@@ -1,0 +1,59 @@
+﻿<Page
+    x:Class="PanoramicDataWin8.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PanoramicDataWin8"
+    xmlns:common="using:PanoramicDataWin8.view.common"
+    xmlns:inq="using:PanoramicData.view.inq"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <DataTemplate x:Name="Foo">
+            <common:AttributeView DataContext="{Binding}" />
+        </DataTemplate>
+    </Page.Resources>
+
+    <Grid Background="{StaticResource backgroundBrush}"  Name="mainGrid">
+        
+        <Canvas x:Name="layoutRoot" Width="Auto" Height="Auto" Visibility="Visible">
+            <inq:InkableScene 
+                        x:Name="inkableScene" 
+                        Width="50000" Height="50000" 
+                        Background="#00000000">
+                <inq:InkableScene.RenderTransform>
+                    <MatrixTransform Matrix="1 0 0 1 -25000 -25000"/>
+                </inq:InkableScene.RenderTransform>
+            </inq:InkableScene>
+        </Canvas>
+
+        <Button Name="addButton" Click="addButton_Click"
+                Margin="10,0,0,0">
+            <Button.Template>
+                <ControlTemplate>
+                    <Grid>
+                        <Rectangle Width="50" Height="50" Fill="{StaticResource lightBrush}"/>
+                        <SymbolIcon Symbol="Add" Foreground="{StaticResource highlightBrush}" Margin="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                </ControlTemplate>
+            </Button.Template>
+        </Button>
+        
+        <Grid Name="attributeGrid" Width="104" HorizontalAlignment="Left" Margin="64,0,0,0" Visibility="Collapsed" >
+            <Canvas Name="attributeCanvas">
+            </Canvas>
+        </Grid>
+        
+    </Grid>
+
+    <Page.BottomAppBar >
+        <CommandBar Name="commandBar" Style="{StaticResource CommandBarStyle1}">
+            <AppBarButton Label="Refresh" Icon="Refresh" Style="{StaticResource AppBarButtonStyle1}"/>
+            <AppBarButton Label="Help" Icon="Help"  Style="{StaticResource AppBarButtonStyle1}"/>
+
+            <CommandBar.SecondaryCommands >
+            </CommandBar.SecondaryCommands>
+        </CommandBar>
+    </Page.BottomAppBar>
+</Page>

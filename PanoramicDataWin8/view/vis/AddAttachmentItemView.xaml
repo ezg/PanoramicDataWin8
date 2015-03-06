@@ -1,0 +1,40 @@
+﻿<UserControl
+    x:Class="PanoramicDataWin8.view.vis.AddAttachmentItemView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PanoramicDataWin8.view.vis"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:model="clr-namespace:PanoramicDataWin8.model.view"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Canvas.Top="{Binding Position.Y}" Canvas.Left="{Binding Position.X}"
+    Width="{Binding Size.X}" Height="{Binding Size.Y}"
+    FontFamily="{StaticResource abel}">
+
+    <d:DesignProperties.DataContext>
+        <model:AddAttachmentItemViewModel>
+            <model:AddAttachmentItemViewModel.Label>asdf</model:AddAttachmentItemViewModel.Label>
+        </model:AddAttachmentItemViewModel>
+    </d:DesignProperties.DataContext>
+
+    <Grid Name="mainGrid" Background="{StaticResource lightBrush}">
+        <!--<Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>-->
+        <Viewbox Margin="2" UseLayoutRounding="False">
+            <TextBlock
+                CacheMode="BitmapCache"
+                Grid.Row="0"
+                VerticalAlignment="Stretch"
+                HorizontalAlignment="Stretch"
+                TextAlignment="Center"  
+                MaxWidth="{Binding Size.X}"
+                Text="{Binding Label}" FontSize="14" Foreground="{StaticResource darkBrush}" TextWrapping="Wrap"/>
+        </Viewbox>
+        <!--<Grid Grid.Row="1">
+            <Rectangle Margin="6" HorizontalAlignment="Center" Height="15" Width="3" Fill="{StaticResource backgroundBrush}"/>
+            <Rectangle Margin="6" HorizontalAlignment="Center" Height="3" Width="15" Fill="{StaticResource backgroundBrush}"/>
+        </Grid>-->
+    </Grid>
+</UserControl>
