@@ -72,32 +72,21 @@ namespace PanoramicDataWin8.view.vis.menu
                 backgroundAnimation.Duration = TimeSpan.FromMilliseconds(300);
                 backgroundAnimation.From = (mainGrid.Background as SolidColorBrush).Color;
 
-                ColorAnimation foregroundAnimation = new ColorAnimation();
-                foregroundAnimation.EasingFunction = easingFunction;
-                foregroundAnimation.Duration = TimeSpan.FromMilliseconds(300);
-                foregroundAnimation.From = (txtBlock.Foreground as SolidColorBrush).Color;
-
                 if (((DataContext as MenuItemViewModel).MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).IsChecked)
                 {
                     backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush).Color;
-                    foregroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush).Color;
+                    txtBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush);
                 }
                 else
                 {
                     backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush).Color;
-                    foregroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush).Color;
+                    txtBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush);
                 }
-
-
                 Storyboard storyboard = new Storyboard();
-
                 storyboard.Children.Add(backgroundAnimation);
                 Storyboard.SetTarget(backgroundAnimation, mainGrid);
                 Storyboard.SetTargetProperty(backgroundAnimation, "(Border.Background).(SolidColorBrush.Color)");
-
-                storyboard.Children.Add(foregroundAnimation);
-                Storyboard.SetTarget(foregroundAnimation, txtBlock);
-                Storyboard.SetTargetProperty(foregroundAnimation, "(TextBlock.Foreground).Color");
+                //Storyboard.SetTargetProperty(foregroundAnimation, "(TextBlock.Foreground).Color");
 
                 storyboard.Begin();
             }

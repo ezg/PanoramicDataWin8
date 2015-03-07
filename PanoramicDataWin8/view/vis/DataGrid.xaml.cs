@@ -30,6 +30,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.view.vis.menu;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -38,7 +39,12 @@ namespace PanoramicDataWin8.view.vis
     public sealed partial class DataGrid : UserControl, AttributeViewModelEventHandler
     {
         private IDisposable _observableDisposable = null;
-        
+
+
+        private MenuViewModel _menuViewModel = null;
+        private MenuView _menuView = null;
+        private AttributeView _menuAttributeView = null;
+
         public ObservableCollection<HeaderObject> HeaderObjects { get; set; }
         public bool CanReorder { get; set; }
         public bool CanResize { get; set; }
@@ -51,6 +57,8 @@ namespace PanoramicDataWin8.view.vis
 
             this.InitializeComponent();
             this.DataContextChanged += DataGrid_DataContextChanged;
+            AttributeView.AttributeViewModelTapped += AttributeView_AttributeViewModelTapped;
+            
             listView.ManipulationMode = ManipulationModes.None;
         }
 
@@ -66,6 +74,7 @@ namespace PanoramicDataWin8.view.vis
                 QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
                 resultModel.PropertyChanged -= QueryResultModel_PropertyChanged;
             }
+            AttributeView.AttributeViewModelTapped -= AttributeView_AttributeViewModelTapped;
         }
 
         ~DataGrid()
@@ -109,6 +118,11 @@ namespace PanoramicDataWin8.view.vis
             {
                 updateSize(null);
             }
+            else if (e.PropertyName == model.GetPropertyName(() => model.Size) ||
+                     e.PropertyName == model.GetPropertyName(() => model.Position))
+            {
+                setMenuViewModelAnkerPosition();
+            }      
         }
 
         void headerObject_Resized(object sender, EventArgs e)
@@ -136,6 +150,7 @@ namespace PanoramicDataWin8.view.vis
                 double ratio = availableWidth / totalHeaderWidth;
                 HeaderObjects.ForEach(ho => ho.Value.Width *= ratio);
             }
+            setMenuViewModelAnkerPosition();
         }
 
         void QueryResultModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -338,6 +353,62 @@ namespace PanoramicDataWin8.view.vis
                 return this.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             }
         }
+        
+        void AttributeView_AttributeViewModelTapped(object sender, EventArgs e)
+        {
+            AttributeViewModel model = (sender as AttributeView).DataContext as AttributeViewModel;
+            bool createNew = true;
+
+            if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
+            {
+                createNew = _menuViewModel.AttributeViewModel != model;
+                Rct bounds = _menuAttributeView.GetBounds(MainViewController.Instance.InkableScene);
+                foreach (var menuItem in _menuViewModel.MenuItemViewModels)
+                {
+                    menuItem.TargetPosition = bounds.TopLeft;
+                }
+                _menuViewModel.IsToBeRemoved = true;
+                _menuViewModel.IsDisplayed = false;
+            }
+
+            if (createNew)
+            {
+                _menuAttributeView = sender as AttributeView;
+                var menuViewModel = model.CreateMenuViewModel(_menuAttributeView.GetBounds(MainViewController.Instance.InkableScene));
+                if (menuViewModel.MenuItemViewModels.Count > 0)
+                {
+                    _menuViewModel = menuViewModel;
+                    _menuView = new MenuView()
+                    {
+                        DataContext = _menuViewModel
+                    };
+                    setMenuViewModelAnkerPosition();
+                    MainViewController.Instance.InkableScene.Add(_menuView);
+                    _menuViewModel.IsDisplayed = true;
+                }
+            }
+        }
+
+        private void setMenuViewModelAnkerPosition()
+        {
+            if (_menuViewModel != null)
+            {
+                if (_menuViewModel.IsToBeRemoved)
+                {
+                    Rct bounds = _menuAttributeView.GetBounds(MainViewController.Instance.InkableScene);
+                    foreach (var menuItem in _menuViewModel.MenuItemViewModels)
+                    {
+                        menuItem.TargetPosition = bounds.TopLeft;
+                    }
+                }
+                else
+                {
+                    Rct bounds = _menuAttributeView.GetBounds(MainViewController.Instance.InkableScene);
+                    _menuViewModel.AnkerPosition = bounds.TopLeft;
+                }
+            }
+        }
+
     }
 
     public class HeaderObject : ExtendedBindableBase

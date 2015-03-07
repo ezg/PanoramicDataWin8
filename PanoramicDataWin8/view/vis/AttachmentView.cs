@@ -24,7 +24,6 @@ namespace PanoramicDataWin8.view.vis
     {
         public static double GAP = 4;
 
-        private Stopwatch _activeStopwatch = new Stopwatch();
         private DispatcherTimer _activeTimer = new DispatcherTimer();
         private bool _isActive = false;
         private Canvas _contentCanvas = new Canvas();
@@ -51,14 +50,14 @@ namespace PanoramicDataWin8.view.vis
 
         void _activeTimer_Tick(object sender, object e)
         {
-            if (_activeStopwatch.Elapsed > TimeSpan.FromSeconds(5))
+            var model = (DataContext as AttachmentViewModel);
+            if (model.ActiveStopwatch.Elapsed > TimeSpan.FromSeconds(5))
             {
                 toggleActive();
-                _activeStopwatch.Reset();
+                model.ActiveStopwatch.Reset();
             }
 
             // animate all elements to target size, position
-            var model = (DataContext as AttachmentViewModel);
             if (model != null)
             {
                 foreach (var header in model.AttachmentHeaderViewModels)
@@ -144,6 +143,7 @@ namespace PanoramicDataWin8.view.vis
 
                 if (_menuViewModel != null)
                 {
+                    _menuViewModel.IsToBeRemoved = true;
                     _menuViewModel.IsDisplayed = false;
                 }
             }
@@ -223,6 +223,7 @@ namespace PanoramicDataWin8.view.vis
         void attachmentView_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             Debug.WriteLine("press");
+            (DataContext as AttachmentViewModel).ActiveStopwatch.Restart();
             AttachmentItemViewModel model = (sender as AttachmentItemView).DataContext as AttachmentItemViewModel;
             displayMenu(model);
             e.Handled = true;
@@ -235,7 +236,7 @@ namespace PanoramicDataWin8.view.vis
             {
                 if (model.IsDisplayed)
                 {
-                    _activeStopwatch.Reset();
+                    model.ActiveStopwatch.Reset();
                 }
                 if (!_isActive && model.IsDisplayed)
                 {
@@ -243,7 +244,7 @@ namespace PanoramicDataWin8.view.vis
                 }
                 if (_isActive && !model.IsDisplayed)
                 {
-                    _activeStopwatch.Restart();
+                    model.ActiveStopwatch.Restart();
                 }
             }
         }
@@ -426,16 +427,15 @@ namespace PanoramicDataWin8.view.vis
             AttachmentViewModel model = (DataContext as AttachmentViewModel);
             bool createNew = true;
 
-            if (_menuViewModel != null)
+            if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
             {
                 createNew = _menuViewModel.AttachmentItemViewModel != itemModel;
                 foreach (var menuItem in _menuViewModel.MenuItemViewModels)
                 {
-                    menuItem.TargetPosition = model.VisualizationViewModel.Bounds.Center;
+                    menuItem.TargetPosition = _menuViewModel.AttachmentItemViewModel.Position;
                 }
                 _menuViewModel.IsToBeRemoved = true;
                 _menuViewModel.IsDisplayed = false;
-                _menuViewModel = null;
             }
 
             if (createNew)
@@ -459,15 +459,25 @@ namespace PanoramicDataWin8.view.vis
         {
             if (_menuViewModel != null)
             {
-                AttachmentViewModel model = (DataContext as AttachmentViewModel);
-
-                if (model.AttachmentOrientation == AttachmentOrientation.Left)
+                if (_menuViewModel.IsToBeRemoved)
                 {
-                    _menuViewModel.AnkerPosition = new Pt(_maxX, _menuViewModel.AttachmentItemViewModel.TargetPosition.Y);
+                    foreach (var menuItem in _menuViewModel.MenuItemViewModels)
+                    {
+                        menuItem.TargetPosition = _menuViewModel.AttachmentItemViewModel.TargetPosition;
+                    }
                 }
-                else if (model.AttachmentOrientation == AttachmentOrientation.Bottom)
+                else
                 {
-                    _menuViewModel.AnkerPosition = new Pt(_menuViewModel.AttachmentItemViewModel.TargetPosition.X, _maxY);
+                    AttachmentViewModel model = (DataContext as AttachmentViewModel);
+
+                    if (model.AttachmentOrientation == AttachmentOrientation.Left)
+                    {
+                        _menuViewModel.AnkerPosition = new Pt(_maxX, _menuViewModel.AttachmentItemViewModel.TargetPosition.Y);
+                    }
+                    else if (model.AttachmentOrientation == AttachmentOrientation.Bottom)
+                    {
+                        _menuViewModel.AnkerPosition = new Pt(_menuViewModel.AttachmentItemViewModel.TargetPosition.X, _maxY);
+                    }
                 }
             }
         }

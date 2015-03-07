@@ -132,6 +132,13 @@ namespace PanoramicDataWin8.model.view
                 this.SetProperty(ref _position, value);
             }
         }
+        public Rct Bounds
+        {
+            get
+            {
+                return new Rct(Position, Size);
+            }
+        }
 
         private string _mainLabel = "";
         public string MainLabel

@@ -24,6 +24,7 @@ using Windows.UI;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
+using System.Diagnostics;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -31,6 +32,9 @@ namespace PanoramicDataWin8.view.common
 {
     public sealed partial class AttributeView : UserControl
     {
+        public delegate void AttributeViewModelTappedHandler(object sender, EventArgs e);
+        public static event AttributeViewModelTappedHandler AttributeViewModelTapped;
+
         private AttributeView _shadow = null;
         private long _manipulationStartTime = 0;
         private Pt _startDrag = new Point(0, 0);
@@ -38,9 +42,6 @@ namespace PanoramicDataWin8.view.common
 
         private PointerManager _mainPointerManager = new PointerManager();
         private Point _mainPointerManagerPreviousPoint = new Point();
-
-        private MenuViewModel _menuViewModel = null;
-        private MenuView _menuView = null;
 
         public AttributeView()
         {
@@ -136,9 +137,10 @@ namespace PanoramicDataWin8.view.common
             if (_shadow == null &&
                 _manipulationStartTime + TimeSpan.FromSeconds(0.5).Ticks > DateTime.Now.Ticks)
             {
-                if ((DataContext as AttributeViewModel).IsMenuEnabled)
+                if ((DataContext as AttributeViewModel).IsMenuEnabled && AttributeViewModelTapped != null)
                 {
-                    DisplayMenu(_mainPointerManagerPreviousPoint);
+                    Debug.WriteLine("--TAPP");
+                    AttributeViewModelTapped(this, new EventArgs());
                 }
             }
 
@@ -194,54 +196,5 @@ namespace PanoramicDataWin8.view.common
                     AttributeViewModelEventArgType.Default);
             }
         }
-        
-        private void DisplayMenu(Point fromInkableScene)
-        {
-            AttributeViewModel model = (DataContext as AttributeViewModel);
-            bool createNew = true;
-
-            if (_menuViewModel != null)
-            {
-                createNew = _menuViewModel.AttributeViewModel != model;
-                foreach (var menuItem in _menuViewModel.MenuItemViewModels)
-                {
-                    menuItem.TargetPosition = model.VisualizationViewModel.Bounds.Center;
-                }
-                _menuViewModel.IsToBeRemoved = true;
-                _menuViewModel.IsDisplayed = false;
-                _menuViewModel = null;
-            }
-
-            if (createNew)
-            {
-                var menuViewModel = model.CreateMenuViewModel();
-                if (menuViewModel.MenuItemViewModels.Count > 0)
-                {
-                    _menuViewModel = menuViewModel;
-                    _menuView = new MenuView()
-                    {
-                        DataContext = _menuViewModel
-                    };
-                    setMenuViewModelAnkerPosition();
-                    MainViewController.Instance.InkableScene.Add(_menuView);
-                    _menuViewModel.IsDisplayed = true;
-                }
-            }
-        }
-
-        private void setMenuViewModelAnkerPosition()
-        {
-            if (_menuViewModel != null)
-            {
-                AttributeViewModel model = (DataContext as AttributeViewModel);
-
-                if (model.AttachmentOrientation == AttachmentOrientation.Top)
-                {
-                    Rct bounds = this.GetBounds(MainViewController.Instance.InkableScene);
-                    _menuViewModel.AnkerPosition = bounds.TopLeft;
-                }
-            }
-        }
-
     }
 }

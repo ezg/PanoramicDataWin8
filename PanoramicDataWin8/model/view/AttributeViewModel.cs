@@ -1,5 +1,6 @@
 ﻿using GeoAPI.Geometries;
 using Microsoft.Practices.Prism.Mvvm;
+using PanoramicData.controller.view;
 using PanoramicData.model.data;
 using PanoramicData.utils;
 using PanoramicDataWin8.model.view;
@@ -241,7 +242,7 @@ namespace PanoramicData.model.view
             }
         }
 
-        public MenuViewModel CreateMenuViewModel()
+        public MenuViewModel CreateMenuViewModel(Rct bounds)
         {
             MenuViewModel menuViewModel = new MenuViewModel()
             {
@@ -249,22 +250,55 @@ namespace PanoramicData.model.view
                 AttachmentOrientation = this.AttachmentOrientation
             };
             MenuItemViewModel menuItem = null;
-            menuViewModel.NrRows = 1;
+            menuViewModel.NrRows = 3;
 
-
+            // Sort None
+            menuItem = new MenuItemViewModel()
+            {
+                MenuViewModel = menuViewModel,
+                Row = 0,
+                Size = new Vec(50, 32),
+                TargetSize = new Vec(50, 32)
+            };
+            menuItem.Position = bounds.TopLeft;
+            ToggleMenuItemComponentViewModel toggle1 = new ToggleMenuItemComponentViewModel()
+            {
+                Label = "None",
+                IsChecked = _attributeOperationModel.SortMode == SortMode.None
+            };
+            menuItem.MenuItemComponentViewModel = toggle1;
+            menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
+            {
+                var model = (sender as ToggleMenuItemComponentViewModel);
+                if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                {
+                    if (model.IsChecked)
+                    {
+                        _attributeOperationModel.SortMode = SortMode.None;
+                        foreach (var tg in model.OtherToggles)
+                        {
+                            tg.IsChecked = false;
+                        }
+                    }
+                }
+            };
+            menuViewModel.MenuItemViewModels.Add(menuItem);
 
             // Sort Asc
             menuItem = new MenuItemViewModel()
             {
-                Row = 0
+                MenuViewModel = menuViewModel,
+                Row = 1,
+                Size = new Vec(50, 32),
+                TargetSize = new Vec(50, 32)
             };
-            menuItem.Position = this.VisualizationViewModel.Bounds.Center;
-            ToggleMenuItemComponentViewModel toggle1 = new ToggleMenuItemComponentViewModel()
+            menuItem.Position = bounds.TopLeft;
+            ToggleMenuItemComponentViewModel toggle2 = new ToggleMenuItemComponentViewModel()
             {
                 Label = "asc",
                 IsChecked = _attributeOperationModel.SortMode == SortMode.Asc
             };
-            menuItem.MenuItemComponentViewModel = toggle1;
+            menuItem.MenuItemComponentViewModel = toggle2;
             menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
             {
                 var model = (sender as ToggleMenuItemComponentViewModel);
@@ -282,18 +316,21 @@ namespace PanoramicData.model.view
             };
             menuViewModel.MenuItemViewModels.Add(menuItem);
 
-            // Binned
+            // Sort Desc
             menuItem = new MenuItemViewModel()
             {
-                Row = 0
+                MenuViewModel = menuViewModel,
+                Row = 2,
+                Size = new Vec(50, 32),
+                TargetSize = new Vec(50, 32)
             };
-            menuItem.Position = this.VisualizationViewModel.Bounds.Center;
-            ToggleMenuItemComponentViewModel toggle2 = new ToggleMenuItemComponentViewModel()
+            menuItem.Position = bounds.TopLeft;
+            ToggleMenuItemComponentViewModel toggle3 = new ToggleMenuItemComponentViewModel()
             {
                 Label = "desc",
                 IsChecked = _attributeOperationModel.SortMode == SortMode.Desc
             };
-            menuItem.MenuItemComponentViewModel = toggle2;
+            menuItem.MenuItemComponentViewModel = toggle3;
             menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
             {
                 var model = (sender as ToggleMenuItemComponentViewModel);
@@ -311,9 +348,10 @@ namespace PanoramicData.model.view
             };
             menuViewModel.MenuItemViewModels.Add(menuItem);
 
-            // set toogle groups
-            toggle1.OtherToggles.Add(toggle2);
-            toggle2.OtherToggles.Add(toggle1);
+            // sort toogle groups
+            toggle1.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle2, toggle3 });
+            toggle2.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle1, toggle3 });
+            toggle3.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle1, toggle2 });
 
 
             if (_attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT ||

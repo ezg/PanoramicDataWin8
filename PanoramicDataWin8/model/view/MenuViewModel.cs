@@ -94,6 +94,20 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private AttachmentViewModel _attachmentViewModel = null;
+        public AttachmentViewModel AttachmentViewModel
+        {
+            get
+            {
+                return _attachmentViewModel;
+            }
+            set
+            {
+                this.SetProperty(ref _attachmentViewModel, value);
+            }
+        }
+
+
         private AttachmentItemViewModel _attachmentItemViewModel = null;
         public AttachmentItemViewModel AttachmentItemViewModel
         {

@@ -221,6 +221,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 else if (model.AttachmentOrientation == AttachmentOrientation.Top)
                 {
                     double currentY = (model.AnkerPosition.Y - GAP) - model.MenuItemViewModels.GroupBy(mi => mi.Row).Sum(g => g.Max(mi => mi.Size.Y));
+                    currentY -= (model.NrRows - 1) * GAP;
                     for (int row = 0; row < model.NrRows; row++)
                     {
                         double currentX = model.AnkerPosition.X;

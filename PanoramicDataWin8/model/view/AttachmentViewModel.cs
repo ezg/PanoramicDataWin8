@@ -4,6 +4,7 @@ using PanoramicData.utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -73,10 +74,24 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private Stopwatch _activeStopwatch = new Stopwatch();
+        public Stopwatch ActiveStopwatch
+        {
+            get
+            {
+                return _activeStopwatch;
+            }
+            set
+            {
+                this.SetProperty(ref _activeStopwatch, value);
+            }
+        }
+
         public MenuViewModel CreateMenuViewModel(AttachmentItemViewModel attachmentItemViewModel)
         {
             MenuViewModel menuViewModel = new MenuViewModel()
             {
+                AttachmentViewModel = this,
                 AttachmentItemViewModel = attachmentItemViewModel,
                 AttachmentOrientation = this.AttachmentOrientation
             };
@@ -93,9 +108,10 @@ namespace PanoramicDataWin8.model.view
                     // Distinct
                     MenuItemViewModel menuItem = new MenuItemViewModel()
                     {
+                        MenuViewModel = menuViewModel,
                         Row = 0
                     };
-                    menuItem.Position = this.VisualizationViewModel.Bounds.Center;
+                    menuItem.Position = attachmentItemViewModel.Position;
                     ToggleMenuItemComponentViewModel toggle1 = new ToggleMenuItemComponentViewModel()
                     {
                         Label = "distinct",
@@ -126,9 +142,10 @@ namespace PanoramicDataWin8.model.view
                     // Binned
                     menuItem = new MenuItemViewModel()
                     {
+                        MenuViewModel = menuViewModel,
                         Row = 0
                     };
-                    menuItem.Position = this.VisualizationViewModel.Bounds.Center;
+                    menuItem.Position = attachmentItemViewModel.Position;
                     ToggleMenuItemComponentViewModel toggle2 = new ToggleMenuItemComponentViewModel()
                     {
                         Label = "binned",
@@ -163,11 +180,12 @@ namespace PanoramicDataWin8.model.view
                     // Bin size slider
                     menuItem = new MenuItemViewModel()
                     {
+                        MenuViewModel = menuViewModel,
                         Row = 1,
                         Size = new Vec(104, 50),
                         TargetSize = new Vec(104, 50)
                     };
-                    menuItem.Position = this.VisualizationViewModel.Bounds.Center;
+                    menuItem.Position = attachmentItemViewModel.Position;
                     menuItem.MenuItemComponentViewModel = new SliderMenuItemComponentViewModel()
                     {
                         Label = "bin size",

@@ -30,6 +30,7 @@
                 <TextBlock
                     Name="txtBlock"
                     Grid.Row="0"
+                    CacheMode="BitmapCache"
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch"
                     TextAlignment="Center"  

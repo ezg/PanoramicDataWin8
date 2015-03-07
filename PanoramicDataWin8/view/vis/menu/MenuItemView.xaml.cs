@@ -31,6 +31,7 @@ namespace PanoramicDataWin8.view.vis.menu
             if (args.NewValue != null)
             {
                 (args.NewValue as MenuItemViewModel).PropertyChanged += MenuItemView_PropertyChanged;
+                (args.NewValue as MenuItemViewModel).MenuItemComponentViewModel.PropertyChanged += MenuItemComponentViewModel_PropertyChanged;
                 updateRendering();
             }
         }
@@ -41,6 +42,16 @@ namespace PanoramicDataWin8.view.vis.menu
             if (e.PropertyName == model.GetPropertyName(() => model.MenuItemComponentViewModel))
             {
                 updateRendering();
+                model.MenuItemComponentViewModel.PropertyChanged += MenuItemComponentViewModel_PropertyChanged;
+            }
+        }
+
+        void MenuItemComponentViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            MenuItemViewModel model = (DataContext as MenuItemViewModel);
+            if (model.MenuViewModel.AttachmentViewModel != null)
+            {
+                model.MenuViewModel.AttachmentViewModel.ActiveStopwatch.Restart();
             }
         }
 
