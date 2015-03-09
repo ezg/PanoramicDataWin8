@@ -69,6 +69,19 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private int _column = 0;
+        public int Column
+        {
+            get
+            {
+                return _column;
+            }
+            set
+            {
+                this.SetProperty(ref _column, value);
+            }
+        }
+
         private Vec _preferedSize = new Vec(50, 50);
         public Vec PreferedSize
         {

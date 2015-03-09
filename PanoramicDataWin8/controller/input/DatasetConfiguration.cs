@@ -26,6 +26,19 @@ namespace PanoramicData.controller.input
             }
         }
 
+        private string _endPoint;
+        public string EndPoint
+        {
+            get
+            {
+                return _endPoint;
+            }
+            set
+            {
+                this.SetProperty(ref _endPoint, value);
+            }
+        }
+
         private string _schema;
         public string Schema
         {
@@ -112,6 +125,10 @@ namespace PanoramicData.controller.input
                     else if (parts[0] == "DataFile")
                     {
                         config.DataFile = parts[1].Trim();
+                    }
+                    else if (parts[0] == "EndPoint")
+                    {
+                        config.EndPoint = parts[1].Trim();
                     }
                 }
 

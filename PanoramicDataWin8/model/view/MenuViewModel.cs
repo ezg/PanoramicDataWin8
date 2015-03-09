@@ -55,6 +55,19 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private int _nrColumns = 0;
+        public int NrColumns
+        {
+            get
+            {
+                return _nrColumns;
+            }
+            set
+            {
+                this.SetProperty(ref _nrColumns, value);
+            }
+        }
+
         private int _nrRows = 0;
         public int NrRows
         {

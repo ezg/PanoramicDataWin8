@@ -251,12 +251,14 @@ namespace PanoramicData.model.view
             };
             MenuItemViewModel menuItem = null;
             menuViewModel.NrRows = 3;
+            menuViewModel.NrColumns = 4;
 
             // Sort None
             menuItem = new MenuItemViewModel()
             {
                 MenuViewModel = menuViewModel,
                 Row = 0,
+                Column = 0,
                 Size = new Vec(50, 32),
                 TargetSize = new Vec(50, 32)
             };
@@ -289,6 +291,7 @@ namespace PanoramicData.model.view
             {
                 MenuViewModel = menuViewModel,
                 Row = 1,
+                Column = 0,
                 Size = new Vec(50, 32),
                 TargetSize = new Vec(50, 32)
             };
@@ -321,6 +324,7 @@ namespace PanoramicData.model.view
             {
                 MenuViewModel = menuViewModel,
                 Row = 2,
+                Column = 0,
                 Size = new Vec(50, 32),
                 TargetSize = new Vec(50, 32)
             };
@@ -353,10 +357,55 @@ namespace PanoramicData.model.view
             toggle2.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle1, toggle3 });
             toggle3.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle1, toggle2 });
 
-
             if (_attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT ||
                 _attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT)
             {
+                List<ToggleMenuItemComponentViewModel> toggles = new List<ToggleMenuItemComponentViewModel>();
+                List<MenuItemViewModel> items = new List<MenuItemViewModel>();
+
+                int count = 0;
+                foreach (var aggregationFunction in Enum.GetValues(typeof(AggregateFunction)).Cast<AggregateFunction>())
+                {
+                    menuItem = new MenuItemViewModel()
+                    {
+                        MenuViewModel = menuViewModel,
+                        Row = count <= 2 ? 0 : 1,
+                        Column = count % 3 + 1,
+                        Size = new Vec(32, 50),
+                        TargetSize = new Vec(32, 50)
+                    };
+                    menuItem.Position = bounds.TopLeft;
+                    ToggleMenuItemComponentViewModel toggle = new ToggleMenuItemComponentViewModel()
+                    {
+                        Label = aggregationFunction.ToString(),
+                        IsChecked = _attributeOperationModel.AggregateFunction == aggregationFunction
+                    };
+                    toggles.Add(toggle);
+                    menuItem.MenuItemComponentViewModel = toggle;
+                    menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
+                    {
+                        var model = (sender as ToggleMenuItemComponentViewModel);
+                        if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                        {
+                            if (model.IsChecked)
+                            {
+                                _attributeOperationModel.AggregateFunction = aggregationFunction;
+                                foreach (var tg in model.OtherToggles)
+                                {
+                                    tg.IsChecked = false;
+                                }
+                            }
+                        }
+                    };
+                    menuViewModel.MenuItemViewModels.Add(menuItem);
+                    items.Add(menuItem);
+                    count++;
+                }
+
+                foreach (var mi in items)
+                {
+                    (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
+                }
             }
 
 

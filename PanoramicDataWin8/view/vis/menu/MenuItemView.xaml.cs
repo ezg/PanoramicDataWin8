@@ -53,6 +53,11 @@ namespace PanoramicDataWin8.view.vis.menu
             {
                 model.MenuViewModel.AttachmentViewModel.ActiveStopwatch.Restart();
             }
+
+            if (model.MenuViewModel.AttributeViewModel != null)
+            {
+                model.MenuViewModel.AttributeViewModel.VisualizationViewModel.ActiveStopwatch.Restart();
+            }
         }
 
         private void updateRendering()

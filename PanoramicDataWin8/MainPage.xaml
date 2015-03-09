@@ -28,18 +28,29 @@
             </inq:InkableScene>
         </Canvas>
 
-        <Button Name="addButton" Click="addButton_Click"
-                Margin="10,0,0,0">
-            <Button.Template>
-                <ControlTemplate>
-                    <Grid>
-                        <Rectangle Width="50" Height="50" Fill="{StaticResource lightBrush}"/>
-                        <SymbolIcon Symbol="Add" Foreground="{StaticResource highlightBrush}" Margin="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                    </Grid>
-                </ControlTemplate>
-            </Button.Template>
-        </Button>
-        
+        <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10,0,0,0" >
+            <Button Name="addAttributeButton" Click="addAttributeButton_Click" Margin="0,0,0,4">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Grid>
+                            <Rectangle Width="50" Height="50" Fill="{StaticResource lightBrush}"/>
+                            <SymbolIcon Symbol="List" Foreground="{StaticResource highlightBrush}" Margin="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+            <Button Name="addJobButton" Click="addJobButton_Click" Visibility="Collapsed">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Grid>
+                            <Rectangle Width="50" Height="50" Fill="{StaticResource lightBrush}"/>
+                            <SymbolIcon Symbol="Setting" Foreground="{StaticResource highlightBrush}" Margin="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </StackPanel>
         <Grid Name="attributeGrid" Width="104" HorizontalAlignment="Left" Margin="64,0,0,0" Visibility="Collapsed" >
             <Canvas Name="attributeCanvas">
             </Canvas>

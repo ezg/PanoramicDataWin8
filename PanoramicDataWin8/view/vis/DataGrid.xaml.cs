@@ -43,13 +43,14 @@ namespace PanoramicDataWin8.view.vis
 
         private MenuViewModel _menuViewModel = null;
         private MenuView _menuView = null;
-        private AttributeView _menuAttributeView = null;
 
         public ObservableCollection<HeaderObject> HeaderObjects { get; set; }
         public bool CanReorder { get; set; }
         public bool CanResize { get; set; }
         public bool CanDrag { get; set; }
         public bool CanExplore { get; set; }
+
+        private DispatcherTimer _activeTimer = new DispatcherTimer();
 
         public DataGrid()
         {
@@ -59,7 +60,23 @@ namespace PanoramicDataWin8.view.vis
             this.DataContextChanged += DataGrid_DataContextChanged;
             AttributeView.AttributeViewModelTapped += AttributeView_AttributeViewModelTapped;
             
-            listView.ManipulationMode = ManipulationModes.None;
+            listView.ManipulationMode = ManipulationModes.None;            
+            _activeTimer.Interval = TimeSpan.FromMilliseconds(10);
+            _activeTimer.Tick += _activeTimer_Tick;
+            _activeTimer.Start();
+        }
+
+        void _activeTimer_Tick(object sender, object e)
+        {
+            var model = (DataContext as VisualizationViewModel);
+            if (model != null)
+            {
+                if (model.ActiveStopwatch.Elapsed > TimeSpan.FromSeconds(5))
+                {
+                    removeMenu();
+                    model.ActiveStopwatch.Reset();
+                }
+            }
         }
 
         public void Dispose()
@@ -170,6 +187,7 @@ namespace PanoramicDataWin8.view.vis
 
         private void populateTableHeaders()
         {
+            removeMenu();
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
             List<AttributeOperationModel> attributeOperationModels = model.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).ToList();
 
@@ -185,7 +203,8 @@ namespace PanoramicDataWin8.view.vis
                 ho.Width = 100;
                 if (HeaderObjects.Any(hoo => hoo.AttributeViewModel != null && hoo.AttributeViewModel.AttributeOperationModel == ho.AttributeViewModel.AttributeOperationModel))
                 {
-                    ho.Width = HeaderObjects.First(hoo => hoo.AttributeViewModel.AttributeOperationModel == ho.AttributeViewModel.AttributeOperationModel).Width;
+                    var oldHo = HeaderObjects.First(hoo => hoo.AttributeViewModel.AttributeOperationModel == ho.AttributeViewModel.AttributeOperationModel);
+                    ho.Width = oldHo.Width;
                 }
                 headerObjects.Add(ho);
             }
@@ -353,38 +372,56 @@ namespace PanoramicDataWin8.view.vis
                 return this.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             }
         }
+
+        void removeMenu()
+        {
+            
+            if (_menuViewModel != null)
+            {
+                AttributeView attributeView = this.GetDescendantsOfType<AttributeView>().Where(av => av.DataContext == _menuViewModel.AttributeViewModel).FirstOrDefault();
+                if (attributeView != null)
+                {
+                    Rct bounds = attributeView.GetBounds(MainViewController.Instance.InkableScene);
+                    foreach (var menuItem in _menuViewModel.MenuItemViewModels)
+                    {
+                        menuItem.TargetPosition = bounds.TopLeft;
+                    }
+                    _menuViewModel.IsToBeRemoved = true;
+                    _menuViewModel.IsDisplayed = false;
+                }
+            }
+        }
         
         void AttributeView_AttributeViewModelTapped(object sender, EventArgs e)
         {
+            var visModel = (DataContext as VisualizationViewModel);
+            visModel.ActiveStopwatch.Restart();
+
             AttributeViewModel model = (sender as AttributeView).DataContext as AttributeViewModel;
-            bool createNew = true;
-
-            if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
+            if (HeaderObjects.Any(ho => ho.AttributeViewModel == model))
             {
-                createNew = _menuViewModel.AttributeViewModel != model;
-                Rct bounds = _menuAttributeView.GetBounds(MainViewController.Instance.InkableScene);
-                foreach (var menuItem in _menuViewModel.MenuItemViewModels)
+                bool createNew = true;
+                if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
                 {
-                    menuItem.TargetPosition = bounds.TopLeft;
+                    createNew = _menuViewModel.AttributeViewModel != model;
+                    removeMenu();
                 }
-                _menuViewModel.IsToBeRemoved = true;
-                _menuViewModel.IsDisplayed = false;
-            }
 
-            if (createNew)
-            {
-                _menuAttributeView = sender as AttributeView;
-                var menuViewModel = model.CreateMenuViewModel(_menuAttributeView.GetBounds(MainViewController.Instance.InkableScene));
-                if (menuViewModel.MenuItemViewModels.Count > 0)
+                if (createNew)
                 {
-                    _menuViewModel = menuViewModel;
-                    _menuView = new MenuView()
+                    AttributeView attributeView = sender as AttributeView;
+                    var menuViewModel = model.CreateMenuViewModel(attributeView.GetBounds(MainViewController.Instance.InkableScene));
+                    if (menuViewModel.MenuItemViewModels.Count > 0)
                     {
-                        DataContext = _menuViewModel
-                    };
-                    setMenuViewModelAnkerPosition();
-                    MainViewController.Instance.InkableScene.Add(_menuView);
-                    _menuViewModel.IsDisplayed = true;
+                        _menuViewModel = menuViewModel;
+                        _menuView = new MenuView()
+                        {
+                            DataContext = _menuViewModel
+                        };
+                        setMenuViewModelAnkerPosition();
+                        MainViewController.Instance.InkableScene.Add(_menuView);
+                        _menuViewModel.IsDisplayed = true;
+                    }
                 }
             }
         }
@@ -393,18 +430,23 @@ namespace PanoramicDataWin8.view.vis
         {
             if (_menuViewModel != null)
             {
-                if (_menuViewModel.IsToBeRemoved)
+                AttributeView attributeView = this.GetDescendantsOfType<AttributeView>().Where(av => av.DataContext == _menuViewModel.AttributeViewModel).FirstOrDefault();
+
+                if (attributeView != null)
                 {
-                    Rct bounds = _menuAttributeView.GetBounds(MainViewController.Instance.InkableScene);
-                    foreach (var menuItem in _menuViewModel.MenuItemViewModels)
+                    if (_menuViewModel.IsToBeRemoved)
                     {
-                        menuItem.TargetPosition = bounds.TopLeft;
+                        Rct bounds = attributeView.GetBounds(MainViewController.Instance.InkableScene);
+                        foreach (var menuItem in _menuViewModel.MenuItemViewModels)
+                        {
+                            menuItem.TargetPosition = bounds.TopLeft;
+                        }
                     }
-                }
-                else
-                {
-                    Rct bounds = _menuAttributeView.GetBounds(MainViewController.Instance.InkableScene);
-                    _menuViewModel.AnkerPosition = bounds.TopLeft;
+                    else
+                    {
+                        Rct bounds = attributeView.GetBounds(MainViewController.Instance.InkableScene);
+                        _menuViewModel.AnkerPosition = bounds.TopLeft;
+                    }
                 }
             }
         }

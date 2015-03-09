@@ -11,6 +11,7 @@ using System.Windows;
 using Windows.UI.Xaml.Media;
 using Windows.UI;
 using PanoramicDataWin8.model.view;
+using System.Diagnostics;
 
 namespace PanoramicData.model.view
 {
@@ -53,6 +54,19 @@ namespace PanoramicData.model.view
         {
             _queryModel = new QueryModel(schemaModel);
             selectColor();
+        }
+
+        private Stopwatch _activeStopwatch = new Stopwatch();
+        public Stopwatch ActiveStopwatch
+        {
+            get
+            {
+                return _activeStopwatch;
+            }
+            set
+            {
+                this.SetProperty(ref _activeStopwatch, value);
+            }
         }
 
         private QueryModel _queryModel = null;

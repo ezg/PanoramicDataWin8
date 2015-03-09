@@ -26,6 +26,7 @@ using MathNet.Numerics.LinearAlgebra;
 using PanoramicDataWin8.view;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.utils;
+using PanoramicData.model.data.sim;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -51,7 +52,7 @@ namespace PanoramicDataWin8
         {
             Button button = (e.OriginalSource as FrameworkElement).GetFirstAncestorOfType<Button>();
             var ancestors = (e.OriginalSource as FrameworkElement).GetAncestors();
-            if (!ancestors.Contains(addButton) && !ancestors.Contains(attributeGrid))
+            if (!ancestors.Contains(addAttributeButton) && !ancestors.Contains(attributeGrid))
             {
                 attributeGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             }
@@ -61,7 +62,24 @@ namespace PanoramicDataWin8
         {
             if (args.NewValue != null)
             {
+                (args.NewValue as MainModel).PropertyChanged += MainPage_PropertyChanged;
                 (args.NewValue as MainModel).DatasetConfigurations.CollectionChanged += DatasetConfigurations_CollectionChanged;
+            }
+        }
+
+        void MainPage_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var model = DataContext as MainModel;
+            if (model.SchemaModel != null)
+            {
+                if (model.SchemaModel != null && model.SchemaModel is TuppleWareSchemaModel)
+                {
+                    addJobButton.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    addJobButton.Visibility = Visibility.Collapsed;
+                }
             }
         }
 
@@ -137,10 +155,49 @@ namespace PanoramicDataWin8
         {
         }
 
-        private void addButton_Click(object sender, RoutedEventArgs e)
+        private void addJobButton_Click(object sender, RoutedEventArgs e)
         {
             MainModel mainModel = (DataContext as MainModel);
-            var buttonBounds = addButton.GetBounds(this);
+            var buttonBounds = addJobButton.GetBounds(this);
+            var jobTypes = Enum.GetValues(typeof(JobType)).Cast<JobType>().Where(jt => jt != JobType.DB).ToList();
+
+            attributeCanvas.Children.Clear();
+            double perColumn = Math.Ceiling(jobTypes.Count / 2.0);
+            double height = perColumn * 50 + (perColumn - 1) * 4;
+            double startY = buttonBounds.Center.Y - height / 2.0;
+
+            int countPerColumn = 0;
+            int column = 0;
+            foreach (var jobType in jobTypes)
+            {
+                JobTypeViewModel jobTypeViewModel = new JobTypeViewModel()
+                {
+                    JobType = jobType
+                };
+                JobTypeView jobTypeView = new JobTypeView();
+                jobTypeView.DataContext = jobTypeViewModel;
+                attributeCanvas.Children.Add(jobTypeView);
+                jobTypeView.RenderTransform = new TranslateTransform()
+                {
+                    X = column * 54,
+                    Y = startY + countPerColumn * 54
+                };
+
+                countPerColumn++;
+                if (countPerColumn >= perColumn)
+                {
+                    column++;
+                    countPerColumn = 0;
+                }
+            }
+
+            attributeGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+        }
+
+        private void addAttributeButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainModel mainModel = (DataContext as MainModel);
+            var buttonBounds = addAttributeButton.GetBounds(this);
             var attributeModels = mainModel.SchemaModel.OriginModels.First().AttributeModels;
 
             attributeCanvas.Children.Clear();

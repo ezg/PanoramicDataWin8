@@ -116,6 +116,7 @@
     <Compile Include="controller\data\IItemsProvider.cs" />
     <Compile Include="controller\data\QueryExecuter.cs" />
     <Compile Include="controller\data\sim\SimQueryExecuter.cs" />
+    <Compile Include="controller\data\tuppleware\TuppleWareQueryExecuter.cs" />
     <Compile Include="controller\data\VirtualizingCollection.cs" />
     <Compile Include="controller\input\DatasetConfiguration.cs" />
     <Compile Include="controller\view\MainViewController.cs" />
@@ -140,8 +141,12 @@
     <Compile Include="model\data\sim\SimAttributeModel.cs" />
     <Compile Include="model\data\sim\SimOriginModel.cs" />
     <Compile Include="model\data\sim\SimSchemaModel.cs" />
+    <Compile Include="model\data\tuppleware\TuppleWareAttributeModel.cs" />
+    <Compile Include="model\data\tuppleware\TuppleWareOriginModel.cs" />
+    <Compile Include="model\data\tuppleware\TuppleWareSchemaModel.cs" />
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
+    <Compile Include="model\view\JobTypeViewModel.cs" />
     <Compile Include="model\view\MenuViewModel.cs" />
     <Compile Include="model\view\MenuItemViewModel.cs" />
     <Compile Include="model\view\AttachmentItemViewModel.cs" />
@@ -165,6 +170,9 @@
     <Compile Include="utils\PointerManager.cs" />
     <Compile Include="utils\SimpleValueConverter.cs" />
     <Compile Include="utils\VisualTreeHelperExtensions.cs" />
+    <Compile Include="view\common\JobTypeView.xaml.cs">
+      <DependentUpon>JobTypeView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\common\DataGridCell.xaml.cs">
       <DependentUpon>DataGridCell.xaml</DependentUpon>
     </Compile>
@@ -247,6 +255,9 @@
     <Content Include="Assets\font\Lato-Bold.ttf" />
     <Content Include="Assets\font\Lato-Thin.ttf" />
     <Content Include="Assets\font\Abel-Regular.ttf" />
+    <Content Include="Assets\data\config\tuppleware_test.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="PanoramicDataWin8_TemporaryKey.pfx" />
   </ItemGroup>
@@ -270,6 +281,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="MainPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="view\common\JobTypeView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

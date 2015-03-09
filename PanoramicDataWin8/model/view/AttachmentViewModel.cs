@@ -256,6 +256,8 @@ namespace PanoramicDataWin8.model.view
                 header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
                 {
                     AttachmentHeaderViewModel = header,
+                    //Size = new Vec(25,25),
+                    //TargetSize = new Vec(25, 25),
                     Label = "group"
                 };
 

@@ -24,52 +24,11 @@ namespace PanoramicData.controller.data.sim
     {
         public override void ExecuteQuery(QueryModel queryModel)
         {
-            ITraceWriter traceWriter = new MemoryTraceWriter();
-
-            string serializedQueryModel = JsonConvert.SerializeObject(queryModel, Formatting.Indented, new JsonSerializerSettings()
-            {
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-                TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto
-            });
-
-            //Debug.WriteLine("");
-            //Debug.WriteLine(traceWriter);
-
-            traceWriter = new MemoryTraceWriter();
-            QueryModel deserializedQueryModel = null;
-            deserializedQueryModel = JsonConvert.DeserializeObject<QueryModel>(serializedQueryModel, new JsonSerializerSettings()
-            {
-                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-                TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto
-            });
-
-            IItemsProvider<QueryResultItemModel> itemsProvider = new SimItemsProvider(deserializedQueryModel, (queryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data);
+            IItemsProvider<QueryResultItemModel> itemsProvider = new SimItemsProvider(queryModel.Clone(), (queryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data);
             AsyncVirtualizingCollection<QueryResultItemModel> dataValues = new AsyncVirtualizingCollection<QueryResultItemModel>(itemsProvider, 
                 queryModel.VisualizationType == VisualizationType.Table ? 1000 : (queryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data.Count + 1,  // page size
                 1000);
             queryModel.QueryResultModel.QueryResultItemModels = dataValues;
-        }
-
-        public static T Deserialize<T>(string json)
-        {
-            var _Bytes = Encoding.Unicode.GetBytes(json);
-            using (MemoryStream _Stream = new MemoryStream(_Bytes))
-            {
-                var _Serializer = new DataContractJsonSerializer(typeof(T));
-                return (T)_Serializer.ReadObject(_Stream);
-            }
-        }
-
-        public static string Serialize(object instance)
-        {
-            using (MemoryStream _Stream = new MemoryStream())
-            {
-                var _Serializer = new DataContractJsonSerializer(instance.GetType());
-                _Serializer.WriteObject(_Stream, instance);
-                _Stream.Position = 0;
-                using (StreamReader _Reader = new StreamReader(_Stream))
-                { return _Reader.ReadToEnd(); }
-            }
         }
     }
 
@@ -77,8 +36,6 @@ namespace PanoramicData.controller.data.sim
     {
         private QueryModel _queryModel = null;
         private int _fetchCount = -1;
-        private QueryModel deserializedQueryModel;
-        private SimOriginModel simOriginModel;
         private List<Dictionary<AttributeModel, object>> _data = null;
 
         public SimItemsProvider(QueryModel queryModel)
@@ -105,7 +62,7 @@ namespace PanoramicData.controller.data.sim
             Debug.WriteLine("Start Get Page : " + startIndex + " " + pageCount);
             //System.Threading.Tasks.Task.Delay(500).Wait();
 
-            IList<QueryResultItemModel> returnList = returnList = QueryEngine.ComputeQueryResult(_queryModel, _data).Skip(startIndex).Take(pageCount).ToList();
+            IList<QueryResultItemModel> returnList = QueryEngine.ComputeQueryResult(_queryModel, _data).Skip(startIndex).Take(pageCount).ToList();
 
             // reset selections
             foreach (var queryResultItemModel in returnList)

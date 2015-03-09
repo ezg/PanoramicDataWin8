@@ -30,12 +30,9 @@ using System.Diagnostics;
 
 namespace PanoramicDataWin8.view.common
 {
-    public sealed partial class AttributeView : UserControl
+    public sealed partial class JobTypeView : UserControl
     {
-        public delegate void AttributeViewModelTappedHandler(object sender, EventArgs e);
-        public static event AttributeViewModelTappedHandler AttributeViewModelTapped;
-
-        private AttributeView _shadow = null;
+        private JobTypeView _shadow = null;
         private long _manipulationStartTime = 0;
         private Pt _startDrag = new Point(0, 0);
         private Pt _currentFromInkableScene = new Point(0, 0);
@@ -43,10 +40,10 @@ namespace PanoramicDataWin8.view.common
         private PointerManager _mainPointerManager = new PointerManager();
         private Point _mainPointerManagerPreviousPoint = new Point();
 
-        public AttributeView()
+        public JobTypeView()
         {
             this.InitializeComponent();
-            this.DataContextChanged += AttributeView_DataContextChanged;
+            this.DataContextChanged += JobTypeView_DataContextChanged;
 
             _mainPointerManager.Added += mainPointerManager_Added;
             _mainPointerManager.Moved += mainPointerManager_Moved;
@@ -54,23 +51,23 @@ namespace PanoramicDataWin8.view.common
             _mainPointerManager.Attach(this);
         }
 
-        void AttributeView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        void JobTypeView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (args.NewValue != null && args.NewValue is AttributeViewModel)
+            if (args.NewValue != null && args.NewValue is JobTypeViewModel)
             {
-                (args.NewValue as AttributeViewModel).PropertyChanged += AttributeView_PropertyChanged;
+                (args.NewValue as JobTypeViewModel).PropertyChanged += JobTypeViewModel_PropertyChanged;
                 updateRendering();
             }
         }
 
-        void AttributeView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void JobTypeViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             updateRendering();
         }
 
         void updateRendering()
         {
-            AttributeViewModel model = DataContext as AttributeViewModel;
+            JobTypeViewModel model = DataContext as JobTypeViewModel;
 
             if (model.IsShadow)
             {
@@ -121,9 +118,7 @@ namespace PanoramicDataWin8.view.common
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        (DataContext as AttributeViewModel).FireMoved(bounds,
-                            new AttributeOperationModel((DataContext as AttributeViewModel).AttributeOperationModel.AttributeModel),
-                            AttributeViewModelEventArgType.Default);
+                        (DataContext as JobTypeViewModel).FireMoved(bounds);
                     }
                 }
 
@@ -137,11 +132,7 @@ namespace PanoramicDataWin8.view.common
             if (_shadow == null &&
                 _manipulationStartTime + TimeSpan.FromSeconds(0.5).Ticks > DateTime.Now.Ticks)
             {
-                if ((DataContext as AttributeViewModel).IsMenuEnabled && AttributeViewModelTapped != null)
-                {
-                    Debug.WriteLine("--TAPP");
-                    AttributeViewModelTapped(this, new EventArgs());
-                }
+                // tapp
             }
 
             if (_shadow != null)
@@ -149,8 +140,7 @@ namespace PanoramicDataWin8.view.common
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as AttributeViewModel).FireDropped(bounds, AttributeViewModelEventArgType.Default,
-                    new AttributeOperationModel((DataContext as AttributeViewModel).AttributeOperationModel.AttributeModel));
+                (DataContext as JobTypeViewModel).FireDropped(bounds);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -162,23 +152,22 @@ namespace PanoramicDataWin8.view.common
         public void createShadow(Point fromInkableScene)
         {
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
-            if (inkableScene != null && DataContext != null && (DataContext as AttributeViewModel).AttributeOperationModel != null)
+            if (inkableScene != null && DataContext != null)
             {
                 _currentFromInkableScene = fromInkableScene;
-                _shadow = new AttributeView();
-                _shadow.DataContext = new AttributeViewModel(null, (DataContext as AttributeViewModel).AttributeOperationModel)
+                _shadow = new JobTypeView();
+                _shadow.DataContext = new JobTypeViewModel()
                 {
-                    IsNoChrome = false,
-                    IsMenuEnabled = true,
+                    JobType = (DataContext as JobTypeViewModel).JobType,
                     IsShadow = true
                 };
+
 
                 _shadow.Measure(new Size(double.PositiveInfinity,
                                          double.PositiveInfinity));
 
-                double add = (DataContext as AttributeViewModel).IsNoChrome ? 30 : 0;
-                //_shadow.Width = this.ActualWidth + add;
-                //_shadow.Height = _shadow.DesiredSize.Height;
+                _shadow.Width = this.ActualWidth;
+                _shadow.Height = _shadow.DesiredSize.Height;
 
                 _shadow.RenderTransform = new TranslateTransform()
                 {
@@ -191,9 +180,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow.SendToFront();
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as AttributeViewModel).FireMoved(bounds,
-                    new AttributeOperationModel((DataContext as AttributeViewModel).AttributeOperationModel.AttributeModel),
-                    AttributeViewModelEventArgType.Default);
+                (DataContext as JobTypeViewModel).FireMoved(bounds);
             }
         }
     }

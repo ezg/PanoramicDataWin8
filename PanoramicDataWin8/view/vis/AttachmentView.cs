@@ -51,7 +51,7 @@ namespace PanoramicDataWin8.view.vis
         void _activeTimer_Tick(object sender, object e)
         {
             var model = (DataContext as AttachmentViewModel);
-            if (model.ActiveStopwatch.Elapsed > TimeSpan.FromSeconds(5))
+            if (model.ActiveStopwatch.Elapsed > TimeSpan.FromSeconds(2.5))
             {
                 toggleActive();
                 model.ActiveStopwatch.Reset();

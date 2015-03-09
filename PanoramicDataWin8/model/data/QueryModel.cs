@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using PanoramicData.model.view;
 using PanoramicData.model.view;
 using PanoramicData.utils;
@@ -22,6 +23,29 @@ namespace PanoramicData.model.data
         public QueryModel()
             : this(null)
         {
+        }
+
+        public QueryModel Clone()
+        {
+            ITraceWriter traceWriter = new MemoryTraceWriter();
+
+            string serializedQueryModel = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings()
+            {
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto
+            });
+
+            //Debug.WriteLine("");
+            //Debug.WriteLine(traceWriter);
+
+            traceWriter = new MemoryTraceWriter();
+            QueryModel deserializedQueryModel = null;
+            deserializedQueryModel = JsonConvert.DeserializeObject<QueryModel>(serializedQueryModel, new JsonSerializerSettings()
+            {
+                PreserveReferencesHandling = PreserveReferencesHandling.Objects,
+                TypeNameHandling = Newtonsoft.Json.TypeNameHandling.Auto
+            });
+            return deserializedQueryModel;
         }
 
         public QueryModel(SchemaModel schemaModel)
@@ -151,6 +175,19 @@ namespace PanoramicData.model.data
             set
             {
                 this.SetProperty(ref _visualizationType, value);
+            }
+        }
+
+        private JobType _jobType;
+        public JobType JobType
+        {
+            get
+            {
+                return _jobType;
+            }
+            set
+            {
+                this.SetProperty(ref _jobType, value);
             }
         }
 
@@ -383,4 +420,6 @@ namespace PanoramicData.model.data
     public enum QueryModelUpdatedEventType { Structure, Links, FilterModels }
     
     public enum VisualizationType { Table, Bar, Map, Plot, Line }
+
+    public enum JobType { DB, Kmeans }
 }

@@ -220,20 +220,22 @@ namespace PanoramicDataWin8.view.vis.menu
                 }
                 else if (model.AttachmentOrientation == AttachmentOrientation.Top)
                 {
-                    double currentY = (model.AnkerPosition.Y - GAP) - model.MenuItemViewModels.GroupBy(mi => mi.Row).Sum(g => g.Max(mi => mi.Size.Y));
-                    currentY -= (model.NrRows - 1) * GAP;
-                    for (int row = 0; row < model.NrRows; row++)
+                    for (int col = 0; col < model.NrColumns; col++)
                     {
-                        double currentX = model.AnkerPosition.X;
-                        var rowItems = model.MenuItemViewModels.Where(mi => mi.Row == row);
-
-                        foreach (var menuItemModel in rowItems)
+                        for (int row = 0; row < model.NrRows; row++)
                         {
-                            menuItemModel.TargetPosition = new Pt(currentX, currentY);
-                            currentX += menuItemModel.Size.X + GAP;
-                        }
+                            var itemsInRow = model.MenuItemViewModels.Where(mi => mi.Row < row && mi.Column == col).ToList();
+                            double currentY = (model.AnkerPosition.Y - GAP) - itemsInRow.Sum(mi => mi.Size.Y) - Math.Max(itemsInRow.Count(), 0) * GAP;
 
-                        currentY += rowItems.Max(mi => mi.Size.Y) + GAP;
+                            var itemsInCols = model.MenuItemViewModels.Where(mi => mi.Column < col && mi.Row == row).ToList();
+                            double currentX = model.AnkerPosition.X + itemsInCols.Sum(mi => mi.Size.X) + Math.Max(itemsInCols.Count(), 0) * GAP; ;
+
+                            var rowItem = model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
+                            if (rowItem != null)
+                            {
+                                rowItem.TargetPosition = new Pt(currentX, currentY - rowItem.Size.Y);
+                            }
+                        }
                     }
                 }
             }

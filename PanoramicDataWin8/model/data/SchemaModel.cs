@@ -24,6 +24,7 @@ namespace PanoramicData.model.data
         {
             get;
         }
+
         public abstract QueryExecuter QueryExecuter
         {
             get;

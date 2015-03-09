@@ -44,6 +44,10 @@ namespace PanoramicData.controller.view
             
             AttributeViewModel.AttributeViewModelDropped += AttributeViewModelDropped;
             AttributeViewModel.AttributeViewModelMoved += AttributeViewModelMoved;
+
+            JobTypeViewModel.JobTypeViewModelDropped += JobTypeViewModelDropped;
+            JobTypeViewModel.JobTypeViewModelMoved += JobTypeViewModelMoved;
+
             _root.InkCollectedEvent += root_InkCollectedEvent;
             VisualizationViewModels.CollectionChanged += VisualizationViewModels_CollectionChanged;
 
@@ -63,7 +67,7 @@ namespace PanoramicData.controller.view
                 var content = await Windows.Storage.FileIO.ReadTextAsync(file);
                 _mainModel.DatasetConfigurations.Add(DatasetConfiguration.FromContent(content, file.Name));
             }
-            LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("small")).First());
+            LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("tuppleware")).First());
             //LoadData(_mainModel.DatasetConfigurations.First());
         }
 
@@ -127,22 +131,43 @@ namespace PanoramicData.controller.view
 
         public void LoadData(DatasetConfiguration datasetConfiguration)
         {
-            if (datasetConfiguration.Backend == "MSSQL")
+            if (datasetConfiguration.Backend.ToLower() == "mssql")
             {
                 _mainModel.SchemaModel = null; //new MSSQLSchemaModel(datasetConfiguration);
             }
-            else if (datasetConfiguration.Backend == "SIM")
+            else if (datasetConfiguration.Backend.ToLower() == "sim")
             {
                 _mainModel.SchemaModel = new SimSchemaModel();
                 (_mainModel.SchemaModel as SimSchemaModel).QueryExecuter = new SimQueryExecuter();
                 (_mainModel.SchemaModel as SimSchemaModel).RootOriginModel = new SimOriginModel(datasetConfiguration);
                 (_mainModel.SchemaModel as SimSchemaModel).RootOriginModel.LoadData();
             }
+            else if (datasetConfiguration.Backend.ToLower() == "tuppleware")
+            {
+                _mainModel.SchemaModel = new TuppleWareSchemaModel();
+                (_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter = new TuppleWareQueryExecuter();
+                (_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel = new TuppleWareOriginModel(datasetConfiguration);
+                ((_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter as TuppleWareQueryExecuter).LoadFileDescription((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
+            }
+        }
+        public VisualizationViewModel CreateVisualizationViewModel(JobType jobType)
+        {
+            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, jobType);
+            addAttachmentViews(visModel);
+            _visualizationViewModels.Add(visModel);
+            return visModel;
         }
 
         public VisualizationViewModel CreateVisualizationViewModel(AttributeOperationModel attributeOperationModel)
         {
             VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, attributeOperationModel);
+            addAttachmentViews(visModel);
+            _visualizationViewModels.Add(visModel);
+            return visModel;
+        }
+
+        private void addAttachmentViews(VisualizationViewModel visModel)
+        {
             foreach (var attachmentViewModel in visModel.AttachementViewModels)
             {
                 AttachmentView attachmentView = new AttachmentView()
@@ -151,10 +176,8 @@ namespace PanoramicData.controller.view
                 };
                 InkableScene.Add(attachmentView);
             }
-
-            _visualizationViewModels.Add(visModel);
-            return visModel;
         }
+
 
         public void RemoveVisualizationViewModel(VisualizationContainerView visualizationContainerView)
         {
@@ -208,6 +231,26 @@ namespace PanoramicData.controller.view
                     _root.Remove(_root.Elements.First(e => e is LinkView && (e as LinkView).DataContext == linkViewModel));
                 }
             }
+        }
+
+        void JobTypeViewModelMoved(object sender, model.view.JobTypeViewModelEventArgs e)
+        {
+            
+        }
+
+        void JobTypeViewModelDropped(object sender, model.view.JobTypeViewModelEventArgs e)
+        {
+            double width = VisualizationViewModel.WIDTH;
+            double height = VisualizationViewModel.HEIGHT;
+            Vec size = new Vec(width, height);
+            Pt position = (Pt)new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
+
+            VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
+            VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel((sender as JobTypeViewModel).JobType);
+            visualizationViewModel.Position = position;
+            visualizationViewModel.Size = size;
+            visualizationContainerView.DataContext = visualizationViewModel;
+            InkableScene.Add(visualizationContainerView);
         }
         
         void AttributeViewModelMoved(object sender, AttributeViewModelEventArgs e)
