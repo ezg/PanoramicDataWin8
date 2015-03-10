@@ -110,14 +110,13 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="controller\data\AsyncVirtualizingCollection.cs" />
+    <Compile Include="controller\data\AsyncVirtualizedCollection.cs" />
     <Compile Include="controller\data\DataPage.cs" />
     <Compile Include="controller\data\DataWrapper.cs" />
     <Compile Include="controller\data\IItemsProvider.cs" />
     <Compile Include="controller\data\QueryExecuter.cs" />
     <Compile Include="controller\data\sim\SimQueryExecuter.cs" />
     <Compile Include="controller\data\tuppleware\TuppleWareQueryExecuter.cs" />
-    <Compile Include="controller\data\VirtualizingCollection.cs" />
     <Compile Include="controller\input\DatasetConfiguration.cs" />
     <Compile Include="controller\view\MainViewController.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -217,6 +216,9 @@
     </Compile>
     <Compile Include="view\vis\menu\ToggleMenuItemView.xaml.cs">
       <DependentUpon>ToggleMenuItemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\render\KmeansRenderer.xaml.cs">
+      <DependentUpon>KmeansRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\Renderer.cs" />
     <Compile Include="view\vis\render\RendererResources.cs" />
@@ -330,6 +332,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\menu\ToggleMenuItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\KmeansRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -101,9 +101,9 @@ namespace PanoramicData.utils
             if (value != null)
             {
                 QueryResultItemModel model = (value as QueryResultItemModel);
-                if (model.Values.ContainsKey(AttributeOperationModel))
+                if (model.AttributeValues.ContainsKey(AttributeOperationModel))
                 {
-                    return model.Values[AttributeOperationModel].ShortStringValue;
+                    return model.AttributeValues[AttributeOperationModel].ShortStringValue;
                 }
                 return "";
             }

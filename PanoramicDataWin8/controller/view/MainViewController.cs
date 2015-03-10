@@ -150,17 +150,9 @@ namespace PanoramicData.controller.view
                 ((_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter as TuppleWareQueryExecuter).LoadFileDescription((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
             }
         }
-        public VisualizationViewModel CreateVisualizationViewModel(JobType jobType)
+        public VisualizationViewModel CreateVisualizationViewModel(JobType jobType, AttributeOperationModel attributeOperationModel)
         {
-            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, jobType);
-            addAttachmentViews(visModel);
-            _visualizationViewModels.Add(visModel);
-            return visModel;
-        }
-
-        public VisualizationViewModel CreateVisualizationViewModel(AttributeOperationModel attributeOperationModel)
-        {
-            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, attributeOperationModel);
+            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, jobType, attributeOperationModel);
             addAttachmentViews(visModel);
             _visualizationViewModels.Add(visModel);
             return visModel;
@@ -246,7 +238,7 @@ namespace PanoramicData.controller.view
             Pt position = (Pt)new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
 
             VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-            VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel((sender as JobTypeViewModel).JobType);
+            VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel((sender as JobTypeViewModel).JobType, null);
             visualizationViewModel.Position = position;
             visualizationViewModel.Size = size;
             visualizationContainerView.DataContext = visualizationViewModel;
@@ -304,7 +296,7 @@ namespace PanoramicData.controller.view
             if (hits.Count() == 0)
             {
                 VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-                VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel(e.AttributeOperationModel);
+                VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel(JobType.DB, e.AttributeOperationModel);
                 visualizationViewModel.Position = position;
                 visualizationViewModel.Size = size;
                 visualizationContainerView.DataContext = visualizationViewModel;

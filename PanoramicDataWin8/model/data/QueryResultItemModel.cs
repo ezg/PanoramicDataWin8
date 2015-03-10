@@ -15,16 +15,29 @@ namespace PanoramicData.model.data
         {
         }
 
-        private Dictionary<AttributeOperationModel, QueryResultItemValueModel> _values = new Dictionary<AttributeOperationModel, QueryResultItemValueModel>();
-        public Dictionary<AttributeOperationModel, QueryResultItemValueModel> Values
+        private Dictionary<JobTypeResult, QueryResultItemValueModel> _jobResultValues = new Dictionary<JobTypeResult, QueryResultItemValueModel>();
+        public Dictionary<JobTypeResult, QueryResultItemValueModel> JobResultValues
         {
             get
             {
-                return _values;
+                return _jobResultValues;
             }
             set
             {
-                this.SetProperty(ref _values, value);
+                this.SetProperty(ref _jobResultValues, value);
+            }
+        }
+
+        private Dictionary<AttributeOperationModel, QueryResultItemValueModel> _attributeValues = new Dictionary<AttributeOperationModel, QueryResultItemValueModel>();
+        public Dictionary<AttributeOperationModel, QueryResultItemValueModel> AttributeValues
+        {
+            get
+            {
+                return _attributeValues;
+            }
+            set
+            {
+                this.SetProperty(ref _attributeValues, value);
             }
         }
 

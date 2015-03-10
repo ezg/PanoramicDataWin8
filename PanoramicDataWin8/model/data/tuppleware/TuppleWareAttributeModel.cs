@@ -10,11 +10,21 @@ namespace PanoramicData.model.data.sim
     [JsonObject(MemberSerialization.OptOut)]
     public class TuppleWareAttributeModel : AttributeModel
     {
-        public TuppleWareAttributeModel(string name, string attributeDataType, string attributeVisualizationType)
+        public TuppleWareAttributeModel(int index, string name, string attributeDataType, string attributeVisualizationType)
         {
+            _index = index;
             _name = name;
             _attributeDataType = attributeDataType;
             _attributeVisualizationType = attributeVisualizationType;
+        }
+
+        private int _index = -1;
+        public int Index
+        {
+            get
+            {
+                return _index;
+            }
         }
 
         private string _name = "";

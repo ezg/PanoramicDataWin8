@@ -42,6 +42,8 @@ namespace PanoramicData.model.data.sim
             }
         }
 
+        public long FileId{ get; set; }
+
         private List<AttributeModel> _attributeModels = new List<AttributeModel>();
         public override List<AttributeModel> AttributeModels
         {

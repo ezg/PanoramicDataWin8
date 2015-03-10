@@ -40,11 +40,11 @@
             SelectionMode="Multiple"
             Style="{StaticResource ListViewStyle1}"
             ItemContainerStyle="{StaticResource ListViewItemStyle2}">
-            <ListView.ItemsPanel>
+            <!--<ListView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <StackPanel Orientation="Vertical" />
+                    <VirtualizingStackPanel Orientation="Vertical"/>
                 </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
+            </ListView.ItemsPanel>-->
             <ListView.ItemTemplate >
                 <DataTemplate>
                 </DataTemplate>

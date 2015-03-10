@@ -26,22 +26,24 @@ namespace PanoramicData.controller.data.sim
     {
         public override void ExecuteQuery(QueryModel queryModel)
         {
-            /*IItemsProvider<QueryResultItemModel> itemsProvider = new SimItemsProvider(queryModel.Clone(), (queryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data);
-            AsyncVirtualizingCollection<QueryResultItemModel> dataValues = new AsyncVirtualizingCollection<QueryResultItemModel>(itemsProvider,
-                queryModel.VisualizationType == VisualizationType.Table ? 1000 : (queryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data.Count + 1,  // page size
-                1000);
-            queryModel.QueryResultModel.QueryResultItemModels = dataValues;*/
+            IItemsProvider<QueryResultItemModel> itemsProvider = new TuppleWareItemsProvider(queryModel.Clone());
+            AsyncVirtualizedCollection<QueryResultItemModel> dataValues = new AsyncVirtualizedCollection<QueryResultItemModel>(itemsProvider,
+                1000,  // page size
+                -1);
+            queryModel.QueryResultModel.QueryResultItemModels = dataValues;
         }
 
-        public void LoadFileDescription(TuppleWareOriginModel tuppleWareOriginModel)
+        public async void LoadFileDescription(TuppleWareOriginModel tuppleWareOriginModel)
         {
             TuppleWareWebClient web = new TuppleWareWebClient();
-            string responseStr = "{\"files\":[{\"id\":0,\"names\":[\"a0\",\"a1\"],\"types\":[\"float\",\"float\"]}]}";//await web.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, "files");
+            string responseStr = await web.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, "files");
             dynamic responseObj = JObject.Parse(responseStr);
+
+            tuppleWareOriginModel.FileId = responseObj["files"][0]["id"].Value;
 
             for (int i = 0; i < responseObj["files"][0]["names"].Count; i++)
             {
-                TuppleWareAttributeModel attributeModel = new TuppleWareAttributeModel(responseObj["files"][0]["names"][i].Value, responseObj["files"][0]["types"][0].Value, "numeric");
+                TuppleWareAttributeModel attributeModel = new TuppleWareAttributeModel(i, responseObj["files"][0]["names"][i].Value, responseObj["files"][0]["types"][0].Value, "numeric");
                 attributeModel.OriginModel = tuppleWareOriginModel;
                 tuppleWareOriginModel.AttributeModels.Add(attributeModel);
             }
@@ -52,14 +54,6 @@ namespace PanoramicData.controller.data.sim
     {
         public async Task<string> Request(string endPoint, string query)
         {
-            if (query == "files")
-                return "{\"files\":[{\"id\":0,\"names\":[\"a0\",\"a1\"],\"types\":[\"float\",\"float\"]}]}";
-            else if (query.StartsWith("job"))
-                return "{\"k\":[[0,0],[1,1],[2,2]],\"samples\":[[0.5,0.5],[0.9,0.9],[2.1,2.1],[2.5,2.5]]}";
-            else if (query.StartsWith("sample"))
-                return "{\"samples\":[[0.5,0.5],[0.9,0.9],[2.1,2.1]]}";
-            else
-                return "";
             var httpClient = new HttpClient();
             var content = await httpClient.GetStringAsync(endPoint + "/" + query);
             return content;
@@ -69,54 +63,174 @@ namespace PanoramicData.controller.data.sim
     public class TuppleWareItemsProvider : IItemsProvider<QueryResultItemModel>
     {
         private QueryModel _queryModel = null;
-        private int _fetchCount = -1;
+        private int _fetchCount = 0;
 
         public TuppleWareItemsProvider(QueryModel queryModel)
         {
             _queryModel = queryModel;
         }
 
-        public TuppleWareItemsProvider(QueryModel queryModel, List<Dictionary<AttributeModel, object>> data)
+        public async Task<int> FetchCount()
         {
-            _queryModel = queryModel;
-           // _data = data;
-        }
-
-        public int FetchCount()
-        {
-            //_fetchCount = QueryEngine.ComputeQueryResult(_queryModel, _data).Count;
+            if (_queryModel.JobType == JobType.DB)
+            {
+                dynamic responseObj = await getDbWebResponse();
+                _fetchCount = responseObj["samples"].Count;
+            }
+            else if (_queryModel.JobType == JobType.Kmeans && _queryModel.GetFunctionAttributeOperationModel(AttributeFunction.JobInput).Count >= 2)
+            {
+                _fetchCount = _queryModel.KmeansClusters + _queryModel.KmeansNrSamples;
+            }
             return _fetchCount;
         }
 
-        public IList<QueryResultItemModel> FetchRange(int startIndex, int pageCount, out int overallCount)
+        public async Task<IList<QueryResultItemModel>> FetchPage(int startIndex, int pageCount)
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
             Debug.WriteLine("Start Get Page : " + startIndex + " " + pageCount);
-            //System.Threading.Tasks.Task.Delay(500).Wait();
 
-            IList<QueryResultItemModel> returnList = null;//returnList = QueryEngine.ComputeQueryResult(_queryModel, _data).Skip(startIndex).Take(pageCount).ToList();
+            TuppleWareWebClient web = new TuppleWareWebClient();
+            IList<QueryResultItemModel> returnList = new List<QueryResultItemModel>();
 
-            // reset selections
-            foreach (var queryResultItemModel in returnList)
+            if (_queryModel.JobType == JobType.DB)
             {
-                FilterModel filterQueryResultItemModel = new FilterModel(queryResultItemModel);
-                foreach (var fi in _queryModel.FilterModels.ToArray())
+                dynamic responseObj = await getDbWebResponse();
+                foreach (var sample in responseObj["samples"])
                 {
-                    if (fi != null)
+                    QueryResultItemModel item = new QueryResultItemModel();
+                    foreach (var attributeOperationModel in _queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X))
                     {
-                        if (fi.Equals(filterQueryResultItemModel))
+                        QueryResultItemValueModel valueModel = fromRaw(
+                            attributeOperationModel.AttributeModel.AttributeDataType,
+                            sample[(attributeOperationModel.AttributeModel as TuppleWareAttributeModel).Index]);
+
+                        if (!item.AttributeValues.ContainsKey(attributeOperationModel))
                         {
-                            queryResultItemModel.IsSelected = true;
+                            item.AttributeValues.Add(attributeOperationModel, valueModel);
                         }
                     }
+                    returnList.Add(item);
+                }
+            }
+            else if (_queryModel.JobType == JobType.Kmeans && _queryModel.GetFunctionAttributeOperationModel(AttributeFunction.JobInput).Count >= 2)
+            {
+                dynamic responseObj = await getKmeansWebResponse();
+                // clusters first
+                foreach (var k in responseObj["k"])
+                {
+                    QueryResultItemModel item = new QueryResultItemModel();
+                    QueryResultItemValueModel valueModel = null;
+
+                    valueModel = fromRaw(AttributeDataTypeConstants.FLOAT, k[0]);
+                    item.JobResultValues.Add(JobTypeResult.ClusterX, valueModel);
+
+                    valueModel = fromRaw(AttributeDataTypeConstants.FLOAT, k[1]);
+                    item.JobResultValues.Add(JobTypeResult.ClusterY, valueModel);
+
+                    returnList.Add(item);
+                }
+
+                // then samples
+                foreach (var sample in responseObj["samples"])
+                {
+                    QueryResultItemModel item = new QueryResultItemModel();
+                    QueryResultItemValueModel valueModel = null;
+
+                    valueModel = fromRaw(AttributeDataTypeConstants.FLOAT, sample[0]);
+                    item.JobResultValues.Add(JobTypeResult.SampleX, valueModel);
+
+                    valueModel = fromRaw(AttributeDataTypeConstants.FLOAT, sample[1]);
+                    item.JobResultValues.Add(JobTypeResult.SampleY, valueModel);
+
+                    returnList.Add(item);
                 }
             }
 
-            overallCount = _fetchCount;
-
             Debug.WriteLine("End Get Page : " + sw.ElapsedMilliseconds + " millis");
             return returnList;
+        }
+
+        private async Task<object> getDbWebResponse()
+        {
+            TuppleWareWebClient web = new TuppleWareWebClient();
+            string responseStr = await web.Request((_queryModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel.DatasetConfiguration.EndPoint,
+                    "sample/?q={\"file_id\":" + (_queryModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel.FileId + ",\"num_samples\":100}");
+
+            dynamic responseObj = JObject.Parse(responseStr);
+            return responseObj;
+        }
+
+        private async Task<object> getKmeansWebResponse()
+        {
+            TuppleWareWebClient web = new TuppleWareWebClient();
+            string responseStr = await web.Request((_queryModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel.DatasetConfiguration.EndPoint,
+                    "job/?q={\"job\":\"kmeans\"," +
+                        "\"file_id\":" + (_queryModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel.FileId + "," +
+                        "\"attrs\":" + "[" + string.Join(",", _queryModel.GetFunctionAttributeOperationModel(AttributeFunction.JobInput).Select(aom => (aom.AttributeModel as TuppleWareAttributeModel).Index)) + "]" + "," +
+                        "\"k\":" + _queryModel.KmeansClusters + "," +
+                        "\"samples\":" + _queryModel.KmeansNrSamples + "}"
+                    );
+
+            dynamic responseObj = JObject.Parse(responseStr);
+            return responseObj;
+        }
+
+        private static QueryResultItemValueModel fromRaw(string dataType, object value)
+        {
+            QueryResultItemValueModel valueModel = new QueryResultItemValueModel();
+
+            if (value == null)
+            {
+                valueModel.Value = null;
+                valueModel.StringValue = "";
+                valueModel.ShortStringValue = "";
+            }
+            else
+            {
+                double d = 0.0;
+                valueModel.Value = value;
+                if (double.TryParse(value.ToString(), out d))
+                {
+                    valueModel.StringValue = valueModel.Value.ToString().Contains(".") ? d.ToString("N") : valueModel.Value.ToString();
+                    if (dataType == AttributeDataTypeConstants.BIT)
+                    {
+                        if (d == 1.0)
+                        {
+                            valueModel.StringValue = "True";
+                        }
+                        else if (d == 0.0)
+                        {
+                            valueModel.StringValue = "False";
+                        }
+                    }
+                }
+                else
+                {
+                    valueModel.StringValue = valueModel.Value.ToString();
+                    if (valueModel.Value is DateTime)
+                    {
+                        valueModel.StringValue = ((DateTime)valueModel.Value).ToString();
+                    }
+                }
+
+                if (dataType == AttributeDataTypeConstants.GEOGRAPHY)
+                {
+
+                    string toSplit = valueModel.StringValue;
+                    if (toSplit.Contains("(") && toSplit.Contains(")"))
+                    {
+                        toSplit = toSplit.Substring(toSplit.IndexOf("("));
+                        toSplit = toSplit.Substring(1, toSplit.IndexOf(")") - 1);
+                    }
+                    valueModel.ShortStringValue = valueModel.StringValue.Replace("(" + toSplit + ")", "");
+                }
+                else
+                {
+                    valueModel.ShortStringValue = valueModel.StringValue.TrimTo(300);
+                }
+            }
+            return valueModel;
         }
     }
 }

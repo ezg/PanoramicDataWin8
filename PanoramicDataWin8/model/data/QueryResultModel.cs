@@ -11,8 +11,8 @@ namespace PanoramicData.model.data
 {
     public class QueryResultModel : ExtendedBindableBase
     {
-        private AsyncVirtualizingCollection<QueryResultItemModel> _queryResultItemModels = null;
-        public AsyncVirtualizingCollection<QueryResultItemModel> QueryResultItemModels
+        private AsyncVirtualizedCollection<QueryResultItemModel> _queryResultItemModels = null;
+        public AsyncVirtualizedCollection<QueryResultItemModel> QueryResultItemModels
         {
             get
             {

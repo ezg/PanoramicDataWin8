@@ -12,38 +12,28 @@ namespace PanoramicData.model.view
 {
     public class VisualizationViewModelFactory
     {
-        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType)
+        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType, AttributeOperationModel attributeOperationModel)
         {
             VisualizationViewModel visualizationViewModel = new VisualizationViewModel(schemaModel);
+            visualizationViewModel.QueryModel.JobType = jobType;
 
             foreach (var attachmentOrientation in Enum.GetValues(typeof(AttachmentOrientation)).Cast<AttachmentOrientation>())
             {
                 visualizationViewModel.AttachementViewModels.Add(new AttachmentViewModel()
                 {
                     AttachmentOrientation = attachmentOrientation,
-                    VisualizationViewModel = visualizationViewModel
+                    VisualizationViewModel = visualizationViewModel,
                 });
             }
 
-            return visualizationViewModel;
-        }
-
-        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, AttributeOperationModel attributeOperationModel)
-        {
-            VisualizationViewModel visualizationViewModel = new VisualizationViewModel(schemaModel);
-
-            foreach (var attachmentOrientation in Enum.GetValues(typeof(AttachmentOrientation)).Cast<AttachmentOrientation>())
+            if (jobType == JobType.DB)
             {
-                visualizationViewModel.AttachementViewModels.Add(new AttachmentViewModel()
+                if (schemaModel is TuppleWareSchemaModel)
                 {
-                    AttachmentOrientation = attachmentOrientation,
-                    VisualizationViewModel = visualizationViewModel
-                });
-            }
-
-            if (attributeOperationModel.AttributeModel.OriginModel is SimOriginModel)
-            {
-                if (attributeOperationModel.AttributeModel.AttributeVisualizationType == AttributeVisualizationTypeConstants.ENUM)
+                    visualizationViewModel.QueryModel.VisualizationType = VisualizationType.Table;
+                    visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, attributeOperationModel);
+                }
+                else if (attributeOperationModel.AttributeModel.AttributeVisualizationType == AttributeVisualizationTypeConstants.ENUM)
                 {
                     /*
                     PanoramicDataColumnDescriptor x = (PanoramicDataColumnDescriptor)columnDescriptor.Clone();
@@ -95,10 +85,10 @@ namespace PanoramicData.model.view
                     visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, attributeOperationModel);
                 }
             }
-            else if (attributeOperationModel.AttributeModel.OriginModel is TuppleWareOriginModel)
+            else if (jobType == JobType.Kmeans)
             {
-                visualizationViewModel.QueryModel.VisualizationType = VisualizationType.Table;
-                visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, attributeOperationModel);
+                visualizationViewModel.QueryModel.KmeansClusters = 2;
+                visualizationViewModel.QueryModel.KmeansNrSamples = 3;
             }
 
             return visualizationViewModel;

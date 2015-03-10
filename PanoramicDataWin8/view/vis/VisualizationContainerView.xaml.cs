@@ -84,40 +84,48 @@ namespace PanoramicDataWin8.view.vis
             }
             contentGrid.Children.Clear();
 
-            if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Bar)
+            if (visualizationViewModel.QueryModel.JobType == JobType.DB)
             {
-               /* Renderer fRenderer = new XYRenderer()
+                if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Bar)
                 {
-                    RenderContent = new Direct2dXYRendererContent()
-                    {
-                        Scene = new ScatterPlotScene()
-                    }
-                };
-                contentGrid.Children.Add(fRenderer);*/
+                    /* Renderer fRenderer = new XYRenderer()
+                     {
+                         RenderContent = new Direct2dXYRendererContent()
+                         {
+                             Scene = new ScatterPlotScene()
+                         }
+                     };
+                     contentGrid.Children.Add(fRenderer);*/
+                }
+                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Table)
+                {
+                    /*Renderer renderer = new TableRenderer();
+                    contentGrid.Children.Add(fRenderer);*/
+                }
+                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Plot)
+                {
+                    //PlotFilterRenderer4 fRenderer = new PlotFilterRenderer4(false);
+                    //(_front.Content as Front).SetContent(fRenderer);
+                }
+                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Line)
+                {
+                    //PlotFilterRenderer4 fRenderer = new PlotFilterRenderer4(false);
+                    //(_front.Content as Front).SetContent(fRenderer);
+                }
+                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Map)
+                {
+                    //MapFilterRenderer2 fRenderer = new MapFilterRenderer2(false);
+                    //(_front.Content as Front).SetContent(fRenderer);
+                }
+                
+                _renderer = new TableRenderer();
+                contentGrid.Children.Add(_renderer);
             }
-            else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Table)
+            else if (visualizationViewModel.QueryModel.JobType == JobType.Kmeans)
             {
-                /*Renderer renderer = new TableRenderer();
-                contentGrid.Children.Add(fRenderer);*/
+                _renderer = new KmeansRenderer();
+                contentGrid.Children.Add(_renderer);
             }
-            else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Plot)
-            {
-                //PlotFilterRenderer4 fRenderer = new PlotFilterRenderer4(false);
-                //(_front.Content as Front).SetContent(fRenderer);
-            }
-            else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Line)
-            {
-                //PlotFilterRenderer4 fRenderer = new PlotFilterRenderer4(false);
-                //(_front.Content as Front).SetContent(fRenderer);
-            }
-            else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Map)
-            {
-                //MapFilterRenderer2 fRenderer = new MapFilterRenderer2(false);
-                //(_front.Content as Front).SetContent(fRenderer);
-            }
-
-            _renderer = new TableRenderer();
-            contentGrid.Children.Add(_renderer);
         }
 
 

@@ -282,7 +282,10 @@ namespace PanoramicDataWin8.view.vis
                     IEnumerable<DataGridResizer> resizers = headerItemsControl.GetDescendantsOfType<DataGridResizer>();
                     // find closest header reorder drop highlight 
                     DataGridResizer closestHeader = findClosestReorderDataGridResizer(e.Bounds.Center);
-                    closestHeader.Highlight();
+                    if (closestHeader != null)
+                    {
+                        closestHeader.Highlight();
+                    }
                 }
             }
         }

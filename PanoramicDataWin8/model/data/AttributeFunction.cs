@@ -11,6 +11,7 @@ namespace PanoramicData.model.data
         Color,
         Group,
         X,
-        Y
+        Y,
+        JobInput
     }
 }

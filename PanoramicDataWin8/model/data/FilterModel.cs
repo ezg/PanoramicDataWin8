@@ -18,15 +18,15 @@ namespace PanoramicData.model.data
         public FilterModel(QueryResultItemModel queryResultItemModel)
         {
             ValueComparisons = new Dictionary<AttributeOperationModel, ValueComparison>();
-            foreach (var k in queryResultItemModel.Values.Keys.Where(aom => aom.IsGrouped || aom.IsBinned))
+            foreach (var k in queryResultItemModel.AttributeValues.Keys.Where(aom => aom.IsGrouped || aom.IsBinned))
             {
-                ValueComparisons.Add(k, new ValueComparison(queryResultItemModel.Values[k], Predicate.EQUALS));
+                ValueComparisons.Add(k, new ValueComparison(queryResultItemModel.AttributeValues[k], Predicate.EQUALS));
             }
             if (ValueComparisons.Count == 0)
             {
-                foreach (var k in queryResultItemModel.Values.Keys.Where(aom => !(aom.IsGrouped || aom.IsBinned)))
+                foreach (var k in queryResultItemModel.AttributeValues.Keys.Where(aom => !(aom.IsGrouped || aom.IsBinned)))
                 {
-                    ValueComparisons.Add(k, new ValueComparison(queryResultItemModel.Values[k], Predicate.EQUALS));
+                    ValueComparisons.Add(k, new ValueComparison(queryResultItemModel.AttributeValues[k], Predicate.EQUALS));
                 }
             }
         }

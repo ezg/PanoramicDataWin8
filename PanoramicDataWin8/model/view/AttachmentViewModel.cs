@@ -30,10 +30,12 @@ namespace PanoramicDataWin8.model.view
                 if (_visualizationViewModel != null)
                 {
                     _visualizationViewModel.PropertyChanged += _visualizationViewModel_PropertyChanged;
+                    _visualizationViewModel.QueryModel.PropertyChanged += QueryModel_PropertyChanged;    
                     initialize();
                 }
             }
         }
+
 
         private ObservableCollection<AttachmentHeaderViewModel> _attachmentHeaderViewModels = new ObservableCollection<AttachmentHeaderViewModel>();
         public ObservableCollection<AttachmentHeaderViewModel> AttachmentHeaderViewModels
@@ -211,85 +213,182 @@ namespace PanoramicDataWin8.model.view
 
         void _visualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            //throw new NotImplementedException();
+        }
+
+
+        void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == _visualizationViewModel.QueryModel.GetPropertyName(() => _visualizationViewModel.QueryModel.JobType) |
+                e.PropertyName == _visualizationViewModel.QueryModel.GetPropertyName(() => _visualizationViewModel.QueryModel.VisualizationType))
+            {
+                initialize();
+            }
         }
 
         void initialize()
         {
             AttachmentHeaderViewModels.Clear();
-            if (_attachmentOrientation == AttachmentOrientation.Bottom)
+            if (_visualizationViewModel.QueryModel.JobType == JobType.DB)
             {
-                AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
+                if (_attachmentOrientation == AttachmentOrientation.Bottom)
                 {
-                    AttributeFunction = AttributeFunction.Group
-                };
-                // initialize items
-                foreach (var item in _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group))
-                {
-                    header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
-                    {
-                        AttributeOperationModel = item,
-                        AttachmentHeaderViewModel = header
-                    });
+                    createDbBottom();
                 }
-
-                // handle added
-                header.AddedTriggered = (attributeOperationModel) =>
-                {
-                    attributeOperationModel.IsGrouped = true;
-                    QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                    if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attributeOperationModel))
-                    {
-                        queryModel.AddFunctionAttributeOperationModel(AttributeFunction.Group, attributeOperationModel);
-                    }
-                };
-                // handle removed
-                header.RemovedTriggered = (attachmentItemViewModel) =>
-                {
-                    QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                    if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attachmentItemViewModel.AttributeOperationModel))
-                    {
-                        queryModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Group, attachmentItemViewModel.AttributeOperationModel);
-                    }
-                };
-
-                header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
-                {
-                    AttachmentHeaderViewModel = header,
-                    //Size = new Vec(25,25),
-                    //TargetSize = new Vec(25, 25),
-                    Label = "group"
-                };
-
-                // handle updates
-                _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).CollectionChanged += (sender, args) =>
-                {
-                    if (args.OldItems != null)
-                    {
-                        foreach (var item in args.OldItems)
-                        {
-                            if (header.AttachmentItemViewModels.Any(aiv => aiv.AttributeOperationModel == item))
-                            {
-                                header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.AttributeOperationModel == item));
-                            }
-                        }
-                    }
-                    if (args.NewItems != null)
-                    {
-                        foreach (var item in args.NewItems)
-                        {
-                            header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
-                            {
-                                AttributeOperationModel = item as AttributeOperationModel,
-                                SubLabel = (item as AttributeOperationModel).AttributeModel.Name,
-                                MainLabel = "group",
-                                AttachmentHeaderViewModel = header
-                            });   
-                        }
-                    }
-                };
-                AttachmentHeaderViewModels.Add(header);
             }
+            else if (_visualizationViewModel.QueryModel.JobType == JobType.Kmeans)
+            {
+                if (_attachmentOrientation == AttachmentOrientation.Bottom)
+                {
+                    createKMeansBottom();
+                }
+            }
+        }
+
+        void createKMeansBottom()
+        {
+            AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
+            {
+                AttributeFunction = AttributeFunction.JobInput
+            };
+            // initialize items
+            foreach (var item in _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.JobInput))
+            {
+                header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
+                {
+                    AttributeOperationModel = item,
+                    AttachmentHeaderViewModel = header
+                });
+            }
+
+            // handle added
+            header.AddedTriggered = (attributeOperationModel) =>
+            {
+                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
+                if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.JobInput).Contains(attributeOperationModel))
+                {
+                    queryModel.AddFunctionAttributeOperationModel(AttributeFunction.JobInput, attributeOperationModel);
+                }
+            };
+            // handle removed
+            header.RemovedTriggered = (attachmentItemViewModel) =>
+            {
+                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
+                if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.JobInput).Contains(attachmentItemViewModel.AttributeOperationModel))
+                {
+                    queryModel.RemoveFunctionAttributeOperationModel(AttributeFunction.JobInput, attachmentItemViewModel.AttributeOperationModel);
+                }
+            };
+
+            header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
+            {
+                AttachmentHeaderViewModel = header,
+                //Size = new Vec(25,25),
+                //TargetSize = new Vec(25, 25),
+                Label = "input"
+            };
+
+            // handle updates
+            _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.JobInput).CollectionChanged += (sender, args) =>
+            {
+                if (args.OldItems != null)
+                {
+                    foreach (var item in args.OldItems)
+                    {
+                        if (header.AttachmentItemViewModels.Any(aiv => aiv.AttributeOperationModel == item))
+                        {
+                            header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.AttributeOperationModel == item));
+                        }
+                    }
+                }
+                if (args.NewItems != null)
+                {
+                    foreach (var item in args.NewItems)
+                    {
+                        header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
+                        {
+                            AttributeOperationModel = item as AttributeOperationModel,
+                            SubLabel = (item as AttributeOperationModel).AttributeModel.Name,
+                            MainLabel = "input",
+                            AttachmentHeaderViewModel = header
+                        });
+                    }
+                }
+            };
+            AttachmentHeaderViewModels.Add(header);
+        }
+
+        void createDbBottom()
+        {
+            AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
+            {
+                AttributeFunction = AttributeFunction.Group
+            };
+            // initialize items
+            foreach (var item in _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group))
+            {
+                header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
+                {
+                    AttributeOperationModel = item,
+                    AttachmentHeaderViewModel = header
+                });
+            }
+
+            // handle added
+            header.AddedTriggered = (attributeOperationModel) =>
+            {
+                attributeOperationModel.IsGrouped = true;
+                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
+                if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attributeOperationModel))
+                {
+                    queryModel.AddFunctionAttributeOperationModel(AttributeFunction.Group, attributeOperationModel);
+                }
+            };
+            // handle removed
+            header.RemovedTriggered = (attachmentItemViewModel) =>
+            {
+                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
+                if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attachmentItemViewModel.AttributeOperationModel))
+                {
+                    queryModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Group, attachmentItemViewModel.AttributeOperationModel);
+                }
+            };
+
+            header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
+            {
+                AttachmentHeaderViewModel = header,
+                //Size = new Vec(25,25),
+                //TargetSize = new Vec(25, 25),
+                Label = "group"
+            };
+
+            // handle updates
+            _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).CollectionChanged += (sender, args) =>
+            {
+                if (args.OldItems != null)
+                {
+                    foreach (var item in args.OldItems)
+                    {
+                        if (header.AttachmentItemViewModels.Any(aiv => aiv.AttributeOperationModel == item))
+                        {
+                            header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.AttributeOperationModel == item));
+                        }
+                    }
+                }
+                if (args.NewItems != null)
+                {
+                    foreach (var item in args.NewItems)
+                    {
+                        header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
+                        {
+                            AttributeOperationModel = item as AttributeOperationModel,
+                            SubLabel = (item as AttributeOperationModel).AttributeModel.Name,
+                            MainLabel = "group",
+                            AttachmentHeaderViewModel = header
+                        });
+                    }
+                }
+            };
+            AttachmentHeaderViewModels.Add(header);
         }
     }
 

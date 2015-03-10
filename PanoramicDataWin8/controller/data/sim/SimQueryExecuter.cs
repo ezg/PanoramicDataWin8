@@ -17,7 +17,6 @@ using System.Text;
 using Newtonsoft.Json;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json.Serialization;
-
 namespace PanoramicData.controller.data.sim
 {
     public class SimQueryExecuter : QueryExecuter
@@ -25,45 +24,38 @@ namespace PanoramicData.controller.data.sim
         public override void ExecuteQuery(QueryModel queryModel)
         {
             IItemsProvider<QueryResultItemModel> itemsProvider = new SimItemsProvider(queryModel.Clone(), (queryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data);
-            AsyncVirtualizingCollection<QueryResultItemModel> dataValues = new AsyncVirtualizingCollection<QueryResultItemModel>(itemsProvider, 
-                queryModel.VisualizationType == VisualizationType.Table ? 1000 : (queryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data.Count + 1,  // page size
-                1000);
+            AsyncVirtualizedCollection<QueryResultItemModel> dataValues = new AsyncVirtualizedCollection<QueryResultItemModel>(itemsProvider,
+                queryModel.VisualizationType == VisualizationType.Table ? 1000 : (queryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data.Count + 1, // page size
+                -1);
             queryModel.QueryResultModel.QueryResultItemModels = dataValues;
         }
     }
-
     public class SimItemsProvider : IItemsProvider<QueryResultItemModel>
     {
         private QueryModel _queryModel = null;
         private int _fetchCount = -1;
         private List<Dictionary<AttributeModel, object>> _data = null;
-
         public SimItemsProvider(QueryModel queryModel)
         {
             _queryModel = queryModel;
         }
-
         public SimItemsProvider(QueryModel queryModel, List<Dictionary<AttributeModel, object>> data)
         {
             _queryModel = queryModel;
             _data = data;
         }
-
-        public int FetchCount()
+        public async Task<int> FetchCount()
         {
             _fetchCount = QueryEngine.ComputeQueryResult(_queryModel, _data).Count;
             return _fetchCount;
         }
-
-        public IList<QueryResultItemModel> FetchRange(int startIndex, int pageCount, out int overallCount)
+        public async Task<IList<QueryResultItemModel>> FetchPage(int startIndex, int pageCount)
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
             Debug.WriteLine("Start Get Page : " + startIndex + " " + pageCount);
             //System.Threading.Tasks.Task.Delay(500).Wait();
-
             IList<QueryResultItemModel> returnList = QueryEngine.ComputeQueryResult(_queryModel, _data).Skip(startIndex).Take(pageCount).ToList();
-
             // reset selections
             foreach (var queryResultItemModel in returnList)
             {
@@ -79,14 +71,10 @@ namespace PanoramicData.controller.data.sim
                     }
                 }
             }
-
-            overallCount = _fetchCount;
-
             Debug.WriteLine("End Get Page : " + sw.ElapsedMilliseconds + " millis");
             return returnList;
         }
     }
-
     public class QueryEngine
     {
         public static List<QueryResultItemModel> ComputeQueryResult(QueryModel queryModel, List<Dictionary<AttributeModel, object>> data)
@@ -94,14 +82,12 @@ namespace PanoramicData.controller.data.sim
             if (queryModel.AttributeOperationModels.Any())
             {
                 var filteredData = getFilteredData(data, queryModel, true);
-
                 var results = filteredData.
-                    GroupBy(
-                        item => getGroupByObject(item, queryModel),
-                        item => item,
-                        (key, g) => getQueryResultItemModel(key, g, queryModel)).
-                        OrderBy(item => item, new ItemComparer(queryModel));
-
+                GroupBy(
+                item => getGroupByObject(item, queryModel),
+                item => item,
+                (key, g) => getQueryResultItemModel(key, g, queryModel)).
+                OrderBy(item => item, new ItemComparer(queryModel));
                 var restultList = results.ToList();
                 for (int i = 0; i < restultList.Count; i++)
                 {
@@ -114,7 +100,6 @@ namespace PanoramicData.controller.data.sim
                 return new List<QueryResultItemModel>();
             }
         }
-
         private static IEnumerable<Dictionary<AttributeModel, object>> getFilteredData(IEnumerable<Dictionary<AttributeModel, object>> data, QueryModel queryModel, bool first)
         {
             var filteredData = data;
@@ -137,14 +122,13 @@ namespace PanoramicData.controller.data.sim
             if (!first)
             {
                 filteredData = filteredData.GroupBy(
-                        item => getGroupByObject(item, queryModel),
-                        item => item,
-                        (key, g) => getPartitionedItem(key, g, queryModel)).Where(partitionedItem => passesFilterModels(partitionedItem, queryModel)).
-                        SelectMany(partitionedItem => partitionedItem.Items);
+                item => getGroupByObject(item, queryModel),
+                item => item,
+                (key, g) => getPartitionedItem(key, g, queryModel)).Where(partitionedItem => passesFilterModels(partitionedItem, queryModel)).
+                SelectMany(partitionedItem => partitionedItem.Items);
             }
             return filteredData;
         }
-
         private static bool passesFilterModels(PartitionedItem item, QueryModel queryModel)
         {
             foreach (var filterModel in queryModel.FilterModels)
@@ -159,13 +143,12 @@ namespace PanoramicData.controller.data.sim
             }
             return queryModel.FilterModels.Count == 0 ? true : false;
         }
-
         private static object getGroupByObject(Dictionary<AttributeModel, object> item, QueryModel queryModel)
         {
             var groupers = queryModel.AttributeOperationModels.Where(aom => aom.IsGrouped || aom.IsBinned).ToList();
             GroupingObject groupingObject = new GroupingObject(
-                groupers.Count() > 0,
-                queryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None));
+            groupers.Count() > 0,
+            queryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None));
             int count = 0;
             foreach (var attributeModel in item.Keys)
             {
@@ -189,12 +172,10 @@ namespace PanoramicData.controller.data.sim
             }
             return groupingObject;
         }
-
         private static PartitionedItem getPartitionedItem(object key, IEnumerable<Dictionary<AttributeModel, object>> dicts, QueryModel queryModel)
         {
             PartitionedItem partitionedItem = new PartitionedItem();
             partitionedItem.Items = dicts;
-
             var attributeOperationModels = queryModel.AttributeOperationModels;
             //Debug.WriteLine("getPartitionedItem " + attributeOperationModels.Count);
             foreach (var attributeOperationModel in attributeOperationModels)
@@ -202,9 +183,7 @@ namespace PanoramicData.controller.data.sim
                 bool binned = false;
                 double binSize = 0;
                 IEnumerable<object> values = dicts.Select(dict => dict[attributeOperationModel.AttributeModel]);
-
                 object rawValue = null;
-
                 if (attributeOperationModel.AggregateFunction == AggregateFunction.Max)
                 {
                     rawValue = values.Max();
@@ -277,7 +256,6 @@ namespace PanoramicData.controller.data.sim
                         rawValue = values.First();
                     }
                 }
-
                 if (!partitionedItem.PartitionValues.ContainsKey(attributeOperationModel))
                 {
                     partitionedItem.PartitionValues.Add(attributeOperationModel, rawValue);
@@ -285,15 +263,12 @@ namespace PanoramicData.controller.data.sim
                     partitionedItem.BinSize.Add(attributeOperationModel, binSize);
                 }
             }
-
             return partitionedItem;
         }
-
         private static QueryResultItemModel getQueryResultItemModel(object key, IEnumerable<Dictionary<AttributeModel, object>> dicts, QueryModel queryModel)
         {
             QueryResultItemModel item = new QueryResultItemModel();
             PartitionedItem partitionedItem = getPartitionedItem(key, dicts, queryModel);
-
             var attributeOperationModels = queryModel.AttributeOperationModels;
             //Debug.WriteLine("getQueryResultItemModel " + attributeOperationModels.Count);
             foreach (var attributeOperationModel in attributeOperationModels)
@@ -301,24 +276,21 @@ namespace PanoramicData.controller.data.sim
                 if (partitionedItem.PartitionValues.ContainsKey(attributeOperationModel))
                 {
                     QueryResultItemValueModel valueModel = fromRaw(
-                        attributeOperationModel,
-                        partitionedItem.PartitionValues[attributeOperationModel],
-                        partitionedItem.IsBinned[attributeOperationModel],
-                        partitionedItem.BinSize[attributeOperationModel]);
-                    if (!item.Values.ContainsKey(attributeOperationModel))
+                    attributeOperationModel,
+                    partitionedItem.PartitionValues[attributeOperationModel],
+                    partitionedItem.IsBinned[attributeOperationModel],
+                    partitionedItem.BinSize[attributeOperationModel]);
+                    if (!item.AttributeValues.ContainsKey(attributeOperationModel))
                     {
-                        item.Values.Add(attributeOperationModel, valueModel);
-
+                        item.AttributeValues.Add(attributeOperationModel, valueModel);
                     }
                 }
             }
             return item;
         }
-
         private static QueryResultItemValueModel fromRaw(AttributeOperationModel attributeOperationModel, object value, bool binned, double binSize)
         {
             QueryResultItemValueModel valueModel = new QueryResultItemValueModel();
-
             if (value == null)
             {
                 valueModel.Value = null;
@@ -356,10 +328,8 @@ namespace PanoramicData.controller.data.sim
                         valueModel.StringValue = ((DateTime)valueModel.Value).ToString();
                     }
                 }
-
                 if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.GEOGRAPHY)
                 {
-
                     string toSplit = valueModel.StringValue;
                     if (toSplit.Contains("(") && toSplit.Contains(")"))
                     {
@@ -376,7 +346,6 @@ namespace PanoramicData.controller.data.sim
             return valueModel;
         }
     }
-
     public class PartitionedItem
     {
         public PartitionedItem()
@@ -390,86 +359,74 @@ namespace PanoramicData.controller.data.sim
         public Dictionary<AttributeOperationModel, double> BinSize { get; set; }
         public Dictionary<AttributeOperationModel, bool> IsBinned { get; set; }
     }
-
     public class DataEqualityComparer : IEqualityComparer<Dictionary<AttributeModel, object>>
     {
         private QueryModel _queryModel = null;
-
         public DataEqualityComparer(QueryModel queryModel)
         {
             _queryModel = queryModel;
         }
-
         public bool Equals(Dictionary<AttributeModel, object> x, Dictionary<AttributeModel, object> y)
         {
             return x[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel].Equals(
-                   y[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel]);
+            y[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel]);
         }
-
         public int GetHashCode(Dictionary<AttributeModel, object> x)
         {
             return x[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel].GetHashCode();
         }
     }
-
     public class ItemComparer : IComparer<QueryResultItemModel>
     {
         private QueryModel _queryModel = null;
-
         public ItemComparer(QueryModel queryModel)
         {
             _queryModel = queryModel;
         }
-
         public int Compare(QueryResultItemModel x, QueryResultItemModel y)
         {
             var attributeOperationModels = _queryModel.AttributeOperationModels.Where(aom => aom.SortMode != SortMode.None);
             foreach (var aom in attributeOperationModels)
             {
                 int factor = aom.SortMode == SortMode.Asc ? 1 : -1;
-
-                if (x.Values[aom].Value is string &&
-                   ((string)x.Values[aom].Value).CompareTo((string)y.Values[aom].Value) != 0)
+                if (x.AttributeValues[aom].Value is string &&
+                ((string)x.AttributeValues[aom].Value).CompareTo((string)y.AttributeValues[aom].Value) != 0)
                 {
-                    return (x.Values[aom].Value as string).CompareTo(y.Values[aom].Value as string) * factor;
+                    return (x.AttributeValues[aom].Value as string).CompareTo(y.AttributeValues[aom].Value as string) * factor;
                 }
-                else if (x.Values[aom].Value is double &&
-                         ((double)x.Values[aom].Value).CompareTo((double) y.Values[aom].Value) != 0)
+                else if (x.AttributeValues[aom].Value is double &&
+                ((double)x.AttributeValues[aom].Value).CompareTo((double)y.AttributeValues[aom].Value) != 0)
                 {
-                    return ((double)x.Values[aom].Value).CompareTo((double)y.Values[aom].Value) * factor;
+                    return ((double)x.AttributeValues[aom].Value).CompareTo((double)y.AttributeValues[aom].Value) * factor;
                 }
-                else if (x.Values[aom].Value is int &&
-                     ((int)x.Values[aom].Value).CompareTo((int)y.Values[aom].Value) != 0)
+                else if (x.AttributeValues[aom].Value is int &&
+                ((int)x.AttributeValues[aom].Value).CompareTo((int)y.AttributeValues[aom].Value) != 0)
                 {
-                    return ((int)x.Values[aom].Value).CompareTo((int)y.Values[aom].Value) * factor;
+                    return ((int)x.AttributeValues[aom].Value).CompareTo((int)y.AttributeValues[aom].Value) * factor;
                 }
-                else if (x.Values[aom].Value is DateTime &&
-                         ((DateTime)x.Values[aom].Value).CompareTo((DateTime)y.Values[aom].Value) != 0)
+                else if (x.AttributeValues[aom].Value is DateTime &&
+                ((DateTime)x.AttributeValues[aom].Value).CompareTo((DateTime)y.AttributeValues[aom].Value) != 0)
                 {
-                    return ((DateTime)x.Values[aom].Value).CompareTo((DateTime)y.Values[aom].Value) * factor;
+                    return ((DateTime)x.AttributeValues[aom].Value).CompareTo((DateTime)y.AttributeValues[aom].Value) * factor;
                 }
             }
             return 0;
         }
     }
-
     public class GroupingObject
     {
         private Dictionary<int, object> _dictionary = new Dictionary<int, object>();
         private bool _isAnyGrouped = false;
         private bool _isAnyAggregated = false;
-
         public GroupingObject(bool isAnyGrouped, bool isAnyAggregated)
         {
             _isAnyGrouped = isAnyGrouped;
             _isAnyAggregated = isAnyAggregated;
         }
-
         public void Add(int index, object value)
         {
             _dictionary.Add(index, value);
         }
-
         public override bool Equals(object obj)
         {
             if (obj is GroupingObject)
@@ -487,11 +444,9 @@ namespace PanoramicData.controller.data.sim
                     }
                     return false;
                 }
-                    
             }
             return false;
         }
-
         public override int GetHashCode()
         {
             if (_isAnyGrouped)

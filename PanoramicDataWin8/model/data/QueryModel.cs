@@ -178,19 +178,6 @@ namespace PanoramicData.model.data
             }
         }
 
-        private JobType _jobType;
-        public JobType JobType
-        {
-            get
-            {
-                return _jobType;
-            }
-            set
-            {
-                this.SetProperty(ref _jobType, value);
-            }
-        }
-
         private Dictionary<AttributeFunction, ObservableCollection<AttributeOperationModel>> _attributeFunctionOperationModels = new Dictionary<AttributeFunction, ObservableCollection<AttributeOperationModel>>();
        
         public Dictionary<AttributeFunction, ObservableCollection<AttributeOperationModel>> AttributeFunctionOperationModels
@@ -404,6 +391,45 @@ namespace PanoramicData.model.data
                 }
             }
         }
+
+        private JobType _jobType;
+        public JobType JobType
+        {
+            get
+            {
+                return _jobType;
+            }
+            set
+            {
+                this.SetProperty(ref _jobType, value);
+            }
+        }
+
+        private int _kmeansNrClusters;
+        public int KmeansClusters
+        {
+            get
+            {
+                return _kmeansNrClusters;
+            }
+            set
+            {
+                this.SetProperty(ref _kmeansNrClusters, value);
+            }
+        }
+
+        private int _kmeansNrSamples;
+        public int KmeansNrSamples
+        {
+            get
+            {
+                return _kmeansNrSamples;
+            }
+            set
+            {
+                this.SetProperty(ref _kmeansNrSamples, value);
+            }
+        }
     }
 
     public class QueryModelUpdatedEventArgs : EventArgs
@@ -422,4 +448,6 @@ namespace PanoramicData.model.data
     public enum VisualizationType { Table, Bar, Map, Plot, Line }
 
     public enum JobType { DB, Kmeans }
+
+    public enum JobTypeResult { ClusterX, ClusterY, SampleX, SampleY }
 }

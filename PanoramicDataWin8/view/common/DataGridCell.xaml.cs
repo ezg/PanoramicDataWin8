@@ -94,9 +94,9 @@ namespace PanoramicDataWin8.view.common
             if (dataWrapper!= null && dataWrapper.Data != null && HeaderObject != null && HeaderObject.AttributeViewModel != null)
             {
                 QueryResultItemModel model = dataWrapper.Data;
-                if (model.Values.ContainsKey(HeaderObject.AttributeViewModel.AttributeOperationModel))
+                if (model.AttributeValues.ContainsKey(HeaderObject.AttributeViewModel.AttributeOperationModel))
                 {
-                    textBlock.Text = model.Values[HeaderObject.AttributeViewModel.AttributeOperationModel].ShortStringValue;
+                    textBlock.Text = model.AttributeValues[HeaderObject.AttributeViewModel.AttributeOperationModel].ShortStringValue;
                     return;
                 }
             }
