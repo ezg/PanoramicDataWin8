@@ -87,7 +87,7 @@ namespace PanoramicData.model.view
             }
             else if (jobType == JobType.Kmeans)
             {
-                visualizationViewModel.QueryModel.KmeansClusters = 2;
+                visualizationViewModel.QueryModel.KmeansClusters = 3;
                 visualizationViewModel.QueryModel.KmeansNrSamples = 3;
             }
 

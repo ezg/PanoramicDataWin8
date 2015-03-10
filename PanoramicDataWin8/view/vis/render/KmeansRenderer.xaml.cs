@@ -173,10 +173,10 @@ namespace PanoramicDataWin8.view.vis.render
             
 
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
-            double xOffset = model.Size.X * 0.1;
-            double yOffset = model.Size.Y * 0.1;
-            double scaleX = (model.Size.X * 0.9) / (maxX - minX);
-            double scaleY = (model.Size.Y * 0.9) /  (maxY - minY);
+            double xOffset = model.Size.X * 0.15;
+            double yOffset = model.Size.Y * 0.15;
+            double scaleX = (model.Size.X * 0.7) / (maxX - minX);
+            double scaleY = (model.Size.Y * 0.7) / (maxY - minY);
 
             renderCanvas.Children.Clear();
 
@@ -187,8 +187,8 @@ namespace PanoramicDataWin8.view.vis.render
                 r.Width = r.Height = 10;
                 r.RenderTransform = new TranslateTransform()
                 {
-                    X = c.X * scaleX + xOffset,
-                    Y = c.Y * scaleY + yOffset
+                    X = c.X * scaleX + xOffset - 5,
+                    Y = c.Y * scaleY + yOffset - 5
                 };
                 renderCanvas.Children.Add(r);
             }
@@ -199,8 +199,8 @@ namespace PanoramicDataWin8.view.vis.render
                 r.Width = r.Height = 10;
                 r.RenderTransform = new TranslateTransform()
                 {
-                    X = s.X * scaleX + xOffset,
-                    Y = s.Y * scaleY + yOffset
+                    X = s.X * scaleX + xOffset - 5,
+                    Y = s.Y * scaleY + yOffset - 5
                 };
                 renderCanvas.Children.Add(r);
             }
