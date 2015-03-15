@@ -16,7 +16,6 @@ namespace PanoramicData.model.data
         }
         
         private OriginModel _originModel = null;
-       
         public OriginModel OriginModel
         {
             get
@@ -26,6 +25,19 @@ namespace PanoramicData.model.data
             set
             {
                 this.SetProperty(ref _originModel, value);
+            }
+        }
+
+        private bool _isDisplayed = true;
+        public bool IsDisplayed
+        {
+            get
+            {
+                return _isDisplayed;
+            }
+            set
+            {
+                this.SetProperty(ref _isDisplayed, value);
             }
         }
 

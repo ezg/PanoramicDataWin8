@@ -198,10 +198,10 @@ namespace PanoramicDataWin8
         {
             MainModel mainModel = (DataContext as MainModel);
             var buttonBounds = addAttributeButton.GetBounds(this);
-            var attributeModels = mainModel.SchemaModel.OriginModels.First().AttributeModels;
+            var attributeModels = mainModel.SchemaModel.OriginModels.First().AttributeModels.Where(am => am.IsDisplayed);
 
             attributeCanvas.Children.Clear();
-            double perColumn = Math.Ceiling(attributeModels.Count / 2.0);
+            double perColumn = Math.Ceiling(attributeModels.Count() / 2.0);
             double height = perColumn * 50 + (perColumn - 1) * 4;
             double startY = buttonBounds.Center.Y - height / 2.0;
 

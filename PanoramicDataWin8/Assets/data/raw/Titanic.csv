@@ -1,6 +1,6 @@
-﻿id,name,passenger_class,survived,sex,age,siblings_spouses,parents_children,ticket,fare,cabin,embarked,boat,body,home,destination
-int,nvarchar,int,bit,nvarchar,float,int,int,nvarchar,float,nvarchar,geography,nvarchar,nvarchar,geography,geography
-numeric,category,enum,enum,enum,numeric,enum,enum,category,numeric,category,geography,category,category,geography,geography
+﻿name=id,name,passenger_class,survived,sex,age,siblings_spouses,parents_children,ticket,fare,cabin,embarked,boat,body,home,destination
+data_type=int,nvarchar,int,bit,nvarchar,float,int,int,nvarchar,float,nvarchar,geography,nvarchar,nvarchar,geography,geography
+visualization_type=numeric,category,enum,enum,enum,numeric,enum,enum,category,numeric,category,geography,category,category,geography,geography
 1,"Allen, Miss. Elisabeth Walton",1,1,female,29,0,0,24160,211.3374939,B5,"United Kingdom (-2.78439235687256, 54.072437286377)",2,,"United States (-98.9573364257813, 39.4432563781738)", 
 2,"Allison, Master. Hudson Trevor",1,1,male,0.916700006,1,2,113781,151.5500031,C22 C26,"United Kingdom (-2.78439235687256, 54.072437286377)",11,,"Canada (-95.9133224487305, 62.8329086303711)","Canada (-95.9133224487305, 62.8329086303711)"
 3,"Allison, Miss. Helen Loraine",1,0,female,2,1,2,113781,151.5500031,C22 C26,"United Kingdom (-2.78439235687256, 54.072437286377)",,,"Canada (-95.9133224487305, 62.8329086303711)","Canada (-95.9133224487305, 62.8329086303711)"

@@ -54,8 +54,9 @@ namespace PanoramicData.controller.data.sim
             Stopwatch sw = new Stopwatch();
             sw.Start();
             Debug.WriteLine("Start Get Page : " + startIndex + " " + pageCount);
-            //System.Threading.Tasks.Task.Delay(500).Wait();
+            
             IList<QueryResultItemModel> returnList = QueryEngine.ComputeQueryResult(_queryModel, _data).Skip(startIndex).Take(pageCount).ToList();
+
             // reset selections
             foreach (var queryResultItemModel in returnList)
             {
@@ -75,7 +76,7 @@ namespace PanoramicData.controller.data.sim
             return returnList;
         }
     }
-    public class QueryEngine
+    public class QueryEngine 
     {
         public static List<QueryResultItemModel> ComputeQueryResult(QueryModel queryModel, List<Dictionary<AttributeModel, object>> data)
         {
@@ -84,10 +85,10 @@ namespace PanoramicData.controller.data.sim
                 var filteredData = getFilteredData(data, queryModel, true);
                 var results = filteredData.
                 GroupBy(
-                item => getGroupByObject(item, queryModel),
-                item => item,
-                (key, g) => getQueryResultItemModel(key, g, queryModel)).
-                OrderBy(item => item, new ItemComparer(queryModel));
+                    item => getGroupByObject(item, queryModel),
+                    item => item,
+                    (key, g) => getQueryResultItemModel(key, g, queryModel)).
+                    OrderBy(item => item, new ItemComparer(queryModel));
                 var restultList = results.ToList();
                 for (int i = 0; i < restultList.Count; i++)
                 {
@@ -276,10 +277,10 @@ namespace PanoramicData.controller.data.sim
                 if (partitionedItem.PartitionValues.ContainsKey(attributeOperationModel))
                 {
                     QueryResultItemValueModel valueModel = fromRaw(
-                    attributeOperationModel,
-                    partitionedItem.PartitionValues[attributeOperationModel],
-                    partitionedItem.IsBinned[attributeOperationModel],
-                    partitionedItem.BinSize[attributeOperationModel]);
+                        attributeOperationModel,
+                        partitionedItem.PartitionValues[attributeOperationModel],
+                        partitionedItem.IsBinned[attributeOperationModel],
+                        partitionedItem.BinSize[attributeOperationModel]);
                     if (!item.AttributeValues.ContainsKey(attributeOperationModel))
                     {
                         item.AttributeValues.Add(attributeOperationModel, valueModel);
@@ -359,6 +360,7 @@ namespace PanoramicData.controller.data.sim
         public Dictionary<AttributeOperationModel, double> BinSize { get; set; }
         public Dictionary<AttributeOperationModel, bool> IsBinned { get; set; }
     }
+
     public class DataEqualityComparer : IEqualityComparer<Dictionary<AttributeModel, object>>
     {
         private QueryModel _queryModel = null;

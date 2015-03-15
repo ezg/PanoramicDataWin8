@@ -67,7 +67,7 @@ namespace PanoramicData.controller.view
                 var content = await Windows.Storage.FileIO.ReadTextAsync(file);
                 _mainModel.DatasetConfigurations.Add(DatasetConfiguration.FromContent(content, file.Name));
             }
-            LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("tuppleware")).First());
+            LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("census")).First());
             //LoadData(_mainModel.DatasetConfigurations.First());
         }
 

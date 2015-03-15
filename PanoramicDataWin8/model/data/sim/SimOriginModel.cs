@@ -29,10 +29,40 @@ namespace PanoramicData.model.data.sim
 
             StorageFile file = await StorageFile.GetFileFromPathAsync(installedLoc.Path + "\\" + _datasetConfiguration.DataFile);
             StreamReader streamReader = new StreamReader(await file.OpenStreamForReadAsync());
+            
+            List<string> names = new List<string>();
+            List<string> dataTypes = new List<string>();
+            List<string> visualizationTypes = new List<string>();
+            List<string> displays = new List<string>();
 
-            List<string> names = CSVParser.CSVLineSplit(await streamReader.ReadLineAsync());
-            List<string> dataTypes = CSVParser.CSVLineSplit(await streamReader.ReadLineAsync());
-            List<string> visualizationTypes = CSVParser.CSVLineSplit(await streamReader.ReadLineAsync());
+            string line = await streamReader.ReadLineAsync();
+            while (line != null)
+            {
+                if (line.StartsWith("name="))
+                {
+                    names = CSVParser.CSVLineSplit(line.Replace("name=", ""));
+                    line = await streamReader.ReadLineAsync();
+                }
+                else if (line.StartsWith("data_type="))
+                {
+                    dataTypes = CSVParser.CSVLineSplit(line.Replace("data_type=", ""));
+                    line = await streamReader.ReadLineAsync();
+                }
+                else if (line.StartsWith("visualization_type="))
+                {
+                    visualizationTypes = CSVParser.CSVLineSplit(line.Replace("visualization_type=", ""));
+                    line = await streamReader.ReadLineAsync();
+                }
+                else if (line.StartsWith("display="))
+                {
+                    displays = CSVParser.CSVLineSplit(line.Replace("display=", ""));
+                    line = await streamReader.ReadLineAsync();
+                }
+                else
+                {
+                    break;
+                }
+            }
 
             for (int i = 0; i < names.Count; i++)
             {
@@ -40,7 +70,7 @@ namespace PanoramicData.model.data.sim
                 attributeModel.OriginModel = this;
                 _attributeModels.Add(attributeModel);
             }
-            string line = await streamReader.ReadLineAsync();
+            
             int count = 0;
             while (line != null)
             {
@@ -81,8 +111,16 @@ namespace PanoramicData.model.data.sim
                 line = await streamReader.ReadLineAsync();
                 count++;
             }
-
+            _idAttributeModel.IsDisplayed = false;
             _attributeModels.Add(_idAttributeModel);
+
+            for (int i = 0; i < _attributeModels.Count; i++)
+            {
+                if (displays.Count > i && displays[i] == "false")
+                {
+                    _attributeModels[i].IsDisplayed = false;
+                }
+            }
         }
 
 

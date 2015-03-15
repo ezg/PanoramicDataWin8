@@ -23,7 +23,7 @@ using Windows.UI.Xaml.Shapes;
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public sealed partial class KmeansRenderer : Renderer
+    public sealed partial class BarRenderer : Renderer
     {
         private int _toLoad = 0;
         private int _loaded = 0;
@@ -31,10 +31,10 @@ namespace PanoramicDataWin8.view.vis.render
         private List<Vec> _clusterCenters = new List<Vec>();
         private List<Vec> _samples = new List<Vec>();
 
-        public KmeansRenderer()
+        public BarRenderer()
         {
             this.InitializeComponent();
-            this.DataContextChanged += KmeansRenderer_DataContextChanged;
+            this.DataContextChanged += BarRenderer_DataContextChanged;
         }
         public override void Dispose()
         {
@@ -47,7 +47,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void KmeansRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        void BarRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (args.NewValue != null)
             {
@@ -104,12 +104,12 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Begin();
 
                 animation = new DoubleAnimation();
-                animation.From = renderCanvas.Opacity;
+                animation.From = dxSurface.Opacity;
                 animation.To = 1;
                 animation.EasingFunction = easingFunction;
                 storyboard = new Storyboard();
                 storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, renderCanvas);
+                Storyboard.SetTarget(animation, dxSurface);
                 Storyboard.SetTargetProperty(animation, "Opacity");
                 storyboard.Begin();
 
@@ -139,12 +139,12 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Begin();
 
                 animation = new DoubleAnimation();
-                animation.From = renderCanvas.Opacity;
+                animation.From = dxSurface.Opacity;
                 animation.To = 0;
                 animation.EasingFunction = easingFunction;
                 storyboard = new Storyboard();
                 storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, renderCanvas);
+                Storyboard.SetTarget(animation, dxSurface);
                 Storyboard.SetTargetProperty(animation, "Opacity");
                 storyboard.Begin();
             }
@@ -199,7 +199,7 @@ namespace PanoramicDataWin8.view.vis.render
             double scaleX = (model.Size.X * 0.7) / (maxX - minX);
             double scaleY = (model.Size.Y * 0.7) / (maxY - minY);
 
-            renderCanvas.Children.Clear();
+           // renderCanvas.Children.Clear();
 
             foreach (var c in _clusterCenters)
             {
@@ -211,7 +211,7 @@ namespace PanoramicDataWin8.view.vis.render
                     X = c.X * scaleX + xOffset - 5,
                     Y = c.Y * scaleY + yOffset - 5
                 };
-                renderCanvas.Children.Add(r);
+               // renderCanvas.Children.Add(r);
             }
             foreach (var s in _samples)
             {
@@ -223,7 +223,7 @@ namespace PanoramicDataWin8.view.vis.render
                     X = s.X * scaleX + xOffset - 5,
                     Y = s.Y * scaleY + yOffset - 5
                 };
-                renderCanvas.Children.Add(r);
+               // renderCanvas.Children.Add(r);
             }
         }
     }
