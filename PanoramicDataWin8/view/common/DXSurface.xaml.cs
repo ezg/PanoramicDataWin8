@@ -316,7 +316,7 @@ namespace PanoramicDataWin8.view.common
         {
 
         }
-        public virtual void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector,  DW.Factory1 dwFactory)
+        public virtual void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
         {
 
         }

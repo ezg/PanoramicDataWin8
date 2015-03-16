@@ -101,6 +101,7 @@ namespace PanoramicData.model.data
         public static string GEOGRAPHY = "geography";
         public static string CATEGORY = "category";
         public static string ENUM = "enum";
+        public static string ENUM_LONG = "enum_long";
         public static string BOOLEAN = "boolean";
     }
 }

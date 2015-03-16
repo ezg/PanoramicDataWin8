@@ -275,6 +275,12 @@
     <Content Include="Assets\data\config\census_csv.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\data\raw\nba.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\data\config\nba_csv - Copy.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="packages.config" />
     <None Include="PanoramicDataWin8_TemporaryKey.pfx" />
   </ItemGroup>
