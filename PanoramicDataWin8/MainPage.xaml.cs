@@ -46,6 +46,21 @@ namespace PanoramicDataWin8
             this.Loaded += MainPage_Loaded;
             this.DataContextChanged += MainPage_DataContextChanged;
             this.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(MainPage_PointerPressed), true);
+            this.KeyUp += MainPage_KeyUp;
+        }
+
+        void MainPage_KeyUp(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == Windows.System.VirtualKey.Up)
+            {
+                MainViewController.Instance.MainModel.SampleSize = MainViewController.Instance.MainModel.SampleSize * 10;
+                Debug.WriteLine("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
+            } 
+            else if (e.Key == Windows.System.VirtualKey.Down)
+            {
+                MainViewController.Instance.MainModel.SampleSize = Math.Max(MainViewController.Instance.MainModel.SampleSize / 10.0, 1.0);
+                Debug.WriteLine("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
+            }
         }
 
         void MainPage_PointerPressed(object sender, PointerRoutedEventArgs e)

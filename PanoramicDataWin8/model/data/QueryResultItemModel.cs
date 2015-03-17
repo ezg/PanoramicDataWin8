@@ -80,9 +80,13 @@ namespace PanoramicData.model.data
             }
         }
 
-        public void Update(QueryResultItemModel sample)
+        public void Update(QueryResultItemModel updateTo)
         {
-            //throw new NotImplementedException();
+            this.JobResultValues = updateTo.JobResultValues;
+            this.IsSelected = updateTo.IsSelected;
+            this.GroupingObject = updateTo.GroupingObject;
+            this.AttributeValues = updateTo.AttributeValues;
+            this.RowNumber = updateTo.RowNumber;
         }
     }
 

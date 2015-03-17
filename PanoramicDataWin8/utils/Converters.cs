@@ -105,7 +105,7 @@ namespace PanoramicData.utils
                 {
                     return model.AttributeValues[AttributeOperationModel].ShortStringValue;
                 }
-                return "";
+                return ""; 
             }
             return null;
         }

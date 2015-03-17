@@ -35,7 +35,6 @@ namespace PanoramicData.model.view
         }
 
         private SchemaModel _schemaModel;
-
         public SchemaModel SchemaModel
         {
             get
@@ -45,6 +44,19 @@ namespace PanoramicData.model.view
             set
             {
                 this.SetProperty(ref _schemaModel, value);
+            }
+        }
+
+        private double _sampleSize = 100.0;
+        public double SampleSize
+        {
+            get
+            {
+                return _sampleSize;
+            }
+            set
+            {
+                this.SetProperty(ref _sampleSize, value);
             }
         }
     }
