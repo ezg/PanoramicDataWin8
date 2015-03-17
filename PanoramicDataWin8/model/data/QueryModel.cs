@@ -17,6 +17,8 @@ namespace PanoramicData.model.data
     [JsonObject(MemberSerialization.OptOut)]
     public class QueryModel : ExtendedBindableBase
     {
+        private static long _nextId = 0;
+
         public delegate void QueryModelUpdatedHandler(object sender, QueryModelUpdatedEventArgs e);
         public event QueryModelUpdatedHandler QueryModelUpdated;
 
@@ -24,6 +26,22 @@ namespace PanoramicData.model.data
             : this(null)
         {
         }
+
+        public QueryModel(SchemaModel schemaModel)
+        {
+            _id = _nextId++;
+            _schemaModel = schemaModel;
+            _queryResultModel = new QueryResultModel();
+
+            foreach (var attributeFunction in Enum.GetValues(typeof(AttributeFunction)).Cast<AttributeFunction>())
+            {
+                _attributeFunctionOperationModels.Add(attributeFunction, new ObservableCollection<AttributeOperationModel>());
+                _attributeFunctionOperationModels[attributeFunction].CollectionChanged += AttributeOperationModel_CollectionChanged;
+            }
+
+            _linkModels.CollectionChanged += LinkModels_CollectionChanged;
+        }
+
 
         public QueryModel Clone()
         {
@@ -48,19 +66,6 @@ namespace PanoramicData.model.data
             return deserializedQueryModel;
         }
 
-        public QueryModel(SchemaModel schemaModel)
-        {
-            _schemaModel = schemaModel;
-            _queryResultModel = new QueryResultModel();
-
-            foreach (var attributeFunction in Enum.GetValues(typeof(AttributeFunction)).Cast<AttributeFunction>())
-            {
-                _attributeFunctionOperationModels.Add(attributeFunction, new ObservableCollection<AttributeOperationModel>());
-                _attributeFunctionOperationModels[attributeFunction].CollectionChanged += AttributeOperationModel_CollectionChanged;
-            }
-
-            _linkModels.CollectionChanged += LinkModels_CollectionChanged;
-        }
 
         void LinkModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -121,6 +126,16 @@ namespace PanoramicData.model.data
         void AttributeOperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             FireQueryModelUpdated(QueryModelUpdatedEventType.Structure);   
+        }
+
+        private long _id = 0;
+        [JsonIgnore]
+        public long Id
+        {
+            get
+            {
+                return _id;
+            }
         }
 
         
@@ -429,6 +444,25 @@ namespace PanoramicData.model.data
             {
                 this.SetProperty(ref _kmeansNrSamples, value);
             }
+        }
+
+
+        public override bool Equals(object obj)
+        {
+            if (obj is QueryModel)
+            {
+                var am = obj as QueryModel;
+                return
+                    am.Id.Equals(this.Id);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            int code = 0;
+            code ^= this.Id.GetHashCode();
+            return code;
         }
     }
 

@@ -30,7 +30,7 @@ namespace PanoramicData.controller.data.sim
             AsyncVirtualizedCollection<QueryResultItemModel> dataValues = new AsyncVirtualizedCollection<QueryResultItemModel>(itemsProvider,
                 1000,  // page size
                 -1);
-            queryModel.QueryResultModel.QueryResultItemModels = dataValues;
+            //queryModel.QueryResultModel.QueryResultItemModels = dataValues;
         }
 
         public async void LoadFileDescription(TuppleWareOriginModel tuppleWareOriginModel)

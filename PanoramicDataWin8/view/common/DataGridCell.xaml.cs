@@ -61,8 +61,8 @@ namespace PanoramicDataWin8.view.common
             {
                 if (DataContext != null)
                 {
-                    DataWrapper<QueryResultItemModel> dataWrapper = DataContext as DataWrapper<QueryResultItemModel>;
-                    dataWrapper.PropertyChanged += dataWrapper_PropertyChanged;
+                    QueryResultItemModel queryResultItemModel = DataContext as QueryResultItemModel;
+                    queryResultItemModel.PropertyChanged += queryResultItemModel_PropertyChanged;
                 }
                 updateValue();
 
@@ -83,20 +83,19 @@ namespace PanoramicDataWin8.view.common
             updateWidth();
         }
 
-        void dataWrapper_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void queryResultItemModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             updateValue();
         }
 
         private void updateValue()
         {
-            DataWrapper<QueryResultItemModel> dataWrapper = DataContext as DataWrapper<QueryResultItemModel>;
-            if (dataWrapper!= null && dataWrapper.Data != null && HeaderObject != null && HeaderObject.AttributeViewModel != null)
+            QueryResultItemModel queryResultItemModel = DataContext as QueryResultItemModel;
+            if (queryResultItemModel != null && HeaderObject != null && HeaderObject.AttributeViewModel != null)
             {
-                QueryResultItemModel model = dataWrapper.Data;
-                if (model.AttributeValues.ContainsKey(HeaderObject.AttributeViewModel.AttributeOperationModel))
+                if (queryResultItemModel.AttributeValues.ContainsKey(HeaderObject.AttributeViewModel.AttributeOperationModel))
                 {
-                    textBlock.Text = model.AttributeValues[HeaderObject.AttributeViewModel.AttributeOperationModel].ShortStringValue;
+                    textBlock.Text = queryResultItemModel.AttributeValues[HeaderObject.AttributeViewModel.AttributeOperationModel].ShortStringValue;
                     return;
                 }
             }

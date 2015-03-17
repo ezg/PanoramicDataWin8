@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Storage;
+using PanoramicDataWin8.utils;
 
 namespace PanoramicData.model.data.sim
 {
@@ -19,6 +20,7 @@ namespace PanoramicData.model.data.sim
         {
             _datasetConfiguration = datasetConfiguration;
             _idAttributeModel = new SimAttributeModel("ID", AttributeDataTypeConstants.INT, AttributeVisualizationTypeConstants.NUMERIC);
+            _idAttributeModel.OriginModel = this;
             
         }
 
@@ -121,6 +123,9 @@ namespace PanoramicData.model.data.sim
                     _attributeModels[i].IsDisplayed = false;
                 }
             }
+
+            // shuffle randomly 
+            _data.Shuffle();
         }
 
 

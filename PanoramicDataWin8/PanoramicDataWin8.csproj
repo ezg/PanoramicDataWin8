@@ -278,7 +278,7 @@
     <Content Include="Assets\data\raw\nba.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\data\config\nba_csv - Copy.ini">
+    <Content Include="Assets\data\config\nba_csv.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
