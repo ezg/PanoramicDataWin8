@@ -38,7 +38,7 @@ namespace PanoramicData.controller.data.sim
                 _activeJobs.Remove(queryModel);
                 _updateIndexCache.Remove(queryModel);
             }
-            SimJob simJob = new SimJob(queryModel, TimeSpan.FromMilliseconds(100), (int)MainViewController.Instance.MainModel.SampleSize);
+            SimJob simJob = new SimJob(queryModel, TimeSpan.FromMilliseconds(3000), (int)MainViewController.Instance.MainModel.SampleSize);
             _activeJobs.Add(queryModel, simJob);
             _updateIndexCache.Add(queryModel, new Dictionary<GroupingObject, KeyValuePair<int, QueryResultItemModel>>());
             simJob.JobUpdate += simJob_JobUpdate;
@@ -107,6 +107,7 @@ namespace PanoramicData.controller.data.sim
                 }
             }
 
+            job.QueryModel.QueryResultModel.FireQueryResultModelUpdated();
             Debug.Assert(oldItems.Count < 10000, "size of result list should not be big");
         }
     }

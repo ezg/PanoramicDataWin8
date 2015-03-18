@@ -2,6 +2,7 @@
 using PanoramicData.model.data;
 using PanoramicData.model.view;
 using PanoramicData.utils;
+using PanoramicDataWin8.view.common;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,6 +19,11 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
+using SharpDX;
+using SharpDX.Direct3D11;
+using SharpDX.Toolkit.Graphics;
+using D2D = SharpDX.Direct2D1;
+using DW = SharpDX.DirectWrite;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -25,8 +31,7 @@ namespace PanoramicDataWin8.view.vis.render
 {
     public sealed partial class BarRenderer : Renderer
     {
-        private int _toLoad = 0;
-        private int _loaded = 0;
+        private BarRendererContentProvider _barRendererContentProvider;
 
         private List<Vec> _clusterCenters = new List<Vec>();
         private List<Vec> _samples = new List<Vec>();
@@ -35,7 +40,15 @@ namespace PanoramicDataWin8.view.vis.render
         {
             this.InitializeComponent();
             this.DataContextChanged += BarRenderer_DataContextChanged;
+            this.Loaded += BarRenderer_Loaded;
         }
+
+        void BarRenderer_Loaded(object sender, RoutedEventArgs e)
+        {
+            _barRendererContentProvider = new BarRendererContentProvider();
+            dxSurface.ContentProvider = _barRendererContentProvider;
+        }
+
         public override void Dispose()
         {
             base.Dispose();
@@ -43,8 +56,9 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
                 QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-                resultModel.PropertyChanged -= QueryResultModel_PropertyChanged;
+                resultModel.QueryResultModelUpdated -= resultModel_QueryResultModelUpdated;
             }
+            dxSurface.Dispose();
         }
 
         void BarRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
@@ -53,13 +67,13 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 (DataContext as VisualizationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
                 QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-                resultModel.PropertyChanged += QueryResultModel_PropertyChanged;
-                if (resultModel.QueryResultItemModels != null)
-                {
-                    resultModel.QueryResultItemModels.CollectionChanged += QueryResultItemModels_CollectionChanged;
-                    populateData();
-                }
+                resultModel.QueryResultModelUpdated += resultModel_QueryResultModelUpdated;
             }
+        }
+
+        void resultModel_QueryResultModelUpdated(object sender, EventArgs e)
+        {
+            populateData();
         }
 
         void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -70,21 +84,7 @@ namespace PanoramicDataWin8.view.vis.render
                 render();
             }
         }
-
-        void QueryResultItemModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            populateData();
-        }
-
-        void QueryResultModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-            if (e.PropertyName == resultModel.GetPropertyName(() => resultModel.QueryResultItemModels))
-            {
-                resultModel.QueryResultItemModels.CollectionChanged += QueryResultItemModels_CollectionChanged;
-                populateData();
-            }
-        }
+        
         private void populateData()
         {
             QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
@@ -113,14 +113,8 @@ namespace PanoramicDataWin8.view.vis.render
                 Storyboard.SetTargetProperty(animation, "Opacity");
                 storyboard.Begin();
 
-                _toLoad = resultModel.QueryResultItemModels.Count;
-                _loaded = 0;
                 _clusterCenters.Clear();
                 _samples.Clear();
-                foreach (var queryResultItemModel in resultModel.QueryResultItemModels)
-                {
-                    queryResultItemModel.PropertyChanged += queryResultItemModel_PropertyChanged;
-                }
             }
             else
             {
@@ -150,18 +144,6 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void queryResultItemModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "Data")
-            {
-                var dataWrapper = sender as DataWrapper<QueryResultItemModel>;
-                if (!dataWrapper.IsLoading && dataWrapper.Data != null)
-                {
-                    loadQueryResultItemModel(dataWrapper.Data);
-                }
-            }
-        }
-
         void loadQueryResultItemModel(QueryResultItemModel queryResultItemModel)
         {
             if (queryResultItemModel.JobResultValues.ContainsKey(JobTypeResult.ClusterX))
@@ -178,8 +160,8 @@ namespace PanoramicDataWin8.view.vis.render
                     double.Parse(queryResultItemModel.JobResultValues[JobTypeResult.SampleY].Value.ToString()));
                 _samples.Add(sample);
             }
-            _loaded++;
-            if (_toLoad == _loaded)
+            //_loaded++;
+            //if (_toLoad == _loaded)
             {
                 render();
             }
@@ -187,44 +169,23 @@ namespace PanoramicDataWin8.view.vis.render
 
         void render()
         {
-            double minX = Math.Min(_clusterCenters.Min(v => v.X), _samples.Min(v => v.X));
-            double minY = Math.Min(_clusterCenters.Min(v => v.Y), _samples.Min(v => v.Y));
-            double maxX = Math.Max(_clusterCenters.Max(v => v.X), _samples.Max(v => v.X));
-            double maxY = Math.Max(_clusterCenters.Max(v => v.Y), _samples.Max(v => v.Y));
-            
+            dxSurface.Redraw();
+        }
+    }
 
-            VisualizationViewModel model = (DataContext as VisualizationViewModel);
-            double xOffset = model.Size.X * 0.15;
-            double yOffset = model.Size.Y * 0.15;
-            double scaleX = (model.Size.X * 0.7) / (maxX - minX);
-            double scaleY = (model.Size.Y * 0.7) / (maxY - minY);
+    public class BarRendererContentProvider : DXSurfaceContentProvider
+    {
+        public override void Clear(GraphicsDevice graphicsDevice)
+        {
+            graphicsDevice.Clear(new Color(230, 230, 230));
+        }
 
-           // renderCanvas.Children.Clear();
-
-            foreach (var c in _clusterCenters)
-            {
-                Rectangle r = new Rectangle();
-                r.Fill = Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush;
-                r.Width = r.Height = 10;
-                r.RenderTransform = new TranslateTransform()
-                {
-                    X = c.X * scaleX + xOffset - 5,
-                    Y = c.Y * scaleY + yOffset - 5
-                };
-               // renderCanvas.Children.Add(r);
-            }
-            foreach (var s in _samples)
-            {
-                Rectangle r = new Rectangle();
-                r.Fill = Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush;
-                r.Width = r.Height = 10;
-                r.RenderTransform = new TranslateTransform()
-                {
-                    X = s.X * scaleX + xOffset - 5,
-                    Y = s.Y * scaleY + yOffset - 5
-                };
-               // renderCanvas.Children.Add(r);
-            }
+        public override void Draw(D2D.DeviceContext d2dDeviceContext)
+        {
+           
+        }
+        public override void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
+        {
         }
     }
 }

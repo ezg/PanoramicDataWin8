@@ -88,19 +88,13 @@ namespace PanoramicDataWin8.view.vis
             {
                 if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Bar)
                 {
-                    /* Renderer fRenderer = new XYRenderer()
-                     {
-                         RenderContent = new Direct2dXYRendererContent()
-                         {
-                             Scene = new ScatterPlotScene()
-                         }
-                     };
-                     contentGrid.Children.Add(fRenderer);*/
+                    _renderer = new BarRenderer();
+                    contentGrid.Children.Add(_renderer);
                 }
                 else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Table)
                 {
-                    /*Renderer renderer = new TableRenderer();
-                    contentGrid.Children.Add(fRenderer);*/
+                    _renderer = new TableRenderer();
+                    contentGrid.Children.Add(_renderer);
                 }
                 else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Plot)
                 {
@@ -118,8 +112,7 @@ namespace PanoramicDataWin8.view.vis
                     //(_front.Content as Front).SetContent(fRenderer);
                 }
                 
-                _renderer = new TableRenderer();
-                contentGrid.Children.Add(_renderer);
+                
             }
             else if (visualizationViewModel.QueryModel.JobType == JobType.Kmeans)
             {
