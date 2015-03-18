@@ -115,6 +115,9 @@ namespace PanoramicDataWin8.view.vis.render
 
                 _clusterCenters.Clear();
                 _samples.Clear();
+
+                loadQueryResultItemModels(resultModel);
+                render();
             }
             else
             {
@@ -144,8 +147,13 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void loadQueryResultItemModel(QueryResultItemModel queryResultItemModel)
+        void loadQueryResultItemModels(QueryResultModel resultModel)
         {
+            foreach (var queryResultItemModel in resultModel.QueryResultItemModels)
+            {
+                 
+            }
+
             if (queryResultItemModel.JobResultValues.ContainsKey(JobTypeResult.ClusterX))
             {
                 Vec cluster = new Vec(
