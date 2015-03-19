@@ -27,6 +27,9 @@ using PanoramicDataWin8.view;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.utils;
 using PanoramicData.model.data.sim;
+using Windows.UI.Notifications;
+using Windows.UI.Core;
+using Windows.System;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -51,15 +54,48 @@ namespace PanoramicDataWin8
 
         void MainPage_KeyUp(object sender, KeyRoutedEventArgs e)
         {
-            if (e.Key == Windows.System.VirtualKey.Up)
+            var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
+            if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
             {
-                MainViewController.Instance.MainModel.SampleSize = MainViewController.Instance.MainModel.SampleSize * 10;
-                Debug.WriteLine("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
-            } 
-            else if (e.Key == Windows.System.VirtualKey.Down)
-            {
-                MainViewController.Instance.MainModel.SampleSize = Math.Max(MainViewController.Instance.MainModel.SampleSize / 10.0, 1.0);
-                Debug.WriteLine("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
+                var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
+                var elements = toastXml.GetElementsByTagName("text");
+
+                if (e.Key == Windows.System.VirtualKey.Q)
+                {
+                    MainViewController.Instance.MainModel.SampleSize = MainViewController.Instance.MainModel.SampleSize * 10;
+                    Debug.WriteLine("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
+
+                    elements[0].AppendChild(toastXml.CreateTextNode("SampleSize : " + MainViewController.Instance.MainModel.SampleSize));
+                    var toast = new ToastNotification(toastXml);
+                    ToastNotificationManager.CreateToastNotifier().Show(toast);
+                }
+                else if (e.Key == Windows.System.VirtualKey.A)
+                {
+                    MainViewController.Instance.MainModel.SampleSize = Math.Max(MainViewController.Instance.MainModel.SampleSize / 10.0, 1.0);
+                    Debug.WriteLine("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
+
+                    elements[0].AppendChild(toastXml.CreateTextNode("SampleSize : " + MainViewController.Instance.MainModel.SampleSize));
+                    var toast = new ToastNotification(toastXml);
+                    ToastNotificationManager.CreateToastNotifier().Show(toast);
+                }
+                if (e.Key == Windows.System.VirtualKey.W)
+                {
+                    MainViewController.Instance.MainModel.ThrottleInMillis = MainViewController.Instance.MainModel.ThrottleInMillis + 300.0;
+                    Debug.WriteLine("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis);
+
+                    elements[0].AppendChild(toastXml.CreateTextNode("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis));
+                    var toast = new ToastNotification(toastXml);
+                    ToastNotificationManager.CreateToastNotifier().Show(toast);
+                }
+                else if (e.Key == Windows.System.VirtualKey.S)
+                {
+                    MainViewController.Instance.MainModel.ThrottleInMillis = Math.Max(MainViewController.Instance.MainModel.ThrottleInMillis - 300.0, 1.0);
+                    Debug.WriteLine("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis);
+
+                    elements[0].AppendChild(toastXml.CreateTextNode("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis));
+                    var toast = new ToastNotification(toastXml);
+                    ToastNotificationManager.CreateToastNotifier().Show(toast);
+                }
             }
         }
 

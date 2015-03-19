@@ -59,5 +59,18 @@ namespace PanoramicData.model.view
                 this.SetProperty(ref _sampleSize, value);
             }
         }
+
+        private double _throttleInMillis = 3000.0;
+        public double ThrottleInMillis
+        {
+            get
+            {
+                return _throttleInMillis;
+            }
+            set
+            {
+                this.SetProperty(ref _throttleInMillis, value);
+            }
+        }
     }
 }

@@ -42,7 +42,7 @@ namespace PanoramicData.controller.data.sim
             if ((queryModel.VisualizationType == VisualizationType.Table && queryModel.AttributeFunctionOperationModels.Count > 0) ||
                 (queryModel.VisualizationType != VisualizationType.Table && queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Any() &&  queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Any()))
             {
-                SimJob simJob = new SimJob(queryModel, TimeSpan.FromMilliseconds(3000), (int)MainViewController.Instance.MainModel.SampleSize);
+                SimJob simJob = new SimJob(queryModel, TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
                 _activeJobs.Add(queryModel, simJob);
                 _updateIndexCache.Add(queryModel, new Dictionary<GroupingObject, KeyValuePair<int, QueryResultItemModel>>());
                 simJob.JobUpdate += simJob_JobUpdate;
