@@ -318,6 +318,41 @@ namespace PanoramicData.model.data
             }
         }
 
+        public AxisType GetAxisType(AttributeOperationModel attributeOperationModel)
+        {
+            // determine axis type
+            // grouping or some aggregation
+            if (AttributeOperationModels.Any(aom => aom.IsGrouped || aom.IsBinned) ||
+                AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None))
+            {
+                if (attributeOperationModel.AggregateFunction == AggregateFunction.Avg ||
+                    attributeOperationModel.AggregateFunction == AggregateFunction.Sum ||
+                    attributeOperationModel.AggregateFunction == AggregateFunction.Count)
+                {
+                    return AxisType.Quantitative;
+                }
+                else if (attributeOperationModel.AggregateFunction == AggregateFunction.Max ||
+                         attributeOperationModel.AggregateFunction == AggregateFunction.Min) 
+                {
+                    if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT ||
+                        attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT)
+                    {
+                        return AxisType.Quantitative;
+                    }
+                }
+            }
+            // no grouping or aggrgation
+            else
+            {
+                if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT ||
+                    attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT)
+                {
+                    return AxisType.Quantitative;
+                }
+            }
+            return AxisType.Nominal;
+        }
+
         public string GetDataType(AttributeOperationModel attributeOperationModel, bool considerGrouping)
         {
             if (!considerGrouping)

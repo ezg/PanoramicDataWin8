@@ -154,7 +154,7 @@ namespace PanoramicDataWin8.view.vis.render
                  
             }
 
-            if (queryResultItemModel.JobResultValues.ContainsKey(JobTypeResult.ClusterX))
+           /* if (queryResultItemModel.JobResultValues.ContainsKey(JobTypeResult.ClusterX))
             {
                 Vec cluster = new Vec(
                     double.Parse(queryResultItemModel.JobResultValues[JobTypeResult.ClusterX].Value.ToString()),
@@ -167,7 +167,7 @@ namespace PanoramicDataWin8.view.vis.render
                     double.Parse(queryResultItemModel.JobResultValues[JobTypeResult.SampleX].Value.ToString()),
                     double.Parse(queryResultItemModel.JobResultValues[JobTypeResult.SampleY].Value.ToString()));
                 _samples.Add(sample);
-            }
+            }*/
             //_loaded++;
             //if (_toLoad == _loaded)
             {

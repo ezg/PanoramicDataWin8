@@ -34,5 +34,34 @@ namespace PanoramicData.model.data
                 QueryResultModelUpdated(this, new EventArgs());
             }
         }
+
+
+        private AxisType _xAxisType = AxisType.Nominal;
+        public AxisType XAxisType
+        {
+            get
+            {
+                return _xAxisType;
+            }
+            set
+            {
+                this.SetProperty(ref _xAxisType, value);
+            }
+        }
+
+        private AxisType _yAxisType = AxisType.Nominal;
+        public AxisType YAxisType
+        {
+            get
+            {
+                return _yAxisType;
+            }
+            set
+            {
+                this.SetProperty(ref _yAxisType, value);
+            }
+        }
     }
+
+    public enum AxisType { Quantitative, Nominal }
 }

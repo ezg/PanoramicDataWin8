@@ -41,6 +41,32 @@ namespace PanoramicData.model.data
             }
         }
 
+        private BinningObject _binningObject = null;
+        public BinningObject BinningObject
+        {
+            get
+            {
+                return _binningObject;
+            }
+            set
+            {
+                this.SetProperty(ref _binningObject, value);
+            }
+        }
+
+        private Dictionary<AttributeOperationModel, double> _partitions = null;
+        public Dictionary<AttributeOperationModel, double> Partitions
+        {
+            get
+            {
+                return _partitions;
+            }
+            set
+            {
+                this.SetProperty(ref _partitions, value);
+            }
+        }
+
         private bool _isSelected = false;
         public bool IsSelected
         {
@@ -88,6 +114,14 @@ namespace PanoramicData.model.data
             this.AttributeValues = updateTo.AttributeValues;
             this.RowNumber = updateTo.RowNumber;
         }
+    }
+
+    public class BinningObject
+    {
+        public double XFrom { get; set; }
+        public double XTo { get; set; }
+        public double YFrom { get; set; }
+        public double YTo { get; set; }
     }
 
     public class GroupingObject

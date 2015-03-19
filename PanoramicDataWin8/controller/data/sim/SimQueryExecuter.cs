@@ -38,12 +38,18 @@ namespace PanoramicData.controller.data.sim
                 _activeJobs.Remove(queryModel);
                 _updateIndexCache.Remove(queryModel);
             }
-            SimJob simJob = new SimJob(queryModel, TimeSpan.FromMilliseconds(3000), (int)MainViewController.Instance.MainModel.SampleSize);
-            _activeJobs.Add(queryModel, simJob);
-            _updateIndexCache.Add(queryModel, new Dictionary<GroupingObject, KeyValuePair<int, QueryResultItemModel>>());
-            simJob.JobUpdate += simJob_JobUpdate;
-            simJob.JobCompleted += simJob_JobCompleted;
-            simJob.Start();
+            // determine if new job is even needed (i.e., are all relevant attributeModels set)
+            if ((queryModel.VisualizationType == VisualizationType.Table && queryModel.AttributeFunctionOperationModels.Count > 0) ||
+                (queryModel.VisualizationType != VisualizationType.Table && queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Any() &&  queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Any()))
+            {
+                SimJob simJob = new SimJob(queryModel, TimeSpan.FromMilliseconds(3000), (int)MainViewController.Instance.MainModel.SampleSize);
+                _activeJobs.Add(queryModel, simJob);
+                _updateIndexCache.Add(queryModel, new Dictionary<GroupingObject, KeyValuePair<int, QueryResultItemModel>>());
+                simJob.JobUpdate += simJob_JobUpdate;
+                simJob.JobCompleted += simJob_JobCompleted;
+                simJob.Start();
+            }
+            
         }
 
         void simJob_JobCompleted(object sender, EventArgs e)
@@ -124,7 +130,10 @@ namespace PanoramicData.controller.data.sim
         private int _sampleSize = 0;
         private bool _additive = false;
         private TimeSpan _throttle = TimeSpan.FromMilliseconds(0);
+        private Binner _binner = new Binner();
         private Object _lock = new Object();
+        private AxisType _xAxisType = AxisType.Nominal;
+        private AxisType _yAxisType = AxisType.Nominal;
 
         public QueryModel QueryModel { get; set; }
 
@@ -138,14 +147,24 @@ namespace PanoramicData.controller.data.sim
         public void Start()
         {
             _isRunning = true;
-
             int samplesToCheck =-1;
-            if (QueryModel.VisualizationType == VisualizationType.Table &&
-                (QueryModel.AttributeOperationModels.Any(aom => aom.IsGrouped || aom.IsBinned) || QueryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None)))
+            if (QueryModel.VisualizationType == VisualizationType.Table)
             {
-                samplesToCheck = 1000;
+                _binner = null;
+                if (QueryModel.AttributeOperationModels.Any(aom => aom.IsGrouped || aom.IsBinned) || QueryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None))
+                {
+                    samplesToCheck = 1000;
+                }
             }
-
+            else
+            {
+                var xAom = QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
+                var yAom = QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
+                _xAxisType = QueryModel.GetAxisType(xAom);
+                _yAxisType = QueryModel.GetAxisType(yAom);
+                QueryModel.QueryResultModel.XAxisType = _xAxisType; 
+                QueryModel.QueryResultModel.YAxisType = _yAxisType;
+            }
             _simDataProvider = new SimDataProvider(QueryModel.Clone(), (QueryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data, samplesToCheck);
 
             Task.Run(() => run());
@@ -229,7 +248,6 @@ namespace PanoramicData.controller.data.sim
                 }
             });
         }
-
     }
 
     public class SimDataProvider
@@ -408,6 +426,10 @@ namespace PanoramicData.controller.data.sim
         }
     }
 
+    public class Binner
+    {
+
+    }
     
     public class DataEqualityComparer : IEqualityComparer<Dictionary<AttributeModel, object>>
     {
