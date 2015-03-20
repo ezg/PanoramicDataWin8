@@ -129,6 +129,7 @@ namespace PanoramicData.controller.data.sim
         private double _nrBinsY = 0;
         private int _sampleSize = 0;
         private bool _additive = false;
+        private bool _isGrouped = false;
         private TimeSpan _throttle = TimeSpan.FromMilliseconds(0);
         private Binner _binner = new Binner();
         private Object _lock = new Object();
@@ -136,6 +137,7 @@ namespace PanoramicData.controller.data.sim
         private AxisType _yAxisType = AxisType.Nominal;
 
         public QueryModel QueryModel { get; set; }
+        public QueryModel QueryModelClone { get; set; }
 
         public SimJob(QueryModel queryModel, TimeSpan throttle, int sampleSize)
         {
@@ -148,13 +150,12 @@ namespace PanoramicData.controller.data.sim
         {
             _isRunning = true;
             int samplesToCheck =-1;
+            QueryModelClone = QueryModel.Clone();
+            _isGrouped = QueryModel.AttributeOperationModels.Any(aom => aom.IsGrouped || aom.IsBinned) || QueryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None);
             if (QueryModel.VisualizationType == VisualizationType.Table)
             {
                 _binner = null;
-                if (QueryModel.AttributeOperationModels.Any(aom => aom.IsGrouped || aom.IsBinned) || QueryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None))
-                {
-                    samplesToCheck = 1000;
-                }
+                samplesToCheck = !_isGrouped ? 1000 : -1;
             }
             else
             {
@@ -164,8 +165,10 @@ namespace PanoramicData.controller.data.sim
                 _yAxisType = QueryModel.GetAxisType(yAom);
                 QueryModel.QueryResultModel.XAxisType = _xAxisType; 
                 QueryModel.QueryResultModel.YAxisType = _yAxisType;
+
+                _binner = !_isGrouped ? null : new Binner();
             }
-            _simDataProvider = new SimDataProvider(QueryModel.Clone(), (QueryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data, samplesToCheck);
+            _simDataProvider = new SimDataProvider(QueryModelClone, (QueryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data, samplesToCheck);
 
             Task.Run(() => run());
         }
@@ -183,6 +186,61 @@ namespace PanoramicData.controller.data.sim
             List<QueryResultItemModel> samples = _simDataProvider.GetSampleQueryResultItemModels(_sampleSize);
             while (samples != null && _isRunning)
             {
+                if (_binner == null)
+                {
+
+                }
+                else
+                {
+                    if (QueryModelClone.VisualizationType != VisualizationType.Table)
+                    {
+                        var xAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
+                        var yAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
+                        int xCount = 0;
+                        int yCount = 0;
+                        Dictionary<object, double> xUniqueValues = new Dictionary<object,double>();
+                        Dictionary<object, double> yUniqueValues = new Dictionary<object,double>();
+                        foreach (var sample in samples)
+                        {
+                            if (_xAxisType == AxisType.Nominal)
+                            {
+                                var queryValue = sample.AttributeValues[xAom];
+                                if (!xUniqueValues.ContainsKey(queryValue.Value))
+                                {
+                                    xUniqueValues.Add(queryValue.Value, xCount++);
+                                }
+                                sample.VisualizationResultValues.Add(VisualizationResult.X,
+                                    new QueryResultItemValueModel()
+                                    {
+                                        Value = xUniqueValues[queryValue.Value]
+                                    });
+                            }
+                            else
+                            {
+                                sample.VisualizationResultValues.Add(VisualizationResult.X, sample.AttributeValues[xAom]);
+                            }
+
+                            if (_yAxisType == AxisType.Nominal)
+                            {
+                                var queryValue = sample.AttributeValues[xAom];
+                                if (!yUniqueValues.ContainsKey(queryValue.Value))
+                                {
+                                    yUniqueValues.Add(queryValue.Value, yCount++);
+                                }
+                                sample.VisualizationResultValues.Add(VisualizationResult.Y,
+                                    new QueryResultItemValueModel()
+                                    {
+                                        Value = yUniqueValues[queryValue.Value]
+                                    });
+                            }
+                            else
+                            {
+                                sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[xAom]);
+                            }
+                        }
+                    }
+                }
+
                 /*List<DataPoint> sampleDataPoints = _dataController.GetSampleDataPoints(_nrProcessedSamples, _dataSampleSize);
 
                 CurrentBinStructure = processStep(sampleDataPoints, CurrentBinStructure, (int)Math.Round(_nrBinsX), (int)Math.Round(_nrBinsY), _additive);

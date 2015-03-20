@@ -15,8 +15,8 @@ namespace PanoramicData.model.data
         {
         }
 
-        private Dictionary<JobTypeResult, QueryResultItemValueModel> _jobResultValues = new Dictionary<JobTypeResult, QueryResultItemValueModel>();
-        public Dictionary<JobTypeResult, QueryResultItemValueModel> JobResultValues
+        private Dictionary<JobResult, QueryResultItemValueModel> _jobResultValues = new Dictionary<JobResult, QueryResultItemValueModel>();
+        public Dictionary<JobResult, QueryResultItemValueModel> JobResultValues
         {
             get
             {
@@ -27,6 +27,20 @@ namespace PanoramicData.model.data
                 this.SetProperty(ref _jobResultValues, value);
             }
         }
+
+        private Dictionary<VisualizationResult, QueryResultItemValueModel> _visualizationResultValues = new Dictionary<VisualizationResult, QueryResultItemValueModel>();
+        public Dictionary<VisualizationResult, QueryResultItemValueModel> VisualizationResultValues
+        {
+            get
+            {
+                return _visualizationResultValues;
+            }
+            set
+            {
+                this.SetProperty(ref _visualizationResultValues, value);
+            }
+        }
+
 
         private Dictionary<AttributeOperationModel, QueryResultItemValueModel> _attributeValues = new Dictionary<AttributeOperationModel, QueryResultItemValueModel>();
         public Dictionary<AttributeOperationModel, QueryResultItemValueModel> AttributeValues

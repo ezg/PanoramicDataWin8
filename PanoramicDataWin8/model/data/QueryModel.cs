@@ -518,5 +518,7 @@ namespace PanoramicData.model.data
 
     public enum JobType { DB, Kmeans }
 
-    public enum JobTypeResult { ClusterX, ClusterY, SampleX, SampleY }
+    public enum JobResult { ClusterX, ClusterY, SampleX, SampleY }
+
+    public enum VisualizationResult { X, Y }
 }

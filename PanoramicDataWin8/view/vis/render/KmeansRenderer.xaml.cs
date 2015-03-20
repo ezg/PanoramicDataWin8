@@ -164,18 +164,18 @@ namespace PanoramicDataWin8.view.vis.render
 
         void loadQueryResultItemModel(QueryResultItemModel queryResultItemModel)
         {
-            if (queryResultItemModel.JobResultValues.ContainsKey(JobTypeResult.ClusterX))
+            if (queryResultItemModel.JobResultValues.ContainsKey(JobResult.ClusterX))
             {
                 Vec cluster = new Vec(
-                    double.Parse(queryResultItemModel.JobResultValues[JobTypeResult.ClusterX].Value.ToString()),
-                    double.Parse(queryResultItemModel.JobResultValues[JobTypeResult.ClusterY].Value.ToString()));
+                    double.Parse(queryResultItemModel.JobResultValues[JobResult.ClusterX].Value.ToString()),
+                    double.Parse(queryResultItemModel.JobResultValues[JobResult.ClusterY].Value.ToString()));
                 _clusterCenters.Add(cluster);
             }
-            else if (queryResultItemModel.JobResultValues.ContainsKey(JobTypeResult.SampleX))
+            else if (queryResultItemModel.JobResultValues.ContainsKey(JobResult.SampleX))
             {
                 Vec sample = new Vec(
-                    double.Parse(queryResultItemModel.JobResultValues[JobTypeResult.SampleX].Value.ToString()),
-                    double.Parse(queryResultItemModel.JobResultValues[JobTypeResult.SampleY].Value.ToString()));
+                    double.Parse(queryResultItemModel.JobResultValues[JobResult.SampleX].Value.ToString()),
+                    double.Parse(queryResultItemModel.JobResultValues[JobResult.SampleY].Value.ToString()));
                 _samples.Add(sample);
             }
             _loaded++;

@@ -143,10 +143,10 @@ namespace PanoramicData.controller.data.sim
                     QueryResultItemValueModel valueModel = null;
 
                     valueModel = fromRaw(AttributeDataTypeConstants.FLOAT, k[0]);
-                    item.JobResultValues.Add(JobTypeResult.ClusterX, valueModel);
+                    item.JobResultValues.Add(JobResult.ClusterX, valueModel);
 
                     valueModel = fromRaw(AttributeDataTypeConstants.FLOAT, k[1]);
-                    item.JobResultValues.Add(JobTypeResult.ClusterY, valueModel);
+                    item.JobResultValues.Add(JobResult.ClusterY, valueModel);
 
                     returnList.Add(item);
                 }
@@ -158,10 +158,10 @@ namespace PanoramicData.controller.data.sim
                     QueryResultItemValueModel valueModel = null;
 
                     valueModel = fromRaw(AttributeDataTypeConstants.FLOAT, sample[0]);
-                    item.JobResultValues.Add(JobTypeResult.SampleX, valueModel);
+                    item.JobResultValues.Add(JobResult.SampleX, valueModel);
 
                     valueModel = fromRaw(AttributeDataTypeConstants.FLOAT, sample[1]);
-                    item.JobResultValues.Add(JobTypeResult.SampleY, valueModel);
+                    item.JobResultValues.Add(JobResult.SampleY, valueModel);
 
                     returnList.Add(item);
                 }
