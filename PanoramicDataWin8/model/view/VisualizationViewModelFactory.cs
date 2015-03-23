@@ -57,12 +57,12 @@ namespace PanoramicData.model.view
                     bin.IsBinned = true;
 
                     AttributeOperationModel y = new AttributeOperationModel(attributeOperationModel.AttributeModel);
-                    y.AggregateFunction = AggregateFunction.Count;
+                   // y.AggregateFunction = AggregateFunction.Count;
 
 
                     visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, x);
                     visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.Y, y);
-                    visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.Group, bin);
+                    //visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.Group, bin);
                 }
                 else if (attributeOperationModel.AttributeModel.AttributeVisualizationType == AttributeVisualizationTypeConstants.GEOGRAPHY)
                 {

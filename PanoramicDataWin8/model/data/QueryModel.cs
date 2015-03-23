@@ -235,7 +235,7 @@ namespace PanoramicData.model.data
         {
             foreach (var key in _attributeFunctionOperationModels.Keys)
             {
-                if (_attributeFunctionOperationModels[key].Contains(attributeOperationModel))
+                if (_attributeFunctionOperationModels[key].Any(aom => aom == attributeOperationModel))
                 {
                     RemoveFunctionAttributeOperationModel(key, attributeOperationModel);
                 }

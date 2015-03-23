@@ -25,6 +25,7 @@ using PanoramicDataWin8.utils;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
 using System.Diagnostics;
+using Windows.UI.Xaml.Media.Animation;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -82,6 +83,37 @@ namespace PanoramicDataWin8.view.common
                 mainGrid.Background = Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush;
                 border.BorderThickness = model.BorderThicknes;
             }
+
+            toggleHighlighted(model.IsHighlighted);
+        }
+
+        void toggleHighlighted(bool isHighlighted)
+        {
+            ExponentialEase easingFunction = new ExponentialEase();
+            easingFunction.EasingMode = EasingMode.EaseInOut;
+
+            ColorAnimation backgroundAnimation = new ColorAnimation();
+            backgroundAnimation.EasingFunction = easingFunction;
+            backgroundAnimation.Duration = TimeSpan.FromMilliseconds(300);
+            backgroundAnimation.From = (mainGrid.Background as SolidColorBrush).Color;
+
+            if (isHighlighted)
+            {
+                backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush).Color;
+                txtBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush);
+            }
+            else
+            {
+                backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush).Color;
+                txtBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush);
+            }
+            Storyboard storyboard = new Storyboard();
+            storyboard.Children.Add(backgroundAnimation);
+            Storyboard.SetTarget(backgroundAnimation, mainGrid);
+            Storyboard.SetTargetProperty(backgroundAnimation, "(Border.Background).(SolidColorBrush.Color)");
+            //Storyboard.SetTargetProperty(foregroundAnimation, "(TextBlock.Foreground).Color");
+
+            storyboard.Begin();
         }
 
         void mainPointerManager_Added(object sender, PointerManagerEvent e)

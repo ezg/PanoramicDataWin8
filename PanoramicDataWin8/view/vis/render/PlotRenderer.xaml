@@ -4,7 +4,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:PanoramicDataWin8.view.vis.render"
     xmlns:common="using:PanoramicDataWin8.view.common"
-    xmlns:transform="using:WinRTXamlToolkit.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -14,56 +13,18 @@
     
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="54"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="54"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
 
-        <Grid Name="xAttributeView" Grid.Column="1" Grid.Row="0" Background="{StaticResource lightBrush}">
-            <Border Name="xAttributeViewBorder" Background="{StaticResource lightBrush}" BorderBrush="{StaticResource backgroundBrush}" BorderThickness="0,0,0,4">
-                <Viewbox Margin="2">
-                    <TextBlock 
-                        Name="xAttributeTextBlock"
-                        CacheMode="BitmapCache"
-                        RenderTransformOrigin="0.5, 0.5"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch"
-                        TextAlignment="Center"  
-                        Text="{Binding MainLabel}" FontSize="14" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap">
-                        <TextBlock.RenderTransform>
-                            <RotateTransform Angle="{Binding TextAngle}" CenterX="0" CenterY="0"/>
-                        </TextBlock.RenderTransform>
-                    </TextBlock>
-                </Viewbox>
-            </Border>
-        </Grid>
-
-        <Grid Name="yAttributeView" Grid.Column="0" Grid.Row="1" Background="{StaticResource lightBrush}" >
-            <Border Name="yAttributeViewBorder" Background="{StaticResource lightBrush}" BorderBrush="{StaticResource backgroundBrush}" BorderThickness="0,0,4,0">
-                <Viewbox Margin="2" >
-                    <transform:LayoutTransformControl x:Name="transformControl">
-                        <transform:LayoutTransformControl.Transform>
-                            <RotateTransform x:Name="rotateTransform" Angle="270"/>
-                        </transform:LayoutTransformControl.Transform>
-                        <TextBlock 
-                            Name="yAttributeTextBlock"
-                            CacheMode="BitmapCache"
-                            VerticalAlignment="Stretch"
-                            HorizontalAlignment="Stretch" 
-                            TextAlignment="Center"  
-                            Text="{Binding MainLabel}" FontSize="14" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
-                    </transform:LayoutTransformControl>
-                </Viewbox>
-            </Border>
-
-        </Grid>
-
-        
+        <common:AttributeView x:Name="xAttributeView" Grid.Column="1" Grid.Row="0"/>
+        <common:AttributeView x:Name="yAttributeView" Grid.Column="0" Grid.Row="1"/>
         
         <Grid Grid.Column="1" Grid.Row="1">
             <Viewbox MaxWidth="150">

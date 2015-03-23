@@ -147,6 +147,19 @@ namespace PanoramicData.model.view
             }
         }
 
+        private bool _isHighlighted = false;
+        public bool IsHighlighted
+        {
+            get
+            {
+                return _isHighlighted;
+            }
+            set
+            {
+                this.SetProperty(ref _isHighlighted, value);
+            }
+        }
+
         private bool _isMenuEnabled = true;
         public bool IsMenuEnabled
         {

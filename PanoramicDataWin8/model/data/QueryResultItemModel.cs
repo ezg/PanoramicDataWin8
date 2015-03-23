@@ -41,6 +41,71 @@ namespace PanoramicData.model.data
             }
         }
 
+        private double _binMinXValue = 0;
+        public double BinMinXValue
+        {
+            get
+            {
+                return _binMinXValue;
+            }
+            set
+            {
+                this.SetProperty(ref _binMinXValue, value);
+            }
+        }
+
+        private double _binMinYValue = 0;
+        public double BinMinYValue
+        {
+            get
+            {
+                return _binMinYValue;
+            }
+            set
+            {
+                this.SetProperty(ref _binMinYValue, value);
+            }
+        }
+
+        private double _binMaxXValue = 0;
+        public double BinMaxXValue
+        {
+            get
+            {
+                return _binMaxXValue;
+            }
+            set
+            {
+                this.SetProperty(ref _binMaxXValue, value);
+            }
+        }
+
+        private double _binMaxYValue = 0;
+        public double BinMaxYValue
+        {
+            get
+            {
+                return _binMaxYValue;
+            }
+            set
+            {
+                this.SetProperty(ref _binMaxYValue, value);
+            }
+        }
+
+        private double _binSize = 0;
+        public double BinSize
+        {
+            get
+            {
+                return _binSize;
+            }
+            set
+            {
+                this.SetProperty(ref _binSize, value);
+            }
+        }
+
         public double XValue
         {
             get
@@ -142,6 +207,12 @@ namespace PanoramicData.model.data
             this.AttributeValues = updateTo.AttributeValues;
             this.RowNumber = updateTo.RowNumber;
             this.VisualizationResultValues = updateTo.VisualizationResultValues;
+
+            this.BinSize = updateTo.BinSize;
+            this.BinMinXValue = updateTo.BinMinXValue;
+            this.BinMinYValue = updateTo.BinMinYValue;
+            this.BinMaxXValue = updateTo.BinMaxXValue;
+            this.BinMaxYValue = updateTo.BinMaxYValue;
         }
     }
 

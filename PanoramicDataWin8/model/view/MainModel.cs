@@ -60,6 +60,32 @@ namespace PanoramicData.model.view
             }
         }
 
+        private double _nrOfXBins = 10.0;
+        public double NrOfXBins
+        {
+            get
+            {
+                return _nrOfXBins;
+            }
+            set
+            {
+                this.SetProperty(ref _nrOfXBins, value);
+            }
+        }
+
+        private double _nrOfYBins = 10.0;
+        public double NrOfYBins
+        {
+            get
+            {
+                return _nrOfYBins;
+            }
+            set
+            {
+                this.SetProperty(ref _nrOfYBins, value);
+            }
+        }
+
         private double _throttleInMillis = 300.0;
         public double ThrottleInMillis
         {

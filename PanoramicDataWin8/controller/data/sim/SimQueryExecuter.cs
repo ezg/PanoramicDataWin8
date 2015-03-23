@@ -148,10 +148,12 @@ namespace PanoramicData.controller.data.sim
 
         public void Start()
         {
+            QueryModelClone = QueryModel.Clone();
+
             _isRunning = true;
             int samplesToCheck =-1;
-            QueryModelClone = QueryModel.Clone();
             _isGrouped = QueryModel.AttributeOperationModels.Any(aom => aom.IsGrouped || aom.IsBinned) || QueryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None);
+
             if (QueryModel.VisualizationType == VisualizationType.Table)
             {
                 _binner = null;
@@ -166,7 +168,14 @@ namespace PanoramicData.controller.data.sim
                 QueryModel.QueryResultModel.XAxisType = _xAxisType; 
                 QueryModel.QueryResultModel.YAxisType = _yAxisType;
 
-                _binner = !_isGrouped ? null : new Binner();
+                _binner = new Binner()
+                {
+                    NrOfXBins = MainViewController.Instance.MainModel.NrOfXBins,
+                    NrOfYBins = MainViewController.Instance.MainModel.NrOfYBins,
+                    Incremental = true,
+                    XAxisType = _xAxisType,
+                    YAxisType = _yAxisType
+                };
             }
             _simDataProvider = new SimDataProvider(QueryModelClone, (QueryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data, samplesToCheck);
 
@@ -189,12 +198,12 @@ namespace PanoramicData.controller.data.sim
                 if (QueryModelClone.VisualizationType != VisualizationType.Table)
                 {
                     setVisualizationValues(samples);
-                }
-                if (_binner == null)
-                {
-                    //_binner.processStep
-                }
-                
+                    if (_binner != null)
+                    {
+                        _binner.ProcessStep(samples);
+                    }
+                    samples = convertBinsToQueryResultItemModels(_binner.LastBinStructure);
+                } 
                 
                 if (_isRunning)
                 {
@@ -257,6 +266,33 @@ namespace PanoramicData.controller.data.sim
                 }
             }
         }
+        
+        private List<QueryResultItemModel> convertBinsToQueryResultItemModels(BinStructure binStructure)
+        {
+            List<QueryResultItemModel> newSamples = new List<QueryResultItemModel>();
+            for (int col = 0; col < binStructure.Bins.Count; col++)
+            {
+                for (int row = 0; row < binStructure.Bins[col].Count; row++)
+                {
+                    Bin bin = binStructure.Bins[col][row];
+                    QueryResultItemModel itemModel = new QueryResultItemModel();
+                    itemModel.BinMinXValue = bin.BinMinX;
+                    itemModel.BinMinYValue = bin.BinMinY;
+                    itemModel.BinMaxXValue = bin.BinMaxX;
+                    itemModel.BinMaxYValue = bin.BinMaxY;
+                    itemModel.BinSize = bin.Size;
+
+                    GroupingObject go = new GroupingObject(true, false, -1);
+                    go.Add(0, col);
+                    go.Add(1, row);
+
+                    itemModel.GroupingObject = go;
+                    newSamples.Add(itemModel);
+                }
+            }
+            return newSamples;
+        }
+
 
         private async Task fireUpdated(List<QueryResultItemModel> samples)
         {
@@ -461,158 +497,85 @@ namespace PanoramicData.controller.data.sim
 
     public class Binner
     {
-        public BinStructure CurrentBinStructure { get; set; }
+        public bool Incremental { get; set; }
+        public AxisType XAxisType { get; set; }
+        public AxisType YAxisType { get; set; }
+        public double NrOfXBins { get; set; }
+        public double NrOfYBins { get; set; }
+        public BinStructure LastBinStructure { get; set; }
 
-        public BinStructure ProcessStep(List<QueryResultItemModel> sampleQueryResultItemModels, int numberOfXBins, int numberOfYBins, bool additive)
+        public void ProcessStep(List<QueryResultItemModel> sampleQueryResultItemModels)
         {
-            double sizeX = 0;
-            double sizeY = 0;
-
             double minX = sampleQueryResultItemModels.Min(dp => dp.XValue);
             double minY = sampleQueryResultItemModels.Min(dp => dp.YValue);
-            double maxX = sampleQueryResultItemModels.Max(dp => dp.XValue) + 0.001;
-            double maxY = sampleQueryResultItemModels.Max(dp => dp.YValue) + 0.001;
+            double maxX = sampleQueryResultItemModels.Max(dp => dp.XValue);
+            double maxY = sampleQueryResultItemModels.Max(dp => dp.YValue);
 
-            if (CurrentBinStructure != null && additive)
+            if (LastBinStructure != null && Incremental)
             {
-                minX = Math.Min(CurrentBinStructure.MinX, minX);
-                minY = Math.Min(CurrentBinStructure.MinY, minY);
-                maxX = Math.Max(CurrentBinStructure.MaxX, maxX);
-                maxY = Math.Max(CurrentBinStructure.MaxY, maxY);
+                minX = Math.Min(LastBinStructure.MinX, minX);
+                minY = Math.Min(LastBinStructure.MinY, minY);
+                maxX = Math.Max(LastBinStructure.MaxX, maxX);
+                maxY = Math.Max(LastBinStructure.MaxY, maxY);
             }
             else
             {
-                sizeX = (maxX - minX) / (double)numberOfXBins;
-                sizeY = (maxY - minY) / (double)numberOfYBins;
-                CurrentBinStructure = new BinStructure();
-                CurrentBinStructure.SizeX = sizeX;
-                CurrentBinStructure.SizeY = sizeY;
-
-                for (int xIndex = 0; xIndex < numberOfXBins; xIndex++)
-                {
-                    double x = minX + xIndex * sizeX;
-                    List<Bin> newBinCol = new List<Bin>();
-                    for (int yIndex = 0; yIndex < numberOfYBins; yIndex++)
-                    {
-                        double y = minY + yIndex * sizeY;
-                        Bin bin = new Bin()
-                        {
-                            BinMinX = x,
-                            BinMaxX = x + sizeX,
-                            BinMinY = y,
-                            BinMaxY = y + sizeY,
-                            Count = 0
-                        };
-                        newBinCol.Add(bin);
-                    }
-                    CurrentBinStructure.Bins.Add(newBinCol);
-                }
-
-                CurrentBinStructure.MinX = minX;
-                CurrentBinStructure.MinY = minY;
-                CurrentBinStructure.MaxX = maxX;
-                CurrentBinStructure.MaxY = maxY;
+                LastBinStructure = initializeBinStructure(minX, maxX, minY, maxY);
             }
             double plusX = 0;
             double plusY = 0;
-            if (minX < CurrentBinStructure.MinX)
-            {
-                minX = CurrentBinStructure.MinX - (Math.Ceiling((CurrentBinStructure.MinX - minX) / CurrentBinStructure.SizeX) * CurrentBinStructure.SizeX);
-                plusX += Math.Ceiling((CurrentBinStructure.MinX - minX) / CurrentBinStructure.SizeX);
-            }
-            if (maxX > CurrentBinStructure.MaxX)
-            {
-                maxX = CurrentBinStructure.MaxX + (Math.Ceiling((maxX - CurrentBinStructure.MaxX) / CurrentBinStructure.SizeX) * CurrentBinStructure.SizeX);
-                plusX += Math.Ceiling((maxX - CurrentBinStructure.MaxX) / CurrentBinStructure.SizeX);
-            }
-            if (minY < CurrentBinStructure.MinY)
-            {
-                minY = CurrentBinStructure.MinY - (Math.Ceiling((CurrentBinStructure.MinY - minY) / CurrentBinStructure.SizeY) * CurrentBinStructure.SizeY);
-                plusY += Math.Ceiling((CurrentBinStructure.MinY - minY) / CurrentBinStructure.SizeY);
-            }
-            if (maxY > CurrentBinStructure.MaxY)
-            {
-                maxY = CurrentBinStructure.MaxY + (Math.Ceiling((maxY - CurrentBinStructure.MaxY) / CurrentBinStructure.SizeY) * CurrentBinStructure.SizeY);
-                plusY += Math.Ceiling((maxY - CurrentBinStructure.MaxY) / CurrentBinStructure.SizeY);
-            }
-            if (plusX != 0)
-            {
-                plusX = Math.Ceiling(plusX / numberOfXBins) * numberOfXBins;
-            }
-            if (plusY != 0)
-            {
-                plusY = Math.Ceiling(plusY / numberOfYBins) * numberOfYBins;
-            }
+            calculateNrOfBinsToAdd(out plusX, out plusY, minX, maxX, minY, maxY);
 
+            BinStructure tempBinStructure = initializeBinStructure(minX, maxX, minY, maxY,
+                LastBinStructure.SizeX, LastBinStructure.SizeY,
+                LastBinStructure.Bins.Count + plusX, LastBinStructure.Bins[0].Count + plusY);
 
-            BinStructure newBinStructure = new BinStructure();
+            binSamples(tempBinStructure, sampleQueryResultItemModels);
 
-            sizeX = CurrentBinStructure.SizeX;
-            sizeY = CurrentBinStructure.SizeY;
-            newBinStructure.SizeX = sizeX;
-            newBinStructure.SizeY = sizeY;
-
-            for (int xIndex = 0; xIndex < CurrentBinStructure.Bins.Count + plusX; xIndex++)
+            // re-map old bins
+            if (Incremental)
             {
-                double x = minX + xIndex * sizeX;
-                List<Bin> newBinCol = new List<Bin>();
-                for (int yIndex = 0; yIndex < CurrentBinStructure.Bins[0].Count + plusY; yIndex++)
+                foreach (var oldBin in LastBinStructure.Bins.SelectMany(b => b))
                 {
-                    double y = minY + yIndex * sizeY;
-                    Bin bin = new Bin()
+                    int containCount = 0;
+                    foreach (var newBin in tempBinStructure.Bins.SelectMany(b => b))
                     {
-                        BinMinX = x,
-                        BinMaxX = x + sizeX,
-                        BinMinY = y,
-                        BinMaxY = y + sizeY,
-                        Count = 0
-                    };
-                    // new datapoints
-                    List<QueryResultItemModel> intersectingQueryResultItemModels = new List<QueryResultItemModel>();
-                    foreach (var dp in sampleQueryResultItemModels)
-                    {
-                        if (bin.BinIntersects(dp.XValue, dp.YValue))
+                        if (newBin.ContainsBin(oldBin))
                         {
-                            intersectingQueryResultItemModels.Add(dp);
+                            newBin.Count += oldBin.Count;
+                            containCount++;
                         }
                     }
-                    bin.Count = intersectingQueryResultItemModels.Count;
-                    newBinCol.Add(bin);
-                }
-                newBinStructure.Bins.Add(newBinCol);
-            }
-
-            // old bins
-            foreach (var oldBin in CurrentBinStructure.Bins.SelectMany(b => b))
-            {
-                int containCount = 0;
-                foreach (var newBin in newBinStructure.Bins.SelectMany(b => b))
-                {
-                    if (newBin.ContainsBin(oldBin))
+                    if (containCount != 1)
                     {
-                        newBin.Count += oldBin.Count;
-                        containCount++;
+
                     }
                 }
-                if (containCount != 1)
-                {
-
-                }
             }
 
+            int xBinsToMerge = XAxisType == AxisType.Quantitative ? (int)(tempBinStructure.Bins.Count / (NrOfXBins + 1)) : 1;
+            int yBinsToMerge = YAxisType == AxisType.Quantitative ? (int)(tempBinStructure.Bins[0].Count / (NrOfYBins + 1)) : 1;
+
             BinStructure mergedBinStructure = new BinStructure();
-            int xBinsToMerge = (int)(newBinStructure.Bins.Count / numberOfXBins);
-            int yBinsToMerge = (int)(newBinStructure.Bins[0].Count / numberOfYBins);
-            mergedBinStructure.SizeX = newBinStructure.SizeX * xBinsToMerge;
-            mergedBinStructure.SizeY = newBinStructure.SizeY * yBinsToMerge;
+            mergedBinStructure.SizeX = tempBinStructure.SizeX * xBinsToMerge;
+            mergedBinStructure.SizeY = tempBinStructure.SizeY * yBinsToMerge;
+
+            mergeBinStructure(mergedBinStructure, tempBinStructure, xBinsToMerge, yBinsToMerge);
+
+            adjustNormalizedCount(mergedBinStructure);
+
+            LastBinStructure = mergedBinStructure;
+        }
+
+        private void mergeBinStructure(BinStructure mergedBinStructure, BinStructure binStructure, int xBinsToMerge, int yBinsToMerge)
+        {
             // merge bins
-            double sum1 = newBinStructure.Bins.SelectMany(b => b).Sum(b => b.Count);
-            for (int col = 0; col < newBinStructure.Bins.Count; col += xBinsToMerge)
+            for (int col = 0; col < binStructure.Bins.Count; col += xBinsToMerge)
             {
                 List<Bin> newBinCol = new List<Bin>();
-                for (int row = 0; row < newBinStructure.Bins[col].Count; row += yBinsToMerge)
+                for (int row = 0; row < binStructure.Bins[col].Count; row += yBinsToMerge)
                 {
-                    List<Bin> bins = newBinStructure.Bins.Skip(col).Take(xBinsToMerge).SelectMany(b => b.Skip(row).Take(yBinsToMerge)).ToList();
+                    List<Bin> bins = binStructure.Bins.Skip(col).Take(xBinsToMerge).SelectMany(b => b.Skip(row).Take(yBinsToMerge)).ToList();
 
                     Bin bin = new Bin()
                     {
@@ -631,14 +594,13 @@ namespace PanoramicData.controller.data.sim
             mergedBinStructure.MinY = mergedBinStructure.Bins.SelectMany(b => b).Min(b => b.BinMinY);
             mergedBinStructure.MaxX = mergedBinStructure.Bins.SelectMany(b => b).Max(b => b.BinMaxX);
             mergedBinStructure.MaxY = mergedBinStructure.Bins.SelectMany(b => b).Max(b => b.BinMaxY);
+        }
 
-            double sum2 = mergedBinStructure.Bins.SelectMany(b => b).Sum(b => b.Count);
-
-            Debug.WriteLine(sum1 + " " + sum2);
-
+        private void adjustNormalizedCount(BinStructure binStructure)
+        {
             // adjust normalized count
-            double maxCount = mergedBinStructure.Bins.SelectMany(b => b).Max(b => b.Count);
-            foreach (var bin in mergedBinStructure.Bins.SelectMany(b => b))
+            double maxCount = binStructure.Bins.SelectMany(b => b).Max(b => b.Count);
+            foreach (var bin in binStructure.Bins.SelectMany(b => b))
             {
                 //bin.NormalizedCount = Math.Log(bin.Count) / Math.Log(maxCount);
                 bin.NormalizedCount = bin.Count / maxCount;
@@ -653,8 +615,126 @@ namespace PanoramicData.controller.data.sim
                     bin.Size = Math.Sqrt(bin.NormalizedCount);// 0.1 * Math.Log10(bin.NormalizedCount) + 1;// bin.NormalizedCount; // = (1.0 / (r + 1)) * Math.Ceiling(bin.NormalizedCount / (1.0 / r));
                 }
             }
+        }
 
-            return mergedBinStructure;
+        private void binSamples(BinStructure binStructure, List<QueryResultItemModel> samples)
+        {
+            foreach (var bin in binStructure.Bins.SelectMany(b => b))
+            {
+                List<QueryResultItemModel> intersectingQueryResultItemModels = new List<QueryResultItemModel>();
+                foreach (var dp in samples)
+                {
+                    if (bin.BinIntersects(dp.XValue, dp.YValue))
+                    {
+                        intersectingQueryResultItemModels.Add(dp);
+                    }
+                }
+                bin.Count += intersectingQueryResultItemModels.Count;
+            }
+        }
+
+        private BinStructure initializeBinStructure(double minX, double maxX, double minY, double maxY, double sizeX, double sizeY, double nrOfXBins, double nrOfYBins)
+        {
+            BinStructure binStructure = new BinStructure();
+            binStructure.SizeX = sizeX;
+            binStructure.SizeY = sizeY;
+
+            for (int xIndex = 0; xIndex <= nrOfXBins; xIndex++)
+            {
+                double x = minX + xIndex * sizeX;
+                List<Bin> newBinCol = new List<Bin>();
+                for (int yIndex = 0; yIndex <= nrOfYBins; yIndex++)
+                {
+                    double y = minY + yIndex * sizeY;
+                    Bin bin = new Bin()
+                    {
+                        BinMinX = x,
+                        BinMaxX = x + sizeX,
+                        BinMinY = y,
+                        BinMaxY = y + sizeY,
+                        Count = 0
+                    };
+                    newBinCol.Add(bin);
+                }
+                binStructure.Bins.Add(newBinCol);
+            }
+
+            binStructure.MinX = minX;
+            binStructure.MinY = minY;
+            binStructure.MaxX = maxX;
+            binStructure.MaxY = maxY;
+
+            return binStructure;
+        }
+
+        private BinStructure initializeBinStructure(double minX, double maxX, double minY, double maxY)
+        {
+            double nrOfXBins = NrOfXBins;
+            double nrOfYBins = NrOfYBins; 
+            if (XAxisType != AxisType.Quantitative)
+            {
+                nrOfXBins = (maxX - minX);
+            }
+            if (YAxisType != AxisType.Quantitative)
+            {
+                nrOfYBins = (maxY - minY);
+            }
+
+            double sizeX = (maxX - minX) / nrOfXBins;
+            double sizeY = (maxY - minY) / nrOfYBins;
+
+            return initializeBinStructure(minX, maxX, minY, maxY, sizeX, sizeY, nrOfXBins, nrOfYBins);            
+        }
+
+        private void calculateNrOfBinsToAdd(out double plusX, out double plusY, double minX, double maxX, double minY, double maxY)
+        {
+            plusX = 0;
+            plusY = 0;
+            if (XAxisType == AxisType.Quantitative)
+            {
+                if (minX < LastBinStructure.MinX)
+                {
+                    minX = LastBinStructure.MinX - (Math.Ceiling((LastBinStructure.MinX - minX) / LastBinStructure.SizeX) * LastBinStructure.SizeX);
+                    plusX += Math.Ceiling((LastBinStructure.MinX - minX) / LastBinStructure.SizeX);
+                }
+                if (maxX > LastBinStructure.MaxX)
+                {
+                    maxX = LastBinStructure.MaxX + (Math.Ceiling((maxX - LastBinStructure.MaxX) / LastBinStructure.SizeX) * LastBinStructure.SizeX);
+                    plusX += Math.Ceiling((maxX - LastBinStructure.MaxX) / LastBinStructure.SizeX);
+                }
+
+                if (plusX != 0)
+                {
+                    plusX = Math.Ceiling(plusX / NrOfXBins) * NrOfXBins;
+                }
+            }
+            else
+            {
+                plusX = Math.Max(0, (maxX - minX) - (LastBinStructure.MaxX - LastBinStructure.MinX));
+            }
+
+            if (YAxisType == AxisType.Quantitative)
+            {
+                if (minY < LastBinStructure.MinY)
+                {
+                    minY = LastBinStructure.MinY - (Math.Ceiling((LastBinStructure.MinY - minY) / LastBinStructure.SizeY) * LastBinStructure.SizeY);
+                    plusY += Math.Ceiling((LastBinStructure.MinY - minY) / LastBinStructure.SizeY);
+                }
+                if (maxY > LastBinStructure.MaxY)
+                {
+                    maxY = LastBinStructure.MaxY + (Math.Ceiling((maxY - LastBinStructure.MaxY) / LastBinStructure.SizeY) * LastBinStructure.SizeY);
+                    plusY += Math.Ceiling((maxY - LastBinStructure.MaxY) / LastBinStructure.SizeY);
+                }
+
+                if (plusY != 0)
+                {
+                    plusY = Math.Ceiling(plusY / NrOfYBins) * NrOfYBins;
+                }
+            }
+            else
+            {
+                plusY = Math.Max(0, (maxY - minY) - (LastBinStructure.MaxY - LastBinStructure.MinY));
+            }
         }
     }
 

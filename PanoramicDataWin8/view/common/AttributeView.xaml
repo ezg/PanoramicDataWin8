@@ -5,10 +5,10 @@
     xmlns:model="clr-namespace:PanoramicData.model.view"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:transform="using:WinRTXamlToolkit.Controls"
     mc:Ignorable="d"
     d:DesignHeight="100"
     d:DesignWidth="100"
-    CacheMode="BitmapCache"
     Width="{Binding Size.X}" Height="{Binding Size.Y}"
     FontFamily="{StaticResource abel}">
 
@@ -25,19 +25,21 @@
     <Grid Name="mainGrid" Background="{StaticResource lightBrush}">
         <Border Name="border" BorderBrush="{StaticResource backgroundBrush}" BorderThickness="4">
             <Viewbox Margin="2">
-                <TextBlock 
-                    Name="txtBlock"
-                    RenderTransformOrigin="0.5, 0.5"
-                    VerticalAlignment="Stretch"
-                    HorizontalAlignment="Stretch"
-                    TextAlignment="Center"  
-                    MaxWidth="{Binding Size.X}"
-                    Text="{Binding MainLabel}" FontSize="14" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap">
-                    
-                    <TextBlock.RenderTransform>
-                        <RotateTransform Angle="{Binding TextAngle}" CenterX="0" CenterY="0"/>
-                    </TextBlock.RenderTransform>
-                </TextBlock>
+
+                <transform:LayoutTransformControl x:Name="transformControl">
+                    <transform:LayoutTransformControl.Transform>
+                        <RotateTransform x:Name="rotateTransform" Angle="{Binding TextAngle}"/>
+                    </transform:LayoutTransformControl.Transform>
+                    <TextBlock 
+                        Name="txtBlock"
+                        CacheMode="BitmapCache"
+                        RenderTransformOrigin="0.5, 0.5"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        TextAlignment="Center"  
+                        MaxWidth="{Binding Size.X}"
+                        Text="{Binding MainLabel}" FontSize="14" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
+                </transform:LayoutTransformControl>
             </Viewbox>
         </Border>
     </Grid>
