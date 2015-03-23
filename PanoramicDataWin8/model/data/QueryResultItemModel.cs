@@ -41,6 +41,20 @@ namespace PanoramicData.model.data
             }
         }
 
+        public double XValue
+        {
+            get
+            {
+                return double.Parse(VisualizationResultValues[VisualizationResult.X].Value.ToString());
+            }
+        }
+        public double YValue
+        {
+            get
+            {
+                return double.Parse(VisualizationResultValues[VisualizationResult.Y].Value.ToString());
+            }
+        }
 
         private Dictionary<AttributeOperationModel, QueryResultItemValueModel> _attributeValues = new Dictionary<AttributeOperationModel, QueryResultItemValueModel>();
         public Dictionary<AttributeOperationModel, QueryResultItemValueModel> AttributeValues
@@ -127,6 +141,7 @@ namespace PanoramicData.model.data
             this.GroupingObject = updateTo.GroupingObject;
             this.AttributeValues = updateTo.AttributeValues;
             this.RowNumber = updateTo.RowNumber;
+            this.VisualizationResultValues = updateTo.VisualizationResultValues;
         }
     }
 

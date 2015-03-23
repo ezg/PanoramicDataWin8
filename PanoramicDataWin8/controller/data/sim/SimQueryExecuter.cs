@@ -186,91 +186,19 @@ namespace PanoramicData.controller.data.sim
             List<QueryResultItemModel> samples = _simDataProvider.GetSampleQueryResultItemModels(_sampleSize);
             while (samples != null && _isRunning)
             {
+                if (QueryModelClone.VisualizationType != VisualizationType.Table)
+                {
+                    setVisualizationValues(samples);
+                }
                 if (_binner == null)
                 {
-
+                    //_binner.processStep
                 }
-                else
+                
+                
+                if (_isRunning)
                 {
-                    if (QueryModelClone.VisualizationType != VisualizationType.Table)
-                    {
-                        var xAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
-                        var yAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
-                        int xCount = 0;
-                        int yCount = 0;
-                        Dictionary<object, double> xUniqueValues = new Dictionary<object,double>();
-                        Dictionary<object, double> yUniqueValues = new Dictionary<object,double>();
-                        foreach (var sample in samples)
-                        {
-                            if (_xAxisType == AxisType.Nominal)
-                            {
-                                var queryValue = sample.AttributeValues[xAom];
-                                if (!xUniqueValues.ContainsKey(queryValue.Value))
-                                {
-                                    xUniqueValues.Add(queryValue.Value, xCount++);
-                                }
-                                sample.VisualizationResultValues.Add(VisualizationResult.X,
-                                    new QueryResultItemValueModel()
-                                    {
-                                        Value = xUniqueValues[queryValue.Value]
-                                    });
-                            }
-                            else
-                            {
-                                sample.VisualizationResultValues.Add(VisualizationResult.X, sample.AttributeValues[xAom]);
-                            }
-
-                            if (_yAxisType == AxisType.Nominal)
-                            {
-                                var queryValue = sample.AttributeValues[xAom];
-                                if (!yUniqueValues.ContainsKey(queryValue.Value))
-                                {
-                                    yUniqueValues.Add(queryValue.Value, yCount++);
-                                }
-                                sample.VisualizationResultValues.Add(VisualizationResult.Y,
-                                    new QueryResultItemValueModel()
-                                    {
-                                        Value = yUniqueValues[queryValue.Value]
-                                    });
-                            }
-                            else
-                            {
-                                sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[xAom]);
-                            }
-                        }
-                    }
-                }
-
-                /*List<DataPoint> sampleDataPoints = _dataController.GetSampleDataPoints(_nrProcessedSamples, _dataSampleSize);
-
-                CurrentBinStructure = processStep(sampleDataPoints, CurrentBinStructure, (int)Math.Round(_nrBinsX), (int)Math.Round(_nrBinsY), _additive);
-                _nrProcessedSamples += _dataSampleSize;
-
-                if (_additive)
-                {
-                    AllProcessedDataPoints.AddRange(sampleDataPoints);
-                }
-                else
-                {
-                    AllProcessedDataPoints = sampleDataPoints;
-                }
-
-                foreach (var newBin in CurrentBinStructure.Bins.SelectMany(b => b))
-                {
-                    newBin.ColorIntensity = Math.Min(1, (double)(_nrProcessedSamples) / (double)_dataController.GetTotalSamples());
-                }
-
-                if (JobUpdate != null)
-                {
-                    JobUpdate(this, new EventArgs());
-                }
-                Debug.WriteLine("Process Step time : " + timer.ElapsedMilliseconds + " " + CurrentBinStructure.Bins.Sum(b => b.Count));*/
-                //lock (_lock)
-                {
-                    if (_isRunning)
-                    {
-                        await fireUpdated(samples);
-                    }
+                    await fireUpdated(samples);
                 }
                 await Task.Delay(_throttle);
                 samples = _simDataProvider.GetSampleQueryResultItemModels(_sampleSize);
@@ -282,6 +210,53 @@ namespace PanoramicData.controller.data.sim
             await fireCompleted();
         }
 
+        private void setVisualizationValues(List<QueryResultItemModel> samples)
+        {
+            var xAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
+            var yAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
+            int xCount = 0;
+            int yCount = 0;
+            Dictionary<object, double> xUniqueValues = new Dictionary<object, double>();
+            Dictionary<object, double> yUniqueValues = new Dictionary<object, double>();
+            foreach (var sample in samples)
+            {
+                if (_xAxisType == AxisType.Nominal)
+                {
+                    var queryValue = sample.AttributeValues[xAom];
+                    if (!xUniqueValues.ContainsKey(queryValue.Value))
+                    {
+                        xUniqueValues.Add(queryValue.Value, xCount++);
+                    }
+                    sample.VisualizationResultValues.Add(VisualizationResult.X,
+                        new QueryResultItemValueModel()
+                        {
+                            Value = xUniqueValues[queryValue.Value]
+                        });
+                }
+                else
+                {
+                    sample.VisualizationResultValues.Add(VisualizationResult.X, sample.AttributeValues[xAom]);
+                }
+
+                if (_yAxisType == AxisType.Nominal)
+                {
+                    var queryValue = sample.AttributeValues[yAom];
+                    if (!yUniqueValues.ContainsKey(queryValue.Value))
+                    {
+                        yUniqueValues.Add(queryValue.Value, yCount++);
+                    }
+                    sample.VisualizationResultValues.Add(VisualizationResult.Y,
+                        new QueryResultItemValueModel()
+                        {
+                            Value = yUniqueValues[queryValue.Value]
+                        });
+                }
+                else
+                {
+                    sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom]);
+                }
+            }
+        }
 
         private async Task fireUpdated(List<QueryResultItemModel> samples)
         {
@@ -486,8 +461,258 @@ namespace PanoramicData.controller.data.sim
 
     public class Binner
     {
+        public BinStructure CurrentBinStructure { get; set; }
 
+        public BinStructure ProcessStep(List<QueryResultItemModel> sampleQueryResultItemModels, int numberOfXBins, int numberOfYBins, bool additive)
+        {
+            BinStructure newBinStructure = new BinStructure();
+
+            double minX = sampleQueryResultItemModels.Min(dp => dp.XValue);
+            double minY = sampleQueryResultItemModels.Min(dp => dp.YValue);
+            double maxX = sampleQueryResultItemModels.Max(dp => dp.XValue);
+            double maxY = sampleQueryResultItemModels.Max(dp => dp.YValue);
+
+
+            if (CurrentBinStructure != null && additive)
+            {
+                minX = Math.Min(CurrentBinStructure.MinX, minX);
+                minY = Math.Min(CurrentBinStructure.MinY, minY);
+                maxX = Math.Max(CurrentBinStructure.MaxX, maxX);
+                maxY = Math.Max(CurrentBinStructure.MaxY, maxY);
+            }
+
+            newBinStructure.MinX = minX;
+            newBinStructure.MinY = minY;
+            newBinStructure.MaxX = maxX;
+            newBinStructure.MaxY = maxY;
+
+            var stepX = (maxX - minX) / (double)numberOfXBins;
+            var stepY = (maxY - minY) / (double)numberOfYBins;
+
+            //stepX = (_xAxisType == AxisType.Quantitative ? stepX : 1);
+            //stepY = (_yAxisType == AxisType.Quantitative ? stepY : 1);
+
+            // compute the new Bins
+            for (double x = minX; x < maxX; x += stepX)
+            {
+                List<Bin> newBinRow = new List<Bin>();
+                for (double y = minY; y < maxY; y += stepY)
+                {
+                    Bin bin = new Bin()
+                    {
+                        BinMinX = x,
+                        BinMaxX = x + stepX,
+                        BinMinY = y,
+                        BinMaxY = y + stepY,
+                        Count = 0
+                    };
+                    List<QueryResultItemModel> intersectingDataPoints = new List<QueryResultItemModel>();
+                    foreach (var dp in sampleQueryResultItemModels)
+                    {
+                        if (bin.BinIntersects(dp.XValue, dp.YValue))
+                        {
+                            intersectingDataPoints.Add(dp);
+                        }
+                    }
+                    bin.Count = intersectingDataPoints.Count;
+                    if (bin.Count > 0)
+                    {
+                        bin.IntervalMinX = intersectingDataPoints.Min(dp => dp.XValue);
+                        bin.IntervalMaxX = intersectingDataPoints.Max(dp => dp.XValue);
+                        bin.IntervalMinY = intersectingDataPoints.Min(dp => dp.YValue);
+                        bin.IntervalMaxY = intersectingDataPoints.Max(dp => dp.YValue);
+                        bin.HasInterval = true;
+                    }
+
+                    newBinRow.Add(bin);
+                }
+                newBinStructure.Bins.Add(newBinRow);
+            }
+
+            if (CurrentBinStructure != null && additive)
+            {
+                foreach (var oldBin in CurrentBinStructure.Bins.SelectMany(b => b))
+                {
+                    if (oldBin.HasInterval)
+                    {
+                        List<Bin> intersectingNewBins = new List<Bin>();
+                        foreach (var newBin in newBinStructure.Bins.SelectMany(b => b))
+                        {
+                            if (oldBin.BinIntersects(newBin))
+                            {
+                                intersectingNewBins.Add(newBin);
+                            }
+                        }
+                        if (intersectingNewBins.Count > 0)
+                        {
+                            var oldBinCount = oldBin.Count;
+                            double oldBinDistCount = 0;
+
+                            foreach (var newBin in intersectingNewBins)
+                            {
+                                double xOverlapRatio = newBin.BinXOverlapRatio(oldBin.IntervalMinX, oldBin.IntervalMaxX);
+                                double yOverlapRatio = newBin.BinYOverlapRatio(oldBin.IntervalMinY, oldBin.IntervalMaxY);
+
+
+                                if (xOverlapRatio != 0 && yOverlapRatio != 0)
+                                {
+                                    newBin.Count += ((double)oldBin.Count) * (xOverlapRatio * yOverlapRatio);
+                                    oldBinDistCount += ((double)oldBin.Count) * (xOverlapRatio * yOverlapRatio);
+
+
+                                    newBin.IntervalMinX = Math.Max(newBin.BinMinX, Math.Min(newBin.IntervalMinX, oldBin.IntervalMinX));
+                                    newBin.IntervalMaxX = Math.Min(newBin.BinMaxX, Math.Max(newBin.IntervalMaxX, oldBin.IntervalMaxX));
+                                    newBin.IntervalMinY = Math.Max(newBin.BinMinY, Math.Min(newBin.IntervalMinY, oldBin.IntervalMinY));
+                                    newBin.IntervalMaxY = Math.Min(newBin.BinMaxY, Math.Max(newBin.IntervalMaxY, oldBin.IntervalMaxY));
+                                    newBin.HasInterval = true;
+                                }
+                                else
+                                {
+                                    // not good
+                                }
+                            }
+                            if (!(oldBinCount - 0.001 <= oldBinDistCount && oldBinCount + 0.001 >= oldBinDistCount))
+                            {
+
+                            }
+
+
+                            //Debug.WriteLine("  oldbinCount and dist " + oldBinCount + " " + oldBinDistCount);
+                        }
+                        else
+                        {
+                            // not good
+                        }
+                    }
+                }
+            }
+
+            // adjust normalized count
+            double maxCount = newBinStructure.Bins.SelectMany(b => b).Max(b => b.Count);
+            foreach (var bin in newBinStructure.Bins.SelectMany(b => b))
+            {
+                //bin.NormalizedCount = Math.Log(bin.Count) / Math.Log(maxCount);
+                bin.NormalizedCount = bin.Count / maxCount;
+                if (bin.NormalizedCount == 0)
+                {
+                    bin.Size = 0;
+                }
+                else
+                {
+                    //double r = sliderRange.Value;
+                    // 0.1 * log10(x ) + 1
+                    bin.Size = Math.Sqrt(bin.NormalizedCount);// 0.1 * Math.Log10(bin.NormalizedCount) + 1;// bin.NormalizedCount; // = (1.0 / (r + 1)) * Math.Ceiling(bin.NormalizedCount / (1.0 / r));
+                }
+            }
+            var cc = newBinStructure.Bins.Sum(b => b.Sum(bb => bb.Count));
+            var ccc = newBinStructure.Bins.SelectMany(b => b).Count();
+            return newBinStructure;
+        }
     }
+
+     public class BinStructure
+    {
+        public BinStructure()
+        {
+            Bins = new List<List<Bin>>();
+            MinX = Double.MaxValue;
+            MinY = Double.MaxValue;
+            MaxX = Double.MinValue;
+            MaxY = Double.MinValue;
+        }
+
+        public double MinX { get; set; }
+        public double MinY { get; set; }
+        public double MaxX { get; set; }
+        public double MaxY { get; set; }
+
+        public List<List<Bin>> Bins { get; set; }
+    }
+
+    public class Bin
+    {
+        public Bin()
+        {
+            IntervalMinX = Double.MaxValue;
+            IntervalMinY = Double.MaxValue;
+            IntervalMaxX = Double.MinValue;
+            IntervalMaxY = Double.MinValue;
+        }
+
+        private bool intersects(double r1Left, double r1Right, double r1Top, double r1Bottom, double r2Left, double r2Right, double r2Top, double r2Bottom)
+        {
+            return !(r2Left > r1Right ||
+                     r2Right < r1Left ||
+                     r2Top > r1Bottom ||
+                     r2Bottom < r1Top);
+        }
+
+
+        public bool BinIntersects(double x, double y)
+        {
+            return x >= this.BinMinX && x < this.BinMaxX && y >= this.BinMinY && y < this.BinMaxY;
+        }
+
+        public bool BinIntersects(Bin b)
+        {
+            return intersects(this.BinMinX, this.BinMaxX, this.BinMinY, this.BinMaxY, b.BinMinX, b.BinMaxX, b.BinMinY, b.BinMaxY);
+        }
+
+        public bool IntervalIntersects(Bin b)
+        {
+            return intersects(this.IntervalMinX, this.IntervalMaxX, this.IntervalMinY, this.IntervalMaxY, b.IntervalMinX, b.IntervalMaxX, b.IntervalMinY, b.IntervalMaxY);
+        }
+
+        public double BinXOverlapRatio(double left, double right)
+        {
+            if (left < this.BinMaxX && right >= this.BinMinX)
+            {
+                double newLeft = Math.Max(left, this.BinMinX);
+                double newRight = Math.Min(right, this.BinMaxX);
+                if (right - left == 0)
+                {
+                    return 1.0;
+                }
+                else
+                {
+                    return (newRight - newLeft) / (right - left);
+                }
+            }
+            return 0;
+        }
+
+        public double BinYOverlapRatio(double top, double bottom)
+        {
+            if (top < this.BinMaxY && bottom >= this.BinMinY)
+            {
+                double newTop = Math.Max(top, this.BinMinY);
+                double newBottom = Math.Min(bottom, this.BinMaxY);
+                if (bottom - top == 0)
+                {
+                    return 1.0;
+                }
+                else
+                {
+                    return (newBottom - newTop) / (bottom - top);
+                }
+            }
+            return 0;
+        }
+
+        public double Size { get; set; }
+        public double Count { get; set; }
+        public double NormalizedCount { get; set; }
+        public double BinMinX { get; set; }
+        public double BinMinY { get; set; }
+        public double BinMaxX { get; set; }
+        public double BinMaxY { get; set; }
+        public bool HasInterval { get; set; }
+        public double IntervalMinX { get; set; }
+        public double IntervalMinY { get; set; }
+        public double IntervalMaxX { get; set; }
+        public double IntervalMaxY { get; set; }
+    }
+   
     
     public class DataEqualityComparer : IEqualityComparer<Dictionary<AttributeModel, object>>
     {

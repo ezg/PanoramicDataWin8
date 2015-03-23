@@ -60,7 +60,7 @@ namespace PanoramicData.model.view
             }
         }
 
-        private double _throttleInMillis = 3000.0;
+        private double _throttleInMillis = 300.0;
         public double ThrottleInMillis
         {
             get

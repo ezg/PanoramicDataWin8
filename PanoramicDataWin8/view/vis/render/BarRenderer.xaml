@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:PanoramicDataWin8.view.vis.render"
     xmlns:common="using:PanoramicDataWin8.view.common"
+    xmlns:transform="using:WinRTXamlToolkit.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -12,9 +13,59 @@
     FontFamily="{StaticResource abel}">
     
     <Grid>
-        <Viewbox MaxWidth="150">
-            <TextBlock Name="mainLabel" Text="bar" Foreground="{StaticResource highlightBrush}"/>
-        </Viewbox>
-        <common:DXSurface x:Name="dxSurface"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="50"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+
+        <Grid Name="xAttributeView" Grid.Column="1" Grid.Row="0" Background="{StaticResource lightBrush}">
+            <Border BorderBrush="{StaticResource backgroundBrush}" BorderThickness="0,0,0,4">
+                <Viewbox Margin="2">
+                    <TextBlock 
+                        RenderTransformOrigin="0.5, 0.5"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch"
+                        TextAlignment="Center"  
+                        Text="{Binding MainLabel}" FontSize="14" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap">
+                        <TextBlock.RenderTransform>
+                            <RotateTransform Angle="{Binding TextAngle}" CenterX="0" CenterY="0"/>
+                        </TextBlock.RenderTransform>
+                    </TextBlock>
+                </Viewbox>
+            </Border>
+        </Grid>
+
+        <Grid Name="yAttributeView" Grid.Column="0" Grid.Row="1" Background="{StaticResource lightBrush}" >
+            <Border Name="yAttributeViewBorder" BorderBrush="{StaticResource backgroundBrush}" BorderThickness="0,0,4,0">
+                <Viewbox Margin="2">
+                    <transform:LayoutTransformControl x:Name="transformControl">
+                        <transform:LayoutTransformControl.Transform>
+                            <RotateTransform x:Name="rotateTransform" Angle="270"/>
+                        </transform:LayoutTransformControl.Transform>
+                        <TextBlock 
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Stretch" 
+                            TextAlignment="Center"  
+                            Text="{Binding MainLabel}" FontSize="14" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
+                    </transform:LayoutTransformControl>
+                </Viewbox>
+            </Border>
+
+        </Grid>
+
+        
+        
+        <Grid Grid.Column="1" Grid.Row="1">
+            <Viewbox MaxWidth="150">
+                <TextBlock Name="mainLabel" Text="bar" Foreground="{StaticResource highlightBrush}"/>
+            </Viewbox>
+            <common:DXSurface x:Name="dxSurface"/>
+        </Grid>
     </Grid>
 </local:Renderer>

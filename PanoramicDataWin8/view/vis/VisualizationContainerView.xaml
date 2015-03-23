@@ -13,7 +13,7 @@
     Canvas.Top="{Binding Position.Y}" Canvas.Left="{Binding Position.X}">
 
     <Border Name="border" BorderBrush="{StaticResource backgroundBrush}" BorderThickness="0">
-        <Grid Background="{StaticResource lightBrush}">
+        <Grid>
             <Grid Name="contentGrid"/>
             <Polygon 
             Name="resizeGrid" 

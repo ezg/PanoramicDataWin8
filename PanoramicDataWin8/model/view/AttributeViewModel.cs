@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Xaml;
 
 namespace PanoramicData.model.view
 {
@@ -54,6 +55,20 @@ namespace PanoramicData.model.view
             }
         }
 
+
+        private double _textAngle = 0;
+        public double TextAngle
+        {
+            get
+            {
+                return _textAngle;
+            }
+            set
+            {
+                this.SetProperty(ref _textAngle, value);
+            }
+        }
+
         private bool _isShadow = false;
         public bool IsShadow
         {
@@ -64,6 +79,19 @@ namespace PanoramicData.model.view
             set
             {
                 this.SetProperty(ref _isShadow, value);
+            }
+        }
+
+        private Thickness _borderThicknes = new Thickness();
+        public Thickness BorderThicknes
+        {
+            get
+            {
+                return _borderThicknes;
+            }
+            set
+            {
+                this.SetProperty(ref _borderThicknes, value);
             }
         }
 

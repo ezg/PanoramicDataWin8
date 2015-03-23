@@ -275,11 +275,14 @@ namespace PanoramicDataWin8.view.vis
                 {
                     var model = (item as AttachmentItemViewModel);
                     var view = _attachmentItemViews[model.AttachmentHeaderViewModel].FirstOrDefault(v => v.DataContext == model);
-                    view.PointerPressed -= attachmentView_PointerPressed;
-                    view.PointerEntered -= attachmentView_PointerEntered;
-                    _contentCanvas.Children.Remove(view);
-                    _attachmentItemViews[model.AttachmentHeaderViewModel].Remove(view);
-                    updateRendering();
+                    if (view != null)
+                    {
+                        view.PointerPressed -= attachmentView_PointerPressed;
+                        view.PointerEntered -= attachmentView_PointerEntered;
+                        _contentCanvas.Children.Remove(view);
+                        _attachmentItemViews[model.AttachmentHeaderViewModel].Remove(view);
+                        updateRendering();
+                    }
                 }
             }
             else if (e.NewItems != null)

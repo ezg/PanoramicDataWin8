@@ -80,7 +80,7 @@ namespace PanoramicDataWin8.view.common
             else
             {
                 mainGrid.Background = Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush;
-                border.BorderThickness = new Thickness(0);
+                border.BorderThickness = model.BorderThicknes;
             }
         }
 

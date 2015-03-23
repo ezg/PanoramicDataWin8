@@ -340,6 +340,10 @@ namespace PanoramicData.model.data
                         return AxisType.Quantitative;
                     }
                 }
+                else if (AttributeOperationModels.Any(aom => aom.IsBinned && aom.AttributeModel.Equals(attributeOperationModel.AttributeModel)) && attributeOperationModel.AggregateFunction == AggregateFunction.None)
+                {
+                    return AxisType.Ordinal;
+                }
             }
             // no grouping or aggrgation
             else
