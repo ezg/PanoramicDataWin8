@@ -223,8 +223,8 @@
     <Compile Include="view\vis\menu\ToggleMenuItemView.xaml.cs">
       <DependentUpon>ToggleMenuItemView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="view\vis\render\BarRenderer.xaml.cs">
-      <DependentUpon>BarRenderer.xaml</DependentUpon>
+    <Compile Include="view\vis\render\PlotRenderer.xaml.cs">
+      <DependentUpon>PlotRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\KmeansRenderer.xaml.cs">
       <DependentUpon>KmeansRenderer.xaml</DependentUpon>
@@ -360,7 +360,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="view\vis\render\BarRenderer.xaml">
+    <Page Include="view\vis\render\PlotRenderer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

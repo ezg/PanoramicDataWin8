@@ -88,7 +88,7 @@ namespace PanoramicDataWin8.view.vis
             {
                 if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Bar)
                 {
-                    _renderer = new BarRenderer();
+                    _renderer = new PlotRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
                 else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Table)

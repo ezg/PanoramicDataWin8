@@ -2,6 +2,7 @@
 using PanoramicData.model.data;
 using PanoramicData.model.view;
 using PanoramicData.utils;
+using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
 using System;
 using System.Collections.Generic;
@@ -24,28 +25,32 @@ using SharpDX.Direct3D11;
 using SharpDX.Toolkit.Graphics;
 using D2D = SharpDX.Direct2D1;
 using DW = SharpDX.DirectWrite;
+using PanoramicData.controller.view;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public sealed partial class BarRenderer : Renderer
+    public sealed partial class PlotRenderer : Renderer, AttributeViewModelEventHandler
     {
-        private BarRendererContentProvider _barRendererContentProvider = new BarRendererContentProvider();
+        private PlotRendererContentProvider _PlotRendererContentProvider = new PlotRendererContentProvider();
 
         private List<Vec> _clusterCenters = new List<Vec>();
         private List<Vec> _samples = new List<Vec>();
 
-        public BarRenderer()
+        private bool _isXHighlighted = false;
+        private bool _isYHighlighted = false;
+
+        public PlotRenderer()
         {
             this.InitializeComponent();
-            this.DataContextChanged += BarRenderer_DataContextChanged;
-            this.Loaded += BarRenderer_Loaded;
+            this.DataContextChanged += PlotRenderer_DataContextChanged;
+            this.Loaded += PlotRenderer_Loaded;
         }
 
-        void BarRenderer_Loaded(object sender, RoutedEventArgs e)
+        void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
-            dxSurface.ContentProvider = _barRendererContentProvider;
+            dxSurface.ContentProvider = _PlotRendererContentProvider;
         }
 
         public override void Dispose()
@@ -62,7 +67,7 @@ namespace PanoramicDataWin8.view.vis.render
             dxSurface.Dispose();
         }
 
-        void BarRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        void PlotRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (args.NewValue != null)
             {
@@ -200,7 +205,7 @@ namespace PanoramicDataWin8.view.vis.render
 
                 barDataPoints.Add(point);
             }
-            _barRendererContentProvider.BarDataPoints = barDataPoints;
+            _PlotRendererContentProvider.BarDataPoints = barDataPoints;
             render();
         }
 
@@ -208,9 +213,112 @@ namespace PanoramicDataWin8.view.vis.render
         {
             dxSurface.Redraw();
         }
+
+        public GeoAPI.Geometries.IGeometry BoundsGeometry
+        {
+            get
+            {
+                return this.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
+            }
+        }
+
+        public void AttributeViewModelMoved(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        {
+            // turn both off 
+            var xBounds = xAttributeViewBorder.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
+            if (xBounds.Intersects(e.Bounds.GetPolygon()))
+            {
+                if (!_isXHighlighted)
+                {
+                    toggle(true, xAttributeTextBlock, xAttributeViewBorder);
+                    _isXHighlighted = true;
+                } 
+            }
+            else
+            {
+                if (_isXHighlighted)
+                {
+                    toggle(false, xAttributeTextBlock, xAttributeViewBorder);
+                    _isXHighlighted = false;
+                } 
+            }
+
+            var yBounds = yAttributeViewBorder.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
+            if (yBounds.Intersects(e.Bounds.GetPolygon()))
+            {
+                if (!_isYHighlighted)
+                {
+                    toggle(true, yAttributeTextBlock, yAttributeViewBorder);
+                    _isYHighlighted = true;
+                }
+            }
+            else
+            {
+                if (_isYHighlighted)
+                {
+                    toggle(false, yAttributeTextBlock, yAttributeViewBorder);
+                    _isYHighlighted = false;
+                }
+            }
+        }
+
+        public void AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        {
+            // turn both off 
+            toggle(false, xAttributeTextBlock, xAttributeViewBorder);
+            _isXHighlighted = false;
+            toggle(false, yAttributeTextBlock, yAttributeViewBorder);
+            _isYHighlighted = false;
+
+
+            QueryModel qModel = (DataContext as VisualizationViewModel).QueryModel;
+
+            var xBounds = xAttributeViewBorder.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
+            if (xBounds.Intersects(e.Bounds.GetPolygon()))
+            {
+                qModel.RemoveAttributeOperationModel(qModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First());
+                qModel.AddFunctionAttributeOperationModel(AttributeFunction.X, e.AttributeOperationModel);
+            }
+
+            var yBounds = yAttributeViewBorder.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
+            if (yBounds.Intersects(e.Bounds.GetPolygon()))
+            {
+                qModel.RemoveAttributeOperationModel(qModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First());
+                qModel.AddFunctionAttributeOperationModel(AttributeFunction.Y, e.AttributeOperationModel);
+            }
+        }
+
+        void toggle(bool isHighlighted, TextBlock textBlock, Border border)
+        {
+            ExponentialEase easingFunction = new ExponentialEase();
+            easingFunction.EasingMode = EasingMode.EaseInOut;
+
+            ColorAnimation backgroundAnimation = new ColorAnimation();
+            backgroundAnimation.EasingFunction = easingFunction;
+            backgroundAnimation.Duration = TimeSpan.FromMilliseconds(300);
+            backgroundAnimation.From = (border.Background as SolidColorBrush).Color;
+
+            if (isHighlighted)
+            {
+                backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush).Color;
+                textBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush);
+            }
+            else
+            {
+                backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush).Color;
+                textBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush);
+            }
+            Storyboard storyboard = new Storyboard();
+            storyboard.Children.Add(backgroundAnimation);
+            Storyboard.SetTarget(backgroundAnimation, border);
+            Storyboard.SetTargetProperty(backgroundAnimation, "(Border.Background).(SolidColorBrush.Color)");
+            //Storyboard.SetTargetProperty(foregroundAnimation, "(TextBlock.Foreground).Color");
+
+            storyboard.Begin();
+        }
     }
 
-    public class BarRendererContentProvider : DXSurfaceContentProvider
+    public class PlotRendererContentProvider : DXSurfaceContentProvider
     {
         private float _leftOffset = 30;
         private float _rightOffset = 30;
