@@ -528,7 +528,7 @@ namespace PanoramicData.controller.data.sim
 
             BinStructure tempBinStructure = initializeBinStructure(minX, maxX, minY, maxY,
                 LastBinStructure.SizeX, LastBinStructure.SizeY,
-                LastBinStructure.Bins.Count + plusX, LastBinStructure.Bins[0].Count + plusY);
+                (LastBinStructure.Bins.Count - 1) + plusX, (LastBinStructure.Bins[0].Count - 1) + plusY);
 
             binSamples(tempBinStructure, sampleQueryResultItemModels);
 
@@ -553,8 +553,8 @@ namespace PanoramicData.controller.data.sim
                 }
             }
 
-            int xBinsToMerge = XAxisType == AxisType.Quantitative ? (int)(tempBinStructure.Bins.Count / (NrOfXBins + 1)) : 1;
-            int yBinsToMerge = YAxisType == AxisType.Quantitative ? (int)(tempBinStructure.Bins[0].Count / (NrOfYBins + 1)) : 1;
+            int xBinsToMerge = XAxisType == AxisType.Quantitative ? (int)((tempBinStructure.Bins.Count -1) / (NrOfXBins)) : 1;
+            int yBinsToMerge = YAxisType == AxisType.Quantitative ? (int)((tempBinStructure.Bins[0].Count -1) / (NrOfYBins)) : 1;
 
             BinStructure mergedBinStructure = new BinStructure();
             mergedBinStructure.SizeX = tempBinStructure.SizeX * xBinsToMerge;
@@ -585,7 +585,7 @@ namespace PanoramicData.controller.data.sim
                         BinMaxY = bins.Max(b => b.BinMaxY),
                         Count = bins.Sum(b => b.Count)
                     };
-
+                     
                     newBinCol.Add(bin);
                 }
                 mergedBinStructure.Bins.Add(newBinCol);
@@ -705,7 +705,7 @@ namespace PanoramicData.controller.data.sim
 
                 if (plusX != 0)
                 {
-                    plusX = Math.Ceiling(plusX / NrOfXBins) * NrOfXBins;
+                    //plusX = Math.Ceiling(plusX / NrOfXBins) * NrOfXBins;
                 }
             }
             else
@@ -728,7 +728,7 @@ namespace PanoramicData.controller.data.sim
 
                 if (plusY != 0)
                 {
-                    plusY = Math.Ceiling(plusY / NrOfYBins) * NrOfYBins;
+                    //plusY = Math.Ceiling(plusY / NrOfYBins) * NrOfYBins;
                 }
             }
             else

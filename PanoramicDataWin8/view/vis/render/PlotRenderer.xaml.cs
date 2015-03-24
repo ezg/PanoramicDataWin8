@@ -357,6 +357,10 @@ namespace PanoramicDataWin8.view.vis.render
         private float _topOffset = 30;
         private float _bottomtOffset = 30;
 
+        private D2D.Brush _textBrush;
+        private DW.TextFormat _textFormat;
+
+
         public List<BinnedDataPoint> BinnedDataPoints { get; set; }
         
         public override void Clear(GraphicsDevice graphicsDevice)
@@ -364,8 +368,9 @@ namespace PanoramicDataWin8.view.vis.render
             graphicsDevice.Clear(new Color(230, 230, 230));
         }
 
-        public override void Draw(D2D.DeviceContext d2dDeviceContext)
+        public override void Draw(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
         {
+
             if (BinnedDataPoints != null && BinnedDataPoints.Count > 0)
             {
                 float deviceWidth = (float)(d2dDeviceContext.Size.Width - _leftOffset - _rightOffset);
@@ -376,13 +381,56 @@ namespace PanoramicDataWin8.view.vis.render
                 float maxX = (float)(BinnedDataPoints.Max(dp => dp.MaxX));
                 float maxY = (float)(BinnedDataPoints.Max(dp => dp.MaxY));
 
+                float xRange = maxX - minX;
+                float yRange = maxY - minY;
+
+                //minX -= 0.15f * xRange;
+                //minY -= 0.15f * yRange;
+                //maxX += 0.15f * xRange;
+                //maxY += 0.15f * yRange;
+
+
                 float xScale = maxX - minX;
                 float yScale = maxY - minY;
 
                 bool flipY = true;
-                var color = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 0f, 0f, 1f));
+                var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color(40, 170, 213));
                 var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
 
+                // draw grid and tickmarks
+                // x axis
+                float[] xExtent = getLinearTicks(minX, maxX, 10);
+                for (float t = xExtent[0]; t < xExtent[1]; t += xExtent[2])
+                {
+                    float yFrom = (float)((minY) / yScale) * deviceHeight +_topOffset;
+                    float yTo = (float)((maxY) / yScale) * deviceHeight + _topOffset;
+                    float x = (t / xScale) * deviceWidth + _leftOffset;
+                   // d2dDeviceContext.DrawLine(new Vector2(x, yFrom), new Vector2(x, yTo), white, 1);
+
+                    /*var layout = new DW.TextLayout(dwFactory, "Demo DirectWrite text here. " + i, _textFormat, 1000f, 1000f);
+                    var tt = layout.Metrics;
+                    d2dDeviceContext.DrawTextLayout(new Vector2(15, 15 + i * 25), layout, _textBrush);
+                    d2dDeviceContext.DrawRectangle(new RectangleF(15, 15 + i * 25, tt.Width, tt.Height), _textBrush);
+                    layout.Dispose();*/
+                }
+
+                // y axis
+                float[] yExtent = getLinearTicks(minY, maxY, 10);
+                for (float t = yExtent[0]; t < yExtent[1]; t += yExtent[2])
+                {
+                    float xFrom = (float)((minX) / xScale) * deviceWidth + _leftOffset;
+                    float xTo = (float)((maxX) / xScale) * deviceWidth + _topOffset;
+                    float y = (t / yScale) * deviceHeight + _topOffset;
+                    //d2dDeviceContext.DrawLine(new Vector2(xFrom, y), new Vector2(xTo, y), white, 1);
+
+                    /*var layout = new DW.TextLayout(dwFactory, "Demo DirectWrite text here. " + i, _textFormat, 1000f, 1000f);
+                    var tt = layout.Metrics;
+                    d2dDeviceContext.DrawTextLayout(new Vector2(15, 15 + i * 25), layout, _textBrush);
+                    d2dDeviceContext.DrawRectangle(new RectangleF(15, 15 + i * 25, tt.Width, tt.Height), _textBrush);
+                    layout.Dispose();*/
+                }
+
+                // draw data
                 foreach (var bin in BinnedDataPoints)
                 {
                     var roundedRect = new D2D.RoundedRectangle();
@@ -390,8 +438,8 @@ namespace PanoramicDataWin8.view.vis.render
                     float yFrom = (float)((bin.MinY - minY) / yScale) * deviceHeight;
                     float xTo = (float)((bin.MaxX - minX) / xScale) * deviceWidth;
                     float yTo = (float)((bin.MaxY - minY) / yScale) * deviceHeight;
-                    float w = (float)Math.Max((xTo - xFrom) * (float)bin.Size, 3.0);
-                    float h = (float)Math.Max((yTo - yFrom) * (float)bin.Size, 3.0);
+                    float w = (float)Math.Max((xTo - xFrom) * (float)bin.Size, 4.0);
+                    float h = (float)Math.Max((yTo - yFrom) * (float)bin.Size, 4.0);
 
                     roundedRect.Rect = new RectangleF(
                         xFrom + ((xTo - xFrom) - w) / 2.0f + _leftOffset,
@@ -402,17 +450,47 @@ namespace PanoramicDataWin8.view.vis.render
 
                     if (bin.Size > 0)
                     {
-                        d2dDeviceContext.FillRoundedRectangle(roundedRect, color);
+                        d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
                         d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 1f);
 
                     }
                 }
-                color.Dispose();
+                binColor.Dispose();
                 white.Dispose();
             }
         }
         public override void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
         {
+            // reusable structure representing a text font with size and style
+            _textFormat = disposeCollector.Collect(new DW.TextFormat(dwFactory, "Abel", SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, 16f));
+
+            // reusable brush structure
+            _textBrush = disposeCollector.Collect(new D2D.SolidColorBrush(d2dDeviceContext, new Color(17, 17, 17)));
+
+            // prebaked text - useful for constant labels as it greatly improves performance
+            //_textLayout = disposeCollector.Collect(new DW.TextLayout(dwFactory, "Demo DirectWrite text here.", _textFormat, 100f, 100f));
+        }
+
+        private float[] getLinearTicks(double min, double max, double m)
+        {
+            double span = max - min;
+
+            double step = Math.Pow(10, Math.Floor(Math.Log10(span / m)));
+            double err = m / span * step;
+
+            if (err <= .15) 
+              step *= 10;
+            else if (err <= .35)
+              step *= 5;
+            else if (err <= .75)
+              step *= 2;
+
+            float[] ret = new float[3];
+            ret[0] = (float)(Math.Ceiling(min / step) * step);
+            ret[1] = (float)(Math.Floor(max / step) * step + step * .5);
+            ret[2] = (float)step;
+
+            return ret;
         }
     }
 

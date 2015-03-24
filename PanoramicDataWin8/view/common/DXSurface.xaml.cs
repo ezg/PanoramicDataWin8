@@ -292,7 +292,7 @@ namespace PanoramicDataWin8.view.common
 
                 _d2dDeviceContext.BeginDraw();
                 beginDrawCalled = true;
-                _contentProvider.Draw(_d2dDeviceContext);
+                _contentProvider.Draw(_d2dDeviceContext, _dwFactory);
                 Debug.WriteLine("Render time: " + sw.ElapsedMilliseconds);
             }
             finally
@@ -312,7 +312,7 @@ namespace PanoramicDataWin8.view.common
             graphicsDevice.Clear(Color.White);
         }
 
-        public virtual void Draw(D2D.DeviceContext d2dDeviceContext)
+        public virtual void Draw(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
         {
 
         }

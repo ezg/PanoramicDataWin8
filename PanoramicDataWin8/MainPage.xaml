@@ -55,7 +55,7 @@
             <Canvas Name="attributeCanvas">
             </Canvas>
         </Grid>
-        
+        <TextBlock Name="msgTextBlock" Text="" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="{StaticResource darkBrush}" Margin="10" Opacity="0"/>
     </Grid>
 
     <Page.BottomAppBar >

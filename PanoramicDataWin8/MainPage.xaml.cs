@@ -42,6 +42,7 @@ namespace PanoramicDataWin8
     {
         private PointerManager _mainPointerManager = new PointerManager();
         private Point _mainPointerManagerPreviousPoint = new Point();
+        private DispatcherTimer _messageTimer = new DispatcherTimer();
 
         public MainPage()
         {
@@ -50,6 +51,15 @@ namespace PanoramicDataWin8
             this.DataContextChanged += MainPage_DataContextChanged;
             this.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(MainPage_PointerPressed), true);
             this.KeyUp += MainPage_KeyUp;
+
+            _messageTimer.Interval = TimeSpan.FromMilliseconds(2000);
+            _messageTimer.Tick += _messageTimer_Tick;
+        }
+
+        void _messageTimer_Tick(object sender, object e)
+        {
+            msgTextBlock.Opacity = 0;
+            _messageTimer.Stop();
         }
 
         void MainPage_KeyUp(object sender, KeyRoutedEventArgs e)
@@ -57,44 +67,78 @@ namespace PanoramicDataWin8
             var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
             if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
             {
-                var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
-                var elements = toastXml.GetElementsByTagName("text");
 
                 if (e.Key == Windows.System.VirtualKey.Q)
                 {
                     MainViewController.Instance.MainModel.SampleSize = MainViewController.Instance.MainModel.SampleSize * 10;
                     Debug.WriteLine("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
 
-                    elements[0].AppendChild(toastXml.CreateTextNode("SampleSize : " + MainViewController.Instance.MainModel.SampleSize));
-                    var toast = new ToastNotification(toastXml);
-                    ToastNotificationManager.CreateToastNotifier().Show(toast);
+                    msgTextBlock.Text = ("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
                 }
                 else if (e.Key == Windows.System.VirtualKey.A)
                 {
                     MainViewController.Instance.MainModel.SampleSize = Math.Max(MainViewController.Instance.MainModel.SampleSize / 10.0, 1.0);
                     Debug.WriteLine("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
 
-                    elements[0].AppendChild(toastXml.CreateTextNode("SampleSize : " + MainViewController.Instance.MainModel.SampleSize));
-                    var toast = new ToastNotification(toastXml);
-                    ToastNotificationManager.CreateToastNotifier().Show(toast);
+                    msgTextBlock.Text = ("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
                 }
                 if (e.Key == Windows.System.VirtualKey.W)
                 {
                     MainViewController.Instance.MainModel.ThrottleInMillis = MainViewController.Instance.MainModel.ThrottleInMillis + 300.0;
                     Debug.WriteLine("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis);
 
-                    elements[0].AppendChild(toastXml.CreateTextNode("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis));
-                    var toast = new ToastNotification(toastXml);
-                    ToastNotificationManager.CreateToastNotifier().Show(toast);
+                    msgTextBlock.Text = ("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis);
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
                 }
                 else if (e.Key == Windows.System.VirtualKey.S)
                 {
                     MainViewController.Instance.MainModel.ThrottleInMillis = Math.Max(MainViewController.Instance.MainModel.ThrottleInMillis - 300.0, 1.0);
                     Debug.WriteLine("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis);
 
-                    elements[0].AppendChild(toastXml.CreateTextNode("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis));
-                    var toast = new ToastNotification(toastXml);
-                    ToastNotificationManager.CreateToastNotifier().Show(toast);
+                    msgTextBlock.Text = ("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis);
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
+                }
+                if (e.Key == Windows.System.VirtualKey.E)
+                {
+                    MainViewController.Instance.MainModel.NrOfXBins = MainViewController.Instance.MainModel.NrOfXBins + 1;
+                    Debug.WriteLine("NrOfXBins : " + MainViewController.Instance.MainModel.NrOfXBins);
+
+                    msgTextBlock.Text = ("NrOfXBins : " + MainViewController.Instance.MainModel.NrOfXBins);
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
+                }
+                else if (e.Key == Windows.System.VirtualKey.D)
+                {
+                    MainViewController.Instance.MainModel.NrOfXBins = Math.Max(MainViewController.Instance.MainModel.NrOfXBins - 1, 1.0);
+                    Debug.WriteLine("NrOfXBins : " + MainViewController.Instance.MainModel.NrOfXBins);
+
+                    msgTextBlock.Text = ("NrOfXBins : " + MainViewController.Instance.MainModel.NrOfXBins);
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
+                }
+                if (e.Key == Windows.System.VirtualKey.R)
+                {
+                    MainViewController.Instance.MainModel.NrOfYBins = MainViewController.Instance.MainModel.NrOfYBins + 1;
+                    Debug.WriteLine("NrOfYBins : " + MainViewController.Instance.MainModel.NrOfYBins);
+
+                    msgTextBlock.Text = ("NrOfYBins : " + MainViewController.Instance.MainModel.NrOfYBins);
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
+                }
+                else if (e.Key == Windows.System.VirtualKey.F)
+                {
+                    MainViewController.Instance.MainModel.NrOfYBins = Math.Max(MainViewController.Instance.MainModel.NrOfYBins - 1, 1.0);
+                    Debug.WriteLine("NrOfYBins : " + MainViewController.Instance.MainModel.NrOfYBins);
+
+                    msgTextBlock.Text = ("NrOfYBins : " + MainViewController.Instance.MainModel.NrOfYBins);
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
                 }
             }
         }
