@@ -411,6 +411,7 @@ namespace PanoramicData.model.view
                     {
                         MenuViewModel = menuViewModel,
                         Row = count <= 2 ? 0 : 1,
+                        RowSpan = count <= 2 ? 1 : 2,
                         Column = count % 3 + 1,
                         Size = new Vec(32, 50),
                         TargetSize = new Vec(32, 50)

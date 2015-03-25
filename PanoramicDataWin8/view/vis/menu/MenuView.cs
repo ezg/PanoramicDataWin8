@@ -198,7 +198,23 @@ namespace PanoramicDataWin8.view.vis.menu
             {
                 if (model.AttachmentOrientation == AttachmentOrientation.Left)
                 {
+                    for (int col = model.NrColumns - 1; col >= 0; col--)
+                    {
+                        for (int row = 0; row < model.NrRows; row++)
+                        {
+                            var itemsInSameCol = model.MenuItemViewModels.Where(mi => mi.Row < row && mi.Column == col).ToList();
+                            var itemsInSameRow = model.MenuItemViewModels.Where(mi => mi.Column > col && (mi.Row == row || (mi.Row < row && mi.Row + mi.RowSpan - 1 >= row))).ToList();
 
+                            double currentY = model.AnkerPosition.Y + itemsInSameCol.Sum(mi => mi.Size.Y) + itemsInSameCol.Count * GAP;
+                            double currentX = model.AnkerPosition.X - itemsInSameRow.Sum(mi => mi.Size.X) - itemsInSameRow.Count() * GAP - GAP;
+
+                            var rowItem = model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
+                            if (rowItem != null)
+                            {
+                                rowItem.TargetPosition = new Pt(currentX - rowItem.Size.X, currentY);
+                            }
+                        }
+                    }
                 }
                 else if (model.AttachmentOrientation == AttachmentOrientation.Bottom)
                 {
@@ -222,13 +238,13 @@ namespace PanoramicDataWin8.view.vis.menu
                 {
                     for (int col = 0; col < model.NrColumns; col++)
                     {
-                        for (int row = 0; row < model.NrRows; row++)
+                        for (int row = model.NrRows - 1; row >= 0; row--)
                         {
-                            var itemsInRow = model.MenuItemViewModels.Where(mi => mi.Row < row && mi.Column == col).ToList();
-                            double currentY = (model.AnkerPosition.Y - GAP) - itemsInRow.Sum(mi => mi.Size.Y) - Math.Max(itemsInRow.Count(), 0) * GAP;
+                            var itemsInSameCol = model.MenuItemViewModels.Where(mi => mi.Row > row && mi.Column == col).ToList();
+                            var itemsInSameRow = model.MenuItemViewModels.Where(mi => mi.Column < col && mi.Row == row).ToList();
 
-                            var itemsInCols = model.MenuItemViewModels.Where(mi => mi.Column < col && mi.Row == row).ToList();
-                            double currentX = model.AnkerPosition.X + itemsInCols.Sum(mi => mi.Size.X) + Math.Max(itemsInCols.Count(), 0) * GAP; ;
+                            double currentY = model.AnkerPosition.Y - itemsInSameCol.Sum(mi => mi.Size.Y) - itemsInSameCol.Count * GAP - GAP;
+                            double currentX = model.AnkerPosition.X + itemsInSameRow.Sum(mi => mi.Size.X) + itemsInSameRow.Count() * GAP;
 
                             var rowItem = model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
                             if (rowItem != null)

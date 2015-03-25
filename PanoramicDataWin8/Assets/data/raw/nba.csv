@@ -1,4 +1,4 @@
-﻿name=game date,name,fg,fga,mp,pts,plus minus,pf,stl,blk,tov,trb,ft,fta,fg3,fg3a,height,weight,position,shoots,name
+﻿name=game date,name,fg,fga,mp,pts,plus minus,pf,stl,blk,tov,trb,ft,fta,fg3,fg3a,height,weight,position,shoots,team name
 data_type=date,nvarchar,int,int,time,int,int,int,int,int,int,int,int,int,int,int,float,float,nvarchar,nvarchar,nvarchar
 visualization_type=date,enum_long,numeric,numeric,time,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,numeric,enum,enum,enum_long
 display=true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true

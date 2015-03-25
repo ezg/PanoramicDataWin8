@@ -48,6 +48,7 @@ namespace PanoramicDataWin8.view.vis.render
             this.InitializeComponent();
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
+            AttributeView.AttributeViewModelTapped += AttributeView_AttributeViewModelTapped;
         }
 
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
@@ -58,6 +59,7 @@ namespace PanoramicDataWin8.view.vis.render
         public override void Dispose()
         {
             base.Dispose();
+            AttributeView.AttributeViewModelTapped -= AttributeView_AttributeViewModelTapped;
             if (DataContext != null)
             {
                 (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
@@ -112,6 +114,11 @@ namespace PanoramicDataWin8.view.vis.render
 
                 render();
             }
+            if (e.PropertyName == model.GetPropertyName(() => model.Size) ||
+                e.PropertyName == model.GetPropertyName(() => model.Position))
+            {
+                setMenuViewModelAnkerPosition();
+            }      
         }
         
         private void populateHeaders()
@@ -125,7 +132,8 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     IsShadow = false,
                     BorderThicknes = new Thickness(0, 0, 0, 4),
-                    Size = new Vec(visModel.Size.X - 54, 54)
+                    Size = new Vec(visModel.Size.X - 54, 54),
+                    AttachmentOrientation = AttachmentOrientation.Top
                 };
             } 
             if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Any())
@@ -136,7 +144,8 @@ namespace PanoramicDataWin8.view.vis.render
                     IsShadow = false,
                     BorderThicknes = new Thickness(0,0,4,0),
                     Size = new Vec(54, visModel.Size.Y - 54),
-                    TextAngle = 270
+                    TextAngle = 270,
+                    AttachmentOrientation = AttachmentOrientation.Left
                 };
             }
         }
@@ -205,16 +214,20 @@ namespace PanoramicDataWin8.view.vis.render
 
         void loadQueryResultItemModels(QueryResultModel resultModel)
         {
+            _PlotRendererContentProvider.XAxisType = resultModel.XAxisType;
+            _PlotRendererContentProvider.YAxisType = resultModel.YAxisType;
             List<BinnedDataPoint> binnedDataPoints = new List<BinnedDataPoint>();
             foreach (var queryResultItemModel in resultModel.QueryResultItemModels)
             {
                 BinnedDataPoint point = new BinnedDataPoint()
                 {
-                    MinX = queryResultItemModel.BinMinXValue,
-                    MinY = queryResultItemModel.BinMinYValue,
-                    MaxX = queryResultItemModel.BinMaxXValue,
-                    MaxY = queryResultItemModel.BinMaxYValue,
-                    Size = queryResultItemModel.BinSize
+                    MinX = queryResultItemModel.Bin.BinMinX,
+                    MinY = queryResultItemModel.Bin.BinMinY,
+                    MaxX = queryResultItemModel.Bin.BinMaxX,
+                    MaxY = queryResultItemModel.Bin.BinMaxY,
+                    Size = queryResultItemModel.Bin.Size,
+                    LabelX = queryResultItemModel.Bin.LabelX,
+                    LabelY = queryResultItemModel.Bin.LabelY,
                 };
 
                 binnedDataPoints.Add(point);
@@ -238,6 +251,65 @@ namespace PanoramicDataWin8.view.vis.render
                     }
                     _menuViewModel.IsToBeRemoved = true;
                     _menuViewModel.IsDisplayed = false;
+                }
+            }
+        }
+
+        void AttributeView_AttributeViewModelTapped(object sender, EventArgs e)
+        {
+            var visModel = (DataContext as VisualizationViewModel);
+            visModel.ActiveStopwatch.Restart();
+
+            AttributeViewModel model = (sender as AttributeView).DataContext as AttributeViewModel;
+            //if (HeaderObjects.Any(ho => ho.AttributeViewModel == model))
+            {
+                bool createNew = true;
+                if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
+                {
+                    createNew = _menuViewModel.AttributeViewModel != model;
+                    removeMenu();
+                }
+
+                if (createNew)
+                {
+                    AttributeView attributeView = sender as AttributeView;
+                    var menuViewModel = model.CreateMenuViewModel(attributeView.GetBounds(MainViewController.Instance.InkableScene));
+                    if (menuViewModel.MenuItemViewModels.Count > 0)
+                    {
+                        _menuViewModel = menuViewModel;
+                        _menuView = new MenuView()
+                        {
+                            DataContext = _menuViewModel
+                        };
+                        setMenuViewModelAnkerPosition();
+                        MainViewController.Instance.InkableScene.Add(_menuView);
+                        _menuViewModel.IsDisplayed = true;
+                    }
+                }
+            }
+        }
+
+        private void setMenuViewModelAnkerPosition()
+        {
+            if (_menuViewModel != null)
+            {
+                AttributeView attributeView = this.GetDescendantsOfType<AttributeView>().Where(av => av.DataContext == _menuViewModel.AttributeViewModel).FirstOrDefault();
+
+                if (attributeView != null)
+                {
+                    if (_menuViewModel.IsToBeRemoved)
+                    {
+                        Rct bounds = attributeView.GetBounds(MainViewController.Instance.InkableScene);
+                        foreach (var menuItem in _menuViewModel.MenuItemViewModels)
+                        {
+                            menuItem.TargetPosition = bounds.TopLeft;
+                        }
+                    }
+                    else
+                    {
+                        Rct bounds = attributeView.GetBounds(MainViewController.Instance.InkableScene);
+                        _menuViewModel.AnkerPosition = bounds.TopLeft;
+                    }
                 }
             }
         }
@@ -370,6 +442,8 @@ namespace PanoramicDataWin8.view.vis.render
         private D2D.Brush _textBrush;
         private DW.TextFormat _textFormat;
 
+        public AxisType XAxisType { get; set; }
+        public AxisType YAxisType { get; set; }
 
         public List<BinnedDataPoint> BinnedDataPoints { get; set; }
 
@@ -391,9 +465,22 @@ namespace PanoramicDataWin8.view.vis.render
 
         public override void Draw(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
         {
-
             if (BinnedDataPoints != null && BinnedDataPoints.Count > 0)
             {
+                var xLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelX.TrimTo(20), MinValue = bin.MinX, MaxValue = bin.MaxX }).Distinct().ToList();
+                var yLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelY.TrimTo(20), MinValue = bin.MinY, MaxValue = bin.MaxY }).Distinct().ToList();
+                var maxXLabelLength = xLabels.Max(b => b.Label.Length);
+                var maxXLabel = xLabels.Where(b => b.Label.Length == maxXLabelLength).First();
+                var maxYLabelLength = yLabels.Max(b => b.Label.Length);
+                var maxYLabel = yLabels.Where(b => b.Label.Length == maxYLabelLength).First();
+
+                var layoutX = new DW.TextLayout(dwFactory, maxXLabel.Label, _textFormat, 1000f, 1000f);
+                var metricsX = layoutX.Metrics;
+                var layoutY = new DW.TextLayout(dwFactory, maxYLabel.Label, _textFormat, 1000f, 1000f);
+                var metricsY = layoutY.Metrics;
+
+                _leftOffset = Math.Max(10, metricsY.Width + 10 + 20);
+
                 _deviceWidth = (float)(d2dDeviceContext.Size.Width - _leftOffset - _rightOffset);
                 _deviceHeight = (float)(d2dDeviceContext.Size.Height - _topOffset - _bottomtOffset);
 
@@ -412,87 +499,65 @@ namespace PanoramicDataWin8.view.vis.render
 
                 var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color(40, 170, 213));
                 var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
-
-                // draw grid and tickmarks
-                // x axis
-                /*float[] xExtent = getLinearTicks(minX, maxX, 10);
-                for (float t = xExtent[0]; t < xExtent[1]; t += xExtent[2])
-                {
-                    float yFrom = (float)((minY - minY) / yScale) * deviceHeight +_topOffset;
-                    float yTo = (float)((maxY - minY) / yScale) * deviceHeight + _topOffset;
-                    float x = ((t - minX) / xScale) * deviceWidth + _leftOffset;
-                    d2dDeviceContext.DrawLine(new Vector2(x, yFrom), new Vector2(x, yTo), white, 0.5f);
-
-                    var layout = new DW.TextLayout(dwFactory, t.ToString() , _textFormat, 1000f, 1000f);
-                    var metrics = layout.Metrics;
-                    d2dDeviceContext.DrawTextLayout(new Vector2(x - metrics.Width / 2.0f, yTo + 5), layout, _textBrush);
-                    //d2dDeviceContext.DrawRectangle(new RectangleF(15, 15 + i * 25, tt.Width, tt.Height), _textBrush);
-                    layout.Dispose();
-                }*/
-
-                List<double> xLabel = BinnedDataPoints.Select(bin => bin.MinX).Distinct().ToList();
-                var maxLength = xLabel.Max(b => b.ToString().Length);
-                var maxLengthText = BinnedDataPoints.Where(bin => bin.MinX.ToString().Length == maxLength).Select(bin => bin.MinX.ToString()).First();
-                var layout = new DW.TextLayout(dwFactory, maxLengthText, _textFormat, 1000f, 1000f);
-                var metrics = layout.Metrics;
-
-                int mod = (int) Math.Ceiling(1.0 / (Math.Floor((_deviceWidth / metrics.Width)) / xLabel.Count));
-
+                 
+               
+                // x labels and grid lines
+                int mod = (int) Math.Ceiling(1.0 / (Math.Floor((_deviceWidth / (metricsX.Width + 5))) / xLabels.Count));
                 int count = 0;
-                foreach (var t in xLabel)
+                foreach (var label in xLabels)
                 {
                     float yFrom = toScreenY(_minY);
                     float yTo = toScreenY(_maxY);
-                    float x = toScreenX((float)t);
-                    d2dDeviceContext.DrawLine(new Vector2(x, yFrom), new Vector2(x, yTo), white, 0.5f);
+                    float xFrom = toScreenX((float)label.MinValue);
+                    float xTo = toScreenX((float)label.MaxValue);
+
                     if (count % mod == 0)
                     {
-                        layout = new DW.TextLayout(dwFactory, t.ToString(), _textFormat, 1000f, 1000f);
-                        metrics = layout.Metrics;
-                        d2dDeviceContext.DrawTextLayout(new Vector2(x - metrics.Width / 2.0f, yFrom + 5), layout, _textBrush);
+                        d2dDeviceContext.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xFrom, yTo), white, 0.5f);
+                        var layout = new DW.TextLayout(dwFactory, label.Label.ToString(), _textFormat, 1000f, 1000f);
+                        var metrics = layout.Metrics;
+                        if (XAxisType == AxisType.Quantitative)
+                        {
+                            d2dDeviceContext.DrawTextLayout(new Vector2(xFrom - metrics.Width / 2.0f, yFrom + 5), layout, _textBrush);
+                        }
+                        else
+                        {
+                            d2dDeviceContext.DrawTextLayout(new Vector2(xFrom + (xTo - xFrom) / 2.0f - metrics.Width / 2.0f, yFrom + 5), layout, _textBrush);
+                        }
                         layout.Dispose();
                     }
                     count++;
                 }
-
-                List<double> yLabel = BinnedDataPoints.Select(bin => bin.MinY).Distinct().ToList();
-                maxLength = yLabel.Max(b => b.ToString().Length);
-                maxLengthText = BinnedDataPoints.Where(bin => bin.MinY.ToString().Length == maxLength).Select(bin => bin.MinY.ToString()).First();
-                layout = new DW.TextLayout(dwFactory, maxLengthText, _textFormat, 1000f, 1000f);
-                metrics = layout.Metrics;
-
-                mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceHeight / metrics.Height)) / yLabel.Count));
-
+                
+                // y labels and grid lines
+                mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceHeight / (metricsY.Height + 5))) / yLabels.Count));
                 count = 0;
-                foreach (var t in yLabel)
+                foreach (var label in yLabels)
                 {
                     
                     float xFrom = toScreenX(_minX);
                     float xTo = toScreenX(_maxX);
-                    float y = toScreenY((float)t);
-                    d2dDeviceContext.DrawLine(new Vector2(xFrom, y), new Vector2(xTo, y), white, 0.5f);
+                    float yFrom = toScreenY((float)label.MinValue);
+                    float yTo = toScreenY((float)label.MaxValue);
+
                     if (count % mod == 0)
                     {
-                        layout = new DW.TextLayout(dwFactory, t.ToString(), _textFormat, 1000f, 1000f);
-                        metrics = layout.Metrics;
-                        d2dDeviceContext.DrawTextLayout(new Vector2(xFrom - 10 - metrics.Width, y - metrics.Height / 2.0f), layout, _textBrush);
+                        d2dDeviceContext.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xTo, yFrom), white, 0.5f);
+                        var layout = new DW.TextLayout(dwFactory, label.Label.ToString(), _textFormat, 1000f, 1000f);
+                        var metrics = layout.Metrics;
+                        if (YAxisType == AxisType.Quantitative)
+                        {
+                            d2dDeviceContext.DrawTextLayout(new Vector2(xFrom - 10 - metrics.Width, yFrom - metrics.Height / 2.0f), layout, _textBrush);
+                        }
+                        else
+                        {
+                            d2dDeviceContext.DrawTextLayout(new Vector2(xFrom - 10 - metrics.Width, yFrom + (yTo - yFrom) / 2.0f - metrics.Height / 2.0f), layout, _textBrush);
+                        }
                         layout.Dispose();
                     }
                     count++;
                 }
 
-/*
-                // y axis
-                float[] yExtent = getLinearTicks(minY, maxY, 10);
-                for (float t = yExtent[0]; t < yExtent[1]; t += yExtent[2])
-                {
-                    float xFrom = (float)((minX) / xScale) * deviceWidth + _leftOffset;
-                    float xTo = (float)((maxX) / xScale) * deviceWidth + _topOffset;
-                    float y = (t / yScale) * deviceHeight + _topOffset;
-                    //d2dDeviceContext.DrawLine(new Vector2(xFrom, y), new Vector2(xTo, y), white, 1);
-
-                }
-*/
                 // draw data
                 foreach (var bin in BinnedDataPoints)
                 {
@@ -520,6 +585,8 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 binColor.Dispose();
                 white.Dispose();
+                layoutX.Dispose();
+                layoutY.Dispose();
             }
         }
         public override void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
@@ -564,5 +631,7 @@ namespace PanoramicDataWin8.view.vis.render
         public double MaxX { get; set; }
         public double MaxY { get; set; }
         public double Size { get; set; }
+        public string LabelX { get; set; }
+        public string LabelY { get; set; }
     }
 }

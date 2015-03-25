@@ -118,6 +118,10 @@
     <Compile Include="controller\data\DataWrapper.cs" />
     <Compile Include="controller\data\IItemsProvider.cs" />
     <Compile Include="controller\data\QueryExecuter.cs" />
+    <Compile Include="controller\data\sim\Binner.cs" />
+    <Compile Include="controller\data\sim\BinStructure.cs" />
+    <Compile Include="controller\data\sim\SimDataProvider.cs" />
+    <Compile Include="controller\data\sim\SimJob.cs" />
     <Compile Include="controller\data\sim\SimQueryExecuter.cs" />
     <Compile Include="controller\data\tuppleware\TuppleWareQueryExecuter.cs" />
     <Compile Include="controller\input\DatasetConfiguration.cs" />
@@ -128,6 +132,7 @@
     <Compile Include="model\data\AttributeFunction.cs" />
     <Compile Include="model\data\AttributeModel.cs" />
     <Compile Include="model\data\AttributeOperationModel.cs" />
+    <Compile Include="model\data\Bin.cs" />
     <Compile Include="model\data\CalculatedAttributeModel.cs" />
     <Compile Include="model\data\FilteringOperation.cs" />
     <Compile Include="model\data\FilterModel.cs" />

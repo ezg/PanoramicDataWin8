@@ -1,6 +1,7 @@
 ﻿using Microsoft.Practices.Prism.Mvvm;
 using PanoramicData.controller.data;
 using PanoramicData.utils;
+using PanoramicDataWin8.model.data;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,71 +42,6 @@ namespace PanoramicData.model.data
             }
         }
 
-        private double _binMinXValue = 0;
-        public double BinMinXValue
-        {
-            get
-            {
-                return _binMinXValue;
-            }
-            set
-            {
-                this.SetProperty(ref _binMinXValue, value);
-            }
-        }
-
-        private double _binMinYValue = 0;
-        public double BinMinYValue
-        {
-            get
-            {
-                return _binMinYValue;
-            }
-            set
-            {
-                this.SetProperty(ref _binMinYValue, value);
-            }
-        }
-
-        private double _binMaxXValue = 0;
-        public double BinMaxXValue
-        {
-            get
-            {
-                return _binMaxXValue;
-            }
-            set
-            {
-                this.SetProperty(ref _binMaxXValue, value);
-            }
-        }
-
-        private double _binMaxYValue = 0;
-        public double BinMaxYValue
-        {
-            get
-            {
-                return _binMaxYValue;
-            }
-            set
-            {
-                this.SetProperty(ref _binMaxYValue, value);
-            }
-        }
-
-        private double _binSize = 0;
-        public double BinSize
-        {
-            get
-            {
-                return _binSize;
-            }
-            set
-            {
-                this.SetProperty(ref _binSize, value);
-            }
-        }
-
         public double XValue
         {
             get
@@ -134,16 +70,16 @@ namespace PanoramicData.model.data
             }
         }
 
-        private BinningObject _binningObject = null;
-        public BinningObject BinningObject
+        private Bin _bin = null;
+        public Bin Bin
         {
             get
             {
-                return _binningObject;
+                return _bin;
             }
             set
             {
-                this.SetProperty(ref _binningObject, value);
+                this.SetProperty(ref _bin, value);
             }
         }
 
@@ -207,21 +143,8 @@ namespace PanoramicData.model.data
             this.AttributeValues = updateTo.AttributeValues;
             this.RowNumber = updateTo.RowNumber;
             this.VisualizationResultValues = updateTo.VisualizationResultValues;
-
-            this.BinSize = updateTo.BinSize;
-            this.BinMinXValue = updateTo.BinMinXValue;
-            this.BinMinYValue = updateTo.BinMinYValue;
-            this.BinMaxXValue = updateTo.BinMaxXValue;
-            this.BinMaxYValue = updateTo.BinMaxYValue;
+            this.Bin = updateTo.Bin;
         }
-    }
-
-    public class BinningObject
-    {
-        public double XFrom { get; set; }
-        public double XTo { get; set; }
-        public double YFrom { get; set; }
-        public double YTo { get; set; }
     }
 
     public class GroupingObject
