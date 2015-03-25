@@ -50,7 +50,8 @@ namespace PanoramicDataWin8
             this.Loaded += MainPage_Loaded;
             this.DataContextChanged += MainPage_DataContextChanged;
             this.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(MainPage_PointerPressed), true);
-            this.KeyUp += MainPage_KeyUp;
+            //this.KeyUp += MainPage_KeyUp;
+            this.KeyDown += MainPage_KeyDown;
 
             _messageTimer.Interval = TimeSpan.FromMilliseconds(2000);
             _messageTimer.Tick += _messageTimer_Tick;
@@ -62,7 +63,7 @@ namespace PanoramicDataWin8
             _messageTimer.Stop();
         }
 
-        void MainPage_KeyUp(object sender, KeyRoutedEventArgs e)
+        void MainPage_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
             if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)

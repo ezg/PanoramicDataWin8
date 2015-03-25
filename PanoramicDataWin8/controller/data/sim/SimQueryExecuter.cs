@@ -520,15 +520,24 @@ namespace PanoramicData.controller.data.sim
             }
             else
             {
-                LastBinStructure = initializeBinStructure(minX, maxX, minY, maxY);
+                double[] xExtent = getExtent(minX, maxX, XAxisType != AxisType.Quantitative ? (maxX - minX) : NrOfXBins);
+                double[] yExtent = getExtent(minY, maxY, XAxisType != AxisType.Quantitative ? (maxY - minY) : NrOfYBins);
+                LastBinStructure = 
+                    initializeBinStructure(xExtent[0], xExtent[1], yExtent[0], yExtent[1],
+                    xExtent[2], yExtent[2],
+                    XAxisType != AxisType.Quantitative ? (maxX - minX) : NrOfXBins,
+                    XAxisType != AxisType.Quantitative ? (maxY - minY) : NrOfYBins);
             }
             double plusX = 0;
             double plusY = 0;
-            calculateNrOfBinsToAdd(out plusX, out plusY, minX, maxX, minY, maxY);
+            calculateNrOfBinsToAdd(out plusX, out plusY, LastBinStructure, minX, maxX, minY, maxY);
+            minX = LastBinStructure.MinX - (Math.Ceiling((LastBinStructure.MinX - minX) / LastBinStructure.SizeX) * LastBinStructure.SizeX);
+            minY = LastBinStructure.MinY - (Math.Ceiling((LastBinStructure.MinY - minY) / LastBinStructure.SizeY) * LastBinStructure.SizeY);
 
-            BinStructure tempBinStructure = initializeBinStructure(minX, maxX, minY, maxY,
-                LastBinStructure.SizeX, LastBinStructure.SizeY,
-                (LastBinStructure.Bins.Count - 1) + plusX, (LastBinStructure.Bins[0].Count - 1) + plusY);
+            BinStructure tempBinStructure = 
+                initializeBinStructure(minX, maxX, minY, maxY,
+                    LastBinStructure.SizeX, LastBinStructure.SizeY,
+                    (LastBinStructure.Bins.Count - 1) + plusX, (LastBinStructure.Bins[0].Count - 1) + plusY);
 
             binSamples(tempBinStructure, sampleQueryResultItemModels);
 
@@ -632,6 +641,28 @@ namespace PanoramicData.controller.data.sim
                 bin.Count += intersectingQueryResultItemModels.Count;
             }
         }
+        
+        private double[] getExtent(double min, double max, double m)
+        {
+            double span = max - min;
+
+            double step = Math.Pow(10, Math.Floor(Math.Log10(span / m)));
+            double err = m / span * step;
+
+            if (err <= .15)
+                step *= 10;
+            else if (err <= .35)
+                step *= 5;
+            else if (err <= .75)
+                step *= 2;
+
+            double[] ret = new double[3];
+            ret[0] = (double)(Math.Floor(min / step) * step);
+            ret[1] = (double)(Math.Floor(max / step) * step + step);
+            ret[2] = (double)step;
+
+            return ret;
+        }
 
         private BinStructure initializeBinStructure(double minX, double maxX, double minY, double maxY, double sizeX, double sizeY, double nrOfXBins, double nrOfYBins)
         {
@@ -686,21 +717,21 @@ namespace PanoramicData.controller.data.sim
             return initializeBinStructure(minX, maxX, minY, maxY, sizeX, sizeY, nrOfXBins, nrOfYBins);            
         }
 
-        private void calculateNrOfBinsToAdd(out double plusX, out double plusY, double minX, double maxX, double minY, double maxY)
+        private void calculateNrOfBinsToAdd(out double plusX, out double plusY, BinStructure binStructure, double minX, double maxX, double minY, double maxY)
         {
             plusX = 0;
             plusY = 0;
             if (XAxisType == AxisType.Quantitative)
             {
-                if (minX < LastBinStructure.MinX)
+                if (minX < binStructure.MinX)
                 {
-                    minX = LastBinStructure.MinX - (Math.Ceiling((LastBinStructure.MinX - minX) / LastBinStructure.SizeX) * LastBinStructure.SizeX);
-                    plusX += Math.Ceiling((LastBinStructure.MinX - minX) / LastBinStructure.SizeX);
+                    minX = binStructure.MinX - (Math.Ceiling((binStructure.MinX - minX) / binStructure.SizeX) * binStructure.SizeX);
+                    plusX += Math.Ceiling((binStructure.MinX - minX) / binStructure.SizeX);
                 }
-                if (maxX > LastBinStructure.MaxX)
+                if (maxX > binStructure.MaxX)
                 {
-                    maxX = LastBinStructure.MaxX + (Math.Ceiling((maxX - LastBinStructure.MaxX) / LastBinStructure.SizeX) * LastBinStructure.SizeX);
-                    plusX += Math.Ceiling((maxX - LastBinStructure.MaxX) / LastBinStructure.SizeX);
+                    maxX = binStructure.MaxX + (Math.Ceiling((maxX - binStructure.MaxX) / binStructure.SizeX) * binStructure.SizeX);
+                    plusX += Math.Ceiling((maxX - binStructure.MaxX) / binStructure.SizeX);
                 }
 
                 if (plusX != 0)
@@ -710,20 +741,20 @@ namespace PanoramicData.controller.data.sim
             }
             else
             {
-                plusX = Math.Max(0, (maxX - minX) - (LastBinStructure.MaxX - LastBinStructure.MinX));
+                plusX = Math.Max(0, (maxX - minX) - (binStructure.MaxX - binStructure.MinX));
             }
 
             if (YAxisType == AxisType.Quantitative)
             {
-                if (minY < LastBinStructure.MinY)
+                if (minY < binStructure.MinY)
                 {
-                    minY = LastBinStructure.MinY - (Math.Ceiling((LastBinStructure.MinY - minY) / LastBinStructure.SizeY) * LastBinStructure.SizeY);
-                    plusY += Math.Ceiling((LastBinStructure.MinY - minY) / LastBinStructure.SizeY);
+                    minY = binStructure.MinY - (Math.Ceiling((binStructure.MinY - minY) / binStructure.SizeY) * binStructure.SizeY);
+                    plusY += Math.Ceiling((binStructure.MinY - minY) / binStructure.SizeY);
                 }
-                if (maxY > LastBinStructure.MaxY)
+                if (maxY > binStructure.MaxY)
                 {
-                    maxY = LastBinStructure.MaxY + (Math.Ceiling((maxY - LastBinStructure.MaxY) / LastBinStructure.SizeY) * LastBinStructure.SizeY);
-                    plusY += Math.Ceiling((maxY - LastBinStructure.MaxY) / LastBinStructure.SizeY);
+                    maxY = binStructure.MaxY + (Math.Ceiling((maxY - binStructure.MaxY) / binStructure.SizeY) * binStructure.SizeY);
+                    plusY += Math.Ceiling((maxY - binStructure.MaxY) / binStructure.SizeY);
                 }
 
                 if (plusY != 0)
@@ -733,7 +764,7 @@ namespace PanoramicData.controller.data.sim
             }
             else
             {
-                plusY = Math.Max(0, (maxY - minY) - (LastBinStructure.MaxY - LastBinStructure.MinY));
+                plusY = Math.Max(0, (maxY - minY) - (binStructure.MaxY - binStructure.MinY));
             }
         }
     }
