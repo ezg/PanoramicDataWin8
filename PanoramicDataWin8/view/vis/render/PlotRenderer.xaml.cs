@@ -613,7 +613,6 @@ namespace PanoramicDataWin8.view.vis.render
                 return;
             }
 
-            var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color(40, 170, 213));
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
 
             // draw data
@@ -627,7 +626,10 @@ namespace PanoramicDataWin8.view.vis.render
                 float w = (float)Math.Max((xTo - xFrom) * (float)bin.Size, 5.0);
                 float h = (float)Math.Max((yFrom - yTo) * (float)bin.Size, 5.0);
 
-                if (bin.Size > 0)
+                float alpha = 0.1f * (float) Math.Log10(bin.Size) + 1f;
+                var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color(40f / 255f, 170f / 255f, 213f / 255f));
+
+                /*if (bin.Size > 0)
                 {
                     roundedRect.Rect = new RectangleF(
                       xFrom + ((xTo - xFrom) - w) / 2.0f,
@@ -637,7 +639,7 @@ namespace PanoramicDataWin8.view.vis.render
                     roundedRect.RadiusX = roundedRect.RadiusY = 4;
                     d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
                     //d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 1f);
-                }
+                }*/
 
                 roundedRect.Rect = new RectangleF(
                     xFrom,
@@ -645,9 +647,12 @@ namespace PanoramicDataWin8.view.vis.render
                     xTo - xFrom,
                     yFrom - yTo);
                 roundedRect.RadiusX = roundedRect.RadiusY = 4;
+                d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
                 d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+
+
+                binColor.Dispose();
             }
-            binColor.Dispose();
             white.Dispose();
         }
 
