@@ -41,16 +41,32 @@ namespace PanoramicDataWin8.controller.data.sim
 
             if (dataMaxX == dataMinX)
             {
-                dataMinX -= 1;
-                dataMaxX += 1;
+                if (XAxisType != AxisType.Quantitative)
+                {
+                    dataMinX -= 0;
+                    dataMaxX += 0.1;
+                }
+                else
+                {
+                    dataMinX -= 1;
+                    dataMaxX += 1;
+                }
             }
             if (dataMaxY == dataMinY)
             {
-                dataMinY = 0;
-                dataMaxY += 1;
+                if (YAxisType != AxisType.Quantitative)
+                {
+                    dataMinY -= 0;
+                    dataMaxY += 0.1;
+                }
+                else
+                {
+                    dataMinY -= 1;
+                    dataMaxY += 1;
+                }
             }
 
-            if (LastBinStructure != null && Incremental)
+            if (LastBinStructure != null)
             {
                 dataMinX = Math.Min(LastBinStructure.DataMinX, dataMinX);
                 dataMinY = Math.Min(LastBinStructure.DataMinY, dataMinY);

@@ -141,6 +141,24 @@ namespace PanoramicDataWin8
                     msgTextBlock.Opacity = 1;
                     _messageTimer.Start();
                 }
+                if (e.Key == Windows.System.VirtualKey.Number1)
+                {
+                    MainViewController.Instance.MainModel.GraphRenderOption = GraphRenderOptions.Grid;
+                    Debug.WriteLine("GraphRenderOption : " + MainViewController.Instance.MainModel.GraphRenderOption.ToString());
+
+                    msgTextBlock.Text = ("GraphRenderOption : " + MainViewController.Instance.MainModel.GraphRenderOption.ToString());
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
+                }
+                if (e.Key == Windows.System.VirtualKey.Number2)
+                {
+                    MainViewController.Instance.MainModel.GraphRenderOption = GraphRenderOptions.Cell;
+                    Debug.WriteLine("GraphRenderOption : " + MainViewController.Instance.MainModel.GraphRenderOption.ToString());
+
+                    msgTextBlock.Text = ("GraphRenderOption : " + MainViewController.Instance.MainModel.GraphRenderOption.ToString());
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
+                }
             }
         }
 

@@ -98,5 +98,20 @@ namespace PanoramicData.model.view
                 this.SetProperty(ref _throttleInMillis, value);
             }
         }
+
+        private GraphRenderOptions _graphRenderOption = GraphRenderOptions.Grid;
+        public GraphRenderOptions GraphRenderOption
+        {
+            get
+            {
+                return _graphRenderOption;
+            }
+            set
+            {
+                this.SetProperty(ref _graphRenderOption, value);
+            }
+        }
     }
+
+    public enum GraphRenderOptions { Grid, Cell}
 }

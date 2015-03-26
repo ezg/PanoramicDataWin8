@@ -88,8 +88,8 @@ namespace PanoramicDataWin8.controller.data.sim
                     returnList.Add(item);
                 }
                 _nrProcessedSamples += sampleSize;
-
-                return returnList.OrderBy(item => item, new ItemComparer(_queryModel)).ToList();
+                var ordered = returnList.OrderBy(item => item, new ItemComparer(_queryModel));
+                return ordered.ToList();
             }
             else
             {

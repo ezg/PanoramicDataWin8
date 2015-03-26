@@ -35,6 +35,7 @@ namespace PanoramicDataWin8.controller.data.sim
         private int _sampleSize = 0;
         private bool _additive = false;
         private bool _isGrouped = false;
+        private bool _isIncremental = false;
         private TimeSpan _throttle = TimeSpan.FromMilliseconds(0);
         private Binner _binner = new Binner();
         private Object _lock = new Object();
@@ -62,6 +63,7 @@ namespace PanoramicDataWin8.controller.data.sim
             _isRunning = true;
             int samplesToCheck = -1;
             _isGrouped = QueryModel.AttributeOperationModels.Any(aom => aom.IsGrouped || aom.IsBinned) || QueryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None);
+            _isIncremental = !_isGrouped;
 
             if (QueryModel.VisualizationType == VisualizationType.Table)
             {
@@ -81,7 +83,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 {
                     NrOfXBins = MainViewController.Instance.MainModel.NrOfXBins,
                     NrOfYBins = MainViewController.Instance.MainModel.NrOfYBins,
-                    Incremental = !_isGrouped,
+                    Incremental = _isIncremental,
                     XAxisType = _xAxisType,
                     YAxisType = _yAxisType
                 };
@@ -106,6 +108,11 @@ namespace PanoramicDataWin8.controller.data.sim
             {
                 if (QueryModelClone.VisualizationType != VisualizationType.Table)
                 {
+                    if (!_isIncremental)
+                    {
+                        _xUniqueValues.Clear();
+                        _yUniqueValues.Clear();
+                    }
                     setVisualizationValues(samples);
                     if (_binner != null)
                     {

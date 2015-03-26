@@ -123,6 +123,7 @@ namespace PanoramicDataWin8.view.vis.render
         
         private void populateHeaders()
         {
+            removeMenu();
             VisualizationViewModel visModel = (DataContext as VisualizationViewModel);
             QueryModel queryModel = visModel.QueryModel;
             if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Any())
@@ -467,128 +468,229 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (BinnedDataPoints != null && BinnedDataPoints.Count > 0)
             {
-                var xLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelX.TrimTo(20), MinValue = bin.MinX, MaxValue = bin.MaxX }).Distinct().ToList();
-                var yLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelY.TrimTo(20), MinValue = bin.MinY, MaxValue = bin.MaxY }).Distinct().ToList();
-                var maxXLabelLength = xLabels.Max(b => b.Label.Length);
-                var maxXLabel = xLabels.Where(b => b.Label.Length == maxXLabelLength).First();
-                var maxYLabelLength = yLabels.Max(b => b.Label.Length);
-                var maxYLabel = yLabels.Where(b => b.Label.Length == maxYLabelLength).First();
-
-                var layoutX = new DW.TextLayout(dwFactory, maxXLabel.Label, _textFormat, 1000f, 1000f);
-                var metricsX = layoutX.Metrics;
-                var layoutY = new DW.TextLayout(dwFactory, maxYLabel.Label, _textFormat, 1000f, 1000f);
-                var metricsY = layoutY.Metrics;
-
-                _leftOffset = Math.Max(10, metricsY.Width + 10 + 20);
-
-                _deviceWidth = (float)(d2dDeviceContext.Size.Width - _leftOffset - _rightOffset);
-                _deviceHeight = (float)(d2dDeviceContext.Size.Height - _topOffset - _bottomtOffset);
-
-                if (_deviceHeight < 0 || _deviceWidth < 0)
+                if (MainViewController.Instance.MainModel.GraphRenderOption == GraphRenderOptions.Grid)
                 {
-                    return;
+                    renderGrid(d2dDeviceContext, dwFactory);
                 }
-
-                _minX = (float)(BinnedDataPoints.Min(dp => dp.MinX));
-                _minY = (float)(BinnedDataPoints.Min(dp => dp.MinY));
-                _maxX = (float)(BinnedDataPoints.Max(dp => dp.MaxX));
-                _maxY = (float)(BinnedDataPoints.Max(dp => dp.MaxY));
-
-                _xScale = _maxX - _minX;
-                _yScale = _maxY - _minY;
-
-                var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color(40, 170, 213));
-                var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
-                 
-               
-                // x labels and grid lines
-                int mod = (int) Math.Ceiling(1.0 / (Math.Floor((_deviceWidth / (metricsX.Width + 5))) / xLabels.Count));
-                int count = 0;
-                foreach (var label in xLabels)
+                else if (MainViewController.Instance.MainModel.GraphRenderOption == GraphRenderOptions.Cell)
                 {
-                    float yFrom = toScreenY(_minY);
-                    float yTo = toScreenY(_maxY);
-                    float xFrom = toScreenX((float)label.MinValue);
-                    float xTo = toScreenX((float)label.MaxValue);
-
-                    if (count % mod == 0)
-                    {
-                        d2dDeviceContext.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xFrom, yTo), white, 0.5f);
-                        var layout = new DW.TextLayout(dwFactory, label.Label.ToString(), _textFormat, 1000f, 1000f);
-                        var metrics = layout.Metrics;
-                        if (XAxisType == AxisType.Quantitative)
-                        {
-                            d2dDeviceContext.DrawTextLayout(new Vector2(xFrom - metrics.Width / 2.0f, yFrom + 5), layout, _textBrush);
-                        }
-                        else
-                        {
-                            d2dDeviceContext.DrawTextLayout(new Vector2(xFrom + (xTo - xFrom) / 2.0f - metrics.Width / 2.0f, yFrom + 5), layout, _textBrush);
-                        }
-                        layout.Dispose();
-                    }
-                    count++;
+                    renderCell(d2dDeviceContext, dwFactory);
                 }
-                
-                // y labels and grid lines
-                mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceHeight / (metricsY.Height + 5))) / yLabels.Count));
-                count = 0;
-                foreach (var label in yLabels)
-                {
-                    
-                    float xFrom = toScreenX(_minX);
-                    float xTo = toScreenX(_maxX);
-                    float yFrom = toScreenY((float)label.MinValue);
-                    float yTo = toScreenY((float)label.MaxValue);
-
-                    if (count % mod == 0)
-                    {
-                        d2dDeviceContext.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xTo, yFrom), white, 0.5f);
-                        var layout = new DW.TextLayout(dwFactory, label.Label.ToString(), _textFormat, 1000f, 1000f);
-                        var metrics = layout.Metrics;
-                        if (YAxisType == AxisType.Quantitative)
-                        {
-                            d2dDeviceContext.DrawTextLayout(new Vector2(xFrom - 10 - metrics.Width, yFrom - metrics.Height / 2.0f), layout, _textBrush);
-                        }
-                        else
-                        {
-                            d2dDeviceContext.DrawTextLayout(new Vector2(xFrom - 10 - metrics.Width, yFrom + (yTo - yFrom) / 2.0f - metrics.Height / 2.0f), layout, _textBrush);
-                        }
-                        layout.Dispose();
-                    }
-                    count++;
-                }
-
-                // draw data
-                foreach (var bin in BinnedDataPoints)
-                {
-                    var roundedRect = new D2D.RoundedRectangle();
-                    float xFrom = toScreenX((float)bin.MinX);
-                    float yFrom = toScreenY((float)bin.MinY);
-                    float xTo = toScreenX((float)bin.MaxX);
-                    float yTo = toScreenY((float)bin.MaxY);
-                    float w = (float)Math.Max((xTo - xFrom) * (float)bin.Size, 5.0);
-                    float h = (float)Math.Max((yFrom - yTo) * (float)bin.Size, 5.0);
-
-                    roundedRect.Rect = new RectangleF(
-                        xFrom + ((xTo - xFrom) - w) / 2.0f,
-                        yTo + ((yFrom - yTo) - h) / 2.0f,
-                        w,
-                        h);
-                    roundedRect.RadiusX = roundedRect.RadiusY = 4;
-
-                    if (bin.Size > 0)
-                    {
-                        d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
-                        d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 1f);
-
-                    }
-                }
-                binColor.Dispose();
-                white.Dispose();
-                layoutX.Dispose();
-                layoutY.Dispose();
             }
         }
+
+        private void drawString(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory, float x, float y, string text, 
+            bool leftAligned,
+            bool horizontallyCentered, bool verticallyCentered)
+        {
+            var layout = new DW.TextLayout(dwFactory, text, _textFormat, 1000f, 1000f);
+            var metrics = layout.Metrics;
+
+            if (horizontallyCentered)
+            {
+                x -= metrics.Width / 2.0f;
+            }
+            if (verticallyCentered)
+            {
+                y -= metrics.Height / 2.0f;
+            }
+            if (!leftAligned)
+            {
+                x -= metrics.Width;
+            }
+
+            d2dDeviceContext.DrawTextLayout(new Vector2(x, y), layout, _textBrush); 
+        }
+
+        private void computeSizesAndRenderLabels(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory, bool renderLines)
+        {
+            var xLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelX.TrimTo(20), MinValue = bin.MinX, MaxValue = bin.MaxX }).Distinct().ToList();
+            var yLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelY.TrimTo(20), MinValue = bin.MinY, MaxValue = bin.MaxY }).Distinct().ToList();
+            var maxXLabelLength = xLabels.Max(b => b.Label.Length);
+            var maxXLabel = xLabels.Where(b => b.Label.Length == maxXLabelLength).First();
+            var maxYLabelLength = yLabels.Max(b => b.Label.Length);
+            var maxYLabel = yLabels.Where(b => b.Label.Length == maxYLabelLength).First();
+
+            var layoutX = new DW.TextLayout(dwFactory, maxXLabel.Label, _textFormat, 1000f, 1000f);
+            var metricsX = layoutX.Metrics;
+            var layoutY = new DW.TextLayout(dwFactory, maxYLabel.Label, _textFormat, 1000f, 1000f);
+            var metricsY = layoutY.Metrics;
+
+            _leftOffset = Math.Max(10, metricsY.Width + 10 + 20);
+
+            _deviceWidth = (float)(d2dDeviceContext.Size.Width - _leftOffset - _rightOffset);
+            _deviceHeight = (float)(d2dDeviceContext.Size.Height - _topOffset - _bottomtOffset);
+
+            _minX = (float)(BinnedDataPoints.Min(dp => dp.MinX));
+            _minY = (float)(BinnedDataPoints.Min(dp => dp.MinY));
+            _maxX = (float)(BinnedDataPoints.Max(dp => dp.MaxX));
+            _maxY = (float)(BinnedDataPoints.Max(dp => dp.MaxY));
+
+            _xScale = _maxX - _minX;
+            _yScale = _maxY - _minY;
+
+            var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
+
+            // x labels and grid lines
+            int mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceWidth / (metricsX.Width + 5))) / xLabels.Count));
+            int count = 0;
+            foreach (var label in xLabels)
+            {
+                float yFrom = toScreenY(_minY);
+                float yTo = toScreenY(_maxY);
+                float xFrom = toScreenX((float)label.MinValue);
+                float xTo = toScreenX((float)label.MaxValue);
+                bool lastLabel = count + 1 == xLabels.Count;
+
+                if (renderLines)
+                {
+                    d2dDeviceContext.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xFrom, yTo), white, 0.5f);
+                    if (lastLabel)
+                    {
+                        d2dDeviceContext.DrawLine(new Vector2(xTo, yFrom), new Vector2(xTo, yTo), white, 0.5f);
+                    }
+                }
+                if (count % mod == 0)
+                {
+                    if (XAxisType == AxisType.Quantitative)
+                    {
+                        drawString(d2dDeviceContext, dwFactory, xFrom, yFrom + 5, label.Label.ToString(), true, true, false);
+                        if (lastLabel)
+                        {
+                            //drawString(d2dDeviceContext, dwFactory, xTo, yFrom + 5, label.Label.ToString(), true, true, false);
+                        }
+                    }
+                    else
+                    {
+                        drawString(d2dDeviceContext, dwFactory, xFrom + (xTo - xFrom) / 2.0f, yFrom + 5, label.Label.ToString(), true, true, false);
+                    }
+                }
+                count++;
+            }
+
+            // y labels and grid lines
+            mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceHeight / (metricsY.Height + 5))) / yLabels.Count));
+            count = 0;
+            foreach (var label in yLabels)
+            {
+                float xFrom = toScreenX(_minX);
+                float xTo = toScreenX(_maxX);
+                float yFrom = toScreenY((float)label.MinValue);
+                float yTo = toScreenY((float)label.MaxValue); 
+                bool lastLabel = count + 1 == xLabels.Count;
+
+                if (renderLines)
+                {
+                    d2dDeviceContext.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xTo, yFrom), white, 0.5f);
+                    if (lastLabel)
+                    {
+                        d2dDeviceContext.DrawLine(new Vector2(xFrom, yTo), new Vector2(xTo, yTo), white, 0.5f);
+                    }
+                }
+                if (count % mod == 0)
+                {
+                    if (YAxisType == AxisType.Quantitative)
+                    {
+                        drawString(d2dDeviceContext, dwFactory, xFrom - 10, yFrom, label.Label.ToString(), false, false, true);
+                    }
+                    else
+                    {
+                        drawString(d2dDeviceContext, dwFactory, xFrom - 10, yFrom + (yTo - yFrom) / 2.0f, label.Label.ToString(), false, false, true);
+                    }
+                }
+                count++;
+            }
+            white.Dispose();
+            layoutX.Dispose();
+            layoutY.Dispose();
+        }
+
+        private void renderCell(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
+        {
+            computeSizesAndRenderLabels(d2dDeviceContext, dwFactory, false);
+            if (_deviceHeight < 0 || _deviceWidth < 0)
+            {
+                return;
+            }
+
+            var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color(40, 170, 213));
+            var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
+
+            // draw data
+            foreach (var bin in BinnedDataPoints)
+            {
+                var roundedRect = new D2D.RoundedRectangle();
+                float xFrom = toScreenX((float)bin.MinX);
+                float yFrom = toScreenY((float)bin.MinY);
+                float xTo = toScreenX((float)bin.MaxX);
+                float yTo = toScreenY((float)bin.MaxY);
+                float w = (float)Math.Max((xTo - xFrom) * (float)bin.Size, 5.0);
+                float h = (float)Math.Max((yFrom - yTo) * (float)bin.Size, 5.0);
+
+                if (bin.Size > 0)
+                {
+                    roundedRect.Rect = new RectangleF(
+                      xFrom + ((xTo - xFrom) - w) / 2.0f,
+                      yTo + ((yFrom - yTo) - h) / 2.0f,
+                      w,
+                      h);
+                    roundedRect.RadiusX = roundedRect.RadiusY = 4;
+                    d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
+                    //d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 1f);
+                }
+
+                roundedRect.Rect = new RectangleF(
+                    xFrom,
+                    yTo,
+                    xTo - xFrom,
+                    yFrom - yTo);
+                roundedRect.RadiusX = roundedRect.RadiusY = 4;
+                d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+            }
+            binColor.Dispose();
+            white.Dispose();
+        }
+
+        private void renderGrid(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
+        {
+            computeSizesAndRenderLabels(d2dDeviceContext, dwFactory, true);
+            if (_deviceHeight < 0 || _deviceWidth < 0)
+            {
+                return;
+            }
+
+            var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color(40, 170, 213));
+            var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
+
+            // draw data
+            foreach (var bin in BinnedDataPoints)
+            {
+                var roundedRect = new D2D.RoundedRectangle();
+                float xFrom = toScreenX((float)bin.MinX);
+                float yFrom = toScreenY((float)bin.MinY);
+                float xTo = toScreenX((float)bin.MaxX);
+                float yTo = toScreenY((float)bin.MaxY);
+                float w = (float)Math.Max((xTo - xFrom) * (float)bin.Size, 5.0);
+                float h = (float)Math.Max((yFrom - yTo) * (float)bin.Size, 5.0);
+
+                roundedRect.Rect = new RectangleF(
+                    xFrom + ((xTo - xFrom) - w) / 2.0f,
+                    yTo + ((yFrom - yTo) - h) / 2.0f,
+                    w,
+                    h);
+                roundedRect.RadiusX = roundedRect.RadiusY = 4;
+
+                if (bin.Size > 0)
+                {
+                    d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
+                    d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 1f);
+
+                }
+            }
+            binColor.Dispose();
+            white.Dispose();
+        }
+
         public override void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
         {
             // reusable structure representing a text font with size and style
@@ -599,28 +701,6 @@ namespace PanoramicDataWin8.view.vis.render
 
             // prebaked text - useful for constant labels as it greatly improves performance
             //_textLayout = disposeCollector.Collect(new DW.TextLayout(dwFactory, "Demo DirectWrite text here.", _textFormat, 100f, 100f));
-        }
-
-        private float[] getLinearTicks(double min, double max, double m)
-        {
-            double span = max - min;
-
-            double step = Math.Pow(10, Math.Floor(Math.Log10(span / m)));
-            double err = m / span * step;
-
-            if (err <= .15) 
-              step *= 10;
-            else if (err <= .35)
-              step *= 5;
-            else if (err <= .75)
-              step *= 2;
-
-            float[] ret = new float[3];
-            ret[0] = (float)(Math.Ceiling(min / step) * step);
-            ret[1] = (float)(Math.Floor(max / step) * step + step * .5);
-            ret[2] = (float)step;
-
-            return ret;
         }
     }
 
