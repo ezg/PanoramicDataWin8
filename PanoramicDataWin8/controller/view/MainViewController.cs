@@ -138,9 +138,11 @@ namespace PanoramicData.controller.view
             else if (datasetConfiguration.Backend.ToLower() == "sim")
             {
                 _mainModel.SchemaModel = new SimSchemaModel();
+                _mainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
+                _mainModel.SampleSize = datasetConfiguration.SampleSize;
                 (_mainModel.SchemaModel as SimSchemaModel).QueryExecuter = new SimQueryExecuter();
                 (_mainModel.SchemaModel as SimSchemaModel).RootOriginModel = new SimOriginModel(datasetConfiguration);
-                (_mainModel.SchemaModel as SimSchemaModel).RootOriginModel.LoadData();
+                (_mainModel.SchemaModel as SimSchemaModel).RootOriginModel.LoadAttributes();
             }
             else if (datasetConfiguration.Backend.ToLower() == "tuppleware")
             {

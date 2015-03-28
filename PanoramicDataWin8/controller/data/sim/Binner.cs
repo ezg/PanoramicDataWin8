@@ -102,7 +102,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     LastBinStructure.BinSizeX, LastBinStructure.BinSizeY,
                     (LastBinStructure.Bins.Count - 1) + plusX, (LastBinStructure.Bins[0].Count - 1) + plusY);
 
-            binSamples(tempBinStructure, sampleQueryResultItemModels);
+            binSamples2(tempBinStructure, sampleQueryResultItemModels);
 
             // re-map old bins
             if (Incremental)
@@ -209,6 +209,17 @@ namespace PanoramicDataWin8.controller.data.sim
             }
         }
 
+        private void binSamples2(BinStructure binStructure, List<QueryResultItemModel> samples)
+        {
+            foreach (var dp in samples)
+            {
+                int x = (int)Math.Floor((dp.XValue - binStructure.BinMinX) / binStructure.BinSizeX);
+                int y = (int)Math.Floor((dp.YValue - binStructure.BinMinY) / binStructure.BinSizeY);
+                Bin bin = binStructure.Bins[x][y];
+                bin.Count += 1;
+            }
+        }
+
         private double[] getExtent(double dataMin, double dataMax, double m)
         {
             double span = dataMax - dataMin;
@@ -276,9 +287,9 @@ namespace PanoramicDataWin8.controller.data.sim
                     double newBinMinX = binStructure.BinMinX - (Math.Ceiling((binStructure.BinMinX - dataMinX) / binStructure.BinSizeX) * binStructure.BinSizeX);
                     plusX += Math.Ceiling((binStructure.BinMinX - newBinMinX) / binStructure.BinSizeX);
                 }
-                if (dataMaxX > binStructure.BinMaxX)
+                if (dataMaxX >= binStructure.BinMaxX)
                 {
-                    double newBinMaxX = binStructure.BinMaxX + (Math.Ceiling((dataMaxX - binStructure.BinMaxX) / binStructure.BinSizeX) * binStructure.BinSizeX);
+                    double newBinMaxX = binStructure.BinMaxX + (Math.Ceiling((dataMaxX - binStructure.BinMaxX) / binStructure.BinSizeX) * binStructure.BinSizeX) + binStructure.BinSizeX;
                     plusX += Math.Ceiling((newBinMaxX - binStructure.BinMaxX) / binStructure.BinSizeX);
                 }
             }
@@ -294,9 +305,9 @@ namespace PanoramicDataWin8.controller.data.sim
                     double newBinMinY = binStructure.BinMinY - (Math.Ceiling((binStructure.BinMinY - dataMinY) / binStructure.BinSizeY) * binStructure.BinSizeY);
                     plusY += Math.Ceiling((binStructure.BinMinY - newBinMinY) / binStructure.BinSizeY);
                 }
-                if (dataMaxY > binStructure.BinMaxY)
+                if (dataMaxY >= binStructure.BinMaxY)
                 {
-                    double newBinMaxY = binStructure.BinMaxY + (Math.Ceiling((dataMaxY - binStructure.BinMaxY) / binStructure.BinSizeY) * binStructure.BinSizeY);
+                    double newBinMaxY = binStructure.BinMaxY + (Math.Ceiling((dataMaxY - binStructure.BinMaxY) / binStructure.BinSizeY) * binStructure.BinSizeY) + binStructure.BinSizeY;
                     plusY += Math.Ceiling((newBinMaxY - binStructure.BinMaxY) / binStructure.BinSizeY);
                 }
             }

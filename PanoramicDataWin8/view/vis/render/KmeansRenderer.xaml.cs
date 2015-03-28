@@ -85,6 +85,8 @@ namespace PanoramicDataWin8.view.vis.render
                 populateData();
             }
         }
+
+
         private void populateData()
         {
             QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;

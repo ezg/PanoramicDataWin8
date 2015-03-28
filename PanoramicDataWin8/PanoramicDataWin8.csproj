@@ -173,6 +173,7 @@
     <Compile Include="utils\ExtendedBindableBase.cs" />
     <Compile Include="utils\Geom.cs" />
     <Compile Include="utils\Helpers.cs" />
+    <Compile Include="utils\LABColor.cs" />
     <Compile Include="utils\MathUtil.cs" />
     <Compile Include="utils\PointerManager.cs" />
     <Compile Include="utils\SimpleValueConverter.cs" />
@@ -284,6 +285,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\data\config\nba_csv.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\data\config\flightdata_csv.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\data\config\flightdata_small_csv.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

@@ -20,38 +20,58 @@ using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using PanoramicData.controller.view;
 using PanoramicData.controller.data.sim;
+using Windows.ApplicationModel;
+using Windows.Storage;
+using PanoramicData.utils;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
     public class SimDataProvider
     {
         private QueryModel _queryModel = null;
-        private List<Dictionary<AttributeModel, object>> _data = null;
+        private SimOriginModel _simOriginModel = null;
         private int _nrProcessedSamples = 0;
         private int _nrSamplesToCheck = -1;
-
+        private StreamReader _streamReader = null;
         private Dictionary<GroupingObject, IterativeCalculationObject> _iterativeCaluclationObjects = new Dictionary<GroupingObject, IterativeCalculationObject>();
 
-        public SimDataProvider(QueryModel queryModel, List<Dictionary<AttributeModel, object>> data, int nrSamplesToCheck = -1)
+        public bool IsInitialized { get; set; }
+
+        public SimDataProvider(QueryModel queryModel, SimOriginModel simOriginModel, int nrSamplesToCheck = -1)
         {
             _queryModel = queryModel;
-            _data = data;
+            _simOriginModel = simOriginModel;
             _nrSamplesToCheck = nrSamplesToCheck;
+            IsInitialized = false;
         }
 
-        public void StartSampling()
+        public async Task StartSampling()
         {
+            var installedLoc = Package.Current.InstalledLocation;
+
+            StorageFile file = null;
+            if (_simOriginModel.DatasetConfiguration.DataFile.StartsWith("Assets"))
+            {
+                file = await StorageFile.GetFileFromPathAsync(installedLoc.Path + "\\" + _simOriginModel.DatasetConfiguration.DataFile);
+            }
+            else
+            {
+                file = await ApplicationData.Current.LocalFolder.GetFileAsync(_simOriginModel.DatasetConfiguration.DataFile);
+            }
+            _streamReader = new StreamReader(await file.OpenStreamForReadAsync());
+
             _nrProcessedSamples = 0;
             _iterativeCaluclationObjects.Clear();
         }
 
-        public List<QueryResultItemModel> GetSampleQueryResultItemModels(int sampleSize)
+        public async Task<List<QueryResultItemModel>> GetSampleQueryResultItemModels(int sampleSize)
         {
             if (_nrProcessedSamples < GetNrTotalSamples())
             {
                 List<QueryResultItemModel> returnList = new List<QueryResultItemModel>();
 
-                foreach (Dictionary<AttributeModel, object> row in _data.Skip(_nrProcessedSamples).Take(sampleSize))
+                List<Dictionary<AttributeModel, object>> data = await getDataFromFile(sampleSize);
+                foreach (Dictionary<AttributeModel, object> row in data)
                 {
                     GroupingObject groupingObject = getGroupingObject(row, _queryModel, row[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel]);
                     if (!_iterativeCaluclationObjects.ContainsKey(groupingObject))
@@ -101,12 +121,17 @@ namespace PanoramicDataWin8.controller.data.sim
         {
             if (_nrSamplesToCheck == -1)
             {
-                return _data.Count;
+                return _simOriginModel.DatasetConfiguration.NrOfRecords;
             }
             else
             {
                 return _nrSamplesToCheck;
             }
+        }        
+
+        public double Progress()
+        {
+            return Math.Min(1.0, (double)_nrProcessedSamples / (double)GetNrTotalSamples());
         }
 
         private GroupingObject getGroupingObject(Dictionary<AttributeModel, object> item, QueryModel queryModel, object idValue)
@@ -138,6 +163,56 @@ namespace PanoramicDataWin8.controller.data.sim
                 }
             }
             return groupingObject;
+        }
+
+        private async Task<List<Dictionary<AttributeModel, object>>> getDataFromFile(int sampleSize)
+        {
+            int count = 0;
+            string line = await _streamReader.ReadLineAsync();
+
+            List<Dictionary<AttributeModel, object>> data = new List<Dictionary<AttributeModel, object>>();
+
+            while (line != null && count < sampleSize)
+            {
+                Dictionary<AttributeModel, object> items = new Dictionary<AttributeModel, object>();
+                items[_simOriginModel.IdAttributeModel] = count;
+
+                List<string> values = CSVParser.CSVLineSplit(line);
+                for (int i = 0; i < values.Count; i++)
+                {
+                    object value = null;
+                    if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.NVARCHAR)
+                    {
+                        value = values[i].ToString();
+                    }
+                    else if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.FLOAT)
+                    {
+                        double d = 0.0;
+                        if (double.TryParse(values[i].ToString(), out d))
+                        {
+                            value = d;
+                        }
+                    }
+                    else if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.INT)
+                    {
+                        int d = 0;
+                        if (int.TryParse(values[i].ToString(), out d))
+                        {
+                            value = d;
+                        }
+                    }
+                    if (value == null || value.ToString().Trim() == "")
+                    {
+                        value = null;
+                    }
+                    items[_simOriginModel.AttributeModels[i]] = value;
+                }
+                data.Add(items);
+                line = await _streamReader.ReadLineAsync();
+                count++;
+            }
+
+            return data;
         }
 
         private QueryResultItemValueModel fromRaw(AttributeOperationModel attributeOperationModel, object value, bool binned, double binSize)

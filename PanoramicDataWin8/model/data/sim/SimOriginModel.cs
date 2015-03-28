@@ -21,7 +21,32 @@ namespace PanoramicData.model.data.sim
             _datasetConfiguration = datasetConfiguration;
             _idAttributeModel = new SimAttributeModel("ID", AttributeDataTypeConstants.INT, AttributeVisualizationTypeConstants.NUMERIC);
             _idAttributeModel.OriginModel = this;
-            
+        }
+
+        public void LoadAttributes()
+        {
+            _idAttributeModel.OriginModel = this;
+
+            for (int i = 0; i < _datasetConfiguration.AttributeNames.Count; i++)
+            {
+                AttributeModel attributeModel = new SimAttributeModel(
+                    _datasetConfiguration.AttributeNames[i],
+                    _datasetConfiguration.AttributeDataTypes[i],
+                    _datasetConfiguration.AttributeVisualizationTypes[i]);
+                attributeModel.OriginModel = this;
+                _attributeModels.Add(attributeModel);
+            }
+
+            _idAttributeModel.IsDisplayed = false;
+            _attributeModels.Add(_idAttributeModel);
+
+            for (int i = 0; i < _attributeModels.Count; i++)
+            {
+                if (_datasetConfiguration.AttributeIsDisplayed.Count > i && !_datasetConfiguration.AttributeIsDisplayed[i])
+                {
+                    _attributeModels[i].IsDisplayed = false;
+                }
+            }
         }
 
         public async void LoadData()

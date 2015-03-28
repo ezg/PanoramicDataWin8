@@ -25,7 +25,7 @@ namespace PanoramicDataWin8.controller.data.sim
 {
     public class SimJob
     {
-        public event EventHandler<List<QueryResultItemModel>> JobUpdate;
+        public event EventHandler<JobEventArgs> JobUpdate;
         public event EventHandler<EventArgs> JobCompleted;
 
         private SimDataProvider _simDataProvider = null;
@@ -88,7 +88,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     YAxisType = _yAxisType
                 };
             }
-            _simDataProvider = new SimDataProvider(QueryModelClone, (QueryModel.SchemaModel.OriginModels[0] as SimOriginModel).Data, samplesToCheck);
+            _simDataProvider = new SimDataProvider(QueryModelClone, (QueryModel.SchemaModel.OriginModels[0] as SimOriginModel), samplesToCheck);
 
             Task.Run(() => run());
         }
@@ -103,9 +103,16 @@ namespace PanoramicDataWin8.controller.data.sim
 
         private async void run()
         {
-            List<QueryResultItemModel> samples = _simDataProvider.GetSampleQueryResultItemModels(_sampleSize);
+            if (!_simDataProvider.IsInitialized)
+            {
+                await _simDataProvider.StartSampling();
+            }
+
+            List<QueryResultItemModel> samples = await _simDataProvider.GetSampleQueryResultItemModels(_sampleSize);
             while (samples != null && _isRunning)
             {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
                 if (QueryModelClone.VisualizationType != VisualizationType.Table)
                 {
                     if (!_isIncremental)
@@ -123,10 +130,12 @@ namespace PanoramicDataWin8.controller.data.sim
 
                 if (_isRunning)
                 {
-                    await fireUpdated(samples);
+                    await fireUpdated(samples, _simDataProvider.Progress());
                 }
+                samples = await _simDataProvider.GetSampleQueryResultItemModels(_sampleSize);
+
+                Debug.WriteLine("Job Iteration Time: " + sw.ElapsedMilliseconds);
                 await Task.Delay(_throttle);
-                samples = _simDataProvider.GetSampleQueryResultItemModels(_sampleSize);
             }
             lock (_lock)
             {
@@ -252,14 +261,14 @@ namespace PanoramicDataWin8.controller.data.sim
         }
 
 
-        private async Task fireUpdated(List<QueryResultItemModel> samples)
+        private async Task fireUpdated(List<QueryResultItemModel> samples, double progress)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 if (JobUpdate != null)
                 {
-                    JobUpdate(this, samples);
+                    JobUpdate(this, new JobEventArgs() { Samples = samples, Progress = progress });
                 }
             });
         }
@@ -276,4 +285,11 @@ namespace PanoramicDataWin8.controller.data.sim
             });
         }
     }
+
+    public class JobEventArgs : EventArgs
+    {
+        public List<QueryResultItemModel> Samples { get; set; }
+        public double Progress { get; set; }
+    }
 }
+

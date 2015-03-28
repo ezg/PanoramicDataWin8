@@ -71,7 +71,7 @@ namespace PanoramicDataWin8
 
                 if (e.Key == Windows.System.VirtualKey.Q)
                 {
-                    MainViewController.Instance.MainModel.SampleSize = MainViewController.Instance.MainModel.SampleSize * 10;
+                    MainViewController.Instance.MainModel.SampleSize = MainViewController.Instance.MainModel.SampleSize + 100;
                     Debug.WriteLine("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
 
                     msgTextBlock.Text = ("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
@@ -80,7 +80,7 @@ namespace PanoramicDataWin8
                 }
                 else if (e.Key == Windows.System.VirtualKey.A)
                 {
-                    MainViewController.Instance.MainModel.SampleSize = Math.Max(MainViewController.Instance.MainModel.SampleSize / 10.0, 1.0);
+                    MainViewController.Instance.MainModel.SampleSize = Math.Max(MainViewController.Instance.MainModel.SampleSize - 100, 1.0);
                     Debug.WriteLine("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
 
                     msgTextBlock.Text = ("SampleSize : " + MainViewController.Instance.MainModel.SampleSize);
@@ -98,7 +98,7 @@ namespace PanoramicDataWin8
                 }
                 else if (e.Key == Windows.System.VirtualKey.S)
                 {
-                    MainViewController.Instance.MainModel.ThrottleInMillis = Math.Max(MainViewController.Instance.MainModel.ThrottleInMillis - 300.0, 1.0);
+                    MainViewController.Instance.MainModel.ThrottleInMillis = Math.Max(MainViewController.Instance.MainModel.ThrottleInMillis - 300.0, 0.0);
                     Debug.WriteLine("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis);
 
                     msgTextBlock.Text = ("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis);

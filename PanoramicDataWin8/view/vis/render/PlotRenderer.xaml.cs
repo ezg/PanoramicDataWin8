@@ -96,6 +96,7 @@ namespace PanoramicDataWin8.view.vis.render
         void resultModel_QueryResultModelUpdated(object sender, EventArgs e)
         {
             populateData();
+            updatePercentageVisualization();
         }
 
         void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -150,7 +151,37 @@ namespace PanoramicDataWin8.view.vis.render
                 };
             }
         }
-        
+
+        private void updatePercentageVisualization()
+        {
+            QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
+            double size = 14;
+            double thickness = 2;
+
+            double progress = resultModel.Progress;
+
+            tbPercentage1.Text = (progress * 100).ToString("F1") + "%";
+            double percentage = Math.Min(progress, 0.999999);
+            if (percentage > 0.5)
+            {
+                arcSegement1.IsLargeArc = true;
+            }
+            else
+            {
+                arcSegement1.IsLargeArc = false;
+            }
+            double angle = 2 * Math.PI * percentage - Math.PI / 2.0;
+            double x = size / 2.0;
+            double y = size / 2.0;
+
+            Windows.Foundation.Point p = new Windows.Foundation.Point(Math.Cos(angle) * (size / 2.0 - thickness / 2.0) + x, Math.Sin(angle) * (size / 2.0 - thickness / 2.0) + y);
+            arcSegement1.Point = p;
+            if ((size / 2.0 - thickness / 2.0) > 0.0)
+            {
+                arcSegement1.Size = new Size((size / 2.0 - thickness / 2.0), (size / 2.0 - thickness / 2.0));
+            }
+        }
+
         private void populateData()
         {
             QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
@@ -577,7 +608,7 @@ namespace PanoramicDataWin8.view.vis.render
                 float xTo = toScreenX(_maxX);
                 float yFrom = toScreenY((float)label.MinValue);
                 float yTo = toScreenY((float)label.MaxValue); 
-                bool lastLabel = count + 1 == xLabels.Count;
+                bool lastLabel = count + 1 == yLabels.Count;
 
                 if (renderLines)
                 {
@@ -627,7 +658,8 @@ namespace PanoramicDataWin8.view.vis.render
                 float h = (float)Math.Max((yFrom - yTo) * (float)bin.Size, 5.0);
 
                 float alpha = 0.1f * (float) Math.Log10(bin.Size) + 1f;
-                var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color(40f / 255f, 170f / 255f, 213f / 255f));
+                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 230, 230, 230), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)bin.Size);
+                var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
 
                 /*if (bin.Size > 0)
                 {

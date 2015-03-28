@@ -1,8 +1,4 @@
-﻿name=id,age,employer type,education,martial status,occupation,relationship,race,sex,capital_gain,capital loss,hours per week,native country,salary over 50k
-data_type=int,float,nvarchar,nvarchar,nvarchar,nvarchar,nvarchar,nvarchar,nvarchar,float,float,int,geography,bit
-visualization_type=numeric,numeric,enum,enum,enum,enum,enum,enum,enum,numeric,numeric,numeric,geography,enum
-display=false,true,true,true,true,true,true,true,true,false,false,true,true,true
-"4746","49","Private","HS-Graduate","Married","Blue-Collar","Wife","Black","Female","0","0","40","United States (-98.9573364257813, 39.4432563781738)","0"
+﻿"4746","49","Private","HS-Graduate","Married","Blue-Collar","Wife","Black","Female","0","0","40","United States (-98.9573364257813, 39.4432563781738)","0"
 "4747","37","Private","Bachelors","Married","Professional","Husband","White","Male","0","0","40","NULL","1"
 "4749","55","Private","HS-Graduate","Married","Service","Other-relative","White","Female","0","0","33","United States (-98.9573364257813, 39.4432563781738)","0"
 "4752","31","Private","HS-Graduate","Never-Married","Admin","Unmarried","Black","Female","0","0","39","United States (-98.9573364257813, 39.4432563781738)","0"

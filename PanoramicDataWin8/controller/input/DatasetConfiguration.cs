@@ -1,4 +1,5 @@
 ﻿using Microsoft.Practices.Prism.Mvvm;
+using PanoramicData.utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -36,6 +37,45 @@ namespace PanoramicData.controller.input
             set
             {
                 this.SetProperty(ref _endPoint, value);
+            }
+        }
+
+        private double _sampleSize = 1;
+        public double SampleSize
+        {
+            get
+            {
+                return _sampleSize;
+            }
+            set
+            {
+                this.SetProperty(ref _sampleSize, value);
+            }
+        }
+
+        private int _nrOfRecords = 0;
+        public int NrOfRecords
+        {
+            get
+            {
+                return _nrOfRecords;
+            }
+            set
+            {
+                this.SetProperty(ref _nrOfRecords, value);
+            }
+        }
+
+        private double _throttleInMillis = 0;
+        public double ThrottleInMillis
+        {
+            get
+            {
+                return _throttleInMillis;
+            }
+            set
+            {
+                this.SetProperty(ref _throttleInMillis, value);
             }
         }
 
@@ -91,6 +131,58 @@ namespace PanoramicData.controller.input
             }
         }
 
+        private List<string> _attributeNames = new List<string>();
+        public List<string> AttributeNames
+        {
+            get
+            {
+                return _attributeNames;
+            }
+            set
+            {
+                this.SetProperty(ref _attributeNames, value);
+            }
+        }
+
+        private List<string> _attributeDataTypes = new List<string>();
+        public List<string> AttributeDataTypes
+        {
+            get
+            {
+                return _attributeDataTypes;
+            }
+            set
+            {
+                this.SetProperty(ref _attributeDataTypes, value);
+            }
+        }
+
+        private List<string> _attributeVisualizationTypes = new List<string>();
+        public List<string> AttributeVisualizationTypes
+        {
+            get
+            {
+                return _attributeVisualizationTypes;
+            }
+            set
+            {
+                this.SetProperty(ref _attributeVisualizationTypes, value);
+            }
+        }
+
+        private List<bool> _attributeIsDisplayed = new List<bool>();
+        public List<bool> AttributeIsDisplayed
+        {
+            get
+            {
+                return _attributeIsDisplayed;
+            }
+            set
+            {
+                this.SetProperty(ref _attributeIsDisplayed, value);
+            }
+        }
+
         public static DatasetConfiguration FromContent(string content, string fileName)
         {
             try
@@ -129,6 +221,34 @@ namespace PanoramicData.controller.input
                     else if (parts[0] == "EndPoint")
                     {
                         config.EndPoint = parts[1].Trim();
+                    }
+                    else if (parts[0] == "SampleSize")
+                    {
+                        config.SampleSize = double.Parse(parts[1].Trim());
+                    }
+                    else if (parts[0] == "NrOfRecords")
+                    {
+                        config.NrOfRecords = int.Parse(parts[1].Trim());
+                    }
+                    else if (parts[0] == "ThrottleInMillis")
+                    {
+                        config.ThrottleInMillis = double.Parse(parts[1].Trim());
+                    }
+                    else if (parts[0] == "Names")
+                    {
+                        config.AttributeNames = CSVParser.CSVLineSplit(parts[1].Trim());
+                    }
+                    else if (parts[0] == "DataTypes")
+                    {
+                        config.AttributeDataTypes = CSVParser.CSVLineSplit(parts[1].Trim());
+                    }
+                    else if (parts[0] == "VisualizationTypes")
+                    {
+                        config.AttributeVisualizationTypes = CSVParser.CSVLineSplit(parts[1].Trim());
+                    }
+                    else if (parts[0] == "IsDisplayed")
+                    {
+                        config.AttributeIsDisplayed = CSVParser.CSVLineSplit(parts[1].Trim()).Select(s => s.ToLower() == "true").ToList();
                     }
                 }
 

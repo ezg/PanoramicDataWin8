@@ -36,6 +36,19 @@ namespace PanoramicData.model.data
         }
 
 
+        private double _progress = 0;
+        public double Progress
+        {
+            get
+            {
+                return _progress;
+            }
+            set
+            {
+                this.SetProperty(ref _progress, value);
+            }
+        }
+
         private AxisType _xAxisType = AxisType.Nominal;
         public AxisType XAxisType
         {

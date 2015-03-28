@@ -58,7 +58,7 @@ namespace PanoramicData.controller.data.sim
         {
         }
 
-        void simJob_JobUpdate(object sender, List<QueryResultItemModel> samples)
+        void simJob_JobUpdate(object sender, JobEventArgs jobEventArgs)
         {
             SimJob job = sender as SimJob;
             var oldItems = job.QueryModel.QueryResultModel.QueryResultItemModels;
@@ -69,9 +69,9 @@ namespace PanoramicData.controller.data.sim
                 var cache = _updateIndexCache[job.QueryModel];
 
                 // update existing ones
-                for (int i = 0; i < samples.Count; i++)
+                for (int i = 0; i < jobEventArgs.Samples.Count; i++)
                 {
-                    var sample = samples[i];
+                    var sample = jobEventArgs.Samples[i];
                     if (cache.ContainsKey(sample.GroupingObject))
                     {
                         KeyValuePair<int, QueryResultItemModel> kvp = cache[sample.GroupingObject];
@@ -108,7 +108,7 @@ namespace PanoramicData.controller.data.sim
                     }
                 }
                 // remove old ones
-                for (int i = samples.Count; i < oldItems.Count; i++)
+                for (int i = jobEventArgs.Samples.Count; i < oldItems.Count; i++)
                 {
                     var oldItem = oldItems[i];
                     oldItems.RemoveAt(i);
@@ -122,14 +122,14 @@ namespace PanoramicData.controller.data.sim
             else
             {
                 oldItems.Clear();
-                foreach (var sample in samples)
+                foreach (var sample in jobEventArgs.Samples)
                 {
                     oldItems.Add(sample);
                 }
             }
 
+            job.QueryModel.QueryResultModel.Progress = jobEventArgs.Progress;
             job.QueryModel.QueryResultModel.FireQueryResultModelUpdated();
-            Debug.Assert(oldItems.Count < 10000, "size of result list should not be big");
         }
     }
 
