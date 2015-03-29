@@ -34,10 +34,10 @@ namespace PanoramicDataWin8.controller.data.sim
 
         public void ProcessStep(List<QueryResultItemModel> sampleQueryResultItemModels)
         {
-            double dataMinX = sampleQueryResultItemModels.Min(dp => dp.XValue);
-            double dataMinY = sampleQueryResultItemModels.Min(dp => dp.YValue);
-            double dataMaxX = sampleQueryResultItemModels.Max(dp => dp.XValue);
-            double dataMaxY = sampleQueryResultItemModels.Max(dp => dp.YValue);
+            double dataMinX = sampleQueryResultItemModels.Where(dp => dp.XValue.HasValue).Min(dp => dp.XValue.Value);
+            double dataMinY = sampleQueryResultItemModels.Where(dp => dp.YValue.HasValue).Min(dp => dp.YValue.Value);
+            double dataMaxX = sampleQueryResultItemModels.Where(dp => dp.XValue.HasValue).Max(dp => dp.XValue.Value);
+            double dataMaxY = sampleQueryResultItemModels.Where(dp => dp.YValue.HasValue).Max(dp => dp.YValue.Value);
 
             if (dataMaxX == dataMinX)
             {
@@ -107,20 +107,19 @@ namespace PanoramicDataWin8.controller.data.sim
             // re-map old bins
             if (Incremental)
             {
+                tempBinStructure.XNullCount += LastBinStructure.XNullCount;
+                tempBinStructure.YNullCount += LastBinStructure.YNullCount;
+                tempBinStructure.XAndYNullCount += LastBinStructure.XAndYNullCount;
+
                 foreach (var oldBin in LastBinStructure.Bins.SelectMany(b => b))
                 {
-                    int containCount = 0;
-                    foreach (var newBin in tempBinStructure.Bins.SelectMany(b => b))
-                    {
-                        if (newBin.ContainsBin(oldBin))
-                        {
-                            newBin.Count += oldBin.Count;
-                            containCount++;
-                        }
-                    }
-                    if (containCount != 1)
-                    {
+                    int x = (int)Math.Floor((oldBin.BinMinX - tempBinStructure.BinMinX) / tempBinStructure.BinSizeX);
+                    int y = (int)Math.Floor((oldBin.BinMinY - tempBinStructure.BinMinY) / tempBinStructure.BinSizeY);
+                    Bin newBin = tempBinStructure.Bins[x][y];
 
+                    if (newBin.ContainsBin(oldBin))
+                    {
+                        newBin.Count += oldBin.Count;
                     }
                 }
             }
@@ -166,6 +165,11 @@ namespace PanoramicDataWin8.controller.data.sim
                 }
                 mergedBinStructure.Bins.Add(newBinCol);
             }
+
+            mergedBinStructure.XNullCount += binStructure.XNullCount;
+            mergedBinStructure.YNullCount += binStructure.YNullCount;
+            mergedBinStructure.XAndYNullCount += binStructure.XAndYNullCount;
+
             mergedBinStructure.BinMinX = mergedBinStructure.Bins.SelectMany(b => b).Min(b => b.BinMinX);
             mergedBinStructure.BinMinY = mergedBinStructure.Bins.SelectMany(b => b).Min(b => b.BinMinY);
             mergedBinStructure.BinMaxX = mergedBinStructure.Bins.SelectMany(b => b).Max(b => b.BinMaxX);
@@ -200,9 +204,18 @@ namespace PanoramicDataWin8.controller.data.sim
                 List<QueryResultItemModel> intersectingQueryResultItemModels = new List<QueryResultItemModel>();
                 foreach (var dp in samples)
                 {
-                    if (bin.BinIntersects(dp.XValue, dp.YValue))
+                    if (dp.XValue.HasValue && dp.YValue.HasValue)
                     {
-                        intersectingQueryResultItemModels.Add(dp);
+                        if (bin.BinIntersects(dp.XValue.Value, dp.YValue.Value))
+                        {
+                            intersectingQueryResultItemModels.Add(dp);
+                        }
+                    }
+                    else
+                    {
+                        binStructure.XNullCount += !dp.XValue.HasValue ? 1 : 0;
+                        binStructure.YNullCount += !dp.YValue.HasValue ? 1 : 0;
+                        binStructure.XAndYNullCount += !dp.XValue.HasValue && !dp.YValue.HasValue ? 1 : 0;
                     }
                 }
                 bin.Count += intersectingQueryResultItemModels.Count;
@@ -213,10 +226,19 @@ namespace PanoramicDataWin8.controller.data.sim
         {
             foreach (var dp in samples)
             {
-                int x = (int)Math.Floor((dp.XValue - binStructure.BinMinX) / binStructure.BinSizeX);
-                int y = (int)Math.Floor((dp.YValue - binStructure.BinMinY) / binStructure.BinSizeY);
-                Bin bin = binStructure.Bins[x][y];
-                bin.Count += 1;
+                if (dp.XValue.HasValue && dp.YValue.HasValue)
+                {
+                    int x = (int)Math.Floor((dp.XValue.Value - binStructure.BinMinX) / binStructure.BinSizeX);
+                    int y = (int)Math.Floor((dp.YValue.Value - binStructure.BinMinY) / binStructure.BinSizeY);
+                    Bin bin = binStructure.Bins[x][y];
+                    bin.Count += 1;
+                }
+                else
+                {
+                    binStructure.XNullCount += !dp.XValue.HasValue ? 1 : 0;
+                    binStructure.YNullCount += !dp.YValue.HasValue ? 1 : 0;
+                    binStructure.XAndYNullCount += !dp.XValue.HasValue && !dp.YValue.HasValue ? 1 : 0;
+                }
             }
         }
 

@@ -15,7 +15,7 @@
     <d:DesignProperties.DataContext>
         <model:AttributeViewModel>
             <model:AttributeViewModel.IsNoChrome>False</model:AttributeViewModel.IsNoChrome>
-            <model:AttributeViewModel.MainLabel>Test</model:AttributeViewModel.MainLabel>
+            <model:AttributeViewModel.MainLabel>Cancellation code</model:AttributeViewModel.MainLabel>
             <model:AttributeViewModel.SubLabel>Test dsafdsa</model:AttributeViewModel.SubLabel>
             <model:AttributeViewModel.IsShadow>False</model:AttributeViewModel.IsShadow>
             <model:AttributeViewModel.TextAngle>0</model:AttributeViewModel.TextAngle>
@@ -36,9 +36,9 @@
                         RenderTransformOrigin="0.5, 0.5"
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch"
-                        TextAlignment="Center"  
+                        TextAlignment="Center"
                         MaxWidth="{Binding Size.X}"
-                        Text="{Binding MainLabel}" FontSize="14" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
+                        Text="{Binding MainLabel}" FontSize="11" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
                 </transform:LayoutTransformControl>
             </Viewbox>
         </Border>

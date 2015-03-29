@@ -42,18 +42,26 @@ namespace PanoramicData.model.data
             }
         }
 
-        public double XValue
+        public double? XValue
         {
             get
             {
-                return double.Parse(VisualizationResultValues[VisualizationResult.X].Value.ToString());
+                if (VisualizationResultValues[VisualizationResult.X].Value != null)
+                {
+                    return double.Parse(VisualizationResultValues[VisualizationResult.X].Value.ToString());
+                }
+                return null;
             }
         }
-        public double YValue
+        public double? YValue
         {
             get
             {
-                return double.Parse(VisualizationResultValues[VisualizationResult.Y].Value.ToString());
+                if (VisualizationResultValues[VisualizationResult.Y].Value != null)
+                {
+                    return double.Parse(VisualizationResultValues[VisualizationResult.Y].Value.ToString());
+                }
+                return null;
             }
         }
 

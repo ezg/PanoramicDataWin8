@@ -130,7 +130,12 @@ namespace PanoramicDataWin8.controller.data.sim
 
                 if (_isRunning)
                 {
-                    await fireUpdated(samples, _simDataProvider.Progress());
+                    await fireUpdated(
+                        samples,
+                        _simDataProvider.Progress(),
+                        _binner == null ? 0 : _binner.LastBinStructure.XNullCount,
+                        _binner == null ? 0 : _binner.LastBinStructure.YNullCount,
+                        _binner == null ? 0 : _binner.LastBinStructure.XAndYNullCount);
                 }
                 samples = await _simDataProvider.GetSampleQueryResultItemModels(_sampleSize);
 
@@ -261,14 +266,20 @@ namespace PanoramicDataWin8.controller.data.sim
         }
 
 
-        private async Task fireUpdated(List<QueryResultItemModel> samples, double progress)
+        private async Task fireUpdated(List<QueryResultItemModel> samples, double progress, double xNullCount, double yNullCount, double xAndYNullCount)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 if (JobUpdate != null)
                 {
-                    JobUpdate(this, new JobEventArgs() { Samples = samples, Progress = progress });
+                    JobUpdate(this, new JobEventArgs() { 
+                        Samples = samples, 
+                        Progress = progress,
+                        XAndYNullCount = xAndYNullCount,
+                        YNullCount= yNullCount,
+                        XNullCount = xNullCount
+                    });
                 }
             });
         }
@@ -290,6 +301,9 @@ namespace PanoramicDataWin8.controller.data.sim
     {
         public List<QueryResultItemModel> Samples { get; set; }
         public double Progress { get; set; }
+        public double XNullCount { get; set; }
+        public double YNullCount { get; set; }
+        public double XAndYNullCount { get; set; } 
     }
 }
 

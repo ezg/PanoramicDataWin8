@@ -278,8 +278,11 @@ namespace PanoramicData.model.view
                     _attributeOperationModel.PropertyChanged -= _attributeOperationModel_PropertyChanged;
                 }
                 this.SetProperty(ref _attributeOperationModel, value);
-                _attributeOperationModel.PropertyChanged += _attributeOperationModel_PropertyChanged;
-                updateLabels();
+                if (_attributeOperationModel != null)
+                {
+                    _attributeOperationModel.PropertyChanged += _attributeOperationModel_PropertyChanged;
+                    updateLabels();
+                }
             }
         }
 

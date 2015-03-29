@@ -23,6 +23,10 @@ namespace PanoramicDataWin8.controller.data.sim
             DataMaxY = Double.MinValue;
         }
 
+        public double XNullCount { get; set; }
+        public double YNullCount { get; set; }
+        public double XAndYNullCount { get; set; } 
+
         public double BinMinX { get; set; }
         public double BinMinY { get; set; }
         public double BinMaxX { get; set; }

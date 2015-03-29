@@ -26,41 +26,53 @@
         <common:AttributeView x:Name="xAttributeView" Grid.Column="1" Grid.Row="0"/>
         <common:AttributeView x:Name="yAttributeView" Grid.Column="0" Grid.Row="1"/>
         
-        <Grid Grid.Column="1" Grid.Row="1">
-            <Viewbox MaxWidth="150">
-                <TextBlock Name="mainLabel" Text="bar" Foreground="{StaticResource highlightBrush}" CacheMode="BitmapCache"/>
+        <Grid Grid.Column="1" Grid.Row="1" Background="{StaticResource lightBrush}">
+            <Viewbox MaxWidth="150" CacheMode="BitmapCache">
+                <TextBlock Name="mainLabel" Text="bar" Foreground="{StaticResource highlightBrush}"/>
             </Viewbox>
-            <common:DXSurface x:Name="dxSurface"/>
-            
-            <StackPanel HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4">
-                <Grid Width="14" Height="14">
-                    <Grid>
-                        <Ellipse Width="14" Height="14" Stroke="{StaticResource backgroundBrush}" StrokeThickness="2"/>
-                        <Path Name="path1" Stroke="{StaticResource highlightBrush}" StrokeThickness="2">
-                            <Path.Data>
-                                <PathGeometry>
-                                    <PathGeometry.Figures>
-                                        <PathFigureCollection>
-                                            <PathFigure x:Name="pathFigure1" StartPoint="7,1">
-                                                <PathFigure.Segments>
-                                                    <PathSegmentCollection>
-                                                        <ArcSegment x:Name="arcSegement1" Size="6,6" RotationAngle="0" IsLargeArc="False" SweepDirection="Clockwise" Point="13,6" />
-                                                    </PathSegmentCollection>
-                                                </PathFigure.Segments>
-                                            </PathFigure>
-                                        </PathFigureCollection>
-                                    </PathGeometry.Figures>
-                                </PathGeometry>
-                            </Path.Data>
-                        </Path>
-                    </Grid>
-                </Grid>
-                <TextBlock Name="tbPercentage1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
-                       FontSize="11"
-                       Foreground="{StaticResource darkBrush}"
-                       Text="25.9%"
-                       Visibility="Collapsed"/>
-            </StackPanel>
+            <Grid Name="dxSurfaceGrid" Opacity="0">
+                <common:DXSurface x:Name="dxSurface"/>
+                <StackPanel Orientation="Horizontal"  HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4">
+                    <StackPanel>
+                        <Grid Width="14" Height="14">
+                            <Grid>
+                                <Ellipse Width="14" Height="14" Stroke="{StaticResource backgroundBrush}" StrokeThickness="2"/>
+                                <Path Name="path1" Stroke="{StaticResource highlightBrush}" StrokeThickness="2">
+                                    <Path.Data>
+                                        <PathGeometry>
+                                            <PathGeometry.Figures>
+                                                <PathFigureCollection>
+                                                    <PathFigure x:Name="pathFigure1" StartPoint="7,1">
+                                                        <PathFigure.Segments>
+                                                            <PathSegmentCollection>
+                                                                <ArcSegment x:Name="arcSegement1" Size="6,6" RotationAngle="0" IsLargeArc="False" SweepDirection="Clockwise" Point="13,6" />
+                                                            </PathSegmentCollection>
+                                                        </PathFigure.Segments>
+                                                    </PathFigure>
+                                                </PathFigureCollection>
+                                            </PathGeometry.Figures>
+                                        </PathGeometry>
+                                    </Path.Data>
+                                </Path>
+                            </Grid>
+                        </Grid>
+                        <TextBlock Name="tbPercentage1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
+                           FontSize="11"
+                           Foreground="{StaticResource darkBrush}"
+                           Text="25.9%"
+                           Visibility="Collapsed"/>
+                    </StackPanel>
+                    <TextBlock Name="tbXNull" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
+                           FontSize="11"
+                           Foreground="{StaticResource darkBrush}"
+                           Text="25.9%"/>
+
+                    <TextBlock Name="tbYNull" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
+                           FontSize="11"
+                           Foreground="{StaticResource darkBrush}"
+                           Text="25.9%"/>
+                </StackPanel>
+            </Grid>
         </Grid>
     </Grid>
 </local:Renderer>

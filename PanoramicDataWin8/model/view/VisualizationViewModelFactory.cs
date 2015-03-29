@@ -12,7 +12,7 @@ namespace PanoramicData.model.view
 {
     public class VisualizationViewModelFactory
     {
-        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType, AttributeOperationModel attributeOperationModel)
+        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType, VisualizationType visualizationType)
         {
             VisualizationViewModel visualizationViewModel = new VisualizationViewModel(schemaModel);
             visualizationViewModel.QueryModel.JobType = jobType;
@@ -25,6 +25,14 @@ namespace PanoramicData.model.view
                     VisualizationViewModel = visualizationViewModel,
                 });
             }
+            visualizationViewModel.QueryModel.VisualizationType = visualizationType;
+
+            return visualizationViewModel;
+        }
+
+        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType, AttributeOperationModel attributeOperationModel)
+        {
+            VisualizationViewModel visualizationViewModel = CreateDefault(schemaModel, jobType, VisualizationType.Table);
 
             if (jobType == JobType.DB)
             {

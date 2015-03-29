@@ -32,9 +32,32 @@
             <Button Name="addAttributeButton" Click="addAttributeButton_Click" Margin="0,0,0,4">
                 <Button.Template>
                     <ControlTemplate>
-                        <Grid>
-                            <Rectangle Width="50" Height="50" Fill="{StaticResource lightBrush}"/>
-                            <SymbolIcon Symbol="List" Foreground="{StaticResource highlightBrush}" Margin="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
+                            <TextBlock 
+                                    CacheMode="BitmapCache"
+                                    RenderTransformOrigin="0.5, 0.5"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    TextAlignment="Center"
+                                    MaxWidth="50"
+                                    Text="a" FontSize="30" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+
+            <Button Name="addVisualizationButton" Click="addVisualizationButton_Click" Margin="0,0,0,4">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
+                            <TextBlock 
+                                    CacheMode="BitmapCache"
+                                    RenderTransformOrigin="0.5, 0.5"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    TextAlignment="Center"
+                                    MaxWidth="50"
+                                    Text="v" FontSize="30" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
                         </Grid>
                     </ControlTemplate>
                 </Button.Template>
@@ -43,9 +66,15 @@
             <Button Name="addJobButton" Click="addJobButton_Click" Visibility="Collapsed">
                 <Button.Template>
                     <ControlTemplate>
-                        <Grid>
-                            <Rectangle Width="50" Height="50" Fill="{StaticResource lightBrush}"/>
-                            <SymbolIcon Symbol="Setting" Foreground="{StaticResource highlightBrush}" Margin="8" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
+                            <TextBlock 
+                                    CacheMode="BitmapCache"
+                                    RenderTransformOrigin="0.5, 0.5"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    TextAlignment="Center"
+                                    MaxWidth="50"
+                                    Text="j" FontSize="30" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
                         </Grid>
                     </ControlTemplate>
                 </Button.Template>

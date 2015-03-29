@@ -153,6 +153,7 @@
     <Compile Include="model\data\tuppleware\TuppleWareSchemaModel.cs" />
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
+    <Compile Include="model\view\VisualizationTypeViewModel.cs" />
     <Compile Include="model\view\JobTypeViewModel.cs" />
     <Compile Include="model\view\MenuViewModel.cs" />
     <Compile Include="model\view\MenuItemViewModel.cs" />
@@ -180,6 +181,9 @@
     <Compile Include="utils\VisualTreeHelperExtensions.cs" />
     <Compile Include="view\common\DXSurface.xaml.cs">
       <DependentUpon>DXSurface.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\common\VisualizationTypeView.xaml.cs">
+      <DependentUpon>VisualizationTypeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\common\JobTypeView.xaml.cs">
       <DependentUpon>JobTypeView.xaml</DependentUpon>
@@ -322,6 +326,10 @@
     <Page Include="view\common\DXSurface.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\common\VisualizationTypeView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="view\common\JobTypeView.xaml">
       <Generator>MSBuild:Compile</Generator>

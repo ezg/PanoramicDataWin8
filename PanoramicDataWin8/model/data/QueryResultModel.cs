@@ -49,6 +49,45 @@ namespace PanoramicData.model.data
             }
         }
 
+        private double _xNullCount = 0;
+        public double XNullCount
+        {
+            get
+            {
+                return _xNullCount;
+            }
+            set
+            {
+                this.SetProperty(ref _xNullCount, value);
+            }
+        }
+
+        private double _yNullCount = 0;
+        public double YNullCount
+        {
+            get
+            {
+                return _yNullCount;
+            }
+            set
+            {
+                this.SetProperty(ref _yNullCount, value);
+            }
+        }
+
+        private double _xAndYNullCount = 0;
+        public double XAndYNullCount
+        {
+            get
+            {
+                return _xAndYNullCount;
+            }
+            set
+            {
+                this.SetProperty(ref _xAndYNullCount, value);
+            }
+        }
+
         private AxisType _xAxisType = AxisType.Nominal;
         public AxisType XAxisType
         {

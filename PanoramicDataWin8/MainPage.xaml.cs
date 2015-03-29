@@ -312,7 +312,7 @@ namespace PanoramicDataWin8
         {
             MainModel mainModel = (DataContext as MainModel);
             var buttonBounds = addAttributeButton.GetBounds(this);
-            var attributeModels = mainModel.SchemaModel.OriginModels.First().AttributeModels.Where(am => am.IsDisplayed);
+            var attributeModels = mainModel.SchemaModel.OriginModels.First().AttributeModels.Where(am => am.IsDisplayed).OrderBy(am => am.Name);
 
             attributeCanvas.Children.Clear();
             double perColumn = Math.Ceiling(attributeModels.Count() / 2.0);
@@ -332,6 +332,45 @@ namespace PanoramicDataWin8
                 attributeView.DataContext = attributeViewModel;
                 attributeCanvas.Children.Add(attributeView);
                 attributeView.RenderTransform = new TranslateTransform()
+                {
+                    X = column * 54,
+                    Y = startY + countPerColumn * 54
+                };
+
+                countPerColumn++;
+                if (countPerColumn >= perColumn)
+                {
+                    column++;
+                    countPerColumn = 0;
+                }
+            }
+
+            attributeGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+        }
+
+        private void addVisualizationButton_Click(object sender, RoutedEventArgs e)
+        {
+            MainModel mainModel = (DataContext as MainModel);
+            var buttonBounds = addVisualizationButton.GetBounds(this);
+            var visualizationTypes = Enum.GetValues(typeof(VisualizationType)).Cast<VisualizationType>().ToList();
+
+            attributeCanvas.Children.Clear();
+            double perColumn = Math.Ceiling(visualizationTypes.Count() / 2.0);
+            double height = perColumn * 50 + (perColumn - 1) * 4;
+            double startY = buttonBounds.Center.Y - height / 2.0;
+
+            int countPerColumn = 0;
+            int column = 0;
+            foreach (var visualizationType in visualizationTypes)
+            {
+                VisualizationTypeViewModel visualizationTypeViewModel = new VisualizationTypeViewModel()
+                {
+                    VisualizationType = visualizationType
+                };
+                VisualizationTypeView visualizationTypeView = new VisualizationTypeView();
+                visualizationTypeView.DataContext = visualizationTypeViewModel;
+                attributeCanvas.Children.Add(visualizationTypeView);
+                visualizationTypeView.RenderTransform = new TranslateTransform()
                 {
                     X = column * 54,
                     Y = startY + countPerColumn * 54

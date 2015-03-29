@@ -46,6 +46,7 @@ namespace PanoramicDataWin8.view.vis.render
         public PlotRenderer()
         {
             this.InitializeComponent();
+
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
             AttributeView.AttributeViewModelTapped += AttributeView_AttributeViewModelTapped;
@@ -96,7 +97,7 @@ namespace PanoramicDataWin8.view.vis.render
         void resultModel_QueryResultModelUpdated(object sender, EventArgs e)
         {
             populateData();
-            updatePercentageVisualization();
+            updateProgressAndNullVisualization();
         }
 
         void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -137,7 +138,20 @@ namespace PanoramicDataWin8.view.vis.render
                     Size = new Vec(visModel.Size.X - 54, 54),
                     AttachmentOrientation = AttachmentOrientation.Top
                 };
-            } 
+            }
+            else
+            {
+                xAttributeView.DataContext = new AttributeViewModel((DataContext as VisualizationViewModel), null)
+                {
+                    IsDraggableByPen = false,
+                    IsDraggable = false,
+                    IsShadow = false,
+                    BorderThicknes = new Thickness(0, 0, 0, 4),
+                    Size = new Vec(visModel.Size.X - 54, 54),
+                    AttachmentOrientation = AttachmentOrientation.Top
+                };
+            }
+
             if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Any())
             {
                 var yAom = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
@@ -150,11 +164,26 @@ namespace PanoramicDataWin8.view.vis.render
                     AttachmentOrientation = AttachmentOrientation.Left
                 };
             }
+            else
+            {
+                yAttributeView.DataContext = new AttributeViewModel((DataContext as VisualizationViewModel), null)
+                {
+                    IsDraggableByPen = false,
+                    IsDraggable = false,
+                    IsShadow = false,
+                    BorderThicknes = new Thickness(0, 0, 4, 0),
+                    Size = new Vec(54, visModel.Size.Y - 54),
+                    TextAngle = 270,
+                    AttachmentOrientation = AttachmentOrientation.Left
+                };
+            }
         }
 
-        private void updatePercentageVisualization()
+        private void updateProgressAndNullVisualization()
         {
             QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
+
+            // progress
             double size = 14;
             double thickness = 2;
 
@@ -180,6 +209,27 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 arcSegement1.Size = new Size((size / 2.0 - thickness / 2.0), (size / 2.0 - thickness / 2.0));
             }
+
+            // null labels
+            if (resultModel.XNullCount > 0)
+            {
+                tbXNull.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                tbXNull.Text = "x null values : " + resultModel.XNullCount;
+            }
+            else
+            {
+                tbXNull.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            }
+
+            if (resultModel.YNullCount > 0)
+            {
+                tbYNull.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                tbYNull.Text = "y null values : " + resultModel.YNullCount;
+            }
+            else
+            {
+                tbYNull.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            }
         }
 
         private void populateData()
@@ -191,6 +241,7 @@ namespace PanoramicDataWin8.view.vis.render
                 easingFunction.EasingMode = EasingMode.EaseInOut;
 
                 DoubleAnimation animation = new DoubleAnimation();
+                animation.Duration = TimeSpan.FromMilliseconds(300);
                 animation.From = mainLabel.Opacity;
                 animation.To = 0;
                 animation.EasingFunction = easingFunction;
@@ -201,12 +252,13 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Begin();
 
                 animation = new DoubleAnimation();
-                animation.From = dxSurface.Opacity;
+                animation.Duration = TimeSpan.FromMilliseconds(300);
+                animation.From = dxSurfaceGrid.Opacity;
                 animation.To = 1;
                 animation.EasingFunction = easingFunction;
                 storyboard = new Storyboard();
                 storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, dxSurface);
+                Storyboard.SetTarget(animation, dxSurfaceGrid);
                 Storyboard.SetTargetProperty(animation, "Opacity");
                 storyboard.Begin();
 
@@ -223,6 +275,7 @@ namespace PanoramicDataWin8.view.vis.render
                 easingFunction.EasingMode = EasingMode.EaseInOut;
 
                 DoubleAnimation animation = new DoubleAnimation();
+                animation.Duration = TimeSpan.FromMilliseconds(300);
                 animation.From = mainLabel.Opacity;
                 animation.To = 1;
                 animation.EasingFunction = easingFunction;
@@ -233,12 +286,13 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Begin();
 
                 animation = new DoubleAnimation();
-                animation.From = dxSurface.Opacity;
+                animation.Duration = TimeSpan.FromMilliseconds(300);
+                animation.From = dxSurfaceGrid.Opacity;
                 animation.To = 0;
                 animation.EasingFunction = easingFunction;
                 storyboard = new Storyboard();
                 storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, dxSurface);
+                Storyboard.SetTarget(animation, dxSurfaceGrid);
                 Storyboard.SetTargetProperty(animation, "Opacity");
                 storyboard.Begin();
             }
@@ -412,45 +466,22 @@ namespace PanoramicDataWin8.view.vis.render
             var xBounds = xAttributeView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             if (xBounds.Intersects(e.Bounds.GetPolygon()))
             {
-                qModel.RemoveFunctionAttributeOperationModel(AttributeFunction.X, qModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First());
+                if (qModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Any())
+                {
+                    qModel.RemoveFunctionAttributeOperationModel(AttributeFunction.X, qModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First());
+                }
                 qModel.AddFunctionAttributeOperationModel(AttributeFunction.X, e.AttributeOperationModel);
             }
 
             var yBounds = yAttributeView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             if (yBounds.Intersects(e.Bounds.GetPolygon()) && !xBounds.Intersects(e.Bounds.GetPolygon()))
             {
-                qModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Y, qModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First());
+                if (qModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Any())
+                {
+                    qModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Y, qModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First());
+                }
                 qModel.AddFunctionAttributeOperationModel(AttributeFunction.Y, e.AttributeOperationModel);
             }
-        }
-
-        void toggle(bool isHighlighted, TextBlock textBlock, Border border)
-        {
-            ExponentialEase easingFunction = new ExponentialEase();
-            easingFunction.EasingMode = EasingMode.EaseInOut;
-
-            ColorAnimation backgroundAnimation = new ColorAnimation();
-            backgroundAnimation.EasingFunction = easingFunction;
-            backgroundAnimation.Duration = TimeSpan.FromMilliseconds(300);
-            backgroundAnimation.From = (border.Background as SolidColorBrush).Color;
-
-            if (isHighlighted)
-            {
-                backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush).Color;
-                textBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush);
-            }
-            else
-            {
-                backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush).Color;
-                textBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush);
-            }
-            Storyboard storyboard = new Storyboard();
-            storyboard.Children.Add(backgroundAnimation);
-            Storyboard.SetTarget(backgroundAnimation, border);
-            Storyboard.SetTargetProperty(backgroundAnimation, "(Border.Background).(SolidColorBrush.Color)");
-            //Storyboard.SetTargetProperty(foregroundAnimation, "(TextBlock.Foreground).Color");
-
-            storyboard.Begin();
         }
     }
 
@@ -459,7 +490,7 @@ namespace PanoramicDataWin8.view.vis.render
         private float _leftOffset = 40;
         private float _rightOffset = 10;
         private float _topOffset = 10;
-        private float _bottomtOffset = 40;
+        private float _bottomtOffset = 45;
 
         private float _deviceWidth = 0;
         private float _deviceHeight = 0;
@@ -680,7 +711,10 @@ namespace PanoramicDataWin8.view.vis.render
                     yFrom - yTo);
                 roundedRect.RadiusX = roundedRect.RadiusY = 4;
                 d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
-                d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                if (BinnedDataPoints.Count < 10000)
+                {
+                    d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                }
 
 
                 binColor.Dispose();
@@ -690,7 +724,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void renderGrid(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
         {
-            computeSizesAndRenderLabels(d2dDeviceContext, dwFactory, true);
+            computeSizesAndRenderLabels(d2dDeviceContext, dwFactory, BinnedDataPoints.Count < 10000);
             if (_deviceHeight < 0 || _deviceWidth < 0)
             {
                 return;

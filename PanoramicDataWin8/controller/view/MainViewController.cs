@@ -27,6 +27,7 @@ using Windows.UI.Xaml.Media;
 using PanoramicData.controller.data.sim;
 using PanoramicDataWin8.model.view;
 using GeoAPI.Geometries;
+using PanoramicDataWin8.view.common;
 
 namespace PanoramicData.controller.view
 {
@@ -41,12 +42,15 @@ namespace PanoramicData.controller.view
             _mainPage = mainPage;
 
             _mainModel = new MainModel();
-            
+
             AttributeViewModel.AttributeViewModelDropped += AttributeViewModelDropped;
             AttributeViewModel.AttributeViewModelMoved += AttributeViewModelMoved;
 
             JobTypeViewModel.JobTypeViewModelDropped += JobTypeViewModelDropped;
             JobTypeViewModel.JobTypeViewModelMoved += JobTypeViewModelMoved;
+
+            VisualizationTypeViewModel.VisualizationTypeViewModelDropped += VisualizationTypeViewModel_VisualizationTypeViewModelDropped;
+            VisualizationTypeViewModel.VisualizationTypeViewModelMoved += VisualizationTypeViewModel_VisualizationTypeViewModelMoved;
 
             _root.InkCollectedEvent += root_InkCollectedEvent;
             VisualizationViewModels.CollectionChanged += VisualizationViewModels_CollectionChanged;
@@ -67,7 +71,7 @@ namespace PanoramicData.controller.view
                 var content = await Windows.Storage.FileIO.ReadTextAsync(file);
                 _mainModel.DatasetConfigurations.Add(DatasetConfiguration.FromContent(content, file.Name));
             }
-            LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("nba")).First());
+            LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("flight data small")).First());
             //LoadData(_mainModel.DatasetConfigurations.First());
         }
 
@@ -160,6 +164,14 @@ namespace PanoramicData.controller.view
             return visModel;
         }
 
+        public VisualizationViewModel CreateVisualizationViewModel(JobType jobType, VisualizationType visualizationType)
+        {
+            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, jobType, visualizationType);
+            addAttachmentViews(visModel);
+            _visualizationViewModels.Add(visModel);
+            return visModel;
+        }
+
         private void addAttachmentViews(VisualizationViewModel visModel)
         {
             foreach (var attachmentViewModel in visModel.AttachementViewModels)
@@ -241,6 +253,25 @@ namespace PanoramicData.controller.view
 
             VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
             VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel((sender as JobTypeViewModel).JobType, null);
+            visualizationViewModel.Position = position;
+            visualizationViewModel.Size = size;
+            visualizationContainerView.DataContext = visualizationViewModel;
+            InkableScene.Add(visualizationContainerView);
+        }
+
+        void VisualizationTypeViewModel_VisualizationTypeViewModelMoved(object sender, model.view.VisualizationTypeViewModelEventArgs e)
+        {
+        }
+
+        void VisualizationTypeViewModel_VisualizationTypeViewModelDropped(object sender, model.view.VisualizationTypeViewModelEventArgs e)
+        {
+            double width = VisualizationViewModel.WIDTH;
+            double height = VisualizationViewModel.HEIGHT;
+            Vec size = new Vec(width, height);
+            Pt position = (Pt)new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
+
+            VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
+            VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel(JobType.DB, (sender as VisualizationTypeViewModel).VisualizationType);
             visualizationViewModel.Position = position;
             visualizationViewModel.Size = size;
             visualizationContainerView.DataContext = visualizationViewModel;
