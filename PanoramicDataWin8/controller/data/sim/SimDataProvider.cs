@@ -70,7 +70,10 @@ namespace PanoramicDataWin8.controller.data.sim
             {
                 List<QueryResultItemModel> returnList = new List<QueryResultItemModel>();
 
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
                 List<Dictionary<AttributeModel, object>> data = await getDataFromFile(sampleSize);
+                Debug.WriteLine("From File Time: " + sw.ElapsedMilliseconds);
                 foreach (Dictionary<AttributeModel, object> row in data)
                 {
                     GroupingObject groupingObject = getGroupingObject(row, _queryModel, row[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel]);
