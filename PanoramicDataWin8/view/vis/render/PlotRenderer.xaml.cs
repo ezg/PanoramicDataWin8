@@ -515,12 +515,12 @@ namespace PanoramicDataWin8.view.vis.render
 
         private float toScreenX(float x)
         {
-            return ((x - _minX) / _xScale) * (_deviceWidth / CompositionScaleX) + (_leftOffset / CompositionScaleX);
+            return ((x - _minX) / _xScale) * (_deviceWidth) + (_leftOffset);
         }
         private float toScreenY(float y)
         {
-            float retY = ((y - _minY) / _yScale) * (_deviceHeight / CompositionScaleY);
-            return _flipY ? (_deviceHeight / CompositionScaleY) - retY + (_topOffset / CompositionScaleY) : retY + (_topOffset / CompositionScaleY);
+            float retY = ((y - _minY) / _yScale) * (_deviceHeight);
+            return _flipY ? (_deviceHeight) - retY + (_topOffset) : retY + (_topOffset);
         }
 
 
@@ -587,8 +587,8 @@ namespace PanoramicDataWin8.view.vis.render
 
             _leftOffset = Math.Max(10, metricsY.Width + 10 + 20);
 
-            _deviceWidth = (float)(d2dDeviceContext.Size.Width - _leftOffset - _rightOffset);
-            _deviceHeight = (float)(d2dDeviceContext.Size.Height - _topOffset - _bottomtOffset);
+            _deviceWidth = (float)(d2dDeviceContext.Size.Width / CompositionScaleX - _leftOffset - _rightOffset);
+            _deviceHeight = (float)(d2dDeviceContext.Size.Height / CompositionScaleY - _topOffset - _bottomtOffset);
 
             _minX = (float)(BinnedDataPoints.Min(dp => dp.MinX));
             _minY = (float)(BinnedDataPoints.Min(dp => dp.MinY));
