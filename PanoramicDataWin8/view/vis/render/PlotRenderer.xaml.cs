@@ -38,7 +38,7 @@ namespace PanoramicDataWin8.view.vis.render
         private MenuViewModel _menuViewModel = null;
         private MenuView _menuView = null;
 
-        private PlotRendererContentProvider _PlotRendererContentProvider = new PlotRendererContentProvider();
+        private PlotRendererContentProvider _plotRendererContentProvider = new PlotRendererContentProvider();
 
         private List<Vec> _clusterCenters = new List<Vec>();
         private List<Vec> _samples = new List<Vec>();
@@ -54,7 +54,9 @@ namespace PanoramicDataWin8.view.vis.render
 
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
-            dxSurface.ContentProvider = _PlotRendererContentProvider;
+            _plotRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
+            _plotRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
+            dxSurface.ContentProvider = _plotRendererContentProvider;
         }
 
         public override void Dispose()
@@ -300,8 +302,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         void loadQueryResultItemModels(QueryResultModel resultModel)
         {
-            _PlotRendererContentProvider.XAxisType = resultModel.XAxisType;
-            _PlotRendererContentProvider.YAxisType = resultModel.YAxisType;
+            _plotRendererContentProvider.XAxisType = resultModel.XAxisType;
+            _plotRendererContentProvider.YAxisType = resultModel.YAxisType;
             List<BinnedDataPoint> binnedDataPoints = new List<BinnedDataPoint>();
             foreach (var queryResultItemModel in resultModel.QueryResultItemModels)
             {
@@ -318,7 +320,7 @@ namespace PanoramicDataWin8.view.vis.render
 
                 binnedDataPoints.Add(point);
             }
-            _PlotRendererContentProvider.BinnedDataPoints = binnedDataPoints;
+            _plotRendererContentProvider.BinnedDataPoints = binnedDataPoints;
             render();
         }
 
@@ -507,17 +509,18 @@ namespace PanoramicDataWin8.view.vis.render
 
         public AxisType XAxisType { get; set; }
         public AxisType YAxisType { get; set; }
-
+        public float CompositionScaleX { get; set; }
+        public float CompositionScaleY { get; set; }
         public List<BinnedDataPoint> BinnedDataPoints { get; set; }
 
         private float toScreenX(float x)
         {
-            return ((x - _minX) / _xScale) * _deviceWidth + _leftOffset;
+            return ((x - _minX) / _xScale) * (_deviceWidth / CompositionScaleX) + (_leftOffset / CompositionScaleX);
         }
         private float toScreenY(float y)
         {
-            float retY = ((y - _minY) / _yScale) * _deviceHeight;
-            return _flipY ? _deviceHeight - retY + _topOffset : retY + _topOffset;
+            float retY = ((y - _minY) / _yScale) * (_deviceHeight / CompositionScaleY);
+            return _flipY ? (_deviceHeight / CompositionScaleY) - retY + (_topOffset / CompositionScaleY) : retY + (_topOffset / CompositionScaleY);
         }
 
 
@@ -528,6 +531,10 @@ namespace PanoramicDataWin8.view.vis.render
 
         public override void Draw(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
         {
+            var mat = Matrix3x2.Identity;
+            mat.ScaleVector = new Vector2(1.4f, 1.4f);
+            d2dDeviceContext.Transform = mat; 
+
             if (BinnedDataPoints != null && BinnedDataPoints.Count > 0)
             {
                 if (MainViewController.Instance.MainModel.GraphRenderOption == GraphRenderOptions.Grid)

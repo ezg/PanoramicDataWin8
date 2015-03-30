@@ -67,6 +67,22 @@ namespace PanoramicDataWin8.view.common
             swapChainPanel.SizeChanged += HandleSizeChanged;
         }
 
+        public float CompositionScaleX
+        {
+            get
+            {
+                return swapChainPanel.CompositionScaleX;
+            }
+        }
+
+        public float CompositionScaleY
+        {
+            get
+            {
+                return swapChainPanel.CompositionScaleY;
+            }
+        }
+
         public void Dispose()
         {
             UnloadContent();
@@ -165,13 +181,15 @@ namespace PanoramicDataWin8.view.common
             CreateD2DRenderTarget();
 
             CompositionTarget.Rendering += HandleRendering;
+
+            ResetSize(new Size(ActualWidth, ActualHeight));
         }
 
         private void CreateD2DRenderTarget()
         {
             var renderTarget = _presenter.BackBuffer;
 
-            var dpi = DisplayProperties.LogicalDpi;
+            var dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
 
             // 1. Use same format as the underlying render target with premultiplied alpha mode
             // 2. Use correct DPI
@@ -212,7 +230,7 @@ namespace PanoramicDataWin8.view.common
             Redraw();
 
             DisposeD2DRenderTarget();
-            _presenter.Resize((int)size.Width, (int)size.Height, _presenter.Description.BackBufferFormat);
+            _presenter.Resize((int)(size.Width * swapChainPanel.CompositionScaleX), (int)(size.Height * swapChainPanel.CompositionScaleY), _presenter.Description.BackBufferFormat);
             CreateD2DRenderTarget();
         }
 
