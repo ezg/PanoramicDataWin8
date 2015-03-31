@@ -115,5 +115,5 @@ namespace PanoramicData.model.data
         }
     }
 
-    public enum AxisType { Ordinal, Quantitative, Nominal }
+    public enum AxisType { Ordinal, Quantitative, Nominal, Time, Date }
 }

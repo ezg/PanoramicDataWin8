@@ -29,8 +29,8 @@ namespace PanoramicData.model.data
             }
         }
 
-        private Dictionary<VisualizationResult, QueryResultItemValueModel> _visualizationResultValues = new Dictionary<VisualizationResult, QueryResultItemValueModel>();
-        public Dictionary<VisualizationResult, QueryResultItemValueModel> VisualizationResultValues
+        private Dictionary<VisualizationResult, double?> _visualizationResultValues = new Dictionary<VisualizationResult, double?>();
+        public Dictionary<VisualizationResult, double?> VisualizationResultValues
         {
             get
             {
@@ -46,11 +46,7 @@ namespace PanoramicData.model.data
         {
             get
             {
-                if (VisualizationResultValues[VisualizationResult.X].Value != null)
-                {
-                    return double.Parse(VisualizationResultValues[VisualizationResult.X].Value.ToString());
-                }
-                return null;
+                return VisualizationResultValues[VisualizationResult.X];
             }
         }
         public double? YValue

@@ -171,6 +171,7 @@
     <Compile Include="utils\Converters.cs" />
     <Compile Include="utils\ConvexHull.cs" />
     <Compile Include="utils\CSVParser.cs" />
+    <Compile Include="utils\DateTimeUtil.cs" />
     <Compile Include="utils\ExtendedBindableBase.cs" />
     <Compile Include="utils\Geom.cs" />
     <Compile Include="utils\Helpers.cs" />

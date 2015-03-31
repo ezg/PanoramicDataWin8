@@ -532,7 +532,7 @@ namespace PanoramicDataWin8.view.vis.render
         public override void Draw(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
         {
             var mat = Matrix3x2.Identity;
-            mat.ScaleVector = new Vector2(1.4f, 1.4f);
+            mat.ScaleVector = new Vector2(CompositionScaleX, CompositionScaleY);
             d2dDeviceContext.Transform = mat; 
 
             if (BinnedDataPoints != null && BinnedDataPoints.Count > 0)

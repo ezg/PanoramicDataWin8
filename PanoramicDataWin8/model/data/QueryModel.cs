@@ -353,6 +353,14 @@ namespace PanoramicData.model.data
                 {
                     return AxisType.Quantitative;
                 }
+                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.TIME)
+                {
+                    return AxisType.Time;
+                }
+                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.DATE)
+                {
+                    return AxisType.Date;
+                }
             }
             return AxisType.Nominal;
         }

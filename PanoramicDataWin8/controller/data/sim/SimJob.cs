@@ -30,10 +30,7 @@ namespace PanoramicDataWin8.controller.data.sim
 
         private SimDataProvider _simDataProvider = null;
         private bool _isRunning = false;
-        private double numberOfXBins = 0;
-        private double numberOfYBins = 0;
         private int _sampleSize = 0;
-        private bool _additive = false;
         private bool _isGrouped = false;
         private bool _isIncremental = false;
         private TimeSpan _throttle = TimeSpan.FromMilliseconds(0);
@@ -155,9 +152,25 @@ namespace PanoramicDataWin8.controller.data.sim
             var yAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
             foreach (var sample in samples)
             {
+                // x
                 if (_xAxisType == AxisType.Quantitative)
                 {
-                    sample.VisualizationResultValues.Add(VisualizationResult.X, sample.AttributeValues[xAom]);
+                    if (xAom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT)
+                    {
+                        sample.VisualizationResultValues.Add(VisualizationResult.X, (double?)sample.AttributeValues[xAom].Value);
+                    }
+                    else if (xAom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT)
+                    {
+                        sample.VisualizationResultValues.Add(VisualizationResult.X, sample.AttributeValues[xAom].Value == null ? null : (double?)(int)sample.AttributeValues[xAom].Value);
+                    }
+                }
+                else if (_xAxisType == AxisType.Time)
+                {
+                    sample.VisualizationResultValues.Add(VisualizationResult.X, ((DateTime)sample.AttributeValues[xAom].Value).TimeOfDay.Ticks);
+                }
+                else if (_xAxisType == AxisType.Date)
+                {
+                    sample.VisualizationResultValues.Add(VisualizationResult.X, ((DateTime)sample.AttributeValues[xAom].Value).Ticks);
                 }
                 else
                 {
@@ -166,15 +179,28 @@ namespace PanoramicDataWin8.controller.data.sim
                     {
                         _xUniqueValues.Add(queryValue.StringValue, _xUniqueValues.Count);
                     }
-                    sample.VisualizationResultValues.Add(VisualizationResult.X,
-                        new QueryResultItemValueModel()
-                        {
-                            Value = _xUniqueValues[queryValue.StringValue]
-                        });
+                    sample.VisualizationResultValues.Add(VisualizationResult.X, _xUniqueValues[queryValue.StringValue]);
                 }
+
+                // y
                 if (_yAxisType == AxisType.Quantitative)
                 {
-                    sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom]);
+                    if (yAom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT)
+                    {
+                        sample.VisualizationResultValues.Add(VisualizationResult.Y, (double?)sample.AttributeValues[yAom].Value);
+                    }
+                    else if (yAom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT)
+                    {
+                        sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom].Value == null ? null : (double?)(int)sample.AttributeValues[yAom].Value);
+                    }
+                }
+                else if (_yAxisType == AxisType.Time)
+                {
+                    sample.VisualizationResultValues.Add(VisualizationResult.Y, ((DateTime)sample.AttributeValues[yAom].Value).TimeOfDay.Ticks);
+                }
+                else if (_yAxisType == AxisType.Date)
+                {
+                    sample.VisualizationResultValues.Add(VisualizationResult.Y, ((DateTime)sample.AttributeValues[yAom].Value).Ticks);
                 }
                 else
                 {
@@ -183,11 +209,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     {
                         _yUniqueValues.Add(queryValue.StringValue, _yUniqueValues.Count);
                     }
-                    sample.VisualizationResultValues.Add(VisualizationResult.Y,
-                        new QueryResultItemValueModel()
-                        {
-                            Value = _yUniqueValues[queryValue.StringValue]
-                        });
+                    sample.VisualizationResultValues.Add(VisualizationResult.Y,_yUniqueValues[queryValue.StringValue]);
                 }
             }
         }

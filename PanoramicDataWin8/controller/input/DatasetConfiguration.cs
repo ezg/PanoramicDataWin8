@@ -118,6 +118,19 @@ namespace PanoramicData.controller.input
             }
         }
 
+        private bool _useQuoteParsing = true;
+        public bool UseQuoteParsing
+        {
+            get
+            {
+                return _useQuoteParsing;
+            }
+            set
+            {
+                this.SetProperty(ref _useQuoteParsing, value);
+            }
+        }
+
         private string _dataFile;
         public string DataFile
         {
@@ -249,6 +262,10 @@ namespace PanoramicData.controller.input
                     else if (parts[0] == "IsDisplayed")
                     {
                         config.AttributeIsDisplayed = CSVParser.CSVLineSplit(parts[1].Trim()).Select(s => s.ToLower() == "true").ToList();
+                    }
+                    else if (parts[0] == "UseQuoteParsing")
+                    {
+                        config.UseQuoteParsing = parts[1].ToLower().Trim() == "true";
                     }
                 }
 

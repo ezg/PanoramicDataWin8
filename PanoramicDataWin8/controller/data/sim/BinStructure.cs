@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
@@ -39,6 +40,9 @@ namespace PanoramicDataWin8.controller.data.sim
 
         public double BinSizeX { get; set; }
         public double BinSizeY { get; set; }
+
+        public DateTimeStep DateTimeStepX { get; set; }
+        public DateTimeStep DateTimeStepY { get; set; }
 
         public List<List<Bin>> Bins { get; set; }
     }

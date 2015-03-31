@@ -23,6 +23,7 @@ using PanoramicData.controller.data.sim;
 using Windows.ApplicationModel;
 using Windows.Storage;
 using PanoramicData.utils;
+using Windows.Storage.FileProperties;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
@@ -33,6 +34,7 @@ namespace PanoramicDataWin8.controller.data.sim
         private int _nrProcessedSamples = 0;
         private int _nrSamplesToCheck = -1;
         private StreamReader _streamReader = null;
+        private BasicProperties _dataFileProperties = null;
         private Dictionary<GroupingObject, IterativeCalculationObject> _iterativeCaluclationObjects = new Dictionary<GroupingObject, IterativeCalculationObject>();
 
         public bool IsInitialized { get; set; }
@@ -58,6 +60,7 @@ namespace PanoramicDataWin8.controller.data.sim
             {
                 file = await ApplicationData.Current.LocalFolder.GetFileAsync(_simOriginModel.DatasetConfiguration.DataFile);
             }
+            _dataFileProperties = await file.GetBasicPropertiesAsync();
             _streamReader = new StreamReader(await file.OpenStreamForReadAsync());
 
             _nrProcessedSamples = 0;
@@ -180,7 +183,15 @@ namespace PanoramicDataWin8.controller.data.sim
                 Dictionary<AttributeModel, object> items = new Dictionary<AttributeModel, object>();
                 items[_simOriginModel.IdAttributeModel] = count;
 
-                List<string> values = CSVParser.CSVLineSplit(line);
+                List<string> values = null;
+                if (_simOriginModel.DatasetConfiguration.UseQuoteParsing)
+                {
+                    values = CSVParser.CSVLineSplit(line);
+                }
+                else
+                {
+                    values = line.Split(new char[] { ',' }).ToList();
+                }
                 for (int i = 0; i < values.Count; i++)
                 {
                     object value = null;
@@ -202,6 +213,30 @@ namespace PanoramicDataWin8.controller.data.sim
                         if (int.TryParse(values[i].ToString(), out d))
                         {
                             value = d;
+                        }
+                    }
+                    else if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.TIME)
+                    {
+                        DateTime timeStamp = DateTime.Now;
+                        if (DateTime.TryParseExact(values[i].ToString(), new string[] {"HH:mm:ss","mm:ss","mm:ss.f"} , null, System.Globalization.DateTimeStyles.None, out timeStamp))
+                        {
+                            value = timeStamp;
+                        }
+                        else
+                        {
+                            value = null;
+                        }
+                    }
+                    else if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.DATE)
+                    {
+                        DateTime date = DateTime.Now;
+                        if (DateTime.TryParseExact(values[i].ToString(), new string[] { "MM/dd/yyyy HH:mm:ss", "M/d/yyyy" }, null, System.Globalization.DateTimeStyles.None, out date))
+                        {
+                            value = date;
+                        }
+                        else
+                        {
+                            value = null;
                         }
                     }
                     if (value == null || value.ToString().Trim() == "")
@@ -253,10 +288,6 @@ namespace PanoramicDataWin8.controller.data.sim
                 else
                 {
                     valueModel.StringValue = valueModel.Value.ToString();
-                    if (valueModel.Value is DateTime)
-                    {
-                        valueModel.StringValue = ((DateTime)valueModel.Value).ToString();
-                    }
                 }
                 if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.GEOGRAPHY)
                 {
@@ -267,6 +298,16 @@ namespace PanoramicDataWin8.controller.data.sim
                         toSplit = toSplit.Substring(1, toSplit.IndexOf(")") - 1);
                     }
                     valueModel.ShortStringValue = valueModel.StringValue.Replace("(" + toSplit + ")", "");
+                }
+                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.TIME)
+                {
+                    valueModel.StringValue = ((DateTime)valueModel.Value).TimeOfDay.ToString();
+                    valueModel.ShortStringValue = ((DateTime)valueModel.Value).TimeOfDay.ToString();
+                }
+                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.DATE)
+                {
+                    valueModel.StringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
+                    valueModel.ShortStringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
                 }
                 else
                 {
