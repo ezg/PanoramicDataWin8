@@ -28,6 +28,7 @@ using DW = SharpDX.DirectWrite;
 using PanoramicData.controller.view;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
+using PanoramicDataWin8.controller.data.sim;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -304,6 +305,8 @@ namespace PanoramicDataWin8.view.vis.render
         {
             _plotRendererContentProvider.XAxisType = resultModel.XAxisType;
             _plotRendererContentProvider.YAxisType = resultModel.YAxisType;
+            _plotRendererContentProvider.XScale = resultModel.XScale;
+            _plotRendererContentProvider.YScale = resultModel.YScale;
             List<BinnedDataPoint> binnedDataPoints = new List<BinnedDataPoint>();
             foreach (var queryResultItemModel in resultModel.QueryResultItemModels)
             {
@@ -508,7 +511,9 @@ namespace PanoramicDataWin8.view.vis.render
         private DW.TextFormat _textFormat;
 
         public AxisType XAxisType { get; set; }
-        public AxisType YAxisType { get; set; }
+        public AxisType YAxisType { get; set; }        
+        public Scale XScale { get; set; }
+        public Scale YScale { get; set; }
         public float CompositionScaleX { get; set; }
         public float CompositionScaleY { get; set; }
         public List<BinnedDataPoint> BinnedDataPoints { get; set; }

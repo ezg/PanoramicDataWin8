@@ -1,6 +1,7 @@
 ﻿using Microsoft.Practices.Prism.Mvvm;
 using PanoramicData.controller.data;
 using PanoramicData.utils;
+using PanoramicDataWin8.controller.data.sim;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -111,6 +112,32 @@ namespace PanoramicData.model.data
             set
             {
                 this.SetProperty(ref _yAxisType, value);
+            }
+        }
+
+        private Scale _xScale = null;
+        public Scale XScale
+        {
+            get
+            {
+                return _xScale;
+            }
+            set
+            {
+                this.SetProperty(ref _xScale, value);
+            }
+        }
+
+        private Scale _yScale = null;
+        public Scale YScale
+        {
+            get
+            {
+                return _yScale;
+            }
+            set
+            {
+                this.SetProperty(ref _yScale, value);
             }
         }
     }

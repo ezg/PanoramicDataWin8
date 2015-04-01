@@ -120,6 +120,7 @@
     <Compile Include="controller\data\QueryExecuter.cs" />
     <Compile Include="controller\data\sim\Binner.cs" />
     <Compile Include="controller\data\sim\BinStructure.cs" />
+    <Compile Include="controller\data\sim\Scale.cs" />
     <Compile Include="controller\data\sim\SimDataProvider.cs" />
     <Compile Include="controller\data\sim\SimJob.cs" />
     <Compile Include="controller\data\sim\SimQueryExecuter.cs" />

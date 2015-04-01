@@ -16,9 +16,9 @@ namespace PanoramicDataWin8.utils
                 new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Second, DateTimeStepValue  = 15, DateTimeStepMaxValue = TimeSpan.FromSeconds(15).Ticks },  // 15-second
                 new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Second, DateTimeStepValue  = 30, DateTimeStepMaxValue = TimeSpan.FromSeconds(30).Ticks },  // 30-second
                 new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Minute, DateTimeStepValue  = 1, DateTimeStepMaxValue = TimeSpan.FromMinutes(1).Ticks },  // 1-minute
-                new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Second, DateTimeStepValue  = 5, DateTimeStepMaxValue = TimeSpan.FromMinutes(5).Ticks }, // 5-minute
-                new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Second, DateTimeStepValue  = 15, DateTimeStepMaxValue = TimeSpan.FromMinutes(15).Ticks }, // 15-minute
-                new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Second, DateTimeStepValue  = 30, DateTimeStepMaxValue = TimeSpan.FromMinutes(30).Ticks }, // 30-minute
+                new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Minute, DateTimeStepValue  = 5, DateTimeStepMaxValue = TimeSpan.FromMinutes(5).Ticks }, // 5-minute
+                new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Minute, DateTimeStepValue  = 15, DateTimeStepMaxValue = TimeSpan.FromMinutes(15).Ticks }, // 15-minute
+                new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Minute, DateTimeStepValue  = 30, DateTimeStepMaxValue = TimeSpan.FromMinutes(30).Ticks }, // 30-minute
                 new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Hour, DateTimeStepValue  = 1, DateTimeStepMaxValue = TimeSpan.FromHours(1).Ticks }, // 1-hour
                 new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Hour, DateTimeStepValue  = 3, DateTimeStepMaxValue = TimeSpan.FromHours(3).Ticks }, // 3-hour
                 new DateTimeStep() {DateTimeStepGranularity = DateTimeStepGranularity.Hour, DateTimeStepValue  = 6, DateTimeStepMaxValue = TimeSpan.FromHours(6).Ticks }, // 6-hour
@@ -146,6 +146,38 @@ namespace PanoramicDataWin8.utils
             return AddToDateTime(new DateTime((long)ticks), dateTimeStep);
         }
 
+        public static string GetLabel(double ticks, DateTimeStep dateTimeStep)
+        {
+            return GetLabel(new DateTime((long)ticks), dateTimeStep);
+        }
+        public static string GetLabel(DateTime dt, DateTimeStep dateTimeStep)
+        {
+            //MM/dd/yyyy HH:mm:ss
+            if (dateTimeStep.DateTimeStepGranularity == DateTimeStepGranularity.Second ||
+                dateTimeStep.DateTimeStepGranularity == DateTimeStepGranularity.Minute)
+            {
+                return dt.ToString("mm:ss");
+            } 
+            else if (dateTimeStep.DateTimeStepGranularity == DateTimeStepGranularity.Hour)
+            {
+                return dt.ToString("HH:mm");
+            }
+            else if (dateTimeStep.DateTimeStepGranularity == DateTimeStepGranularity.Day)
+            {
+                return dt.ToString("MM/dd/yyyy");
+            } 
+            else if (dateTimeStep.DateTimeStepGranularity == DateTimeStepGranularity.Month)
+            {
+                return dt.ToString("MM/yyyy");
+            }        
+            else if (dateTimeStep.DateTimeStepGranularity == DateTimeStepGranularity.Year)
+            {
+                return dt.ToString("yyyy");
+            }
+            return "";
+        }
+
+
         public static DateTime AddToDateTime(DateTime dt, DateTimeStep dateTimeStep)
         {
             if (dateTimeStep.DateTimeStepGranularity == DateTimeStepGranularity.Second)
@@ -195,17 +227,23 @@ namespace PanoramicDataWin8.utils
             {
                 if (target > lastStepValue && target < step.DateTimeStepMaxValue)
                 {
-                    i = count;
+                    i = count; 
+                    i = Math.Max(0, i - 1);
                     break;
                 }
                 lastStepValue = step.DateTimeStepMaxValue;
                 count++;
             }
-
+            
             long[] ret = new long[2];
             ret[0] = RoundDateTimeTo(min, _dateTimeSteps[i]).Ticks;
-            ret[1] = AddToDateTime(RoundDateTimeTo(max, _dateTimeSteps[i]), _dateTimeSteps[i]).Ticks;
-            dateTimeStep = _dateTimeSteps[i];
+            ret[1] = AddToDateTime(RoundDateTimeTo(AddToDateTime(max, _dateTimeSteps[i]), _dateTimeSteps[i]), _dateTimeSteps[i]).Ticks;
+            dateTimeStep = new DateTimeStep()
+            {
+                DateTimeStepGranularity = _dateTimeSteps[i].DateTimeStepGranularity,
+                DateTimeStepMaxValue = _dateTimeSteps[i].DateTimeStepMaxValue,
+                DateTimeStepValue = _dateTimeSteps[i].DateTimeStepValue
+            };
             return ret;
         }
     }

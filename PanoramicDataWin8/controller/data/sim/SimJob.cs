@@ -132,7 +132,9 @@ namespace PanoramicDataWin8.controller.data.sim
                         _simDataProvider.Progress(),
                         _binner == null ? 0 : _binner.LastBinStructure.XNullCount,
                         _binner == null ? 0 : _binner.LastBinStructure.YNullCount,
-                        _binner == null ? 0 : _binner.LastBinStructure.XAndYNullCount);
+                        _binner == null ? 0 : _binner.LastBinStructure.XAndYNullCount,
+                        _binner == null ? null : _binner.LastBinStructure.XScale,
+                        _binner == null ? null : _binner.LastBinStructure.YScale);
                 }
                 samples = await _simDataProvider.GetSampleQueryResultItemModels(_sampleSize);
 
@@ -166,11 +168,11 @@ namespace PanoramicDataWin8.controller.data.sim
                 }
                 else if (_xAxisType == AxisType.Time)
                 {
-                    sample.VisualizationResultValues.Add(VisualizationResult.X, ((DateTime)sample.AttributeValues[xAom].Value).TimeOfDay.Ticks);
+                    sample.VisualizationResultValues.Add(VisualizationResult.X, sample.AttributeValues[xAom].Value == null ? null : (double?)((DateTime)sample.AttributeValues[xAom].Value).TimeOfDay.Ticks);
                 }
                 else if (_xAxisType == AxisType.Date)
                 {
-                    sample.VisualizationResultValues.Add(VisualizationResult.X, ((DateTime)sample.AttributeValues[xAom].Value).Ticks);
+                    sample.VisualizationResultValues.Add(VisualizationResult.X, sample.AttributeValues[xAom].Value == null ? null : (double?)((DateTime)sample.AttributeValues[xAom].Value).Ticks);
                 }
                 else
                 {
@@ -196,11 +198,11 @@ namespace PanoramicDataWin8.controller.data.sim
                 }
                 else if (_yAxisType == AxisType.Time)
                 {
-                    sample.VisualizationResultValues.Add(VisualizationResult.Y, ((DateTime)sample.AttributeValues[yAom].Value).TimeOfDay.Ticks);
+                    sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom].Value == null ? null : (double?)((DateTime)sample.AttributeValues[yAom].Value).TimeOfDay.Ticks);
                 }
                 else if (_yAxisType == AxisType.Date)
                 {
-                    sample.VisualizationResultValues.Add(VisualizationResult.Y, ((DateTime)sample.AttributeValues[yAom].Value).Ticks);
+                    sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom].Value == null ? null : (double?)((DateTime)sample.AttributeValues[yAom].Value).Ticks);
                 }
                 else
                 {
@@ -238,7 +240,7 @@ namespace PanoramicDataWin8.controller.data.sim
                         Size = bin.Size
                     };
 
-                    if (_xAxisType != AxisType.Quantitative)
+                    if (_xAxisType == AxisType.Nominal || _xAxisType == AxisType.Ordinal)
                     {
                         var k =_xUniqueValues.Where(kvp => kvp.Value == bin.BinMinX).FirstOrDefault();
                         if (k.Key != null)
@@ -252,9 +254,10 @@ namespace PanoramicDataWin8.controller.data.sim
                     }
                     else
                     {
-                        binClone.LabelX = bin.BinMinX.ToString();
+                        binClone.LabelX = binStructure.XScale.GetLabel(bin.BinMinX);
                     }
-                    if (_yAxisType != AxisType.Quantitative)
+
+                    if (_yAxisType == AxisType.Nominal || _yAxisType == AxisType.Ordinal)
                     {
                         var k = _yUniqueValues.Where(kvp => kvp.Value == bin.BinMinY).FirstOrDefault();
                         if (k.Key != null)
@@ -268,7 +271,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     }
                     else
                     {
-                        binClone.LabelY = bin.BinMinY.ToString();
+                        binClone.LabelY = binStructure.YScale.GetLabel(bin.BinMinY);
                     }
 
                     QueryResultItemModel itemModel = new QueryResultItemModel();
@@ -277,8 +280,8 @@ namespace PanoramicDataWin8.controller.data.sim
                     GroupingObject go = new GroupingObject(true, false, -1);
                     go.Add(0, col);
                     go.Add(1, row);
-                    go.Add(2, binStructure.BinSizeX);
-                    go.Add(3, binStructure.BinSizeY);
+                    //go.Add(2, binStructure.BinSizeX);
+                    //go.Add(3, binStructure.BinSizeY);
 
                     itemModel.GroupingObject = go;
                     newSamples.Add(itemModel);
@@ -288,19 +291,22 @@ namespace PanoramicDataWin8.controller.data.sim
         }
 
 
-        private async Task fireUpdated(List<QueryResultItemModel> samples, double progress, double xNullCount, double yNullCount, double xAndYNullCount)
+        private async Task fireUpdated(List<QueryResultItemModel> samples, double progress, double xNullCount, double yNullCount, double xAndYNullCount, Scale xScale, Scale yScale)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 if (JobUpdate != null)
                 {
-                    JobUpdate(this, new JobEventArgs() { 
-                        Samples = samples, 
+                    JobUpdate(this, new JobEventArgs()
+                    {
+                        Samples = samples,
                         Progress = progress,
                         XAndYNullCount = xAndYNullCount,
-                        YNullCount= yNullCount,
-                        XNullCount = xNullCount
+                        YNullCount = yNullCount,
+                        XNullCount = xNullCount,
+                        XScale = xScale,
+                        YScale = yScale
                     });
                 }
             });
@@ -325,7 +331,9 @@ namespace PanoramicDataWin8.controller.data.sim
         public double Progress { get; set; }
         public double XNullCount { get; set; }
         public double YNullCount { get; set; }
-        public double XAndYNullCount { get; set; } 
+        public double XAndYNullCount { get; set; }
+        public Scale XScale { get; set; }
+        public Scale YScale { get; set; }
     }
 }
 

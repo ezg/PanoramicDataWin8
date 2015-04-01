@@ -53,11 +53,7 @@ namespace PanoramicData.model.data
         {
             get
             {
-                if (VisualizationResultValues[VisualizationResult.Y].Value != null)
-                {
-                    return double.Parse(VisualizationResultValues[VisualizationResult.Y].Value.ToString());
-                }
-                return null;
+                return VisualizationResultValues[VisualizationResult.Y];
             }
         }
 

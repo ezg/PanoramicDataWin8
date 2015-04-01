@@ -13,37 +13,13 @@ namespace PanoramicDataWin8.controller.data.sim
         public BinStructure()
         {
             Bins = new List<List<Bin>>();
-            BinMinX = Double.MaxValue;
-            BinMinY = Double.MaxValue;
-            BinMaxX = Double.MinValue;
-            BinMaxY = Double.MinValue;
-
-            DataMinX = Double.MaxValue;
-            DataMinY = Double.MaxValue;
-            DataMaxX = Double.MinValue;
-            DataMaxY = Double.MinValue;
         }
 
         public double XNullCount { get; set; }
         public double YNullCount { get; set; }
         public double XAndYNullCount { get; set; } 
-
-        public double BinMinX { get; set; }
-        public double BinMinY { get; set; }
-        public double BinMaxX { get; set; }
-        public double BinMaxY { get; set; }
-
-        public double DataMinX { get; set; }
-        public double DataMinY { get; set; }
-        public double DataMaxX { get; set; }
-        public double DataMaxY { get; set; }
-
-        public double BinSizeX { get; set; }
-        public double BinSizeY { get; set; }
-
-        public DateTimeStep DateTimeStepX { get; set; }
-        public DateTimeStep DateTimeStepY { get; set; }
-
         public List<List<Bin>> Bins { get; set; }
+        public Scale XScale { get; set; }
+        public Scale YScale { get; set; }
     }
 }
