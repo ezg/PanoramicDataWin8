@@ -99,7 +99,7 @@ namespace PanoramicData.model.view
             }
         }
 
-        private GraphRenderOptions _graphRenderOption = GraphRenderOptions.Grid;
+        private GraphRenderOptions _graphRenderOption = GraphRenderOptions.Cell;
         public GraphRenderOptions GraphRenderOption
         {
             get

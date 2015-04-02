@@ -32,13 +32,13 @@ namespace PanoramicData.model.view
 
         public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType, AttributeOperationModel attributeOperationModel)
         {
-            VisualizationViewModel visualizationViewModel = CreateDefault(schemaModel, jobType, VisualizationType.Table);
+            VisualizationViewModel visualizationViewModel = CreateDefault(schemaModel, jobType, VisualizationType.table);
 
             if (jobType == JobType.DB)
             {
                 if (schemaModel is TuppleWareSchemaModel)
                 {
-                    visualizationViewModel.QueryModel.VisualizationType = VisualizationType.Table;
+                    visualizationViewModel.QueryModel.VisualizationType = VisualizationType.table;
                     visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, attributeOperationModel);
                 }
                 else if (attributeOperationModel.AttributeModel.AttributeVisualizationType == AttributeVisualizationTypeConstants.ENUM)
@@ -56,7 +56,7 @@ namespace PanoramicData.model.view
                 }
                 else if (attributeOperationModel.AttributeModel.AttributeVisualizationType == AttributeVisualizationTypeConstants.NUMERIC)
                 {
-                    visualizationViewModel.QueryModel.VisualizationType = VisualizationType.Bar;
+                    visualizationViewModel.QueryModel.VisualizationType = VisualizationType.bar;
 
                     AttributeOperationModel x = new AttributeOperationModel(attributeOperationModel.AttributeModel);
                     x.AggregateFunction = AggregateFunction.None;
@@ -89,7 +89,7 @@ namespace PanoramicData.model.view
                 }
                 else
                 {
-                    visualizationViewModel.QueryModel.VisualizationType = VisualizationType.Table;
+                    visualizationViewModel.QueryModel.VisualizationType = VisualizationType.table;
                     visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, attributeOperationModel);
                 }
             }

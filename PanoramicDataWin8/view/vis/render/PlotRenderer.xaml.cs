@@ -41,9 +41,6 @@ namespace PanoramicDataWin8.view.vis.render
 
         private PlotRendererContentProvider _plotRendererContentProvider = new PlotRendererContentProvider();
 
-        private List<Vec> _clusterCenters = new List<Vec>();
-        private List<Vec> _samples = new List<Vec>();
-
         public PlotRenderer()
         {
             this.InitializeComponent();
@@ -84,6 +81,7 @@ namespace PanoramicDataWin8.view.vis.render
                 (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).CollectionChanged += Y_CollectionChanged;
                 QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
                 resultModel.QueryResultModelUpdated += resultModel_QueryResultModelUpdated;
+                mainLabel.Text = (DataContext as VisualizationViewModel).QueryModel.VisualizationType.ToString();
                 populateHeaders();
             }
         }
@@ -263,10 +261,10 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Children.Add(animation);
                 Storyboard.SetTarget(animation, dxSurfaceGrid);
                 Storyboard.SetTargetProperty(animation, "Opacity");
-                storyboard.Begin();
+                // storyboard.Begin();
 
-                _clusterCenters.Clear();
-                _samples.Clear();
+                dxSurfaceGrid.Opacity = 1;
+                mainLabel.Opacity = 0;
 
                 loadQueryResultItemModels(resultModel);
                 render();
@@ -297,7 +295,9 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Children.Add(animation);
                 Storyboard.SetTarget(animation, dxSurfaceGrid);
                 Storyboard.SetTargetProperty(animation, "Opacity");
-                storyboard.Begin();
+                //storyboard.Begin();
+                dxSurfaceGrid.Opacity = 0;
+                mainLabel.Opacity = 1;
             }
         }
 

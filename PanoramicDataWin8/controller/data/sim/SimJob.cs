@@ -62,7 +62,7 @@ namespace PanoramicDataWin8.controller.data.sim
             _isGrouped = QueryModel.AttributeOperationModels.Any(aom => aom.IsGrouped || aom.IsBinned) || QueryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None);
             _isIncremental = !_isGrouped;
 
-            if (QueryModel.VisualizationType == VisualizationType.Table)
+            if (QueryModel.VisualizationType == VisualizationType.table)
             {
                 _binner = null;
                 samplesToCheck = !_isGrouped ? 1000 : -1;
@@ -110,7 +110,7 @@ namespace PanoramicDataWin8.controller.data.sim
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
-                if (QueryModelClone.VisualizationType != VisualizationType.Table)
+                if (QueryModelClone.VisualizationType != VisualizationType.table)
                 {
                     if (!_isIncremental)
                     {

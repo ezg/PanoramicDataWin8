@@ -526,7 +526,7 @@ namespace PanoramicData.model.data
 
     public enum QueryModelUpdatedEventType { Structure, Links, FilterModels }
     
-    public enum VisualizationType { Table, Bar, Map, Plot, Line }
+    public enum VisualizationType { table, bar, map, plot, line }
 
     public enum JobType { DB, Kmeans }
 

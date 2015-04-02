@@ -31,7 +31,7 @@ namespace PanoramicData.utils
     {
         protected override bool ConvertBase(VisualizationType input)
         {
-            return input == VisualizationType.Table;
+            return input == VisualizationType.table;
         }
     }
     

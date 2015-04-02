@@ -86,30 +86,30 @@ namespace PanoramicDataWin8.view.vis
 
             if (visualizationViewModel.QueryModel.JobType == JobType.DB)
             {
-                if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Bar)
+                if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.bar)
                 {
                     _renderer = new PlotRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
-                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Table)
+                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.table)
                 {
                     _renderer = new TableRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
-                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Plot)
+                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.plot)
                 {
-                    //PlotFilterRenderer4 fRenderer = new PlotFilterRenderer4(false);
-                    //(_front.Content as Front).SetContent(fRenderer);
+                    _renderer = new PlotRenderer();
+                    contentGrid.Children.Add(_renderer);
                 }
-                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Line)
+                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.line)
                 {
-                    //PlotFilterRenderer4 fRenderer = new PlotFilterRenderer4(false);
-                    //(_front.Content as Front).SetContent(fRenderer);
+                    _renderer = new PlotRenderer();
+                    contentGrid.Children.Add(_renderer);
                 }
-                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.Map)
+                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.map)
                 {
-                    //MapFilterRenderer2 fRenderer = new MapFilterRenderer2(false);
-                    //(_front.Content as Front).SetContent(fRenderer);
+                    _renderer = new PlotRenderer();
+                    contentGrid.Children.Add(_renderer);
                 }
                 
                 

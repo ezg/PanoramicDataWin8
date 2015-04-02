@@ -41,8 +41,8 @@ namespace PanoramicData.controller.data.sim
                 _updateIndexCache.Remove(queryModel);
             }
             // determine if new job is even needed (i.e., are all relevant attributeModels set)
-            if ((queryModel.VisualizationType == VisualizationType.Table && queryModel.AttributeFunctionOperationModels.Count > 0) ||
-                (queryModel.VisualizationType != VisualizationType.Table && queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Any() &&  queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Any()))
+            if ((queryModel.VisualizationType == VisualizationType.table && queryModel.AttributeFunctionOperationModels.Count > 0) ||
+                (queryModel.VisualizationType != VisualizationType.table && queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Any() &&  queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Any()))
             {
                 SimJob simJob = new SimJob(queryModel, TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
                 _activeJobs.Add(queryModel, simJob);
@@ -64,7 +64,7 @@ namespace PanoramicData.controller.data.sim
             var oldItems = job.QueryModel.QueryResultModel.QueryResultItemModels;
 
             // do proper updateing if this is a table
-            if (job.QueryModel.VisualizationType == VisualizationType.Table)
+            if (job.QueryModel.VisualizationType == VisualizationType.table)
             {
                 var cache = _updateIndexCache[job.QueryModel];
 
