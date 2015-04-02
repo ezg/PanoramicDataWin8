@@ -322,7 +322,7 @@ namespace PanoramicData.model.data
         {
             // determine axis type
             // grouping or some aggregation
-            if (AttributeOperationModels.Any(aom => aom.IsGrouped || aom.IsBinned) ||
+            if (AttributeOperationModels.Any(aom => aom.GroupMode != GroupMode.None) ||
                 AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None))
             {
                 if (attributeOperationModel.AggregateFunction == AggregateFunction.Avg ||
@@ -340,7 +340,7 @@ namespace PanoramicData.model.data
                         return AxisType.Quantitative;
                     }
                 }
-                else if (AttributeOperationModels.Any(aom => aom.IsBinned && aom.AttributeModel.Equals(attributeOperationModel.AttributeModel)) && attributeOperationModel.AggregateFunction == AggregateFunction.None)
+                else if (AttributeOperationModels.Any(aom => aom.GroupMode == GroupMode.Binned && aom.AttributeModel.Equals(attributeOperationModel.AttributeModel)) && attributeOperationModel.AggregateFunction == AggregateFunction.None)
                 {
                     return AxisType.Ordinal;
                 }
@@ -373,13 +373,13 @@ namespace PanoramicData.model.data
             }
             else
             {
-                if (attributeOperationModel.IsBinned)
+                if (attributeOperationModel.GroupMode == GroupMode.Binned)
                 {
                     return AttributeDataTypeConstants.NVARCHAR;
                 }
 
                 List<AttributeOperationModel> allOperationModels = AttributeOperationModels;
-                bool isGroupingApplied = allOperationModels.Any(aom => aom.IsBinned || aom.IsGrouped);
+                bool isGroupingApplied = allOperationModels.Any(aom => aom.GroupMode != GroupMode.None);
 
                 if (!isGroupingApplied)
                 {
@@ -418,7 +418,7 @@ namespace PanoramicData.model.data
                 else
                 {
                     if (attributeOperationModel.AggregateFunction == AggregateFunction.None &&
-                        allOperationModels.Any(aom => (aom.IsBinned || aom.IsGrouped) && aom.AttributeModel == attributeOperationModel.AttributeModel))
+                        allOperationModels.Any(aom => (aom.GroupMode != GroupMode.None) && aom.AttributeModel == attributeOperationModel.AttributeModel))
                     {
                         return attributeOperationModel.AttributeModel.AttributeDataType;
                     }

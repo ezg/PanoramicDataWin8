@@ -62,7 +62,7 @@ namespace PanoramicData.model.view
                     x.AggregateFunction = AggregateFunction.None;
 
                     AttributeOperationModel bin = new AttributeOperationModel(attributeOperationModel.AttributeModel);
-                    bin.IsBinned = true;
+                    bin.GroupMode = GroupMode.Binned;
 
                     AttributeOperationModel y = new AttributeOperationModel(attributeOperationModel.AttributeModel);
                    // y.AggregateFunction = AggregateFunction.Count;

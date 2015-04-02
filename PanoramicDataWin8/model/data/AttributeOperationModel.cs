@@ -96,29 +96,16 @@ namespace PanoramicData.model.data
             }
         }
 
-        private bool _isBinned = false;
-        public bool IsBinned
+        private GroupMode _groupMode = GroupMode.None;
+        public GroupMode GroupMode
         {
             get
             {
-                return _isBinned;
+                return _groupMode;
             }
             set
             {
-                this.SetProperty(ref _isBinned, value);
-            }
-        }
-
-        private bool _isGrouped = false;
-        public bool IsGrouped
-        {
-            get
-            {
-                return _isGrouped;
-            }
-            set
-            {
-                this.SetProperty(ref _isGrouped, value);
+                this.SetProperty(ref _groupMode, value);
             }
         }
 
@@ -156,9 +143,8 @@ namespace PanoramicData.model.data
                 return
                     aom._aggregateFunction.Equals(this.AggregateFunction) &&
                     aom._attributeModel.Equals(this._attributeModel) &&
-                    aom._isBinned.Equals(this._isBinned) &&
+                    aom._groupMode.Equals(this._groupMode) &&
                     aom._binSize.Equals(this._binSize) &&
-                    aom._isGrouped.Equals(this._isGrouped) &&
                     aom._scaleFunction.Equals(this._scaleFunction) &&
                     aom._sortMode.Equals(this._sortMode);
             }
@@ -170,9 +156,8 @@ namespace PanoramicData.model.data
             int code = 0;
             code ^= this._aggregateFunction.GetHashCode();
             code ^= this._attributeModel.GetHashCode();
-            code ^= this._isBinned.GetHashCode();
+            code ^= this._groupMode.GetHashCode();
             code ^= this._binSize.GetHashCode();
-            code ^= this._isGrouped.GetHashCode();
             code ^= this._scaleFunction.GetHashCode();
             //code ^= this._sortMode.GetHashCode();
             return code;
@@ -182,6 +167,8 @@ namespace PanoramicData.model.data
     public enum AggregateFunction { None, Sum, Count, Min, Max, Avg };
 
     public enum SortMode { Asc, Desc, None }
+
+    public enum GroupMode { None, Distinct, Binned, Year, MonthOfTheYear, DayOfTheMonth, DayOfTheWeek, HourOfTheDay}
 
     public enum ScaleFunction { None, Log, Normalize, RunningTotal, RunningTotalNormalized };
 }

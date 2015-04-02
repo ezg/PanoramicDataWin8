@@ -142,7 +142,7 @@ namespace PanoramicDataWin8.controller.data.sim
 
         private GroupingObject getGroupingObject(Dictionary<AttributeModel, object> item, QueryModel queryModel, object idValue)
         {
-            var groupers = queryModel.AttributeOperationModels.Where(aom => aom.IsGrouped || aom.IsBinned).ToList();
+            var groupers = queryModel.AttributeOperationModels.Where(aom => aom.GroupMode != GroupMode.None).ToList();
             GroupingObject groupingObject = new GroupingObject(
                 groupers.Count() > 0,
                 queryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None),
@@ -150,13 +150,17 @@ namespace PanoramicDataWin8.controller.data.sim
             int count = 0;
             foreach (var attributeModel in item.Keys)
             {
-                if (groupers.Count(avo => avo.IsGrouped && avo.AttributeModel.Equals(attributeModel)) > 0)
+                if (groupers.Count(avo => avo.GroupMode == GroupMode.Distinct && avo.AttributeModel.Equals(attributeModel)) > 0)
                 {
                     groupingObject.Add(count++, item[attributeModel]);
                 }
-                else if (groupers.Count(avo => avo.IsBinned && avo.AttributeModel.Equals(attributeModel)) > 0)
+                else if (groupers.Count(avo => avo.GroupMode == GroupMode.Year && avo.AttributeModel.Equals(attributeModel)) > 0)
                 {
-                    AttributeOperationModel bin = groupers.Where(avo => avo.IsBinned && avo.AttributeModel.Equals(attributeModel)).First();
+                    groupingObject.Add(count++, item[attributeModel]);
+                }
+                else if (groupers.Count(avo => avo.GroupMode == GroupMode.Binned && avo.AttributeModel.Equals(attributeModel)) > 0)
+                {
+                    AttributeOperationModel bin = groupers.Where(avo => avo.GroupMode == GroupMode.Binned && avo.AttributeModel.Equals(attributeModel)).First();
                     if (item[attributeModel] == null)
                     {
                         groupingObject.Add(count++, item[attributeModel]);
@@ -306,8 +310,11 @@ namespace PanoramicDataWin8.controller.data.sim
                 }
                 else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.DATE)
                 {
-                    valueModel.StringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
-                    valueModel.ShortStringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
+                    if (valueModel.Value is DateTime)
+                    {
+                        valueModel.StringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
+                        valueModel.ShortStringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
+                    }
                 }
                 else
                 {

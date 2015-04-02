@@ -18,13 +18,13 @@ namespace PanoramicData.model.data
         public FilterModel(QueryResultItemModel queryResultItemModel)
         {
             ValueComparisons = new Dictionary<AttributeOperationModel, ValueComparison>();
-            foreach (var k in queryResultItemModel.AttributeValues.Keys.Where(aom => aom.IsGrouped || aom.IsBinned))
+            foreach (var k in queryResultItemModel.AttributeValues.Keys.Where(aom => aom.GroupMode != GroupMode.None))
             {
                 ValueComparisons.Add(k, new ValueComparison(queryResultItemModel.AttributeValues[k], Predicate.EQUALS));
             }
             if (ValueComparisons.Count == 0)
             {
-                foreach (var k in queryResultItemModel.AttributeValues.Keys.Where(aom => !(aom.IsGrouped || aom.IsBinned)))
+                foreach (var k in queryResultItemModel.AttributeValues.Keys.Where(aom => aom.GroupMode == GroupMode.None))
                 {
                     ValueComparisons.Add(k, new ValueComparison(queryResultItemModel.AttributeValues[k], Predicate.EQUALS));
                 }
@@ -46,14 +46,14 @@ namespace PanoramicData.model.data
             {
                 compareTo = obj as FilterModel;
                 bool groupComp = compare(
-                    this.ValueComparisons.Where(kvp => kvp.Key.IsBinned || kvp.Key.IsBinned).ToDictionary(t => t.Key, t => t.Value),
-                    compareTo.ValueComparisons.Where(kvp => kvp.Key.IsBinned || kvp.Key.IsBinned).ToDictionary(t => t.Key, t => t.Value));
+                    this.ValueComparisons.Where(kvp => kvp.Key.GroupMode != GroupMode.None).ToDictionary(t => t.Key, t => t.Value),
+                    compareTo.ValueComparisons.Where(kvp => kvp.Key.GroupMode != GroupMode.None).ToDictionary(t => t.Key, t => t.Value));
                 if (!groupComp)
                     return false;
 
                 bool valueComp = compare(
-                    this.ValueComparisons.Where(kvp => !(kvp.Key.IsBinned || kvp.Key.IsBinned)).ToDictionary(t => t.Key, t => t.Value),
-                    compareTo.ValueComparisons.Where(kvp => !(kvp.Key.IsBinned || kvp.Key.IsBinned)).ToDictionary(t => t.Key, t => t.Value));
+                    this.ValueComparisons.Where(kvp => !(kvp.Key.GroupMode != GroupMode.None)).ToDictionary(t => t.Key, t => t.Value),
+                    compareTo.ValueComparisons.Where(kvp => !(kvp.Key.GroupMode != GroupMode.None)).ToDictionary(t => t.Key, t => t.Value));
                 if (!valueComp)
                     return false;
 

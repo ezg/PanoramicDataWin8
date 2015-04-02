@@ -59,7 +59,7 @@ namespace PanoramicDataWin8.controller.data.sim
 
             _isRunning = true;
             int samplesToCheck = -1;
-            _isGrouped = QueryModel.AttributeOperationModels.Any(aom => aom.IsGrouped || aom.IsBinned) || QueryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None);
+            _isGrouped = QueryModel.AttributeOperationModels.Any(aom => aom.GroupMode != GroupMode.None) || QueryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None);
             _isIncremental = !_isGrouped;
 
             if (QueryModel.VisualizationType == VisualizationType.table)
@@ -193,7 +193,14 @@ namespace PanoramicDataWin8.controller.data.sim
                     }
                     else if (yAom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT)
                     {
-                        sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom].Value == null ? null : (double?)(int)sample.AttributeValues[yAom].Value);
+                        if (sample.AttributeValues[yAom].Value is int)
+                        {
+                            sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom].Value == null ? null : (double?)(int)sample.AttributeValues[yAom].Value);
+                        }
+                        else
+                        {
+                            sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom].Value == null ? null : (double?)sample.AttributeValues[yAom].Value);
+                        }
                     }
                 }
                 else if (_yAxisType == AxisType.Time)

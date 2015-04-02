@@ -102,8 +102,165 @@ namespace PanoramicDataWin8.model.view
             if (_visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attachmentItemViewModel.AttributeOperationModel))
             {
                 var aom = attachmentItemViewModel.AttributeOperationModel;
-                if (aom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT ||
-                    aom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT)
+                if (aom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.DATE)
+                {
+                    menuViewModel.NrRows = 1;
+                    // Year
+                    MenuItemViewModel menuItem = new MenuItemViewModel()
+                    {
+                        MenuViewModel = menuViewModel,
+                        Row = 0
+                    };
+                    menuItem.Position = attachmentItemViewModel.Position;
+                    ToggleMenuItemComponentViewModel toggle1 = new ToggleMenuItemComponentViewModel()
+                    {
+                        Label = "year",
+                        IsChecked = aom.GroupMode == GroupMode.Year
+                    };
+                    menuItem.MenuItemComponentViewModel = toggle1;
+                    menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
+                    {
+                        var model = (sender as ToggleMenuItemComponentViewModel);
+                        if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                        {
+                            if (model.IsChecked)
+                            {
+                                foreach (var tg in model.OtherToggles)
+                                {
+                                    tg.IsChecked = false;
+                                }
+                                aom.GroupMode = GroupMode.Year;
+                            }
+                            else
+                            {
+                                aom.GroupMode = GroupMode.None;
+                            }
+                        }
+                    };
+                    menuViewModel.MenuItemViewModels.Add(menuItem);
+
+                    // month
+                    menuItem = new MenuItemViewModel()
+                    {
+                        MenuViewModel = menuViewModel,
+                        Row = 0
+                    };
+                    menuItem.Position = attachmentItemViewModel.Position;
+                    ToggleMenuItemComponentViewModel toggle2 = new ToggleMenuItemComponentViewModel()
+                    {
+                        Label = "month",
+                        IsChecked = aom.GroupMode == GroupMode.MonthOfTheYear
+                    };
+                    menuItem.MenuItemComponentViewModel = toggle2;
+                    menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
+                    {
+                        var model = (sender as ToggleMenuItemComponentViewModel);
+                        if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                        {
+                            if (model.IsChecked)
+                            {
+                                foreach (var tg in model.OtherToggles)
+                                {
+                                    tg.IsChecked = false;
+                                }
+                                aom.GroupMode = GroupMode.MonthOfTheYear;
+                            }
+                            else
+                            {
+                                aom.GroupMode = GroupMode.None;
+                            }
+                        }
+                    };
+                    menuViewModel.MenuItemViewModels.Add(menuItem);
+
+                    // day
+                    menuItem = new MenuItemViewModel()
+                    {
+                        MenuViewModel = menuViewModel,
+                        Row = 0
+                    };
+                    menuItem.Position = attachmentItemViewModel.Position;
+                    ToggleMenuItemComponentViewModel toggle3 = new ToggleMenuItemComponentViewModel()
+                    {
+                        Label = "day",
+                        IsChecked = aom.GroupMode == GroupMode.DayOfTheMonth
+                    };
+                    menuItem.MenuItemComponentViewModel = toggle3;
+                    menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
+                    {
+                        var model = (sender as ToggleMenuItemComponentViewModel);
+                        if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                        {
+                            if (model.IsChecked)
+                            {
+                                foreach (var tg in model.OtherToggles)
+                                {
+                                    tg.IsChecked = false;
+                                }
+                                aom.GroupMode = GroupMode.DayOfTheMonth;
+                            }
+                            else
+                            {
+                                aom.GroupMode = GroupMode.None;
+                            }
+                        }
+                    };
+                    menuViewModel.MenuItemViewModels.Add(menuItem);
+
+                    // week day
+                    menuItem = new MenuItemViewModel()
+                    {
+                        MenuViewModel = menuViewModel,
+                        Row = 0
+                    };
+                    menuItem.Position = attachmentItemViewModel.Position;
+                    ToggleMenuItemComponentViewModel toggle4 = new ToggleMenuItemComponentViewModel()
+                    {
+                        Label = "week day",
+                        IsChecked = aom.GroupMode == GroupMode.DayOfTheWeek
+                    };
+                    menuItem.MenuItemComponentViewModel = toggle4;
+                    menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
+                    {
+                        var model = (sender as ToggleMenuItemComponentViewModel);
+                        if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                        {
+                            if (model.IsChecked)
+                            {
+                                foreach (var tg in model.OtherToggles)
+                                {
+                                    tg.IsChecked = false;
+                                }
+                                aom.GroupMode = GroupMode.DayOfTheMonth;
+                            }
+                            else
+                            {
+                                aom.GroupMode = GroupMode.None;
+                            }
+                        }
+                    };
+                    menuViewModel.MenuItemViewModels.Add(menuItem);
+
+                    // set toogle groups
+                    toggle1.OtherToggles.Add(toggle2);
+                    toggle1.OtherToggles.Add(toggle3);
+                    toggle1.OtherToggles.Add(toggle4);
+                    
+                    toggle2.OtherToggles.Add(toggle1);
+                    toggle2.OtherToggles.Add(toggle3);
+                    toggle2.OtherToggles.Add(toggle4);
+                    
+                    toggle3.OtherToggles.Add(toggle2);
+                    toggle3.OtherToggles.Add(toggle1);
+                    toggle3.OtherToggles.Add(toggle4);
+
+                    toggle4.OtherToggles.Add(toggle2);
+                    toggle4.OtherToggles.Add(toggle1);
+                    toggle4.OtherToggles.Add(toggle3);
+
+                }
+                else if (aom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT ||
+                         aom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT)
                 {
                     menuViewModel.NrRows = 2;
 
@@ -117,7 +274,7 @@ namespace PanoramicDataWin8.model.view
                     ToggleMenuItemComponentViewModel toggle1 = new ToggleMenuItemComponentViewModel()
                     {
                         Label = "distinct",
-                        IsChecked = aom.IsGrouped
+                        IsChecked = aom.GroupMode == GroupMode.Distinct
                     };
                     menuItem.MenuItemComponentViewModel = toggle1;
                     menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
@@ -127,7 +284,7 @@ namespace PanoramicDataWin8.model.view
                         {
                             if (model.IsChecked)
                             {
-                                aom.IsGrouped = true;
+                                aom.GroupMode = GroupMode.Distinct;
                                 foreach (var tg in model.OtherToggles)
                                 {
                                     tg.IsChecked = false;
@@ -135,7 +292,7 @@ namespace PanoramicDataWin8.model.view
                             }
                             else
                             {
-                                aom.IsGrouped = false;
+                                aom.GroupMode = GroupMode.None;
                             }
                         }
                     };
@@ -151,9 +308,9 @@ namespace PanoramicDataWin8.model.view
                     ToggleMenuItemComponentViewModel toggle2 = new ToggleMenuItemComponentViewModel()
                     {
                         Label = "binned",
-                        IsChecked = aom.IsBinned
+                        IsChecked = aom.GroupMode == GroupMode.Binned
                     };
-                    menuItem.MenuItemComponentViewModel = toggle2; 
+                    menuItem.MenuItemComponentViewModel = toggle2;
                     menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
                     {
                         var model = (sender as ToggleMenuItemComponentViewModel);
@@ -161,7 +318,7 @@ namespace PanoramicDataWin8.model.view
                         {
                             if (model.IsChecked)
                             {
-                                aom.IsBinned = true;
+                                aom.GroupMode = GroupMode.Binned;
                                 foreach (var tg in model.OtherToggles)
                                 {
                                     tg.IsChecked = false;
@@ -169,7 +326,7 @@ namespace PanoramicDataWin8.model.view
                             }
                             else
                             {
-                                aom.IsBinned = false;
+                                aom.GroupMode = GroupMode.None;
                             }
                         }
                     };
@@ -336,7 +493,14 @@ namespace PanoramicDataWin8.model.view
             // handle added
             header.AddedTriggered = (attributeOperationModel) =>
             {
-                attributeOperationModel.IsGrouped = true;
+                if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.DATE)
+                {
+                    attributeOperationModel.GroupMode = GroupMode.Year;
+                }
+                else
+                {
+                    attributeOperationModel.GroupMode = GroupMode.Distinct;
+                }
                 QueryModel queryModel = this.VisualizationViewModel.QueryModel;
                 if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attributeOperationModel))
                 {

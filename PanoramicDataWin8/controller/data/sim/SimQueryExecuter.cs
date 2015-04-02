@@ -277,16 +277,16 @@ namespace PanoramicData.controller.data.sim
                 }
                 else if (attributeOperationModel.AggregateFunction == AggregateFunction.None)
                 {
-                    if (queryModel.AttributeOperationModels.Any(aom => aom.IsGrouped || aom.IsBinned))
+                    if (queryModel.AttributeOperationModels.Any(aom => aom.GroupMode != GroupMode.None))
                     {
-                        if (queryModel.AttributeOperationModels.Where(aom => aom.IsGrouped || aom.IsBinned).Any(aom => aom.AttributeModel.Equals(attributeOperationModel.AttributeModel)))
+                        if (queryModel.AttributeOperationModels.Where(aom => aom.GroupMode != GroupMode.None).Any(aom => aom.AttributeModel.Equals(attributeOperationModel.AttributeModel)))
                         {
-                            AttributeOperationModel grouper = queryModel.AttributeOperationModels.Where(aom => aom.IsGrouped || aom.IsBinned).Where(aom => aom.AttributeModel.Equals(attributeOperationModel.AttributeModel)).First();
-                            if (grouper.IsGrouped)
+                            AttributeOperationModel grouper = queryModel.AttributeOperationModels.Where(aom => aom.GroupMode != GroupMode.None).Where(aom => aom.AttributeModel.Equals(attributeOperationModel.AttributeModel)).First();
+                            if (grouper.GroupMode == GroupMode.Distinct)
                             {
                                 rawValue = value;
                             }
-                            else if (grouper.IsBinned)
+                            else if (grouper.GroupMode == GroupMode.Binned)
                             {
                                 if (value != null)
                                 {
@@ -300,6 +300,13 @@ namespace PanoramicData.controller.data.sim
                                     rawValue = null;
                                     binned = true;
                                     binSize = grouper.BinSize;
+                                }
+                            }
+                            else if (grouper.GroupMode == GroupMode.Year)
+                            {
+                                if (value != null)
+                                {
+                                    rawValue = ((DateTime)value).Year;
                                 }
                             }
                         }

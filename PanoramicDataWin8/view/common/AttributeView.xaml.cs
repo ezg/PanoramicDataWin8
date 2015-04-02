@@ -182,7 +182,10 @@ namespace PanoramicDataWin8.view.common
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
                 (DataContext as AttributeViewModel).FireDropped(bounds, AttributeViewModelEventArgType.Default,
-                    new AttributeOperationModel((DataContext as AttributeViewModel).AttributeOperationModel.AttributeModel));
+                    new AttributeOperationModel((DataContext as AttributeViewModel).AttributeOperationModel.AttributeModel)
+                    {
+                        AggregateFunction = (DataContext as AttributeViewModel).AttributeOperationModel.AggregateFunction
+                    });
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
