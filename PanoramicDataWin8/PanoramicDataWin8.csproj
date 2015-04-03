@@ -120,6 +120,7 @@
     <Compile Include="controller\data\QueryExecuter.cs" />
     <Compile Include="controller\data\sim\Binner.cs" />
     <Compile Include="controller\data\sim\BinStructure.cs" />
+    <Compile Include="controller\data\sim\IterativeCalculation.cs" />
     <Compile Include="controller\data\sim\Scale.cs" />
     <Compile Include="controller\data\sim\SimDataProvider.cs" />
     <Compile Include="controller\data\sim\SimJob.cs" />
@@ -178,6 +179,7 @@
     <Compile Include="utils\Helpers.cs" />
     <Compile Include="utils\LABColor.cs" />
     <Compile Include="utils\MathUtil.cs" />
+    <Compile Include="utils\NumberUtil.cs" />
     <Compile Include="utils\PointerManager.cs" />
     <Compile Include="utils\SimpleValueConverter.cs" />
     <Compile Include="utils\VisualTreeHelperExtensions.cs" />

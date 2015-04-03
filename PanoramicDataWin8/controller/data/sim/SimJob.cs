@@ -154,72 +154,32 @@ namespace PanoramicDataWin8.controller.data.sim
             var yAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
             foreach (var sample in samples)
             {
-                // x
-                if (_xAxisType == AxisType.Quantitative)
-                {
-                    if (xAom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT)
-                    {
-                        sample.VisualizationResultValues.Add(VisualizationResult.X, (double?)sample.AttributeValues[xAom].Value);
-                    }
-                    else if (xAom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT)
-                    {
-                        sample.VisualizationResultValues.Add(VisualizationResult.X, sample.AttributeValues[xAom].Value == null ? null : (double?)(int)sample.AttributeValues[xAom].Value);
-                    }
-                }
-                else if (_xAxisType == AxisType.Time)
-                {
-                    sample.VisualizationResultValues.Add(VisualizationResult.X, sample.AttributeValues[xAom].Value == null ? null : (double?)((DateTime)sample.AttributeValues[xAom].Value).TimeOfDay.Ticks);
-                }
-                else if (_xAxisType == AxisType.Date)
-                {
-                    sample.VisualizationResultValues.Add(VisualizationResult.X, sample.AttributeValues[xAom].Value == null ? null : (double?)((DateTime)sample.AttributeValues[xAom].Value).Ticks);
-                }
-                else
-                {
-                    var queryValue = sample.AttributeValues[xAom];
-                    if (!_xUniqueValues.ContainsKey(queryValue.StringValue))
-                    {
-                        _xUniqueValues.Add(queryValue.StringValue, _xUniqueValues.Count);
-                    }
-                    sample.VisualizationResultValues.Add(VisualizationResult.X, _xUniqueValues[queryValue.StringValue]);
-                }
+                sample.VisualizationResultValues.Add(VisualizationResult.X, getVisualizationValue(_xAxisType, sample.AttributeValues[xAom], xAom, _xUniqueValues));
+                sample.VisualizationResultValues.Add(VisualizationResult.Y, getVisualizationValue(_yAxisType, sample.AttributeValues[yAom], yAom, _yUniqueValues));
+            }
+        }
 
-                // y
-                if (_yAxisType == AxisType.Quantitative)
+        private double? getVisualizationValue(AxisType axisType, QueryResultItemValueModel itemValue, AttributeOperationModel attributeOperationModel, Dictionary<object, double> uniqueValues) 
+        {
+            if (axisType == AxisType.Quantitative)
+            {
+                return itemValue.Value == null ? null : (double?)double.Parse(itemValue.Value.ToString());
+            }
+            else if (axisType == AxisType.Time)
+            {
+                return itemValue.Value == null ? null : (double?)((DateTime) itemValue.Value).TimeOfDay.Ticks;
+            }
+            else if (axisType == AxisType.Date)
+            {
+                return itemValue == null ? null : (double?)((DateTime)itemValue.Value).Ticks;
+            }
+            else
+            {
+                if (!uniqueValues.ContainsKey(itemValue.StringValue))
                 {
-                    if (yAom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT)
-                    {
-                        sample.VisualizationResultValues.Add(VisualizationResult.Y, (double?)sample.AttributeValues[yAom].Value);
-                    }
-                    else if (yAom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT)
-                    {
-                        if (sample.AttributeValues[yAom].Value is int)
-                        {
-                            sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom].Value == null ? null : (double?)(int)sample.AttributeValues[yAom].Value);
-                        }
-                        else
-                        {
-                            sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom].Value == null ? null : (double?)sample.AttributeValues[yAom].Value);
-                        }
-                    }
+                    uniqueValues.Add(itemValue.StringValue, uniqueValues.Count);
                 }
-                else if (_yAxisType == AxisType.Time)
-                {
-                    sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom].Value == null ? null : (double?)((DateTime)sample.AttributeValues[yAom].Value).TimeOfDay.Ticks);
-                }
-                else if (_yAxisType == AxisType.Date)
-                {
-                    sample.VisualizationResultValues.Add(VisualizationResult.Y, sample.AttributeValues[yAom].Value == null ? null : (double?)((DateTime)sample.AttributeValues[yAom].Value).Ticks);
-                }
-                else
-                {
-                    var queryValue = sample.AttributeValues[yAom];
-                    if (!_yUniqueValues.ContainsKey(queryValue.StringValue))
-                    {
-                        _yUniqueValues.Add(queryValue.StringValue, _yUniqueValues.Count);
-                    }
-                    sample.VisualizationResultValues.Add(VisualizationResult.Y,_yUniqueValues[queryValue.StringValue]);
-                }
+                return uniqueValues[itemValue.StringValue];
             }
         }
 

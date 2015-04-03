@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.controller.data.sim
         private int _nrSamplesToCheck = -1;
         private StreamReader _streamReader = null;
         private BasicProperties _dataFileProperties = null;
-        private Dictionary<GroupingObject, IterativeCalculationObject> _iterativeCaluclationObjects = new Dictionary<GroupingObject, IterativeCalculationObject>();
+        private Dictionary<GroupingObject, IterativeCalculation> _iterativeCaluclationObjects = new Dictionary<GroupingObject, IterativeCalculation>();
 
         public bool IsInitialized { get; set; }
 
@@ -77,14 +77,16 @@ namespace PanoramicDataWin8.controller.data.sim
                 sw.Start();
                 List<Dictionary<AttributeModel, object>> data = await getDataFromFile(sampleSize);
                 Debug.WriteLine("From File Time: " + sw.ElapsedMilliseconds);
+
+                // group and update calculations (potential aggregates)
                 foreach (Dictionary<AttributeModel, object> row in data)
                 {
                     GroupingObject groupingObject = getGroupingObject(row, _queryModel, row[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel]);
                     if (!_iterativeCaluclationObjects.ContainsKey(groupingObject))
                     {
-                        _iterativeCaluclationObjects.Add(groupingObject, new IterativeCalculationObject());
+                        _iterativeCaluclationObjects.Add(groupingObject, new IterativeCalculation());
                     }
-                    IterativeCalculationObject iterativeCalculation = _iterativeCaluclationObjects[groupingObject];
+                    IterativeCalculation iterativeCalculation = _iterativeCaluclationObjects[groupingObject];
                     iterativeCalculation.Update(row, _queryModel);
                 }
 
@@ -100,11 +102,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     {
                         if (iterativeCalculation.AggregateValues.ContainsKey(attributeOperationModel))
                         {
-                            QueryResultItemValueModel valueModel = fromRaw(
-                                attributeOperationModel,
-                                iterativeCalculation.AggregateValues[attributeOperationModel],
-                                iterativeCalculation.IsBinned[attributeOperationModel],
-                                iterativeCalculation.BinSize[attributeOperationModel]);
+                            QueryResultItemValueModel valueModel = iterativeCalculation.GetQueryResultItemValueModel(attributeOperationModel);
                             if (!item.AttributeValues.ContainsKey(attributeOperationModel))
                             {
                                 item.AttributeValues.Add(attributeOperationModel, valueModel);
@@ -255,73 +253,6 @@ namespace PanoramicDataWin8.controller.data.sim
             }
 
             return data;
-        }
-
-        private QueryResultItemValueModel fromRaw(AttributeOperationModel attributeOperationModel, object value, bool binned, double binSize)
-        {
-            QueryResultItemValueModel valueModel = new QueryResultItemValueModel();
-            if (value == null)
-            {
-                valueModel.Value = null;
-                valueModel.StringValue = "";
-                valueModel.ShortStringValue = "";
-            }
-            else
-            {
-                double d = 0.0;
-                valueModel.Value = value;
-                if (double.TryParse(value.ToString(), out d))
-                {
-                    valueModel.StringValue = valueModel.Value.ToString().Contains(".") ? d.ToString("N") : valueModel.Value.ToString();
-                    if (binned)
-                    {
-                        valueModel.StringValue = d + " - " + (d + binSize);
-                    }
-                    else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.BIT)
-                    {
-                        if (d == 1.0)
-                        {
-                            valueModel.StringValue = "True";
-                        }
-                        else if (d == 0.0)
-                        {
-                            valueModel.StringValue = "False";
-                        }
-                    }
-                }
-                else
-                {
-                    valueModel.StringValue = valueModel.Value.ToString();
-                }
-                if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.GEOGRAPHY)
-                {
-                    string toSplit = valueModel.StringValue;
-                    if (toSplit.Contains("(") && toSplit.Contains(")"))
-                    {
-                        toSplit = toSplit.Substring(toSplit.IndexOf("("));
-                        toSplit = toSplit.Substring(1, toSplit.IndexOf(")") - 1);
-                    }
-                    valueModel.ShortStringValue = valueModel.StringValue.Replace("(" + toSplit + ")", "");
-                }
-                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.TIME)
-                {
-                    valueModel.StringValue = ((DateTime)valueModel.Value).TimeOfDay.ToString();
-                    valueModel.ShortStringValue = ((DateTime)valueModel.Value).TimeOfDay.ToString();
-                }
-                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.DATE)
-                {
-                    if (valueModel.Value is DateTime)
-                    {
-                        valueModel.StringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
-                        valueModel.ShortStringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
-                    }
-                }
-                else
-                {
-                    valueModel.ShortStringValue = valueModel.StringValue.TrimTo(300);
-                }
-            }
-            return valueModel;
         }
     }
 }

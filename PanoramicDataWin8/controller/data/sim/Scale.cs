@@ -365,5 +365,10 @@ namespace PanoramicDataWin8.controller.data.sim
 
             return ret;
         }
+
+        public override string GetLabel(double value)
+        {
+            return (Math.Floor(value / _step) * _step).ToString();
+        }
     }
 }
