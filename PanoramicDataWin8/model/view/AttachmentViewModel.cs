@@ -99,7 +99,7 @@ namespace PanoramicDataWin8.model.view
             };
 
             // is grouping attributeOperationModel
-            if (_visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attachmentItemViewModel.AttributeOperationModel))
+            /*if (_visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attachmentItemViewModel.AttributeOperationModel))
             {
                 var aom = attachmentItemViewModel.AttributeOperationModel;
                 if (aom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.DATE)
@@ -231,7 +231,7 @@ namespace PanoramicDataWin8.model.view
                                 {
                                     tg.IsChecked = false;
                                 }
-                                aom.GroupMode = GroupMode.DayOfTheMonth;
+                                aom.GroupMode = GroupMode.DayOfTheWeek;
                             }
                             else
                             {
@@ -362,7 +362,7 @@ namespace PanoramicDataWin8.model.view
                     };
                     menuViewModel.MenuItemViewModels.Add(menuItem);
                 }
-            }
+            }*/
             
 
             return menuViewModel;
@@ -476,12 +476,73 @@ namespace PanoramicDataWin8.model.view
 
         void createDbBottom()
         {
+            // intensity
+            var intensityHeader = createIntensityAttachmentHeader();
+            AttachmentHeaderViewModels.Add(intensityHeader);
+
+            // grouping
+            var groupHeader = createGroupingAttachmentHeader();
+            AttachmentHeaderViewModels.Add(groupHeader);
+        }
+
+        AttachmentHeaderViewModel createIntensityAttachmentHeader()
+        {
+            var groupHeader = createAttributeFunctionAttachmentHeader(AttributeFunction.Intensity);
+
+            // handle added
+            groupHeader.AddedTriggered = (attributeOperationModel) =>
+            {
+                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
+                if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Intensity).Contains(attributeOperationModel))
+                {
+                    queryModel.AddFunctionAttributeOperationModel(AttributeFunction.Intensity, attributeOperationModel);
+                }
+            };
+            // handle removed
+            groupHeader.RemovedTriggered = (attachmentItemViewModel) =>
+            {
+                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
+                if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Intensity).Contains(attachmentItemViewModel.AttributeOperationModel))
+                {
+                    queryModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Intensity, attachmentItemViewModel.AttributeOperationModel);
+                }
+            };
+            return groupHeader;
+        }
+
+        AttachmentHeaderViewModel createGroupingAttachmentHeader()
+        {
+             var groupHeader = createAttributeFunctionAttachmentHeader(AttributeFunction.Group);
+
+            // handle added
+            groupHeader.AddedTriggered = (attributeOperationModel) =>
+            {
+                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
+                if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attributeOperationModel))
+                {
+                    queryModel.AddFunctionAttributeOperationModel(AttributeFunction.Group, attributeOperationModel);
+                }
+            };
+            // handle removed
+            groupHeader.RemovedTriggered = (attachmentItemViewModel) =>
+            {
+                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
+                if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attachmentItemViewModel.AttributeOperationModel))
+                {
+                    queryModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Group, attachmentItemViewModel.AttributeOperationModel);
+                }
+            };
+            return groupHeader;
+        }
+
+        AttachmentHeaderViewModel createAttributeFunctionAttachmentHeader(AttributeFunction attributeFunction)
+        {
             AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
             {
-                AttributeFunction = AttributeFunction.Group
+                AttributeFunction = attributeFunction
             };
             // initialize items
-            foreach (var item in _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group))
+            foreach (var item in _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(attributeFunction))
             {
                 header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                 {
@@ -490,43 +551,14 @@ namespace PanoramicDataWin8.model.view
                 });
             }
 
-            // handle added
-            header.AddedTriggered = (attributeOperationModel) =>
-            {
-                if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.DATE)
-                {
-                    attributeOperationModel.GroupMode = GroupMode.Year;
-                }
-                else
-                {
-                    attributeOperationModel.GroupMode = GroupMode.Distinct;
-                }
-                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attributeOperationModel))
-                {
-                    queryModel.AddFunctionAttributeOperationModel(AttributeFunction.Group, attributeOperationModel);
-                }
-            };
-            // handle removed
-            header.RemovedTriggered = (attachmentItemViewModel) =>
-            {
-                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attachmentItemViewModel.AttributeOperationModel))
-                {
-                    queryModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Group, attachmentItemViewModel.AttributeOperationModel);
-                }
-            };
-
             header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
             {
                 AttachmentHeaderViewModel = header,
-                //Size = new Vec(25,25),
-                //TargetSize = new Vec(25, 25),
-                Label = "group"
+                Label = attributeFunction.ToString().ToLower()
             };
 
             // handle updates
-            _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).CollectionChanged += (sender, args) =>
+            _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(attributeFunction).CollectionChanged += (sender, args) =>
             {
                 if (args.OldItems != null)
                 {
@@ -546,13 +578,13 @@ namespace PanoramicDataWin8.model.view
                         {
                             AttributeOperationModel = item as AttributeOperationModel,
                             SubLabel = (item as AttributeOperationModel).AttributeModel.Name,
-                            MainLabel = "group",
+                            MainLabel = attributeFunction.ToString().ToLower(),
                             AttachmentHeaderViewModel = header
                         });
                     }
                 }
             };
-            AttachmentHeaderViewModels.Add(header);
+            return header;
         }
     }
 

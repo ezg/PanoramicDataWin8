@@ -24,6 +24,7 @@ using Windows.ApplicationModel;
 using Windows.Storage;
 using PanoramicData.utils;
 using Windows.Storage.FileProperties;
+using System.Globalization;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
@@ -35,7 +36,6 @@ namespace PanoramicDataWin8.controller.data.sim
         private int _nrSamplesToCheck = -1;
         private StreamReader _streamReader = null;
         private BasicProperties _dataFileProperties = null;
-        private Dictionary<GroupingObject, IterativeCalculation> _iterativeCaluclationObjects = new Dictionary<GroupingObject, IterativeCalculation>();
 
         public bool IsInitialized { get; set; }
 
@@ -64,56 +64,21 @@ namespace PanoramicDataWin8.controller.data.sim
             _streamReader = new StreamReader(await file.OpenStreamForReadAsync());
 
             _nrProcessedSamples = 0;
-            _iterativeCaluclationObjects.Clear();
         }
 
-        public async Task<List<QueryResultItemModel>> GetSampleQueryResultItemModels(int sampleSize)
+        public async Task<List<DataRow>> GetSampleDataRows(int sampleSize)
         {
             if (_nrProcessedSamples < GetNrTotalSamples())
             {
-                List<QueryResultItemModel> returnList = new List<QueryResultItemModel>();
-
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
+                
                 List<Dictionary<AttributeModel, object>> data = await getDataFromFile(sampleSize);
-                Debug.WriteLine("From File Time: " + sw.ElapsedMilliseconds);
-
-                // group and update calculations (potential aggregates)
-                foreach (Dictionary<AttributeModel, object> row in data)
-                {
-                    GroupingObject groupingObject = getGroupingObject(row, _queryModel, row[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel]);
-                    if (!_iterativeCaluclationObjects.ContainsKey(groupingObject))
-                    {
-                        _iterativeCaluclationObjects.Add(groupingObject, new IterativeCalculation());
-                    }
-                    IterativeCalculation iterativeCalculation = _iterativeCaluclationObjects[groupingObject];
-                    iterativeCalculation.Update(row, _queryModel);
-                }
-
-                foreach (GroupingObject groupingObject in _iterativeCaluclationObjects.Keys)
-                {
-                    var attributeOperationModels = _queryModel.AttributeOperationModels;
-                    var iterativeCalculation = _iterativeCaluclationObjects[groupingObject];
-                    QueryResultItemModel item = new QueryResultItemModel()
-                    {
-                        GroupingObject = groupingObject
-                    };
-                    foreach (var attributeOperationModel in attributeOperationModels)
-                    {
-                        if (iterativeCalculation.AggregateValues.ContainsKey(attributeOperationModel))
-                        {
-                            QueryResultItemValueModel valueModel = iterativeCalculation.GetQueryResultItemValueModel(attributeOperationModel);
-                            if (!item.AttributeValues.ContainsKey(attributeOperationModel))
-                            {
-                                item.AttributeValues.Add(attributeOperationModel, valueModel);
-                            }
-                        }
-                    }
-                    returnList.Add(item);
-                }
+                List<DataRow> returnList = data.Select(d => new DataRow() { Entries = d }).ToList();
                 _nrProcessedSamples += sampleSize;
-                var ordered = returnList.OrderBy(item => item, new ItemComparer(_queryModel));
-                return ordered.ToList();
+
+                Debug.WriteLine("From File Time: " + sw.ElapsedMilliseconds);
+                return returnList;
             }
             else
             {
@@ -138,39 +103,54 @@ namespace PanoramicDataWin8.controller.data.sim
             return Math.Min(1.0, (double)_nrProcessedSamples / (double)GetNrTotalSamples());
         }
 
-        private GroupingObject getGroupingObject(Dictionary<AttributeModel, object> item, QueryModel queryModel, object idValue)
+        public QueryResultItemValueModel GetQueryResultItemValueModel(AttributeOperationModel attributeOperationModel, Dictionary<AttributeModel, object> valueDict)
         {
-            var groupers = queryModel.AttributeOperationModels.Where(aom => aom.GroupMode != GroupMode.None).ToList();
-            GroupingObject groupingObject = new GroupingObject(
-                groupers.Count() > 0,
-                queryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None),
-                idValue);
-            int count = 0;
-            foreach (var attributeModel in item.Keys)
+            QueryResultItemValueModel valueModel = new QueryResultItemValueModel();
+            if (valueDict[attributeOperationModel.AttributeModel] == null)
             {
-                if (groupers.Count(avo => avo.GroupMode == GroupMode.Distinct && avo.AttributeModel.Equals(attributeModel)) > 0)
-                {
-                    groupingObject.Add(count++, item[attributeModel]);
-                }
-                else if (groupers.Count(avo => avo.GroupMode == GroupMode.Year && avo.AttributeModel.Equals(attributeModel)) > 0)
-                {
-                    groupingObject.Add(count++, item[attributeModel]);
-                }
-                else if (groupers.Count(avo => avo.GroupMode == GroupMode.Binned && avo.AttributeModel.Equals(attributeModel)) > 0)
-                {
-                    AttributeOperationModel bin = groupers.Where(avo => avo.GroupMode == GroupMode.Binned && avo.AttributeModel.Equals(attributeModel)).First();
-                    if (item[attributeModel] == null)
-                    {
-                        groupingObject.Add(count++, item[attributeModel]);
-                    }
-                    else
-                    {
-                        double d = double.Parse(item[attributeModel].ToString());
-                        groupingObject.Add(count++, Math.Floor(d / bin.BinSize) * bin.BinSize);
-                    }
-                }
+                valueModel.Value = null;
+                valueModel.StringValue = "";
+                valueModel.ShortStringValue = "";
             }
-            return groupingObject;
+            else
+            {
+                double d = 0.0;
+                valueModel.Value = valueDict[attributeOperationModel.AttributeModel];
+                valueModel.StringValue = valueModel.Value.ToString();
+
+                if (double.TryParse(valueModel.Value.ToString(), out d))
+                {
+                    valueModel.StringValue = valueModel.Value.ToString().Contains(".") ? d.ToString("N") : valueModel.Value.ToString();
+                }
+                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.GEOGRAPHY)
+                {
+                    string toSplit = valueModel.StringValue;
+                    if (toSplit.Contains("(") && toSplit.Contains(")"))
+                    {
+                        toSplit = toSplit.Substring(toSplit.IndexOf("("));
+                        toSplit = toSplit.Substring(1, toSplit.IndexOf(")") - 1);
+                    }
+                    valueModel.ShortStringValue = valueModel.StringValue.Replace("(" + toSplit + ")", "");
+                }
+                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.TIME)
+                {
+                    if (valueModel.Value is DateTime)
+                    {
+                        valueModel.StringValue = ((DateTime)valueModel.Value).TimeOfDay.ToString();
+                        valueModel.ShortStringValue = ((DateTime)valueModel.Value).TimeOfDay.ToString();
+                    }
+                }
+                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.DATE)
+                {
+                    if (valueModel.Value is DateTime)
+                    {
+                        valueModel.StringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
+                        valueModel.ShortStringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
+                    }
+                }
+                valueModel.ShortStringValue = valueModel.StringValue.TrimTo(300);
+            }
+            return valueModel;
         }
 
         private async Task<List<Dictionary<AttributeModel, object>>> getDataFromFile(int sampleSize)
@@ -253,6 +233,50 @@ namespace PanoramicDataWin8.controller.data.sim
             }
 
             return data;
+        }
+    }
+
+    public class DataRow
+    {
+        private  Dictionary<AttributeModel, object> _entries = null;
+        public Dictionary<AttributeModel, object> Entries
+        {
+            get
+            {
+                return _entries;
+            }
+            set
+            {
+                _entries = value;
+            }
+        }
+
+        private Dictionary<VisualizationResult, double?> _visualizationResultValues = new Dictionary<VisualizationResult, double?>();
+        public Dictionary<VisualizationResult, double?> VisualizationResultValues
+        {
+            get
+            {
+                return _visualizationResultValues;
+            }
+            set
+            {
+                _visualizationResultValues = value;
+            }
+        }
+
+        public double? XValue
+        {
+            get
+            {
+                return VisualizationResultValues[VisualizationResult.X];
+            }
+        }
+        public double? YValue
+        {
+            get
+            {
+                return VisualizationResultValues[VisualizationResult.Y];
+            }
         }
     }
 }

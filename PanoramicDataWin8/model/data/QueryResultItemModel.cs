@@ -29,34 +29,6 @@ namespace PanoramicData.model.data
             }
         }
 
-        private Dictionary<VisualizationResult, double?> _visualizationResultValues = new Dictionary<VisualizationResult, double?>();
-        public Dictionary<VisualizationResult, double?> VisualizationResultValues
-        {
-            get
-            {
-                return _visualizationResultValues;
-            }
-            set
-            {
-                this.SetProperty(ref _visualizationResultValues, value);
-            }
-        }
-
-        public double? XValue
-        {
-            get
-            {
-                return VisualizationResultValues[VisualizationResult.X];
-            }
-        }
-        public double? YValue
-        {
-            get
-            {
-                return VisualizationResultValues[VisualizationResult.Y];
-            }
-        }
-
         private Dictionary<AttributeOperationModel, QueryResultItemValueModel> _attributeValues = new Dictionary<AttributeOperationModel, QueryResultItemValueModel>();
         public Dictionary<AttributeOperationModel, QueryResultItemValueModel> AttributeValues
         {
@@ -142,7 +114,6 @@ namespace PanoramicData.model.data
             this.GroupingObject = updateTo.GroupingObject;
             this.AttributeValues = updateTo.AttributeValues;
             this.RowNumber = updateTo.RowNumber;
-            this.VisualizationResultValues = updateTo.VisualizationResultValues;
             this.Bin = updateTo.Bin;
         }
     }

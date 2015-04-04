@@ -31,10 +31,9 @@ namespace PanoramicDataWin8.controller.data.sim
         private SimDataProvider _simDataProvider = null;
         private bool _isRunning = false;
         private int _sampleSize = 0;
-        private bool _isGrouped = false;
         private bool _isIncremental = false;
         private TimeSpan _throttle = TimeSpan.FromMilliseconds(0);
-        private Binner _binner = new Binner();
+        private DataBinner _binner = new DataBinner();
         private Object _lock = new Object();
         private AxisType _xAxisType = AxisType.Nominal;
         private AxisType _yAxisType = AxisType.Nominal;
@@ -59,13 +58,11 @@ namespace PanoramicDataWin8.controller.data.sim
 
             _isRunning = true;
             int samplesToCheck = -1;
-            _isGrouped = QueryModel.AttributeOperationModels.Any(aom => aom.GroupMode != GroupMode.None) || QueryModel.AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None);
-            _isIncremental = !_isGrouped;
 
             if (QueryModel.VisualizationType == VisualizationType.table)
             {
                 _binner = null;
-                samplesToCheck = !_isGrouped ? 1000 : -1;
+                samplesToCheck = 1000;
             }
             else
             {
@@ -76,7 +73,9 @@ namespace PanoramicDataWin8.controller.data.sim
                 QueryModel.QueryResultModel.XAxisType = _xAxisType;
                 QueryModel.QueryResultModel.YAxisType = _yAxisType;
 
-                _binner = new Binner()
+                _isIncremental = xAom.AggregateFunction == AggregateFunction.None && yAom.AggregateFunction == AggregateFunction.None;
+
+                _binner = new DataBinner()
                 {
                     NrOfXBins = MainViewController.Instance.MainModel.NrOfXBins,
                     NrOfYBins = MainViewController.Instance.MainModel.NrOfYBins,
@@ -105,8 +104,9 @@ namespace PanoramicDataWin8.controller.data.sim
                 await _simDataProvider.StartSampling();
             }
 
-            List<QueryResultItemModel> samples = await _simDataProvider.GetSampleQueryResultItemModels(_sampleSize);
-            while (samples != null && _isRunning)
+            List<DataRow> dataRows = await _simDataProvider.GetSampleDataRows(_sampleSize);
+            List<QueryResultItemModel> queryResultItemModels = new List<QueryResultItemModel>();
+            while (dataRows != null && _isRunning)
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
@@ -117,26 +117,26 @@ namespace PanoramicDataWin8.controller.data.sim
                         _xUniqueValues.Clear();
                         _yUniqueValues.Clear();
                     }
-                    setVisualizationValues(samples);
+                    setVisualizationValues(dataRows);
                     if (_binner != null)
                     {
-                        _binner.ProcessStep(samples);
+                        _binner.ProcessStep(dataRows);
                     }
-                    samples = convertBinsToQueryResultItemModels(_binner.LastBinStructure);
+                    queryResultItemModels = convertBinsToQueryResultItemModels(_binner.DataBinStructure);
                 }
 
                 if (_isRunning)
                 {
                     await fireUpdated(
-                        samples,
+                        queryResultItemModels,
                         _simDataProvider.Progress(),
-                        _binner == null ? 0 : _binner.LastBinStructure.XNullCount,
-                        _binner == null ? 0 : _binner.LastBinStructure.YNullCount,
-                        _binner == null ? 0 : _binner.LastBinStructure.XAndYNullCount,
-                        _binner == null ? null : _binner.LastBinStructure.XScale,
-                        _binner == null ? null : _binner.LastBinStructure.YScale);
+                        _binner == null ? 0 : _binner.DataBinStructure.XNullCount,
+                        _binner == null ? 0 : _binner.DataBinStructure.YNullCount,
+                        _binner == null ? 0 : _binner.DataBinStructure.XAndYNullCount,
+                        _binner == null ? null : _binner.DataBinStructure.XBinRange,
+                        _binner == null ? null : _binner.DataBinStructure.YBinRange);
                 }
-                samples = await _simDataProvider.GetSampleQueryResultItemModels(_sampleSize);
+                dataRows = await _simDataProvider.GetSampleDataRows(_sampleSize);
 
                 Debug.WriteLine("Job Iteration Time: " + sw.ElapsedMilliseconds);
                 await Task.Delay(_throttle);
@@ -148,42 +148,42 @@ namespace PanoramicDataWin8.controller.data.sim
             await fireCompleted();
         }
 
-        private void setVisualizationValues(List<QueryResultItemModel> samples)
+        private void setVisualizationValues(List<DataRow> samples)
         {
             var xAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
             var yAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
             foreach (var sample in samples)
             {
-                sample.VisualizationResultValues.Add(VisualizationResult.X, getVisualizationValue(_xAxisType, sample.AttributeValues[xAom], xAom, _xUniqueValues));
-                sample.VisualizationResultValues.Add(VisualizationResult.Y, getVisualizationValue(_yAxisType, sample.AttributeValues[yAom], yAom, _yUniqueValues));
+                sample.VisualizationResultValues.Add(VisualizationResult.X, getVisualizationValue(_xAxisType, sample.Entries[xAom.AttributeModel], xAom, _xUniqueValues));
+                sample.VisualizationResultValues.Add(VisualizationResult.Y, getVisualizationValue(_yAxisType, sample.Entries[yAom.AttributeModel], yAom, _yUniqueValues));
             }
         }
 
-        private double? getVisualizationValue(AxisType axisType, QueryResultItemValueModel itemValue, AttributeOperationModel attributeOperationModel, Dictionary<object, double> uniqueValues) 
+        private double? getVisualizationValue(AxisType axisType, object value, AttributeOperationModel attributeOperationModel, Dictionary<object, double> uniqueValues) 
         {
             if (axisType == AxisType.Quantitative)
             {
-                return itemValue.Value == null ? null : (double?)double.Parse(itemValue.Value.ToString());
+                return value == null ? null : (double?)double.Parse(value.ToString());
             }
             else if (axisType == AxisType.Time)
             {
-                return itemValue.Value == null ? null : (double?)((DateTime) itemValue.Value).TimeOfDay.Ticks;
+                return value == null ? null : (double?)((DateTime)value).TimeOfDay.Ticks;
             }
             else if (axisType == AxisType.Date)
             {
-                return itemValue == null ? null : (double?)((DateTime)itemValue.Value).Ticks;
+                return value == null ? null : (double?)((DateTime)value).Ticks;
             }
             else
             {
-                if (!uniqueValues.ContainsKey(itemValue.StringValue))
+                if (!uniqueValues.ContainsKey(value.ToString()))
                 {
-                    uniqueValues.Add(itemValue.StringValue, uniqueValues.Count);
+                    uniqueValues.Add(value.ToString(), uniqueValues.Count);
                 }
-                return uniqueValues[itemValue.StringValue];
+                return uniqueValues[value.ToString()];
             }
         }
 
-        private List<QueryResultItemModel> convertBinsToQueryResultItemModels(BinStructure binStructure)
+        private List<QueryResultItemModel> convertBinsToQueryResultItemModels(DataBinStructure binStructure)
         {
             List<QueryResultItemModel> newSamples = new List<QueryResultItemModel>();
             for (int col = 0; col < binStructure.Bins.Count; col++)
@@ -198,11 +198,6 @@ namespace PanoramicDataWin8.controller.data.sim
                         BinMinX = bin.BinMinX,
                         BinMinY = bin.BinMinY,
                         Count = bin.Count,
-                        HasInterval = bin.HasInterval,
-                        IntervalMaxX = bin.IntervalMaxX,
-                        IntervalMaxY = bin.IntervalMaxY,
-                        IntervalMinX = bin.IntervalMinX,
-                        IntervalMinY = bin.IntervalMinY,
                         NormalizedCount = bin.NormalizedCount,
                         Size = bin.Size
                     };
@@ -221,7 +216,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     }
                     else
                     {
-                        binClone.LabelX = binStructure.XScale.GetLabel(bin.BinMinX);
+                        binClone.LabelX = binStructure.XBinRange.GetLabel(bin.BinMinX);
                     }
 
                     if (_yAxisType == AxisType.Nominal || _yAxisType == AxisType.Ordinal)
@@ -238,7 +233,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     }
                     else
                     {
-                        binClone.LabelY = binStructure.YScale.GetLabel(bin.BinMinY);
+                        binClone.LabelY = binStructure.YBinRange.GetLabel(bin.BinMinY);
                     }
 
                     QueryResultItemModel itemModel = new QueryResultItemModel();
@@ -258,7 +253,7 @@ namespace PanoramicDataWin8.controller.data.sim
         }
 
 
-        private async Task fireUpdated(List<QueryResultItemModel> samples, double progress, double xNullCount, double yNullCount, double xAndYNullCount, Scale xScale, Scale yScale)
+        private async Task fireUpdated(List<QueryResultItemModel> samples, double progress, double xNullCount, double yNullCount, double xAndYNullCount, BinRange xBinRange, BinRange yBinRange)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -272,8 +267,8 @@ namespace PanoramicDataWin8.controller.data.sim
                         XAndYNullCount = xAndYNullCount,
                         YNullCount = yNullCount,
                         XNullCount = xNullCount,
-                        XScale = xScale,
-                        YScale = yScale
+                        XBinRange = xBinRange,
+                        YBinRange = yBinRange
                     });
                 }
             });
@@ -299,8 +294,8 @@ namespace PanoramicDataWin8.controller.data.sim
         public double XNullCount { get; set; }
         public double YNullCount { get; set; }
         public double XAndYNullCount { get; set; }
-        public Scale XScale { get; set; }
-        public Scale YScale { get; set; }
+        public BinRange XBinRange { get; set; }
+        public BinRange YBinRange { get; set; }
     }
 }
 

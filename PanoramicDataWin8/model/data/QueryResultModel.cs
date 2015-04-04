@@ -115,29 +115,29 @@ namespace PanoramicData.model.data
             }
         }
 
-        private Scale _xScale = null;
-        public Scale XScale
+        private BinRange _xBinRange = null;
+        public BinRange XBinRange
         {
             get
             {
-                return _xScale;
+                return _xBinRange;
             }
             set
             {
-                this.SetProperty(ref _xScale, value);
+                this.SetProperty(ref _xBinRange, value);
             }
         }
 
-        private Scale _yScale = null;
-        public Scale YScale
+        private BinRange _yBinRange = null;
+        public BinRange YBinRange
         {
             get
             {
-                return _yScale;
+                return _yBinRange;
             }
             set
             {
-                this.SetProperty(ref _yScale, value);
+                this.SetProperty(ref _yBinRange, value);
             }
         }
     }

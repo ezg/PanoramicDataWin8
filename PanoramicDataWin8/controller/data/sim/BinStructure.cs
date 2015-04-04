@@ -8,9 +8,9 @@ using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
-    public class BinStructure
+    public class DataBinStructure
     {
-        public BinStructure()
+        public DataBinStructure()
         {
             Bins = new List<List<Bin>>();
         }
@@ -19,7 +19,7 @@ namespace PanoramicDataWin8.controller.data.sim
         public double YNullCount { get; set; }
         public double XAndYNullCount { get; set; } 
         public List<List<Bin>> Bins { get; set; }
-        public Scale XScale { get; set; }
-        public Scale YScale { get; set; }
+        public BinRange XBinRange { get; set; }
+        public BinRange YBinRange { get; set; }
     }
 }

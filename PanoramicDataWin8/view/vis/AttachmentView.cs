@@ -377,12 +377,13 @@ namespace PanoramicDataWin8.view.vis
             {
                 var availableWidth = model.VisualizationViewModel.Size.X;
                 var tt = this.Opacity;
-                var currentX = model.VisualizationViewModel.Position.X;
                 if (availableWidth > calculateMinPreferedSizeX(model.AttachmentHeaderViewModels))
                 {
                     var remainingHeaders = model.AttachmentHeaderViewModels.ToList();
+                    var maxX = 0d;
                     foreach (var header in model.AttachmentHeaderViewModels)
                     {
+                        var currentX = model.VisualizationViewModel.Position.X;
                         remainingHeaders.Remove(header);
                         double headerWidth = header.PreferedItemSize.X;
                         int nrCols = (availableWidth - calculateMinPreferedSizeX(remainingHeaders)) + GAP > 2 * header.PreferedItemSize.X + GAP ? 2 : 1;
@@ -395,7 +396,7 @@ namespace PanoramicDataWin8.view.vis
                         foreach (var item in header.AttachmentItemViewModels)
                         {
                             var itemView = _attachmentItemViews[header].FirstOrDefault(v => v.DataContext == item);
-                            item.TargetPosition = new Pt(currentX, currentY);
+                            item.TargetPosition = new Pt(maxX + currentX, currentY);
                             currentY += header.PreferedItemSize.Y + GAP;
                             count++;
                             if (count == leftNrElemPerCol)
@@ -405,12 +406,10 @@ namespace PanoramicDataWin8.view.vis
                                 currentX = model.VisualizationViewModel.Position.X + header.PreferedItemSize.Y + GAP;
                             }
                         }
-                        availableWidth -= headerWidth; 
-                        
                         if (header.AddAttachmentItemViewModel != null)
                         {
                             header.AddAttachmentItemViewModel.TargetPosition = new Pt(
-                                model.VisualizationViewModel.Position.X, 
+                                maxX + model.VisualizationViewModel.Position.X, 
                                 (model.VisualizationViewModel.Position.Y + model.VisualizationViewModel.Size.Y) + GAP + 
                                 leftNrElemPerCol * header.PreferedItemSize.Y + leftNrElemPerCol * GAP);
                             // header.AddAttachmentItemViewModel.Size = new Vec(300, 300);
@@ -418,6 +417,16 @@ namespace PanoramicDataWin8.view.vis
                             _maxY = Math.Max(_maxY, header.AddAttachmentItemViewModel.TargetPosition.Y + header.AddAttachmentItemViewModel.Size.Y);
                         }
 
+                        if (header.AttachmentItemViewModels.Count > 0)
+                        {
+                            maxX = header.AttachmentItemViewModels.Max(item => item.TargetPosition.X) + header.PreferedItemSize.X - model.VisualizationViewModel.Position.X + GAP;
+                        }
+                        else
+                        {
+                            maxX += header.PreferedItemSize.X + GAP;
+                        }
+                        availableWidth -= headerWidth; 
+                        
                     }
                 }
             }

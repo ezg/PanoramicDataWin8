@@ -305,8 +305,8 @@ namespace PanoramicDataWin8.view.vis.render
         {
             _plotRendererContentProvider.XAxisType = resultModel.XAxisType;
             _plotRendererContentProvider.YAxisType = resultModel.YAxisType;
-            _plotRendererContentProvider.XScale = resultModel.XScale;
-            _plotRendererContentProvider.YScale = resultModel.YScale;
+            _plotRendererContentProvider.XBinRange = resultModel.XBinRange;
+            _plotRendererContentProvider.YBinRange = resultModel.YBinRange;
             List<BinnedDataPoint> binnedDataPoints = new List<BinnedDataPoint>();
             foreach (var queryResultItemModel in resultModel.QueryResultItemModels)
             {
@@ -512,8 +512,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         public AxisType XAxisType { get; set; }
         public AxisType YAxisType { get; set; }        
-        public Scale XScale { get; set; }
-        public Scale YScale { get; set; }
+        public BinRange XBinRange { get; set; }
+        public BinRange YBinRange { get; set; }
         public float CompositionScaleX { get; set; }
         public float CompositionScaleY { get; set; }
         public List<BinnedDataPoint> BinnedDataPoints { get; set; }

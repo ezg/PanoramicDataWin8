@@ -8,7 +8,7 @@ namespace PanoramicData.model.data
 {
     public enum AttributeFunction
     {
-        Color,
+        Intensity,
         Group,
         X,
         Y,

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -150,6 +151,21 @@ namespace PanoramicDataWin8.utils
         {
             return GetLabel(new DateTime((long)ticks), dateTimeStep);
         }
+
+        public static string GetShortMonth(DateTime dt)
+        {
+            string[] names = CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedMonthNames;
+            string month = names[(int)dt.Month-1];
+            return month;
+        }
+
+        public static string GetShortWeekDay(DateTime dt)
+        {
+            string[] names = CultureInfo.CurrentCulture.DateTimeFormat.AbbreviatedDayNames;
+            string weekDay = names[(int)dt.DayOfWeek];
+            return weekDay;
+        }
+
         public static string GetLabel(DateTime dt, DateTimeStep dateTimeStep)
         {
             //MM/dd/yyyy HH:mm:ss

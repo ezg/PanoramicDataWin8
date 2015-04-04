@@ -96,16 +96,16 @@ namespace PanoramicData.model.data
             }
         }
 
-        private GroupMode _groupMode = GroupMode.None;
-        public GroupMode GroupMode
+        private TransformationFunction _transformationFunction = TransformationFunction.None;
+        public TransformationFunction TransformationFunction
         {
             get
             {
-                return _groupMode;
+                return _transformationFunction;
             }
             set
             {
-                this.SetProperty(ref _groupMode, value);
+                this.SetProperty(ref _transformationFunction, value);
             }
         }
 
@@ -143,7 +143,7 @@ namespace PanoramicData.model.data
                 return
                     aom._aggregateFunction.Equals(this.AggregateFunction) &&
                     aom._attributeModel.Equals(this._attributeModel) &&
-                    aom._groupMode.Equals(this._groupMode) &&
+                    aom._transformationFunction.Equals(this._transformationFunction) &&
                     aom._binSize.Equals(this._binSize) &&
                     aom._scaleFunction.Equals(this._scaleFunction) &&
                     aom._sortMode.Equals(this._sortMode);
@@ -156,7 +156,7 @@ namespace PanoramicData.model.data
             int code = 0;
             code ^= this._aggregateFunction.GetHashCode();
             code ^= this._attributeModel.GetHashCode();
-            code ^= this._groupMode.GetHashCode();
+            code ^= this._transformationFunction.GetHashCode();
             code ^= this._binSize.GetHashCode();
             code ^= this._scaleFunction.GetHashCode();
             //code ^= this._sortMode.GetHashCode();
@@ -168,7 +168,7 @@ namespace PanoramicData.model.data
 
     public enum SortMode { Asc, Desc, None }
 
-    public enum GroupMode { None, Distinct, Binned, Year, MonthOfTheYear, DayOfTheMonth, DayOfTheWeek, HourOfTheDay}
+    public enum TransformationFunction { None, Year, MonthOfTheYear, DayOfTheMonth, DayOfTheWeek, HourOfTheDay}
 
     public enum ScaleFunction { None, Log, Normalize, RunningTotal, RunningTotalNormalized };
 }

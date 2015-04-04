@@ -78,54 +78,10 @@ namespace PanoramicData.model.view
             }
             set
             {
-                if (_queryModel != null)
-                {
-                    QueryModel.AttributeFunctionOperationModels[AttributeFunction.Color].CollectionChanged -= ColorAttributes_CollectionChanged;
-                    QueryModel.AttributeFunctionOperationModels[AttributeFunction.Group].CollectionChanged -= GroupAttributes_CollectionChanged;
-                }
                 this.SetProperty(ref _queryModel, value);
-
-                if (_queryModel != null)
-                {
-                    QueryModel.AttributeFunctionOperationModels[AttributeFunction.Color].CollectionChanged += ColorAttributes_CollectionChanged;
-                    QueryModel.AttributeFunctionOperationModels[AttributeFunction.Group].CollectionChanged += GroupAttributes_CollectionChanged;
-                }
             }
         }
-
-        void ColorAttributes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.OldItems != null)
-            {
-                foreach (var item in e.OldItems)
-                {
-                }
-            }
-            if (e.NewItems != null)
-            {
-                foreach (var item in e.NewItems)
-                {
-                }
-            }
-        }
-
-        void GroupAttributes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (e.OldItems != null)
-            {
-                foreach (var item in e.OldItems)
-                {
-                }
-            }
-            if (e.NewItems != null)
-            {
-                foreach (var item in e.NewItems)
-                {
-                }
-            }
-        }
-
-
+        
         private void selectColor()
         {
             if (_nextColorId >= COLORS.Count() - 1)
