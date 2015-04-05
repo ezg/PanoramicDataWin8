@@ -12,7 +12,7 @@ namespace PanoramicDataWin8.model.data
     {
         public Bin()
         {
-            Samples = new List<QueryResultItemModel>();
+            Samples = new List<DataRow>();
         }
         public bool ContainsBin(Bin bin)
         {

@@ -321,9 +321,8 @@ namespace PanoramicData.model.data
         public AxisType GetAxisType(AttributeOperationModel attributeOperationModel)
         {
             // determine axis type
-            // grouping or some aggregation
-            if (AttributeOperationModels.Any(aom => aom.GroupMode != GroupMode.None) ||
-                AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None))
+            // some aggregation
+            if (AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None))
             {
                 if (attributeOperationModel.AggregateFunction == AggregateFunction.Avg ||
                     attributeOperationModel.AggregateFunction == AggregateFunction.Sum ||
@@ -340,7 +339,7 @@ namespace PanoramicData.model.data
                         return AxisType.Quantitative;
                     }
                 }
-                else if (AttributeOperationModels.Any(aom => aom.GroupMode == GroupMode.Binned && aom.AttributeModel.Equals(attributeOperationModel.AttributeModel)) && attributeOperationModel.AggregateFunction == AggregateFunction.None)
+                else 
                 {
                     return AxisType.Ordinal;
                 }
@@ -363,95 +362,6 @@ namespace PanoramicData.model.data
                 }
             }
             return AxisType.Nominal;
-        }
-
-        public string GetDataType(AttributeOperationModel attributeOperationModel, bool considerGrouping)
-        {
-            if (!considerGrouping)
-            {
-                return attributeOperationModel.AttributeModel.AttributeDataType;
-            }
-            else
-            {
-                if (attributeOperationModel.GroupMode == GroupMode.Binned)
-                {
-                    return AttributeDataTypeConstants.NVARCHAR;
-                }
-
-                List<AttributeOperationModel> allOperationModels = AttributeOperationModels;
-                bool isGroupingApplied = allOperationModels.Any(aom => aom.GroupMode != GroupMode.None);
-
-                if (!isGroupingApplied)
-                {
-                    if (allOperationModels.Count(aom => aom.AggregateFunction != AggregateFunction.None) > 0)
-                    {
-                        if (attributeOperationModel.AggregateFunction == AggregateFunction.Avg ||
-                            attributeOperationModel.AggregateFunction == AggregateFunction.Sum ||
-                            attributeOperationModel.AggregateFunction == AggregateFunction.Max ||
-                            attributeOperationModel.AggregateFunction == AggregateFunction.Min)
-                        {
-                            if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.TIME)
-                            {
-                                return AttributeDataTypeConstants.TIME;
-                            }
-                            if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.NVARCHAR)
-                            {
-                                return AttributeDataTypeConstants.NVARCHAR;
-                            }
-                            if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.BIT)
-                            {
-                                return AttributeDataTypeConstants.BIT;
-                            }
-                            return AttributeDataTypeConstants.FLOAT;
-                        }
-                        else if (attributeOperationModel.AggregateFunction == AggregateFunction.Count)
-                        {
-                            return AttributeDataTypeConstants.INT;
-                        }
-                        return AttributeDataTypeConstants.NVARCHAR;
-                    }
-                    else
-                    {
-                        return attributeOperationModel.AttributeModel.AttributeDataType;
-                    }
-                }
-                else
-                {
-                    if (attributeOperationModel.AggregateFunction == AggregateFunction.None &&
-                        allOperationModels.Any(aom => (aom.GroupMode != GroupMode.None) && aom.AttributeModel == attributeOperationModel.AttributeModel))
-                    {
-                        return attributeOperationModel.AttributeModel.AttributeDataType;
-                    }
-
-                    if (attributeOperationModel.AggregateFunction == AggregateFunction.Avg ||
-                        attributeOperationModel.AggregateFunction == AggregateFunction.Sum ||
-                        attributeOperationModel.AggregateFunction == AggregateFunction.Max ||
-                        attributeOperationModel.AggregateFunction == AggregateFunction.Min)
-                    {
-                        if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.NVARCHAR)
-                        {
-                            return AttributeDataTypeConstants.NVARCHAR;
-                        }
-                        if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.TIME)
-                        {
-                            return AttributeDataTypeConstants.TIME;
-                        }
-                        if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.BIT)
-                        {
-                            return AttributeDataTypeConstants.BIT;
-                        }
-                        return AttributeDataTypeConstants.FLOAT;
-                    }
-                    else if (attributeOperationModel.AggregateFunction == AggregateFunction.Count)
-                    {
-                        return AttributeDataTypeConstants.INT;
-                    }
-                    else
-                    {
-                        return AttributeDataTypeConstants.NVARCHAR;
-                    }
-                }
-            }
         }
 
         private JobType _jobType;

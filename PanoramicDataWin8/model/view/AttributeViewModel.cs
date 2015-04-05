@@ -469,19 +469,7 @@ namespace PanoramicData.model.view
             string mainLabel = _attributeOperationModel.AttributeModel.Name;
             string subLabel = "";
 
-            if (AttributeOperationModel.GroupMode == GroupMode.Distinct)
-            {
-                mainLabel = "[" + mainLabel + "]";
-            }
-            else if (AttributeOperationModel.GroupMode == GroupMode.Binned)
-            {
-                mainLabel = "[" + mainLabel + "] / [" + AttributeOperationModel.BinSize + "]";
-            }
-            else
-            {
-                mainLabel = addDetailToLabel(mainLabel);
-            }
-
+            mainLabel = addDetailToLabel(mainLabel);
             MainLabel = mainLabel;
             SubLabel = subLabel;
         }

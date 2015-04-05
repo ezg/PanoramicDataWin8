@@ -18,7 +18,7 @@ namespace PanoramicData.model.data
         public FilterModel(QueryResultItemModel queryResultItemModel)
         {
             ValueComparisons = new Dictionary<AttributeOperationModel, ValueComparison>();
-            foreach (var k in queryResultItemModel.AttributeValues.Keys.Where(aom => aom.GroupMode != GroupMode.None))
+            /*foreach (var k in queryResultItemModel.AttributeValues.Keys.Where(aom => aom.GroupMode != GroupMode.None))
             {
                 ValueComparisons.Add(k, new ValueComparison(queryResultItemModel.AttributeValues[k], Predicate.EQUALS));
             }
@@ -28,7 +28,7 @@ namespace PanoramicData.model.data
                 {
                     ValueComparisons.Add(k, new ValueComparison(queryResultItemModel.AttributeValues[k], Predicate.EQUALS));
                 }
-            }
+            }*/
         }
 
         public override int GetHashCode()
@@ -44,7 +44,7 @@ namespace PanoramicData.model.data
             FilterModel compareTo = null;
             if (obj is FilterModel)
             {
-                compareTo = obj as FilterModel;
+                /*compareTo = obj as FilterModel;
                 bool groupComp = compare(
                     this.ValueComparisons.Where(kvp => kvp.Key.GroupMode != GroupMode.None).ToDictionary(t => t.Key, t => t.Value),
                     compareTo.ValueComparisons.Where(kvp => kvp.Key.GroupMode != GroupMode.None).ToDictionary(t => t.Key, t => t.Value));
@@ -57,7 +57,7 @@ namespace PanoramicData.model.data
                 if (!valueComp)
                     return false;
 
-                return true;
+                return true;*/
             }
             return false;
         }
