@@ -316,7 +316,7 @@ namespace PanoramicDataWin8.view.vis.render
                     MinY = queryResultItemModel.Bin.BinMinY,
                     MaxX = queryResultItemModel.Bin.BinMaxX,
                     MaxY = queryResultItemModel.Bin.BinMaxY,
-                    Size = queryResultItemModel.Bin.Size,
+                    Value = queryResultItemModel.Bin.Value,
                     LabelX = queryResultItemModel.Bin.LabelX,
                     LabelY = queryResultItemModel.Bin.LabelY,
                 };
@@ -697,11 +697,11 @@ namespace PanoramicDataWin8.view.vis.render
                 float yFrom = toScreenY((float)bin.MinY);
                 float xTo = toScreenX((float)bin.MaxX);
                 float yTo = toScreenY((float)bin.MaxY);
-                float w = (float)Math.Max((xTo - xFrom) * (float)bin.Size, 5.0);
-                float h = (float)Math.Max((yFrom - yTo) * (float)bin.Size, 5.0);
+                float w = (float)Math.Max((xTo - xFrom) * (float)bin.Value, 5.0);
+                float h = (float)Math.Max((yFrom - yTo) * (float)bin.Value, 5.0);
 
-                float alpha = 0.1f * (float) Math.Log10(bin.Size) + 1f;
-                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 230, 230, 230), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)bin.Size);
+                float alpha = 0.1f * (float) Math.Log10(bin.Value) + 1f;
+                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 230, 230, 230), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(bin.Value));
                 var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
 
                 /*if (bin.Size > 0)
@@ -753,8 +753,8 @@ namespace PanoramicDataWin8.view.vis.render
                 float yFrom = toScreenY((float)bin.MinY);
                 float xTo = toScreenX((float)bin.MaxX);
                 float yTo = toScreenY((float)bin.MaxY);
-                float w = (float)Math.Max((xTo - xFrom) * (float)bin.Size, 5.0);
-                float h = (float)Math.Max((yFrom - yTo) * (float)bin.Size, 5.0);
+                float w = (float)Math.Max((xTo - xFrom) * (float)bin.Value, 5.0);
+                float h = (float)Math.Max((yFrom - yTo) * (float)bin.Value, 5.0);
 
                 roundedRect.Rect = new RectangleF(
                     xFrom + ((xTo - xFrom) - w) / 2.0f,
@@ -763,7 +763,7 @@ namespace PanoramicDataWin8.view.vis.render
                     h);
                 roundedRect.RadiusX = roundedRect.RadiusY = 4;
 
-                if (bin.Size > 0)
+                if (bin.Value > 0)
                 {
                     d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
                     d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 1f);
@@ -793,7 +793,7 @@ namespace PanoramicDataWin8.view.vis.render
         public double MinY { get; set; }
         public double MaxX { get; set; }
         public double MaxY { get; set; }
-        public double Size { get; set; }
+        public double Value { get; set; }
         public string LabelX { get; set; }
         public string LabelY { get; set; }
     }

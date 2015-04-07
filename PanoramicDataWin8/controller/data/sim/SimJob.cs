@@ -34,6 +34,7 @@ namespace PanoramicDataWin8.controller.data.sim
         private bool _isIncremental = false;
         private TimeSpan _throttle = TimeSpan.FromMilliseconds(0);
         private DataBinner _binner = new DataBinner();
+        private DataAggregator _aggregator = new DataAggregator();
         private Object _lock = new Object();
         private AxisType _xAxisType = AxisType.Nominal;
         private AxisType _yAxisType = AxisType.Nominal;
@@ -81,7 +82,9 @@ namespace PanoramicDataWin8.controller.data.sim
                     NrOfYBins = MainViewController.Instance.MainModel.NrOfYBins,
                     Incremental = _isIncremental,
                     XAxisType = _xAxisType,
-                    YAxisType = _yAxisType
+                    YAxisType = _yAxisType,
+                    IsXAxisAggregated = xAom.AggregateFunction != AggregateFunction.None,
+                    IsYAxisAggregated = yAom.AggregateFunction != AggregateFunction.None
                 };
             }
             _simDataProvider = new SimDataProvider(QueryModelClone, (QueryModel.SchemaModel.OriginModels[0] as SimOriginModel), samplesToCheck);
@@ -120,7 +123,11 @@ namespace PanoramicDataWin8.controller.data.sim
                     setVisualizationValues(dataRows);
                     if (_binner != null)
                     {
-                        _binner.ProcessStep(dataRows);
+                        _binner.BinStep(dataRows);
+                    }
+                    if (_aggregator != null)
+                    {
+                        _aggregator.AggregateStep(_binner.DataBinStructure, QueryModelClone);
                     }
                     queryResultItemModels = convertBinsToQueryResultItemModels(_binner.DataBinStructure);
                 }
@@ -198,8 +205,8 @@ namespace PanoramicDataWin8.controller.data.sim
                         BinMinX = bin.BinMinX,
                         BinMinY = bin.BinMinY,
                         Count = bin.Count,
-                        NormalizedCount = bin.NormalizedCount,
-                        Size = bin.Size
+                        NormalizedValue = bin.NormalizedValue,
+                        Value = bin.Value
                     };
 
                     if (_xAxisType == AxisType.Nominal || _xAxisType == AxisType.Ordinal)

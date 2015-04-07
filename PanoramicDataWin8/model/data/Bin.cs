@@ -28,9 +28,9 @@ namespace PanoramicDataWin8.model.data
             return Math.Abs(x - y) <= epsilon;
         }
 
-        public double Size { get; set; }
         public double Count { get; set; }
-        public double NormalizedCount { get; set; }
+        public double Value { get; set; }
+        public double NormalizedValue { get; set; }
         public double BinMinX { get; set; }
         public double BinMinY { get; set; }
         public double BinMaxX { get; set; }

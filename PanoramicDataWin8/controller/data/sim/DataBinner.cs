@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.controller.data.sim
         public double NrOfYBins { get; set; }
         public DataBinStructure DataBinStructure { get; set; }
 
-        public void ProcessStep(List<DataRow> dataRows)
+        public void BinStep(List<DataRow> dataRows)
         {
             double dataMinX = 0;
             double dataMinY = 0;
@@ -70,7 +70,6 @@ namespace PanoramicDataWin8.controller.data.sim
             tempBinStructure.XNullCount += DataBinStructure.XNullCount;
             tempBinStructure.YNullCount += DataBinStructure.YNullCount;
             tempBinStructure.XAndYNullCount += DataBinStructure.XAndYNullCount;
-
             foreach (var oldBin in DataBinStructure.Bins.SelectMany(b => b))
             {
                 int x = tempBinStructure.XBinRange.GetIndex(oldBin.BinMinX);
@@ -92,7 +91,7 @@ namespace PanoramicDataWin8.controller.data.sim
             {
                 scale = AggregateBinRange.Initialize();
             }
-            if (axisType == AxisType.Time || axisType == AxisType.Date)
+            else if (axisType == AxisType.Time || axisType == AxisType.Date)
             {
                 scale = DateTimeBinRange.Initialize(dataMinValue, dataMaxValue, nrBins);
             }
@@ -149,16 +148,16 @@ namespace PanoramicDataWin8.controller.data.sim
             foreach (var bin in binStructure.Bins.SelectMany(b => b))
             {
                 //bin.NormalizedCount = Math.Log(bin.Count) / Math.Log(maxCount);
-                bin.NormalizedCount = bin.Count / maxCount;
-                if (bin.NormalizedCount == 0)
+                bin.NormalizedValue = bin.Count / maxCount;
+                if (bin.NormalizedValue == 0)
                 {
-                    bin.Size = 0;
+                    bin.Value = 0;
                 }
                 else
                 {
                     //double r = sliderRange.Value;
                     // 0.1 * log10(x ) + 1
-                    bin.Size = Math.Sqrt(bin.NormalizedCount);// 0.1 * Math.Log10(bin.NormalizedCount) + 1;// bin.NormalizedCount; // = (1.0 / (r + 1)) * Math.Ceiling(bin.NormalizedCount / (1.0 / r));
+                    bin.Value = Math.Sqrt(bin.NormalizedValue);// 0.1 * Math.Log10(bin.NormalizedCount) + 1;// bin.NormalizedCount; // = (1.0 / (r + 1)) * Math.Ceiling(bin.NormalizedCount / (1.0 / r));
                 }
             }
         }

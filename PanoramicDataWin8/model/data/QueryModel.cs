@@ -322,7 +322,7 @@ namespace PanoramicData.model.data
         {
             // determine axis type
             // some aggregation
-            if (AttributeOperationModels.Any(aom => aom.AggregateFunction != AggregateFunction.None))
+            if (attributeOperationModel.AggregateFunction != AggregateFunction.None)
             {
                 if (attributeOperationModel.AggregateFunction == AggregateFunction.Avg ||
                     attributeOperationModel.AggregateFunction == AggregateFunction.Sum ||
@@ -344,7 +344,7 @@ namespace PanoramicData.model.data
                     return AxisType.Ordinal;
                 }
             }
-            // no grouping or aggrgation
+            // no aggrgation
             else
             {
                 if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT ||
