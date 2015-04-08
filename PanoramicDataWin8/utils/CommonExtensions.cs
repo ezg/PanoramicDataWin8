@@ -200,6 +200,12 @@ namespace PanoramicDataWin8.utils
             return true;
         }
 
+        public static void Each<T>(this IEnumerable<T> ie, Action<T, int> action)
+        {
+            var i = 0;
+            foreach (var e in ie) action(e, i++);
+        }
+
         public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> coll)
         {
             var c = new ObservableCollection<T>();

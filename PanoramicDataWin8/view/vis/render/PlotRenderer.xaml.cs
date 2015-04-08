@@ -316,10 +316,20 @@ namespace PanoramicDataWin8.view.vis.render
                     MinY = queryResultItemModel.Bin.BinMinY,
                     MaxX = queryResultItemModel.Bin.BinMaxX,
                     MaxY = queryResultItemModel.Bin.BinMaxY,
-                    Value = queryResultItemModel.Bin.Value,
                     LabelX = queryResultItemModel.Bin.LabelX,
                     LabelY = queryResultItemModel.Bin.LabelY,
                 };
+                if (queryResultItemModel.Bin.NormalizedValues.Count > 0)
+                {
+                    foreach (var go in queryResultItemModel.Bin.NormalizedValues.Keys)
+                    {
+                        point.Values.Add(queryResultItemModel.Bin.NormalizedValues[go].Values.FirstOrDefault());
+                    }
+                }
+                else
+                {
+                    point.Values.Add(queryResultItemModel.Bin.NormalizedCount);
+                }
 
                 binnedDataPoints.Add(point);
             }
@@ -690,18 +700,18 @@ namespace PanoramicDataWin8.view.vis.render
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
 
             // draw data
-            foreach (var bin in BinnedDataPoints)
+            foreach (var bin in BinnedDataPoints.Where(bin => bin.Values.Any() && bin.Values.First().HasValue))
             {
                 var roundedRect = new D2D.RoundedRectangle();
                 float xFrom = toScreenX((float)bin.MinX);
                 float yFrom = toScreenY((float)bin.MinY);
                 float xTo = toScreenX((float)bin.MaxX);
                 float yTo = toScreenY((float)bin.MaxY);
-                float w = (float)Math.Max((xTo - xFrom) * (float)bin.Value, 5.0);
-                float h = (float)Math.Max((yFrom - yTo) * (float)bin.Value, 5.0);
+                float w = (float)Math.Max((xTo - xFrom) * (float)bin.Values.First().Value, 5.0);
+                float h = (float)Math.Max((yFrom - yTo) * (float)bin.Values.First().Value, 5.0);
 
-                float alpha = 0.1f * (float) Math.Log10(bin.Value) + 1f;
-                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 230, 230, 230), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(bin.Value));
+                float alpha = 0.1f * (float) Math.Log10(bin.Values.First().Value) + 1f;
+                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 230, 230, 230), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(bin.Values.First().Value));
                 var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
 
                 /*if (bin.Size > 0)
@@ -746,15 +756,15 @@ namespace PanoramicDataWin8.view.vis.render
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
 
             // draw data
-            foreach (var bin in BinnedDataPoints)
+            foreach (var bin in BinnedDataPoints.Where(bin => bin.Values.Any() && bin.Values.First().HasValue))
             {
                 var roundedRect = new D2D.RoundedRectangle();
                 float xFrom = toScreenX((float)bin.MinX);
                 float yFrom = toScreenY((float)bin.MinY);
                 float xTo = toScreenX((float)bin.MaxX);
                 float yTo = toScreenY((float)bin.MaxY);
-                float w = (float)Math.Max((xTo - xFrom) * (float)bin.Value, 5.0);
-                float h = (float)Math.Max((yFrom - yTo) * (float)bin.Value, 5.0);
+                float w = (float)Math.Max((xTo - xFrom) * (float)bin.Values.First().Value, 5.0);
+                float h = (float)Math.Max((yFrom - yTo) * (float)bin.Values.First().Value, 5.0);
 
                 roundedRect.Rect = new RectangleF(
                     xFrom + ((xTo - xFrom) - w) / 2.0f,
@@ -763,7 +773,7 @@ namespace PanoramicDataWin8.view.vis.render
                     h);
                 roundedRect.RadiusX = roundedRect.RadiusY = 4;
 
-                if (bin.Value > 0)
+                if (bin.Values.First().Value > 0)
                 {
                     d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
                     d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 1f);
@@ -789,11 +799,15 @@ namespace PanoramicDataWin8.view.vis.render
 
     public class BinnedDataPoint
     {
+        public BinnedDataPoint()
+        {
+            Values = new List<double?>();
+        }
         public double MinX { get; set; }
         public double MinY { get; set; }
         public double MaxX { get; set; }
         public double MaxY { get; set; }
-        public double Value { get; set; }
+        public List<double?> Values { get; set; }
         public string LabelX { get; set; }
         public string LabelY { get; set; }
     }

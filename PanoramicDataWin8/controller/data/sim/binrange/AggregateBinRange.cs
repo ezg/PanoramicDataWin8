@@ -20,6 +20,7 @@ namespace PanoramicDataWin8.controller.data.sim.binrange
             scale.Add(0);
             return scale;
         }
+
         public override BinRange GetUpdatedBinRange(double dataMin, double dataMax)
         {
             return new AggregateBinRange();

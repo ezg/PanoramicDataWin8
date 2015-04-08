@@ -78,7 +78,7 @@ namespace PanoramicDataWin8.controller.data.sim
 
                 if (newBin.ContainsBin(oldBin))
                 {
-                    newBin.Count += oldBin.Count;
+                    newBin.Map(oldBin);
                 }
             }
             DataBinStructure = tempBinStructure;
@@ -140,28 +140,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 }
             }
         }
-
-        private void adjustNormalizedCount(DataBinStructure binStructure)
-        {
-            // adjust normalized count
-            double maxCount = binStructure.Bins.SelectMany(b => b).Max(b => b.Count);
-            foreach (var bin in binStructure.Bins.SelectMany(b => b))
-            {
-                //bin.NormalizedCount = Math.Log(bin.Count) / Math.Log(maxCount);
-                bin.NormalizedValue = bin.Count / maxCount;
-                if (bin.NormalizedValue == 0)
-                {
-                    bin.Value = 0;
-                }
-                else
-                {
-                    //double r = sliderRange.Value;
-                    // 0.1 * log10(x ) + 1
-                    bin.Value = Math.Sqrt(bin.NormalizedValue);// 0.1 * Math.Log10(bin.NormalizedCount) + 1;// bin.NormalizedCount; // = (1.0 / (r + 1)) * Math.Ceiling(bin.NormalizedCount / (1.0 / r));
-                }
-            }
-        }
-
+        
         private void binSamples(DataBinStructure binStructure, List<DataRow> samples)
         {
             foreach (var sample in samples)

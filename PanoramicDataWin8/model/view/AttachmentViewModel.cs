@@ -487,24 +487,24 @@ namespace PanoramicDataWin8.model.view
 
         AttachmentHeaderViewModel createIntensityAttachmentHeader()
         {
-            var groupHeader = createAttributeFunctionAttachmentHeader(AttributeFunction.Intensity);
+            var groupHeader = createAttributeFunctionAttachmentHeader(AttributeFunction.Value);
 
             // handle added
             groupHeader.AddedTriggered = (attributeOperationModel) =>
             {
                 QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Intensity).Contains(attributeOperationModel))
+                if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Contains(attributeOperationModel))
                 {
-                    queryModel.AddFunctionAttributeOperationModel(AttributeFunction.Intensity, attributeOperationModel);
+                    queryModel.AddFunctionAttributeOperationModel(AttributeFunction.Value, attributeOperationModel);
                 }
             };
             // handle removed
             groupHeader.RemovedTriggered = (attachmentItemViewModel) =>
             {
                 QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Intensity).Contains(attachmentItemViewModel.AttributeOperationModel))
+                if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Contains(attachmentItemViewModel.AttributeOperationModel))
                 {
-                    queryModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Intensity, attachmentItemViewModel.AttributeOperationModel);
+                    queryModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Value, attachmentItemViewModel.AttributeOperationModel);
                 }
             };
             return groupHeader;

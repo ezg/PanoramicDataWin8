@@ -118,6 +118,7 @@
     <Compile Include="controller\data\DataWrapper.cs" />
     <Compile Include="controller\data\IItemsProvider.cs" />
     <Compile Include="controller\data\QueryExecuter.cs" />
+    <Compile Include="controller\data\sim\DataAggregator.cs" />
     <Compile Include="controller\data\sim\DataBinner.cs" />
     <Compile Include="controller\data\sim\binrange\AggregateBinRange.cs" />
     <Compile Include="controller\data\sim\BinStructure.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="controller\data\sim\binrange\NominalBinRange.cs" />
     <Compile Include="controller\data\sim\binrange\QuantitativeBinRange.cs" />
     <Compile Include="controller\data\sim\binrange\BinRange.cs" />
+    <Compile Include="controller\data\sim\GroupingObject.cs" />
     <Compile Include="controller\data\sim\SimDataProvider.cs" />
     <Compile Include="controller\data\sim\SimJob.cs" />
     <Compile Include="controller\data\sim\SimQueryExecuter.cs" />

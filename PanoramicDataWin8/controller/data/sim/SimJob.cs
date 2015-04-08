@@ -198,16 +198,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 for (int row = 0; row < binStructure.Bins[col].Count; row++)
                 {
                     Bin bin = binStructure.Bins[col][row];
-                    Bin binClone = new Bin()
-                    {
-                        BinMaxX = bin.BinMaxX,
-                        BinMaxY = bin.BinMaxY,
-                        BinMinX = bin.BinMinX,
-                        BinMinY = bin.BinMinY,
-                        Count = bin.Count,
-                        NormalizedValue = bin.NormalizedValue,
-                        Value = bin.Value
-                    };
+                    Bin binClone = bin.Clone();
 
                     if (_xAxisType == AxisType.Nominal || _xAxisType == AxisType.Ordinal)
                     {
@@ -246,13 +237,6 @@ namespace PanoramicDataWin8.controller.data.sim
                     QueryResultItemModel itemModel = new QueryResultItemModel();
                     itemModel.Bin = binClone;
 
-                    GroupingObject go = new GroupingObject(true, false, -1);
-                    go.Add(0, col);
-                    go.Add(1, row);
-                    //go.Add(2, binStructure.BinSizeX);
-                    //go.Add(3, binStructure.BinSizeY);
-
-                    itemModel.GroupingObject = go;
                     newSamples.Add(itemModel);
                 }
             }

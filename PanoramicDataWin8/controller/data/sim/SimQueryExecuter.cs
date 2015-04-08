@@ -64,7 +64,7 @@ namespace PanoramicData.controller.data.sim
             var oldItems = job.QueryModel.QueryResultModel.QueryResultItemModels;
 
             // do proper updateing if this is a table
-            if (job.QueryModel.VisualizationType == VisualizationType.table)
+            /*if (job.QueryModel.VisualizationType == VisualizationType.table)
             {
                 var cache = _updateIndexCache[job.QueryModel];
 
@@ -117,9 +117,9 @@ namespace PanoramicData.controller.data.sim
                         cache.Remove(oldItem.GroupingObject);
                     }
                 }
-            }
+            }*/
             // not a table
-            else
+            //else
             {
                 oldItems.Clear();
                 foreach (var sample in jobEventArgs.Samples)
