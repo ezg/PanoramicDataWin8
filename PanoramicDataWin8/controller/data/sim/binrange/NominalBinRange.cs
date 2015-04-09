@@ -8,6 +8,19 @@ namespace PanoramicDataWin8.controller.data.sim
 {
     public class NominalBinRange : BinRange
     {
+        private List<string> _labels = new List<string>();
+        public List<string> Labels
+        {
+            get
+            {
+                return _labels;
+            }
+            set
+            {
+                _labels = value;
+            }
+        }
+
         private double _step = 0;
         public double Step
         {
@@ -67,6 +80,12 @@ namespace PanoramicDataWin8.controller.data.sim
         public override double AddStep(double value)
         {
             return value + Step;
+        }
+
+        public override string GetLabel(double value)
+        {
+            int index = GetIndex(value);
+            return Labels[index];
         }
     }
 

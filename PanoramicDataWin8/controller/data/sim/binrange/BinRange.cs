@@ -86,5 +86,28 @@ namespace PanoramicDataWin8.controller.data.sim
         {
             return value.ToString();
         }
+
+        public virtual List<BinLabel> GetLabels()
+        {
+            List<BinLabel> labels = new List<BinLabel>();
+            foreach (var bin in GetBins())
+            {
+                labels.Add(new BinLabel()
+                {
+                    MinValue = bin,
+                    MaxValue = AddStep(bin),
+                    Label = GetLabel(bin)
+                });
+            }
+
+            return labels;
+        }
+    }
+
+    public class BinLabel
+    {
+        public double MinValue { get; set; }
+        public double MaxValue { get; set; }
+        public string Label { get; set; }
     }
 }

@@ -129,6 +129,8 @@ namespace PanoramicData.controller.data.sim
             }
 
             job.QueryModel.QueryResultModel.Progress = jobEventArgs.Progress;
+            job.QueryModel.QueryResultModel.XBinRange = jobEventArgs.XBinRange;
+            job.QueryModel.QueryResultModel.YBinRange = jobEventArgs.YBinRange;
             job.QueryModel.QueryResultModel.XNullCount = jobEventArgs.XNullCount;
             job.QueryModel.QueryResultModel.YNullCount = jobEventArgs.YNullCount;
             job.QueryModel.QueryResultModel.XAndYNullCount = jobEventArgs.XAndYNullCount;

@@ -73,9 +73,6 @@ namespace PanoramicDataWin8.model.data
         public double BinMinY { get; set; }
         public double BinMaxX { get; set; }
         public double BinMaxY { get; set; }
-        public string LabelX { get; set; }
-        public string LabelY { get; set; }
-
         public List<DataRow> Samples { get; set; }
     }
 }

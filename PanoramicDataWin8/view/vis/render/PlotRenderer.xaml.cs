@@ -315,9 +315,7 @@ namespace PanoramicDataWin8.view.vis.render
                     MinX = queryResultItemModel.Bin.BinMinX,
                     MinY = queryResultItemModel.Bin.BinMinY,
                     MaxX = queryResultItemModel.Bin.BinMaxX,
-                    MaxY = queryResultItemModel.Bin.BinMaxY,
-                    LabelX = queryResultItemModel.Bin.LabelX,
-                    LabelY = queryResultItemModel.Bin.LabelY,
+                    MaxY = queryResultItemModel.Bin.BinMaxY
                 };
                 if (queryResultItemModel.Bin.NormalizedValues.Count > 0)
                 {
@@ -588,8 +586,12 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void computeSizesAndRenderLabels(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory, bool renderLines)
         {
-            var xLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelX.TrimTo(20), MinValue = bin.MinX, MaxValue = bin.MaxX }).Distinct().ToList();
-            var yLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelY.TrimTo(20), MinValue = bin.MinY, MaxValue = bin.MaxY }).Distinct().ToList();
+            //var xLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelX.TrimTo(20), MinValue = bin.MinX, MaxValue = bin.MaxX }).Distinct().ToList();
+            //var yLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelY.TrimTo(20), MinValue = bin.MinY, MaxValue = bin.MaxY }).Distinct().ToList();
+            var xLabels = XBinRange.GetLabels();
+            var yLabels = YBinRange.GetLabels();
+
+
             var maxXLabelLength = xLabels.Max(b => b.Label.Length);
             var maxXLabel = xLabels.Where(b => b.Label.Length == maxXLabelLength).First();
             var maxYLabelLength = yLabels.Max(b => b.Label.Length);
@@ -808,7 +810,5 @@ namespace PanoramicDataWin8.view.vis.render
         public double MaxX { get; set; }
         public double MaxY { get; set; }
         public List<double?> Values { get; set; }
-        public string LabelX { get; set; }
-        public string LabelY { get; set; }
     }
 }

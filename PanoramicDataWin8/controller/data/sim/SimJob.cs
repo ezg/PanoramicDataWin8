@@ -193,6 +193,15 @@ namespace PanoramicDataWin8.controller.data.sim
         private List<QueryResultItemModel> convertBinsToQueryResultItemModels(DataBinStructure binStructure)
         {
             List<QueryResultItemModel> newSamples = new List<QueryResultItemModel>();
+            if (binStructure.XBinRange is NominalBinRange)
+            {
+                (binStructure.XBinRange as NominalBinRange).Labels = _xUniqueValues.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key.ToString()).ToList();
+            }
+            if (binStructure.YBinRange is NominalBinRange)
+            {
+                (binStructure.YBinRange as NominalBinRange).Labels = _yUniqueValues.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key.ToString()).ToList();
+            }
+
             for (int col = 0; col < binStructure.Bins.Count; col++)
             {
                 for (int row = 0; row < binStructure.Bins[col].Count; row++)
@@ -200,7 +209,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     Bin bin = binStructure.Bins[col][row];
                     Bin binClone = bin.Clone();
 
-                    if (_xAxisType == AxisType.Nominal || _xAxisType == AxisType.Ordinal)
+                   /* if (_xAxisType == AxisType.Nominal || _xAxisType == AxisType.Ordinal)
                     {
                         var k =_xUniqueValues.Where(kvp => kvp.Value == bin.BinMinX).FirstOrDefault();
                         if (k.Key != null)
@@ -232,7 +241,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     else
                     {
                         binClone.LabelY = binStructure.YBinRange.GetLabel(bin.BinMinY);
-                    }
+                    }*/
 
                     QueryResultItemModel itemModel = new QueryResultItemModel();
                     itemModel.Bin = binClone;

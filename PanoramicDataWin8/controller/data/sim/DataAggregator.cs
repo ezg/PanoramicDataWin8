@@ -19,7 +19,9 @@ namespace PanoramicDataWin8.controller.data.sim
             double maxCount = double.MinValue;
 
             var groupers = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group);
-            var aggregators = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value);
+            var aggregators = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Concat(
+                              queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
+                              queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None));
 
             // update aggregations and counts
             foreach (var bin in dataBinStructure.Bins.SelectMany(b => b))
@@ -27,7 +29,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 bin.Count += bin.Samples.Count;
                 maxCount = Math.Max(bin.Count, maxCount);
 
-                if (aggregators.Count > 0)
+                if (aggregators.Count() > 0)
                 {
                     foreach (var aggregator in aggregators)
                     {
@@ -44,7 +46,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 }
             }
 
-            // update max / min
+            // update max / min 
             foreach (var bin in dataBinStructure.Bins.SelectMany(b => b))
             {
                 foreach (var groupingObject in bin.Values.Keys)
@@ -69,7 +71,7 @@ namespace PanoramicDataWin8.controller.data.sim
             foreach (var bin in dataBinStructure.Bins.SelectMany(b => b))
             {
                 bin.NormalizedCount = bin.Count / maxCount;
-                if (aggregators.Count > 0)
+                if (aggregators.Count() > 0)
                 {
                     foreach (var aggregator in aggregators)
                     {
