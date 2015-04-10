@@ -248,6 +248,7 @@
     <Compile Include="view\vis\render\KmeansRenderer.xaml.cs">
       <DependentUpon>KmeansRenderer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\vis\render\PlotRendererContentProvider.cs" />
     <Compile Include="view\vis\render\Renderer.cs" />
     <Compile Include="view\vis\render\RendererResources.cs" />
     <Compile Include="view\vis\render\TableRenderer.cs" />

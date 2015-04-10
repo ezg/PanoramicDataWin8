@@ -133,6 +133,8 @@ namespace PanoramicData.controller.data.sim
             job.QueryModel.QueryResultModel.YBinRange = jobEventArgs.YBinRange;
             job.QueryModel.QueryResultModel.XNullCount = jobEventArgs.XNullCount;
             job.QueryModel.QueryResultModel.YNullCount = jobEventArgs.YNullCount;
+            job.QueryModel.QueryResultModel.MaxValues = jobEventArgs.MaxValues;
+            job.QueryModel.QueryResultModel.MinValues = jobEventArgs.MinValues;
             job.QueryModel.QueryResultModel.XAndYNullCount = jobEventArgs.XAndYNullCount;
             job.QueryModel.QueryResultModel.FireQueryResultModelUpdated();
         }

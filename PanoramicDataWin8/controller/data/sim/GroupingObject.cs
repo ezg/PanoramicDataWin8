@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PanoramicData.model.data;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,15 +9,16 @@ namespace PanoramicDataWin8.controller.data.sim
 {
     public class GroupingObject
     {
-        private Dictionary<int, object> _dictionary = new Dictionary<int, object>();
+        public Dictionary<AttributeOperationModel, object> GroupingValues {get;set;}
 
         public GroupingObject()
         {
+             GroupingValues = new Dictionary<AttributeOperationModel, object>();
         }
 
-        public void Add(int index, object value)
+        public void Add(AttributeOperationModel aom, object value)
         {
-            _dictionary.Add(index, value);
+            GroupingValues.Add(aom, value);
         }
 
         public override bool Equals(object obj)
@@ -24,9 +26,9 @@ namespace PanoramicDataWin8.controller.data.sim
             if (obj is GroupingObject)
             {
                 var go = obj as GroupingObject;
-                if (_dictionary.Count > 0)
+                if (GroupingValues.Count > 0)
                 {
-                    return go._dictionary.SequenceEqual(this._dictionary);
+                    return go.GroupingValues.SequenceEqual(this.GroupingValues);
                 }
                 else
                 {
@@ -37,10 +39,10 @@ namespace PanoramicDataWin8.controller.data.sim
         }
         public override int GetHashCode()
         {
-            if (_dictionary.Count > 0)
+            if (GroupingValues.Count > 0)
             {
                 int code = 0;
-                foreach (var v in _dictionary.Values)
+                foreach (var v in GroupingValues.Values)
                 {
                     if (v == null)
                     {

@@ -42,29 +42,15 @@ namespace PanoramicData.model.data
             }
         }
 
-        private Bin _bin = null;
-        public Bin Bin
+        public void AddAttributeValue(AttributeOperationModel aom, QueryResultItemValueModel value)
         {
-            get
+            if (!_attributeValues.ContainsKey(aom))
             {
-                return _bin;
+                _attributeValues.Add(aom, value);
             }
-            set
+            else
             {
-                this.SetProperty(ref _bin, value);
-            }
-        }
-
-        private Dictionary<AttributeOperationModel, double> _partitions = null;
-        public Dictionary<AttributeOperationModel, double> Partitions
-        {
-            get
-            {
-                return _partitions;
-            }
-            set
-            {
-                this.SetProperty(ref _partitions, value);
+                _attributeValues[aom] = value;
             }
         }
 
@@ -100,7 +86,6 @@ namespace PanoramicData.model.data
             this.IsSelected = updateTo.IsSelected;
             this.AttributeValues = updateTo.AttributeValues;
             this.RowNumber = updateTo.RowNumber;
-            this.Bin = updateTo.Bin;
         }
     }
 

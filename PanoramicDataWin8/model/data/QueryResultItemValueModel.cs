@@ -17,6 +17,12 @@ namespace PanoramicData.model.data
         {
         }
 
+        public QueryResultItemValueModel(object value)
+        {
+            this.Value = value;
+            this.StringValue = this.ShortStringValue = value.ToString();
+        }
+
         public override int GetHashCode()
         {
             int code = Value.GetHashCode();

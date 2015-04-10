@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PanoramicDataWin8.utils;
+using PanoramicData.model.data;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
@@ -14,6 +15,9 @@ namespace PanoramicDataWin8.controller.data.sim
         {
             Bins = new List<List<Bin>>();
         }
+
+        public Dictionary<AttributeOperationModel, double> MaxValues = new Dictionary<AttributeOperationModel, double>();
+        public Dictionary<AttributeOperationModel, double> MinValues = new Dictionary<AttributeOperationModel, double>();
 
         public double XNullCount { get; set; }
         public double YNullCount { get; set; }

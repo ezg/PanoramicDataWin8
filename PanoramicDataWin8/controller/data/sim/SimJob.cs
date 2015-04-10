@@ -20,6 +20,7 @@ using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using PanoramicData.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.controller.data.sim.binrange;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
@@ -141,7 +142,9 @@ namespace PanoramicDataWin8.controller.data.sim
                         _binner == null ? 0 : _binner.DataBinStructure.YNullCount,
                         _binner == null ? 0 : _binner.DataBinStructure.XAndYNullCount,
                         _binner == null ? null : _binner.DataBinStructure.XBinRange,
-                        _binner == null ? null : _binner.DataBinStructure.YBinRange);
+                        _binner == null ? null : _binner.DataBinStructure.YBinRange,
+                        _binner == null ? null : _binner.DataBinStructure.MinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
+                        _binner == null ? null : _binner.DataBinStructure.MaxValues.ToDictionary(entry => entry.Key, entry => entry.Value));
                 }
                 dataRows = await _simDataProvider.GetSampleDataRows(_sampleSize);
 
@@ -192,7 +195,7 @@ namespace PanoramicDataWin8.controller.data.sim
 
         private List<QueryResultItemModel> convertBinsToQueryResultItemModels(DataBinStructure binStructure)
         {
-            List<QueryResultItemModel> newSamples = new List<QueryResultItemModel>();
+            List<QueryResultItemModel> returnValues = new List<QueryResultItemModel>();
             if (binStructure.XBinRange is NominalBinRange)
             {
                 (binStructure.XBinRange as NominalBinRange).Labels = _xUniqueValues.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key.ToString()).ToList();
@@ -209,51 +212,38 @@ namespace PanoramicDataWin8.controller.data.sim
                     Bin bin = binStructure.Bins[col][row];
                     Bin binClone = bin.Clone();
 
-                   /* if (_xAxisType == AxisType.Nominal || _xAxisType == AxisType.Ordinal)
+                    foreach (var groupingObject in bin.Values.Keys)
                     {
-                        var k =_xUniqueValues.Where(kvp => kvp.Value == bin.BinMinX).FirstOrDefault();
-                        if (k.Key != null)
+                        foreach (var aom in bin.Values[groupingObject].Keys)
                         {
-                            binClone.LabelX = k.Key.ToString();
-                        }
-                        else
-                        {
-                            binClone.LabelX = "";
-                        }
-                    }
-                    else
-                    {
-                        binClone.LabelX = binStructure.XBinRange.GetLabel(bin.BinMinX);
-                    }
+                            QueryResultItemModel itemModel = new QueryResultItemModel();
+                            itemModel.AddAttributeValue(aom, new QueryResultItemValueModel(bin.NormalizedValues[groupingObject][aom]));
+                            foreach (var aomGrouping in groupingObject.GroupingValues.Keys)
+                            {
+                                itemModel.AddAttributeValue(aomGrouping, new QueryResultItemValueModel(groupingObject.GroupingValues[aomGrouping]));
+                            }
 
-                    if (_yAxisType == AxisType.Nominal || _yAxisType == AxisType.Ordinal)
-                    {
-                        var k = _yUniqueValues.Where(kvp => kvp.Value == bin.BinMinY).FirstOrDefault();
-                        if (k.Key != null)
-                        {
-                            binClone.LabelY = k.Key.ToString();
+                            if (!(binStructure.XBinRange is AggregateBinRange))
+                            {
+                                itemModel.AddAttributeValue(QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.X).First(), new QueryResultItemValueModel(bin.BinMinX));
+                            }
+                            if (!(binStructure.YBinRange is AggregateBinRange))
+                            {
+                                itemModel.AddAttributeValue(QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.Y).First(), new QueryResultItemValueModel(bin.BinMinY));
+                            }
+                            returnValues.Add(itemModel);
                         }
-                        else
-                        {
-                            binClone.LabelY = "";
-                        }
-                    }
-                    else
-                    {
-                        binClone.LabelY = binStructure.YBinRange.GetLabel(bin.BinMinY);
-                    }*/
-
-                    QueryResultItemModel itemModel = new QueryResultItemModel();
-                    itemModel.Bin = binClone;
-
-                    newSamples.Add(itemModel);
+                    }                   
                 }
             }
-            return newSamples;
+            return returnValues;
         }
 
 
-        private async Task fireUpdated(List<QueryResultItemModel> samples, double progress, double xNullCount, double yNullCount, double xAndYNullCount, BinRange xBinRange, BinRange yBinRange)
+        private async Task fireUpdated(List<QueryResultItemModel> samples, double progress, 
+            double xNullCount, double yNullCount, double xAndYNullCount, 
+            BinRange xBinRange, BinRange yBinRange,
+            Dictionary<AttributeOperationModel, double> minValues, Dictionary<AttributeOperationModel, double> maxValues)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -268,7 +258,9 @@ namespace PanoramicDataWin8.controller.data.sim
                         YNullCount = yNullCount,
                         XNullCount = xNullCount,
                         XBinRange = xBinRange,
-                        YBinRange = yBinRange
+                        YBinRange = yBinRange,
+                        MaxValues = maxValues,
+                        MinValues = minValues
                     });
                 }
             });
@@ -296,6 +288,8 @@ namespace PanoramicDataWin8.controller.data.sim
         public double XAndYNullCount { get; set; }
         public BinRange XBinRange { get; set; }
         public BinRange YBinRange { get; set; }
+        public Dictionary<AttributeOperationModel, double> MaxValues { get; set; }
+        public Dictionary<AttributeOperationModel, double> MinValues { get; set; }
     }
 }
 

@@ -140,6 +140,32 @@ namespace PanoramicData.model.data
                 this.SetProperty(ref _yBinRange, value);
             }
         }
+
+        private Dictionary<AttributeOperationModel, double> _maxValues = new Dictionary<AttributeOperationModel, double>();
+        public Dictionary<AttributeOperationModel, double> MaxValues
+        {
+            get
+            {
+                return _maxValues;
+            }
+            set
+            {
+                this.SetProperty(ref _maxValues, value);
+            }
+        }
+
+        private Dictionary<AttributeOperationModel, double> _minValues = new Dictionary<AttributeOperationModel, double>();
+        public Dictionary<AttributeOperationModel, double> MinValues
+        {
+            get
+            {
+                return _minValues;
+            }
+            set
+            {
+                this.SetProperty(ref _minValues, value);
+            }
+        }
     }
 
     public enum AxisType { Ordinal, Quantitative, Nominal, Time, Date }
