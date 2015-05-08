@@ -218,21 +218,23 @@ namespace PanoramicDataWin8.view.vis.menu
                 }
                 else if (model.AttachmentOrientation == AttachmentOrientation.Bottom)
                 {
-                    double currentY = model.AnkerPosition.Y + GAP;
-                    for (int row = 0; row < model.NrRows; row++)
+                    for (int col = 0; col < model.NrColumns; col++)
                     {
-                        double currentX = model.AnkerPosition.X;
-                        var rowItems = model.MenuItemViewModels.Where(mi => mi.Row == row);
-
-                        foreach (var menuItemModel in rowItems)
+                        for (int row = model.NrRows - 1; row >= 0; row--)
                         {
-                            menuItemModel.TargetPosition = new Pt(currentX, currentY);
-                            currentX += menuItemModel.Size.X + GAP;
-                        }
+                            var itemsInSameCol = model.MenuItemViewModels.Where(mi => mi.Row > row && mi.Column == col).ToList();
+                            var itemsInSameRow = model.MenuItemViewModels.Where(mi => mi.Column < col && mi.Row == row).ToList();
 
-                        currentY += rowItems.Max(mi => mi.Size.Y) + GAP;
+                            double currentY = model.AnkerPosition.Y + itemsInSameCol.Sum(mi => mi.Size.Y) + itemsInSameCol.Count * GAP + GAP;
+                            double currentX = model.AnkerPosition.X + itemsInSameRow.Sum(mi => mi.Size.X) + itemsInSameRow.Count() * GAP;
+
+                            var rowItem = model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
+                            if (rowItem != null)
+                            {
+                                rowItem.TargetPosition = new Pt(currentX, currentY);
+                            }
+                        }
                     }
-                        
                 }
                 else if (model.AttachmentOrientation == AttachmentOrientation.Top)
                 {

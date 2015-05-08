@@ -15,6 +15,8 @@ namespace PanoramicData.view.inq
 {
     public class InkStrokeElement : Canvas
     {
+        private static SolidColorBrush COLOR = new SolidColorBrush(Color.FromArgb(255, 17, 17, 17));
+
         protected InkStroke _inkStroke;
         public InkStroke InkStroke { get { return _inkStroke; } }
 
@@ -38,7 +40,7 @@ namespace PanoramicData.view.inq
             this.RenderTransform = new MatrixTransform();
 
             Polyline pl = new Polyline();
-            pl.Stroke = new SolidColorBrush(Colors.Black);
+            pl.Stroke = COLOR;
             pl.StrokeThickness = 3;
             pl.Points = new PointCollection();
 

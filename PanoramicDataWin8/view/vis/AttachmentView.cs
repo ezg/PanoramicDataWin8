@@ -383,7 +383,9 @@ namespace PanoramicDataWin8.view.vis
                     var maxX = 0d;
                     foreach (var header in model.AttachmentHeaderViewModels)
                     {
-                        var currentX = model.VisualizationViewModel.Position.X;
+                        var startX = model.VisualizationViewModel.Position.X;
+                        var offsetX =  (model.VisualizationViewModel.QueryModel.VisualizationType != VisualizationType.table ? 50 + GAP : 0);
+                        var currentX = startX;
                         remainingHeaders.Remove(header);
                         double headerWidth = header.PreferedItemSize.X;
                         int nrCols = (availableWidth - calculateMinPreferedSizeX(remainingHeaders)) + GAP > 2 * header.PreferedItemSize.X + GAP ? 2 : 1;
@@ -396,20 +398,20 @@ namespace PanoramicDataWin8.view.vis
                         foreach (var item in header.AttachmentItemViewModels)
                         {
                             var itemView = _attachmentItemViews[header].FirstOrDefault(v => v.DataContext == item);
-                            item.TargetPosition = new Pt(maxX + currentX, currentY);
+                            item.TargetPosition = new Pt(maxX + currentX + offsetX, currentY);
                             currentY += header.PreferedItemSize.Y + GAP;
                             count++;
                             if (count == leftNrElemPerCol)
                             {
                                 currentCol++;
                                 currentY = (model.VisualizationViewModel.Position.Y + model.VisualizationViewModel.Size.Y) + GAP;
-                                currentX = model.VisualizationViewModel.Position.X + header.PreferedItemSize.Y + GAP;
+                                currentX = startX + header.PreferedItemSize.Y + GAP;
                             }
                         }
                         if (header.AddAttachmentItemViewModel != null)
                         {
                             header.AddAttachmentItemViewModel.TargetPosition = new Pt(
-                                maxX + model.VisualizationViewModel.Position.X, 
+                                maxX + startX + offsetX, 
                                 (model.VisualizationViewModel.Position.Y + model.VisualizationViewModel.Size.Y) + GAP + 
                                 leftNrElemPerCol * header.PreferedItemSize.Y + leftNrElemPerCol * GAP);
                             // header.AddAttachmentItemViewModel.Size = new Vec(300, 300);
@@ -419,7 +421,7 @@ namespace PanoramicDataWin8.view.vis
 
                         if (header.AttachmentItemViewModels.Count > 0)
                         {
-                            maxX = header.AttachmentItemViewModels.Max(item => item.TargetPosition.X) + header.PreferedItemSize.X - model.VisualizationViewModel.Position.X + GAP;
+                            maxX = header.AttachmentItemViewModels.Max(item => item.TargetPosition.X) + header.PreferedItemSize.X - model.VisualizationViewModel.Position.X + GAP - offsetX;
                         }
                         else
                         {

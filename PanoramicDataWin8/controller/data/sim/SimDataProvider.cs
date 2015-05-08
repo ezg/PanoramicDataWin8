@@ -207,7 +207,7 @@ namespace PanoramicDataWin8.controller.data.sim
                         else
                         {
                             value = null;
-                        }
+                         }
                     }
                     else if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.DATE)
                     {

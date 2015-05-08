@@ -61,7 +61,8 @@ namespace PanoramicData.model.view
                     AttributeOperationModel x = new AttributeOperationModel(attributeOperationModel.AttributeModel);
                     x.AggregateFunction = AggregateFunction.None;
 
-                    AttributeOperationModel bin = new AttributeOperationModel(attributeOperationModel.AttributeModel);
+                    AttributeOperationModel value = new AttributeOperationModel(attributeOperationModel.AttributeModel);
+                    value.AggregateFunction = AggregateFunction.Count;
 
                     AttributeOperationModel y = new AttributeOperationModel(attributeOperationModel.AttributeModel);
                    // y.AggregateFunction = AggregateFunction.Count;
@@ -69,7 +70,7 @@ namespace PanoramicData.model.view
 
                     visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, x);
                     visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.Y, y);
-                    //visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.Group, bin);
+                    visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.DefaultValue, value);
                 }
                 else if (attributeOperationModel.AttributeModel.AttributeVisualizationType == AttributeVisualizationTypeConstants.GEOGRAPHY)
                 {

@@ -8,6 +8,7 @@ namespace PanoramicData.model.data
 {
     public enum AttributeFunction
     {
+        DefaultValue,
         Value,
         Group,
         X,

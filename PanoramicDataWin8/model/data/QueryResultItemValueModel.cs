@@ -10,6 +10,7 @@ namespace PanoramicData.model.data
     public class QueryResultItemValueModel
     {
         public object Value { get; set; }
+        public object NoramlizedValue { get; set; }
         public string StringValue { get; set; }
         public string ShortStringValue { get; set; }
         
@@ -17,9 +18,10 @@ namespace PanoramicData.model.data
         {
         }
 
-        public QueryResultItemValueModel(object value)
+        public QueryResultItemValueModel(object value, object normalizedValue)
         {
             this.Value = value;
+            this.NoramlizedValue = normalizedValue;
             this.StringValue = this.ShortStringValue = value.ToString();
         }
 

@@ -236,36 +236,46 @@ namespace PanoramicDataWin8.view.vis.render
             // draw data
             foreach (var resultItem in _queryResultModel.QueryResultItemModels)
             {
-                double? xValue = (double?)resultItem.AttributeValues[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First()].Value;
-                double? yValue = (double?)resultItem.AttributeValues[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First()].Value;
-                double? value = (double?)resultItem.AttributeValues[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).First()].Value;
-
-                var roundedRect = new D2D.RoundedRectangle();
-                float xFrom = toScreenX((float)xBins[_xBinRange.GetIndex(xValue.Value)]);
-                float yFrom = toScreenY((float)yBins[_yBinRange.GetIndex(yValue.Value)]);
-                float xTo = toScreenX((float)xBins[_xBinRange.GetIndex(_xBinRange.AddStep(xValue.Value))]);
-                float yTo = toScreenY((float)yBins[_yBinRange.GetIndex(_yBinRange.AddStep(yValue.Value))]);
-                float w = (float)Math.Max((xTo - xFrom) * (float)value.Value, 5.0);
-                float h = (float)Math.Max((yFrom - yTo) * (float)value.Value, 5.0);
-
-                float alpha = 0.1f * (float)Math.Log10(value.Value) + 1f;
-                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 230, 230, 230), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value.Value));
-                var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
-
-                roundedRect.Rect = new RectangleF(
-                    xFrom,
-                    yTo,
-                    xTo - xFrom,
-                    yFrom - yTo);
-                roundedRect.RadiusX = roundedRect.RadiusY = 4;
-                d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
-                if (_queryResultModel.QueryResultItemModels.Count < 10000)
+                if (resultItem.AttributeValues.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First()) &&
+                    resultItem.AttributeValues.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First()))
                 {
-                    d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                    double? xValue = (double?)resultItem.AttributeValues[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First()].Value;
+                    double? yValue = (double?)resultItem.AttributeValues[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First()].Value;
+                    double? value = null;
+                    if (_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Any() && resultItem.AttributeValues.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).First()))
+                    {
+                        value = (double?)resultItem.AttributeValues[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).First()].NoramlizedValue;
+                    }
+                    else
+                    {
+                        value = (double?)resultItem.AttributeValues[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue).First()].NoramlizedValue;
+                    }
+
+                    var roundedRect = new D2D.RoundedRectangle();
+                    float xFrom = toScreenX((float)xBins[_xBinRange.GetIndex(xValue.Value)]);
+                    float yFrom = toScreenY((float)yBins[_yBinRange.GetIndex(yValue.Value)]);
+                    float xTo = toScreenX((float)xBins[_xBinRange.GetIndex(_xBinRange.AddStep(xValue.Value))]);
+                    float yTo = toScreenY((float)yBins[_yBinRange.GetIndex(_yBinRange.AddStep(yValue.Value))]);
+                    float w = (float)Math.Max((xTo - xFrom) * (float)value.Value, 5.0);
+                    float h = (float)Math.Max((yFrom - yTo) * (float)value.Value, 5.0);
+
+                    float alpha = 0.1f * (float)Math.Log10(value.Value) + 1f;
+                    var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 230, 230, 230), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value.Value));
+                    var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
+
+                    roundedRect.Rect = new RectangleF(
+                        xFrom,
+                        yTo,
+                        xTo - xFrom,
+                        yFrom - yTo);
+                    roundedRect.RadiusX = roundedRect.RadiusY = 4;
+                    d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
+                    binColor.Dispose();
+                    if (_queryResultModel.QueryResultItemModels.Count < 10000)
+                    {
+                        d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                    }
                 }
-
-
-                binColor.Dispose();
             }
             white.Dispose();
         }

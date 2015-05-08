@@ -214,25 +214,34 @@ namespace PanoramicDataWin8.controller.data.sim
 
                     foreach (var groupingObject in bin.Values.Keys)
                     {
+                        QueryResultItemModel itemModel = new QueryResultItemModel();
+
                         foreach (var aom in bin.Values[groupingObject].Keys)
                         {
-                            QueryResultItemModel itemModel = new QueryResultItemModel();
-                            itemModel.AddAttributeValue(aom, new QueryResultItemValueModel(bin.NormalizedValues[groupingObject][aom]));
+                            itemModel.AddAttributeValue(aom, new QueryResultItemValueModel(
+                                bin.Values[groupingObject][aom],
+                                bin.NormalizedValues[groupingObject][aom]));
+
                             foreach (var aomGrouping in groupingObject.GroupingValues.Keys)
                             {
-                                itemModel.AddAttributeValue(aomGrouping, new QueryResultItemValueModel(groupingObject.GroupingValues[aomGrouping]));
+                                itemModel.AddAttributeValue(aomGrouping, new QueryResultItemValueModel(
+                                    groupingObject.GroupingValues[aomGrouping],
+                                    groupingObject.GroupingValues[aomGrouping]));
                             }
 
                             if (!(binStructure.XBinRange is AggregateBinRange))
                             {
-                                itemModel.AddAttributeValue(QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.X).First(), new QueryResultItemValueModel(bin.BinMinX));
+                                itemModel.AddAttributeValue(QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.X).First(),
+                                    new QueryResultItemValueModel(bin.BinMinX, bin.BinMinX));
                             }
                             if (!(binStructure.YBinRange is AggregateBinRange))
                             {
-                                itemModel.AddAttributeValue(QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.Y).First(), new QueryResultItemValueModel(bin.BinMinY));
+                                itemModel.AddAttributeValue(QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.Y).First(),
+                                    new QueryResultItemValueModel(bin.BinMinY, bin.BinMinY));
                             }
-                            returnValues.Add(itemModel);
                         }
+                        
+                        returnValues.Add(itemModel);
                     }                   
                 }
             }

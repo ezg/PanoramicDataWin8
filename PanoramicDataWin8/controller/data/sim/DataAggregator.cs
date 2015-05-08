@@ -19,8 +19,9 @@ namespace PanoramicDataWin8.controller.data.sim
 
             var groupers = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group);
             var aggregates = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Concat(
+                             queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue)).Concat(
                              queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
-                             queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None));
+                             queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).ToList();
 
             // update aggregations and counts
             foreach (var bin in dataBinStructure.Bins.SelectMany(b => b))
@@ -66,7 +67,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 }
             }
 
-            // noramlize values
+            // normalized values
             foreach (var bin in dataBinStructure.Bins.SelectMany(b => b))
             {
                 bin.NormalizedCount = bin.Count / maxCount;
@@ -76,8 +77,15 @@ namespace PanoramicDataWin8.controller.data.sim
                     {
                         foreach (var groupingObject in bin.Values.Keys)
                         {
-                            bin.NormalizedValues[groupingObject][aggregator] =
-                                (bin.Values[groupingObject][aggregator] - dataBinStructure.MinValues[aggregator]) / (dataBinStructure.MaxValues[aggregator] - dataBinStructure.MinValues[aggregator]);
+                            if ((dataBinStructure.MaxValues[aggregator] - dataBinStructure.MinValues[aggregator]) != 0.0)
+                            {
+                                bin.NormalizedValues[groupingObject][aggregator] =
+                                    (bin.Values[groupingObject][aggregator] - dataBinStructure.MinValues[aggregator]) / (dataBinStructure.MaxValues[aggregator] - dataBinStructure.MinValues[aggregator]);
+                            }
+                            else
+                            {
+                                bin.NormalizedValues[groupingObject][aggregator] = 1.0;
+                            }
                         }
                     }
                 }
@@ -90,7 +98,10 @@ namespace PanoramicDataWin8.controller.data.sim
             double? sampleValue = null;
 
             double d = 0;
-            if (double.TryParse(sample.Entries[aggregator.AttributeModel].ToString(), out d))
+            if (aggregator.AggregateFunction == AggregateFunction.Count) {
+                sampleValue = 0;
+            }
+            else if (double.TryParse(sample.Entries[aggregator.AttributeModel].ToString(), out d))
             {
                 sampleValue = d;
             }

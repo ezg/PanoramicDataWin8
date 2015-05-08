@@ -98,6 +98,66 @@ namespace PanoramicDataWin8.model.view
                 AttachmentOrientation = this.AttachmentOrientation
             };
 
+            // is value attributeOperationModel
+            if (_visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Contains(attachmentItemViewModel.AttributeOperationModel))
+            {
+                var aom = attachmentItemViewModel.AttributeOperationModel;
+                if (aom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT ||
+                    aom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT)
+                {
+                    menuViewModel.NrRows = 3;
+                    menuViewModel.NrColumns = 4;
+
+                    List<ToggleMenuItemComponentViewModel> toggles = new List<ToggleMenuItemComponentViewModel>();
+                    List<MenuItemViewModel> items = new List<MenuItemViewModel>();
+
+                    int count = 0;
+                    foreach (var aggregationFunction in Enum.GetValues(typeof(AggregateFunction)).Cast<AggregateFunction>().Where(af => af != AggregateFunction.None))
+                    {
+                        var menuItem = new MenuItemViewModel()
+                        {
+                            MenuViewModel = menuViewModel,
+                            Row = count <= 2 ? 0 : 1,
+                            RowSpan = count <= 2 ? 1 : 2,
+                            Column = count % 3 + 1,
+                            Size = new Vec(32, 50),
+                            TargetSize = new Vec(32, 50)
+                        };
+                        menuItem.Position = attachmentItemViewModel.Position;
+                        ToggleMenuItemComponentViewModel toggle = new ToggleMenuItemComponentViewModel()
+                        {
+                            Label = aggregationFunction.ToString(),
+                            IsChecked = attachmentItemViewModel.AttributeOperationModel.AggregateFunction == aggregationFunction
+                        };
+                        toggles.Add(toggle);
+                        menuItem.MenuItemComponentViewModel = toggle;
+                        menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
+                        {
+                            var model = (sender as ToggleMenuItemComponentViewModel);
+                            if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                            {
+                                if (model.IsChecked)
+                                {
+                                    attachmentItemViewModel.AttributeOperationModel.AggregateFunction = aggregationFunction;
+                                    foreach (var tg in model.OtherToggles)
+                                    {
+                                        tg.IsChecked = false;
+                                    }
+                                }
+                            }
+                        };
+                        menuViewModel.MenuItemViewModels.Add(menuItem);
+                        items.Add(menuItem);
+                        count++;
+                    }
+
+                    foreach (var mi in items)
+                    {
+                        (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
+                    }
+                }
+            }
+
             // is grouping attributeOperationModel
             /*if (_visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attachmentItemViewModel.AttributeOperationModel))
             {
@@ -493,6 +553,7 @@ namespace PanoramicDataWin8.model.view
             groupHeader.AddedTriggered = (attributeOperationModel) =>
             {
                 QueryModel queryModel = this.VisualizationViewModel.QueryModel;
+                attributeOperationModel.AggregateFunction = AggregateFunction.Avg;
                 if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Contains(attributeOperationModel))
                 {
                     queryModel.AddFunctionAttributeOperationModel(AttributeFunction.Value, attributeOperationModel);
