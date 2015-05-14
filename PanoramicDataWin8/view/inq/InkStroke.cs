@@ -1,16 +1,11 @@
-﻿using PanoramicData.utils;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using Windows.Foundation;
 using Windows.UI;
+using PanoramicDataWin8.utils;
 
-namespace PanoramicData.view.inq
+namespace PanoramicDataWin8.view.inq
 {
     public class InkStroke : IScribbable
     {

@@ -1,15 +1,8 @@
-﻿using Microsoft.Practices.Prism.Mvvm;
-using PanoramicData.controller.data;
-using PanoramicData.utils;
-using PanoramicDataWin8.controller.data.sim;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PanoramicDataWin8.utils;
 
-namespace PanoramicData.model.data.result
+namespace PanoramicDataWin8.model.data.result
 {
     public class ResultModel : ExtendedBindableBase
     {

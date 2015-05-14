@@ -1,13 +1,8 @@
-﻿using PanoramicData.model.data;
-using PanoramicDataWin8.controller.data.sim;
-using PanoramicDataWin8.model.data.common;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PanoramicDataWin8.controller.data.sim;
 
-namespace PanoramicData.model.data.common
+namespace PanoramicDataWin8.model.data.common
 {
     public class Bin
     {

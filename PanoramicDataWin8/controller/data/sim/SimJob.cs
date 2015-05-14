@@ -1,7 +1,4 @@
-﻿using PanoramicData.model.data;
-using PanoramicData.model.data.sim;
-using PanoramicData.model.view;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,10 +15,12 @@ using System.Collections.ObjectModel;
 using Newtonsoft.Json.Serialization;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
-using PanoramicData.controller.view;
-using PanoramicData.model.data.common;
-using PanoramicData.model.data.result;
 using Windows.System.Threading;
+using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.common;
+using PanoramicDataWin8.model.data.result;
+using PanoramicDataWin8.model.data.sim;
 
 namespace PanoramicDataWin8.controller.data.sim
 {

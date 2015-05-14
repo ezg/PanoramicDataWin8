@@ -1,8 +1,4 @@
 ﻿using GeoAPI.Geometries;
-using PanoramicData.model.data;
-using PanoramicData.model.view;
-using PanoramicData.utils;
-using PanoramicData.view.inq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,14 +8,16 @@ using Windows.Foundation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using PanoramicDataWin8.utils;
-using PanoramicData.utils;
 using Windows.UI.Xaml.Shapes;
 using Windows.UI.Xaml.Media;
 using Windows.UI;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Text;
-using PanoramicData.controller.view;
-using LinkType = PanoramicData.model.data.LinkType;
+using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.view.inq;
+using LinkType = PanoramicDataWin8.model.data.LinkType;
 
 namespace PanoramicDataWin8.view.vis
 {
@@ -124,15 +122,15 @@ namespace PanoramicDataWin8.view.vis
                 _visualizationViewModelCenterGeometries.Clear();
                 _visualizationViewModelIconGeometries.Clear();
 
-                Vec attachmentCenter = updateAttachmentCenter(PanoramicData.model.data.LinkType.Filter, c);
-                drawLinesFromModelsToAttachmentCenter(PanoramicData.model.data.LinkType.Filter, attachmentCenter, c);
+                Vec attachmentCenter = updateAttachmentCenter(LinkType.Filter, c);
+                drawLinesFromModelsToAttachmentCenter(LinkType.Filter, attachmentCenter, c);
                 if (linkViewModel.LinkModels.Any(lm => lm.LinkType == LinkType.Filter))
                 {
                     drawFilterAttachment(attachmentCenter, c);
                 }
 
-                attachmentCenter = updateAttachmentCenter(PanoramicData.model.data.LinkType.Brush, c);
-                drawLinesFromModelsToAttachmentCenter(PanoramicData.model.data.LinkType.Brush, attachmentCenter, c);
+                attachmentCenter = updateAttachmentCenter(LinkType.Brush, c);
+                drawLinesFromModelsToAttachmentCenter(LinkType.Brush, attachmentCenter, c);
                 if (linkViewModel.LinkModels.Any(lm => lm.LinkType == LinkType.Brush))
                 {
                     drawBrushAttachment(attachmentCenter, c);
@@ -141,7 +139,7 @@ namespace PanoramicDataWin8.view.vis
             Content = c;
         }
 
-        private Vec updateAttachmentCenter(PanoramicData.model.data.LinkType linkType, Canvas canvas)
+        private Vec updateAttachmentCenter(LinkType linkType, Canvas canvas)
         {
             LinkViewModel linkViewModel = (DataContext as LinkViewModel);
 
@@ -245,7 +243,7 @@ namespace PanoramicDataWin8.view.vis
             return attachmentCenter;
         }
 
-        private void drawLinesFromModelsToAttachmentCenter(PanoramicData.model.data.LinkType linkType, Vec attachmentCenter, Canvas c)
+        private void drawLinesFromModelsToAttachmentCenter(LinkType linkType, Vec attachmentCenter, Canvas c)
         {
             LinkViewModel linkViewModel = (DataContext as LinkViewModel);
             foreach (var incomingModel in linkViewModel.FromVisualizationViewModels.Where(

@@ -1,35 +1,22 @@
-﻿using PanoramicData.model.view;
-using PanoramicData.utils;
-using PanoramicData.view.inq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using PanoramicData.controller.data;
-using System.IO;
-using PanoramicData.controller.input;
-using PanoramicData.model.data;
-using PanoramicData.model.view;
-using PanoramicData.utils;
-using PanoramicDataWin8.utils;
-using PanoramicData.model.data.sim;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using Windows.Foundation;
-using Windows.UI.Xaml;
+using System.Linq;
 using Windows.ApplicationModel;
-using PanoramicDataWin8;
-using PanoramicDataWin8.view.vis;
-using System.Diagnostics;
-using Windows.UI.Xaml.Media;
-using PanoramicData.controller.data.sim;
-using PanoramicDataWin8.model.view;
 using GeoAPI.Geometries;
-using PanoramicDataWin8.view.common;
+using PanoramicDataWin8.controller.data.sim;
+using PanoramicDataWin8.controller.data.tuppleware;
+using PanoramicDataWin8.controller.input;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.sim;
+using PanoramicDataWin8.model.data.tuppleware;
+using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.utils;
+using PanoramicDataWin8.view.inq;
+using PanoramicDataWin8.view.vis;
 
-namespace PanoramicData.controller.view
+namespace PanoramicDataWin8.controller.view
 {
     public class MainViewController
     {
@@ -55,8 +42,8 @@ namespace PanoramicData.controller.view
             _root.InkCollectedEvent += root_InkCollectedEvent;
             VisualizationViewModels.CollectionChanged += VisualizationViewModels_CollectionChanged;
 
-            _gesturizer.AddGesture(new PanoramicData.view.inq.ConnectGesture(_root));
-            _gesturizer.AddGesture(new PanoramicData.view.inq.ScribbleGesture(_root));
+            _gesturizer.AddGesture(new ConnectGesture(_root));
+            _gesturizer.AddGesture(new ScribbleGesture(_root));
 
             loadConfigs();
         }
@@ -239,12 +226,12 @@ namespace PanoramicData.controller.view
             }
         }
 
-        void JobTypeViewModelMoved(object sender, model.view.JobTypeViewModelEventArgs e)
+        void JobTypeViewModelMoved(object sender, JobTypeViewModelEventArgs e)
         {
             
         }
 
-        void JobTypeViewModelDropped(object sender, model.view.JobTypeViewModelEventArgs e)
+        void JobTypeViewModelDropped(object sender, JobTypeViewModelEventArgs e)
         {
             double width = VisualizationViewModel.WIDTH;
             double height = VisualizationViewModel.HEIGHT;
@@ -259,11 +246,11 @@ namespace PanoramicData.controller.view
             InkableScene.Add(visualizationContainerView);
         }
 
-        void VisualizationTypeViewModel_VisualizationTypeViewModelMoved(object sender, model.view.VisualizationTypeViewModelEventArgs e)
+        void VisualizationTypeViewModel_VisualizationTypeViewModelMoved(object sender, VisualizationTypeViewModelEventArgs e)
         {
         }
 
-        void VisualizationTypeViewModel_VisualizationTypeViewModelDropped(object sender, model.view.VisualizationTypeViewModelEventArgs e)
+        void VisualizationTypeViewModel_VisualizationTypeViewModelDropped(object sender, VisualizationTypeViewModelEventArgs e)
         {
             double width = VisualizationViewModel.WIDTH;
             double height = VisualizationViewModel.HEIGHT;
@@ -281,7 +268,7 @@ namespace PanoramicData.controller.view
         void AttributeViewModelMoved(object sender, AttributeViewModelEventArgs e)
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
-            List<AttributeViewModelEventHandler> hits = new List<model.view.AttributeViewModelEventHandler>();
+            List<AttributeViewModelEventHandler> hits = new List<AttributeViewModelEventHandler>();
             foreach (var element in InkableScene.Elements.Where(ele => ele is AttributeViewModelEventHandler).Select(ele => ele as AttributeViewModelEventHandler))
             {
                 var geom = element.BoundsGeometry;
@@ -303,7 +290,7 @@ namespace PanoramicData.controller.view
         void AttributeViewModelDropped(object sender, AttributeViewModelEventArgs e)
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
-            List<AttributeViewModelEventHandler> hits = new List<model.view.AttributeViewModelEventHandler>();
+            List<AttributeViewModelEventHandler> hits = new List<AttributeViewModelEventHandler>();
             foreach (var element in InkableScene.Elements.Where(ele => ele is AttributeViewModelEventHandler).Select(ele => ele as AttributeViewModelEventHandler))
             {
                 var geom = element.BoundsGeometry;
@@ -383,9 +370,9 @@ namespace PanoramicData.controller.view
 
             foreach (IGesture recognizedGesture in recognizedGestures.ToList())
             {
-                if (recognizedGesture is PanoramicData.view.inq.ConnectGesture)
+                if (recognizedGesture is ConnectGesture)
                 {
-                    PanoramicData.view.inq.ConnectGesture connect = recognizedGesture as PanoramicData.view.inq.ConnectGesture;
+                    ConnectGesture connect = recognizedGesture as ConnectGesture;
                     LinkModel linkModel = new LinkModel()
                     {
                         FromQueryModel= connect.FromVisualizationViewModel.QueryModel,
@@ -398,9 +385,9 @@ namespace PanoramicData.controller.view
                         linkModel.ToQueryModel.LinkModels.Add(linkModel);
                     }
                 }
-                else if (recognizedGesture is PanoramicData.view.inq.ScribbleGesture)
+                else if (recognizedGesture is ScribbleGesture)
                 {
-                    PanoramicData.view.inq.ScribbleGesture scribble = recognizedGesture as PanoramicData.view.inq.ScribbleGesture;
+                    ScribbleGesture scribble = recognizedGesture as ScribbleGesture;
                     foreach (IScribbable hitScribbable in scribble.HitScribbables)
                     {
                         if (hitScribbable is InkStroke)

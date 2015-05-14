@@ -1,14 +1,10 @@
-﻿using GeoAPI.Geometries;
-using PanoramicData.utils;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using Windows.Foundation;
+using GeoAPI.Geometries;
+using PanoramicDataWin8.utils;
 
-namespace PanoramicData.view.inq
+namespace PanoramicDataWin8.view.inq
 {
     public class ScribbleGesture : IGesture
     {

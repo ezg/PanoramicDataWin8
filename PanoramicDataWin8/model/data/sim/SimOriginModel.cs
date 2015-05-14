@@ -1,17 +1,8 @@
-﻿using Newtonsoft.Json;
-using PanoramicData.controller.input;
-using PanoramicData.utils;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.ApplicationModel;
-using Windows.Storage;
-using PanoramicDataWin8.utils;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+using PanoramicDataWin8.controller.input;
 
-namespace PanoramicData.model.data.sim
+namespace PanoramicDataWin8.model.data.sim
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class SimOriginModel : OriginModel

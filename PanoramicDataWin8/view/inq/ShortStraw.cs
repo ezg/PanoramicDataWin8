@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using Windows.Foundation;
 
-namespace PanoramicData.view.inq
+namespace PanoramicDataWin8.view.inq
 {
     public class ShortStraw
     {

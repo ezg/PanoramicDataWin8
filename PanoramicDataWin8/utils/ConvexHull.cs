@@ -1,20 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Diagnostics;
+using Windows.Foundation;
 
-namespace PanoramicData.utils
+namespace PanoramicDataWin8.utils
 {
     // Finding a convex hull in the plane
     // This program requires .Net version 2.0.
     // Peter Sestoft (sestoft@itu.dk) * Java 2000-10-07, GC# 2001-10-27
-
-    using System;
-    using System.Diagnostics;
-    using System.Windows;
-    using Windows.Foundation;
-
+    
     // ------------------------------------------------------------
 
     // Find the convex hull of a XPoint set in the plane

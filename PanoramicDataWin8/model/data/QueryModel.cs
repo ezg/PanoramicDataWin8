@@ -1,20 +1,15 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using PanoramicData.model.data.common;
-using PanoramicData.model.data.result;
-using PanoramicData.model.view;
-using PanoramicData.model.view;
-using PanoramicData.utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using PanoramicDataWin8.model.data.common;
+using PanoramicDataWin8.model.data.result;
+using PanoramicDataWin8.utils;
 
-namespace PanoramicData.model.data
+namespace PanoramicDataWin8.model.data
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class QueryModel : ExtendedBindableBase

@@ -1,14 +1,8 @@
-﻿using Newtonsoft.Json;
-using PanoramicData.controller.data;
-using PanoramicData.controller.data.sim;
-using PanoramicData.controller.input;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+using PanoramicDataWin8.controller.data;
 
-namespace PanoramicData.model.data.sim
+namespace PanoramicDataWin8.model.data.sim
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class SimSchemaModel : SchemaModel

@@ -4,9 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:PanoramicDataWin8"
     xmlns:common="using:PanoramicDataWin8.view.common"
-    xmlns:inq="using:PanoramicData.view.inq"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:inq="using:PanoramicDataWin8.view.inq"
     mc:Ignorable="d">
 
     <Page.Resources>

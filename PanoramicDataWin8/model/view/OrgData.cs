@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using PanoramicData.model.data;
-using PanoramicData.utils;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.utils;
 
-namespace PanoramicData.model.view
+namespace PanoramicDataWin8.model.view
 
 {
     public abstract class OrgItem : ExtendedBindableBase

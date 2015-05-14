@@ -1,9 +1,4 @@
-﻿using PanoramicData.controller.view;
-using PanoramicData.model.data;
-using PanoramicData.model.view;
-using PanoramicData.utils;
-using PanoramicDataWin8.utils;
-using PanoramicData.view.inq;
+﻿using PanoramicDataWin8.utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -31,7 +26,10 @@ using System.Threading.Tasks;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
-using PanoramicData.model.data.result;
+using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.result;
+using PanoramicDataWin8.view.inq;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 

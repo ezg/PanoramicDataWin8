@@ -1,11 +1,6 @@
-﻿using PanoramicData.utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PanoramicDataWin8.utils;
 
-namespace PanoramicData.model.data.result
+namespace PanoramicDataWin8.model.data.result
 {
     public abstract class ResultDescriptionModel : ExtendedBindableBase
     {

@@ -1,14 +1,9 @@
-﻿using PanoramicData.model.data;
-using PanoramicData.model.data.sim;
-using PanoramicData.model.view;
-using PanoramicDataWin8.model.view;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.tuppleware;
 
-namespace PanoramicData.model.view
+namespace PanoramicDataWin8.model.view
 {
     public class VisualizationViewModelFactory
     {

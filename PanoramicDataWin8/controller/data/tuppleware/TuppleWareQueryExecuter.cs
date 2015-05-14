@@ -1,27 +1,16 @@
-﻿using PanoramicData.model.data;
-using PanoramicData.model.data.sim;
-using PanoramicData.model.view;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Dynamic;
 using System.Diagnostics;
-using PanoramicDataWin8.utils;
-using System.Runtime.Serialization;
-using System.IO;
-using System.Runtime.Serialization.Json;
-using System.Text;
-using Newtonsoft.Json;
-using System.Collections.ObjectModel;
-using Newtonsoft.Json.Serialization;
+using System.Linq;
 using System.Net.Http;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using PanoramicData.model.data.result;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.result;
+using PanoramicDataWin8.model.data.tuppleware;
+using PanoramicDataWin8.utils;
 
-namespace PanoramicData.controller.data.sim
+namespace PanoramicDataWin8.controller.data.tuppleware
 {
     public class TuppleWareQueryExecuter : QueryExecuter
     {

@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Collections.Generic;
 using Windows.UI;
 using Windows.UI.Xaml;
 
-namespace PanoramicData.view.inq
+namespace PanoramicDataWin8.view.inq
 {
     public interface IStroqConsumer
     {

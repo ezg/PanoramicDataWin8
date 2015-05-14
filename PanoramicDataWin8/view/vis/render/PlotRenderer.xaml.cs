@@ -1,8 +1,4 @@
-﻿using PanoramicData.controller.data;
-using PanoramicData.model.data;
-using PanoramicData.model.view;
-using PanoramicData.utils;
-using PanoramicDataWin8.utils;
+﻿using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
 using System;
 using System.Collections.Generic;
@@ -23,14 +19,15 @@ using Windows.UI.Xaml.Shapes;
 using SharpDX;
 using SharpDX.Direct3D11;
 using SharpDX.Toolkit.Graphics;
-using PanoramicData.controller.view;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
 using PanoramicDataWin8.controller.data.sim;
-using PanoramicData.model.data.result;
 using Windows.UI.Input;
 using System.Diagnostics;
 using GeoAPI.Geometries;
+using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.result;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 

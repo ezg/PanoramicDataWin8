@@ -1,13 +1,9 @@
-﻿using MathNet.Numerics.LinearAlgebra;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.UI.Xaml.Media;
+using MathNet.Numerics.LinearAlgebra;
 
-namespace PanoramicData.utils
+namespace PanoramicDataWin8.utils
 {
     /// <summary>
     /// Angle measured in degrees. Type-safety for angle measurements. See the types <c>Rad</c> and <c>Circles</c>.

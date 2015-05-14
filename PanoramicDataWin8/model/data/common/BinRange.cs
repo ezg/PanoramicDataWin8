@@ -1,11 +1,6 @@
-﻿using PanoramicDataWin8.utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace PanoramicData.model.data.common
+namespace PanoramicDataWin8.model.data.common
 {
     public abstract class BinRange
     {

@@ -1,7 +1,4 @@
-﻿using PanoramicData.controller.view;
-using PanoramicData.model.view;
-using PanoramicData.utils;
-using PanoramicDataWin8.utils;
+﻿using PanoramicDataWin8.utils;
 using PanoramicDataWin8.model.view;
 using System;
 using System.Collections.Generic;
@@ -14,8 +11,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Shapes;
-using PanoramicData.model.data;
-using PanoramicData.view.inq;
+using PanoramicDataWin8.controller.view;
 
 namespace PanoramicDataWin8.view.vis.menu
 {

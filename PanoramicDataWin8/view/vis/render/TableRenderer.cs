@@ -1,9 +1,9 @@
-﻿using PanoramicData.model.view;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PanoramicDataWin8.model.view;
 
 namespace PanoramicDataWin8.view.vis.render
 {

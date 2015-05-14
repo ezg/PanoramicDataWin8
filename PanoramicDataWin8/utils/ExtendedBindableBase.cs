@@ -1,13 +1,8 @@
-﻿using Microsoft.Practices.Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Linq.Expressions;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Practices.Prism.Mvvm;
 
-namespace PanoramicData.utils
+namespace PanoramicDataWin8.utils
 {
     public class ExtendedBindableBase : BindableBase
     {

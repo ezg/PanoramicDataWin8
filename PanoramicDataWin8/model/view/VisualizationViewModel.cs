@@ -1,20 +1,13 @@
-﻿using Microsoft.Practices.Prism.Mvvm;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PanoramicData.utils;
-using System.Collections.ObjectModel;
-using PanoramicData.model.data;
-using System.Windows;
-using Windows.UI.Xaml.Media;
-using Windows.UI;
-using PanoramicDataWin8.model.view;
+﻿using System.Collections.ObjectModel;
 using System.Diagnostics;
-using PanoramicData.model.data.result;
+using System.Linq;
+using Windows.UI;
+using Windows.UI.Xaml.Media;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.result;
+using PanoramicDataWin8.utils;
 
-namespace PanoramicData.model.view
+namespace PanoramicDataWin8.model.view
 {
     public class VisualizationViewModel : ExtendedBindableBase
     {

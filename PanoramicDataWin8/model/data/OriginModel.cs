@@ -1,12 +1,8 @@
-﻿using Microsoft.Practices.Prism.Mvvm;
+﻿using System.Collections.Generic;
+using Microsoft.Practices.Prism.Mvvm;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PanoramicData.model.data
+namespace PanoramicDataWin8.model.data
 {
     [JsonObject(MemberSerialization.OptOut)]
     public abstract class OriginModel : BindableBase

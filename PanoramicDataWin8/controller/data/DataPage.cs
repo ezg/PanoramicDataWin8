@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
-namespace PanoramicData.controller.data
+namespace PanoramicDataWin8.controller.data
 {
     public class DataPage<T> where T : class
     {

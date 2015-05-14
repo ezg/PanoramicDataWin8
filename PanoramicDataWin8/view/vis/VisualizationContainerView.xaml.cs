@@ -1,9 +1,4 @@
-﻿using PanoramicData.controller.view;
-using PanoramicData.model.data;
-using PanoramicData.model.view;
-using PanoramicData.utils;
-using PanoramicData.view.inq;
-using PanoramicDataWin8.view.vis.render;
+﻿using PanoramicDataWin8.view.vis.render;
 using PanoramicDataWin8.utils;
 using System;
 using System.Collections.Generic;
@@ -23,6 +18,10 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Core;
 using Windows.System;
 using Windows.UI.Input;
+using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.view.inq;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 

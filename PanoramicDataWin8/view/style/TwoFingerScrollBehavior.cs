@@ -1,5 +1,4 @@
 ﻿using Microsoft.Xaml.Interactivity;
-using PanoramicData.utils;
 using PanoramicDataWin8.utils;
 using System;
 using System.Collections.Generic;

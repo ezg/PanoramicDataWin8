@@ -19,7 +19,7 @@ using D2D = SharpDX.Direct2D1;
 using DW = SharpDX.DirectWrite;
 using System.Diagnostics;
 using Windows.Graphics.Display;
-using PanoramicData.controller.view;
+using PanoramicDataWin8.controller.view;
 
 namespace PanoramicDataWin8.view.common
 {

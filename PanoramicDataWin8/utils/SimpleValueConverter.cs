@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 
-namespace PanoramicData.utils
+namespace PanoramicDataWin8.utils
 {
     public abstract class SimpleValueConverter<TSource, TTarget> : IValueConverter
     {

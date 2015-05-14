@@ -1,11 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PanoramicData.model.data.sim
+namespace PanoramicDataWin8.model.data.sim
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class SimAttributeModel : AttributeModel

@@ -1,13 +1,9 @@
-﻿using Microsoft.Practices.Prism.Mvvm;
-using PanoramicData.model.data;
-using PanoramicData.utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Microsoft.Practices.Prism.Mvvm;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.utils;
 
-namespace PanoramicData.model.view
+namespace PanoramicDataWin8.model.view
 {
     public class SchemaViewModel : BindableBase
     {

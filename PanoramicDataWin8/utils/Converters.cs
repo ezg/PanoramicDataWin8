@@ -1,16 +1,10 @@
-﻿using PanoramicData.model.data;
-using PanoramicData.model.data.result;
-using PanoramicData.model.view;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.result;
 
-namespace PanoramicData.utils
+namespace PanoramicDataWin8.utils
 {
     public class StringToVisibilityConverter : SimpleValueConverter<string, Visibility>
     {

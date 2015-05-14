@@ -1,6 +1,4 @@
-﻿using PanoramicData.controller.view;
-using PanoramicData.utils;
-using PanoramicDataWin8.model.view;
+﻿using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 using System;
 using System.Collections.Generic;

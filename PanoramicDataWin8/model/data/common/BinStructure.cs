@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PanoramicDataWin8.utils;
-using PanoramicData.model.data;
 
-namespace PanoramicData.model.data.common
+namespace PanoramicDataWin8.model.data.common
 {
     public class BinStructure
     {

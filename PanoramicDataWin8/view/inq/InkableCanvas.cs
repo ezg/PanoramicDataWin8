@@ -1,11 +1,4 @@
-﻿using PanoramicData.utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
+﻿using System.Collections.Generic;
 using Windows.Devices.Input;
 using Windows.Foundation;
 using Windows.System;
@@ -15,7 +8,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 
-namespace PanoramicData.view.inq
+namespace PanoramicDataWin8.view.inq
 {
     public class InkableCanvas : Canvas
     {

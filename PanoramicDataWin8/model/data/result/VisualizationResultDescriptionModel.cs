@@ -1,11 +1,7 @@
-﻿using PanoramicData.model.data.common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using PanoramicDataWin8.model.data.common;
 
-namespace PanoramicData.model.data.result
+namespace PanoramicDataWin8.model.data.result
 {
     public class VisualizationResultDescriptionModel : ResultDescriptionModel
     {

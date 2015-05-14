@@ -1,16 +1,9 @@
-﻿using GeoAPI.Geometries;
-using PanoramicData.model.view;
-using PanoramicData.utils;
-using PanoramicDataWin8.view.vis;
+﻿using System.Linq;
+using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+using PanoramicDataWin8.view.vis;
 
-namespace PanoramicData.view.inq
+namespace PanoramicDataWin8.view.inq
 {
     public class ConnectGesture : IGesture
     {

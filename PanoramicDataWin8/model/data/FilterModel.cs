@@ -1,11 +1,7 @@
-﻿using PanoramicData.model.data.result;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using PanoramicDataWin8.model.data.result;
 
-namespace PanoramicData.model.data
+namespace PanoramicDataWin8.model.data
 {
     public class FilterModel
     {

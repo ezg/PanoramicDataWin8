@@ -1,16 +1,11 @@
-﻿using Microsoft.Practices.Prism.Mvvm;
-using PanoramicData.utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using Windows.UI.Popups;
+using Microsoft.Practices.Prism.Mvvm;
+using PanoramicDataWin8.utils;
 
-namespace PanoramicData.controller.input
+namespace PanoramicDataWin8.controller.input
 {
     public class DatasetConfiguration :BindableBase
     {

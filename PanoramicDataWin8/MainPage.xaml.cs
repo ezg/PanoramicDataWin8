@@ -13,23 +13,22 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
-using PanoramicData.controller.view;
 using System.Diagnostics;
-using PanoramicData.model.view;
 using System.ComponentModel;
-using PanoramicData.controller.input;
-using PanoramicData.model.data;
 using PanoramicDataWin8.view.vis;
 using Windows.UI.Input;
-using PanoramicData.utils;
 using MathNet.Numerics.LinearAlgebra;
 using PanoramicDataWin8.view;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.utils;
-using PanoramicData.model.data.sim;
 using Windows.UI.Notifications;
 using Windows.UI.Core;
 using Windows.System;
+using PanoramicDataWin8.controller.input;
+using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.tuppleware;
+using PanoramicDataWin8.model.view;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
