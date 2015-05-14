@@ -19,8 +19,9 @@ using Newtonsoft.Json.Serialization;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using PanoramicData.controller.view;
-using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.controller.data.sim.binrange;
+using PanoramicData.model.data.common;
+using PanoramicData.model.data.result;
+using Windows.System.Threading;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
@@ -34,15 +35,14 @@ namespace PanoramicDataWin8.controller.data.sim
         private int _sampleSize = 0;
         private bool _isIncremental = false;
         private TimeSpan _throttle = TimeSpan.FromMilliseconds(0);
-        private DataBinner _binner = new DataBinner();
+        private DataBinner _binner = null;
         private DataAggregator _aggregator = new DataAggregator();
         private Object _lock = new Object();
-        private AxisType _xAxisType = AxisType.Nominal;
-        private AxisType _yAxisType = AxisType.Nominal;
+        private List<AxisType> _axisTypes = new List<AxisType>();
+        private Stopwatch _stopWatch = new Stopwatch();
 
-
-        private Dictionary<object, double> _xUniqueValues = new Dictionary<object, double>();
-        private Dictionary<object, double> _yUniqueValues = new Dictionary<object, double>();
+        private List<AttributeOperationModel> _dimensions = new List<AttributeOperationModel>();
+        private List<Dictionary<object, double>> _uniqueValues = new List<Dictionary<object, double>>();
 
         public QueryModel QueryModel { get; set; }
         public QueryModel QueryModelClone { get; set; }
@@ -56,6 +56,8 @@ namespace PanoramicDataWin8.controller.data.sim
 
         public void Start()
         {
+            _stopWatch.Start();
+
             QueryModelClone = QueryModel.Clone();
 
             _isRunning = true;
@@ -68,29 +70,32 @@ namespace PanoramicDataWin8.controller.data.sim
             }
             else
             {
-                var xAom = QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
-                var yAom = QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
-                _xAxisType = QueryModel.GetAxisType(xAom);
-                _yAxisType = QueryModel.GetAxisType(yAom);
-                QueryModel.QueryResultModel.XAxisType = _xAxisType;
-                QueryModel.QueryResultModel.YAxisType = _yAxisType;
+                _dimensions = QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Concat(
+                                 QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y)).Concat(
+                                 QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group)).ToList();
 
-                _isIncremental = xAom.AggregateFunction == AggregateFunction.None && yAom.AggregateFunction == AggregateFunction.None;
+                _uniqueValues = _dimensions.Select(d => new Dictionary<object, double>()).ToList();
+
+                _axisTypes = _dimensions.Select(d => QueryModel.GetAxisType(d)).ToList();
+                (QueryModel.ResultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).AxisTypes = _axisTypes;
+
+                _isIncremental = _dimensions.Any(aom => aom.AggregateFunction == AggregateFunction.None);
 
                 _binner = new DataBinner()
                 {
-                    NrOfXBins = MainViewController.Instance.MainModel.NrOfXBins,
-                    NrOfYBins = MainViewController.Instance.MainModel.NrOfYBins,
+                    NrOfBins = new double[] { MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins }.Concat(
+                                    QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Select(qom => MainViewController.Instance.MainModel.NrOfGroupBins)).ToList(),
                     Incremental = _isIncremental,
-                    XAxisType = _xAxisType,
-                    YAxisType = _yAxisType,
-                    IsXAxisAggregated = xAom.AggregateFunction != AggregateFunction.None,
-                    IsYAxisAggregated = yAom.AggregateFunction != AggregateFunction.None
+                    AxisTypes = _axisTypes,
+                    IsAxisAggregated = _dimensions.Select(d => d.AggregateFunction != AggregateFunction.None).ToList(),
+                    Dimensions = _dimensions.Select(aom => aom.AttributeModel).ToList()
                 };
             }
             _simDataProvider = new SimDataProvider(QueryModelClone, (QueryModel.SchemaModel.OriginModels[0] as SimOriginModel), samplesToCheck);
 
             Task.Run(() => run());
+
+            //ThreadPool.RunAsync(_ => run(), WorkItemPriority.Low);
         }
 
         public void Stop()
@@ -103,13 +108,25 @@ namespace PanoramicDataWin8.controller.data.sim
 
         private async void run()
         {
+            /*for (long i = 0; i < 100000; i++)
+            {
+                for (long j = 0; j < 100000; j++)
+                {
+                    var tt = j * i;
+                   
+                }
+                //await Task.Delay(5);
+            }
+            await fireCompleted();
+            return;*/
+
             if (!_simDataProvider.IsInitialized)
             {
                 await _simDataProvider.StartSampling();
             }
 
             List<DataRow> dataRows = await _simDataProvider.GetSampleDataRows(_sampleSize);
-            List<QueryResultItemModel> queryResultItemModels = new List<QueryResultItemModel>();
+            List<ResultItemModel> resultItemModels = new List<ResultItemModel>();
             while (dataRows != null && _isRunning)
             {
                 Stopwatch sw = new Stopwatch();
@@ -118,8 +135,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 {
                     if (!_isIncremental)
                     {
-                        _xUniqueValues.Clear();
-                        _yUniqueValues.Clear();
+                        _uniqueValues = _dimensions.Select(d => new Dictionary<object, double>()).ToList();
                     }
                     setVisualizationValues(dataRows);
                     if (_binner != null)
@@ -128,28 +144,38 @@ namespace PanoramicDataWin8.controller.data.sim
                     }
                     if (_aggregator != null)
                     {
-                        _aggregator.AggregateStep(_binner.DataBinStructure, QueryModelClone);
+                        _aggregator.AggregateStep(_binner.BinStructure, QueryModelClone, _simDataProvider.Progress());
                     }
-                    queryResultItemModels = convertBinsToQueryResultItemModels(_binner.DataBinStructure);
+                    resultItemModels = convertBinsToResultItemModels(_binner.BinStructure);
                 }
 
                 if (_isRunning)
                 {
-                    await fireUpdated(
-                        queryResultItemModels,
-                        _simDataProvider.Progress(),
-                        _binner == null ? 0 : _binner.DataBinStructure.XNullCount,
-                        _binner == null ? 0 : _binner.DataBinStructure.YNullCount,
-                        _binner == null ? 0 : _binner.DataBinStructure.XAndYNullCount,
-                        _binner == null ? null : _binner.DataBinStructure.XBinRange,
-                        _binner == null ? null : _binner.DataBinStructure.YBinRange,
-                        _binner == null ? null : _binner.DataBinStructure.MinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
-                        _binner == null ? null : _binner.DataBinStructure.MaxValues.ToDictionary(entry => entry.Key, entry => entry.Value));
+                    ResultDescriptionModel resultDescriptionModel = null;
+                    if (_binner != null)
+                    {
+                        resultDescriptionModel = new VisualizationResultDescriptionModel()
+                        {
+                            BinRanges = _binner.BinStructure.BinRanges,
+                            NullCount = _binner.BinStructure.NullCount,
+                            Dimensions = _dimensions,
+                            AxisTypes = _axisTypes,
+                            MinValues = _binner.BinStructure.AggregatedMinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
+                            MaxValues = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => entry.Value)
+                        };
+                    }
+                    await fireUpdated(resultItemModels, _simDataProvider.Progress(), resultDescriptionModel);
                 }
                 dataRows = await _simDataProvider.GetSampleDataRows(_sampleSize);
 
-                Debug.WriteLine("Job Iteration Time: " + sw.ElapsedMilliseconds);
-                await Task.Delay(_throttle);
+                if (MainViewController.Instance.MainModel.Verbose)
+                {
+                    Debug.WriteLine("Job Iteration Time: " + sw.ElapsedMilliseconds);
+                }
+                if (_throttle.Ticks > 0)
+                {
+                    await Task.Delay(_throttle);
+                }
             }
             lock (_lock)
             {
@@ -160,12 +186,12 @@ namespace PanoramicDataWin8.controller.data.sim
 
         private void setVisualizationValues(List<DataRow> samples)
         {
-            var xAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
-            var yAom = QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
             foreach (var sample in samples)
             {
-                sample.VisualizationResultValues.Add(VisualizationResult.X, getVisualizationValue(_xAxisType, sample.Entries[xAom.AttributeModel], xAom, _xUniqueValues));
-                sample.VisualizationResultValues.Add(VisualizationResult.Y, getVisualizationValue(_yAxisType, sample.Entries[yAom.AttributeModel], yAom, _yUniqueValues));
+                for (int d = 0; d < _dimensions.Count; d++)
+                {
+                    sample.VisualizationValues[_dimensions[d].AttributeModel] = getVisualizationValue(_axisTypes[d], sample.Entries[_dimensions[d].AttributeModel], _dimensions[d], _uniqueValues[d]);
+                }
             }
         }
 
@@ -193,66 +219,43 @@ namespace PanoramicDataWin8.controller.data.sim
             }
         }
 
-        private List<QueryResultItemModel> convertBinsToQueryResultItemModels(DataBinStructure binStructure)
+        private List<ResultItemModel> convertBinsToResultItemModels(BinStructure binStructure)
         {
-            List<QueryResultItemModel> returnValues = new List<QueryResultItemModel>();
-            if (binStructure.XBinRange is NominalBinRange)
-            {
-                (binStructure.XBinRange as NominalBinRange).Labels = _xUniqueValues.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key.ToString()).ToList();
-            }
-            if (binStructure.YBinRange is NominalBinRange)
-            {
-                (binStructure.YBinRange as NominalBinRange).Labels = _yUniqueValues.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key.ToString()).ToList();
-            }
+            List<ResultItemModel> returnValues = new List<ResultItemModel>();
 
-            for (int col = 0; col < binStructure.Bins.Count; col++)
+            for (int d = 0; d < _dimensions.Count; d++)
             {
-                for (int row = 0; row < binStructure.Bins[col].Count; row++)
+                if (binStructure.BinRanges[d] is NominalBinRange)
                 {
-                    Bin bin = binStructure.Bins[col][row];
-                    Bin binClone = bin.Clone();
-
-                    foreach (var groupingObject in bin.Values.Keys)
-                    {
-                        QueryResultItemModel itemModel = new QueryResultItemModel();
-
-                        foreach (var aom in bin.Values[groupingObject].Keys)
-                        {
-                            itemModel.AddAttributeValue(aom, new QueryResultItemValueModel(
-                                bin.Values[groupingObject][aom],
-                                bin.NormalizedValues[groupingObject][aom]));
-
-                            foreach (var aomGrouping in groupingObject.GroupingValues.Keys)
-                            {
-                                itemModel.AddAttributeValue(aomGrouping, new QueryResultItemValueModel(
-                                    groupingObject.GroupingValues[aomGrouping],
-                                    groupingObject.GroupingValues[aomGrouping]));
-                            }
-
-                            if (!(binStructure.XBinRange is AggregateBinRange))
-                            {
-                                itemModel.AddAttributeValue(QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.X).First(),
-                                    new QueryResultItemValueModel(bin.BinMinX, bin.BinMinX));
-                            }
-                            if (!(binStructure.YBinRange is AggregateBinRange))
-                            {
-                                itemModel.AddAttributeValue(QueryModelClone.GetFunctionAttributeOperationModel(AttributeFunction.Y).First(),
-                                    new QueryResultItemValueModel(bin.BinMinY, bin.BinMinY));
-                            }
-                        }
-                        
-                        returnValues.Add(itemModel);
-                    }                   
+                    (binStructure.BinRanges[d] as NominalBinRange).Labels = _uniqueValues[d].OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key.ToString()).ToList();
                 }
             }
+            foreach (var bin in binStructure.Bins.Values)
+            {
+                VisualizationItemResultModel itemModel = new VisualizationItemResultModel();
+                for (int d = 0; d < _dimensions.Count; d++)
+                {
+                    if (!(binStructure.BinRanges[d] is AggregateBinRange))
+                    {
+                        itemModel.AddValue(_dimensions[d],
+                            new ResultItemValueModel(bin.Spans[d].Min, bin.Spans[d].Max));
+                    }
+                }
+
+                foreach (var aom in bin.Values.Keys)
+                {
+                    itemModel.AddValue(aom, new ResultItemValueModel(
+                               bin.Values[aom],
+                               bin.NormalizedValues[aom]));
+                }      
+                returnValues.Add(itemModel);
+            }
+
             return returnValues;
         }
 
 
-        private async Task fireUpdated(List<QueryResultItemModel> samples, double progress, 
-            double xNullCount, double yNullCount, double xAndYNullCount, 
-            BinRange xBinRange, BinRange yBinRange,
-            Dictionary<AttributeOperationModel, double> minValues, Dictionary<AttributeOperationModel, double> maxValues)
+        private async Task fireUpdated(List<ResultItemModel> samples, double progress, ResultDescriptionModel resultDescriptionModel)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
@@ -263,13 +266,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     {
                         Samples = samples,
                         Progress = progress,
-                        XAndYNullCount = xAndYNullCount,
-                        YNullCount = yNullCount,
-                        XNullCount = xNullCount,
-                        XBinRange = xBinRange,
-                        YBinRange = yBinRange,
-                        MaxValues = maxValues,
-                        MinValues = minValues
+                        ResultDescriptionModel = resultDescriptionModel
                     });
                 }
             });
@@ -284,21 +281,19 @@ namespace PanoramicDataWin8.controller.data.sim
                 {
                     JobCompleted(this, new EventArgs());
                 }
-            });
+            }); 
+            if (MainViewController.Instance.MainModel.Verbose)
+            {
+                Debug.WriteLine("Job Total Run Time: " + _stopWatch.ElapsedMilliseconds);
+            }
         }
     }
 
     public class JobEventArgs : EventArgs
     {
-        public List<QueryResultItemModel> Samples { get; set; }
+        public List<ResultItemModel> Samples { get; set; }
         public double Progress { get; set; }
-        public double XNullCount { get; set; }
-        public double YNullCount { get; set; }
-        public double XAndYNullCount { get; set; }
-        public BinRange XBinRange { get; set; }
-        public BinRange YBinRange { get; set; }
-        public Dictionary<AttributeOperationModel, double> MaxValues { get; set; }
-        public Dictionary<AttributeOperationModel, double> MinValues { get; set; }
+        public ResultDescriptionModel ResultDescriptionModel { get; set; }
     }
 }
 

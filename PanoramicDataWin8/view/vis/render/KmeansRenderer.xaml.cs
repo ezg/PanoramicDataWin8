@@ -1,5 +1,6 @@
 ﻿using PanoramicData.controller.data;
 using PanoramicData.model.data;
+using PanoramicData.model.data.result;
 using PanoramicData.model.view;
 using PanoramicData.utils;
 using System;
@@ -42,8 +43,8 @@ namespace PanoramicDataWin8.view.vis.render
             if (DataContext != null)
             {
                 (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
-                QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-                resultModel.PropertyChanged -= QueryResultModel_PropertyChanged;
+                ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+                resultModel.PropertyChanged -= ResultModel_PropertyChanged;
             }
         }
 
@@ -52,11 +53,11 @@ namespace PanoramicDataWin8.view.vis.render
             if (args.NewValue != null)
             {
                 (DataContext as VisualizationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
-                QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-                resultModel.PropertyChanged += QueryResultModel_PropertyChanged;
-                if (resultModel.QueryResultItemModels != null)
+                ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+                resultModel.PropertyChanged += ResultModel_PropertyChanged;
+                if (resultModel.ResultItemModels != null)
                 {
-                    resultModel.QueryResultItemModels.CollectionChanged += QueryResultItemModels_CollectionChanged;
+                    resultModel.ResultItemModels.CollectionChanged += ResultItemModels_CollectionChanged;
                     populateData();
                 }
             }
@@ -71,17 +72,17 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void QueryResultItemModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        void ResultItemModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             populateData();
         }
 
-        void QueryResultModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void ResultModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-            if (e.PropertyName == resultModel.GetPropertyName(() => resultModel.QueryResultItemModels))
+            ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+            if (e.PropertyName == resultModel.GetPropertyName(() => resultModel.ResultItemModels))
             {
-                resultModel.QueryResultItemModels.CollectionChanged += QueryResultItemModels_CollectionChanged;
+                resultModel.ResultItemModels.CollectionChanged += ResultItemModels_CollectionChanged;
                 populateData();
             }
         }
@@ -89,8 +90,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void populateData()
         {
-            QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-            if (resultModel.QueryResultItemModels.Count > 0)
+            ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+            if (resultModel.ResultItemModels.Count > 0)
             {
                 ExponentialEase easingFunction = new ExponentialEase();
                 easingFunction.EasingMode = EasingMode.EaseInOut;
@@ -115,13 +116,13 @@ namespace PanoramicDataWin8.view.vis.render
                 Storyboard.SetTargetProperty(animation, "Opacity");
                 storyboard.Begin();
 
-                _toLoad = resultModel.QueryResultItemModels.Count;
+                _toLoad = resultModel.ResultItemModels.Count;
                 _loaded = 0;
                 _clusterCenters.Clear();
                 _samples.Clear();
-                foreach (var queryResultItemModel in resultModel.QueryResultItemModels)
+                foreach (var resultItemModel in resultModel.ResultItemModels)
                 {
-                    queryResultItemModel.PropertyChanged += queryResultItemModel_PropertyChanged;
+                    resultItemModel.PropertyChanged += resultItemModel_PropertyChanged;
                 }
             }
             else
@@ -152,39 +153,39 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void queryResultItemModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void resultItemModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "Data")
             {
-                var dataWrapper = sender as DataWrapper<QueryResultItemModel>;
+                var dataWrapper = sender as DataWrapper<ResultItemModel>;
                 if (!dataWrapper.IsLoading && dataWrapper.Data != null)
                 {
-                    loadQueryResultItemModel(dataWrapper.Data);
+                    loadResultItemModel(dataWrapper.Data);
                 }
             }
         }
 
-        void loadQueryResultItemModel(QueryResultItemModel queryResultItemModel)
+        void loadResultItemModel(ResultItemModel resultItemModel)
         {
-            if (queryResultItemModel.JobResultValues.ContainsKey(JobResult.ClusterX))
+            /*if (resultItemModel.JobResultValues.ContainsKey(JobResult.ClusterX))
             {
                 Vec cluster = new Vec(
-                    double.Parse(queryResultItemModel.JobResultValues[JobResult.ClusterX].Value.ToString()),
-                    double.Parse(queryResultItemModel.JobResultValues[JobResult.ClusterY].Value.ToString()));
+                    double.Parse(resultItemModel.JobResultValues[JobResult.ClusterX].Value.ToString()),
+                    double.Parse(resultItemModel.JobResultValues[JobResult.ClusterY].Value.ToString()));
                 _clusterCenters.Add(cluster);
             }
-            else if (queryResultItemModel.JobResultValues.ContainsKey(JobResult.SampleX))
+            else if (resultItemModel.JobResultValues.ContainsKey(JobResult.SampleX))
             {
                 Vec sample = new Vec(
-                    double.Parse(queryResultItemModel.JobResultValues[JobResult.SampleX].Value.ToString()),
-                    double.Parse(queryResultItemModel.JobResultValues[JobResult.SampleY].Value.ToString()));
+                    double.Parse(resultItemModel.JobResultValues[JobResult.SampleX].Value.ToString()),
+                    double.Parse(resultItemModel.JobResultValues[JobResult.SampleY].Value.ToString()));
                 _samples.Add(sample);
             }
             _loaded++;
             if (_toLoad == _loaded)
             {
                 render();
-            }
+            }*/
         }
 
         void render()

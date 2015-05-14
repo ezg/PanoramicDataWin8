@@ -25,6 +25,7 @@ using Windows.Storage;
 using PanoramicData.utils;
 using Windows.Storage.FileProperties;
 using System.Globalization;
+using PanoramicData.model.data.result;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
@@ -77,7 +78,10 @@ namespace PanoramicDataWin8.controller.data.sim
                 List<DataRow> returnList = data.Select(d => new DataRow() { Entries = d }).ToList();
                 _nrProcessedSamples += sampleSize;
 
-                Debug.WriteLine("From File Time: " + sw.ElapsedMilliseconds);
+                if (MainViewController.Instance.MainModel.Verbose)
+                {
+                    Debug.WriteLine("From File Time: " + sw.ElapsedMilliseconds);
+                }
                 return returnList;
             }
             else
@@ -103,9 +107,9 @@ namespace PanoramicDataWin8.controller.data.sim
             return Math.Min(1.0, (double)_nrProcessedSamples / (double)GetNrTotalSamples());
         }
 
-        public QueryResultItemValueModel GetQueryResultItemValueModel(AttributeOperationModel attributeOperationModel, Dictionary<AttributeModel, object> valueDict)
+        public ResultItemValueModel GetResultItemValueModel(AttributeOperationModel attributeOperationModel, Dictionary<AttributeModel, object> valueDict)
         {
-            QueryResultItemValueModel valueModel = new QueryResultItemValueModel();
+            ResultItemValueModel valueModel = new ResultItemValueModel();
             if (valueDict[attributeOperationModel.AttributeModel] == null)
             {
                 valueModel.Value = null;
@@ -200,14 +204,14 @@ namespace PanoramicDataWin8.controller.data.sim
                     else if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.TIME)
                     {
                         DateTime timeStamp = DateTime.Now;
-                        if (DateTime.TryParseExact(values[i].ToString(), new string[] {"HH:mm:ss","mm:ss","mm:ss.f"} , null, System.Globalization.DateTimeStyles.None, out timeStamp))
+                        if (DateTime.TryParseExact(values[i].ToString(), new string[] {"HH:mm:ss","mm:ss","mm:ss.f","m:ss"} , null, System.Globalization.DateTimeStyles.None, out timeStamp))
                         {
                             value = timeStamp;
                         }
                         else
                         {
                             value = null;
-                         }
+                        }
                     }
                     else if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.DATE)
                     {
@@ -251,31 +255,16 @@ namespace PanoramicDataWin8.controller.data.sim
             }
         }
 
-        private Dictionary<VisualizationResult, double?> _visualizationResultValues = new Dictionary<VisualizationResult, double?>();
-        public Dictionary<VisualizationResult, double?> VisualizationResultValues
+        private Dictionary<AttributeModel, double?> _visualizationValues = new Dictionary<AttributeModel, double?>();
+        public Dictionary<AttributeModel, double?> VisualizationValues
         {
             get
             {
-                return _visualizationResultValues;
+                return _visualizationValues;
             }
             set
             {
-                _visualizationResultValues = value;
-            }
-        }
-
-        public double? XValue
-        {
-            get
-            {
-                return VisualizationResultValues[VisualizationResult.X];
-            }
-        }
-        public double? YValue
-        {
-            get
-            {
-                return VisualizationResultValues[VisualizationResult.Y];
+                _visualizationValues = value;
             }
         }
     }

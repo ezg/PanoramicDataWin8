@@ -31,6 +31,7 @@ using System.Threading.Tasks;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
+using PanoramicData.model.data.result;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -88,8 +89,8 @@ namespace PanoramicDataWin8.view.vis
             if (DataContext != null)
             {
                 (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
-                QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-                resultModel.PropertyChanged -= QueryResultModel_PropertyChanged;
+                ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+                resultModel.PropertyChanged -= ResultModel_PropertyChanged;
             }
             AttributeView.AttributeViewModelTapped -= AttributeView_AttributeViewModelTapped;
         }
@@ -118,9 +119,9 @@ namespace PanoramicDataWin8.view.vis
 
                 (DataContext as VisualizationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
 
-                QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-                resultModel.PropertyChanged += QueryResultModel_PropertyChanged;
-                if (resultModel.QueryResultItemModels != null)
+                ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+                resultModel.PropertyChanged += ResultModel_PropertyChanged;
+                if (resultModel.ResultItemModels != null)
                 {
                     populateData();
                 }
@@ -170,10 +171,10 @@ namespace PanoramicDataWin8.view.vis
             setMenuViewModelAnkerPosition();
         }
 
-        void QueryResultModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void ResultModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-             QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-             if (e.PropertyName == resultModel.GetPropertyName(() => resultModel.QueryResultItemModels))
+             ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+             if (e.PropertyName == resultModel.GetPropertyName(() => resultModel.ResultItemModels))
              {
                  populateData();
              }
@@ -181,8 +182,8 @@ namespace PanoramicDataWin8.view.vis
 
         private void populateData()
         {
-            QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-            listView.ItemsSource = resultModel.QueryResultItemModels;
+            ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+            listView.ItemsSource = resultModel.ResultItemModels;
         }
 
         private void populateTableHeaders()

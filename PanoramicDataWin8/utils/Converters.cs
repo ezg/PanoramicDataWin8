@@ -1,4 +1,5 @@
 ﻿using PanoramicData.model.data;
+using PanoramicData.model.data.result;
 using PanoramicData.model.view;
 using System;
 using System.Collections.Generic;
@@ -100,11 +101,11 @@ namespace PanoramicData.utils
             }
             if (value != null)
             {
-                QueryResultItemModel model = (value as QueryResultItemModel);
-                if (model.AttributeValues.ContainsKey(AttributeOperationModel))
+                ResultItemModel model = (value as ResultItemModel);
+                /*if (model.AttributeValues.ContainsKey(AttributeOperationModel))
                 {
                     return model.AttributeValues[AttributeOperationModel].ShortStringValue;
-                }
+                }*/
                 return ""; 
             }
             return null;

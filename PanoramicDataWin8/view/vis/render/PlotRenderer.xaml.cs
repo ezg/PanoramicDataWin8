@@ -27,7 +27,10 @@ using PanoramicData.controller.view;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
 using PanoramicDataWin8.controller.data.sim;
-using PanoramicDataWin8.controller.data.sim.binrange;
+using PanoramicData.model.data.result;
+using Windows.UI.Input;
+using System.Diagnostics;
+using GeoAPI.Geometries;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -65,8 +68,8 @@ namespace PanoramicDataWin8.view.vis.render
                 (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
                 (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).CollectionChanged -= X_CollectionChanged;
                 (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).CollectionChanged -= Y_CollectionChanged;
-                QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-                resultModel.QueryResultModelUpdated -= resultModel_QueryResultModelUpdated;
+                ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+                resultModel.ResultModelUpdated -= resultModel_ResultModelUpdated;
             }
             dxSurface.Dispose();
         }
@@ -78,8 +81,8 @@ namespace PanoramicDataWin8.view.vis.render
                 (DataContext as VisualizationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
                 (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).CollectionChanged += X_CollectionChanged;
                 (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).CollectionChanged += Y_CollectionChanged;
-                QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-                resultModel.QueryResultModelUpdated += resultModel_QueryResultModelUpdated;
+                ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+                resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
                 mainLabel.Text = (DataContext as VisualizationViewModel).QueryModel.VisualizationType.ToString();
                 populateHeaders();
             }
@@ -94,7 +97,7 @@ namespace PanoramicDataWin8.view.vis.render
             populateHeaders();
         }
 
-        void resultModel_QueryResultModelUpdated(object sender, EventArgs e)
+        void resultModel_ResultModelUpdated(object sender, EventArgs e)
         {
             populateData();
             updateProgressAndNullVisualization();
@@ -181,7 +184,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void updateProgressAndNullVisualization()
         {
-            QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
+            ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
 
             // progress
             double size = 14;
@@ -211,31 +214,21 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             // null labels
-            if (resultModel.XNullCount > 0)
+            if ((resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount > 0)
             {
-                tbXNull.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                tbXNull.Text = "x null values : " + resultModel.XNullCount;
+                tbNull.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                tbNull.Text = "null values : " + (resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount;
             }
             else
             {
-                tbXNull.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            }
-
-            if (resultModel.YNullCount > 0)
-            {
-                tbYNull.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                tbYNull.Text = "y null values : " + resultModel.YNullCount;
-            }
-            else
-            {
-                tbYNull.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                tbNull.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
             }
         }
 
         private void populateData()
         {
-            QueryResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.QueryResultModel;
-            if (resultModel.QueryResultItemModels.Count > 0)
+            ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+            if (resultModel.ResultItemModels.Count > 0)
             {
                 ExponentialEase easingFunction = new ExponentialEase();
                 easingFunction.EasingMode = EasingMode.EaseInOut;
@@ -265,7 +258,7 @@ namespace PanoramicDataWin8.view.vis.render
                 dxSurfaceGrid.Opacity = 1;
                 mainLabel.Opacity = 0;
 
-                loadQueryResultItemModels(resultModel);
+                loadResultItemModels(resultModel);
                 render();
             }
             else
@@ -300,7 +293,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void loadQueryResultItemModels(QueryResultModel resultModel)
+        void loadResultItemModels(ResultModel resultModel)
         {
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
             _plotRendererContentProvider.UpdateData(resultModel,
@@ -387,6 +380,23 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
+        private List<Windows.Foundation.Point> _selectionPoints = new List<Windows.Foundation.Point>();
+        public override void StartSelection(Windows.Foundation.Point point)
+        {
+            Debug.WriteLine("start");
+            _selectionPoints = new List<Windows.Foundation.Point>();
+            _selectionPoints.Add(point);
+        }
+        public override void MoveSelection(Windows.Foundation.Point point)
+        {
+            _selectionPoints.Add(point);
+        }
+        public override void EndSelection()
+        {
+            IList<Vec> convexHull = Convexhull.convexhull(_selectionPoints);
+            IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon();
+        }
+
         void render()
         {
             dxSurface.Redraw();
@@ -469,6 +479,10 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 qModel.AddFunctionAttributeOperationModel(AttributeFunction.Y, e.AttributeOperationModel);
             }
+        }
+
+        private void Renderer_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
         }
     }
 }

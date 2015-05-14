@@ -19,178 +19,175 @@ using Newtonsoft.Json.Serialization;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using PanoramicData.controller.view;
-using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.controller.data.sim.binrange;
+using PanoramicData.model.data.common;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
     public class DataBinner
     {
         public bool Incremental { get; set; }
-        public AxisType XAxisType { get; set; }
-        public bool IsXAxisAggregated { get; set; }
-        public AxisType YAxisType { get; set; }
-        public bool IsYAxisAggregated { get; set; }
-        public double NrOfXBins { get; set; }
-        public double NrOfYBins { get; set; }
-        public DataBinStructure DataBinStructure { get; set; }
+        public List<AxisType> AxisTypes { get; set; }
+        public List<bool> IsAxisAggregated { get; set; }
+        public List<double> NrOfBins { get; set; }
+        public BinStructure BinStructure { get; set; }
+        public List<AttributeModel> Dimensions { get; set; }
 
         public void BinStep(List<DataRow> dataRows)
         {
-            double dataMinX = 0;
-            double dataMinY = 0;
-            double dataMaxX = 0;
-            double dataMaxY = 0;
-            BinRange xBinRange = null;
-            BinRange yBinRange = null;
+            List<double> dataMins = new List<double>();
+            List<double> dataMaxs = new List<double>();
+            List<BinRange> binRanges = null;
 
-            getMinMaxValuesFromSamples(dataRows, out dataMinX, out dataMinY, out dataMaxX, out dataMaxY);
-
-            if (DataBinStructure != null)
+            if (dataRows.Count == 0)
             {
-                dataMinX = Math.Min(DataBinStructure.XBinRange.DataMinValue, dataMinX);
-                dataMinY = Math.Min(DataBinStructure.YBinRange.DataMinValue, dataMinY);
-                dataMaxX = Math.Max(DataBinStructure.XBinRange.DataMaxValue, dataMaxX);
-                dataMaxY = Math.Max(DataBinStructure.YBinRange.DataMaxValue, dataMaxY);
+                return;
+            }
+
+            getMinMaxValuesFromSamples(dataRows, dataMins, dataMaxs);
+
+            if (BinStructure != null)
+            {
+                for (int d = 0; d < Dimensions.Count; d++)
+                {
+                    dataMins[d] = Math.Min(BinStructure.BinRanges[d].DataMinValue, dataMins[d]);
+                    dataMaxs[d] = Math.Max(BinStructure.BinRanges[d].DataMaxValue, dataMaxs[d]);
+                }
+                binRanges = BinStructure.BinRanges.ToArray().ToList();
             }
             else
             {
-                xBinRange = CreateBinRange(XAxisType, dataMinX, dataMaxX, NrOfXBins, IsXAxisAggregated);
-                yBinRange = CreateBinRange(YAxisType, dataMinY, dataMaxY, NrOfYBins, IsYAxisAggregated);
-
-                DataBinStructure = initializeBinStructure(xBinRange, yBinRange);
+                binRanges = createBinRanges(dataMins, dataMaxs);
+                BinStructure = initializeBinStructure(binRanges);
             }
-            xBinRange = DataBinStructure.XBinRange.GetUpdatedBinRange(dataMinX, dataMaxX);
-            yBinRange = DataBinStructure.YBinRange.GetUpdatedBinRange(dataMinY, dataMaxY);
+            for (int i = 0; i < BinStructure.BinRanges.Count; i++)
+            {
+                binRanges[i] = BinStructure.BinRanges[i].GetUpdatedBinRange(dataMins[i], dataMaxs[i]);
+            }
 
-            DataBinStructure tempBinStructure = initializeBinStructure(xBinRange, yBinRange);
+            BinStructure tempBinStructure = initializeBinStructure(binRanges);
             binSamples(tempBinStructure, dataRows);
 
             // re-map old bins
-            tempBinStructure.XNullCount += DataBinStructure.XNullCount;
-            tempBinStructure.YNullCount += DataBinStructure.YNullCount;
-            tempBinStructure.XAndYNullCount += DataBinStructure.XAndYNullCount;
-            foreach (var oldBin in DataBinStructure.Bins.SelectMany(b => b))
-            {
-                int x = tempBinStructure.XBinRange.GetIndex(oldBin.BinMinX);
-                int y = tempBinStructure.YBinRange.GetIndex(oldBin.BinMinY);
-                Bin newBin = tempBinStructure.Bins[x][y];
+            tempBinStructure.Map(BinStructure);
+            BinStructure = tempBinStructure;
+        }
 
-                if (newBin.ContainsBin(oldBin))
+        private List<BinRange> createBinRanges(List<double> dataMins, List<double> dataMax)
+        {
+            List<BinRange> binRanges = new List<BinRange>();
+            for (int d = 0; d < Dimensions.Count; d++)
+            {
+                BinRange scale = null;
+                if (IsAxisAggregated[d])
                 {
-                    newBin.Map(oldBin);
+                    scale = AggregateBinRange.Initialize();
                 }
-            }
-            DataBinStructure = tempBinStructure;
-        }
-
-        private BinRange CreateBinRange(AxisType axisType, double dataMinValue, double dataMaxValue, double nrBins, bool isAxisAggregated)
-        {
-            BinRange scale = null;
-            if (isAxisAggregated)
-            {
-                scale = AggregateBinRange.Initialize();
-            }
-            else if (axisType == AxisType.Time || axisType == AxisType.Date)
-            {
-                scale = DateTimeBinRange.Initialize(dataMinValue, dataMaxValue, nrBins);
-            }
-            else if (axisType == AxisType.Quantitative)
-            {
-                scale = QuantitativeBinRange.Initialize(dataMinValue, dataMaxValue, nrBins);
-            }
-            else
-            {
-                scale = NominalBinRange.Initialize(dataMinValue, dataMaxValue, nrBins);
-            }
-            return scale;
-        }
-
-        private void getMinMaxValuesFromSamples(List<DataRow> dataRows, out double dataMinX, out double dataMinY, out double dataMaxX, out double dataMaxY)
-        {
-            dataMinX = dataRows.Where(dp => dp.XValue.HasValue).Min(dp => dp.XValue.Value);
-            dataMinY = dataRows.Where(dp => dp.YValue.HasValue).Min(dp => dp.YValue.Value);
-            dataMaxX = dataRows.Where(dp => dp.XValue.HasValue).Max(dp => dp.XValue.Value);
-            dataMaxY = dataRows.Where(dp => dp.YValue.HasValue).Max(dp => dp.YValue.Value);
-
-            if (dataMaxX == dataMinX)
-            {
-                if (XAxisType != AxisType.Quantitative)
+                else if (AxisTypes[d] == AxisType.Time || AxisTypes[d] == AxisType.Date)
                 {
-                    dataMinX -= 0;
-                    dataMaxX += 0.1;
+                    scale = DateTimeBinRange.Initialize(dataMins[d], dataMax[d], NrOfBins[d]);
+                }
+                else if (AxisTypes[d] == AxisType.Quantitative)
+                {
+                    scale = QuantitativeBinRange.Initialize(dataMins[d], dataMax[d], NrOfBins[d]);
                 }
                 else
                 {
-                    dataMinX -= 1;
-                    dataMaxX += 1;
+                    scale = NominalBinRange.Initialize(dataMins[d], dataMax[d], NrOfBins[d]);
                 }
+                binRanges.Add(scale);
             }
-            if (dataMaxY == dataMinY)
+            return binRanges;
+        }
+
+        private void getMinMaxValuesFromSamples(List<DataRow> dataRows, List<double> dataMins, List<double> dataMaxs)
+        {
+            for (int d = 0; d < Dimensions.Count; d++)
             {
-                if (YAxisType != AxisType.Quantitative)
+                var dimension = Dimensions[d];
+                var dataMin = dataRows.Select(dp => dp.VisualizationValues[dimension]).Where(dp => dp.HasValue).Min(dp => dp.Value);
+                var dataMax = dataRows.Select(dp => dp.VisualizationValues[dimension]).Where(dp => dp.HasValue).Max(dp => dp.Value);
+
+                if (dataMax == dataMin)
                 {
-                    dataMinY -= 0;
-                    dataMaxY += 0.1;
+                    if (AxisTypes[d] != AxisType.Quantitative)
+                    {
+                        dataMin -= 0;
+                        dataMax += 0.1;
+                    }
+                    else
+                    {
+                        dataMin -= 1;
+                        dataMax += 1;
+                    }
                 }
-                else
-                {
-                    dataMinY -= 1;
-                    dataMaxY += 1;
-                }
+                dataMins.Add(dataMin);
+                dataMaxs.Add(dataMax);
             }
         }
         
-        private void binSamples(DataBinStructure binStructure, List<DataRow> samples)
+        private void binSamples(BinStructure binStructure, List<DataRow> samples)
         {
             foreach (var sample in samples)
             {
-                if (sample.XValue.HasValue && sample.YValue.HasValue)
+                BinIndex binIndex = new BinIndex();
+
+                for (int d = 0; d < binStructure.BinRanges.Count; d++)
                 {
-                    int x = binStructure.XBinRange.GetIndex(sample.XValue.Value);
-                    int y = binStructure.YBinRange.GetIndex(sample.YValue.Value);
-                    Bin bin = binStructure.Bins[x][y];
+                    double? value = sample.VisualizationValues[Dimensions[d]];
+                    binIndex.Indices.Add(value.HasValue ? binStructure.BinRanges[d].GetIndex(value.Value) : -1);
+                }
+                Bin bin = null;
+                if (binStructure.Bins.TryGetValue(binIndex, out bin))
+                {
                     bin.Samples.Add(sample);
                 }
                 else
                 {
-                    binStructure.XNullCount += !sample.XValue.HasValue ? 1 : 0;
-                    binStructure.YNullCount += !sample.YValue.HasValue ? 1 : 0;
-                    binStructure.XAndYNullCount += !sample.XValue.HasValue && !sample.YValue.HasValue ? 1 : 0;
+                    binStructure.NullCount++;
                 }
             }
         }
 
-        private DataBinStructure initializeBinStructure(BinRange xBinRange, BinRange yBinRange)
+        private BinStructure initializeBinStructure(List<BinRange> binRanges)
         {
-            DataBinStructure binStructure = new DataBinStructure();
-            binStructure.XBinRange = xBinRange;
-            binStructure.YBinRange = yBinRange;
+            BinStructure binStructure = new BinStructure();
+            binStructure.BinRanges = binRanges;
 
-            foreach (double x in xBinRange.GetBins())
+            Dictionary<BinIndex, Bin> bins = new Dictionary<BinIndex, Bin>();
+            recursiveCreateBins(binRanges.ToArray().ToList(), bins, new List<Span>());
+            binStructure.Bins = bins;
+
+            return binStructure;
+        }
+
+        private void recursiveCreateBins(List<BinRange> previousBinRangesLeft, Dictionary<BinIndex, Bin> bins, List<Span> previousSpans)
+        {
+            List<BinRange> binRangesLeft = new List<BinRange>();
+            binRangesLeft.AddRange(previousBinRangesLeft);
+
+            BinRange binRange = binRangesLeft[0];
+            binRangesLeft.RemoveAt(0);
+
+            foreach (double x in binRange.GetBins())
             {
-                double minX = x;
-                double maxX = xBinRange.AddStep(x);
-            
-                List<Bin> newBinCol = new List<Bin>();
-                foreach (double y in yBinRange.GetBins())
+                Span span = new Span() { Min = x, Max = binRange.AddStep(x), Index = binRange.GetIndex(x) };
+                List<Span> spans = new List<Span>();
+                spans.AddRange(previousSpans);
+                spans.Add(span);
+                if (binRangesLeft.Count == 0)
                 {
-                    double minY = y;
-                    double maxY = yBinRange.AddStep(y);
-
                     Bin bin = new Bin()
                     {
-                        BinMinX = x,
-                        BinMaxX = maxX,
-                        BinMinY = y,
-                        BinMaxY = maxY,
-                        Count = 0
+                        Spans = spans,
+                        BinIndex = new BinIndex(spans.Select(s => s.Index).ToArray())
                     };
-                    newBinCol.Add(bin);
+                    bins.Add(bin.BinIndex, bin);
                 }
-                binStructure.Bins.Add(newBinCol);
+                else
+                {
+                    recursiveCreateBins(binRangesLeft, bins, spans);
+                }
             }
-            return binStructure;
         }
     }
 }

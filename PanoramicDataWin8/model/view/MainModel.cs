@@ -86,6 +86,19 @@ namespace PanoramicData.model.view
             }
         }
 
+        private double _nrOfGroupBins = 10.0;
+        public double NrOfGroupBins
+        {
+            get
+            {
+                return _nrOfGroupBins;
+            }
+            set
+            {
+                this.SetProperty(ref _nrOfGroupBins, value);
+            }
+        }
+
         private double _throttleInMillis = 300.0;
         public double ThrottleInMillis
         {
@@ -96,6 +109,19 @@ namespace PanoramicData.model.view
             set
             {
                 this.SetProperty(ref _throttleInMillis, value);
+            }
+        }
+
+        private bool _verbose = false;
+        public bool Verbose
+        {
+            get
+            {
+                return _verbose;
+            }
+            set
+            {
+                this.SetProperty(ref _verbose, value);
             }
         }
 

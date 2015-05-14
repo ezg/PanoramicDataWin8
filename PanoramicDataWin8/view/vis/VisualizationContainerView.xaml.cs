@@ -20,6 +20,9 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Core;
+using Windows.System;
+using Windows.UI.Input;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -121,38 +124,108 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
+        bool isSingle = false;
+        uint pointersAdded = 0;
+        Stopwatch secondUpTime = new Stopwatch();
+        Stopwatch firstDownTime = new Stopwatch();
 
         void mainPointerManager_Added(object sender, PointerManagerEvent e)
         {
-            if (e.NumActiveContacts == 1)
+            pointersAdded = e.NumActiveContacts;
+            if (e.NumActiveContacts == 2)
             {
-                this.SendToFront();
-                GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
-                _mainPointerManagerPreviousPoint = gt.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position);
-                VisualizationViewModel model = (DataContext as VisualizationViewModel);
-                foreach (var avm in model.AttachementViewModels)
+                if (firstDownTime.ElapsedMilliseconds < 100)
                 {
-                    avm.IsDisplayed = true;
+                    isSingle = false;
                 }
+                performAdded(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
+            }
+            else if (e.NumActiveContacts == 1)
+            {
+                GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
+                _mainPointerManagerPreviousPoint = gt.TransformPoint(e.CurrentContacts[e.CurrentPointers.First().PointerId].Position);
+
+                firstDownTime.Restart();
+                var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift);
+                if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
+                {
+                    performAdded(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
+                }
+            }
+        }
+
+        void performAdded(PointerPoint pp)
+        {
+            this.SendToFront();
+            GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
+            _mainPointerManagerPreviousPoint = gt.TransformPoint(pp.Position);
+            VisualizationViewModel model = (DataContext as VisualizationViewModel);
+            foreach (var avm in model.AttachementViewModels)
+            {
+                avm.IsDisplayed = true;
             }
         }
 
         void mainPointerManager_Moved(object sender, PointerManagerEvent e)
         {
-            if (e.NumActiveContacts == 1)
+            if (e.NumActiveContacts == 2 && e.TriggeringPointer.PointerId == e.CurrentPointers.First().PointerId)
             {
-                GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
-                Point currentPoint = gt.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position);
-
-                Vec delta = _mainPointerManagerPreviousPoint.GetVec() - currentPoint.GetVec();
-                VisualizationViewModel model = (DataContext as VisualizationViewModel);
-                model.Position -= delta;
-                _mainPointerManagerPreviousPoint = currentPoint;
+                performMoved(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
             }
+            else if (e.NumActiveContacts == 1)
+            {
+                if (!isSingle && firstDownTime.ElapsedMilliseconds >= 100 && (!secondUpTime.IsRunning || secondUpTime.ElapsedMilliseconds > 100))
+                {
+                    isSingle = true;
+                    GeneralTransform gt = this.TransformToVisual(_renderer);
+                    Point currentPoint = gt.TransformPoint(e.CurrentContacts[e.CurrentPointers.First().PointerId].Position);
+                    _renderer.StartSelection(currentPoint);
+                }
+                if (isSingle)
+                {
+                    GeneralTransform gt = this.TransformToVisual(_renderer);
+                    Point currentPoint = gt.TransformPoint(e.CurrentContacts[e.CurrentPointers.First().PointerId].Position);
+                    _renderer.MoveSelection(currentPoint);
+                }
+
+                var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift);
+                if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
+                {
+                    performMoved(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
+                }
+            }
+        }
+
+        void performMoved(PointerPoint pp)
+        {
+            GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
+            Point currentPoint = gt.TransformPoint(pp.Position);
+
+            Vec delta = _mainPointerManagerPreviousPoint.GetVec() - currentPoint.GetVec();
+            VisualizationViewModel model = (DataContext as VisualizationViewModel);
+            model.Position -= delta;
+            _mainPointerManagerPreviousPoint = currentPoint;
         }
 
         void mainPointerManager_Removed(object sender, PointerManagerEvent e)
         {
+            if (e.NumActiveContacts == 1 && pointersAdded == 2)
+            {
+                secondUpTime.Restart();
+            }
+
+            if (e.NumActiveContacts == 0 && isSingle)
+            {
+                _renderer.EndSelection();
+                isSingle = false;
+            }
+            if (e.NumActiveContacts == 0 && (!secondUpTime.IsRunning || secondUpTime.ElapsedMilliseconds > 100))
+            {
+                _renderer.StartSelection(_mainPointerManagerPreviousPoint);
+                _renderer.EndSelection();
+            }
+
+            pointersAdded = e.NumActiveContacts;
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
             foreach (var avm in model.AttachementViewModels)
             {

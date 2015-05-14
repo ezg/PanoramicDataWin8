@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using PanoramicData.model.data.result;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -61,8 +62,8 @@ namespace PanoramicDataWin8.view.common
             {
                 if (DataContext != null)
                 {
-                    QueryResultItemModel queryResultItemModel = DataContext as QueryResultItemModel;
-                    queryResultItemModel.PropertyChanged += queryResultItemModel_PropertyChanged;
+                    ResultItemModel resultItemModel = DataContext as ResultItemModel;
+                    resultItemModel.PropertyChanged += resultItemModel_PropertyChanged;
                 }
                 updateValue();
 
@@ -83,21 +84,21 @@ namespace PanoramicDataWin8.view.common
             updateWidth();
         }
 
-        void queryResultItemModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void resultItemModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             updateValue();
         }
 
         private void updateValue()
         {
-            QueryResultItemModel queryResultItemModel = DataContext as QueryResultItemModel;
-            if (queryResultItemModel != null && HeaderObject != null && HeaderObject.AttributeViewModel != null)
+            ResultItemModel resultItemModel = DataContext as ResultItemModel;
+            if (resultItemModel != null && HeaderObject != null && HeaderObject.AttributeViewModel != null)
             {
-                if (queryResultItemModel.AttributeValues.ContainsKey(HeaderObject.AttributeViewModel.AttributeOperationModel))
+                /*if (resultItemModel.AttributeValues.ContainsKey(HeaderObject.AttributeViewModel.AttributeOperationModel))
                 {
-                    textBlock.Text = queryResultItemModel.AttributeValues[HeaderObject.AttributeViewModel.AttributeOperationModel].ShortStringValue;
+                    textBlock.Text = resultItemModel.AttributeValues[HeaderObject.AttributeViewModel.AttributeOperationModel].ShortStringValue;
                     return;
-                }
+                }*/
             }
             textBlock.Text = "";
         }

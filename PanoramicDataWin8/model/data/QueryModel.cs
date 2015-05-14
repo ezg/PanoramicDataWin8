@@ -1,5 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using PanoramicData.model.data.common;
+using PanoramicData.model.data.result;
 using PanoramicData.model.view;
 using PanoramicData.model.view;
 using PanoramicData.utils;
@@ -21,17 +23,12 @@ namespace PanoramicData.model.data
 
         public delegate void QueryModelUpdatedHandler(object sender, QueryModelUpdatedEventArgs e);
         public event QueryModelUpdatedHandler QueryModelUpdated;
-
-        public QueryModel()
-            : this(null)
-        {
-        }
-
-        public QueryModel(SchemaModel schemaModel)
+        
+        public QueryModel(SchemaModel schemaModel, ResultModel resultModel)
         {
             _id = _nextId++;
             _schemaModel = schemaModel;
-            _queryResultModel = new QueryResultModel();
+            _resultModel = resultModel;
 
             foreach (var attributeFunction in Enum.GetValues(typeof(AttributeFunction)).Cast<AttributeFunction>())
             {
@@ -139,17 +136,17 @@ namespace PanoramicData.model.data
         }
 
         
-        private QueryResultModel _queryResultModel = null;
+        private ResultModel _resultModel = null;
         [JsonIgnore]
-        public QueryResultModel QueryResultModel
+        public ResultModel ResultModel
         {
             get
             {
-                return _queryResultModel;
+                return _resultModel;
             }
             set
             {
-                this.SetProperty(ref _queryResultModel, value);
+                this.SetProperty(ref _resultModel, value);
             }
         }
 
@@ -441,6 +438,4 @@ namespace PanoramicData.model.data
     public enum JobType { DB, Kmeans }
 
     public enum JobResult { ClusterX, ClusterY, SampleX, SampleY }
-
-    public enum VisualizationResult { X, Y }
 }

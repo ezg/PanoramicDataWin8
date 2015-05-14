@@ -20,17 +20,18 @@ using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using PanoramicData.controller.view;
 using PanoramicDataWin8.controller.data.sim;
+using PanoramicData.model.data.result;
+using PanoramicDataWin8.model.data.common;
 
 namespace PanoramicData.controller.data.sim
 {
     public class SimQueryExecuter : QueryExecuter
     {
         private Dictionary<QueryModel, SimJob> _activeJobs = new Dictionary<QueryModel, SimJob>();
-        private Dictionary<QueryModel, Dictionary<GroupingObject, KeyValuePair<int, QueryResultItemModel>>> _updateIndexCache = new Dictionary<QueryModel, Dictionary<GroupingObject, KeyValuePair<int, QueryResultItemModel>>>();
         
         public override void ExecuteQuery(QueryModel queryModel)
         {
-            queryModel.QueryResultModel.QueryResultItemModels = new ObservableCollection<QueryResultItemModel>();
+            queryModel.ResultModel.ResultItemModels = new ObservableCollection<ResultItemModel>();
 
             if (_activeJobs.ContainsKey(queryModel))
             {
@@ -38,7 +39,6 @@ namespace PanoramicData.controller.data.sim
                 _activeJobs[queryModel].JobUpdate -= simJob_JobUpdate;
                 _activeJobs[queryModel].JobCompleted -= simJob_JobCompleted;
                 _activeJobs.Remove(queryModel);
-                _updateIndexCache.Remove(queryModel);
             }
             // determine if new job is even needed (i.e., are all relevant attributeModels set)
             if ((queryModel.VisualizationType == VisualizationType.table && queryModel.AttributeFunctionOperationModels.Count > 0) ||
@@ -46,7 +46,6 @@ namespace PanoramicData.controller.data.sim
             {
                 SimJob simJob = new SimJob(queryModel, TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
                 _activeJobs.Add(queryModel, simJob);
-                _updateIndexCache.Add(queryModel, new Dictionary<GroupingObject, KeyValuePair<int, QueryResultItemModel>>());
                 simJob.JobUpdate += simJob_JobUpdate;
                 simJob.JobCompleted += simJob_JobCompleted;
                 simJob.Start();
@@ -61,7 +60,7 @@ namespace PanoramicData.controller.data.sim
         void simJob_JobUpdate(object sender, JobEventArgs jobEventArgs)
         {
             SimJob job = sender as SimJob;
-            var oldItems = job.QueryModel.QueryResultModel.QueryResultItemModels;
+            var oldItems = job.QueryModel.ResultModel.ResultItemModels;
 
             // do proper updateing if this is a table
             /*if (job.QueryModel.VisualizationType == VisualizationType.table)
@@ -74,7 +73,7 @@ namespace PanoramicData.controller.data.sim
                     var sample = jobEventArgs.Samples[i];
                     if (cache.ContainsKey(sample.GroupingObject))
                     {
-                        KeyValuePair<int, QueryResultItemModel> kvp = cache[sample.GroupingObject];
+                        KeyValuePair<int, ResultItemModel> kvp = cache[sample.GroupingObject];
                         if (kvp.Key == i)
                         {
                             oldItems[i].Update(sample);
@@ -92,7 +91,7 @@ namespace PanoramicData.controller.data.sim
                             }
                         }
                         sample = oldItems[i];
-                        cache[sample.GroupingObject] = new KeyValuePair<int, QueryResultItemModel>(i, sample);
+                        cache[sample.GroupingObject] = new KeyValuePair<int, ResultItemModel>(i, sample);
                     }
                     else
                     {
@@ -104,7 +103,7 @@ namespace PanoramicData.controller.data.sim
                         {
                             oldItems[i] = sample;
                         }
-                        cache.Add(sample.GroupingObject, new KeyValuePair<int, QueryResultItemModel>(i, sample));
+                        cache.Add(sample.GroupingObject, new KeyValuePair<int, ResultItemModel>(i, sample));
                     }
                 }
                 // remove old ones
@@ -128,15 +127,9 @@ namespace PanoramicData.controller.data.sim
                 }
             }
 
-            job.QueryModel.QueryResultModel.Progress = jobEventArgs.Progress;
-            job.QueryModel.QueryResultModel.XBinRange = jobEventArgs.XBinRange;
-            job.QueryModel.QueryResultModel.YBinRange = jobEventArgs.YBinRange;
-            job.QueryModel.QueryResultModel.XNullCount = jobEventArgs.XNullCount;
-            job.QueryModel.QueryResultModel.YNullCount = jobEventArgs.YNullCount;
-            job.QueryModel.QueryResultModel.MaxValues = jobEventArgs.MaxValues;
-            job.QueryModel.QueryResultModel.MinValues = jobEventArgs.MinValues;
-            job.QueryModel.QueryResultModel.XAndYNullCount = jobEventArgs.XAndYNullCount;
-            job.QueryModel.QueryResultModel.FireQueryResultModelUpdated();
+            job.QueryModel.ResultModel.Progress = jobEventArgs.Progress;
+            job.QueryModel.ResultModel.ResultDescriptionModel = jobEventArgs.ResultDescriptionModel;
+            job.QueryModel.ResultModel.FireResultModelUpdated();
         }
     }
 
@@ -155,44 +148,6 @@ namespace PanoramicData.controller.data.sim
         public int GetHashCode(Dictionary<AttributeModel, object> x)
         {
             return x[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel].GetHashCode();
-        }
-    }
-
-    public class ItemComparer : IComparer<QueryResultItemModel>
-    {
-        private QueryModel _queryModel = null;
-        public ItemComparer(QueryModel queryModel)
-        {
-            _queryModel = queryModel;
-        }
-        public int Compare(QueryResultItemModel x, QueryResultItemModel y)
-        {
-            var attributeOperationModels = _queryModel.AttributeOperationModels.Where(aom => aom.SortMode != SortMode.None);
-            foreach (var aom in attributeOperationModels)
-            {
-                int factor = aom.SortMode == SortMode.Asc ? 1 : -1;
-                if (x.AttributeValues[aom].Value is string &&
-                   ((string)x.AttributeValues[aom].Value).CompareTo((string)y.AttributeValues[aom].Value) != 0)
-                {
-                    return (x.AttributeValues[aom].Value as string).CompareTo(y.AttributeValues[aom].Value as string) * factor;
-                }
-                else if (x.AttributeValues[aom].Value is double &&
-                        ((double)x.AttributeValues[aom].Value).CompareTo((double)y.AttributeValues[aom].Value) != 0)
-                {
-                    return ((double)x.AttributeValues[aom].Value).CompareTo((double)y.AttributeValues[aom].Value) * factor;
-                }
-                else if (x.AttributeValues[aom].Value is int &&
-                        ((int)x.AttributeValues[aom].Value).CompareTo((int)y.AttributeValues[aom].Value) != 0)
-                {
-                    return ((int)x.AttributeValues[aom].Value).CompareTo((int)y.AttributeValues[aom].Value) * factor;
-                }
-                else if (x.AttributeValues[aom].Value is DateTime &&
-                        ((DateTime)x.AttributeValues[aom].Value).CompareTo((DateTime)y.AttributeValues[aom].Value) != 0)
-                {
-                    return ((DateTime)x.AttributeValues[aom].Value).CompareTo((DateTime)y.AttributeValues[aom].Value) * factor;
-                }
-            }
-            return 0;
         }
     }
 }

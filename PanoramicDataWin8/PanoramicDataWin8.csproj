@@ -120,13 +120,13 @@
     <Compile Include="controller\data\QueryExecuter.cs" />
     <Compile Include="controller\data\sim\DataAggregator.cs" />
     <Compile Include="controller\data\sim\DataBinner.cs" />
-    <Compile Include="controller\data\sim\binrange\AggregateBinRange.cs" />
-    <Compile Include="controller\data\sim\BinStructure.cs" />
-    <Compile Include="controller\data\sim\binrange\DateTimeBinRange.cs" />
-    <Compile Include="controller\data\sim\binrange\NominalBinRange.cs" />
-    <Compile Include="controller\data\sim\binrange\QuantitativeBinRange.cs" />
-    <Compile Include="controller\data\sim\binrange\BinRange.cs" />
-    <Compile Include="controller\data\sim\GroupingObject.cs" />
+    <Compile Include="model\data\common\AggregateBinRange.cs" />
+    <Compile Include="model\data\common\BinStructure.cs" />
+    <Compile Include="model\data\common\DateTimeBinRange.cs" />
+    <Compile Include="model\data\common\NominalBinRange.cs" />
+    <Compile Include="model\data\common\QuantitativeBinRange.cs" />
+    <Compile Include="model\data\common\BinRange.cs" />
+    <Compile Include="model\data\common\GroupingObject.cs" />
     <Compile Include="controller\data\sim\SimDataProvider.cs" />
     <Compile Include="controller\data\sim\SimJob.cs" />
     <Compile Include="controller\data\sim\SimQueryExecuter.cs" />
@@ -139,8 +139,9 @@
     <Compile Include="model\data\AttributeFunction.cs" />
     <Compile Include="model\data\AttributeModel.cs" />
     <Compile Include="model\data\AttributeOperationModel.cs" />
-    <Compile Include="model\data\Bin.cs" />
+    <Compile Include="model\data\common\Bin.cs" />
     <Compile Include="model\data\CalculatedAttributeModel.cs" />
+    <Compile Include="model\data\common\AxisType.cs" />
     <Compile Include="model\data\FilteringOperation.cs" />
     <Compile Include="model\data\FilterModel.cs" />
     <Compile Include="model\data\LinkModel.cs" />
@@ -148,9 +149,12 @@
     <Compile Include="model\data\NamedAttributeModel.cs" />
     <Compile Include="model\data\OriginModel.cs" />
     <Compile Include="model\data\QueryModel.cs" />
-    <Compile Include="model\data\QueryResultItemModel.cs" />
-    <Compile Include="model\data\QueryResultItemValueModel.cs" />
-    <Compile Include="model\data\QueryResultModel.cs" />
+    <Compile Include="model\data\result\VisualizationItemResultModel.cs" />
+    <Compile Include="model\data\result\ResultDescriptionModel.cs" />
+    <Compile Include="model\data\result\ResultItemModel.cs" />
+    <Compile Include="model\data\result\ResultItemValueModel.cs" />
+    <Compile Include="model\data\result\ResultModel.cs" />
+    <Compile Include="model\data\result\VisualizationResultDescriptionModel.cs" />
     <Compile Include="model\data\SchemaModel.cs" />
     <Compile Include="model\data\sim\SimAttributeModel.cs" />
     <Compile Include="model\data\sim\SimOriginModel.cs" />
@@ -305,6 +309,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\data\config\flightdata_small_csv.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\data\raw\nba_shuff.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\data\config\nba_shots.ini">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\data\raw\nba_shots_shuff.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

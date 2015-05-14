@@ -159,6 +159,15 @@ namespace PanoramicDataWin8
                     msgTextBlock.Opacity = 1;
                     _messageTimer.Start();
                 }
+                if (e.Key == Windows.System.VirtualKey.V)
+                {
+                    MainViewController.Instance.MainModel.Verbose = !MainViewController.Instance.MainModel.Verbose;
+                    Debug.WriteLine("Verbose : " + MainViewController.Instance.MainModel.Verbose.ToString());
+
+                    msgTextBlock.Text = ("Verbose : " + MainViewController.Instance.MainModel.Verbose.ToString());
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
+                }
             }
         }
 

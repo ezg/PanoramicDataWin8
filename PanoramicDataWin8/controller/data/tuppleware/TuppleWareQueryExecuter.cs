@@ -19,6 +19,7 @@ using System.Collections.ObjectModel;
 using Newtonsoft.Json.Serialization;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using PanoramicData.model.data.result;
 
 namespace PanoramicData.controller.data.sim
 {
@@ -26,11 +27,11 @@ namespace PanoramicData.controller.data.sim
     {
         public override void ExecuteQuery(QueryModel queryModel)
         {
-            IItemsProvider<QueryResultItemModel> itemsProvider = new TuppleWareItemsProvider(queryModel.Clone());
-            AsyncVirtualizedCollection<QueryResultItemModel> dataValues = new AsyncVirtualizedCollection<QueryResultItemModel>(itemsProvider,
+            IItemsProvider<ResultItemModel> itemsProvider = new TuppleWareItemsProvider(queryModel.Clone());
+            AsyncVirtualizedCollection<ResultItemModel> dataValues = new AsyncVirtualizedCollection<ResultItemModel>(itemsProvider,
                 1000,  // page size
                 -1);
-            //queryModel.QueryResultModel.QueryResultItemModels = dataValues;
+            //queryModel.ResultModel.ResultItemModels = dataValues;
         }
 
         public async void LoadFileDescription(TuppleWareOriginModel tuppleWareOriginModel)
@@ -80,7 +81,7 @@ namespace PanoramicData.controller.data.sim
         }
     }
 
-    public class TuppleWareItemsProvider : IItemsProvider<QueryResultItemModel>
+    public class TuppleWareItemsProvider : IItemsProvider<ResultItemModel>
     {
         private QueryModel _queryModel = null;
         private int _fetchCount = 0;
@@ -104,24 +105,24 @@ namespace PanoramicData.controller.data.sim
             return _fetchCount;
         }
 
-        public async Task<IList<QueryResultItemModel>> FetchPage(int startIndex, int pageCount)
+        public async Task<IList<ResultItemModel>> FetchPage(int startIndex, int pageCount)
         {
             Stopwatch sw = new Stopwatch();
             sw.Start();
             Debug.WriteLine("Start Get Page : " + startIndex + " " + pageCount);
 
             TuppleWareWebClient web = new TuppleWareWebClient();
-            IList<QueryResultItemModel> returnList = new List<QueryResultItemModel>();
+            IList<ResultItemModel> returnList = new List<ResultItemModel>();
 
-            if (_queryModel.JobType == JobType.DB)
+            /*if (_queryModel.JobType == JobType.DB)
             {
                 dynamic responseObj = await getDbWebResponse();
                 foreach (var sample in responseObj["samples"])
                 {
-                    QueryResultItemModel item = new QueryResultItemModel();
+                    ResultItemModel item = new ResultItemModel();
                     foreach (var attributeOperationModel in _queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X))
                     {
-                        QueryResultItemValueModel valueModel = fromRaw(
+                        ResultItemValueModel valueModel = fromRaw(
                             attributeOperationModel.AttributeModel.AttributeDataType,
                             sample[(attributeOperationModel.AttributeModel as TuppleWareAttributeModel).Index]);
 
@@ -139,8 +140,8 @@ namespace PanoramicData.controller.data.sim
                 // clusters first
                 foreach (var k in responseObj["k"])
                 {
-                    QueryResultItemModel item = new QueryResultItemModel();
-                    QueryResultItemValueModel valueModel = null;
+                    ResultItemModel item = new ResultItemModel();
+                    ResultItemValueModel valueModel = null;
 
                     valueModel = fromRaw(AttributeDataTypeConstants.FLOAT, k[0]);
                     item.JobResultValues.Add(JobResult.ClusterX, valueModel);
@@ -154,8 +155,8 @@ namespace PanoramicData.controller.data.sim
                 // then samples
                 foreach (var sample in responseObj["samples"])
                 {
-                    QueryResultItemModel item = new QueryResultItemModel();
-                    QueryResultItemValueModel valueModel = null;
+                    ResultItemModel item = new ResultItemModel();
+                    ResultItemValueModel valueModel = null;
 
                     valueModel = fromRaw(AttributeDataTypeConstants.FLOAT, sample[0]);
                     item.JobResultValues.Add(JobResult.SampleX, valueModel);
@@ -165,7 +166,7 @@ namespace PanoramicData.controller.data.sim
 
                     returnList.Add(item);
                 }
-            }
+            }*/
 
             Debug.WriteLine("End Get Page : " + sw.ElapsedMilliseconds + " millis");
             return returnList;
@@ -196,9 +197,9 @@ namespace PanoramicData.controller.data.sim
             return responseObj;
         }
 
-        private static QueryResultItemValueModel fromRaw(string dataType, object value)
+        private static ResultItemValueModel fromRaw(string dataType, object value)
         {
-            QueryResultItemValueModel valueModel = new QueryResultItemValueModel();
+            ResultItemValueModel valueModel = new ResultItemValueModel();
 
             if (value == null)
             {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PanoramicData.model.data.result;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,18 +16,18 @@ namespace PanoramicData.model.data
             ValueComparisons = new Dictionary<AttributeOperationModel, ValueComparison>();
         }
 
-        public FilterModel(QueryResultItemModel queryResultItemModel)
+        public FilterModel(ResultItemModel resultItemModel)
         {
             ValueComparisons = new Dictionary<AttributeOperationModel, ValueComparison>();
-            /*foreach (var k in queryResultItemModel.AttributeValues.Keys.Where(aom => aom.GroupMode != GroupMode.None))
+            /*foreach (var k in resultItemModel.AttributeValues.Keys.Where(aom => aom.GroupMode != GroupMode.None))
             {
-                ValueComparisons.Add(k, new ValueComparison(queryResultItemModel.AttributeValues[k], Predicate.EQUALS));
+                ValueComparisons.Add(k, new ValueComparison(resultItemModel.AttributeValues[k], Predicate.EQUALS));
             }
             if (ValueComparisons.Count == 0)
             {
-                foreach (var k in queryResultItemModel.AttributeValues.Keys.Where(aom => aom.GroupMode == GroupMode.None))
+                foreach (var k in resultItemModel.AttributeValues.Keys.Where(aom => aom.GroupMode == GroupMode.None))
                 {
-                    ValueComparisons.Add(k, new ValueComparison(queryResultItemModel.AttributeValues[k], Predicate.EQUALS));
+                    ValueComparisons.Add(k, new ValueComparison(resultItemModel.AttributeValues[k], Predicate.EQUALS));
                 }
             }*/
         }
@@ -87,14 +88,14 @@ namespace PanoramicData.model.data
 
     public class ValueComparison
     {
-        public QueryResultItemValueModel Value { get; set; }
+        public ResultItemValueModel Value { get; set; }
         public Predicate Predicate { get; set; }
 
         public ValueComparison()
         {
         }
 
-        public ValueComparison(QueryResultItemValueModel value, Predicate predicate)
+        public ValueComparison(ResultItemValueModel value, Predicate predicate)
         {
             this.Value = value;
             this.Predicate = predicate;
@@ -119,7 +120,7 @@ namespace PanoramicData.model.data
         }
 
 
-        public bool Compare(QueryResultItemValueModel value)
+        public bool Compare(ResultItemValueModel value)
         {
             if (this.Predicate == Predicate.EQUALS)
             {

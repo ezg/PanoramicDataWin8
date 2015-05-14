@@ -9,7 +9,7 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400"
-    FontFamily="{StaticResource abel}">
+    FontFamily="{StaticResource abel}" PointerPressed="Renderer_PointerPressed">
     
     <Grid>
         <Grid.RowDefinitions>
@@ -62,12 +62,7 @@
                            Text="25.9%"
                            Visibility="Collapsed"/>
                     </StackPanel>
-                    <TextBlock Name="tbXNull" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
-                           FontSize="11"
-                           Foreground="{StaticResource darkBrush}"
-                           Text="25.9%"/>
-
-                    <TextBlock Name="tbYNull" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
+                    <TextBlock Name="tbNull" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
                            FontSize="11"
                            Foreground="{StaticResource darkBrush}"
                            Text="25.9%"/>

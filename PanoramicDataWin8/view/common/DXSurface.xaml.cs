@@ -19,6 +19,7 @@ using D2D = SharpDX.Direct2D1;
 using DW = SharpDX.DirectWrite;
 using System.Diagnostics;
 using Windows.Graphics.Display;
+using PanoramicData.controller.view;
 
 namespace PanoramicDataWin8.view.common
 {
@@ -311,7 +312,10 @@ namespace PanoramicDataWin8.view.common
                 _d2dDeviceContext.BeginDraw();
                 beginDrawCalled = true;
                 _contentProvider.Draw(_d2dDeviceContext, _dwFactory);
-                Debug.WriteLine("Render time: " + sw.ElapsedMilliseconds);
+                if (MainViewController.Instance.MainModel.Verbose)
+                {
+                    Debug.WriteLine("Render time: " + sw.ElapsedMilliseconds);
+                }
             }
             finally
             {

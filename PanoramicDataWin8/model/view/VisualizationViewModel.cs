@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI;
 using PanoramicDataWin8.model.view;
 using System.Diagnostics;
+using PanoramicData.model.data.result;
 
 namespace PanoramicData.model.view
 {
@@ -52,7 +53,10 @@ namespace PanoramicData.model.view
 
         public VisualizationViewModel(SchemaModel schemaModel)
         {
-            _queryModel = new QueryModel(schemaModel);
+            _queryModel = new QueryModel(schemaModel, new ResultModel()
+            {
+                ResultDescriptionModel = new VisualizationResultDescriptionModel()
+            });
             selectColor();
         }
 
