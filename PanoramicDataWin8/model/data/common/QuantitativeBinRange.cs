@@ -1,13 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace PanoramicData.model.data.common
+namespace PanoramicDataWin8.model.data.common
 {
     public class QuantitativeBinRange : BinRange
     {
+        private bool _isIntegerRange = false;
+        public bool IsIntegerRange
+        {
+            get
+            {
+                return _isIntegerRange;
+            }
+            set
+            {
+                _isIntegerRange = value;
+            }
+        }
+
         private double _step = 0;
         public double Step
         {
@@ -21,17 +31,17 @@ namespace PanoramicData.model.data.common
             }
         }
 
-        public QuantitativeBinRange(double dataMinValue, double dataMaxValue, double targetBinNumber)
+        private QuantitativeBinRange(double dataMinValue, double dataMaxValue, double targetBinNumber, bool isIntegerRange)
         {
             DataMinValue = dataMinValue;
             DataMaxValue = dataMaxValue;
             TargetBinNumber = targetBinNumber;
-
+            IsIntegerRange = isIntegerRange;
         }
 
-        public static QuantitativeBinRange Initialize(double dataMinValue, double dataMaxValue, double targetBinNumber)
+        public static QuantitativeBinRange Initialize(double dataMinValue, double dataMaxValue, double targetBinNumber, bool isIntegerRange)
         {
-            QuantitativeBinRange scale = new QuantitativeBinRange(dataMinValue, dataMaxValue, targetBinNumber);
+            QuantitativeBinRange scale = new QuantitativeBinRange(dataMinValue, dataMaxValue, targetBinNumber, isIntegerRange);
             double[] extent = scale.getExtent(scale.DataMinValue, scale.DataMaxValue, scale.TargetBinNumber);
             scale.MinValue = extent[0];
             scale.MaxValue = extent[1];
@@ -75,7 +85,7 @@ namespace PanoramicData.model.data.common
                 //newStep = Step * (double)multiplier;
             }
 
-            return new QuantitativeBinRange(dataMin, dataMax, TargetBinNumber)
+            return new QuantitativeBinRange(dataMin, dataMax, TargetBinNumber, this.IsIntegerRange)
             {
                 MinValue = newMin,
                 MaxValue = newMax,
@@ -108,6 +118,10 @@ namespace PanoramicData.model.data.common
             else if (err <= .75)
                 step *= 2;
 
+            if (IsIntegerRange)
+            {
+                step = Math.Ceiling(step);
+            }
             double[] ret = new double[3];
             ret[0] = (double)(Math.Floor(Math.Round(dataMin, 4) / step) * step);
             ret[1] = (double)(Math.Floor(Math.Round(dataMax, 4) / step) * step + step);

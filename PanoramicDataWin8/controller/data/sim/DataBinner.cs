@@ -1,7 +1,4 @@
-﻿using PanoramicData.model.data;
-using PanoramicData.model.data.sim;
-using PanoramicData.model.view;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,8 +15,8 @@ using System.Collections.ObjectModel;
 using Newtonsoft.Json.Serialization;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
-using PanoramicData.controller.view;
-using PanoramicData.model.data.common;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.common;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
@@ -88,7 +85,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 }
                 else if (AxisTypes[d] == AxisType.Quantitative)
                 {
-                    scale = QuantitativeBinRange.Initialize(dataMins[d], dataMax[d], NrOfBins[d]);
+                    scale = QuantitativeBinRange.Initialize(dataMins[d], dataMax[d], NrOfBins[d], Dimensions[d].AttributeDataType == AttributeDataTypeConstants.INT);
                 }
                 else
                 {

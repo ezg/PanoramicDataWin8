@@ -1,20 +1,23 @@
-﻿using PanoramicData.controller.view;
-using PanoramicData.model.data;
-using PanoramicData.model.data.common;
-using PanoramicData.model.data.result;
-using PanoramicData.model.view;
-using PanoramicData.utils;
+﻿using NetTopologySuite.Geometries;
 using PanoramicDataWin8.controller.data.sim;
 using PanoramicDataWin8.view.common;
 using SharpDX;
 using SharpDX.Toolkit.Graphics;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using D2D = SharpDX.Direct2D1;
 using DW = SharpDX.DirectWrite;
+using PanoramicDataWin8.utils;
+using GeoAPI.Geometries;
+using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.common;
+using PanoramicDataWin8.model.data.result;
+using PanoramicDataWin8.model.view;
 
 namespace PanoramicDataWin8.view.vis.render
 {
@@ -44,8 +47,12 @@ namespace PanoramicDataWin8.view.vis.render
         private QueryModel _queryModel = null;
         private BinRange _xBinRange = null;
         private BinRange _yBinRange = null;
+        private bool _isXAxisAggregated = false;
+        private bool _isYAxisAggregated = false;
         private int _xIndex = -1;
         private int _yIndex = -1;
+        private Dictionary<BinIndex, List<VisualizationItemResultModel>> _binDictonary = null;
+        Dictionary<IGeometry, VisualizationItemResultModel> _hitTargets = new Dictionary<IGeometry, VisualizationItemResultModel>();
 
         public float CompositionScaleX { get; set; }
         public float CompositionScaleY { get; set; }
@@ -63,6 +70,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (!(_visualizationDescriptionModel.BinRanges[_xIndex] is AggregateBinRange))
             {
                 _xBinRange = _visualizationDescriptionModel.BinRanges[_xIndex];
+                _isXAxisAggregated = false;
             }
             else
             {
@@ -71,13 +79,14 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     factor = 0.1;
                 }
-
-                _xBinRange = QuantitativeBinRange.Initialize(_visualizationDescriptionModel.MinValues[xAom] * (1.0 - factor), _visualizationDescriptionModel.MaxValues[xAom] * (1.0 + factor), 10);
+                _isXAxisAggregated = true;
+                _xBinRange = QuantitativeBinRange.Initialize(_visualizationDescriptionModel.MinValues[xAom] * (1.0 - factor), _visualizationDescriptionModel.MaxValues[xAom] * (1.0 + factor), 10, false);
             }
 
             if (!(_visualizationDescriptionModel.BinRanges[_yIndex] is AggregateBinRange))
             {
                 _yBinRange = _visualizationDescriptionModel.BinRanges[_yIndex];
+                _isYAxisAggregated = false;
             }
             else
             {
@@ -86,7 +95,32 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     factor = 0.1;
                 }
-                _yBinRange = QuantitativeBinRange.Initialize(_visualizationDescriptionModel.MinValues[yAom] * (1.0 - factor), _visualizationDescriptionModel.MaxValues[yAom] * (1.0 + factor), 10);
+                _isYAxisAggregated = true;
+                _yBinRange = QuantitativeBinRange.Initialize(_visualizationDescriptionModel.MinValues[yAom] * (1.0 - factor), _visualizationDescriptionModel.MaxValues[yAom] * (1.0 + factor), 10, false);
+            }
+
+            // create bin dictionary
+            var resultDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
+            _binDictonary = new Dictionary<BinIndex, List<VisualizationItemResultModel>>();
+            foreach (var resultItem in _resultModel.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
+            {
+                if (resultItem.Values.ContainsKey(xAom) && resultItem.Values.ContainsKey(yAom))
+                {
+                    double? xValue = (double?)resultItem.Values[xAom].Value;
+                    double? yValue = (double?)resultItem.Values[yAom].Value;
+
+                    if (xValue.HasValue && yValue.HasValue)
+                    {
+                        BinIndex binIndex = new BinIndex(
+                            resultDescriptionModel.BinRanges[_xIndex].GetIndex(xValue.Value),
+                            resultDescriptionModel.BinRanges[_yIndex].GetIndex(yValue.Value));
+                        if (!_binDictonary.ContainsKey(binIndex))
+                        {
+                            _binDictonary.Add(binIndex, new List<VisualizationItemResultModel>());
+                        }
+                        _binDictonary[binIndex].Add(resultItem);
+                    }
+                }
             }
         }
 
@@ -284,7 +318,87 @@ namespace PanoramicDataWin8.view.vis.render
             yBins.Add(_yBinRange.AddStep(yBins.Max()));
 
             // draw data
-            foreach (var resultItem in _resultModel.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
+            _hitTargets.Clear();
+            var resultDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
+            var roundedRect = new D2D.RoundedRectangle();
+            float xFrom = 0;
+            float yFrom = 0;
+            float xTo = 0;
+            float yTo = 0;
+            for (int xi = 0; xi < resultDescriptionModel.BinRanges[_xIndex].GetBins().Count; xi++)
+            {
+                for (int yi = 0; yi < resultDescriptionModel.BinRanges[_yIndex].GetBins().Count; yi++)
+                {
+                    BinIndex binIndex = new BinIndex(xi, yi);
+                    if (_binDictonary.ContainsKey(binIndex))
+                    {
+                        foreach (var resultItem in _binDictonary[binIndex])
+                        {
+                            double? xValue = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First()].Value;
+                            double? yValue = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First()].Value;
+                            double? value = null;
+                            if (_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Any() && resultItem.Values.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).First()))
+                            {
+                                value = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).First()].NoramlizedValue;
+                            }
+                            else if (_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue).First()))
+                            {
+                                value = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue).First()].NoramlizedValue;
+                            }
+
+                            if (value != null)
+                            {
+                                xFrom = toScreenX((float)xBins[_xBinRange.GetIndex(xValue.Value)]);
+                                yFrom = toScreenY((float)yBins[_yBinRange.GetIndex(yValue.Value)]);
+                                xTo = toScreenX((float)xBins[_xBinRange.GetIndex(_xBinRange.AddStep(xValue.Value))]);
+                                yTo = toScreenY((float)yBins[_yBinRange.GetIndex(_yBinRange.AddStep(yValue.Value))]);
+
+                                float alpha = 0.1f * (float)Math.Log10(value.Value) + 1f;
+                                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value.Value));
+                                var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
+
+                                roundedRect.Rect = new RectangleF(
+                                    xFrom,
+                                    yTo,
+                                    xTo - xFrom,
+                                    yFrom - yTo);
+                                roundedRect.RadiusX = roundedRect.RadiusY = 4;
+                                d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
+                                d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                                binColor.Dispose();
+
+                                if (_isXAxisAggregated || _isYAxisAggregated)
+                                {
+                                    IGeometry hitGeom = new Rct(xFrom, yTo, xTo - xFrom, yFrom - yTo).GetPolygon();
+                                    _hitTargets.Add(hitGeom, resultItem);
+                                }
+                            }
+                        }
+                    }
+                    if (!_isXAxisAggregated && !_isYAxisAggregated)
+                    {
+                        xFrom = toScreenX((float)xBins[xi]);
+                        yFrom = toScreenY((float)yBins[yi]);
+                        xTo = toScreenX((float)xBins[xi+1]);
+                        yTo = toScreenY((float)yBins[yi+1]);
+                        roundedRect.Rect = new RectangleF(
+                                    xFrom,
+                                    yTo,
+                                    xTo - xFrom,
+                                    yFrom - yTo);
+                        roundedRect.RadiusX = roundedRect.RadiusY = 4;
+                        if (_resultModel.ResultItemModels.Count < 10000)
+                        {
+                            d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                        }
+
+                        IGeometry hitGeom = new Rct(xFrom, yTo, xTo - xFrom, yFrom - yTo).GetPolygon();
+                        //_hitTargets.Add(hitGeom, resultItem);
+                    }
+                }
+            }
+
+            /*foreach (var resultItem in _resultModel.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
             {
                 if (resultItem.Values.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First()) &&
                     resultItem.Values.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First()))
@@ -329,7 +443,7 @@ namespace PanoramicDataWin8.view.vis.render
                         }
                     }
                 }
-            }
+            }*/
             white.Dispose();
         }
 
