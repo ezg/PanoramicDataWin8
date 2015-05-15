@@ -51,16 +51,25 @@ namespace PanoramicDataWin8.view.vis.render
         private bool _isYAxisAggregated = false;
         private int _xIndex = -1;
         private int _yIndex = -1;
+        private AttributeOperationModel _xAom = null;
+        private AttributeOperationModel _yAom = null;
         private Dictionary<BinIndex, List<VisualizationItemResultModel>> _binDictonary = null;
-        Dictionary<IGeometry, VisualizationItemResultModel> _hitTargets = new Dictionary<IGeometry, VisualizationItemResultModel>();
 
         public float CompositionScaleX { get; set; }
         public float CompositionScaleY { get; set; }
+        public Dictionary<IGeometry, FilterModel> HitTargets { get; set; }
+
+        public PlotRendererContentProvider()
+        {
+            HitTargets = new Dictionary<IGeometry, FilterModel>();
+        }
 
         public void UpdateData(ResultModel resultModel, QueryModel queryModel, AttributeOperationModel xAom, AttributeOperationModel yAom)
         {
             _resultModel = resultModel;
             _queryModel = queryModel;
+            _xAom = xAom;
+            _yAom = yAom;
 
             _visualizationDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
 
@@ -180,9 +189,9 @@ namespace PanoramicDataWin8.view.vis.render
 
 
             var maxXLabelLength = xLabels.Max(b => b.Label.Length);
-            var maxXLabel = xLabels.Where(b => b.Label.Length == maxXLabelLength).First();
+            var maxXLabel = xLabels.First(b => b.Label.Length == maxXLabelLength);
             var maxYLabelLength = yLabels.Max(b => b.Label.Length);
-            var maxYLabel = yLabels.Where(b => b.Label.Length == maxYLabelLength).First();
+            var maxYLabel = yLabels.First(b => b.Label.Length == maxYLabelLength);
 
             var layoutX = new DW.TextLayout(dwFactory, maxXLabel.Label, _textFormat, 1000f, 1000f);
             var metricsX = layoutX.Metrics;
@@ -318,7 +327,7 @@ namespace PanoramicDataWin8.view.vis.render
             yBins.Add(_yBinRange.AddStep(yBins.Max()));
 
             // draw data
-            _hitTargets.Clear();
+            HitTargets.Clear();
             var resultDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
             var roundedRect = new D2D.RoundedRectangle();
             float xFrom = 0;
@@ -370,7 +379,7 @@ namespace PanoramicDataWin8.view.vis.render
                                 if (_isXAxisAggregated || _isYAxisAggregated)
                                 {
                                     IGeometry hitGeom = new Rct(xFrom, yTo, xTo - xFrom, yFrom - yTo).GetPolygon();
-                                    _hitTargets.Add(hitGeom, resultItem);
+                                    //HitTargets.Add(hitGeom, resultItem);
                                 }
                             }
                         }
@@ -392,8 +401,13 @@ namespace PanoramicDataWin8.view.vis.render
                             d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
                         }
 
-                        IGeometry hitGeom = new Rct(xFrom, yTo, xTo - xFrom, yFrom - yTo).GetPolygon();
-                        //_hitTargets.Add(hitGeom, resultItem);
+                        IGeometry hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
+                        var filterModel = new FilterModel();
+                        filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.GREATER_THAN_EQUAL, xBins[xi]));
+                        filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.LESS_THAN, xBins[xi+1]));
+                        filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.GREATER_THAN_EQUAL, yBins[yi]));
+                        filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.LESS_THAN, yBins[yi + 1]));
+                        HitTargets.Add(hitGeom, filterModel);
                     }
                 }
             }

@@ -380,18 +380,53 @@ namespace PanoramicDataWin8.view.vis.render
         private List<Windows.Foundation.Point> _selectionPoints = new List<Windows.Foundation.Point>();
         public override void StartSelection(Windows.Foundation.Point point)
         {
-            Debug.WriteLine("start");
-            _selectionPoints = new List<Windows.Foundation.Point>();
-            _selectionPoints.Add(point);
+            GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
+            _selectionPoints = new List<Windows.Foundation.Point> {gt.TransformPoint(point)};
         }
+
         public override void MoveSelection(Windows.Foundation.Point point)
         {
-            _selectionPoints.Add(point);
+            GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
+            _selectionPoints.Add(gt.TransformPoint(point));
         }
+
         public override void EndSelection()
         {
             IList<Vec> convexHull = Convexhull.convexhull(_selectionPoints);
             IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon();
+
+            List<FilterModel> hits = new List<FilterModel>();
+            foreach (var geom in _plotRendererContentProvider.HitTargets.Keys)
+            {
+                if (convexHullPoly.Intersects(geom))
+                {
+                    hits.Add(_plotRendererContentProvider.HitTargets[geom]);
+                }
+            }
+            if (hits.Count > 0)
+            {
+                foreach (var valueComparison in hits[0].ValueComparisons)
+                {
+                    Debug.WriteLine((valueComparison.AttributeOperationModel.AttributeModel.Name + " " +
+                                     valueComparison.Value));
+                }
+
+                QueryModel qModel = (DataContext as VisualizationViewModel).QueryModel;
+                var vcs = hits.SelectMany(h => h.ValueComparisons).ToList();
+
+                var xAom = qModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
+                tbSelection.Text = xAom.AttributeModel.Name + " " +
+                                   vcs
+                                       .Where(vc => Equals(vc.AttributeOperationModel, xAom))
+                                       .Min(vc => vc.Value);
+                tbSelection.Text += " - " + hits.SelectMany(h => h.ValueComparisons)
+                    .Where(vc => Equals(vc.AttributeOperationModel, xAom))
+                    .Max(vc => vc.Value);
+            } 
+            else
+            {
+                tbSelection.Text = "";
+            }
         }
 
         void render()

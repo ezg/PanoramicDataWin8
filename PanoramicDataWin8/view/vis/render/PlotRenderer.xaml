@@ -66,6 +66,10 @@
                            FontSize="11"
                            Foreground="{StaticResource darkBrush}"
                            Text="25.9%"/>
+                    <TextBlock Name="tbSelection" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
+                           FontSize="11"
+                           Foreground="{StaticResource darkBrush}"
+                           Text=""/>
                 </StackPanel>
             </Grid>
         </Grid>

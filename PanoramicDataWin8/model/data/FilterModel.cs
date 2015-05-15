@@ -1,39 +1,22 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using PanoramicDataWin8.model.data.result;
+// ReSharper disable All
 
 namespace PanoramicDataWin8.model.data
 {
     public class FilterModel
     {
-        public Dictionary<AttributeOperationModel, ValueComparison> ValueComparisons { get; set; }
+        public List<ValueComparison> ValueComparisons { get; set; }
         
         public FilterModel()
         {
-            ValueComparisons = new Dictionary<AttributeOperationModel, ValueComparison>();
-        }
-
-        public FilterModel(ResultItemModel resultItemModel)
-        {
-            ValueComparisons = new Dictionary<AttributeOperationModel, ValueComparison>();
-            /*foreach (var k in resultItemModel.AttributeValues.Keys.Where(aom => aom.GroupMode != GroupMode.None))
-            {
-                ValueComparisons.Add(k, new ValueComparison(resultItemModel.AttributeValues[k], Predicate.EQUALS));
-            }
-            if (ValueComparisons.Count == 0)
-            {
-                foreach (var k in resultItemModel.AttributeValues.Keys.Where(aom => aom.GroupMode == GroupMode.None))
-                {
-                    ValueComparisons.Add(k, new ValueComparison(resultItemModel.AttributeValues[k], Predicate.EQUALS));
-                }
-            }*/
+            ValueComparisons = new List<ValueComparison>();
         }
 
         public override int GetHashCode()
         {
-            int code = 0;
-            foreach (var k in ValueComparisons.Keys)
-                code ^= k.GetHashCode() + ValueComparisons[k].GetHashCode();
-            return code;
+            return ValueComparisons.Aggregate(0, (current, k) => current ^ k.GetHashCode());
         }
 
         public override bool Equals(object obj)
@@ -41,58 +24,48 @@ namespace PanoramicDataWin8.model.data
             FilterModel compareTo = null;
             if (obj is FilterModel)
             {
-                /*compareTo = obj as FilterModel;
-                bool groupComp = compare(
-                    this.ValueComparisons.Where(kvp => kvp.Key.GroupMode != GroupMode.None).ToDictionary(t => t.Key, t => t.Value),
-                    compareTo.ValueComparisons.Where(kvp => kvp.Key.GroupMode != GroupMode.None).ToDictionary(t => t.Key, t => t.Value));
-                if (!groupComp)
-                    return false;
-
-                bool valueComp = compare(
-                    this.ValueComparisons.Where(kvp => !(kvp.Key.GroupMode != GroupMode.None)).ToDictionary(t => t.Key, t => t.Value),
-                    compareTo.ValueComparisons.Where(kvp => !(kvp.Key.GroupMode != GroupMode.None)).ToDictionary(t => t.Key, t => t.Value));
-                if (!valueComp)
-                    return false;
-
-                return true;*/
+                compareTo = obj as FilterModel;
+                
+                bool valueComp = Compare( this.ValueComparisons, compareTo.ValueComparisons);
+                return valueComp;
             }
             return false;
         }
 
-        public bool compare(Dictionary<AttributeOperationModel, ValueComparison> a, Dictionary<AttributeOperationModel, ValueComparison> b)
+        public bool Compare(List<ValueComparison> a, List<ValueComparison> b)
         {
             if (a.Count != b.Count)
             {
                 return false;
             }
-            foreach (AttributeOperationModel aom in a.Keys)
+            int count = 0;
+            foreach (var valueComp in a)
             {
-                if (!b.ContainsKey(aom))
+                if (!valueComp.Equals(b[count]))
                 {
                     return false;
                 }
-                if (!a[aom].Equals(b[aom]))
-                {
-                    return false;
-                }
+                count++;
             }
             return true;
         }
     }
 
-    public enum Predicate { EQUALS, BETWEEN, LIKE, GREATER_THAN, LESS_THAN, GREATER_THAN_EQUAL, LESS_THAN_EQUAL }
+    public enum Predicate { EQUALS, LIKE, GREATER_THAN, LESS_THAN, GREATER_THAN_EQUAL, LESS_THAN_EQUAL }
 
     public class ValueComparison
     {
-        public ResultItemValueModel Value { get; set; }
+        public AttributeOperationModel AttributeOperationModel { get; set; }
+        public object Value { get; set; }
         public Predicate Predicate { get; set; }
 
         public ValueComparison()
         {
         }
 
-        public ValueComparison(ResultItemValueModel value, Predicate predicate)
+        public ValueComparison(AttributeOperationModel aom, Predicate predicate, object value)
         {
+            this.AttributeOperationModel = aom;
             this.Value = value;
             this.Predicate = predicate;
         }
@@ -116,20 +89,20 @@ namespace PanoramicDataWin8.model.data
         }
 
 
-        public bool Compare(ResultItemValueModel value)
+        public bool Compare(object value)
         {
             if (this.Predicate == Predicate.EQUALS)
             {
                 double d1 = 0.0;
                 double d2 = 0.0;
-                if (double.TryParse(this.Value.StringValue, out d1) &&
-                    double.TryParse(value.StringValue, out d2))
+                if (double.TryParse(this.Value.ToString(), out d1) &&
+                    double.TryParse(value.ToString(), out d2))
                 {
                     return d1 > d2 - 0.0001 && d1 < d2 + 0.0001;
                 }
                 else
                 {
-                    int cmp = value.StringValue.CompareTo(this.Value.StringValue);
+                    int cmp = value.ToString().CompareTo(this.Value.ToString());
                     if (cmp == 0)
                     {
                         return true;
@@ -140,14 +113,14 @@ namespace PanoramicDataWin8.model.data
             {
                 double d1 = 0.0;
                 double d2 = 0.0;
-                if (double.TryParse(this.Value.StringValue, out d1) &&
-                    double.TryParse(value.StringValue, out d2))
+                if (double.TryParse(this.Value.ToString(), out d1) &&
+                    double.TryParse(value.ToString(), out d2))
                 {
                     return d2 >= d1;
                 }
                 else
                 {
-                    int cmp = value.StringValue.CompareTo(this.Value.StringValue);
+                    int cmp = value.ToString().CompareTo(this.Value.ToString());
                     if (cmp == 1 || cmp == 0)
                     {
                         return true;
@@ -158,15 +131,15 @@ namespace PanoramicDataWin8.model.data
             {
                 double d1 = 0.0;
                 double d2 = 0.0;
-                if (double.TryParse(this.Value.StringValue, out d1) &&
-                    double.TryParse(value.StringValue, out d2))
+                if (double.TryParse(this.Value.ToString(), out d1) &&
+                    double.TryParse(value.ToString(), out d2))
                 {
                     return d2 <= d1;
                 }
 
                 else
                 {
-                    int cmp = value.StringValue.CompareTo(this.Value.StringValue);
+                    int cmp = value.ToString().CompareTo(this.Value.ToString());
                     if (cmp == -1 || cmp == 0)
                     {
                         return true;

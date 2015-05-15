@@ -123,41 +123,24 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
-        bool isSingle = false;
-        uint pointersAdded = 0;
-        Stopwatch secondUpTime = new Stopwatch();
-        Stopwatch firstDownTime = new Stopwatch();
+        private int _status = 0; // 0: unknonw, 1: single, 2: double
+        private bool _moved = false;
+        private Stopwatch _firstDownTime = new Stopwatch();
 
         void mainPointerManager_Added(object sender, PointerManagerEvent e)
         {
-            pointersAdded = e.NumActiveContacts;
-            if (e.NumActiveContacts == 2)
-            {
-                if (firstDownTime.ElapsedMilliseconds < 100)
-                {
-                    isSingle = false;
-                }
-                performAdded(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
-            }
-            else if (e.NumActiveContacts == 1)
+            if (e.NumActiveContacts == 1)
             {
                 GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
                 _mainPointerManagerPreviousPoint = gt.TransformPoint(e.CurrentContacts[e.CurrentPointers.First().PointerId].Position);
-
-                firstDownTime.Restart();
-                var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift);
-                if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
-                {
-                    performAdded(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
-                }
+                _firstDownTime.Restart();
             }
-        }
-
-        void performAdded(PointerPoint pp)
-        {
+            else if (e.NumActiveContacts == 2)
+            {
+                _firstDownTime.Stop();
+            }
+            _moved = false;
             this.SendToFront();
-            GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
-            _mainPointerManagerPreviousPoint = gt.TransformPoint(pp.Position);
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
             foreach (var avm in model.AttachementViewModels)
             {
@@ -165,32 +148,51 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
+        void performAdded(PointerPoint pp)
+        {
+          
+            
+        }
+
         void mainPointerManager_Moved(object sender, PointerManagerEvent e)
         {
+            _moved = true;
+            GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
             if (e.NumActiveContacts == 2 && e.TriggeringPointer.PointerId == e.CurrentPointers.First().PointerId)
             {
-                performMoved(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
+                if (_status != 2 && _firstDownTime.ElapsedMilliseconds < 50)
+                {
+                    _status = 2;
+                    performAdded(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
+                }
+                if (_status == 2)
+                {
+                    performMoved(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
+                }
             }
             else if (e.NumActiveContacts == 1)
             {
-                if (!isSingle && firstDownTime.ElapsedMilliseconds >= 100 && (!secondUpTime.IsRunning || secondUpTime.ElapsedMilliseconds > 100))
-                {
-                    isSingle = true;
-                    GeneralTransform gt = this.TransformToVisual(_renderer);
-                    Point currentPoint = gt.TransformPoint(e.CurrentContacts[e.CurrentPointers.First().PointerId].Position);
-                    _renderer.StartSelection(currentPoint);
-                }
-                if (isSingle)
-                {
-                    GeneralTransform gt = this.TransformToVisual(_renderer);
-                    Point currentPoint = gt.TransformPoint(e.CurrentContacts[e.CurrentPointers.First().PointerId].Position);
-                    _renderer.MoveSelection(currentPoint);
-                }
-
                 var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift);
                 if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
                 {
                     performMoved(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
+                }
+                else
+                {
+                    if (_status != 1 && _firstDownTime.ElapsedMilliseconds > 50)
+                    {
+                        _status = 1;
+                        Point currentPoint =
+                            gt.TransformPoint(e.CurrentContacts[e.CurrentPointers.First().PointerId].Position);
+                        _renderer.StartSelection(currentPoint);
+                        _renderer.MoveSelection(currentPoint);
+                    }
+                    if (_status == 1)
+                    {
+                        Point currentPoint =
+                            gt.TransformPoint(e.CurrentContacts[e.CurrentPointers.First().PointerId].Position);
+                        _renderer.MoveSelection(currentPoint);
+                    }
                 }
             }
         }
@@ -208,23 +210,24 @@ namespace PanoramicDataWin8.view.vis
 
         void mainPointerManager_Removed(object sender, PointerManagerEvent e)
         {
-            if (e.NumActiveContacts == 1 && pointersAdded == 2)
+            if (_status == 0)
             {
-                secondUpTime.Restart();
+                if (_firstDownTime.IsRunning && !_moved)
+                {
+                    _renderer.StartSelection(_mainPointerManagerPreviousPoint);
+                    _renderer.EndSelection();
+                }
             }
-
-            if (e.NumActiveContacts == 0 && isSingle)
+            if (_status == 1)
             {
                 _renderer.EndSelection();
-                isSingle = false;
+                _status = 0;
             }
-            if (e.NumActiveContacts == 0 && (!secondUpTime.IsRunning || secondUpTime.ElapsedMilliseconds > 100))
+            if (_status == 2)
             {
-                _renderer.StartSelection(_mainPointerManagerPreviousPoint);
-                _renderer.EndSelection();
+                _status = 0;
             }
 
-            pointersAdded = e.NumActiveContacts;
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
             foreach (var avm in model.AttachementViewModels)
             {
