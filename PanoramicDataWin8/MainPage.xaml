@@ -28,6 +28,10 @@
             </inq:InkableScene>
         </Canvas>
 
+        <Grid Name="attributeGrid" Width="100" HorizontalAlignment="Left" Margin="60,0,0,0" Visibility="Visible">
+            <Canvas Name="attributeCanvas">
+            </Canvas>
+        </Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10,0,0,0" >
             <Button Name="addAttributeButton" Click="addAttributeButton_Click" Margin="0,0,0,4">
                 <Button.Template>
@@ -80,10 +84,6 @@
                 </Button.Template>
             </Button>
         </StackPanel>
-        <Grid Name="attributeGrid" Width="104" HorizontalAlignment="Left" Margin="64,0,0,0" Visibility="Collapsed" >
-            <Canvas Name="attributeCanvas">
-            </Canvas>
-        </Grid>
         <TextBlock Name="msgTextBlock" Text="" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="{StaticResource darkBrush}" Margin="10" Opacity="0"/>
     </Grid>
 

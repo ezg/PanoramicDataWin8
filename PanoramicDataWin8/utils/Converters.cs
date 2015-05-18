@@ -96,9 +96,9 @@ namespace PanoramicDataWin8.utils
             if (value != null)
             {
                 ResultItemModel model = (value as ResultItemModel);
-                /*if (model.AttributeValues.ContainsKey(AttributeOperationModel))
+                /*if (model.AttributeValues.ContainsKey(AttributeViewModel))
                 {
-                    return model.AttributeValues[AttributeOperationModel].ShortStringValue;
+                    return model.AttributeValues[AttributeViewModel].ShortStringValue;
                 }*/
                 return ""; 
             }

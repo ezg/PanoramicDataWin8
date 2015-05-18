@@ -161,8 +161,11 @@
     <Compile Include="model\data\tuppleware\TuppleWareAttributeModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareOriginModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareSchemaModel.cs" />
+    <Compile Include="model\data\tuppleware\TuppleWareWebClient.cs" />
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
+    <Compile Include="model\view\tilemenu\TileMenuItemView.cs" />
+    <Compile Include="model\view\tilemenu\TileMenuContentViewModel.cs" />
     <Compile Include="model\view\VisualizationTypeViewModel.cs" />
     <Compile Include="model\view\JobTypeViewModel.cs" />
     <Compile Include="model\view\MenuViewModel.cs" />
@@ -193,6 +196,9 @@
     <Compile Include="utils\VisualTreeHelperExtensions.cs" />
     <Compile Include="view\common\DXSurface.xaml.cs">
       <DependentUpon>DXSurface.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\common\TileMenuItemView.xaml.cs">
+      <DependentUpon>TileMenuItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\common\VisualizationTypeView.xaml.cs">
       <DependentUpon>VisualizationTypeView.xaml</DependentUpon>
@@ -346,6 +352,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\common\DXSurface.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\common\TileMenuItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

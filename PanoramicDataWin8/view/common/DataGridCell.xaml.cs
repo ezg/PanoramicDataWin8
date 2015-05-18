@@ -92,9 +92,9 @@ namespace PanoramicDataWin8.view.common
             ResultItemModel resultItemModel = DataContext as ResultItemModel;
             if (resultItemModel != null && HeaderObject != null && HeaderObject.AttributeViewModel != null)
             {
-                /*if (resultItemModel.AttributeValues.ContainsKey(HeaderObject.AttributeViewModel.AttributeOperationModel))
+                /*if (resultItemModel.AttributeValues.ContainsKey(HeaderObject.AttributeViewModel.AttributeViewModel))
                 {
-                    textBlock.Text = resultItemModel.AttributeValues[HeaderObject.AttributeViewModel.AttributeOperationModel].ShortStringValue;
+                    textBlock.Text = resultItemModel.AttributeValues[HeaderObject.AttributeViewModel.AttributeViewModel].ShortStringValue;
                     return;
                 }*/
             }

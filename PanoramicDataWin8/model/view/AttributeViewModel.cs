@@ -492,7 +492,7 @@ namespace PanoramicDataWin8.model.view
             {
                 name = "Sum(" + name + ")";
             }
-            /*else if (AttributeOperationModel.AggregateFunction == AggregateFunction.Bin)
+            /*else if (AttributeViewModel.AggregateFunction == AggregateFunction.Bin)
             {
                 name = "Bin Range(" + name + ")";
             }*/
