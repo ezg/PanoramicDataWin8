@@ -107,7 +107,6 @@
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <Folder Include="controller\data\mssql\" />
-    <Folder Include="model\data\mssql\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">

@@ -257,31 +257,31 @@ namespace PanoramicDataWin8.model.data
             }
         }
 
-        public void ClearFilterModels(bool fireUpdate = true)
+        public void ClearFilterModels()
         {
             _filterModels.Clear();
             FireQueryModelUpdated(QueryModelUpdatedEventType.FilterModels);
         }
 
-        public void AddFilterModels(List<FilterModel> filterModels, object sender)
+        public void AddFilterModels(List<FilterModel> filterModels)
         {
             _filterModels.AddRange(filterModels);
             FireQueryModelUpdated(QueryModelUpdatedEventType.FilterModels);
         }
 
-        public void AddFilterModel(FilterModel filterModel, object sender)
+        public void AddFilterModel(FilterModel filterModel)
         {
             _filterModels.Add(filterModel);
             FireQueryModelUpdated(QueryModelUpdatedEventType.FilterModels);
         }
 
-        public void RemoveFilterModel(FilterModel filterModel, object sender)
+        public void RemoveFilterModel(FilterModel filterModel)
         {
             _filterModels.Remove(filterModel);
             FireQueryModelUpdated(QueryModelUpdatedEventType.FilterModels);
         }
 
-        public void RemoveFilterModels(List<FilterModel> filterModels, object sender)
+        public void RemoveFilterModels(List<FilterModel> filterModels)
         {
             foreach (var filterItem in filterModels)
             {
@@ -297,7 +297,7 @@ namespace PanoramicDataWin8.model.data
         {
             if (type == QueryModelUpdatedEventType.Structure)
             {
-                ClearFilterModels(false);
+                ClearFilterModels();
             }
             if (QueryModelUpdated != null)
             {

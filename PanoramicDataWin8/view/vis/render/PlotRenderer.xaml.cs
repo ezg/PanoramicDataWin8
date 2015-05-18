@@ -65,6 +65,7 @@ namespace PanoramicDataWin8.view.vis.render
                 (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
                 (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).CollectionChanged -= X_CollectionChanged;
                 (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).CollectionChanged -= Y_CollectionChanged;
+                (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated -= QueryModel_QueryModelUpdated;
                 ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated -= resultModel_ResultModelUpdated;
             }
@@ -78,10 +79,20 @@ namespace PanoramicDataWin8.view.vis.render
                 (DataContext as VisualizationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
                 (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).CollectionChanged += X_CollectionChanged;
                 (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).CollectionChanged += Y_CollectionChanged;
+                (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
                 ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
                 mainLabel.Text = (DataContext as VisualizationViewModel).QueryModel.VisualizationType.ToString();
                 populateHeaders();
+            }
+        }
+
+        void QueryModel_QueryModelUpdated(object sender, QueryModelUpdatedEventArgs e)
+        {
+            if (e.QueryModelUpdatedEventType == QueryModelUpdatedEventType.FilterModels)
+            {
+                _plotRendererContentProvider.UpdateFilterModels((sender as QueryModel).FilterModels);
+                render();
             }
         }
 
@@ -411,17 +422,28 @@ namespace PanoramicDataWin8.view.vis.render
                                      valueComparison.Value));
                 }
 
-                QueryModel qModel = (DataContext as VisualizationViewModel).QueryModel;
+                QueryModel queryModel = (DataContext as VisualizationViewModel).QueryModel;
                 var vcs = hits.SelectMany(h => h.ValueComparisons).ToList();
 
-                var xAom = qModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
-                tbSelection.Text = xAom.AttributeModel.Name + " " +
-                                   vcs
-                                       .Where(vc => Equals(vc.AttributeOperationModel, xAom))
+                var xAom = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
+                var yAom = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
+                tbSelection.Text = xAom.AttributeModel.Name + ": " +
+                                   vcs.Where(vc => Equals(vc.AttributeOperationModel, xAom))
                                        .Min(vc => vc.Value);
-                tbSelection.Text += " - " + hits.SelectMany(h => h.ValueComparisons)
-                    .Where(vc => Equals(vc.AttributeOperationModel, xAom))
-                    .Max(vc => vc.Value);
+                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.AttributeOperationModel, xAom)).Max(vc => vc.Value);
+                tbSelection.Text += ", " + yAom.AttributeModel.Name + ": " +
+                                   vcs.Where(vc => Equals(vc.AttributeOperationModel, yAom))
+                                       .Min(vc => vc.Value);
+                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.AttributeOperationModel, yAom)).Max(vc => vc.Value);
+
+                if (hits.Any(h => queryModel.FilterModels.Contains(h)))
+                {
+                    queryModel.RemoveFilterModels(hits);
+                }
+                else
+                {
+                    queryModel.AddFilterModels(hits);
+                }
             } 
             else
             {

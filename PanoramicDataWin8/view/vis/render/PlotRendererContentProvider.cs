@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Graphics.Display;
 using D2D = SharpDX.Direct2D1;
 using DW = SharpDX.DirectWrite;
 using PanoramicDataWin8.utils;
@@ -45,6 +46,7 @@ namespace PanoramicDataWin8.view.vis.render
         private VisualizationResultDescriptionModel _visualizationDescriptionModel = null;
 
         private QueryModel _queryModel = null;
+        private List<FilterModel> _filterModels = new List<FilterModel>();
         private BinRange _xBinRange = null;
         private BinRange _yBinRange = null;
         private bool _isXAxisAggregated = false;
@@ -62,6 +64,11 @@ namespace PanoramicDataWin8.view.vis.render
         public PlotRendererContentProvider()
         {
             HitTargets = new Dictionary<IGeometry, FilterModel>();
+        }
+
+        public void UpdateFilterModels(List<FilterModel> filterModels)
+        {
+            _filterModels = filterModels;
         }
 
         public void UpdateData(ResultModel resultModel, QueryModel queryModel, AttributeOperationModel xAom, AttributeOperationModel yAom)
@@ -320,6 +327,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
+            var dark = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(11f / 255f, 11f / 255f, 11f / 255f, 1f));
 
             var xBins = _xBinRange.GetBins();
             xBins.Add(_xBinRange.AddStep(xBins.Max()));
@@ -373,7 +381,7 @@ namespace PanoramicDataWin8.view.vis.render
                                     yFrom - yTo);
                                 roundedRect.RadiusX = roundedRect.RadiusY = 4;
                                 d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
-                                d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                                //d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
                                 binColor.Dispose();
 
                                 if (_isXAxisAggregated || _isYAxisAggregated)
@@ -384,30 +392,83 @@ namespace PanoramicDataWin8.view.vis.render
                             }
                         }
                     }
+
+                    if (!_isXAxisAggregated && !_isYAxisAggregated)
+                    {
+                        /*var oldTarget = d2dDeviceContext.Target;
+                        var dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
+                        var bitmapProperties = new D2D.BitmapProperties1(new SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.A8_UNorm, D2D.AlphaMode.Premultiplied),
+                                                             dpi,
+                                                             dpi,
+                                                             D2D.BitmapOptions.CannotDraw | D2D.BitmapOptions.Target);
+
+
+                        D2D.Bitmap bitmap = new D2D.Bitmap1(d2dDeviceContext, new Size2(100,100), bitmapProperties);
+                        d2dDeviceContext.Target = bitmap;
+                        d2dDeviceContext.BeginDraw();
+                        ....
+                        d2dDeviceContext.EndDraw();
+
+                        d2dDeviceContext.Target = oldTarget;
+                        d2dDeviceContext.FillOpacityMask(
+                            bitmap,
+                            white,
+                            D2D.OpacityMaskContent.Graphics);*/
+                        xFrom = toScreenX((float) xBins[xi]);
+                        yFrom = toScreenY((float) yBins[yi]);
+                        xTo = toScreenX((float) xBins[xi + 1]);
+                        yTo = toScreenY((float) yBins[yi + 1]);
+                        roundedRect.Rect = new RectangleF(
+                            xFrom,
+                            yTo,
+                            xTo - xFrom,
+                            yFrom - yTo);
+                        roundedRect.RadiusX = roundedRect.RadiusY = 4;
+
+
+                        IGeometry hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
+                        var filterModel = new FilterModel();
+                        filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.GREATER_THAN_EQUAL,
+                            xBins[xi]));
+                        filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.LESS_THAN, xBins[xi + 1]));
+                        filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.GREATER_THAN_EQUAL,
+                            yBins[yi]));
+                        filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.LESS_THAN, yBins[yi + 1]));
+                        HitTargets.Add(hitGeom, filterModel);
+
+                        d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                    }
+                }
+            }
+
+            for (int xi = 0; xi < resultDescriptionModel.BinRanges[_xIndex].GetBins().Count; xi++)
+            {
+                for (int yi = 0; yi < resultDescriptionModel.BinRanges[_yIndex].GetBins().Count; yi++)
+                {
                     if (!_isXAxisAggregated && !_isYAxisAggregated)
                     {
                         xFrom = toScreenX((float)xBins[xi]);
                         yFrom = toScreenY((float)yBins[yi]);
-                        xTo = toScreenX((float)xBins[xi+1]);
-                        yTo = toScreenY((float)yBins[yi+1]);
+                        xTo = toScreenX((float)xBins[xi + 1]);
+                        yTo = toScreenY((float)yBins[yi + 1]);
                         roundedRect.Rect = new RectangleF(
                                     xFrom,
                                     yTo,
                                     xTo - xFrom,
                                     yFrom - yTo);
                         roundedRect.RadiusX = roundedRect.RadiusY = 4;
-                        if (_resultModel.ResultItemModels.Count < 10000)
-                        {
-                            d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
-                        }
 
                         IGeometry hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
                         var filterModel = new FilterModel();
                         filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.GREATER_THAN_EQUAL, xBins[xi]));
-                        filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.LESS_THAN, xBins[xi+1]));
+                        filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.LESS_THAN, xBins[xi + 1]));
                         filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.GREATER_THAN_EQUAL, yBins[yi]));
                         filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.LESS_THAN, yBins[yi + 1]));
-                        HitTargets.Add(hitGeom, filterModel);
+
+                        if (_filterModels.Contains(filterModel))
+                        {
+                            d2dDeviceContext.DrawRoundedRectangle(roundedRect, dark, 0.5f);
+                        }
                     }
                 }
             }

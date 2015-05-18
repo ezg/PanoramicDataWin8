@@ -147,13 +147,7 @@ namespace PanoramicDataWin8.view.vis
                 avm.IsDisplayed = true;
             }
         }
-
-        void performAdded(PointerPoint pp)
-        {
-          
-            
-        }
-
+        
         void mainPointerManager_Moved(object sender, PointerManagerEvent e)
         {
             _moved = true;
@@ -163,7 +157,6 @@ namespace PanoramicDataWin8.view.vis
                 if (_status != 2 && _firstDownTime.ElapsedMilliseconds < 50)
                 {
                     _status = 2;
-                    performAdded(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
                 }
                 if (_status == 2)
                 {

@@ -26,7 +26,7 @@ namespace PanoramicDataWin8.model.data
             {
                 compareTo = obj as FilterModel;
                 
-                bool valueComp = Compare( this.ValueComparisons, compareTo.ValueComparisons);
+                bool valueComp = Compare(this.ValueComparisons, compareTo.ValueComparisons);
                 return valueComp;
             }
             return false;
