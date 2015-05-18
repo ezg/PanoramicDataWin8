@@ -29,6 +29,7 @@ using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.model.view.tilemenu;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -176,7 +177,13 @@ namespace PanoramicDataWin8
             var ancestors = (e.OriginalSource as FrameworkElement).GetAncestors();
             if (!ancestors.Contains(addAttributeButton) && !ancestors.Contains(attributeGrid))
             {
-                attributeGrid.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+                if (_attributeMenu != null)
+                {
+                    (_attributeMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded = false;
+                    (_attributeMenu.DataContext as TileMenuItemViewModel).IsBeingRemoved = true;
+                    _attributeMenu.Dispose();
+                    attributeCanvas.Children.Remove(_attributeMenu);
+                }
             }
         }
                 
@@ -316,44 +323,69 @@ namespace PanoramicDataWin8
             attributeGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
         }
 
+        private TileMenuItemView _attributeMenu = null;
         private void addAttributeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainModel mainModel = (DataContext as MainModel);
-            var buttonBounds = addAttributeButton.GetBounds(this);
-            var attributeModels = mainModel.SchemaModel.OriginModels.First().AttributeModels.Where(am => am.IsDisplayed).OrderBy(am => am.Name);
-
-            attributeCanvas.Children.Clear();
-            double perColumn = Math.Ceiling(attributeModels.Count() / 2.0);
-            double height = perColumn * 50 + (perColumn - 1) * 4;
-            double startY = buttonBounds.Center.Y - height / 2.0;
-
-            int countPerColumn = 0;
-            int column = 0;
-            foreach (var attributeModel in attributeModels)
+            if (_attributeMenu == null || !(_attributeMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded)
             {
-                AttributeViewModel attributeViewModel = new AttributeViewModel(null, new AttributeOperationModel(attributeModel))
-                {
-                    IsNoChrome = true,
-                    IsMenuEnabled = false
-                };
-                AttributeView attributeView = new AttributeView();
-                attributeView.DataContext = attributeViewModel;
-                attributeCanvas.Children.Add(attributeView);
-                attributeView.RenderTransform = new TranslateTransform()
-                {
-                    X = column * 54,
-                    Y = startY + countPerColumn * 54
-                };
+                MainModel mainModel = (DataContext as MainModel);
+                var buttonBounds = addAttributeButton.GetBounds(this);
+                var attributeModels =
+                    mainModel.SchemaModel.OriginModels.First()
+                        .AttributeModels.Where(am => am.IsDisplayed)
+                        .OrderBy(am => am.Name);
 
-                countPerColumn++;
-                if (countPerColumn >= perColumn)
+                if (_attributeMenu != null)
                 {
-                    column++;
-                    countPerColumn = 0;
+                    (_attributeMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded = false;
+                    (_attributeMenu.DataContext as TileMenuItemViewModel).IsBeingRemoved = true;
+                    _attributeMenu.Dispose();
+                    attributeCanvas.Children.Remove(_attributeMenu);
                 }
-            }
 
-            attributeGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                TileMenuItemViewModel parentModel = new TileMenuItemViewModel(null);
+                parentModel.ChildrenNrColumns = (int) Math.Ceiling(attributeModels.Count()/10.0);
+                parentModel.ChildrenNrRows = (int) Math.Min(10.0, attributeModels.Count());
+                parentModel.Alignment = Alignment.Center;
+                parentModel.AttachPosition = AttachPosition.Right;
+
+                int count = 0;
+                foreach (var attributeModel in attributeModels)
+                {
+                    TileMenuItemViewModel tileMenuItemViewModel = new TileMenuItemViewModel(parentModel);
+                    tileMenuItemViewModel.Alignment = Alignment.Center;
+                    tileMenuItemViewModel.AttachPosition = AttachPosition.Right;
+                    AttributeViewModel attributeViewModel = new AttributeViewModel(null, new AttributeOperationModel(attributeModel));
+
+                    tileMenuItemViewModel.TileMenuContentViewModel = new AttributeViewTileMenuContentViewModel()
+                    {
+                        Name = attributeModel.Name,
+                        AttributeViewModel = attributeViewModel
+                    };
+
+
+                    tileMenuItemViewModel.Row = count; // TileMenuItemViewModel.Children.Count;
+                    tileMenuItemViewModel.Column = (int) Math.Floor(parentModel.Children.Count/10.0);
+                    tileMenuItemViewModel.RowSpan = 1;
+                    tileMenuItemViewModel.ColumnSpan = 1;
+                    parentModel.Children.Add(tileMenuItemViewModel);
+                    count++;
+                    if (count >= 10)
+                    {
+                        count = 0;
+                    }
+                }
+
+                _attributeMenu = new TileMenuItemView {MenuCanvas = attributeCanvas, DataContext = parentModel};
+                attributeCanvas.Children.Add(_attributeMenu);
+
+                parentModel.CurrentPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
+                parentModel.TargetPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
+                parentModel.Size = new Vec(buttonBounds.Width, buttonBounds.Height);
+                parentModel.AreChildrenExpanded = true;
+
+                attributeGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+            }
         }
 
         private void addVisualizationButton_Click(object sender, RoutedEventArgs e)
