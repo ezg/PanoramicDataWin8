@@ -8,14 +8,14 @@ namespace PanoramicDataWin8.model.data.common
 {
     public class GroupingObject
     {
-        public Dictionary<AttributeOperationModel, object> GroupingValues {get;set;}
+        public Dictionary<InputOperationModel, object> GroupingValues {get;set;}
 
         public GroupingObject()
         {
-             GroupingValues = new Dictionary<AttributeOperationModel, object>();
+             GroupingValues = new Dictionary<InputOperationModel, object>();
         }
 
-        public void Add(AttributeOperationModel aom, object value)
+        public void Add(InputOperationModel aom, object value)
         {
             GroupingValues.Add(aom, value);
         }

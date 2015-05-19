@@ -55,7 +55,7 @@ namespace PanoramicDataWin8.model.data
 
     public class ValueComparison
     {
-        public AttributeOperationModel AttributeOperationModel { get; set; }
+        public InputOperationModel InputOperationModel { get; set; }
         public object Value { get; set; }
         public Predicate Predicate { get; set; }
 
@@ -63,9 +63,9 @@ namespace PanoramicDataWin8.model.data
         {
         }
 
-        public ValueComparison(AttributeOperationModel aom, Predicate predicate, object value)
+        public ValueComparison(InputOperationModel aom, Predicate predicate, object value)
         {
-            this.AttributeOperationModel = aom;
+            this.InputOperationModel = aom;
             this.Value = value;
             this.Predicate = predicate;
         }

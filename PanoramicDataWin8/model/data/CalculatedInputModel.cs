@@ -2,21 +2,22 @@
 
 namespace PanoramicDataWin8.model.data
 {
-    public class CalculatedAttributeModel : AttributeModel
+    public class CalculatedInputModel : InputFieldModel
     {
-        public CalculatedAttributeModel() : base() { }
+        public CalculatedInputModel() : base() { }
 
         public override string Name
         {
             get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
         }
 
-        public override string AttributeVisualizationType
+        public override string InputVisualizationType
         {
             get { throw new NotImplementedException(); }
         }
 
-        public override string AttributeDataType
+        public override string InputDataType
         {
             get { throw new NotImplementedException(); }
         }

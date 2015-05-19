@@ -112,13 +112,40 @@ namespace PanoramicDataWin8.view.common
             }
             else
             {
-                if (model.TileMenuContentViewModel is AttributeViewTileMenuContentViewModel)
+                if (model.TileMenuContentViewModel is InputFieldViewTileMenuContentViewModel)
                 {
                     mainGrid.Children.Clear();
-                    mainGrid.Children.Add(new AttributeView()
+                    mainGrid.Children.Add(new InputFieldView()
                     {
                         DataContext =
-                            ((AttributeViewTileMenuContentViewModel) model.TileMenuContentViewModel).AttributeViewModel
+                            ((InputFieldViewTileMenuContentViewModel) model.TileMenuContentViewModel).InputFieldViewModel
+                    });
+                }
+                else if (model.TileMenuContentViewModel is VisualizationTypeViewTileMenuContentViewModel)
+                {
+                    mainGrid.Children.Clear();
+                    mainGrid.Children.Add(new VisualizationTypeView()
+                    {
+                        DataContext =
+                            ((VisualizationTypeViewTileMenuContentViewModel)model.TileMenuContentViewModel).VisualizationTypeViewModel
+                    });
+                }
+                else if (model.TileMenuContentViewModel is JobTypeViewTileMenuContentViewModel)
+                {
+                    mainGrid.Children.Clear();
+                    mainGrid.Children.Add(new JobTypeView()
+                    {
+                        DataContext =
+                            ((JobTypeViewTileMenuContentViewModel)model.TileMenuContentViewModel).JobTypeViewModel
+                    });
+                }
+                else if (model.TileMenuContentViewModel is InputGroupViewTileMenuContentViewModel)
+                {
+                    mainGrid.Children.Clear();
+                    mainGrid.Children.Add(new InputGroupView()
+                    {
+                        DataContext =
+                            ((InputGroupViewTileMenuContentViewModel)model.TileMenuContentViewModel).InputGroupViewModel
                     });
                 }
             }
@@ -240,6 +267,10 @@ namespace PanoramicDataWin8.view.common
             TileMenuItemViewModel model = (DataContext as TileMenuItemViewModel);
             if (model.AreChildrenExpanded)
             {
+                if (model.TileMenuContentViewModel != null &&  model.TileMenuContentViewModel.Name == "bmp")
+                {
+                    
+                }
                 if (model.AttachPosition == AttachPosition.Left)
                 {
                     for (int col = model.ChildrenNrColumns - 1; col >= 0; col--)
@@ -374,7 +405,7 @@ namespace PanoramicDataWin8.view.common
                 var items = model.Children.Where(
                     mi =>
                         (mi.Column == col || (mi.Column < col && mi.Column + mi.ColumnSpan - 1 >= col)));
-                double current = items.Sum(mi => mi.Size.Y) + items.Count() * model.Gap;
+                double current = items.Sum(mi => mi.Size.Y) + (items.Count() - 1) * model.Gap;
                 max = Math.Max(max, current);
             }
             return max;

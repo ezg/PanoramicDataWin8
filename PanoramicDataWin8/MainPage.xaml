@@ -11,7 +11,7 @@
 
     <Page.Resources>
         <DataTemplate x:Name="Foo">
-            <common:AttributeView DataContext="{Binding}" />
+            <common:InputFieldView DataContext="{Binding}" />
         </DataTemplate>
     </Page.Resources>
 
@@ -28,12 +28,12 @@
             </inq:InkableScene>
         </Canvas>
 
-        <Grid Name="attributeGrid" Width="100" HorizontalAlignment="Left" Margin="60,0,0,0" Visibility="Visible">
-            <Canvas Name="attributeCanvas">
+        <Grid Name="menuGrid" Width="100" HorizontalAlignment="Left" Margin="60,0,0,0" Visibility="Visible">
+            <Canvas Name="menuCanvas">
             </Canvas>
         </Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10,0,0,0" >
-            <Button Name="addAttributeButton" Click="addAttributeButton_Click" Margin="0,0,0,4">
+            <Button Name="addInputButton" Click="addInputButton_Click" Margin="0,0,0,4">
                 <Button.Template>
                     <ControlTemplate>
                         <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">

@@ -8,8 +8,8 @@ namespace PanoramicDataWin8.model.data.result
         {
         }
 
-        private Dictionary<AttributeOperationModel, ResultItemValueModel> _values = new Dictionary<AttributeOperationModel, ResultItemValueModel>();
-        public Dictionary<AttributeOperationModel, ResultItemValueModel> Values
+        private Dictionary<InputOperationModel, ResultItemValueModel> _values = new Dictionary<InputOperationModel, ResultItemValueModel>();
+        public Dictionary<InputOperationModel, ResultItemValueModel> Values
         {
             get
             {
@@ -21,7 +21,7 @@ namespace PanoramicDataWin8.model.data.result
             }
         }
 
-        public void AddValue(AttributeOperationModel aom, ResultItemValueModel value)
+        public void AddValue(InputOperationModel aom, ResultItemValueModel value)
         {
             if (!_values.ContainsKey(aom)) 
             {

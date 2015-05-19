@@ -53,8 +53,8 @@ namespace PanoramicDataWin8.view.vis.render
         private bool _isYAxisAggregated = false;
         private int _xIndex = -1;
         private int _yIndex = -1;
-        private AttributeOperationModel _xAom = null;
-        private AttributeOperationModel _yAom = null;
+        private InputOperationModel _xAom = null;
+        private InputOperationModel _yAom = null;
         private Dictionary<BinIndex, List<VisualizationItemResultModel>> _binDictonary = null;
 
         public float CompositionScaleX { get; set; }
@@ -71,7 +71,7 @@ namespace PanoramicDataWin8.view.vis.render
             _filterModels = filterModels;
         }
 
-        public void UpdateData(ResultModel resultModel, QueryModel queryModel, AttributeOperationModel xAom, AttributeOperationModel yAom)
+        public void UpdateData(ResultModel resultModel, QueryModel queryModel, InputOperationModel xAom, InputOperationModel yAom)
         {
             _resultModel = resultModel;
             _queryModel = queryModel;
@@ -351,16 +351,16 @@ namespace PanoramicDataWin8.view.vis.render
                     {
                         foreach (var resultItem in _binDictonary[binIndex])
                         {
-                            double? xValue = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First()].Value;
-                            double? yValue = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First()].Value;
+                            double? xValue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.X).First()].Value;
+                            double? yValue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Y).First()].Value;
                             double? value = null;
-                            if (_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Any() && resultItem.Values.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).First()))
+                            if (_queryModel.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()))
                             {
-                                value = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).First()].NoramlizedValue;
+                                value = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()].NoramlizedValue;
                             }
-                            else if (_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue).First()))
+                            else if (_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
                             {
-                                value = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue).First()].NoramlizedValue;
+                                value = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
                             }
 
                             if (value != null)
@@ -475,19 +475,19 @@ namespace PanoramicDataWin8.view.vis.render
 
             /*foreach (var resultItem in _resultModel.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
             {
-                if (resultItem.Values.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First()) &&
-                    resultItem.Values.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First()))
+                if (resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.X).First()) &&
+                    resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.Y).First()))
                 {
-                    double? xValue = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First()].Value;
-                    double? yValue = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First()].Value;
+                    double? xValue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.X).First()].Value;
+                    double? yValue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Y).First()].Value;
                     double? value = null;
-                    if (_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Any() && resultItem.Values.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).First()))
+                    if (_queryModel.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()))
                     {
-                        value = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).First()].NoramlizedValue;
+                        value = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()].NoramlizedValue;
                     }
-                    else if (_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue).First()))
+                    else if (_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
                     {
-                        value = (double?)resultItem.Values[_queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue).First()].NoramlizedValue;
+                        value = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
                     }
 
                     if (value != null)

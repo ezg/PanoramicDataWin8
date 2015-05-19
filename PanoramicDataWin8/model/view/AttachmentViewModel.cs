@@ -97,12 +97,12 @@ namespace PanoramicDataWin8.model.view
                 AttachmentOrientation = this.AttachmentOrientation
             };
 
-            // is value attributeOperationModel
-            if (_visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Contains(attachmentItemViewModel.AttributeOperationModel))
+            // is value InputOperationModel
+            if (_visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Value).Contains(attachmentItemViewModel.InputOperationModel))
             {
-                var aom = attachmentItemViewModel.AttributeOperationModel;
-                if (aom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT ||
-                    aom.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT)
+                var aom = attachmentItemViewModel.InputOperationModel;
+                if (aom.InputModel.InputDataType == InputDataTypeConstants.INT ||
+                    aom.InputModel.InputDataType == InputDataTypeConstants.FLOAT)
                 {
                     menuViewModel.NrRows = 3;
                     menuViewModel.NrColumns = 4;
@@ -126,7 +126,7 @@ namespace PanoramicDataWin8.model.view
                         ToggleMenuItemComponentViewModel toggle = new ToggleMenuItemComponentViewModel()
                         {
                             Label = aggregationFunction.ToString(),
-                            IsChecked = attachmentItemViewModel.AttributeOperationModel.AggregateFunction == aggregationFunction
+                            IsChecked = attachmentItemViewModel.InputOperationModel.AggregateFunction == aggregationFunction
                         };
                         toggles.Add(toggle);
                         menuItem.MenuItemComponentViewModel = toggle;
@@ -137,7 +137,7 @@ namespace PanoramicDataWin8.model.view
                             {
                                 if (model.IsChecked)
                                 {
-                                    attachmentItemViewModel.AttributeOperationModel.AggregateFunction = aggregationFunction;
+                                    attachmentItemViewModel.InputOperationModel.AggregateFunction = aggregationFunction;
                                     foreach (var tg in model.OtherToggles)
                                     {
                                         tg.IsChecked = false;
@@ -197,34 +197,34 @@ namespace PanoramicDataWin8.model.view
         {
             AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
             {
-                AttributeFunction = AttributeFunction.JobInput
+                InputUsage = InputUsage.JobInput
             };
             // initialize items
-            foreach (var item in _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.JobInput))
+            foreach (var item in _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.JobInput))
             {
                 header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                 {
-                    AttributeOperationModel = item,
+                    InputOperationModel = item,
                     AttachmentHeaderViewModel = header
                 });
             }
 
             // handle added
-            header.AddedTriggered = (attributeOperationModel) =>
+            header.AddedTriggered = (inputOperationModel) =>
             {
                 QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.JobInput).Contains(attributeOperationModel))
+                if (!queryModel.GetUsageInputOperationModel(InputUsage.JobInput).Contains(inputOperationModel))
                 {
-                    queryModel.AddFunctionAttributeOperationModel(AttributeFunction.JobInput, attributeOperationModel);
+                    queryModel.AddUsageInputOperationModel(InputUsage.JobInput, inputOperationModel);
                 }
             };
             // handle removed
             header.RemovedTriggered = (attachmentItemViewModel) =>
             {
                 QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.JobInput).Contains(attachmentItemViewModel.AttributeOperationModel))
+                if (queryModel.GetUsageInputOperationModel(InputUsage.JobInput).Contains(attachmentItemViewModel.InputOperationModel))
                 {
-                    queryModel.RemoveFunctionAttributeOperationModel(AttributeFunction.JobInput, attachmentItemViewModel.AttributeOperationModel);
+                    queryModel.RemoveUsageInputOperationModel(InputUsage.JobInput, attachmentItemViewModel.InputOperationModel);
                 }
             };
 
@@ -237,15 +237,15 @@ namespace PanoramicDataWin8.model.view
             };
 
             // handle updates
-            _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.JobInput).CollectionChanged += (sender, args) =>
+            _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.JobInput).CollectionChanged += (sender, args) =>
             {
                 if (args.OldItems != null)
                 {
                     foreach (var item in args.OldItems)
                     {
-                        if (header.AttachmentItemViewModels.Any(aiv => aiv.AttributeOperationModel == item))
+                        if (header.AttachmentItemViewModels.Any(aiv => aiv.InputOperationModel == item))
                         {
-                            header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.AttributeOperationModel == item));
+                            header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.InputOperationModel == item));
                         }
                     }
                 }
@@ -255,8 +255,8 @@ namespace PanoramicDataWin8.model.view
                     {
                         header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                         {
-                            AttributeOperationModel = item as AttributeOperationModel,
-                            SubLabel = (item as AttributeOperationModel).AttributeModel.Name,
+                            InputOperationModel = item as InputOperationModel,
+                            SubLabel = (item as InputOperationModel).InputModel.Name,
                             MainLabel = "input",
                             AttachmentHeaderViewModel = header
                         });
@@ -279,33 +279,33 @@ namespace PanoramicDataWin8.model.view
 
         AttachmentHeaderViewModel createValueAttachmentHeader()
         {
-            var groupHeader = createAttributeFunctionAttachmentHeader(AttributeFunction.Value);
+            var groupHeader = createInputFieldUsageAttachmentHeader(InputUsage.Value);
 
             // handle added
-            groupHeader.AddedTriggered = (attributeOperationModel) =>
+            groupHeader.AddedTriggered = (inputOperationModel) =>
             {
                 QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT ||
-                    attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT)
+                if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.INT ||
+                    inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.FLOAT)
                 {
-                    attributeOperationModel.AggregateFunction = AggregateFunction.Avg;
+                    inputOperationModel.AggregateFunction = AggregateFunction.Avg;
                 }
                 else
                 {
-                    attributeOperationModel.AggregateFunction = AggregateFunction.Count;
+                    inputOperationModel.AggregateFunction = AggregateFunction.Count;
                 }
-                if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Contains(attributeOperationModel))
+                if (!queryModel.GetUsageInputOperationModel(InputUsage.Value).Contains(inputOperationModel))
                 {
-                    queryModel.AddFunctionAttributeOperationModel(AttributeFunction.Value, attributeOperationModel);
+                    queryModel.AddUsageInputOperationModel(InputUsage.Value, inputOperationModel);
                 }
             };
             // handle removed
             groupHeader.RemovedTriggered = (attachmentItemViewModel) =>
             {
                 QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Contains(attachmentItemViewModel.AttributeOperationModel))
+                if (queryModel.GetUsageInputOperationModel(InputUsage.Value).Contains(attachmentItemViewModel.InputOperationModel))
                 {
-                    queryModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Value, attachmentItemViewModel.AttributeOperationModel);
+                    queryModel.RemoveUsageInputOperationModel(InputUsage.Value, attachmentItemViewModel.InputOperationModel);
                 }
             };
             return groupHeader;
@@ -313,41 +313,41 @@ namespace PanoramicDataWin8.model.view
 
         AttachmentHeaderViewModel createGroupingAttachmentHeader()
         {
-             var groupHeader = createAttributeFunctionAttachmentHeader(AttributeFunction.Group);
+             var groupHeader = createInputFieldUsageAttachmentHeader(InputUsage.Group);
 
             // handle added
-            groupHeader.AddedTriggered = (attributeOperationModel) =>
+            groupHeader.AddedTriggered = (inputOperationModel) =>
             {
                 QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (!queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attributeOperationModel))
+                if (!queryModel.GetUsageInputOperationModel(InputUsage.Group).Contains(inputOperationModel))
                 {
-                    queryModel.AddFunctionAttributeOperationModel(AttributeFunction.Group, attributeOperationModel);
+                    queryModel.AddUsageInputOperationModel(InputUsage.Group, inputOperationModel);
                 }
             };
             // handle removed
             groupHeader.RemovedTriggered = (attachmentItemViewModel) =>
             {
                 QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Contains(attachmentItemViewModel.AttributeOperationModel))
+                if (queryModel.GetUsageInputOperationModel(InputUsage.Group).Contains(attachmentItemViewModel.InputOperationModel))
                 {
-                    queryModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Group, attachmentItemViewModel.AttributeOperationModel);
+                    queryModel.RemoveUsageInputOperationModel(InputUsage.Group, attachmentItemViewModel.InputOperationModel);
                 }
             };
             return groupHeader;
         }
 
-        AttachmentHeaderViewModel createAttributeFunctionAttachmentHeader(AttributeFunction attributeFunction)
+        AttachmentHeaderViewModel createInputFieldUsageAttachmentHeader(InputUsage inputUsage)
         {
             AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
             {
-                AttributeFunction = attributeFunction
+                InputUsage = inputUsage
             };
             // initialize items
-            foreach (var item in _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(attributeFunction))
+            foreach (var item in _visualizationViewModel.QueryModel.GetUsageInputOperationModel(inputUsage))
             {
                 header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                 {
-                    AttributeOperationModel = item,
+                    InputOperationModel = item,
                     AttachmentHeaderViewModel = header
                 });
             }
@@ -355,19 +355,19 @@ namespace PanoramicDataWin8.model.view
             header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
             {
                 AttachmentHeaderViewModel = header,
-                Label = attributeFunction.ToString().ToLower()
+                Label = inputUsage.ToString().ToLower()
             };
 
             // handle updates
-            _visualizationViewModel.QueryModel.GetFunctionAttributeOperationModel(attributeFunction).CollectionChanged += (sender, args) =>
+            _visualizationViewModel.QueryModel.GetUsageInputOperationModel(inputUsage).CollectionChanged += (sender, args) =>
             {
                 if (args.OldItems != null)
                 {
                     foreach (var item in args.OldItems)
                     {
-                        if (header.AttachmentItemViewModels.Any(aiv => aiv.AttributeOperationModel == item))
+                        if (header.AttachmentItemViewModels.Any(aiv => aiv.InputOperationModel == item))
                         {
-                            header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.AttributeOperationModel == item));
+                            header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.InputOperationModel == item));
                         }
                     }
                 }
@@ -377,9 +377,9 @@ namespace PanoramicDataWin8.model.view
                     {
                         header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                         {
-                            AttributeOperationModel = item as AttributeOperationModel,
-                            SubLabel = (item as AttributeOperationModel).AttributeModel.Name,
-                            MainLabel = attributeFunction.ToString().ToLower(),
+                            InputOperationModel = item as InputOperationModel,
+                            SubLabel = (item as InputOperationModel).InputModel.Name,
+                            MainLabel = inputUsage.ToString().ToLower(),
                             AttachmentHeaderViewModel = header
                         });
                     }

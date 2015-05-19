@@ -44,8 +44,8 @@ namespace PanoramicDataWin8.model.data.result
             }
         }
 
-        private List<AttributeOperationModel> _dimensions = new List<AttributeOperationModel>();
-        public List<AttributeOperationModel> Dimensions
+        private List<InputOperationModel> _dimensions = new List<InputOperationModel>();
+        public List<InputOperationModel> Dimensions
         {
             get
             {
@@ -58,8 +58,8 @@ namespace PanoramicDataWin8.model.data.result
         }
 
 
-        private Dictionary<AttributeOperationModel, double> _maxValues = new Dictionary<AttributeOperationModel, double>();
-        public Dictionary<AttributeOperationModel, double> MaxValues
+        private Dictionary<InputOperationModel, double> _maxValues = new Dictionary<InputOperationModel, double>();
+        public Dictionary<InputOperationModel, double> MaxValues
         {
             get
             {
@@ -71,8 +71,8 @@ namespace PanoramicDataWin8.model.data.result
             }
         }
 
-        private Dictionary<AttributeOperationModel, double> _minValues = new Dictionary<AttributeOperationModel, double>();
-        public Dictionary<AttributeOperationModel, double> MinValues
+        private Dictionary<InputOperationModel, double> _minValues = new Dictionary<InputOperationModel, double>();
+        public Dictionary<InputOperationModel, double> MinValues
         {
             get
             {

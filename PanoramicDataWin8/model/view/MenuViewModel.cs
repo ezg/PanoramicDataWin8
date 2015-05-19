@@ -92,16 +92,16 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private AttributeViewModel _attributeViewModel = null;
-        public AttributeViewModel AttributeViewModel
+        private InputFieldViewModel _inputFieldViewModel = null;
+        public InputFieldViewModel InputFieldViewModel
         {
             get
             {
-                return _attributeViewModel;
+                return _inputFieldViewModel;
             }
             set
             {
-                this.SetProperty(ref _attributeViewModel, value);
+                this.SetProperty(ref _inputFieldViewModel, value);
             }
         }
 

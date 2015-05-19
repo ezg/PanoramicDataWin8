@@ -11,12 +11,12 @@ namespace PanoramicDataWin8.model.data
             get;
         }
 
-        public abstract Dictionary<CalculatedAttributeModel, string> CalculatedAttributeModels
+        public abstract Dictionary<CalculatedInputModel, string> CalculatedInputFieldModels
         {
             get;
         }
 
-        public abstract Dictionary<NamedAttributeModel, string> NamedAttributeModels
+        public abstract Dictionary<NamedInputModel, string> NamedInputFieldModels
         {
             get;
         }

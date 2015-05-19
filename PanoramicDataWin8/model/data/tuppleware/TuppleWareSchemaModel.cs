@@ -49,19 +49,19 @@ namespace PanoramicDataWin8.model.data.tuppleware
             }
         }
 
-        public override Dictionary<CalculatedAttributeModel, string> CalculatedAttributeModels
+        public override Dictionary<CalculatedInputModel, string> CalculatedInputFieldModels
         {
             get
             {
-                return new Dictionary<CalculatedAttributeModel, string>();
+                return new Dictionary<CalculatedInputModel, string>();
             }
         }
 
-        public override Dictionary<NamedAttributeModel, string> NamedAttributeModels
+        public override Dictionary<NamedInputModel, string> NamedInputFieldModels
         {
             get
             {
-                return new Dictionary<NamedAttributeModel, string>();
+                return new Dictionary<NamedInputModel, string>();
             }
         }
     }

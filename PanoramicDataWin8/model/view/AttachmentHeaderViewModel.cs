@@ -11,7 +11,7 @@ namespace PanoramicDataWin8.model.view
 {
     public class AttachmentHeaderViewModel : ExtendedBindableBase
     {
-        public Action<AttributeOperationModel> AddedTriggered { get; set; }
+        public Action<InputOperationModel> AddedTriggered { get; set; }
         public Action<AttachmentItemViewModel> RemovedTriggered { get; set; }
 
         private Vec _preferedItemSize = new Vec(50, 50);
@@ -53,16 +53,16 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private AttributeFunction? _attributeFunction = null;
-        public AttributeFunction? AttributeFunction
+        private InputUsage? _inputUsage = null;
+        public InputUsage? InputUsage
         {
             get
             {
-                return _attributeFunction;
+                return _inputUsage;
             }
             set
             {
-                this.SetProperty(ref _attributeFunction, value);
+                this.SetProperty(ref _inputUsage, value);
             }
         }
     }

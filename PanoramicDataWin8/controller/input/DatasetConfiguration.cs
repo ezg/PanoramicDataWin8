@@ -139,55 +139,55 @@ namespace PanoramicDataWin8.controller.input
             }
         }
 
-        private List<string> _attributeNames = new List<string>();
-        public List<string> AttributeNames
+        private List<string> _inputFieldNames = new List<string>();
+        public List<string> InputFieldNames
         {
             get
             {
-                return _attributeNames;
+                return _inputFieldNames;
             }
             set
             {
-                this.SetProperty(ref _attributeNames, value);
+                this.SetProperty(ref _inputFieldNames, value);
             }
         }
 
-        private List<string> _attributeDataTypes = new List<string>();
-        public List<string> AttributeDataTypes
+        private List<string> _inputFieldDataTypes = new List<string>();
+        public List<string> InputFieldDataTypes
         {
             get
             {
-                return _attributeDataTypes;
+                return _inputFieldDataTypes;
             }
             set
             {
-                this.SetProperty(ref _attributeDataTypes, value);
+                this.SetProperty(ref _inputFieldDataTypes, value);
             }
         }
 
-        private List<string> _attributeVisualizationTypes = new List<string>();
-        public List<string> AttributeVisualizationTypes
+        private List<string> _inputFieldVisualizationTypes = new List<string>();
+        public List<string> InputFieldVisualizationTypes
         {
             get
             {
-                return _attributeVisualizationTypes;
+                return _inputFieldVisualizationTypes;
             }
             set
             {
-                this.SetProperty(ref _attributeVisualizationTypes, value);
+                this.SetProperty(ref _inputFieldVisualizationTypes, value);
             }
         }
 
-        private List<bool> _attributeIsDisplayed = new List<bool>();
-        public List<bool> AttributeIsDisplayed
+        private List<bool> _inputFieldIsDisplayed = new List<bool>();
+        public List<bool> InputFieldIsDisplayed
         {
             get
             {
-                return _attributeIsDisplayed;
+                return _inputFieldIsDisplayed;
             }
             set
             {
-                this.SetProperty(ref _attributeIsDisplayed, value);
+                this.SetProperty(ref _inputFieldIsDisplayed, value);
             }
         }
 
@@ -244,19 +244,19 @@ namespace PanoramicDataWin8.controller.input
                     }
                     else if (parts[0] == "Names")
                     {
-                        config.AttributeNames = CSVParser.CSVLineSplit(parts[1].Trim());
+                        config.InputFieldNames = CSVParser.CSVLineSplit(parts[1].Trim());
                     }
                     else if (parts[0] == "DataTypes")
                     {
-                        config.AttributeDataTypes = CSVParser.CSVLineSplit(parts[1].Trim());
+                        config.InputFieldDataTypes = CSVParser.CSVLineSplit(parts[1].Trim());
                     }
                     else if (parts[0] == "VisualizationTypes")
                     {
-                        config.AttributeVisualizationTypes = CSVParser.CSVLineSplit(parts[1].Trim());
+                        config.InputFieldVisualizationTypes = CSVParser.CSVLineSplit(parts[1].Trim());
                     }
                     else if (parts[0] == "IsDisplayed")
                     {
-                        config.AttributeIsDisplayed = CSVParser.CSVLineSplit(parts[1].Trim()).Select(s => s.ToLower() == "true").ToList();
+                        config.InputFieldIsDisplayed = CSVParser.CSVLineSplit(parts[1].Trim()).Select(s => s.ToLower() == "true").ToList();
                     }
                     else if (parts[0] == "UseQuoteParsing")
                     {

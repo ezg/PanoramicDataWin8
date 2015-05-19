@@ -6,10 +6,10 @@ namespace PanoramicDataWin8.model.data.common
 {
     public class Bin
     {
-        public Dictionary<AttributeOperationModel, double> Counts { get; set; }
-        public Dictionary<AttributeOperationModel, double?> Values { get; set; }
-        public Dictionary<AttributeOperationModel, object> TemporaryValues { get; set; }
-        public Dictionary<AttributeOperationModel, double?> NormalizedValues { get; set; }
+        public Dictionary<InputOperationModel, double> Counts { get; set; }
+        public Dictionary<InputOperationModel, double?> Values { get; set; }
+        public Dictionary<InputOperationModel, object> TemporaryValues { get; set; }
+        public Dictionary<InputOperationModel, double?> NormalizedValues { get; set; }
         public double? NormalizedCount { get; set; }
         public List<DataRow> Samples { get; set; }
         public BinIndex BinIndex { get; set; }
@@ -21,10 +21,10 @@ namespace PanoramicDataWin8.model.data.common
         {
             Spans = new List<Span>();
             Samples = new List<DataRow>();
-            Counts = new Dictionary<AttributeOperationModel, double>();
-            Values = new Dictionary<AttributeOperationModel, double?>();
-            TemporaryValues = new Dictionary<AttributeOperationModel, object>();
-            NormalizedValues = new Dictionary<AttributeOperationModel, double?>();
+            Counts = new Dictionary<InputOperationModel, double>();
+            Values = new Dictionary<InputOperationModel, double?>();
+            TemporaryValues = new Dictionary<InputOperationModel, object>();
+            NormalizedValues = new Dictionary<InputOperationModel, double?>();
         }
 
         public bool ContainsBin(Bin bin)

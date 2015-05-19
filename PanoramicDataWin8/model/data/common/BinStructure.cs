@@ -10,8 +10,8 @@ namespace PanoramicDataWin8.model.data.common
             Bins = new Dictionary<BinIndex, Bin>();
         }
 
-        public Dictionary<AttributeOperationModel, double> AggregatedMaxValues = new Dictionary<AttributeOperationModel, double>();
-        public Dictionary<AttributeOperationModel, double> AggregatedMinValues = new Dictionary<AttributeOperationModel, double>();
+        public Dictionary<InputOperationModel, double> AggregatedMaxValues = new Dictionary<InputOperationModel, double>();
+        public Dictionary<InputOperationModel, double> AggregatedMinValues = new Dictionary<InputOperationModel, double>();
 
         public double NullCount { get; set; } 
         public Dictionary<BinIndex, Bin> Bins { get; set; }

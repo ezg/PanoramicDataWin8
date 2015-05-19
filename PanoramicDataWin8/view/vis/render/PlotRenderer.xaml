@@ -23,8 +23,8 @@
         </Grid.ColumnDefinitions>
 
 
-        <common:AttributeView x:Name="xAttributeView" Grid.Column="1" Grid.Row="0"/>
-        <common:AttributeView x:Name="yAttributeView" Grid.Column="0" Grid.Row="1"/>
+        <common:InputFieldView x:Name="xInputFieldView" Grid.Column="1" Grid.Row="0"/>
+        <common:InputFieldView x:Name="yInputFieldView" Grid.Column="0" Grid.Row="1"/>
         
         <Grid Grid.Column="1" Grid.Row="1" Background="{StaticResource lightBrush}">
             <Viewbox MaxWidth="150" CacheMode="BitmapCache">

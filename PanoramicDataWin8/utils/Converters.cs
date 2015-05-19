@@ -85,20 +85,20 @@ namespace PanoramicDataWin8.utils
 
     public class TextValueConverter : IValueConverter
     {
-        public AttributeOperationModel AttributeOperationModel { get; set; }
+        public InputOperationModel InputOperationModel { get; set; }
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            if (AttributeOperationModel == null)
+            if (InputOperationModel == null)
             {
                 return "";
             }
             if (value != null)
             {
                 ResultItemModel model = (value as ResultItemModel);
-                /*if (model.AttributeValues.ContainsKey(AttributeViewModel))
+                /*if (model.AttributeValues.ContainsKey(InputFieldViewModel))
                 {
-                    return model.AttributeValues[AttributeViewModel].ShortStringValue;
+                    return model.AttributeValues[InputFieldViewModel].ShortStringValue;
                 }*/
                 return ""; 
             }

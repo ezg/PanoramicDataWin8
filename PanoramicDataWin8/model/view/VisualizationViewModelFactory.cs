@@ -25,7 +25,7 @@ namespace PanoramicDataWin8.model.view
             return visualizationViewModel;
         }
 
-        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType, AttributeOperationModel attributeOperationModel)
+        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType, InputOperationModel inputOperationModel)
         {
             VisualizationViewModel visualizationViewModel = CreateDefault(schemaModel, jobType, VisualizationType.table);
 
@@ -34,9 +34,9 @@ namespace PanoramicDataWin8.model.view
                 if (schemaModel is TuppleWareSchemaModel)
                 {
                     visualizationViewModel.QueryModel.VisualizationType = VisualizationType.table;
-                    visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, attributeOperationModel);
+                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.X, inputOperationModel);
                 }
-                else if (attributeOperationModel.AttributeModel.AttributeVisualizationType == AttributeVisualizationTypeConstants.ENUM)
+                else if (inputOperationModel.InputModel.InputVisualizationType == InputVisualizationTypeConstants.ENUM)
                 {
                     /*
                     PanoramicDataColumnDescriptor x = (PanoramicDataColumnDescriptor)columnDescriptor.Clone();
@@ -49,25 +49,25 @@ namespace PanoramicDataWin8.model.view
                     filterHolderViewModel.AddOptionColumnDescriptor(Option.ColorBy, g);
                     filterHolderViewModel.AddOptionColumnDescriptor(Option.Y, y);*/
                 }
-                else if (attributeOperationModel.AttributeModel.AttributeVisualizationType == AttributeVisualizationTypeConstants.NUMERIC)
+                else if (inputOperationModel.InputModel.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
                 {
                     visualizationViewModel.QueryModel.VisualizationType = VisualizationType.bar;
 
-                    AttributeOperationModel x = new AttributeOperationModel(attributeOperationModel.AttributeModel);
+                    InputOperationModel x = new InputOperationModel(inputOperationModel.InputModel);
                     x.AggregateFunction = AggregateFunction.None;
 
-                    AttributeOperationModel value = new AttributeOperationModel(attributeOperationModel.AttributeModel);
+                    InputOperationModel value = new InputOperationModel(inputOperationModel.InputModel);
                     value.AggregateFunction = AggregateFunction.Count;
 
-                    AttributeOperationModel y = new AttributeOperationModel(attributeOperationModel.AttributeModel);
+                    InputOperationModel y = new InputOperationModel(inputOperationModel.InputModel);
                    // y.AggregateFunction = AggregateFunction.Count;
 
 
-                    visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, x);
-                    visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.Y, y);
-                    visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.DefaultValue, value);
+                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.X, x);
+                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.Y, y);
+                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.DefaultValue, value);
                 }
-                else if (attributeOperationModel.AttributeModel.AttributeVisualizationType == AttributeVisualizationTypeConstants.GEOGRAPHY)
+                else if (inputOperationModel.InputModel.InputVisualizationType == InputVisualizationTypeConstants.GEOGRAPHY)
                 {
                     /*visualizationViewModel.VisualizationType = VisualizationType.Map;
 
@@ -85,7 +85,7 @@ namespace PanoramicDataWin8.model.view
                 else
                 {
                     visualizationViewModel.QueryModel.VisualizationType = VisualizationType.table;
-                    visualizationViewModel.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, attributeOperationModel);
+                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.X, inputOperationModel);
                 }
             }
             else if (jobType == JobType.Kmeans)

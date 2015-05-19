@@ -71,7 +71,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 
-                List<Dictionary<AttributeModel, object>> data = await getDataFromFile(sampleSize);
+                List<Dictionary<InputFieldModel, object>> data = await getDataFromFile(sampleSize);
                 List<DataRow> returnList = data.Select(d => new DataRow() { Entries = d }).ToList();
                 _nrProcessedSamples += sampleSize;
 
@@ -104,10 +104,10 @@ namespace PanoramicDataWin8.controller.data.sim
             return Math.Min(1.0, (double)_nrProcessedSamples / (double)GetNrTotalSamples());
         }
 
-        public ResultItemValueModel GetResultItemValueModel(AttributeOperationModel attributeOperationModel, Dictionary<AttributeModel, object> valueDict)
+        public ResultItemValueModel GetResultItemValueModel(InputOperationModel inputOperationModel, Dictionary<InputFieldModel, object> valueDict)
         {
             ResultItemValueModel valueModel = new ResultItemValueModel();
-            if (valueDict[attributeOperationModel.AttributeModel] == null)
+            if (valueDict[inputOperationModel.InputModel] == null)
             {
                 valueModel.Value = null;
                 valueModel.StringValue = "";
@@ -116,14 +116,14 @@ namespace PanoramicDataWin8.controller.data.sim
             else
             {
                 double d = 0.0;
-                valueModel.Value = valueDict[attributeOperationModel.AttributeModel];
+                valueModel.Value = valueDict[inputOperationModel.InputModel];
                 valueModel.StringValue = valueModel.Value.ToString();
 
                 if (double.TryParse(valueModel.Value.ToString(), out d))
                 {
                     valueModel.StringValue = valueModel.Value.ToString().Contains(".") ? d.ToString("N") : valueModel.Value.ToString();
                 }
-                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.GEOGRAPHY)
+                else if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.GEOGRAPHY)
                 {
                     string toSplit = valueModel.StringValue;
                     if (toSplit.Contains("(") && toSplit.Contains(")"))
@@ -133,7 +133,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     }
                     valueModel.ShortStringValue = valueModel.StringValue.Replace("(" + toSplit + ")", "");
                 }
-                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.TIME)
+                else if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.TIME)
                 {
                     if (valueModel.Value is DateTime)
                     {
@@ -141,7 +141,7 @@ namespace PanoramicDataWin8.controller.data.sim
                         valueModel.ShortStringValue = ((DateTime)valueModel.Value).TimeOfDay.ToString();
                     }
                 }
-                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.DATE)
+                else if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.DATE)
                 {
                     if (valueModel.Value is DateTime)
                     {
@@ -154,17 +154,17 @@ namespace PanoramicDataWin8.controller.data.sim
             return valueModel;
         }
 
-        private async Task<List<Dictionary<AttributeModel, object>>> getDataFromFile(int sampleSize)
+        private async Task<List<Dictionary<InputFieldModel, object>>> getDataFromFile(int sampleSize)
         {
             int count = 0;
             string line = await _streamReader.ReadLineAsync();
 
-            List<Dictionary<AttributeModel, object>> data = new List<Dictionary<AttributeModel, object>>();
+            List<Dictionary<InputFieldModel, object>> data = new List<Dictionary<InputFieldModel, object>>();
 
             while (line != null && count < sampleSize)
             {
-                Dictionary<AttributeModel, object> items = new Dictionary<AttributeModel, object>();
-                items[_simOriginModel.IdAttributeModel] = count;
+                Dictionary<InputFieldModel, object> items = new Dictionary<InputFieldModel, object>();
+                items[_simOriginModel.IdInputModel] = count;
 
                 List<string> values = null;
                 if (_simOriginModel.DatasetConfiguration.UseQuoteParsing)
@@ -178,11 +178,11 @@ namespace PanoramicDataWin8.controller.data.sim
                 for (int i = 0; i < values.Count; i++)
                 {
                     object value = null;
-                    if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.NVARCHAR)
+                    if (((InputFieldModel) _simOriginModel.InputModels[i]).InputDataType == InputDataTypeConstants.NVARCHAR)
                     {
                         value = values[i].ToString();
                     }
-                    else if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.FLOAT)
+                    else if (((InputFieldModel) _simOriginModel.InputModels[i]).InputDataType == InputDataTypeConstants.FLOAT)
                     {
                         double d = 0.0;
                         if (double.TryParse(values[i].ToString(), out d))
@@ -190,7 +190,7 @@ namespace PanoramicDataWin8.controller.data.sim
                             value = d;
                         }
                     }
-                    else if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.INT)
+                    else if (((InputFieldModel) _simOriginModel.InputModels[i]).InputDataType == InputDataTypeConstants.INT)
                     {
                         int d = 0;
                         if (int.TryParse(values[i].ToString(), out d))
@@ -198,7 +198,7 @@ namespace PanoramicDataWin8.controller.data.sim
                             value = d;
                         }
                     }
-                    else if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.TIME)
+                    else if (((InputFieldModel) _simOriginModel.InputModels[i]).InputDataType == InputDataTypeConstants.TIME)
                     {
                         DateTime timeStamp = DateTime.Now;
                         if (DateTime.TryParseExact(values[i].ToString(), new string[] {"HH:mm:ss","mm:ss","mm:ss.f","m:ss"} , null, System.Globalization.DateTimeStyles.None, out timeStamp))
@@ -210,7 +210,7 @@ namespace PanoramicDataWin8.controller.data.sim
                             value = null;
                         }
                     }
-                    else if (_simOriginModel.AttributeModels[i].AttributeDataType == AttributeDataTypeConstants.DATE)
+                    else if (((InputFieldModel) _simOriginModel.InputModels[i]).InputDataType == InputDataTypeConstants.DATE)
                     {
                         DateTime date = DateTime.Now;
                         if (DateTime.TryParseExact(values[i].ToString(), new string[] { "MM/dd/yyyy HH:mm:ss", "M/d/yyyy" }, null, System.Globalization.DateTimeStyles.None, out date))
@@ -226,7 +226,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     {
                         value = null;
                     }
-                    items[_simOriginModel.AttributeModels[i]] = value;
+                    items[(InputFieldModel) _simOriginModel.InputModels[i]] = value;
                 }
                 data.Add(items);
                 line = await _streamReader.ReadLineAsync();
@@ -239,8 +239,8 @@ namespace PanoramicDataWin8.controller.data.sim
 
     public class DataRow
     {
-        private  Dictionary<AttributeModel, object> _entries = null;
-        public Dictionary<AttributeModel, object> Entries
+        private  Dictionary<InputFieldModel, object> _entries = null;
+        public Dictionary<InputFieldModel, object> Entries
         {
             get
             {
@@ -252,8 +252,8 @@ namespace PanoramicDataWin8.controller.data.sim
             }
         }
 
-        private Dictionary<AttributeModel, double?> _visualizationValues = new Dictionary<AttributeModel, double?>();
-        public Dictionary<AttributeModel, double?> VisualizationValues
+        private Dictionary<InputFieldModel, double?> _visualizationValues = new Dictionary<InputFieldModel, double?>();
+        public Dictionary<InputFieldModel, double?> VisualizationValues
         {
             get
             {

@@ -18,7 +18,7 @@ using PanoramicDataWin8.view.vis.menu;
 
 namespace PanoramicDataWin8.view.vis
 {
-    public class AttachmentView : UserControl, AttributeViewModelEventHandler, IScribbable
+    public class AttachmentView : UserControl, InputFieldViewModelEventHandler, IScribbable
     {
         public static double GAP = 4;
 
@@ -541,7 +541,7 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
-        public void AttributeViewModelMoved(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        public void InputFieldViewModelMoved(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
         {
             AttachmentViewModel model = (DataContext as AttachmentViewModel);
             model.IsDisplayed = true;
@@ -561,7 +561,7 @@ namespace PanoramicDataWin8.view.vis
             }
         }
         
-        public void AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        public void InputFieldViewModelDropped(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
         {
             AttachmentViewModel model = (DataContext as AttachmentViewModel);
             model.IsDisplayed = false;
@@ -576,7 +576,7 @@ namespace PanoramicDataWin8.view.vis
             var closestModel = overElement ? getClosestModel(e.Bounds) : null;
             if (closestModel != null && closestModel is AddAttachmentItemViewModel && (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AddedTriggered != null)
             {
-                (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AddedTriggered(e.AttributeOperationModel);
+                (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AddedTriggered(e.InputOperationModel);
             }
         }
 

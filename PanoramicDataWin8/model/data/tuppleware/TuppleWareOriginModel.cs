@@ -36,12 +36,12 @@ namespace PanoramicDataWin8.model.data.tuppleware
 
         public long FileId{ get; set; }
 
-        private List<AttributeModel> _attributeModels = new List<AttributeModel>();
-        public override List<AttributeModel> AttributeModels
+        private List<InputModel> _inputModels = new List<InputModel>();
+        public override List<InputModel> InputModels
         {
             get
             {
-                return _attributeModels;
+                return _inputModels;
             }
         }
 

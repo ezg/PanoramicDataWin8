@@ -27,7 +27,7 @@ namespace PanoramicDataWin8.model.data
         }
 
         [JsonIgnore]
-        public abstract List<AttributeModel> AttributeModels
+        public abstract List<InputModel> InputModels
         {
             get;
         }

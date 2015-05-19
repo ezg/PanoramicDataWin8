@@ -10,32 +10,32 @@ namespace PanoramicDataWin8.model.data.sim
         public SimOriginModel(DatasetConfiguration datasetConfiguration)
         {
             _datasetConfiguration = datasetConfiguration;
-            _idAttributeModel = new SimAttributeModel("ID", AttributeDataTypeConstants.INT, AttributeVisualizationTypeConstants.NUMERIC);
-            _idAttributeModel.OriginModel = this;
+            _idInputModel = new SimInputFieldModel("ID", InputDataTypeConstants.INT, InputVisualizationTypeConstants.NUMERIC);
+            _idInputModel.OriginModel = this;
         }
 
-        public void LoadAttributes()
+        public void LoadInputFields()
         {
-            _idAttributeModel.OriginModel = this;
+            _idInputModel.OriginModel = this;
 
-            for (int i = 0; i < _datasetConfiguration.AttributeNames.Count; i++)
+            for (int i = 0; i < _datasetConfiguration.InputFieldNames.Count; i++)
             {
-                AttributeModel attributeModel = new SimAttributeModel(
-                    _datasetConfiguration.AttributeNames[i],
-                    _datasetConfiguration.AttributeDataTypes[i],
-                    _datasetConfiguration.AttributeVisualizationTypes[i]);
-                attributeModel.OriginModel = this;
-                _attributeModels.Add(attributeModel);
+                InputFieldModel inputModel = new SimInputFieldModel(
+                    _datasetConfiguration.InputFieldNames[i],
+                    _datasetConfiguration.InputFieldDataTypes[i],
+                    _datasetConfiguration.InputFieldVisualizationTypes[i]);
+                inputModel.OriginModel = this;
+                _inputModels.Add(inputModel);
             }
 
-            _idAttributeModel.IsDisplayed = false;
-            _attributeModels.Add(_idAttributeModel);
+            _idInputModel.IsDisplayed = false;
+            _inputModels.Add(_idInputModel);
 
-            for (int i = 0; i < _attributeModels.Count; i++)
+            for (int i = 0; i < _inputModels.Count; i++)
             {
-                if (_datasetConfiguration.AttributeIsDisplayed.Count > i && !_datasetConfiguration.AttributeIsDisplayed[i])
+                if (_datasetConfiguration.InputFieldIsDisplayed.Count > i && !_datasetConfiguration.InputFieldIsDisplayed[i])
                 {
-                    _attributeModels[i].IsDisplayed = false;
+                    _inputModels[i].IsDisplayed = false;
                 }
             }
         }
@@ -53,13 +53,13 @@ namespace PanoramicDataWin8.model.data.sim
             }
         }
 
-        private AttributeModel _idAttributeModel = null;
+        private InputFieldModel _idInputModel = null;
         [JsonIgnore]
-        public AttributeModel IdAttributeModel
+        public InputFieldModel IdInputModel
         {
             get
             {
-                return _idAttributeModel;
+                return _idInputModel;
             }
         }
 
@@ -71,12 +71,12 @@ namespace PanoramicDataWin8.model.data.sim
             }
         }
 
-        private List<AttributeModel> _attributeModels = new List<AttributeModel>();
-        public override List<AttributeModel> AttributeModels
+        private List<InputModel> _inputModels = new List<InputModel>();
+        public override List<InputModel> InputModels
         {
             get
             {
-                return _attributeModels;
+                return _inputModels;
             }
         }
 

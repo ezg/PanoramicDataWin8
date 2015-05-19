@@ -119,6 +119,7 @@
     <Compile Include="controller\data\QueryExecuter.cs" />
     <Compile Include="controller\data\sim\DataAggregator.cs" />
     <Compile Include="controller\data\sim\DataBinner.cs" />
+    <Compile Include="controller\data\tuppleware\TuppleWareItemsProvider.cs" />
     <Compile Include="model\data\common\AggregateBinRange.cs" />
     <Compile Include="model\data\common\BinStructure.cs" />
     <Compile Include="model\data\common\DateTimeBinRange.cs" />
@@ -135,17 +136,21 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="model\data\AttributeFunction.cs" />
-    <Compile Include="model\data\AttributeModel.cs" />
-    <Compile Include="model\data\AttributeOperationModel.cs" />
+    <Compile Include="model\data\InputDataTypeConstants.cs" />
+    <Compile Include="model\data\InputGroupModel.cs" />
+    <Compile Include="model\data\InputModel.cs" />
+    <Compile Include="model\data\InputUsage.cs" />
+    <Compile Include="model\data\InputFieldModel.cs" />
+    <Compile Include="model\data\InputOperationModel.cs" />
     <Compile Include="model\data\common\Bin.cs" />
-    <Compile Include="model\data\CalculatedAttributeModel.cs" />
+    <Compile Include="model\data\CalculatedInputModel.cs" />
     <Compile Include="model\data\common\AxisType.cs" />
     <Compile Include="model\data\FilteringOperation.cs" />
     <Compile Include="model\data\FilterModel.cs" />
+    <Compile Include="model\data\InputVisualizationTypeConstants.cs" />
     <Compile Include="model\data\LinkModel.cs" />
     <Compile Include="model\data\LinkType.cs" />
-    <Compile Include="model\data\NamedAttributeModel.cs" />
+    <Compile Include="model\data\NamedInputModel.cs" />
     <Compile Include="model\data\OriginModel.cs" />
     <Compile Include="model\data\QueryModel.cs" />
     <Compile Include="model\data\result\VisualizationItemResultModel.cs" />
@@ -155,15 +160,17 @@
     <Compile Include="model\data\result\ResultModel.cs" />
     <Compile Include="model\data\result\VisualizationResultDescriptionModel.cs" />
     <Compile Include="model\data\SchemaModel.cs" />
-    <Compile Include="model\data\sim\SimAttributeModel.cs" />
+    <Compile Include="model\data\sim\SimInputFieldModel.cs" />
     <Compile Include="model\data\sim\SimOriginModel.cs" />
     <Compile Include="model\data\sim\SimSchemaModel.cs" />
-    <Compile Include="model\data\tuppleware\TuppleWareAttributeModel.cs" />
+    <Compile Include="model\data\tuppleware\TuppleWareInputModel.cs" />
+    <Compile Include="model\data\tuppleware\TuppleWareInputGroupModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareOriginModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareSchemaModel.cs" />
-    <Compile Include="model\data\tuppleware\TuppleWareWebClient.cs" />
+    <Compile Include="controller\data\tuppleware\TuppleWareGateway.cs" />
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
+    <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="model\view\tilemenu\TileMenuItemView.cs" />
     <Compile Include="model\view\tilemenu\TileMenuContentViewModel.cs" />
     <Compile Include="model\view\VisualizationTypeViewModel.cs" />
@@ -172,10 +179,9 @@
     <Compile Include="model\view\MenuItemViewModel.cs" />
     <Compile Include="model\view\AttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentViewModel.cs" />
-    <Compile Include="model\view\AttributeViewModel.cs" />
+    <Compile Include="model\view\InputFieldViewModel.cs" />
     <Compile Include="model\view\LinkViewModel.cs" />
     <Compile Include="model\view\MainModel.cs" />
-    <Compile Include="model\view\OrgData.cs" />
     <Compile Include="model\view\SchemaViewModel.cs" />
     <Compile Include="model\view\VisualizationViewModel.cs" />
     <Compile Include="model\view\VisualizationViewModelFactory.cs" />
@@ -196,6 +202,9 @@
     <Compile Include="utils\VisualTreeHelperExtensions.cs" />
     <Compile Include="view\common\DXSurface.xaml.cs">
       <DependentUpon>DXSurface.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\common\InputGroupView.xaml.cs">
+      <DependentUpon>InputGroupView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\common\TileMenuItemView.xaml.cs">
       <DependentUpon>TileMenuItemView.xaml</DependentUpon>
@@ -223,8 +232,8 @@
     <Compile Include="view\inq\IStroqConsumer.cs" />
     <Compile Include="view\inq\ScribbleGesture.cs" />
     <Compile Include="view\inq\ShortStraw.cs" />
-    <Compile Include="view\common\AttributeView.xaml.cs">
-      <DependentUpon>AttributeView.xaml</DependentUpon>
+    <Compile Include="view\common\InputFieldView.xaml.cs">
+      <DependentUpon>InputFieldView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\style\ScrollViewStyle.xaml.cs">
       <DependentUpon>ScrollViewStyle.xaml</DependentUpon>
@@ -295,7 +304,7 @@
     <Content Include="Assets\font\Lato-Bold.ttf" />
     <Content Include="Assets\font\Lato-Thin.ttf" />
     <Content Include="Assets\font\Abel-Regular.ttf" />
-    <Content Include="Assets\data\config\tuppleware_test.ini">
+    <Content Include="Assets\data\config\mimic2.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\data\raw\census.csv">
@@ -355,6 +364,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="view\common\InputGroupView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="view\common\TileMenuItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -380,7 +393,7 @@
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
-    <Page Include="view\common\AttributeView.xaml">
+    <Page Include="view\common\InputFieldView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

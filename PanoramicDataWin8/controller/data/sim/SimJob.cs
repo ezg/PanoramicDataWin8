@@ -40,7 +40,7 @@ namespace PanoramicDataWin8.controller.data.sim
         private List<AxisType> _axisTypes = new List<AxisType>();
         private Stopwatch _stopWatch = new Stopwatch();
 
-        private List<AttributeOperationModel> _dimensions = new List<AttributeOperationModel>();
+        private List<InputOperationModel> _dimensions = new List<InputOperationModel>();
         private List<Dictionary<object, double>> _uniqueValues = new List<Dictionary<object, double>>();
 
         public QueryModel QueryModel { get; set; }
@@ -69,9 +69,9 @@ namespace PanoramicDataWin8.controller.data.sim
             }
             else
             {
-                _dimensions = QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Concat(
-                                 QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y)).Concat(
-                                 QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group)).ToList();
+                _dimensions = QueryModel.GetUsageInputOperationModel(InputUsage.X).Concat(
+                                 QueryModel.GetUsageInputOperationModel(InputUsage.Y)).Concat(
+                                 QueryModel.GetUsageInputOperationModel(InputUsage.Group)).ToList();
 
                 _uniqueValues = _dimensions.Select(d => new Dictionary<object, double>()).ToList();
 
@@ -83,11 +83,11 @@ namespace PanoramicDataWin8.controller.data.sim
                 _binner = new DataBinner()
                 {
                     NrOfBins = new double[] { MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins }.Concat(
-                                    QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Group).Select(qom => MainViewController.Instance.MainModel.NrOfGroupBins)).ToList(),
+                                    QueryModel.GetUsageInputOperationModel(InputUsage.Group).Select(qom => MainViewController.Instance.MainModel.NrOfGroupBins)).ToList(),
                     Incremental = _isIncremental,
                     AxisTypes = _axisTypes,
                     IsAxisAggregated = _dimensions.Select(d => d.AggregateFunction != AggregateFunction.None).ToList(),
-                    Dimensions = _dimensions.Select(aom => aom.AttributeModel).ToList()
+                    Dimensions = _dimensions.Select(aom => aom.InputModel).ToList()
                 };
             }
             _simDataProvider = new SimDataProvider(QueryModelClone, (QueryModel.SchemaModel.OriginModels[0] as SimOriginModel), samplesToCheck);
@@ -189,12 +189,12 @@ namespace PanoramicDataWin8.controller.data.sim
             {
                 for (int d = 0; d < _dimensions.Count; d++)
                 {
-                    sample.VisualizationValues[_dimensions[d].AttributeModel] = getVisualizationValue(_axisTypes[d], sample.Entries[_dimensions[d].AttributeModel], _dimensions[d], _uniqueValues[d]);
+                    sample.VisualizationValues[_dimensions[d].InputModel] = getVisualizationValue(_axisTypes[d], sample.Entries[_dimensions[d].InputModel], _dimensions[d], _uniqueValues[d]);
                 }
             }
         }
 
-        private double? getVisualizationValue(AxisType axisType, object value, AttributeOperationModel attributeOperationModel, Dictionary<object, double> uniqueValues) 
+        private double? getVisualizationValue(AxisType axisType, object value, InputOperationModel inputOperationModel, Dictionary<object, double> uniqueValues) 
         {
             if (axisType == AxisType.Quantitative)
             {

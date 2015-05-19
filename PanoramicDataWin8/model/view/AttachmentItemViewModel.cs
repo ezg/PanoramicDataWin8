@@ -29,16 +29,16 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private AttributeOperationModel _attributeOperationModel = null;
-        public AttributeOperationModel AttributeOperationModel
+        private InputOperationModel _inputOperationModel = null;
+        public InputOperationModel InputOperationModel
         {
             get
             {
-                return _attributeOperationModel;
+                return _inputOperationModel;
             }
             set
             {
-                this.SetProperty(ref _attributeOperationModel, value);
+                this.SetProperty(ref _inputOperationModel, value);
             }
         }
 

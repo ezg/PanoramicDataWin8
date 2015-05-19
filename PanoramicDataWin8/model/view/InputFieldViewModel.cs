@@ -9,32 +9,32 @@ using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
 {
-    public class AttributeViewModel : BindableBase
+    public class InputFieldViewModel : BindableBase
     {
-        public static event EventHandler<AttributeViewModelEventArgs> AttributeViewModelMoved;
-        public static event EventHandler<AttributeViewModelEventArgs> AttributeViewModelDropped;
+        public static event EventHandler<InputFieldViewModelEventArgs> InputFieldViewModelMoved;
+        public static event EventHandler<InputFieldViewModelEventArgs> InputFieldViewModelDropped;
 
-        public AttributeViewModel() { }
+        public InputFieldViewModel() { }
 
-        public AttributeViewModel(VisualizationViewModel visualizationViewModel, AttributeOperationModel attributeOperationModel)
+        public InputFieldViewModel(VisualizationViewModel visualizationViewModel, InputOperationModel inputOperationModel)
         {
             VisualizationViewModel = visualizationViewModel;
-            AttributeOperationModel = attributeOperationModel;
+            InputOperationModel = inputOperationModel;
         }
 
-        public void FireMoved(Rct bounds, AttributeOperationModel attributeOperationModel, AttributeViewModelEventArgType type)
+        public void FireMoved(Rct bounds, InputOperationModel inputOperationModel, InputFieldViewModelEventArgType type)
         {
-            if (AttributeViewModelMoved != null)
+            if (InputFieldViewModelMoved != null)
             {
-                AttributeViewModelMoved(this, new AttributeViewModelEventArgs(attributeOperationModel, bounds, type));
+                InputFieldViewModelMoved(this, new InputFieldViewModelEventArgs(inputOperationModel, bounds, type));
             }
         }
 
-        public void FireDropped(Rct bounds, AttributeViewModelEventArgType type, AttributeOperationModel attributeOperationModel)
+        public void FireDropped(Rct bounds, InputFieldViewModelEventArgType type, InputOperationModel inputOperationModel)
         {
-            if (AttributeViewModelDropped != null)
+            if (InputFieldViewModelDropped != null)
             {
-                AttributeViewModelDropped(this, new AttributeViewModelEventArgs(attributeOperationModel, bounds, type));
+                InputFieldViewModelDropped(this, new InputFieldViewModelEventArgs(inputOperationModel, bounds, type));
             }
         }
 
@@ -260,23 +260,23 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private AttributeOperationModel _attributeOperationModel = null;
-        public AttributeOperationModel AttributeOperationModel
+        private InputOperationModel _inputOperationModel = null;
+        public InputOperationModel InputOperationModel
         {
             get
             {
-                return _attributeOperationModel;
+                return _inputOperationModel;
             }
             set
             {
-                if (_attributeOperationModel != null)
+                if (_inputOperationModel != null)
                 {
-                    _attributeOperationModel.PropertyChanged -= _attributeOperationModel_PropertyChanged;
+                    _inputOperationModel.PropertyChanged -= InputOperationModelPropertyChanged;
                 }
-                this.SetProperty(ref _attributeOperationModel, value);
-                if (_attributeOperationModel != null)
+                this.SetProperty(ref _inputOperationModel, value);
+                if (_inputOperationModel != null)
                 {
-                    _attributeOperationModel.PropertyChanged += _attributeOperationModel_PropertyChanged;
+                    _inputOperationModel.PropertyChanged += InputOperationModelPropertyChanged;
                     updateLabels();
                 }
             }
@@ -286,7 +286,7 @@ namespace PanoramicDataWin8.model.view
         {
             MenuViewModel menuViewModel = new MenuViewModel()
             {
-                AttributeViewModel = this,
+                InputFieldViewModel = this,
                 AttachmentOrientation = this.AttachmentOrientation
             };
             MenuItemViewModel menuItem = null;
@@ -306,7 +306,7 @@ namespace PanoramicDataWin8.model.view
             ToggleMenuItemComponentViewModel toggle1 = new ToggleMenuItemComponentViewModel()
             {
                 Label = "None",
-                IsChecked = _attributeOperationModel.SortMode == SortMode.None
+                IsChecked = _inputOperationModel.SortMode == SortMode.None
             };
             menuItem.MenuItemComponentViewModel = toggle1;
             menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
@@ -316,7 +316,7 @@ namespace PanoramicDataWin8.model.view
                 {
                     if (model.IsChecked)
                     {
-                        _attributeOperationModel.SortMode = SortMode.None;
+                        _inputOperationModel.SortMode = SortMode.None;
                         foreach (var tg in model.OtherToggles)
                         {
                             tg.IsChecked = false;
@@ -339,7 +339,7 @@ namespace PanoramicDataWin8.model.view
             ToggleMenuItemComponentViewModel toggle2 = new ToggleMenuItemComponentViewModel()
             {
                 Label = "asc",
-                IsChecked = _attributeOperationModel.SortMode == SortMode.Asc
+                IsChecked = _inputOperationModel.SortMode == SortMode.Asc
             };
             menuItem.MenuItemComponentViewModel = toggle2;
             menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
@@ -349,7 +349,7 @@ namespace PanoramicDataWin8.model.view
                 {
                     if (model.IsChecked)
                     {
-                        _attributeOperationModel.SortMode = SortMode.Asc;
+                        _inputOperationModel.SortMode = SortMode.Asc;
                         foreach (var tg in model.OtherToggles)
                         {
                             tg.IsChecked = false;
@@ -372,7 +372,7 @@ namespace PanoramicDataWin8.model.view
             ToggleMenuItemComponentViewModel toggle3 = new ToggleMenuItemComponentViewModel()
             {
                 Label = "desc",
-                IsChecked = _attributeOperationModel.SortMode == SortMode.Desc
+                IsChecked = _inputOperationModel.SortMode == SortMode.Desc
             };
             menuItem.MenuItemComponentViewModel = toggle3;
             menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
@@ -382,7 +382,7 @@ namespace PanoramicDataWin8.model.view
                 {
                     if (model.IsChecked)
                     {
-                        _attributeOperationModel.SortMode = SortMode.Desc;
+                        _inputOperationModel.SortMode = SortMode.Desc;
                         foreach (var tg in model.OtherToggles)
                         {
                             tg.IsChecked = false;
@@ -397,8 +397,8 @@ namespace PanoramicDataWin8.model.view
             toggle2.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle1, toggle3 });
             toggle3.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle1, toggle2 });
 
-            if (_attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT ||
-                _attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT)
+            if (_inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.INT ||
+                _inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.FLOAT)
             {
                 List<ToggleMenuItemComponentViewModel> toggles = new List<ToggleMenuItemComponentViewModel>();
                 List<MenuItemViewModel> items = new List<MenuItemViewModel>();
@@ -419,7 +419,7 @@ namespace PanoramicDataWin8.model.view
                     ToggleMenuItemComponentViewModel toggle = new ToggleMenuItemComponentViewModel()
                     {
                         Label = aggregationFunction.ToString(),
-                        IsChecked = _attributeOperationModel.AggregateFunction == aggregationFunction
+                        IsChecked = _inputOperationModel.AggregateFunction == aggregationFunction
                     };
                     toggles.Add(toggle);
                     menuItem.MenuItemComponentViewModel = toggle;
@@ -430,7 +430,7 @@ namespace PanoramicDataWin8.model.view
                         {
                             if (model.IsChecked)
                             {
-                                _attributeOperationModel.AggregateFunction = aggregationFunction;
+                                _inputOperationModel.AggregateFunction = aggregationFunction;
                                 foreach (var tg in model.OtherToggles)
                                 {
                                     tg.IsChecked = false;
@@ -453,65 +453,65 @@ namespace PanoramicDataWin8.model.view
             return menuViewModel;
         }
 
-        void _attributeOperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void InputOperationModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             updateLabels();
         }
 
         private void updateLabels()
         {
-            MainLabel = _attributeOperationModel.AttributeModel.Name; //columnDescriptor.GetLabels(out mainLabel, out subLabel);
+            MainLabel = _inputOperationModel.InputModel.Name; //columnDescriptor.GetLabels(out mainLabel, out subLabel);
 
-            string mainLabel = _attributeOperationModel.AttributeModel.Name;
+            string mainLabel = _inputOperationModel.InputModel.Name;
             string subLabel = "";
 
             mainLabel = addDetailToLabel(mainLabel);
-            MainLabel = mainLabel;
+            MainLabel = mainLabel.Replace("_", "");
             SubLabel = subLabel;
         }
 
         private string addDetailToLabel(string name)
         {
-            if (AttributeOperationModel.AggregateFunction == AggregateFunction.Avg)
+            if (InputOperationModel.AggregateFunction == AggregateFunction.Avg)
             {
                 name = "Avg(" + name + ")";
             }
-            else if (AttributeOperationModel.AggregateFunction == AggregateFunction.Count)
+            else if (InputOperationModel.AggregateFunction == AggregateFunction.Count)
             {
                 name = "Count(" + name + ")";
             }
-            else if (AttributeOperationModel.AggregateFunction == AggregateFunction.Max)
+            else if (InputOperationModel.AggregateFunction == AggregateFunction.Max)
             {
                 name = "Max(" + name + ")";
             }
-            else if (AttributeOperationModel.AggregateFunction == AggregateFunction.Min)
+            else if (InputOperationModel.AggregateFunction == AggregateFunction.Min)
             {
                 name = "Min(" + name + ")";
             }
-            else if (AttributeOperationModel.AggregateFunction == AggregateFunction.Sum)
+            else if (InputOperationModel.AggregateFunction == AggregateFunction.Sum)
             {
                 name = "Sum(" + name + ")";
             }
-            /*else if (AttributeViewModel.AggregateFunction == AggregateFunction.Bin)
+            /*else if (InputFieldViewModel.AggregateFunction == AggregateFunction.Bin)
             {
                 name = "Bin Range(" + name + ")";
             }*/
 
-            if (AttributeOperationModel.ScaleFunction != ScaleFunction.None)
+            if (InputOperationModel.ScaleFunction != ScaleFunction.None)
             {
-                if (AttributeOperationModel.ScaleFunction == ScaleFunction.Log)
+                if (InputOperationModel.ScaleFunction == ScaleFunction.Log)
                 {
                     name += " [Log]";
                 }
-                else if (AttributeOperationModel.ScaleFunction == ScaleFunction.Normalize)
+                else if (InputOperationModel.ScaleFunction == ScaleFunction.Normalize)
                 {
                     name += " [Normalize]";
                 }
-                else if (AttributeOperationModel.ScaleFunction == ScaleFunction.RunningTotal)
+                else if (InputOperationModel.ScaleFunction == ScaleFunction.RunningTotal)
                 {
                     name += " [RT]";
                 }
-                else if (AttributeOperationModel.ScaleFunction == ScaleFunction.RunningTotalNormalized)
+                else if (InputOperationModel.ScaleFunction == ScaleFunction.RunningTotalNormalized)
                 {
                     name += " [RT Norm]";
                 }
@@ -522,32 +522,32 @@ namespace PanoramicDataWin8.model.view
 
 
 
-    public interface AttributeViewModelEventHandler
+    public interface InputFieldViewModelEventHandler
     {
         IGeometry BoundsGeometry { get; }
-        void AttributeViewModelMoved(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement);
-        void AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement);
+        void InputFieldViewModelMoved(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement);
+        void InputFieldViewModelDropped(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement);
     }
 
 
-    public class AttributeViewModelEventArgs : EventArgs
+    public class InputFieldViewModelEventArgs : EventArgs
     {
         public Rct Bounds { get; set; }
-        public AttributeOperationModel AttributeOperationModel { get; set; }
-        public AttributeViewModelEventArgType Type { get; set; }
+        public InputOperationModel InputOperationModel { get; set; }
+        public InputFieldViewModelEventArgType Type { get; set; }
         public bool UseDefaultSize { get; set; }
         public VisualizationViewModel CreateLinkFrom { get; set; }
 
-        public  AttributeViewModelEventArgs(AttributeOperationModel attributeOperationModel, Rct bounds, AttributeViewModelEventArgType type)
+        public  InputFieldViewModelEventArgs(InputOperationModel inputOperationModel, Rct bounds, InputFieldViewModelEventArgType type)
         {
-            AttributeOperationModel = attributeOperationModel;
+            InputOperationModel = inputOperationModel;
             Bounds = bounds;
             Type = type;
             UseDefaultSize = true;
         }
     }
 
-    public enum AttributeViewModelEventArgType
+    public enum InputFieldViewModelEventArgType
     {
         Default,
         Copy,

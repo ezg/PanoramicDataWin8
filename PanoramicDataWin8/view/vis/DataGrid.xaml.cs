@@ -35,7 +35,7 @@ using PanoramicDataWin8.view.inq;
 
 namespace PanoramicDataWin8.view.vis
 {
-    public sealed partial class DataGrid : UserControl, AttributeViewModelEventHandler
+    public sealed partial class DataGrid : UserControl, InputFieldViewModelEventHandler
     {
         private IDisposable _observableDisposable = null;
 
@@ -57,7 +57,7 @@ namespace PanoramicDataWin8.view.vis
 
             this.InitializeComponent();
             this.DataContextChanged += DataGrid_DataContextChanged;
-            AttributeView.AttributeViewModelTapped += AttributeView_AttributeViewModelTapped;
+            InputFieldView.InputFieldViewModelTapped += InputFieldViewInputFieldViewModelTapped;
             
             listView.ManipulationMode = ManipulationModes.None;            
             _activeTimer.Interval = TimeSpan.FromMilliseconds(10);
@@ -90,7 +90,7 @@ namespace PanoramicDataWin8.view.vis
                 ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
                 resultModel.PropertyChanged -= ResultModel_PropertyChanged;
             }
-            AttributeView.AttributeViewModelTapped -= AttributeView_AttributeViewModelTapped;
+            InputFieldView.InputFieldViewModelTapped -= InputFieldViewInputFieldViewModelTapped;
         }
 
         ~DataGrid()
@@ -107,7 +107,7 @@ namespace PanoramicDataWin8.view.vis
                     _observableDisposable.Dispose();
                 }
                 _observableDisposable = Observable.FromEventPattern<NotifyCollectionChangedEventArgs>(
-                    (args.NewValue as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X), "CollectionChanged")
+                    (args.NewValue as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.X), "CollectionChanged")
                     .Throttle(TimeSpan.FromMilliseconds(50))
                     .ObserveOn(SynchronizationContext.Current)
                     .Subscribe((arg) =>
@@ -188,21 +188,21 @@ namespace PanoramicDataWin8.view.vis
         {
             removeMenu();
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
-            List<AttributeOperationModel> attributeOperationModels = model.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).ToList();
+            List<InputOperationModel> inputOperationModels = model.QueryModel.GetUsageInputOperationModel(InputUsage.X).ToList();
 
             List<HeaderObject> headerObjects = new List<HeaderObject>();
 
-            foreach (var attributeOperationModel in attributeOperationModels)
+            foreach (var inputOperationModel in inputOperationModels)
             {
                 HeaderObject ho = new HeaderObject();
-                ho.AttributeViewModel = new AttributeViewModel(model, attributeOperationModel)
+                ho.InputFieldViewModel = new InputFieldViewModel(model, inputOperationModel)
                 {
                     AttachmentOrientation = AttachmentOrientation.Top
                 };
                 ho.Width = 100;
-                if (HeaderObjects.Any(hoo => hoo.AttributeViewModel != null && hoo.AttributeViewModel.AttributeOperationModel == ho.AttributeViewModel.AttributeOperationModel))
+                if (HeaderObjects.Any(hoo => hoo.InputFieldViewModel != null && hoo.InputFieldViewModel.InputOperationModel == ho.InputFieldViewModel.InputOperationModel))
                 {
-                    var oldHo = HeaderObjects.First(hoo => hoo.AttributeViewModel.AttributeOperationModel == ho.AttributeViewModel.AttributeOperationModel);
+                    var oldHo = HeaderObjects.First(hoo => hoo.InputFieldViewModel.InputOperationModel == ho.InputFieldViewModel.InputOperationModel);
                     ho.Width = oldHo.Width;
                 }
                 headerObjects.Add(ho);
@@ -222,7 +222,7 @@ namespace PanoramicDataWin8.view.vis
             sb.Append(" <StackPanel Orientation=\"Horizontal\">");
             sb.Append("     <local:DataGridResizer Margin=\"0,0,0,0\" Width=\"4\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/> ");
             sb.Append("     <Grid Width=\"{Binding Width}\">");
-            sb.Append("         <local:AttributeView DataContext=\"{Binding AttributeViewModel}\" Width=\"{Binding Width}\" Name=\"attributeView\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/>");
+            sb.Append("         <local:InputFieldView DataContext=\"{Binding InputFieldViewModel}\" Width=\"{Binding Width}\" Name=\"inputFieldView\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/>");
             sb.Append("     </Grid>");
             sb.Append("     <local:DataGridResizer Width=\"4\" xmlns:local=\"using:PanoramicDataWin8.view.common\" IsResizer=\"True\"/> ");
             sb.Append(" </StackPanel>");
@@ -251,7 +251,7 @@ namespace PanoramicDataWin8.view.vis
             sb.Append("<DataTemplate xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\" >");
             sb.Append("<StackPanel Orientation=\"Horizontal\" Background=\"{StaticResource lightBrush}\">");
             int count = 0;
-            foreach (var attributeOperationModel in attributeOperationModels)
+            foreach (var inputOperationModel in inputOperationModels)
             {
                 sb.Append("     <local:DataGridCell HeaderObject=\"{Binding ElementName=_this, Path=HeaderObjects[" + count + "]}\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/>");
                 //sb.Append("     <TextBlock Text=\"asdfasfds}\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/>");
@@ -265,7 +265,7 @@ namespace PanoramicDataWin8.view.vis
             listView.ItemTemplate = datatemplate;
         }
 
-        public void AttributeViewModelMoved(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        public void InputFieldViewModelMoved(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
         {
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
@@ -321,7 +321,7 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
-        public void AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        public void InputFieldViewModelDropped(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
         {
             // hide cloumn header reorder drop highlights 
             hideColumnReorderFeedbacks();
@@ -329,9 +329,9 @@ namespace PanoramicDataWin8.view.vis
             {
 
                 VisualizationViewModel model = (DataContext as VisualizationViewModel);
-                if (model.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Count == 0)
+                if (model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Count == 0)
                 {
-                    model.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, sender.AttributeOperationModel);
+                    model.QueryModel.AddUsageInputOperationModel(InputUsage.X, sender.InputOperationModel);
                     return;
                 }
 
@@ -342,26 +342,26 @@ namespace PanoramicDataWin8.view.vis
                 HeaderObject headerObject = closestDataGridResizer.DataContext as HeaderObject;
 
                 if ((CanReorder || CanDrag) &&
-                    model.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Any(aom => object.ReferenceEquals(aom, sender.AttributeOperationModel)))
+                    model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Any(aom => object.ReferenceEquals(aom, sender.InputOperationModel)))
                 {
-                    model.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Remove(sender.AttributeOperationModel);
+                    model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Remove(sender.InputOperationModel);
 
                 }
-                AttributeOperationModel clone = e.AttributeOperationModel;
-                if (headerObject.AttributeViewModel == null)
+                InputOperationModel clone = e.InputOperationModel;
+                if (headerObject.InputFieldViewModel == null)
                 {
-                    model.QueryModel.AddFunctionAttributeOperationModel(AttributeFunction.X, clone);
+                    model.QueryModel.AddUsageInputOperationModel(InputUsage.X, clone);
                 }
                 else
                 {
                     int index = HeaderObjects.IndexOf(headerObject);
                     if (closestDataGridResizer.IsResizer)
                     {
-                        model.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Insert(Math.Min(index + 1, model.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Count), clone);
+                        model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Insert(Math.Min(index + 1, model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Count), clone);
                     }
                     else
                     {
-                        model.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Insert(index, clone);
+                        model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Insert(index, clone);
                     }
                 }
             }
@@ -380,10 +380,10 @@ namespace PanoramicDataWin8.view.vis
             
             if (_menuViewModel != null)
             {
-                AttributeView attributeView = this.GetDescendantsOfType<AttributeView>().Where(av => av.DataContext == _menuViewModel.AttributeViewModel).FirstOrDefault();
-                if (attributeView != null)
+                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.InputFieldViewModel).FirstOrDefault();
+                if (inputFieldView != null)
                 {
-                    Rct bounds = attributeView.GetBounds(MainViewController.Instance.InkableScene);
+                    Rct bounds = inputFieldView.GetBounds(MainViewController.Instance.InkableScene);
                     foreach (var menuItem in _menuViewModel.MenuItemViewModels)
                     {
                         menuItem.TargetPosition = bounds.TopLeft;
@@ -394,25 +394,25 @@ namespace PanoramicDataWin8.view.vis
             }
         }
         
-        void AttributeView_AttributeViewModelTapped(object sender, EventArgs e)
+        void InputFieldViewInputFieldViewModelTapped(object sender, EventArgs e)
         {
             var visModel = (DataContext as VisualizationViewModel);
             visModel.ActiveStopwatch.Restart();
 
-            AttributeViewModel model = (sender as AttributeView).DataContext as AttributeViewModel;
-            if (HeaderObjects.Any(ho => ho.AttributeViewModel == model))
+            InputFieldViewModel model = (sender as InputFieldView).DataContext as InputFieldViewModel;
+            if (HeaderObjects.Any(ho => ho.InputFieldViewModel == model))
             {
                 bool createNew = true;
                 if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
                 {
-                    createNew = _menuViewModel.AttributeViewModel != model;
+                    createNew = _menuViewModel.InputFieldViewModel != model;
                     removeMenu();
                 }
 
                 if (createNew)
                 {
-                    AttributeView attributeView = sender as AttributeView;
-                    var menuViewModel = model.CreateMenuViewModel(attributeView.GetBounds(MainViewController.Instance.InkableScene));
+                    InputFieldView inputFieldView = sender as InputFieldView;
+                    var menuViewModel = model.CreateMenuViewModel(inputFieldView.GetBounds(MainViewController.Instance.InkableScene));
                     if (menuViewModel.MenuItemViewModels.Count > 0)
                     {
                         _menuViewModel = menuViewModel;
@@ -432,13 +432,13 @@ namespace PanoramicDataWin8.view.vis
         {
             if (_menuViewModel != null)
             {
-                AttributeView attributeView = this.GetDescendantsOfType<AttributeView>().Where(av => av.DataContext == _menuViewModel.AttributeViewModel).FirstOrDefault();
+                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.InputFieldViewModel).FirstOrDefault();
 
-                if (attributeView != null)
+                if (inputFieldView != null)
                 {
                     if (_menuViewModel.IsToBeRemoved)
                     {
-                        Rct bounds = attributeView.GetBounds(MainViewController.Instance.InkableScene);
+                        Rct bounds = inputFieldView.GetBounds(MainViewController.Instance.InkableScene);
                         foreach (var menuItem in _menuViewModel.MenuItemViewModels)
                         {
                             menuItem.TargetPosition = bounds.TopLeft;
@@ -446,7 +446,7 @@ namespace PanoramicDataWin8.view.vis
                     }
                     else
                     {
-                        Rct bounds = attributeView.GetBounds(MainViewController.Instance.InkableScene);
+                        Rct bounds = inputFieldView.GetBounds(MainViewController.Instance.InkableScene);
                         _menuViewModel.AnkerPosition = bounds.TopLeft;
                     }
                 }
@@ -459,7 +459,7 @@ namespace PanoramicDataWin8.view.vis
     {
         public event EventHandler<EventArgs> Resized;
 
-        public AttributeViewModel AttributeViewModel { get; set; }
+        public InputFieldViewModel InputFieldViewModel { get; set; }
 
         public void FireResized()
         {

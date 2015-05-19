@@ -17,10 +17,10 @@ namespace PanoramicDataWin8.controller.data.sim
             binStructure.AggregatedMaxValues.Clear();
             binStructure.AggregatedMinValues.Clear();
 
-            var aggregates = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Value).Concat(
-                             queryModel.GetFunctionAttributeOperationModel(AttributeFunction.DefaultValue)).Concat(
-                             queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
-                             queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).ToList();
+            var aggregates = queryModel.GetUsageInputOperationModel(InputUsage.Value).Concat(
+                             queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue)).Concat(
+                             queryModel.GetUsageInputOperationModel(InputUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
+                             queryModel.GetUsageInputOperationModel(InputUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).ToList();
 
             // update aggregations and counts
             foreach (var bin in binStructure.Bins.Values)
@@ -81,7 +81,7 @@ namespace PanoramicDataWin8.controller.data.sim
             }
         }
 
-        private void update(Bin bin, DataRow sample, AttributeOperationModel aggregator, QueryModel queryModel, double progress)
+        private void update(Bin bin, DataRow sample, InputOperationModel aggregator, QueryModel queryModel, double progress)
         {
             double? currentValue = null;
             double? sampleValue = null;
@@ -93,7 +93,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 sampleValue = 0;
                 currentTempValue = 0d;
             }
-            else if (double.TryParse(sample.Entries[aggregator.AttributeModel].ToString(), out d))
+            else if (double.TryParse(sample.Entries[aggregator.InputModel].ToString(), out d))
             {
                 sampleValue = d;
             }

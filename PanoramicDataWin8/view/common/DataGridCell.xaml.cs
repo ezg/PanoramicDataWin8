@@ -90,11 +90,11 @@ namespace PanoramicDataWin8.view.common
         private void updateValue()
         {
             ResultItemModel resultItemModel = DataContext as ResultItemModel;
-            if (resultItemModel != null && HeaderObject != null && HeaderObject.AttributeViewModel != null)
+            if (resultItemModel != null && HeaderObject != null && HeaderObject.InputFieldViewModel != null)
             {
-                /*if (resultItemModel.AttributeValues.ContainsKey(HeaderObject.AttributeViewModel.AttributeViewModel))
+                /*if (resultItemModel.AttributeValues.ContainsKey(HeaderObject.InputFieldViewModel.InputFieldViewModel))
                 {
-                    textBlock.Text = resultItemModel.AttributeValues[HeaderObject.AttributeViewModel.AttributeViewModel].ShortStringValue;
+                    textBlock.Text = resultItemModel.AttributeValues[HeaderObject.InputFieldViewModel.InputFieldViewModel].ShortStringValue;
                     return;
                 }*/
             }

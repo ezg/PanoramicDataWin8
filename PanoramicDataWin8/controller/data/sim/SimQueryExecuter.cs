@@ -24,9 +24,9 @@ namespace PanoramicDataWin8.controller.data.sim
                 _activeJobs[queryModel].JobCompleted -= simJob_JobCompleted;
                 _activeJobs.Remove(queryModel);
             }
-            // determine if new job is even needed (i.e., are all relevant attributeModels set)
-            if ((queryModel.VisualizationType == VisualizationType.table && queryModel.AttributeFunctionOperationModels.Count > 0) ||
-                (queryModel.VisualizationType != VisualizationType.table && queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Any() &&  queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Any()))
+            // determine if new job is even needed (i.e., are all relevant inputfieldmodels set)
+            if ((queryModel.VisualizationType == VisualizationType.table && queryModel.UsageInputOperationModels.Count > 0) ||
+                (queryModel.VisualizationType != VisualizationType.table && queryModel.GetUsageInputOperationModel(InputUsage.X).Any() &&  queryModel.GetUsageInputOperationModel(InputUsage.Y).Any()))
             {
                 SimJob simJob = new SimJob(queryModel, TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
                 _activeJobs.Add(queryModel, simJob);
@@ -117,21 +117,21 @@ namespace PanoramicDataWin8.controller.data.sim
         }
     }
 
-    public class DataEqualityComparer : IEqualityComparer<Dictionary<AttributeModel, object>>
+    public class DataEqualityComparer : IEqualityComparer<Dictionary<InputFieldModel, object>>
     {
         private QueryModel _queryModel = null;
         public DataEqualityComparer(QueryModel queryModel)
         {
             _queryModel = queryModel;
         }
-        public bool Equals(Dictionary<AttributeModel, object> x, Dictionary<AttributeModel, object> y)
+        public bool Equals(Dictionary<InputFieldModel, object> x, Dictionary<InputFieldModel, object> y)
         {
-            return x[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel].Equals(
-                    y[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel]);
+            return x[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdInputModel].Equals(
+                    y[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdInputModel]);
         }
-        public int GetHashCode(Dictionary<AttributeModel, object> x)
+        public int GetHashCode(Dictionary<InputFieldModel, object> x)
         {
-            return x[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdAttributeModel].GetHashCode();
+            return x[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdInputModel].GetHashCode();
         }
     }
 }

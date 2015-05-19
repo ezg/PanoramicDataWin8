@@ -4,24 +4,24 @@ using Newtonsoft.Json;
 namespace PanoramicDataWin8.model.data
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class AttributeOperationModel : BindableBase
+    public class InputOperationModel : BindableBase
     {
-        public AttributeOperationModel(AttributeModel attributeModel)
+        public InputOperationModel(InputFieldModel inputModel)
         {
-            _attributeModel = attributeModel;
+            _inputModel = inputModel;
         }
 
-        private AttributeModel _attributeModel = null;
+        private InputFieldModel _inputModel = null;
         
-        public AttributeModel AttributeModel
+        public InputFieldModel InputModel
         {
             get
             {
-                return _attributeModel;
+                return _inputModel;
             }
             set
             {
-                this.SetProperty(ref _attributeModel, value);
+                this.SetProperty(ref _inputModel, value);
             }
         }
 
@@ -132,12 +132,12 @@ namespace PanoramicDataWin8.model.data
 
         public override bool Equals(object obj)
         {
-            if (obj is AttributeOperationModel)
+            if (obj is InputOperationModel)
             {
-                var aom = obj as AttributeOperationModel;
+                var aom = obj as InputOperationModel;
                 return
                     aom._aggregateFunction.Equals(this.AggregateFunction) &&
-                    aom._attributeModel.Equals(this._attributeModel) &&
+                    aom._inputModel.Equals(this._inputModel) &&
                     aom._transformationFunction.Equals(this._transformationFunction) &&
                     aom._binSize.Equals(this._binSize) &&
                     aom._scaleFunction.Equals(this._scaleFunction) &&
@@ -150,7 +150,7 @@ namespace PanoramicDataWin8.model.data
         {
             int code = 0;
             code ^= this._aggregateFunction.GetHashCode();
-            code ^= this._attributeModel.GetHashCode();
+            code ^= this._inputModel.GetHashCode();
             code ^= this._transformationFunction.GetHashCode();
             code ^= this._binSize.GetHashCode();
             code ^= this._scaleFunction.GetHashCode();

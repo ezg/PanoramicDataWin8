@@ -30,8 +30,8 @@ namespace PanoramicDataWin8.controller.view
 
             _mainModel = new MainModel();
 
-            AttributeViewModel.AttributeViewModelDropped += AttributeViewModelDropped;
-            AttributeViewModel.AttributeViewModelMoved += AttributeViewModelMoved;
+            InputFieldViewModel.InputFieldViewModelDropped += InputFieldViewModelDropped;
+            InputFieldViewModel.InputFieldViewModelMoved += InputFieldViewModelMoved;
 
             JobTypeViewModel.JobTypeViewModelDropped += JobTypeViewModelDropped;
             JobTypeViewModel.JobTypeViewModelMoved += JobTypeViewModelMoved;
@@ -58,7 +58,8 @@ namespace PanoramicDataWin8.controller.view
                 var content = await Windows.Storage.FileIO.ReadTextAsync(file);
                 _mainModel.DatasetConfigurations.Add(DatasetConfiguration.FromContent(content, file.Name));
             }
-            LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("nba")).First());
+            //LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("nba")).First());
+            LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("mimic")).First());
             //LoadData(_mainModel.DatasetConfigurations.First());
         }
 
@@ -133,19 +134,20 @@ namespace PanoramicDataWin8.controller.view
                 _mainModel.SampleSize = datasetConfiguration.SampleSize;
                 (_mainModel.SchemaModel as SimSchemaModel).QueryExecuter = new SimQueryExecuter();
                 (_mainModel.SchemaModel as SimSchemaModel).RootOriginModel = new SimOriginModel(datasetConfiguration);
-                (_mainModel.SchemaModel as SimSchemaModel).RootOriginModel.LoadAttributes();
+                (_mainModel.SchemaModel as SimSchemaModel).RootOriginModel.LoadInputFields();
             }
             else if (datasetConfiguration.Backend.ToLower() == "tuppleware")
             {
                 _mainModel.SchemaModel = new TuppleWareSchemaModel();
                 (_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter = new TuppleWareQueryExecuter();
                 (_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel = new TuppleWareOriginModel(datasetConfiguration);
-                ((_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter as TuppleWareQueryExecuter).LoadFileDescription((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
+                TuppleWareGateway.PopulateSchema((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
+                //((_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter as TuppleWareQueryExecuter).LoadFileDescription((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
             }
         }
-        public VisualizationViewModel CreateVisualizationViewModel(JobType jobType, AttributeOperationModel attributeOperationModel)
+        public VisualizationViewModel CreateVisualizationViewModel(JobType jobType, InputOperationModel inputOperationModel)
         {
-            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, jobType, attributeOperationModel);
+            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, jobType, inputOperationModel);
             addAttachmentViews(visModel);
             _visualizationViewModels.Add(visModel);
             return visModel;
@@ -265,11 +267,11 @@ namespace PanoramicDataWin8.controller.view
             InkableScene.Add(visualizationContainerView);
         }
         
-        void AttributeViewModelMoved(object sender, AttributeViewModelEventArgs e)
+        void InputFieldViewModelMoved(object sender, InputFieldViewModelEventArgs e)
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
-            List<AttributeViewModelEventHandler> hits = new List<AttributeViewModelEventHandler>();
-            foreach (var element in InkableScene.Elements.Where(ele => ele is AttributeViewModelEventHandler).Select(ele => ele as AttributeViewModelEventHandler))
+            List<InputFieldViewModelEventHandler> hits = new List<InputFieldViewModelEventHandler>();
+            foreach (var element in InkableScene.Elements.Where(ele => ele is InputFieldViewModelEventHandler).Select(ele => ele as InputFieldViewModelEventHandler))
             {
                 var geom = element.BoundsGeometry;
                 if (geom != null && mainPageBounds.Intersects(geom)) 
@@ -279,19 +281,19 @@ namespace PanoramicDataWin8.controller.view
             }
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
 
-            foreach (var element in InkableScene.Elements.Where(ele => ele is AttributeViewModelEventHandler).Select(ele => ele as AttributeViewModelEventHandler))
+            foreach (var element in InkableScene.Elements.Where(ele => ele is InputFieldViewModelEventHandler).Select(ele => ele as InputFieldViewModelEventHandler))
             {
-                element.AttributeViewModelMoved(
-                        sender as AttributeViewModel, e,
+                element.InputFieldViewModelMoved(
+                        sender as InputFieldViewModel, e,
                         hits.Count() > 0 ? orderderHits[0] == element : false);
             }
         }
 
-        void AttributeViewModelDropped(object sender, AttributeViewModelEventArgs e)
+        void InputFieldViewModelDropped(object sender, InputFieldViewModelEventArgs e)
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
-            List<AttributeViewModelEventHandler> hits = new List<AttributeViewModelEventHandler>();
-            foreach (var element in InkableScene.Elements.Where(ele => ele is AttributeViewModelEventHandler).Select(ele => ele as AttributeViewModelEventHandler))
+            List<InputFieldViewModelEventHandler> hits = new List<InputFieldViewModelEventHandler>();
+            foreach (var element in InkableScene.Elements.Where(ele => ele is InputFieldViewModelEventHandler).Select(ele => ele as InputFieldViewModelEventHandler))
             {
                 var geom = element.BoundsGeometry;
                 if (geom != null && mainPageBounds.Intersects(geom))
@@ -306,17 +308,17 @@ namespace PanoramicDataWin8.controller.view
             Pt position = (Pt) new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
 
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
-            foreach (var element in InkableScene.Elements.Where(ele => ele is AttributeViewModelEventHandler).Select(ele => ele as AttributeViewModelEventHandler))
+            foreach (var element in InkableScene.Elements.Where(ele => ele is InputFieldViewModelEventHandler).Select(ele => ele as InputFieldViewModelEventHandler))
             {
-                element.AttributeViewModelDropped(
-                        sender as AttributeViewModel, e,
+                element.InputFieldViewModelDropped(
+                        sender as InputFieldViewModel, e,
                         hits.Count() > 0 ? orderderHits[0] == element : false);
             }
 
             if (hits.Count() == 0)
             {
                 VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-                VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel(JobType.DB, e.AttributeOperationModel);
+                VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel(JobType.DB, e.InputOperationModel);
                 visualizationViewModel.Position = position;
                 visualizationViewModel.Size = size;
                 visualizationContainerView.DataContext = visualizationViewModel;

@@ -1,6 +1,6 @@
 ﻿namespace PanoramicDataWin8.model.data
 {
-    public enum AttributeFunction
+    public enum InputUsage
     {
         DefaultValue,
         Value,

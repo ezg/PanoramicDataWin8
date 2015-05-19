@@ -44,6 +44,10 @@ namespace PanoramicDataWin8
         private Point _mainPointerManagerPreviousPoint = new Point();
         private DispatcherTimer _messageTimer = new DispatcherTimer();
 
+        private TileMenuItemView inputMenu = null;
+        private TileMenuItemView _visualizationMenu = null;
+        private TileMenuItemView _jobMenu = null;
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -175,14 +179,34 @@ namespace PanoramicDataWin8
         {
             Button button = (e.OriginalSource as FrameworkElement).GetFirstAncestorOfType<Button>();
             var ancestors = (e.OriginalSource as FrameworkElement).GetAncestors();
-            if (!ancestors.Contains(addAttributeButton) && !ancestors.Contains(attributeGrid))
+            if (!ancestors.Contains(addInputButton) && !ancestors.Contains(menuGrid))
             {
-                if (_attributeMenu != null)
+                if (inputMenu != null)
                 {
-                    (_attributeMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded = false;
-                    (_attributeMenu.DataContext as TileMenuItemViewModel).IsBeingRemoved = true;
-                    _attributeMenu.Dispose();
-                    attributeCanvas.Children.Remove(_attributeMenu);
+                    ((TileMenuItemViewModel) inputMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel) inputMenu.DataContext).IsBeingRemoved = true;
+                    inputMenu.Dispose();
+                    menuCanvas.Children.Remove(inputMenu);
+                }
+            }
+            if (!ancestors.Contains(addVisualizationButton) && !ancestors.Contains(menuGrid))
+            {
+                if (_visualizationMenu != null)
+                {
+                    ((TileMenuItemViewModel) _visualizationMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel) _visualizationMenu.DataContext).IsBeingRemoved = true;
+                    _visualizationMenu.Dispose();
+                    menuCanvas.Children.Remove(_visualizationMenu);
+                }
+            }
+            if (!ancestors.Contains(addJobButton) && !ancestors.Contains(menuGrid))
+            {
+                if (_jobMenu != null)
+                {
+                    ((TileMenuItemViewModel)_jobMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel)_jobMenu.DataContext).IsBeingRemoved = true;
+                    _jobMenu.Dispose();
+                    menuCanvas.Children.Remove(_jobMenu);
                 }
             }
         }
@@ -286,86 +310,44 @@ namespace PanoramicDataWin8
 
         private void addJobButton_Click(object sender, RoutedEventArgs e)
         {
-            MainModel mainModel = (DataContext as MainModel);
-            var buttonBounds = addJobButton.GetBounds(this);
-            var jobTypes = Enum.GetValues(typeof(JobType)).Cast<JobType>().Where(jt => jt != JobType.DB).ToList();
-
-            attributeCanvas.Children.Clear();
-            double perColumn = Math.Ceiling(jobTypes.Count / 2.0);
-            double height = perColumn * 50 + (perColumn - 1) * 4;
-            double startY = buttonBounds.Center.Y - height / 2.0;
-
-            int countPerColumn = 0;
-            int column = 0;
-            foreach (var jobType in jobTypes)
-            {
-                JobTypeViewModel jobTypeViewModel = new JobTypeViewModel()
-                {
-                    JobType = jobType
-                };
-                JobTypeView jobTypeView = new JobTypeView();
-                jobTypeView.DataContext = jobTypeViewModel;
-                attributeCanvas.Children.Add(jobTypeView);
-                jobTypeView.RenderTransform = new TranslateTransform()
-                {
-                    X = column * 54,
-                    Y = startY + countPerColumn * 54
-                };
-
-                countPerColumn++;
-                if (countPerColumn >= perColumn)
-                {
-                    column++;
-                    countPerColumn = 0;
-                }
-            }
-
-            attributeGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
-        }
-
-        private TileMenuItemView _attributeMenu = null;
-        private void addAttributeButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (_attributeMenu == null || !(_attributeMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded)
+            if (_jobMenu == null || !(_jobMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded)
             {
                 MainModel mainModel = (DataContext as MainModel);
-                var buttonBounds = addAttributeButton.GetBounds(this);
-                var attributeModels =
-                    mainModel.SchemaModel.OriginModels.First()
-                        .AttributeModels.Where(am => am.IsDisplayed)
-                        .OrderBy(am => am.Name);
+                var buttonBounds = addJobButton.GetBounds(this);
+                var jobTypes = Enum.GetValues(typeof(JobType)).Cast<JobType>().Where(jt => jt != JobType.DB).ToList();
 
-                if (_attributeMenu != null)
+                if (_jobMenu != null)
                 {
-                    (_attributeMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded = false;
-                    (_attributeMenu.DataContext as TileMenuItemViewModel).IsBeingRemoved = true;
-                    _attributeMenu.Dispose();
-                    attributeCanvas.Children.Remove(_attributeMenu);
+                    ((TileMenuItemViewModel)_jobMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel)_jobMenu.DataContext).IsBeingRemoved = true;
+                    _jobMenu.Dispose();
+                    menuCanvas.Children.Remove(_jobMenu);
                 }
 
                 TileMenuItemViewModel parentModel = new TileMenuItemViewModel(null);
-                parentModel.ChildrenNrColumns = (int) Math.Ceiling(attributeModels.Count()/10.0);
-                parentModel.ChildrenNrRows = (int) Math.Min(10.0, attributeModels.Count());
+                parentModel.ChildrenNrColumns = (int)Math.Ceiling(jobTypes.Count() / 10.0);
+                parentModel.ChildrenNrRows = (int)Math.Min(10.0, jobTypes.Count());
                 parentModel.Alignment = Alignment.Center;
                 parentModel.AttachPosition = AttachPosition.Right;
 
                 int count = 0;
-                foreach (var attributeModel in attributeModels)
+                foreach (var jobType in jobTypes)
                 {
                     TileMenuItemViewModel tileMenuItemViewModel = new TileMenuItemViewModel(parentModel);
                     tileMenuItemViewModel.Alignment = Alignment.Center;
                     tileMenuItemViewModel.AttachPosition = AttachPosition.Right;
-                    AttributeViewModel attributeViewModel = new AttributeViewModel(null, new AttributeOperationModel(attributeModel));
-
-                    tileMenuItemViewModel.TileMenuContentViewModel = new AttributeViewTileMenuContentViewModel()
+                    JobTypeViewModel jobTypeViewModel = new JobTypeViewModel()
                     {
-                        Name = attributeModel.Name,
-                        AttributeViewModel = attributeViewModel
+                        JobType = jobType
+                    };
+                    tileMenuItemViewModel.TileMenuContentViewModel = new JobTypeViewTileMenuContentViewModel()
+                    {
+                        Name = jobType.ToString(),
+                        JobTypeViewModel = jobTypeViewModel
                     };
 
-
-                    tileMenuItemViewModel.Row = count; // TileMenuItemViewModel.Children.Count;
-                    tileMenuItemViewModel.Column = (int) Math.Floor(parentModel.Children.Count/10.0);
+                    tileMenuItemViewModel.Row = count;
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int)Math.Floor(parentModel.Children.Count / 10.0) - 1;
                     tileMenuItemViewModel.RowSpan = 1;
                     tileMenuItemViewModel.ColumnSpan = 1;
                     parentModel.Children.Add(tileMenuItemViewModel);
@@ -376,55 +358,176 @@ namespace PanoramicDataWin8
                     }
                 }
 
-                _attributeMenu = new TileMenuItemView {MenuCanvas = attributeCanvas, DataContext = parentModel};
-                attributeCanvas.Children.Add(_attributeMenu);
+                _jobMenu = new TileMenuItemView { MenuCanvas = menuCanvas, DataContext = parentModel };
+                menuCanvas.Children.Add(_jobMenu);
 
                 parentModel.CurrentPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
                 parentModel.TargetPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
                 parentModel.Size = new Vec(buttonBounds.Width, buttonBounds.Height);
                 parentModel.AreChildrenExpanded = true;
-
-                attributeGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
             }
+        }
+
+        private void addInputButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (inputMenu == null || !(inputMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded)
+            {
+                MainModel mainModel = (DataContext as MainModel);
+                var buttonBounds = addInputButton.GetBounds(this);
+                var inputModels =
+                    mainModel.SchemaModel.OriginModels.First()
+                        .InputModels.Where(am => am.IsDisplayed)
+                        .OrderBy(am => am.Name);
+
+                if (inputMenu != null)
+                {
+                    ((TileMenuItemViewModel) inputMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel) inputMenu.DataContext).IsBeingRemoved = true;
+                    inputMenu.Dispose();
+                    menuCanvas.Children.Remove(inputMenu);
+                }
+
+                TileMenuItemViewModel parentModel = new TileMenuItemViewModel(null);
+                parentModel.ChildrenNrColumns = (int) Math.Ceiling(inputModels.Count()/10.0);
+                parentModel.ChildrenNrRows = (int) Math.Min(10.0, inputModels.Count());
+                parentModel.Alignment = Alignment.Center;
+                parentModel.AttachPosition = AttachPosition.Right;
+
+                int count = 0;
+                foreach (var inputModel in inputModels)
+                {
+                    TileMenuItemViewModel tileMenuItemViewModel = recursiveCreateTileMenu(inputModel, parentModel);
+                    tileMenuItemViewModel.Row = count;
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor(parentModel.Children.Count/10.0) - 1;
+                    tileMenuItemViewModel.RowSpan = 1;
+                    tileMenuItemViewModel.ColumnSpan = 1;
+                    count++;
+                    if (count >= 10)
+                    {
+                        count = 0;
+                    }
+                }
+
+                inputMenu = new TileMenuItemView {MenuCanvas = menuCanvas, DataContext = parentModel};
+                menuCanvas.Children.Add(inputMenu);
+
+                parentModel.CurrentPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
+                parentModel.TargetPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
+                parentModel.Size = new Vec(buttonBounds.Width, buttonBounds.Height);
+                parentModel.AreChildrenExpanded = true;
+            }
+        }
+
+        private TileMenuItemViewModel recursiveCreateTileMenu(InputModel inputModel, TileMenuItemViewModel parent)
+        {
+            TileMenuItemViewModel currentTileMenuItemViewModel = null;
+            if (inputModel is InputGroupModel)
+            {
+                var inputGroupModel = inputModel as InputGroupModel;
+                currentTileMenuItemViewModel = new TileMenuItemViewModel(parent);
+                InputGroupViewModel inputGroupViewModel = new InputGroupViewModel(null, inputGroupModel);
+                currentTileMenuItemViewModel.TileMenuContentViewModel = new InputGroupViewTileMenuContentViewModel()
+                {
+                    Name = inputModel.Name,
+                    InputGroupViewModel = inputGroupViewModel
+                };
+
+                currentTileMenuItemViewModel.ChildrenNrColumns = (int)Math.Ceiling(inputGroupModel.InputModels.Count() / 10.0);
+                currentTileMenuItemViewModel.ChildrenNrRows = (int)Math.Min(10.0, inputGroupModel.InputModels.Count());
+                currentTileMenuItemViewModel.Alignment = Alignment.Center;
+                currentTileMenuItemViewModel.AttachPosition = AttachPosition.Right;
+
+                int count = 0;
+                foreach (var childInputModel in inputGroupModel.InputModels)
+                {
+                    var childTileMenu = recursiveCreateTileMenu(childInputModel, currentTileMenuItemViewModel);
+                    childTileMenu.Row = count; // TileMenuItemViewModel.Children.Count;
+                    childTileMenu.Column = currentTileMenuItemViewModel.ChildrenNrColumns - (int)Math.Floor(currentTileMenuItemViewModel.Children.Count / 10.0) - 1;
+                    childTileMenu.RowSpan = 1;
+                    childTileMenu.ColumnSpan = 1;
+                    //currentTileMenuItemViewModel.Children.Add(childTileMenu);
+                    count++;
+                    if (count >= 10)
+                    {
+                        count = 0;
+                    }
+                }
+            }
+            else if (inputModel is InputFieldModel)
+            {
+                currentTileMenuItemViewModel = new TileMenuItemViewModel(parent);
+                InputFieldViewModel inputFieldViewModel = new InputFieldViewModel(null, new InputOperationModel(inputModel as InputFieldModel));
+                currentTileMenuItemViewModel.TileMenuContentViewModel = new InputFieldViewTileMenuContentViewModel()
+                {
+                    Name = inputModel.Name,
+                    InputFieldViewModel = inputFieldViewModel
+                };
+            }
+            parent.Children.Add(currentTileMenuItemViewModel);
+            currentTileMenuItemViewModel.Alignment = Alignment.Center;
+            currentTileMenuItemViewModel.AttachPosition = AttachPosition.Right;
+            return currentTileMenuItemViewModel;
         }
 
         private void addVisualizationButton_Click(object sender, RoutedEventArgs e)
         {
-            MainModel mainModel = (DataContext as MainModel);
-            var buttonBounds = addVisualizationButton.GetBounds(this);
-            var visualizationTypes = Enum.GetValues(typeof(VisualizationType)).Cast<VisualizationType>().ToList();
-
-            attributeCanvas.Children.Clear();
-            double perColumn = Math.Ceiling(visualizationTypes.Count() / 2.0);
-            double height = perColumn * 50 + (perColumn - 1) * 4;
-            double startY = buttonBounds.Center.Y - height / 2.0;
-
-            int countPerColumn = 0;
-            int column = 0;
-            foreach (var visualizationType in visualizationTypes)
+            if (_visualizationMenu == null || !(_visualizationMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded)
             {
-                VisualizationTypeViewModel visualizationTypeViewModel = new VisualizationTypeViewModel()
-                {
-                    VisualizationType = visualizationType
-                };
-                VisualizationTypeView visualizationTypeView = new VisualizationTypeView();
-                visualizationTypeView.DataContext = visualizationTypeViewModel;
-                attributeCanvas.Children.Add(visualizationTypeView);
-                visualizationTypeView.RenderTransform = new TranslateTransform()
-                {
-                    X = column * 54,
-                    Y = startY + countPerColumn * 54
-                };
+                MainModel mainModel = (DataContext as MainModel);
+                var buttonBounds = addVisualizationButton.GetBounds(this);
+                var visualizationTypes = Enum.GetValues(typeof(VisualizationType)).Cast<VisualizationType>().ToList();
 
-                countPerColumn++;
-                if (countPerColumn >= perColumn)
+                if (_visualizationMenu != null)
                 {
-                    column++;
-                    countPerColumn = 0;
+                    ((TileMenuItemViewModel)_visualizationMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel)_visualizationMenu.DataContext).IsBeingRemoved = true;
+                    _visualizationMenu.Dispose();
+                    menuCanvas.Children.Remove(_visualizationMenu);
                 }
-            }
 
-            attributeGrid.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                TileMenuItemViewModel parentModel = new TileMenuItemViewModel(null);
+                parentModel.ChildrenNrColumns = (int)Math.Ceiling(visualizationTypes.Count() / 10.0);
+                parentModel.ChildrenNrRows = (int)Math.Min(10.0, visualizationTypes.Count());
+                parentModel.Alignment = Alignment.Center;
+                parentModel.AttachPosition = AttachPosition.Right;
+
+                int count = 0;
+                foreach (var visualizationType in visualizationTypes)
+                {
+                    TileMenuItemViewModel tileMenuItemViewModel = new TileMenuItemViewModel(parentModel);
+                    tileMenuItemViewModel.Alignment = Alignment.Center;
+                    tileMenuItemViewModel.AttachPosition = AttachPosition.Right;
+                    VisualizationTypeViewModel visualizationTypeViewModel = new VisualizationTypeViewModel()
+                    {
+                        VisualizationType = visualizationType
+                    };
+
+                    tileMenuItemViewModel.TileMenuContentViewModel = new VisualizationTypeViewTileMenuContentViewModel()
+                    {
+                        Name = visualizationType.ToString(),
+                        VisualizationTypeViewModel = visualizationTypeViewModel
+                    };
+
+                    tileMenuItemViewModel.Row = count; 
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int)Math.Floor(parentModel.Children.Count / 10.0) - 1;
+                    tileMenuItemViewModel.RowSpan = 1;
+                    tileMenuItemViewModel.ColumnSpan = 1;
+                    parentModel.Children.Add(tileMenuItemViewModel);
+                    count++;
+                    if (count >= 10)
+                    {
+                        count = 0;
+                    }
+                }
+
+                _visualizationMenu = new TileMenuItemView { MenuCanvas = menuCanvas, DataContext = parentModel };
+                menuCanvas.Children.Add(_visualizationMenu);
+
+                parentModel.CurrentPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
+                parentModel.TargetPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
+                parentModel.Size = new Vec(buttonBounds.Width, buttonBounds.Height);
+                parentModel.AreChildrenExpanded = true;
+            }
         }
     }
 }

@@ -33,7 +33,7 @@ using PanoramicDataWin8.model.data.result;
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public sealed partial class PlotRenderer : Renderer, AttributeViewModelEventHandler
+    public sealed partial class PlotRenderer : Renderer, InputFieldViewModelEventHandler
     {
         private MenuViewModel _menuViewModel = null;
         private MenuView _menuView = null;
@@ -46,7 +46,7 @@ namespace PanoramicDataWin8.view.vis.render
 
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
-            AttributeView.AttributeViewModelTapped += AttributeView_AttributeViewModelTapped;
+            InputFieldView.InputFieldViewModelTapped += InputFieldViewInputFieldViewModelTapped;
         }
 
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
@@ -59,12 +59,12 @@ namespace PanoramicDataWin8.view.vis.render
         public override void Dispose()
         {
             base.Dispose();
-            AttributeView.AttributeViewModelTapped -= AttributeView_AttributeViewModelTapped;
+            InputFieldView.InputFieldViewModelTapped -= InputFieldViewInputFieldViewModelTapped;
             if (DataContext != null)
             {
                 (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
-                (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).CollectionChanged -= X_CollectionChanged;
-                (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).CollectionChanged -= Y_CollectionChanged;
+                (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged -= X_CollectionChanged;
+                (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged -= Y_CollectionChanged;
                 (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated -= QueryModel_QueryModelUpdated;
                 ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated -= resultModel_ResultModelUpdated;
@@ -77,8 +77,8 @@ namespace PanoramicDataWin8.view.vis.render
             if (args.NewValue != null)
             {
                 (DataContext as VisualizationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
-                (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).CollectionChanged += X_CollectionChanged;
-                (DataContext as VisualizationViewModel).QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).CollectionChanged += Y_CollectionChanged;
+                (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged += X_CollectionChanged;
+                (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged += Y_CollectionChanged;
                 (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
                 ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
@@ -116,13 +116,13 @@ namespace PanoramicDataWin8.view.vis.render
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
             if (e.PropertyName == model.GetPropertyName(() => model.Size))
             {
-                if (xAttributeView.DataContext != null)
+                if (xInputFieldView.DataContext != null)
                 {
-                    (xAttributeView.DataContext as AttributeViewModel).Size = new Vec(model.Size.X - 54, 54);
+                    (xInputFieldView.DataContext as InputFieldViewModel).Size = new Vec(model.Size.X - 54, 54);
                 }
-                if (yAttributeView.DataContext != null)
+                if (yInputFieldView.DataContext != null)
                 {
-                    (yAttributeView.DataContext as AttributeViewModel).Size = new Vec(54, model.Size.Y - 54);
+                    (yInputFieldView.DataContext as InputFieldViewModel).Size = new Vec(54, model.Size.Y - 54);
                 }
 
                 render();
@@ -139,10 +139,10 @@ namespace PanoramicDataWin8.view.vis.render
             removeMenu();
             VisualizationViewModel visModel = (DataContext as VisualizationViewModel);
             QueryModel queryModel = visModel.QueryModel;
-            if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Any())
+            if (queryModel.GetUsageInputOperationModel(InputUsage.X).Any())
             {
-                var xAom = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
-                xAttributeView.DataContext = new AttributeViewModel((DataContext as VisualizationViewModel), xAom)
+                var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
+                xInputFieldView.DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), xAom)
                 {
                     IsShadow = false,
                     BorderThicknes = new Thickness(0, 0, 0, 4),
@@ -152,7 +152,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else
             {
-                xAttributeView.DataContext = new AttributeViewModel((DataContext as VisualizationViewModel), null)
+                xInputFieldView.DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), null)
                 {
                     IsDraggableByPen = false,
                     IsDraggable = false,
@@ -163,10 +163,10 @@ namespace PanoramicDataWin8.view.vis.render
                 };
             }
 
-            if (queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Any())
+            if (queryModel.GetUsageInputOperationModel(InputUsage.Y).Any())
             {
-                var yAom = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
-                yAttributeView.DataContext = new AttributeViewModel((DataContext as VisualizationViewModel), yAom)
+                var yAom = queryModel.GetUsageInputOperationModel(InputUsage.Y).First();
+                yInputFieldView.DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), yAom)
                 {
                     IsShadow = false,
                     BorderThicknes = new Thickness(0,0,4,0),
@@ -177,7 +177,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else
             {
-                yAttributeView.DataContext = new AttributeViewModel((DataContext as VisualizationViewModel), null)
+                yInputFieldView.DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), null)
                 {
                     IsDraggableByPen = false,
                     IsDraggable = false,
@@ -306,8 +306,8 @@ namespace PanoramicDataWin8.view.vis.render
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
             _plotRendererContentProvider.UpdateData(resultModel,
                 model.QueryModel.Clone(),
-                model.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).FirstOrDefault(),
-                model.QueryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).FirstOrDefault());
+                model.QueryModel.GetUsageInputOperationModel(InputUsage.X).FirstOrDefault(),
+                model.QueryModel.GetUsageInputOperationModel(InputUsage.Y).FirstOrDefault());
             render();
         }
 
@@ -315,10 +315,10 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (_menuViewModel != null)
             {
-                AttributeView attributeView = this.GetDescendantsOfType<AttributeView>().Where(av => av.DataContext == _menuViewModel.AttributeViewModel).FirstOrDefault();
-                if (attributeView != null)
+                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.InputFieldViewModel).FirstOrDefault();
+                if (inputFieldView != null)
                 {
-                    Rct bounds = attributeView.GetBounds(MainViewController.Instance.InkableScene);
+                    Rct bounds = inputFieldView.GetBounds(MainViewController.Instance.InkableScene);
                     foreach (var menuItem in _menuViewModel.MenuItemViewModels)
                     {
                         menuItem.TargetPosition = bounds.TopLeft;
@@ -329,25 +329,25 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void AttributeView_AttributeViewModelTapped(object sender, EventArgs e)
+        void InputFieldViewInputFieldViewModelTapped(object sender, EventArgs e)
         {
             var visModel = (DataContext as VisualizationViewModel);
             visModel.ActiveStopwatch.Restart();
 
-            AttributeViewModel model = (sender as AttributeView).DataContext as AttributeViewModel;
-            //if (HeaderObjects.Any(ho => ho.AttributeViewModel == model))
+            InputFieldViewModel model = (sender as InputFieldView).DataContext as InputFieldViewModel;
+            //if (HeaderObjects.Any(ho => ho.InputFieldViewModel == model))
             {
                 bool createNew = true;
                 if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
                 {
-                    createNew = _menuViewModel.AttributeViewModel != model;
+                    createNew = _menuViewModel.InputFieldViewModel != model;
                     removeMenu();
                 }
 
                 if (createNew)
                 {
-                    AttributeView attributeView = sender as AttributeView;
-                    var menuViewModel = model.CreateMenuViewModel(attributeView.GetBounds(MainViewController.Instance.InkableScene));
+                    InputFieldView inputFieldView = sender as InputFieldView;
+                    var menuViewModel = model.CreateMenuViewModel(inputFieldView.GetBounds(MainViewController.Instance.InkableScene));
                     if (menuViewModel.MenuItemViewModels.Count > 0)
                     {
                         _menuViewModel = menuViewModel;
@@ -367,13 +367,13 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (_menuViewModel != null)
             {
-                AttributeView attributeView = this.GetDescendantsOfType<AttributeView>().Where(av => av.DataContext == _menuViewModel.AttributeViewModel).FirstOrDefault();
+                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.InputFieldViewModel).FirstOrDefault();
 
-                if (attributeView != null)
+                if (inputFieldView != null)
                 {
                     if (_menuViewModel.IsToBeRemoved)
                     {
-                        Rct bounds = attributeView.GetBounds(MainViewController.Instance.InkableScene);
+                        Rct bounds = inputFieldView.GetBounds(MainViewController.Instance.InkableScene);
                         foreach (var menuItem in _menuViewModel.MenuItemViewModels)
                         {
                             menuItem.TargetPosition = bounds.TopLeft;
@@ -381,7 +381,7 @@ namespace PanoramicDataWin8.view.vis.render
                     }
                     else
                     {
-                        Rct bounds = attributeView.GetBounds(MainViewController.Instance.InkableScene);
+                        Rct bounds = inputFieldView.GetBounds(MainViewController.Instance.InkableScene);
                         _menuViewModel.AnkerPosition = bounds.TopLeft;
                     }
                 }
@@ -418,23 +418,23 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 foreach (var valueComparison in hits[0].ValueComparisons)
                 {
-                    Debug.WriteLine((valueComparison.AttributeOperationModel.AttributeModel.Name + " " +
+                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.Name + " " +
                                      valueComparison.Value));
                 }
 
                 QueryModel queryModel = (DataContext as VisualizationViewModel).QueryModel;
                 var vcs = hits.SelectMany(h => h.ValueComparisons).ToList();
 
-                var xAom = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First();
-                var yAom = queryModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First();
-                tbSelection.Text = xAom.AttributeModel.Name + ": " +
-                                   vcs.Where(vc => Equals(vc.AttributeOperationModel, xAom))
+                var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
+                var yAom = queryModel.GetUsageInputOperationModel(InputUsage.Y).First();
+                tbSelection.Text = xAom.InputModel.Name + ": " +
+                                   vcs.Where(vc => Equals(vc.InputOperationModel, xAom))
                                        .Min(vc => vc.Value);
-                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.AttributeOperationModel, xAom)).Max(vc => vc.Value);
-                tbSelection.Text += ", " + yAom.AttributeModel.Name + ": " +
-                                   vcs.Where(vc => Equals(vc.AttributeOperationModel, yAom))
+                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.InputOperationModel, xAom)).Max(vc => vc.Value);
+                tbSelection.Text += ", " + yAom.InputModel.Name + ": " +
+                                   vcs.Where(vc => Equals(vc.InputOperationModel, yAom))
                                        .Min(vc => vc.Value);
-                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.AttributeOperationModel, yAom)).Max(vc => vc.Value);
+                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.InputOperationModel, yAom)).Max(vc => vc.Value);
 
                 if (hits.Any(h => queryModel.FilterModels.Contains(h)))
                 {
@@ -464,74 +464,74 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        public void AttributeViewModelMoved(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        public void InputFieldViewModelMoved(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
         {
-            var xBounds = xAttributeView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
+            var xBounds = xInputFieldView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             if (xBounds.Intersects(e.Bounds.GetPolygon()))
             {
-                if (xAttributeView.DataContext != null && !(xAttributeView.DataContext as AttributeViewModel).IsHighlighted)
+                if (xInputFieldView.DataContext != null && !(xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted)
                 {
-                    (xAttributeView.DataContext as AttributeViewModel).IsHighlighted = true;
+                    (xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = true;
                 }
             }
             else
             {
-                if (xAttributeView.DataContext != null && (xAttributeView.DataContext as AttributeViewModel).IsHighlighted)
+                if (xInputFieldView.DataContext != null && (xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted)
                 {
-                    (xAttributeView.DataContext as AttributeViewModel).IsHighlighted = false;
+                    (xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
                 }
             }
 
-            var yBounds = yAttributeView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
+            var yBounds = yInputFieldView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             if (yBounds.Intersects(e.Bounds.GetPolygon()) && !xBounds.Intersects(e.Bounds.GetPolygon()))
             {
-                if (yAttributeView.DataContext != null && !(yAttributeView.DataContext as AttributeViewModel).IsHighlighted)
+                if (yInputFieldView.DataContext != null && !(yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted)
                 {
-                    (yAttributeView.DataContext as AttributeViewModel).IsHighlighted = true;
+                    (yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = true;
                 }
             }
             else
             {
-                if (yAttributeView.DataContext != null && (yAttributeView.DataContext as AttributeViewModel).IsHighlighted)
+                if (yInputFieldView.DataContext != null && (yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted)
                 {
-                    (yAttributeView.DataContext as AttributeViewModel).IsHighlighted = false;
+                    (yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
                 }
             }
         }
 
-        public void AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        public void InputFieldViewModelDropped(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
         {
             // turn both off 
-            if (xAttributeView.DataContext != null)
+            if (xInputFieldView.DataContext != null)
             {
-                (xAttributeView.DataContext as AttributeViewModel).IsHighlighted = false;
+                (xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
             }
-            if (yAttributeView.DataContext != null)
+            if (yInputFieldView.DataContext != null)
             {
-                (yAttributeView.DataContext as AttributeViewModel).IsHighlighted = false;
+                (yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
             }
 
 
             QueryModel qModel = (DataContext as VisualizationViewModel).QueryModel;
 
-            var xBounds = xAttributeView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
+            var xBounds = xInputFieldView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             if (xBounds.Intersects(e.Bounds.GetPolygon()))
             {
-                if (qModel.GetFunctionAttributeOperationModel(AttributeFunction.X).Any())
+                if (qModel.GetUsageInputOperationModel(InputUsage.X).Any())
                 {
-                    qModel.RemoveFunctionAttributeOperationModel(AttributeFunction.X, qModel.GetFunctionAttributeOperationModel(AttributeFunction.X).First());
+                    qModel.RemoveUsageInputOperationModel(InputUsage.X, qModel.GetUsageInputOperationModel(InputUsage.X).First());
                 }
-                qModel.AddFunctionAttributeOperationModel(AttributeFunction.X, e.AttributeOperationModel);
+                qModel.AddUsageInputOperationModel(InputUsage.X, e.InputOperationModel);
             }
 
-            var yBounds = yAttributeView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
+            var yBounds = yInputFieldView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             if (yBounds.Intersects(e.Bounds.GetPolygon()) && !xBounds.Intersects(e.Bounds.GetPolygon()))
             {
-                if (qModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).Any())
+                if (qModel.GetUsageInputOperationModel(InputUsage.Y).Any())
                 {
-                    qModel.RemoveFunctionAttributeOperationModel(AttributeFunction.Y, qModel.GetFunctionAttributeOperationModel(AttributeFunction.Y).First());
+                    qModel.RemoveUsageInputOperationModel(InputUsage.Y, qModel.GetUsageInputOperationModel(InputUsage.Y).First());
                 }
-                qModel.AddFunctionAttributeOperationModel(AttributeFunction.Y, e.AttributeOperationModel);
+                qModel.AddUsageInputOperationModel(InputUsage.Y, e.InputOperationModel);
             }
         }
 

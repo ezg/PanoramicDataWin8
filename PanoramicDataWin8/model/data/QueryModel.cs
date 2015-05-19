@@ -25,10 +25,10 @@ namespace PanoramicDataWin8.model.data
             _schemaModel = schemaModel;
             _resultModel = resultModel;
 
-            foreach (var attributeFunction in Enum.GetValues(typeof(AttributeFunction)).Cast<AttributeFunction>())
+            foreach (var inputUsage in Enum.GetValues(typeof(InputUsage)).Cast<InputUsage>())
             {
-                _attributeFunctionOperationModels.Add(attributeFunction, new ObservableCollection<AttributeOperationModel>());
-                _attributeFunctionOperationModels[attributeFunction].CollectionChanged += AttributeOperationModel_CollectionChanged;
+                _usageInputOperationModels.Add(inputUsage, new ObservableCollection<InputOperationModel>());
+                _usageInputOperationModels[inputUsage].CollectionChanged += InputOperationModel_CollectionChanged;
             }
 
             _linkModels.CollectionChanged += LinkModels_CollectionChanged;
@@ -95,27 +95,27 @@ namespace PanoramicDataWin8.model.data
             FireQueryModelUpdated(QueryModelUpdatedEventType.Links);
         }
 
-        void AttributeOperationModel_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        void InputOperationModel_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
             {
                 foreach (var item in e.OldItems)
                 {
-                    (item as AttributeOperationModel).PropertyChanged -= AttributeOperationModel_PropertyChanged;
+                    (item as InputOperationModel).PropertyChanged -= InputOperationModel_PropertyChanged;
                 }
             }
             if (e.NewItems != null)
             {
                 foreach (var item in e.NewItems)
                 {
-                    (item as AttributeOperationModel).QueryModel = this;
-                    (item as AttributeOperationModel).PropertyChanged += AttributeOperationModel_PropertyChanged;
+                    (item as InputOperationModel).QueryModel = this;
+                    (item as InputOperationModel).PropertyChanged += InputOperationModel_PropertyChanged;
                 }
             }
             FireQueryModelUpdated(QueryModelUpdatedEventType.Structure);
         }
 
-        void AttributeOperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void InputOperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             FireQueryModelUpdated(QueryModelUpdatedEventType.Structure);   
         }
@@ -185,58 +185,58 @@ namespace PanoramicDataWin8.model.data
             }
         }
 
-        private Dictionary<AttributeFunction, ObservableCollection<AttributeOperationModel>> _attributeFunctionOperationModels = new Dictionary<AttributeFunction, ObservableCollection<AttributeOperationModel>>();
+        private Dictionary<InputUsage, ObservableCollection<InputOperationModel>> _usageInputOperationModels = new Dictionary<InputUsage, ObservableCollection<InputOperationModel>>();
        
-        public Dictionary<AttributeFunction, ObservableCollection<AttributeOperationModel>> AttributeFunctionOperationModels
+        public Dictionary<InputUsage, ObservableCollection<InputOperationModel>> UsageInputOperationModels
         {
             get
             {
-                return _attributeFunctionOperationModels;
+                return _usageInputOperationModels;
             }
             set
             {
-                this.SetProperty(ref _attributeFunctionOperationModels, value);
+                this.SetProperty(ref _usageInputOperationModels, value);
             }
         }
 
         [JsonIgnore]
-        public List<AttributeOperationModel> AttributeOperationModels
+        public List<InputOperationModel> InputOperationModels
         {
             get
             {
-                List<AttributeOperationModel> retList = new List<AttributeOperationModel>();
-                foreach (var key in _attributeFunctionOperationModels.Keys)
+                List<InputOperationModel> retList = new List<InputOperationModel>();
+                foreach (var key in _usageInputOperationModels.Keys)
                 {
-                    retList.AddRange(_attributeFunctionOperationModels[key]);
+                    retList.AddRange(_usageInputOperationModels[key]);
                 }
                 return retList;
             }
         }
 
-        public void AddFunctionAttributeOperationModel(AttributeFunction attributeFunction, AttributeOperationModel attributeOperationModel)
+        public void AddUsageInputOperationModel(InputUsage inputUsage, InputOperationModel inputOperationModel)
         {
-            _attributeFunctionOperationModels[attributeFunction].Add(attributeOperationModel);
+            _usageInputOperationModels[inputUsage].Add(inputOperationModel);
         }
 
-        public void RemoveFunctionAttributeOperationModel(AttributeFunction attributeFunction, AttributeOperationModel attributeOperationModel)
+        public void RemoveUsageInputOperationModel(InputUsage inputUsage, InputOperationModel inputOperationModel)
         {
-            _attributeFunctionOperationModels[attributeFunction].Remove(attributeOperationModel);
+            _usageInputOperationModels[inputUsage].Remove(inputOperationModel);
         }
 
-        public void RemoveAttributeOperationModel(AttributeOperationModel attributeOperationModel)
+        public void RemoveInputOperationModel(InputOperationModel inputOperationModel)
         {
-            foreach (var key in _attributeFunctionOperationModels.Keys)
+            foreach (var key in _usageInputOperationModels.Keys)
             {
-                if (_attributeFunctionOperationModels[key].Any(aom => aom == attributeOperationModel))
+                if (_usageInputOperationModels[key].Any(aom => aom == inputOperationModel))
                 {
-                    RemoveFunctionAttributeOperationModel(key, attributeOperationModel);
+                    RemoveUsageInputOperationModel(key, inputOperationModel);
                 }
             }
         }
 
-        public ObservableCollection<AttributeOperationModel> GetFunctionAttributeOperationModel(AttributeFunction attributeFunction)
+        public ObservableCollection<InputOperationModel> GetUsageInputOperationModel(InputUsage inputUsage)
         {
-            return _attributeFunctionOperationModels[attributeFunction];
+            return _usageInputOperationModels[inputUsage];
         }
 
         private ObservableCollection<LinkModel> _linkModels = new ObservableCollection<LinkModel>();
@@ -310,23 +310,23 @@ namespace PanoramicDataWin8.model.data
             }
         }
 
-        public AxisType GetAxisType(AttributeOperationModel attributeOperationModel)
+        public AxisType GetAxisType(InputOperationModel inputOperationModel)
         {
             // determine axis type
             // some aggregation
-            if (attributeOperationModel.AggregateFunction != AggregateFunction.None)
+            if (inputOperationModel.AggregateFunction != AggregateFunction.None)
             {
-                if (attributeOperationModel.AggregateFunction == AggregateFunction.Avg ||
-                    attributeOperationModel.AggregateFunction == AggregateFunction.Sum ||
-                    attributeOperationModel.AggregateFunction == AggregateFunction.Count)
+                if (inputOperationModel.AggregateFunction == AggregateFunction.Avg ||
+                    inputOperationModel.AggregateFunction == AggregateFunction.Sum ||
+                    inputOperationModel.AggregateFunction == AggregateFunction.Count)
                 {
                     return AxisType.Quantitative;
                 }
-                else if (attributeOperationModel.AggregateFunction == AggregateFunction.Max ||
-                         attributeOperationModel.AggregateFunction == AggregateFunction.Min) 
+                else if (inputOperationModel.AggregateFunction == AggregateFunction.Max ||
+                         inputOperationModel.AggregateFunction == AggregateFunction.Min) 
                 {
-                    if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT ||
-                        attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT)
+                    if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.FLOAT ||
+                        inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.INT)
                     {
                         return AxisType.Quantitative;
                     }
@@ -339,16 +339,16 @@ namespace PanoramicDataWin8.model.data
             // no aggrgation
             else
             {
-                if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.FLOAT ||
-                    attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.INT)
+                if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.FLOAT ||
+                    inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.INT)
                 {
                     return AxisType.Quantitative;
                 }
-                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.TIME)
+                else if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.TIME)
                 {
                     return AxisType.Time;
                 }
-                else if (attributeOperationModel.AttributeModel.AttributeDataType == AttributeDataTypeConstants.DATE)
+                else if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.DATE)
                 {
                     return AxisType.Date;
                 }

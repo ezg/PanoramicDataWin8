@@ -1,11 +1,12 @@
 ﻿<UserControl
-    x:Class="PanoramicDataWin8.view.common.AttributeView"
+    x:Class="PanoramicDataWin8.view.common.InputFieldView"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:model="clr-namespace:PanoramicData.model.view"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:transform="using:WinRTXamlToolkit.Controls"
+    xmlns:view="using:PanoramicDataWin8.model.view"
     mc:Ignorable="d"
     d:DesignHeight="100"
     d:DesignWidth="100"
@@ -13,24 +14,19 @@
     FontFamily="{StaticResource abel}">
 
     <d:DesignProperties.DataContext>
-        <model:AttributeViewModel>
-            <model:AttributeViewModel.IsNoChrome>False</model:AttributeViewModel.IsNoChrome>
-            <model:AttributeViewModel.MainLabel>Cancellation code</model:AttributeViewModel.MainLabel>
-            <model:AttributeViewModel.SubLabel>Test dsafdsa</model:AttributeViewModel.SubLabel>
-            <model:AttributeViewModel.IsShadow>False</model:AttributeViewModel.IsShadow>
-            <model:AttributeViewModel.TextAngle>0</model:AttributeViewModel.TextAngle>
-        </model:AttributeViewModel>
+        <view:InputFieldViewModel>
+            <view:InputFieldViewModel.IsNoChrome>False</view:InputFieldViewModel.IsNoChrome>
+            <view:InputFieldViewModel.MainLabel>Cancellation code</view:InputFieldViewModel.MainLabel>
+            <view:InputFieldViewModel.SubLabel>Test dsafdsa</view:InputFieldViewModel.SubLabel>
+            <view:InputFieldViewModel.IsShadow>False</view:InputFieldViewModel.IsShadow>
+            <view:InputFieldViewModel.TextAngle>0</view:InputFieldViewModel.TextAngle>
+        </view:InputFieldViewModel>
     </d:DesignProperties.DataContext>
 
-    <Grid Name="mainGrid" Background="{StaticResource lightBrush}">
+    <Grid Name="mainGrid" Background="{StaticResource highlightBrush}">
         <Border Name="border" BorderBrush="{StaticResource backgroundBrush}" BorderThickness="4">
             <Viewbox Margin="2">
-
-                <transform:LayoutTransformControl x:Name="transformControl">
-                    <transform:LayoutTransformControl.Transform>
-                        <RotateTransform x:Name="rotateTransform" Angle="{Binding TextAngle}"/>
-                    </transform:LayoutTransformControl.Transform>
-                    <TextBlock 
+                <TextBlock 
                         Name="txtBlock"
                         CacheMode="BitmapCache"
                         RenderTransformOrigin="0.5, 0.5"
@@ -38,8 +34,7 @@
                         HorizontalAlignment="Stretch"
                         TextAlignment="Center"
                         MaxWidth="{Binding Size.X}"
-                        Text="{Binding MainLabel}" FontSize="11" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
-                </transform:LayoutTransformControl>
+                        Text="{Binding MainLabel}" FontSize="11" Foreground="{StaticResource darkBrush}" TextWrapping="Wrap"/>
             </Viewbox>
         </Border>
     </Grid>

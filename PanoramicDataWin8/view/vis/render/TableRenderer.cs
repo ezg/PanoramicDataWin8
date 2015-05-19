@@ -7,7 +7,7 @@ using PanoramicDataWin8.model.view;
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public class TableRenderer : Renderer, AttributeViewModelEventHandler
+    public class TableRenderer : Renderer, InputFieldViewModelEventHandler
     {
         private DataGrid _dataGrid = new DataGrid();
 
@@ -25,21 +25,21 @@ namespace PanoramicDataWin8.view.vis.render
             base.Dispose();
             _dataGrid.Dispose();
         }
-        public void AttributeViewModelMoved(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        public void InputFieldViewModelMoved(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
         {
-            AttributeViewModelEventHandler attributeViewModelEventHandler = _dataGrid as AttributeViewModelEventHandler;
-            if (attributeViewModelEventHandler != null)
+            InputFieldViewModelEventHandler inputModelEventHandler = _dataGrid as InputFieldViewModelEventHandler;
+            if (inputModelEventHandler != null)
             {
-                attributeViewModelEventHandler.AttributeViewModelMoved(sender, e, overElement);
+                inputModelEventHandler.InputFieldViewModelMoved(sender, e, overElement);
             }
         }
 
-        public void AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        public void InputFieldViewModelDropped(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
         {
-            AttributeViewModelEventHandler attributeViewModelEventHandler = _dataGrid as AttributeViewModelEventHandler;
-            if (attributeViewModelEventHandler != null)
+            InputFieldViewModelEventHandler inputModelEventHandler = _dataGrid as InputFieldViewModelEventHandler;
+            if (inputModelEventHandler != null)
             {
-                attributeViewModelEventHandler.AttributeViewModelDropped(sender, e, overElement);
+                inputModelEventHandler.InputFieldViewModelDropped(sender, e, overElement);
             }
         }
 
@@ -47,10 +47,10 @@ namespace PanoramicDataWin8.view.vis.render
         {
             get
             {
-                AttributeViewModelEventHandler attributeViewModelEventHandler = _dataGrid as AttributeViewModelEventHandler;
-                if (attributeViewModelEventHandler != null)
+                InputFieldViewModelEventHandler inputModelEventHandler = _dataGrid as InputFieldViewModelEventHandler;
+                if (inputModelEventHandler != null)
                 {
-                    return attributeViewModelEventHandler.BoundsGeometry;
+                    return inputModelEventHandler.BoundsGeometry;
                 }
                 else
                 {
