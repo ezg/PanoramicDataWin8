@@ -397,8 +397,8 @@ namespace PanoramicDataWin8.model.view
             toggle2.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle1, toggle3 });
             toggle3.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle1, toggle2 });
 
-            if (_inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.INT ||
-                _inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.FLOAT)
+            if (((InputFieldModel)_inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.INT ||
+                ((InputFieldModel)_inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.FLOAT)
             {
                 List<ToggleMenuItemComponentViewModel> toggles = new List<ToggleMenuItemComponentViewModel>();
                 List<MenuItemViewModel> items = new List<MenuItemViewModel>();
@@ -466,7 +466,7 @@ namespace PanoramicDataWin8.model.view
             string subLabel = "";
 
             mainLabel = addDetailToLabel(mainLabel);
-            MainLabel = mainLabel.Replace("_", "");
+            MainLabel = mainLabel.Replace("_", " ");
             SubLabel = subLabel;
         }
 

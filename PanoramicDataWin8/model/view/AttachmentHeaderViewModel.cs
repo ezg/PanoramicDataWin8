@@ -53,6 +53,19 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private bool _acceptsInputGroupModels = false;
+        public bool AcceptsInputGroupModels
+        {
+            get
+            {
+                return _acceptsInputGroupModels;
+            }
+            set
+            {
+                this.SetProperty(ref _acceptsInputGroupModels, value);
+            }
+        }
+
         private InputUsage? _inputUsage = null;
         public InputUsage? InputUsage
         {

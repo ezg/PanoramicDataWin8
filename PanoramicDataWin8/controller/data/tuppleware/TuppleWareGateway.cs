@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
@@ -7,22 +6,39 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using PanoramicDataWin8.controller.input;
-using PanoramicDataWin8.model.view.tilemenu;
+using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.tuppleware;
 
-namespace PanoramicDataWin8.model.data.tuppleware
+namespace PanoramicDataWin8.controller.data.tuppleware
 {
 
     public class TuppleWareGateway
     {
+        public async static Task<JArray> Classify(TuppleWareOriginModel tuppleWareOriginModel, List<InputFieldModel> features, List<InputFieldModel> labels, JobType jobType)
+        {
+            ClassifyCommand classifyCommand = new ClassifyCommand();
+            return await  classifyCommand.Classify(tuppleWareOriginModel, features, labels, jobType);
+        }
+
         public static void PopulateSchema(TuppleWareOriginModel tuppleWareOriginModel)
         {
             SchemaCommand schemaCommand = new SchemaCommand();
             schemaCommand.PopulateSchema(tuppleWareOriginModel);
         }
 
+        public async static Task<JArray> GetData(TuppleWareOriginModel tuppleWareOriginModel, List<InputFieldModel> inputModels, int page, int samples)
+        {
+            DataCommand dataCommand = new DataCommand();
+            return await dataCommand.GetData(tuppleWareOriginModel, inputModels, page, samples);
+        }
+
         public static async Task<JToken> Request(string endPoint, JObject data)
         {
+            if (MainViewController.Instance.MainModel.Verbose)
+            {
+                Debug.WriteLine(data.ToString());
+            }
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var httpResponseMessage = await httpClient.PostAsync(endPoint, new StringContent(
@@ -32,11 +48,55 @@ namespace PanoramicDataWin8.model.data.tuppleware
             var stringContent = await httpResponseMessage.Content.ReadAsStringAsync();
             JToken jToken = JToken.Parse(stringContent);
 
-            Debug.WriteLine(stringContent);
+            if (MainViewController.Instance.MainModel.Verbose)
+            {
+                Debug.WriteLine(stringContent);
+            }
 
             return jToken;
         }
     }
+
+    public class ClassifyCommand
+    {
+        public async Task<JArray> Classify(TuppleWareOriginModel tuppleWareOriginModel, List<InputFieldModel> features, List<InputFieldModel> labels, JobType jobType)
+        {
+            JObject data = new JObject(
+                new JProperty("command", "classify"),
+                new JProperty("classifier", jobType.ToString()),
+                new JProperty("project", string.Join(" ", features.Concat(labels).Select(im => im.Name))),
+                new JProperty("labels", string.Join(" ", labels.Select(im => im.Name))),
+                new JProperty("filename", tuppleWareOriginModel.Name));
+            JToken response = await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
+            if (response is JObject)
+            {
+                JArray arr = new JArray(response);
+                return arr;
+            }
+            else
+            {
+                return response as JArray;
+            }
+        }
+    }
+
+
+    public class DataCommand
+    {
+        public async Task<JArray> GetData(TuppleWareOriginModel tuppleWareOriginModel, List<InputFieldModel> inputModels, int page, int samples)
+        {
+            JObject data = new JObject(
+                new JProperty("command", "data"),
+                new JProperty("project", string.Join(" ", inputModels.Select(im => im.Name))),
+                new JProperty("limit", samples),
+                new JProperty("page", page),
+                new JProperty("filename", tuppleWareOriginModel.Name));
+            JToken response = await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
+
+            return response as JArray;
+        }
+    }
+
 
     public class SchemaCommand
     {
@@ -61,15 +121,15 @@ namespace PanoramicDataWin8.model.data.tuppleware
                 {
                     if (token[1] is JValue)
                     {
-                        TuppleWareInputModel inputModel = new TuppleWareInputModel(token[0].ToString(), "float", token[1].ToString().ToLower() == "true" ? "numeric" : "enum");
-                        inputModel.OriginModel = tuppleWareOriginModel;
+                        TuppleWareFieldInputModel fieldInputModel = new TuppleWareFieldInputModel(token[0].ToString(), "float", token[1].ToString().ToLower() == "true" ? "numeric" : "enum");
+                        fieldInputModel.OriginModel = tuppleWareOriginModel;
                         if (parentGroupModel != null)
                         {
-                            parentGroupModel.InputModels.Add(inputModel);
+                            parentGroupModel.InputModels.Add(fieldInputModel);
                         }
                         else
                         {
-                            tuppleWareOriginModel.InputModels.Add(inputModel);
+                            tuppleWareOriginModel.InputModels.Add(fieldInputModel);
                         }
                     }
                     else

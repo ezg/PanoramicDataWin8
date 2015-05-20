@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace PanoramicDataWin8.controller.data
+namespace PanoramicDataWin8.controller.data.virt
 {
     public interface IItemsProvider<T>
     {

@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.utils;
 using PanoramicDataWin8.model.data.common;
 
-namespace PanoramicDataWin8.controller.data.sim
+namespace PanoramicDataWin8.controller.data
 {
     public class DataAggregator
     {
@@ -93,7 +89,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 sampleValue = 0;
                 currentTempValue = 0d;
             }
-            else if (double.TryParse(sample.Entries[aggregator.InputModel].ToString(), out d))
+            else if (double.TryParse(sample.Entries[(InputFieldModel)aggregator.InputModel].ToString(), out d))
             {
                 sampleValue = d;
             }

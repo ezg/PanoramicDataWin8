@@ -26,26 +26,20 @@ using PanoramicDataWin8.model.data.sim;
 
 namespace PanoramicDataWin8.controller.data.sim
 {
-    public class SimDataProvider
+    public class SimDataProvider : DataProvider
     {
-        private QueryModel _queryModel = null;
         private SimOriginModel _simOriginModel = null;
         private int _nrProcessedSamples = 0;
-        private int _nrSamplesToCheck = -1;
         private StreamReader _streamReader = null;
-        private BasicProperties _dataFileProperties = null;
 
-        public bool IsInitialized { get; set; }
-
-        public SimDataProvider(QueryModel queryModel, SimOriginModel simOriginModel, int nrSamplesToCheck = -1)
+        public SimDataProvider(QueryModel queryModel, SimOriginModel simOriginModel)
         {
-            _queryModel = queryModel;
+            QueryModel = queryModel;
             _simOriginModel = simOriginModel;
-            _nrSamplesToCheck = nrSamplesToCheck;
             IsInitialized = false;
         }
 
-        public async Task StartSampling()
+        public override async Task StartSampling()
         {
             var installedLoc = Package.Current.InstalledLocation;
 
@@ -58,13 +52,12 @@ namespace PanoramicDataWin8.controller.data.sim
             {
                 file = await ApplicationData.Current.LocalFolder.GetFileAsync(_simOriginModel.DatasetConfiguration.DataFile);
             }
-            _dataFileProperties = await file.GetBasicPropertiesAsync();
             _streamReader = new StreamReader(await file.OpenStreamForReadAsync());
 
             _nrProcessedSamples = 0;
         }
 
-        public async Task<List<DataRow>> GetSampleDataRows(int sampleSize)
+        public override async Task<List<DataRow>> GetSampleDataRows(int sampleSize)
         {
             if (_nrProcessedSamples < GetNrTotalSamples())
             {
@@ -87,71 +80,21 @@ namespace PanoramicDataWin8.controller.data.sim
             }
         }
 
-        public int GetNrTotalSamples()
+        public override int GetNrTotalSamples()
         {
-            if (_nrSamplesToCheck == -1)
+            if (NrSamplesToCheck == -1)
             {
                 return _simOriginModel.DatasetConfiguration.NrOfRecords;
             }
             else
             {
-                return _nrSamplesToCheck;
+                return NrSamplesToCheck;
             }
-        }        
-
-        public double Progress()
-        {
-            return Math.Min(1.0, (double)_nrProcessedSamples / (double)GetNrTotalSamples());
         }
 
-        public ResultItemValueModel GetResultItemValueModel(InputOperationModel inputOperationModel, Dictionary<InputFieldModel, object> valueDict)
+        public override double Progress()
         {
-            ResultItemValueModel valueModel = new ResultItemValueModel();
-            if (valueDict[inputOperationModel.InputModel] == null)
-            {
-                valueModel.Value = null;
-                valueModel.StringValue = "";
-                valueModel.ShortStringValue = "";
-            }
-            else
-            {
-                double d = 0.0;
-                valueModel.Value = valueDict[inputOperationModel.InputModel];
-                valueModel.StringValue = valueModel.Value.ToString();
-
-                if (double.TryParse(valueModel.Value.ToString(), out d))
-                {
-                    valueModel.StringValue = valueModel.Value.ToString().Contains(".") ? d.ToString("N") : valueModel.Value.ToString();
-                }
-                else if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.GEOGRAPHY)
-                {
-                    string toSplit = valueModel.StringValue;
-                    if (toSplit.Contains("(") && toSplit.Contains(")"))
-                    {
-                        toSplit = toSplit.Substring(toSplit.IndexOf("("));
-                        toSplit = toSplit.Substring(1, toSplit.IndexOf(")") - 1);
-                    }
-                    valueModel.ShortStringValue = valueModel.StringValue.Replace("(" + toSplit + ")", "");
-                }
-                else if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.TIME)
-                {
-                    if (valueModel.Value is DateTime)
-                    {
-                        valueModel.StringValue = ((DateTime)valueModel.Value).TimeOfDay.ToString();
-                        valueModel.ShortStringValue = ((DateTime)valueModel.Value).TimeOfDay.ToString();
-                    }
-                }
-                else if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.DATE)
-                {
-                    if (valueModel.Value is DateTime)
-                    {
-                        valueModel.StringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
-                        valueModel.ShortStringValue = ((DateTime)valueModel.Value).ToString("MM/dd/yyyy");
-                    }
-                }
-                valueModel.ShortStringValue = valueModel.StringValue.TrimTo(300);
-            }
-            return valueModel;
+            return Math.Min(1.0, (double)_nrProcessedSamples / (double)GetNrTotalSamples());
         }
 
         private async Task<List<Dictionary<InputFieldModel, object>>> getDataFromFile(int sampleSize)
@@ -234,35 +177,6 @@ namespace PanoramicDataWin8.controller.data.sim
             }
 
             return data;
-        }
-    }
-
-    public class DataRow
-    {
-        private  Dictionary<InputFieldModel, object> _entries = null;
-        public Dictionary<InputFieldModel, object> Entries
-        {
-            get
-            {
-                return _entries;
-            }
-            set
-            {
-                _entries = value;
-            }
-        }
-
-        private Dictionary<InputFieldModel, double?> _visualizationValues = new Dictionary<InputFieldModel, double?>();
-        public Dictionary<InputFieldModel, double?> VisualizationValues
-        {
-            get
-            {
-                return _visualizationValues;
-            }
-            set
-            {
-                _visualizationValues = value;
-            }
         }
     }
 }

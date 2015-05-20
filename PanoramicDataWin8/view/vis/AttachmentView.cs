@@ -18,7 +18,7 @@ using PanoramicDataWin8.view.vis.menu;
 
 namespace PanoramicDataWin8.view.vis
 {
-    public class AttachmentView : UserControl, InputFieldViewModelEventHandler, IScribbable
+    public class AttachmentView : UserControl, InputFieldViewModelEventHandler, InputGroupViewModelEventHandler, IScribbable
     {
         public static double GAP = 4;
 
@@ -538,6 +538,47 @@ namespace PanoramicDataWin8.view.vis
                 }
                 
                 return geom;
+            }
+        }
+
+        public void InputGroupViewModelMoved(InputGroupViewModel sender, InputGroupViewModelEventArgs e, bool overElement)
+        {
+            AttachmentViewModel model = (DataContext as AttachmentViewModel);
+            model.IsDisplayed = true;
+
+            var closestModel = overElement ? getClosestModel(e.Bounds) : null;
+            if (closestModel != null && closestModel is AddAttachmentItemViewModel &&
+                (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AcceptsInputGroupModels)
+            {
+                (closestModel as AddAttachmentItemViewModel).IsActive = true;
+            }
+
+            foreach (var header in model.AttachmentHeaderViewModels)
+            {
+                if (header.AddAttachmentItemViewModel != null && header.AddAttachmentItemViewModel != closestModel)
+                {
+                    header.AddAttachmentItemViewModel.IsActive = false;
+                }
+            }
+        }
+
+        public void InputGroupViewModelDropped(InputGroupViewModel sender, InputGroupViewModelEventArgs e, bool overElement)
+        {
+            AttachmentViewModel model = (DataContext as AttachmentViewModel);
+            model.IsDisplayed = false;
+            foreach (var header in model.AttachmentHeaderViewModels)
+            {
+                if (header.AddAttachmentItemViewModel != null)
+                {
+                    header.AddAttachmentItemViewModel.IsActive = false;
+                }
+            }
+
+            var closestModel = overElement ? getClosestModel(e.Bounds) : null;
+            if (closestModel != null && closestModel is AddAttachmentItemViewModel && (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AcceptsInputGroupModels &&
+                (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AddedTriggered != null)
+            {
+                (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AddedTriggered(new InputOperationModel(e.InputGroupModel));
             }
         }
 

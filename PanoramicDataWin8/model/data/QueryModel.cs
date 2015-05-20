@@ -325,8 +325,8 @@ namespace PanoramicDataWin8.model.data
                 else if (inputOperationModel.AggregateFunction == AggregateFunction.Max ||
                          inputOperationModel.AggregateFunction == AggregateFunction.Min) 
                 {
-                    if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.FLOAT ||
-                        inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.INT)
+                    if (((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.FLOAT ||
+                        ((InputFieldModel)inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.INT)
                     {
                         return AxisType.Quantitative;
                     }
@@ -339,16 +339,20 @@ namespace PanoramicDataWin8.model.data
             // no aggrgation
             else
             {
-                if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.FLOAT ||
-                    inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.INT)
+                if (((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.FLOAT ||
+                    ((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.INT)
                 {
+                    if (((InputFieldModel) inputOperationModel.InputModel).InputVisualizationType == InputVisualizationTypeConstants.ENUM)
+                    {
+                        return AxisType.Nominal;
+                    }
                     return AxisType.Quantitative;
                 }
-                else if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.TIME)
+                else if (((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.TIME)
                 {
                     return AxisType.Time;
                 }
-                else if (inputOperationModel.InputModel.InputDataType == InputDataTypeConstants.DATE)
+                else if (((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.DATE)
                 {
                     return AxisType.Date;
                 }
@@ -366,35 +370,9 @@ namespace PanoramicDataWin8.model.data
             set
             {
                 this.SetProperty(ref _jobType, value);
+                FireQueryModelUpdated(QueryModelUpdatedEventType.Structure);
             }
         }
-
-        private int _kmeansNrClusters;
-        public int KmeansClusters
-        {
-            get
-            {
-                return _kmeansNrClusters;
-            }
-            set
-            {
-                this.SetProperty(ref _kmeansNrClusters, value);
-            }
-        }
-
-        private int _kmeansNrSamples;
-        public int KmeansNrSamples
-        {
-            get
-            {
-                return _kmeansNrSamples;
-            }
-            set
-            {
-                this.SetProperty(ref _kmeansNrSamples, value);
-            }
-        }
-
 
         public override bool Equals(object obj)
         {
@@ -430,7 +408,5 @@ namespace PanoramicDataWin8.model.data
     
     public enum VisualizationType { table, bar, map, plot, line }
 
-    public enum JobType { DB, Kmeans }
-
-    public enum JobResult { ClusterX, ClusterY, SampleX, SampleY }
+    public enum JobType { DB, logreg, svm, forest, tree }
 }

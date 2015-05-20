@@ -33,6 +33,9 @@ namespace PanoramicDataWin8.controller.view
             InputFieldViewModel.InputFieldViewModelDropped += InputFieldViewModelDropped;
             InputFieldViewModel.InputFieldViewModelMoved += InputFieldViewModelMoved;
 
+            InputGroupViewModel.InputGroupViewModelDropped += InputGroupViewModelDropped;
+            InputGroupViewModel.InputGroupViewModelMoved += InputGroupViewModelMoved;
+
             JobTypeViewModel.JobTypeViewModelDropped += JobTypeViewModelDropped;
             JobTypeViewModel.JobTypeViewModelMoved += JobTypeViewModelMoved;
 
@@ -139,6 +142,8 @@ namespace PanoramicDataWin8.controller.view
             else if (datasetConfiguration.Backend.ToLower() == "tuppleware")
             {
                 _mainModel.SchemaModel = new TuppleWareSchemaModel();
+                _mainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
+                _mainModel.SampleSize = datasetConfiguration.SampleSize;
                 (_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter = new TuppleWareQueryExecuter();
                 (_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel = new TuppleWareOriginModel(datasetConfiguration);
                 TuppleWareGateway.PopulateSchema((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
@@ -147,7 +152,7 @@ namespace PanoramicDataWin8.controller.view
         }
         public VisualizationViewModel CreateVisualizationViewModel(JobType jobType, InputOperationModel inputOperationModel)
         {
-            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, jobType, inputOperationModel);
+            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, jobType, inputOperationModel != null ? inputOperationModel.InputModel : null);
             addAttachmentViews(visModel);
             _visualizationViewModels.Add(visModel);
             return visModel;
@@ -265,6 +270,51 @@ namespace PanoramicDataWin8.controller.view
             visualizationViewModel.Size = size;
             visualizationContainerView.DataContext = visualizationViewModel;
             InkableScene.Add(visualizationContainerView);
+        }
+
+        void InputGroupViewModelMoved(object sender, InputGroupViewModelEventArgs e)
+        {
+            IGeometry mainPageBounds = e.Bounds.GetPolygon();
+            List<InputGroupViewModelEventHandler> hits = new List<InputGroupViewModelEventHandler>();
+            foreach (var element in InkableScene.Elements.Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
+            {
+                var geom = element.BoundsGeometry;
+                if (geom != null && mainPageBounds.Intersects(geom))
+                {
+                    hits.Add(element);
+                }
+            }
+            var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
+
+            foreach (var element in InkableScene.Elements.Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
+            {
+                element.InputGroupViewModelMoved(
+                        sender as InputGroupViewModel, e,
+                        hits.Count() > 0 ? orderderHits[0] == element : false);
+            }
+        }
+
+
+        void InputGroupViewModelDropped(object sender, InputGroupViewModelEventArgs e)
+        {
+            IGeometry mainPageBounds = e.Bounds.GetPolygon();
+            List<InputGroupViewModelEventHandler> hits = new List<InputGroupViewModelEventHandler>();
+            foreach (var element in InkableScene.Elements.Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
+            {
+                var geom = element.BoundsGeometry;
+                if (geom != null && mainPageBounds.Intersects(geom))
+                {
+                    hits.Add(element);
+                }
+            }
+
+            var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
+            foreach (var element in InkableScene.Elements.Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
+            {
+                element.InputGroupViewModelDropped(
+                        sender as InputGroupViewModel, e,
+                        hits.Count() > 0 ? orderderHits[0] == element : false);
+            }
         }
         
         void InputFieldViewModelMoved(object sender, InputFieldViewModelEventArgs e)

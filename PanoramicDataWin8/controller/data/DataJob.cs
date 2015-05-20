@@ -1,35 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Dynamic;
 using System.Diagnostics;
-using PanoramicDataWin8.utils;
-using System.Runtime.Serialization;
-using System.IO;
-using System.Runtime.Serialization.Json;
-using Newtonsoft.Json;
-using System.Collections.ObjectModel;
-using Newtonsoft.Json.Serialization;
+using System.Linq;
+using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
-using Windows.System.Threading;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.model.data.result;
-using PanoramicDataWin8.model.data.sim;
 
-namespace PanoramicDataWin8.controller.data.sim
+namespace PanoramicDataWin8.controller.data
 {
-    public class SimJob
+    public class DataJob : Job
     {
-        public event EventHandler<JobEventArgs> JobUpdate;
-        public event EventHandler<EventArgs> JobCompleted;
-
-        private SimDataProvider _simDataProvider = null;
+        private DataProvider _dataProvider = null;
         private bool _isRunning = false;
         private int _sampleSize = 0;
         private bool _isIncremental = false;
@@ -46,18 +31,18 @@ namespace PanoramicDataWin8.controller.data.sim
         public QueryModel QueryModel { get; set; }
         public QueryModel QueryModelClone { get; set; }
 
-        public SimJob(QueryModel queryModel, TimeSpan throttle, int sampleSize)
+        public DataJob(QueryModel queryModel, QueryModel queryModelClone, DataProvider dataProvider, TimeSpan throttle, int sampleSize)
         {
             QueryModel = queryModel;
+            QueryModelClone = queryModelClone;
+            _dataProvider = dataProvider;
             _sampleSize = sampleSize;
             _throttle = throttle;
         }
 
-        public void Start()
+        public override void Start()
         {
             _stopWatch.Start();
-
-            QueryModelClone = QueryModel.Clone();
 
             _isRunning = true;
             int samplesToCheck = -1;
@@ -76,6 +61,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 _uniqueValues = _dimensions.Select(d => new Dictionary<object, double>()).ToList();
 
                 _axisTypes = _dimensions.Select(d => QueryModel.GetAxisType(d)).ToList();
+                QueryModel.ResultModel.ResultDescriptionModel = new VisualizationResultDescriptionModel();
                 (QueryModel.ResultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).AxisTypes = _axisTypes;
 
                 _isIncremental = _dimensions.Any(aom => aom.AggregateFunction == AggregateFunction.None);
@@ -87,17 +73,17 @@ namespace PanoramicDataWin8.controller.data.sim
                     Incremental = _isIncremental,
                     AxisTypes = _axisTypes,
                     IsAxisAggregated = _dimensions.Select(d => d.AggregateFunction != AggregateFunction.None).ToList(),
-                    Dimensions = _dimensions.Select(aom => aom.InputModel).ToList()
+                    Dimensions = _dimensions.Select(aom => aom.InputModel as InputFieldModel).ToList()
                 };
             }
-            _simDataProvider = new SimDataProvider(QueryModelClone, (QueryModel.SchemaModel.OriginModels[0] as SimOriginModel), samplesToCheck);
-
+            _dataProvider.NrSamplesToCheck = samplesToCheck;
+            _dataProvider.QueryModel = QueryModelClone;
             Task.Run(() => run());
 
             //ThreadPool.RunAsync(_ => run(), WorkItemPriority.Low);
         }
 
-        public void Stop()
+        public override void Stop()
         {
             lock (_lock)
             {
@@ -119,12 +105,12 @@ namespace PanoramicDataWin8.controller.data.sim
             await fireCompleted();
             return;*/
 
-            if (!_simDataProvider.IsInitialized)
+            if (!_dataProvider.IsInitialized)
             {
-                await _simDataProvider.StartSampling();
+                await _dataProvider.StartSampling();
             }
 
-            List<DataRow> dataRows = await _simDataProvider.GetSampleDataRows(_sampleSize);
+            List<DataRow> dataRows = await _dataProvider.GetSampleDataRows(_sampleSize);
             List<ResultItemModel> resultItemModels = new List<ResultItemModel>();
             while (dataRows != null && _isRunning)
             {
@@ -143,7 +129,7 @@ namespace PanoramicDataWin8.controller.data.sim
                     }
                     if (_aggregator != null)
                     {
-                        _aggregator.AggregateStep(_binner.BinStructure, QueryModelClone, _simDataProvider.Progress());
+                        _aggregator.AggregateStep(_binner.BinStructure, QueryModelClone, _dataProvider.Progress());
                     }
                     resultItemModels = convertBinsToResultItemModels(_binner.BinStructure);
                 }
@@ -163,13 +149,13 @@ namespace PanoramicDataWin8.controller.data.sim
                             MaxValues = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => entry.Value)
                         };
                     }
-                    await fireUpdated(resultItemModels, _simDataProvider.Progress(), resultDescriptionModel);
+                    await fireUpdated(resultItemModels, _dataProvider.Progress(), resultDescriptionModel);
                 }
-                dataRows = await _simDataProvider.GetSampleDataRows(_sampleSize);
+                dataRows = await _dataProvider.GetSampleDataRows(_sampleSize);
 
                 if (MainViewController.Instance.MainModel.Verbose)
                 {
-                    Debug.WriteLine("Job Iteration Time: " + sw.ElapsedMilliseconds);
+                    Debug.WriteLine("DataJob Iteration Time: " + sw.ElapsedMilliseconds);
                 }
                 if (_throttle.Ticks > 0)
                 {
@@ -189,7 +175,7 @@ namespace PanoramicDataWin8.controller.data.sim
             {
                 for (int d = 0; d < _dimensions.Count; d++)
                 {
-                    sample.VisualizationValues[_dimensions[d].InputModel] = getVisualizationValue(_axisTypes[d], sample.Entries[_dimensions[d].InputModel], _dimensions[d], _uniqueValues[d]);
+                    sample.VisualizationValues[_dimensions[d].InputModel as InputFieldModel] = getVisualizationValue(_axisTypes[d], sample.Entries[(InputFieldModel)_dimensions[d].InputModel], _dimensions[d], _uniqueValues[d]);
                 }
             }
         }
@@ -259,15 +245,12 @@ namespace PanoramicDataWin8.controller.data.sim
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                if (JobUpdate != null)
+                FireJobUpdated(new JobEventArgs()
                 {
-                    JobUpdate(this, new JobEventArgs()
-                    {
-                        Samples = samples,
-                        Progress = progress,
-                        ResultDescriptionModel = resultDescriptionModel
-                    });
-                }
+                    Samples = samples,
+                    Progress = progress,
+                    ResultDescriptionModel = resultDescriptionModel
+                });
             });
         }
 
@@ -276,14 +259,11 @@ namespace PanoramicDataWin8.controller.data.sim
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                if (JobCompleted != null)
-                {
-                    JobCompleted(this, new EventArgs());
-                }
+                FireJobCompleted(new EventArgs());
             }); 
             if (MainViewController.Instance.MainModel.Verbose)
             {
-                Debug.WriteLine("Job Total Run Time: " + _stopWatch.ElapsedMilliseconds);
+                Debug.WriteLine("DataJob Total Run Time: " + _stopWatch.ElapsedMilliseconds);
             }
         }
     }

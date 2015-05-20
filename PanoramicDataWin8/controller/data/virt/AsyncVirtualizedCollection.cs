@@ -6,7 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace PanoramicDataWin8.controller.data
+namespace PanoramicDataWin8.controller.data.virt
 {
     public class AsyncVirtualizedCollection<T> : IList<DataWrapper<T>>, IList, INotifyCollectionChanged, INotifyPropertyChanged where T : class
     {

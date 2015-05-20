@@ -3,14 +3,9 @@
 namespace PanoramicDataWin8.model.data.tuppleware
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class TuppleWareInputModel : InputFieldModel
+    public class TuppleWareFieldInputModel : InputFieldModel
     {
-        public TuppleWareInputModel()
-        {
-            
-        }
-
-        public TuppleWareInputModel(string name, string inputDataType, string inputVisualizationType)
+        public TuppleWareFieldInputModel(string name, string inputDataType, string inputVisualizationType)
         {
             _name = name;
             _inputDataType = inputDataType;

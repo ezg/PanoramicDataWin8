@@ -6,14 +6,14 @@ namespace PanoramicDataWin8.model.data
     [JsonObject(MemberSerialization.OptOut)]
     public class InputOperationModel : BindableBase
     {
-        public InputOperationModel(InputFieldModel inputModel)
+        public InputOperationModel(InputModel inputModel)
         {
             _inputModel = inputModel;
         }
 
-        private InputFieldModel _inputModel = null;
-        
-        public InputFieldModel InputModel
+        private InputModel _inputModel = null;
+
+        public InputModel InputModel
         {
             get
             {

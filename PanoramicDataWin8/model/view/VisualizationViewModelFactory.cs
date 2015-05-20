@@ -25,73 +25,65 @@ namespace PanoramicDataWin8.model.view
             return visualizationViewModel;
         }
 
-        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType, InputOperationModel inputOperationModel)
+        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType, InputModel inputModel)
         {
             VisualizationViewModel visualizationViewModel = CreateDefault(schemaModel, jobType, VisualizationType.table);
 
             if (jobType == JobType.DB)
             {
-                if (schemaModel is TuppleWareSchemaModel)
+                if (inputModel is InputFieldModel)
                 {
-                    visualizationViewModel.QueryModel.VisualizationType = VisualizationType.table;
-                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.X, inputOperationModel);
-                }
-                else if (inputOperationModel.InputModel.InputVisualizationType == InputVisualizationTypeConstants.ENUM)
-                {
-                    /*
-                    PanoramicDataColumnDescriptor x = (PanoramicDataColumnDescriptor)columnDescriptor.Clone();
-                    PanoramicDataColumnDescriptor g = (PanoramicDataColumnDescriptor)columnDescriptor.Clone();
-                    g.IsGrouped = true;
-                    PanoramicDataColumnDescriptor y = (PanoramicDataColumnDescriptor)columnDescriptor.Clone();
-                    y.AggregateFunction = AggregateFunction.Count;
+                    var inputFieldModel = inputModel as InputFieldModel;
+                    if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.ENUM)
+                    {
+                        visualizationViewModel.QueryModel.VisualizationType = VisualizationType.bar;
 
-                    filterHolderViewModel.AddOptionColumnDescriptor(Option.X, x);
-                    filterHolderViewModel.AddOptionColumnDescriptor(Option.ColorBy, g);
-                    filterHolderViewModel.AddOptionColumnDescriptor(Option.Y, y);*/
-                }
-                else if (inputOperationModel.InputModel.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
-                {
-                    visualizationViewModel.QueryModel.VisualizationType = VisualizationType.bar;
+                        InputOperationModel x = new InputOperationModel(inputFieldModel);
+                        x.AggregateFunction = AggregateFunction.None;
 
-                    InputOperationModel x = new InputOperationModel(inputOperationModel.InputModel);
-                    x.AggregateFunction = AggregateFunction.None;
+                        InputOperationModel value = new InputOperationModel(inputFieldModel);
+                        value.AggregateFunction = AggregateFunction.Count;
 
-                    InputOperationModel value = new InputOperationModel(inputOperationModel.InputModel);
-                    value.AggregateFunction = AggregateFunction.Count;
+                        InputOperationModel y = new InputOperationModel(inputFieldModel);
+                        y.AggregateFunction = AggregateFunction.Count;
 
-                    InputOperationModel y = new InputOperationModel(inputOperationModel.InputModel);
-                   // y.AggregateFunction = AggregateFunction.Count;
+                        visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.X, x);
+                        visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.Y, y);
+                        visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.DefaultValue, value);
+                    }
+                    else if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
+                    {
+                        visualizationViewModel.QueryModel.VisualizationType = VisualizationType.bar;
 
+                        InputOperationModel x = new InputOperationModel(inputFieldModel);
+                        x.AggregateFunction = AggregateFunction.None;
 
-                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.X, x);
-                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.Y, y);
-                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.DefaultValue, value);
-                }
-                else if (inputOperationModel.InputModel.InputVisualizationType == InputVisualizationTypeConstants.GEOGRAPHY)
-                {
-                    /*visualizationViewModel.VisualizationType = VisualizationType.Map;
+                        InputOperationModel value = new InputOperationModel(inputFieldModel);
+                        value.AggregateFunction = AggregateFunction.Count;
 
-                    PanoramicDataColumnDescriptor x = (PanoramicDataColumnDescriptor)columnDescriptor.Clone();
-                    x.AggregateFunction = AggregateFunction.Count;
+                        InputOperationModel y = new InputOperationModel(inputFieldModel);
+                        y.AggregateFunction = AggregateFunction.Count;
 
-                    PanoramicDataColumnDescriptor y = (PanoramicDataColumnDescriptor)columnDescriptor.Clone();
-                    y.IsGrouped = true;
-
-                    filterHolderViewModel.AddOptionColumnDescriptor(Option.Location, y);
-                    filterHolderViewModel.AddOptionColumnDescriptor(Option.Label, x);
-                    //filterHolderViewModel.AddOptionColumnDescriptor(Option.Y, y);
-                    //filterHolderViewModel.AddOptionColumnDescriptor(Option.X, x);*/
-                }
-                else
-                {
-                    visualizationViewModel.QueryModel.VisualizationType = VisualizationType.table;
-                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.X, inputOperationModel);
+                        visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.X, x);
+                        visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.Y, y);
+                        visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.DefaultValue, value);
+                    }
+                    else if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.GEOGRAPHY)
+                    {
+                    }
+                    else
+                    {
+                        visualizationViewModel.QueryModel.VisualizationType = VisualizationType.table;
+                        InputOperationModel x = new InputOperationModel(inputFieldModel);
+                        visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.X, x);
+                    }
                 }
             }
-            else if (jobType == JobType.Kmeans)
+            else if (jobType == JobType.logreg)
             {
-                visualizationViewModel.QueryModel.KmeansClusters = 3;
-                visualizationViewModel.QueryModel.KmeansNrSamples = 3;
+                visualizationViewModel.QueryModel.JobType = JobType.logreg;
+                //visualizationViewModel.QueryModel.KmeansClusters = 3;
+                //visualizationViewModel.QueryModel.KmeansNrSamples = 3;
             }
 
             return visualizationViewModel;

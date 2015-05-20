@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Practices.Prism.Mvvm;
 using PanoramicDataWin8.controller.data;
+using PanoramicDataWin8.controller.data.virt;
 
 namespace PanoramicDataWin8.model.data
 {

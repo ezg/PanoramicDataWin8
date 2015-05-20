@@ -7,6 +7,7 @@
         Group,
         X,
         Y,
-        JobInput
+        Label,
+        Feature
     }
 }

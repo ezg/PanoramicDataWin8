@@ -13,6 +13,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.inq;
@@ -109,7 +110,7 @@ namespace PanoramicDataWin8.view.common
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        (DataContext as InputGroupViewModel).FireMoved(bounds);
+                        (DataContext as InputGroupViewModel).FireMoved(bounds, (DataContext as InputGroupViewModel).InputOperationModel);
                     }
                 }
 
@@ -131,7 +132,7 @@ namespace PanoramicDataWin8.view.common
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as InputGroupViewModel).FireDropped(bounds);
+                (DataContext as InputGroupViewModel).FireDropped(bounds, (DataContext as InputGroupViewModel).InputOperationModel);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -171,7 +172,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow.SendToFront();
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as InputGroupViewModel).FireMoved(bounds);
+                (DataContext as InputGroupViewModel).FireMoved(bounds, (DataContext as InputGroupViewModel).InputOperationModel);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using PanoramicDataWin8.controller.data;
+using PanoramicDataWin8.controller.data.virt;
 
 namespace PanoramicDataWin8.model.data.sim
 {

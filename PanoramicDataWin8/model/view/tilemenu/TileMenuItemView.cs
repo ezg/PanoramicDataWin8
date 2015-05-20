@@ -11,7 +11,7 @@ namespace PanoramicDataWin8.model.view.tilemenu
         public TileMenuItemViewModel(TileMenuItemViewModel parent)
         {
             this.Parent = parent;
-            _dampingFactor = _random.NextDouble() * 3.0 + 3;
+            _dampingFactor = _random.NextDouble() * 1.0 + 3;
         }
 
         private TileMenuItemViewModel _parent = null;

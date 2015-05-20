@@ -116,9 +116,9 @@ namespace PanoramicDataWin8.view.vis
                 
                 
             }
-            else if (visualizationViewModel.QueryModel.JobType == JobType.Kmeans)
+            else if (visualizationViewModel.QueryModel.JobType == JobType.logreg)
             {
-                _renderer = new KmeansRenderer();
+                _renderer = new ClassifierRenderer();
                 contentGrid.Children.Add(_renderer);
             }
         }

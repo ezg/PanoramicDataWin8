@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace PanoramicDataWin8.controller.data
+namespace PanoramicDataWin8.controller.data.virt
 {
     public class DataPage<T> where T : class
     {

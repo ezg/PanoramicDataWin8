@@ -1,24 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Dynamic;
-using System.Diagnostics;
-using PanoramicDataWin8.utils;
-using System.Runtime.Serialization;
-using System.IO;
-using System.Runtime.Serialization.Json;
-using Newtonsoft.Json;
-using System.Collections.ObjectModel;
-using Newtonsoft.Json.Serialization;
-using Windows.ApplicationModel.Core;
-using Windows.UI.Core;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.common;
 
-namespace PanoramicDataWin8.controller.data.sim
+namespace PanoramicDataWin8.controller.data
 {
     public class DataBinner
     {

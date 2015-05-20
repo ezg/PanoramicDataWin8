@@ -106,20 +106,23 @@
   </PropertyGroup>
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-    <Folder Include="controller\data\mssql\" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="controller\data\AsyncVirtualizedCollection.cs" />
-    <Compile Include="controller\data\DataPage.cs" />
-    <Compile Include="controller\data\DataWrapper.cs" />
-    <Compile Include="controller\data\IItemsProvider.cs" />
+    <Compile Include="controller\data\DataProvider.cs" />
+    <Compile Include="controller\data\DataRow.cs" />
+    <Compile Include="controller\data\Job.cs" />
+    <Compile Include="controller\data\tuppleware\ClassifierJob.cs" />
+    <Compile Include="controller\data\tuppleware\TuppleWareDataProvider.cs" />
+    <Compile Include="controller\data\virt\AsyncVirtualizedCollection.cs" />
+    <Compile Include="controller\data\virt\DataPage.cs" />
+    <Compile Include="controller\data\virt\DataWrapper.cs" />
+    <Compile Include="controller\data\virt\IItemsProvider.cs" />
     <Compile Include="controller\data\QueryExecuter.cs" />
-    <Compile Include="controller\data\sim\DataAggregator.cs" />
-    <Compile Include="controller\data\sim\DataBinner.cs" />
-    <Compile Include="controller\data\tuppleware\TuppleWareItemsProvider.cs" />
+    <Compile Include="controller\data\DataAggregator.cs" />
+    <Compile Include="controller\data\DataBinner.cs" />
     <Compile Include="model\data\common\AggregateBinRange.cs" />
     <Compile Include="model\data\common\BinStructure.cs" />
     <Compile Include="model\data\common\DateTimeBinRange.cs" />
@@ -128,7 +131,7 @@
     <Compile Include="model\data\common\BinRange.cs" />
     <Compile Include="model\data\common\GroupingObject.cs" />
     <Compile Include="controller\data\sim\SimDataProvider.cs" />
-    <Compile Include="controller\data\sim\SimJob.cs" />
+    <Compile Include="controller\data\DataJob.cs" />
     <Compile Include="controller\data\sim\SimQueryExecuter.cs" />
     <Compile Include="controller\data\tuppleware\TuppleWareQueryExecuter.cs" />
     <Compile Include="controller\input\DatasetConfiguration.cs" />
@@ -153,6 +156,7 @@
     <Compile Include="model\data\NamedInputModel.cs" />
     <Compile Include="model\data\OriginModel.cs" />
     <Compile Include="model\data\QueryModel.cs" />
+    <Compile Include="model\data\result\ClassfierResultDescriptionModel.cs" />
     <Compile Include="model\data\result\VisualizationItemResultModel.cs" />
     <Compile Include="model\data\result\ResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultItemModel.cs" />
@@ -163,7 +167,7 @@
     <Compile Include="model\data\sim\SimInputFieldModel.cs" />
     <Compile Include="model\data\sim\SimOriginModel.cs" />
     <Compile Include="model\data\sim\SimSchemaModel.cs" />
-    <Compile Include="model\data\tuppleware\TuppleWareInputModel.cs" />
+    <Compile Include="model\data\tuppleware\TuppleWareFieldInputModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareInputGroupModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareOriginModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareSchemaModel.cs" />
@@ -260,11 +264,12 @@
     <Compile Include="view\vis\menu\ToggleMenuItemView.xaml.cs">
       <DependentUpon>ToggleMenuItemView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\vis\render\ClassifierRendererContentProvider.cs" />
     <Compile Include="view\vis\render\PlotRenderer.xaml.cs">
       <DependentUpon>PlotRenderer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="view\vis\render\KmeansRenderer.xaml.cs">
-      <DependentUpon>KmeansRenderer.xaml</DependentUpon>
+    <Compile Include="view\vis\render\ClassifierRenderer.xaml.cs">
+      <DependentUpon>ClassifierRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\PlotRendererContentProvider.cs" />
     <Compile Include="view\vis\render\Renderer.cs" />
@@ -429,7 +434,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="view\vis\render\KmeansRenderer.xaml">
+    <Page Include="view\vis\render\ClassifierRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

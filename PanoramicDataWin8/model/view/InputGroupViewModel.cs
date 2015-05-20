@@ -95,19 +95,19 @@ namespace PanoramicDataWin8.model.view
         }
 
 
-        public void FireMoved(Rct bounds)
+        public void FireMoved(Rct bounds, InputGroupModel inputGroupModel)
         {
             if (InputGroupViewModelMoved != null)
             {
-                InputGroupViewModelMoved(this, new InputGroupViewModelEventArgs(bounds));
+                InputGroupViewModelMoved(this, new InputGroupViewModelEventArgs(bounds, inputGroupModel));
             }
         }
 
-        public void FireDropped(Rct bounds)
+        public void FireDropped(Rct bounds, InputGroupModel inputGroupModel)
         {
             if (InputGroupViewModelDropped != null)
             {
-                InputGroupViewModelDropped(this, new InputGroupViewModelEventArgs(bounds));
+                InputGroupViewModelDropped(this, new InputGroupViewModelEventArgs(bounds, inputGroupModel));
             }
         }
 
@@ -122,17 +122,19 @@ namespace PanoramicDataWin8.model.view
     public interface InputGroupViewModelEventHandler
     {
         IGeometry BoundsGeometry { get; }
-        void JobTypeViewModelMoved(JobTypeViewModel sender, InputGroupViewModelEventArgs e, bool overElement);
-        void JobTypeViewModelDropped(JobTypeViewModel sender, InputGroupViewModelEventArgs e, bool overElement);
+        void InputGroupViewModelMoved(InputGroupViewModel sender, InputGroupViewModelEventArgs e, bool overElement);
+        void InputGroupViewModelDropped(InputGroupViewModel sender, InputGroupViewModelEventArgs e, bool overElement);
     }
 
 
     public class InputGroupViewModelEventArgs : EventArgs
     {
+        public InputGroupModel InputGroupModel { get; set; }
         public Rct Bounds { get; set; }
-        public InputGroupViewModelEventArgs(Rct bounds)
+        public InputGroupViewModelEventArgs(Rct bounds, InputGroupModel inputGroupModel)
         {
             Bounds = bounds;
+            InputGroupModel = inputGroupModel;
         }
     }
 }

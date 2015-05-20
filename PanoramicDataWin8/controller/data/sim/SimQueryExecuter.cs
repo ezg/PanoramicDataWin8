@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using PanoramicDataWin8.controller.data.virt;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
@@ -11,28 +12,32 @@ namespace PanoramicDataWin8.controller.data.sim
 {
     public class SimQueryExecuter : QueryExecuter
     {
-        private Dictionary<QueryModel, SimJob> _activeJobs = new Dictionary<QueryModel, SimJob>();
-        
         public override void ExecuteQuery(QueryModel queryModel)
         {
             queryModel.ResultModel.ResultItemModels = new ObservableCollection<ResultItemModel>();
+            queryModel.ResultModel.FireResultModelUpdated();
 
-            if (_activeJobs.ContainsKey(queryModel))
+            if (ActiveJobs.ContainsKey(queryModel))
             {
-                _activeJobs[queryModel].Stop();
-                _activeJobs[queryModel].JobUpdate -= simJob_JobUpdate;
-                _activeJobs[queryModel].JobCompleted -= simJob_JobCompleted;
-                _activeJobs.Remove(queryModel);
+                ActiveJobs[queryModel].Stop();
+                ActiveJobs[queryModel].JobUpdate -= simJob_JobUpdate;
+                ActiveJobs[queryModel].JobCompleted -= simJob_JobCompleted;
+                ActiveJobs.Remove(queryModel);
             }
             // determine if new job is even needed (i.e., are all relevant inputfieldmodels set)
-            if ((queryModel.VisualizationType == VisualizationType.table && queryModel.UsageInputOperationModels.Count > 0) ||
+            if ((queryModel.VisualizationType == VisualizationType.table && queryModel.InputOperationModels.Count > 0) ||
                 (queryModel.VisualizationType != VisualizationType.table && queryModel.GetUsageInputOperationModel(InputUsage.X).Any() &&  queryModel.GetUsageInputOperationModel(InputUsage.Y).Any()))
             {
-                SimJob simJob = new SimJob(queryModel, TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
-                _activeJobs.Add(queryModel, simJob);
-                simJob.JobUpdate += simJob_JobUpdate;
-                simJob.JobCompleted += simJob_JobCompleted;
-                simJob.Start();
+                var queryModelClone = queryModel.Clone();
+                SimDataProvider dataProvider = new SimDataProvider(queryModelClone, (queryModel.SchemaModel.OriginModels[0] as SimOriginModel));
+                DataJob dataJob = new DataJob(
+                    queryModel, queryModelClone, dataProvider,
+                    TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
+
+                ActiveJobs.Add(queryModel, dataJob);
+                dataJob.JobUpdate += simJob_JobUpdate;
+                dataJob.JobCompleted += simJob_JobCompleted;
+                dataJob.Start();
             }
             
         }
@@ -43,13 +48,13 @@ namespace PanoramicDataWin8.controller.data.sim
 
         void simJob_JobUpdate(object sender, JobEventArgs jobEventArgs)
         {
-            SimJob job = sender as SimJob;
-            var oldItems = job.QueryModel.ResultModel.ResultItemModels;
+            DataJob dataJob = sender as DataJob;
+            var oldItems = dataJob.QueryModel.ResultModel.ResultItemModels;
 
             // do proper updateing if this is a table
-            /*if (job.QueryModel.VisualizationType == VisualizationType.table)
+            /*if (DataJob.QueryModel.VisualizationType == VisualizationType.table)
             {
-                var cache = _updateIndexCache[job.QueryModel];
+                var cache = _updateIndexCache[DataJob.QueryModel];
 
                 // update existing ones
                 for (int i = 0; i < jobEventArgs.Samples.Count; i++)
@@ -111,27 +116,9 @@ namespace PanoramicDataWin8.controller.data.sim
                 }
             }
 
-            job.QueryModel.ResultModel.Progress = jobEventArgs.Progress;
-            job.QueryModel.ResultModel.ResultDescriptionModel = jobEventArgs.ResultDescriptionModel;
-            job.QueryModel.ResultModel.FireResultModelUpdated();
-        }
-    }
-
-    public class DataEqualityComparer : IEqualityComparer<Dictionary<InputFieldModel, object>>
-    {
-        private QueryModel _queryModel = null;
-        public DataEqualityComparer(QueryModel queryModel)
-        {
-            _queryModel = queryModel;
-        }
-        public bool Equals(Dictionary<InputFieldModel, object> x, Dictionary<InputFieldModel, object> y)
-        {
-            return x[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdInputModel].Equals(
-                    y[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdInputModel]);
-        }
-        public int GetHashCode(Dictionary<InputFieldModel, object> x)
-        {
-            return x[(_queryModel.SchemaModel.OriginModels[0] as SimOriginModel).IdInputModel].GetHashCode();
+            dataJob.QueryModel.ResultModel.Progress = jobEventArgs.Progress;
+            dataJob.QueryModel.ResultModel.ResultDescriptionModel = jobEventArgs.ResultDescriptionModel;
+            dataJob.QueryModel.ResultModel.FireResultModelUpdated();
         }
     }
 }

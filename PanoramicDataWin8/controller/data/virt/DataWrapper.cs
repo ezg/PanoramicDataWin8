@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace PanoramicDataWin8.controller.data
+namespace PanoramicDataWin8.controller.data.virt
 {
     public class DataWrapper<T> : INotifyPropertyChanged where T : class
     {
