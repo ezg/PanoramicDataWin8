@@ -131,9 +131,9 @@ namespace PanoramicDataWin8.view.vis.render
                 e.PropertyName == model.GetPropertyName(() => model.Position))
             {
                 setMenuViewModelAnkerPosition();
-            }      
+            }
         }
-        
+
         private void populateHeaders()
         {
             removeMenu();
@@ -169,7 +169,7 @@ namespace PanoramicDataWin8.view.vis.render
                 yInputFieldView.DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), yAom)
                 {
                     IsShadow = false,
-                    BorderThicknes = new Thickness(0,0,4,0),
+                    BorderThicknes = new Thickness(0, 0, 4, 0),
                     Size = new Vec(54, visModel.Size.Y - 54),
                     TextAngle = 270,
                     AttachmentOrientation = AttachmentOrientation.Left
@@ -222,7 +222,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             // null labels
-            if ((resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount > 0)
+            if (resultModel.ResultDescriptionModel != null && (resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount > 0)
             {
                 tbNull.Visibility = Windows.UI.Xaml.Visibility.Visible;
                 tbNull.Text = "null values : " + (resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount;
@@ -392,7 +392,7 @@ namespace PanoramicDataWin8.view.vis.render
         public override void StartSelection(Windows.Foundation.Point point)
         {
             GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
-            _selectionPoints = new List<Windows.Foundation.Point> {gt.TransformPoint(point)};
+            _selectionPoints = new List<Windows.Foundation.Point> { gt.TransformPoint(point) };
         }
 
         public override void MoveSelection(Windows.Foundation.Point point)
@@ -444,7 +444,7 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     queryModel.AddFilterModels(hits);
                 }
-            } 
+            }
             else
             {
                 tbSelection.Text = "";

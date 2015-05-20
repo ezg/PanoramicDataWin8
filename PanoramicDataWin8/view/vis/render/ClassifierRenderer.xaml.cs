@@ -86,6 +86,7 @@ namespace PanoramicDataWin8.view.vis.render
             QueryModel queryModel = ((VisualizationViewModel) DataContext).QueryModel;
             mainLabel.Text = queryModel.JobType.ToString();
             tbType.Text = queryModel.JobType.ToString();
+            render();
         }
 
         void resultModel_ResultModelUpdated(object sender, EventArgs e)
@@ -323,6 +324,14 @@ namespace PanoramicDataWin8.view.vis.render
             IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon();
 
             List<FilterModel> hits = new List<FilterModel>();
+
+             VisualizationViewModel model = ((VisualizationViewModel) DataContext);
+            if (model.QueryModel.ResultModel != null && model.QueryModel.ResultModel.ResultDescriptionModel != null)
+            {
+                ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel) model.QueryModel.ResultModel.ResultDescriptionModel);
+                _classifierRendererContentProvider.LabelIndex = (_classifierRendererContentProvider.LabelIndex + 1)%descriptionModel.Labels.Count;
+                render();
+            }
             
         }
 

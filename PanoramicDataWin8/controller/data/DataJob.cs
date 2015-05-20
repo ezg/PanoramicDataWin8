@@ -60,6 +60,9 @@ namespace PanoramicDataWin8.controller.data
 
                 _uniqueValues = _dimensions.Select(d => new Dictionary<object, double>()).ToList();
 
+                List<FilterModel> filterModels = new List<FilterModel>();
+                getFilterModelsRecursive(QueryModelClone.LinkModels.ToList(), filterModels);
+
                 _axisTypes = _dimensions.Select(d => QueryModel.GetAxisType(d)).ToList();
                 QueryModel.ResultModel.ResultDescriptionModel = new VisualizationResultDescriptionModel();
                 (QueryModel.ResultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).AxisTypes = _axisTypes;
@@ -81,6 +84,15 @@ namespace PanoramicDataWin8.controller.data
             Task.Run(() => run());
 
             //ThreadPool.RunAsync(_ => run(), WorkItemPriority.Low);
+        }
+
+        private void getFilterModelsRecursive(List<LinkModel> linkModels, List<FilterModel> filterModels)
+        {
+            foreach (var linkModel in linkModels)
+            {
+                filterModels.AddRange(linkModel.FromQueryModel.FilterModels);
+                getFilterModelsRecursive(linkModel.FromQueryModel.LinkModels.ToList(), filterModels);
+            }
         }
 
         public override void Stop()
