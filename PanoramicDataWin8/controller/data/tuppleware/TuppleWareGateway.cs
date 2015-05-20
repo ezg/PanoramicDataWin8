@@ -104,7 +104,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
         {
             JObject data = new JObject(
                 new JProperty("command", "schema"),
-                new JProperty("filename", "mimic2"));
+                new JProperty("filename", tuppleWareOriginModel.Name));
             JToken response = await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
 
             foreach (var child in response)
