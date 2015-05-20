@@ -188,13 +188,16 @@ namespace PanoramicDataWin8.model.view
                 _visualizationViewModel.QueryModel.JobType == JobType.forest ||
                 _visualizationViewModel.QueryModel.JobType == JobType.svm)
             {
-                if (_attachmentOrientation == AttachmentOrientation.Bottom)
+                if (AttachmentHeaderViewModels.Count == 0)
                 {
-                    createLogregBottom();
-                }
-                if (_attachmentOrientation == AttachmentOrientation.Left)
-                {
-                    createLogregLeft();
+                    if (_attachmentOrientation == AttachmentOrientation.Bottom)
+                    {
+                        createLogregBottom();
+                    }
+                    if (_attachmentOrientation == AttachmentOrientation.Left)
+                    {
+                        createLogregLeft();
+                    }
                 }
             }
         }
