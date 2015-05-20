@@ -183,7 +183,10 @@ namespace PanoramicDataWin8.model.view
                     createDbBottom();
                 }
             }
-            else if (_visualizationViewModel.QueryModel.JobType == JobType.logreg)
+            else if (_visualizationViewModel.QueryModel.JobType == JobType.logreg ||
+                _visualizationViewModel.QueryModel.JobType == JobType.tree ||
+                _visualizationViewModel.QueryModel.JobType == JobType.forest ||
+                _visualizationViewModel.QueryModel.JobType == JobType.svm)
             {
                 if (_attachmentOrientation == AttachmentOrientation.Bottom)
                 {

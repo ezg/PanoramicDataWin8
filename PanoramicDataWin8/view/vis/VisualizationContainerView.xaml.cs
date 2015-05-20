@@ -43,6 +43,17 @@ namespace PanoramicDataWin8.view.vis
 
             this.Loaded += VisualizationContainerView_Loaded;
             this.DataContextChanged += visualizationContainerView_DataContextChanged;
+            MainViewController.Instance.InkableScene.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
+        }
+
+
+        private void InkableScene_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            var ancestors = (e.OriginalSource as FrameworkElement).GetAncestors();
+            if (!ancestors.Contains(this) && _mainPointerManager.GetNumActiveContacts() > 0)
+            {
+                MainViewController.Instance.CopyVisualisationViewModel(this.DataContext as VisualizationViewModel, e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position);
+            }
         }
 
         void VisualizationContainerView_Loaded(object sender, RoutedEventArgs e)
@@ -116,7 +127,10 @@ namespace PanoramicDataWin8.view.vis
                 
                 
             }
-            else if (visualizationViewModel.QueryModel.JobType == JobType.logreg)
+            else if (visualizationViewModel.QueryModel.JobType == JobType.logreg ||
+                visualizationViewModel.QueryModel.JobType == JobType.tree ||
+                visualizationViewModel.QueryModel.JobType == JobType.forest ||
+                visualizationViewModel.QueryModel.JobType == JobType.svm)
             {
                 _renderer = new ClassifierRenderer();
                 contentGrid.Children.Add(_renderer);

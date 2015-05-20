@@ -15,6 +15,7 @@ using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.view.vis;
+using PanoramicDataWin8.view.vis.render;
 
 namespace PanoramicDataWin8.controller.view
 {
@@ -149,6 +150,7 @@ namespace PanoramicDataWin8.controller.view
                 TuppleWareGateway.PopulateSchema((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
                 //((_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter as TuppleWareQueryExecuter).LoadFileDescription((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
             }
+            MainPage.Load();
         }
         public VisualizationViewModel CreateVisualizationViewModel(JobType jobType, InputOperationModel inputOperationModel)
         {
@@ -164,6 +166,26 @@ namespace PanoramicDataWin8.controller.view
             addAttachmentViews(visModel);
             _visualizationViewModels.Add(visModel);
             return visModel;
+        }
+
+        public void CopyVisualisationViewModel(VisualizationViewModel visualizationViewModel, Pt centerPoint)
+        {
+            VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
+            VisualizationViewModel newVisualizationViewModel = CreateVisualizationViewModel(visualizationViewModel.QueryModel.JobType, null);
+
+            newVisualizationViewModel.Position = centerPoint - (visualizationViewModel.Size / 2.0);
+            newVisualizationViewModel.Size = visualizationViewModel.Size;
+            foreach (var usage in visualizationViewModel.QueryModel.UsageInputOperationModels.Keys)
+            {
+                foreach (var inputOperationModel in visualizationViewModel.QueryModel.UsageInputOperationModels[usage])
+                {
+                    newVisualizationViewModel.QueryModel.AddUsageInputOperationModel(usage, new InputOperationModel(inputOperationModel.InputModel));
+                }
+            }
+            newVisualizationViewModel.Size = visualizationViewModel.Size;
+
+            visualizationContainerView.DataContext = newVisualizationViewModel;
+            InkableScene.Add(visualizationContainerView);
         }
 
         private void addAttachmentViews(VisualizationViewModel visModel)
@@ -245,12 +267,37 @@ namespace PanoramicDataWin8.controller.view
             Vec size = new Vec(width, height);
             Pt position = (Pt)new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
 
-            VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-            VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel((sender as JobTypeViewModel).JobType, null);
-            visualizationViewModel.Position = position;
-            visualizationViewModel.Size = size;
-            visualizationContainerView.DataContext = visualizationViewModel;
-            InkableScene.Add(visualizationContainerView);
+            IGeometry mainPageBounds = e.Bounds.GetPolygon();
+            List<VisualizationContainerView> hits = new List<VisualizationContainerView>();
+            foreach (var element in InkableScene.Elements.Where(ele => ele is VisualizationContainerView).Select(ele => ele as VisualizationContainerView))
+            {
+                var geom = element.GetBounds(InkableScene).GetPolygon();
+                if (geom != null && mainPageBounds.Intersects(geom))
+                {
+                    hits.Add(element);
+                }
+            }
+
+            bool found = false;
+            foreach (var element in hits)
+            {
+                if ((element.DataContext as VisualizationViewModel).QueryModel.JobType != JobType.DB)
+                {
+                    (element.DataContext as VisualizationViewModel).QueryModel.JobType = (sender as JobTypeViewModel).JobType;
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
+                VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel((sender as JobTypeViewModel).JobType, null);
+                visualizationViewModel.Position = position;
+                visualizationViewModel.Size = size;
+                visualizationContainerView.DataContext = visualizationViewModel;
+                InkableScene.Add(visualizationContainerView);
+            }
         }
 
         void VisualizationTypeViewModel_VisualizationTypeViewModelMoved(object sender, VisualizationTypeViewModelEventArgs e)

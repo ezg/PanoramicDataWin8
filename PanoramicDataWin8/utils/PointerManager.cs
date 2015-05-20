@@ -29,6 +29,11 @@ namespace PanoramicDataWin8.utils
         private List<Pointer> _currentPointers;
 
 
+        public uint GetNumActiveContacts()
+        {
+            return _numActiveContacts;
+        }
+
         public void Attach(FrameworkElement frameworkElement)
         {
             _frameworkElement = frameworkElement;

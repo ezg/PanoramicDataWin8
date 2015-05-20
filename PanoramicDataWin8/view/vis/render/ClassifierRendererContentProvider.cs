@@ -19,6 +19,7 @@ using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
+using WinRTXamlToolkit.Controls.Extensions;
 
 namespace PanoramicDataWin8.view.vis.render
 {
@@ -55,7 +56,14 @@ namespace PanoramicDataWin8.view.vis.render
         private int _yIndex = -1;
         private InputOperationModel _xAom = null;
         private InputOperationModel _yAom = null;
+        
         private int _labelIndex = 0;
+
+        public int LabelIndex
+        {
+            get { return _labelIndex; }
+            set { _labelIndex = value; }
+        }
 
         public float CompositionScaleX { get; set; }
         public float CompositionScaleY { get; set; }
@@ -87,42 +95,13 @@ namespace PanoramicDataWin8.view.vis.render
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 0f, 0f, 1f));
             if (_resultModel != null && _classfierResultDescriptionModel != null)
             {
-                drawString(d2dDeviceContext, dwFactory, _textFormatBig, toScreenX(50), toScreenY(90), _classfierResultDescriptionModel.Labels[_labelIndex].Name, false, true, true);
-                var roundedRect = new D2D.RoundedRectangle();
-                var xFrom = toScreenX((float)0);
-                var yFrom = toScreenY((float)0);
-                var xTo = toScreenX((float)10);
-                var yTo = toScreenY((float)10);
-
-                roundedRect.Rect = new RectangleF(
-                    xFrom,
-                    yTo,
-                    xTo - xFrom,
-                    yFrom - yTo);
-                roundedRect.RadiusX = roundedRect.RadiusY = 4;
-
-                d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 1f);
-
-                roundedRect = new D2D.RoundedRectangle();
-                xFrom = toScreenX((float)90);
-                yFrom = toScreenY((float)90);
-                xTo = toScreenX((float)100);
-                yTo = toScreenY((float)100);
-
-                roundedRect.Rect = new RectangleF(
-                    xFrom,
-                    yTo,
-                    xTo - xFrom,
-                    yFrom - yTo);
-                roundedRect.RadiusX = roundedRect.RadiusY = 4;
-
-                d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 1f);
-
                 computeSizes(d2dDeviceContext, dwFactory);
+
+                drawString(d2dDeviceContext, dwFactory, _textFormatBig, toScreenX(50), toScreenY(90), _classfierResultDescriptionModel.Labels[_labelIndex].Name, false, true, true);
+                
                 renderConfusionMatrix(d2dDeviceContext, dwFactory);
                 renderRoc(d2dDeviceContext, dwFactory);
-            }
-            white.Dispose();
+            };
         }
 
         private void renderConfusionMatrix(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
@@ -131,6 +110,41 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 return;
             }
+            var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
+            var roundedRect = new D2D.RoundedRectangle();
+            for (int r = 0; r < _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]].Count; r++)
+            {
+                var row = _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]][r];
+                var valueSum = (float) row.Sum();
+                for (int c = 0; c < row.Count; c++)
+                {
+                    var value = (float) row[c] / valueSum;
+                    var h = 20f;
+                    var w = 20f;
+                    var xOff = 5;
+                    var yOff = 25;
+                    var xFrom = toScreenX((float)r * w + xOff);
+                    var yFrom = toScreenY((float)c * h + yOff);
+                    var xTo = toScreenX((float)r * w + w + xOff);
+                    var yTo = toScreenY((float)c * h + h + yOff);
+
+                    var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)(value));
+                    var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
+
+                    roundedRect.Rect = new RectangleF(
+                        xFrom,
+                        yTo,
+                        xTo - xFrom,
+                        yFrom - yTo);
+                    roundedRect.RadiusX = roundedRect.RadiusY = 4;
+                    d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
+                    //d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+
+                    d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                    binColor.Dispose();
+                }
+            }
+            white.Dispose();
         }
 
         private void renderRoc(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
@@ -139,6 +153,39 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 return;
             }
+
+            var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
+            var blue = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(41f / 255f, 170f / 255f, 213f / 255f, 255f / 255f));
+            var h = 40f;
+            var w = 40f;
+            var xOff = 55;
+            var yOff = 25;
+            var xFrom = toScreenX((float)xOff);
+            var yFrom = toScreenY((float)yOff);
+            var xTo = toScreenX((float)w + xOff);
+            var yTo = toScreenY((float)h + yOff);
+            var rect = new RectangleF(xFrom,
+                        yTo,
+                        xTo - xFrom,
+                        yFrom - yTo);
+            d2dDeviceContext.DrawRectangle(rect, white);
+            d2dDeviceContext.DrawLine(new Vector2(xTo, yTo), new Vector2(xFrom, yFrom), white, 0.5f);
+
+            Pt last = new Pt(0,0);
+            foreach (var pt in _classfierResultDescriptionModel.RocCurves[_classfierResultDescriptionModel.Labels[_labelIndex]])
+            {
+                d2dDeviceContext.DrawLine(
+                    new Vector2(
+                        toScreenX((float)last.X * w + xOff), 
+                        toScreenY((float)last.Y * h + yOff)), 
+                    new Vector2(
+                        toScreenX((float)pt.X * w + xOff),
+                        toScreenY((float)pt.Y * h + yOff)), blue, 1f);
+                last = pt;
+            }
+
+            blue.Dispose();
+            white.Dispose();
         }
 
         private void drawString(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory, DW.TextFormat textFormat, float x, float y, string text,
@@ -150,7 +197,7 @@ namespace PanoramicDataWin8.view.vis.render
 
             if (horizontallyCentered)
             {
-                x -= metrics.Width / 2.0f;
+                x += metrics.Width / 2.0f;
             }
             if (verticallyCentered)
             {

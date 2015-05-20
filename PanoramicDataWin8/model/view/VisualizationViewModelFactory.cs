@@ -82,8 +82,18 @@ namespace PanoramicDataWin8.model.view
             else if (jobType == JobType.logreg)
             {
                 visualizationViewModel.QueryModel.JobType = JobType.logreg;
-                //visualizationViewModel.QueryModel.KmeansClusters = 3;
-                //visualizationViewModel.QueryModel.KmeansNrSamples = 3;
+            }
+            else if (jobType == JobType.forest)
+            {
+                visualizationViewModel.QueryModel.JobType = JobType.forest;
+            }
+            else if (jobType == JobType.svm)
+            {
+                visualizationViewModel.QueryModel.JobType = JobType.svm;
+            }
+            else if (jobType == JobType.tree)
+            {
+                visualizationViewModel.QueryModel.JobType = JobType.tree;
             }
 
             return visualizationViewModel;

@@ -529,5 +529,10 @@ namespace PanoramicDataWin8
                 parentModel.AreChildrenExpanded = true;
             }
         }
+
+        public void Load()
+        {
+           
+        }
     }
 }
