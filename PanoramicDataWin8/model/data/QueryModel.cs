@@ -34,11 +34,13 @@ namespace PanoramicDataWin8.model.data
             _linkModels.CollectionChanged += LinkModels_CollectionChanged;
         }
 
+        public QueryModel() { }
+
 
         public QueryModel Clone()
         {
             ITraceWriter traceWriter = new MemoryTraceWriter();
-
+            
             string serializedQueryModel = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings()
             {
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
@@ -66,9 +68,9 @@ namespace PanoramicDataWin8.model.data
             {
                 foreach (var item in e.OldItems)
                 {
-                    if ((item as LinkModel).ToQueryModel == this)
+                    if (Equals(((LinkModel) item).ToQueryModel, this))
                     {
-                        (item as LinkModel).FromQueryModel.QueryModelUpdated -= FromQueryModel_QueryModelUpdated;
+                        ((LinkModel) item).FromQueryModel.QueryModelUpdated -= FromQueryModel_QueryModelUpdated;
                         fire = true;
                     }
                 }
@@ -77,9 +79,9 @@ namespace PanoramicDataWin8.model.data
             {
                 foreach (var item in e.NewItems)
                 {
-                    if ((item as LinkModel).ToQueryModel == this)
+                    if (Equals(((LinkModel) item).ToQueryModel, this))
                     {
-                        (item as LinkModel).FromQueryModel.QueryModelUpdated += FromQueryModel_QueryModelUpdated;
+                        ((LinkModel) item).FromQueryModel.QueryModelUpdated += FromQueryModel_QueryModelUpdated;
                         fire = true;
                     }
                 }
@@ -245,6 +247,10 @@ namespace PanoramicDataWin8.model.data
             get
             {
                 return _linkModels;
+            }
+            set
+            {
+                this.SetProperty(ref _linkModels, value);
             }
         }
 

@@ -14,12 +14,13 @@ using PanoramicDataWin8.utils;
 namespace PanoramicDataWin8.controller.data.tuppleware
 {
     public class TuppleWareDataProvider : DataProvider
-    {private int _nrProcessedSamples = 0;
+    {
+        private int _nrProcessedSamples = 0;
         private TuppleWareOriginModel _originModel = null;
 
-        public TuppleWareDataProvider(QueryModel queryModel, TuppleWareOriginModel originModel)
+        public TuppleWareDataProvider(QueryModel queryModelClone, TuppleWareOriginModel originModel)
         {
-            QueryModel = queryModel;
+            QueryModelClone = queryModelClone;
             _originModel = originModel;
             IsInitialized = false;
         }
@@ -51,13 +52,41 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             {
                 return null;
             }
-        } 
+        }
+
+
+        private void getFilterModelsRecursive(QueryModel queryModel, List<QueryModel> visitedQueryModels, List<FilterModel> filterModels, bool isFirst)
+        {
+            visitedQueryModels.Add(queryModel);
+            if (!isFirst)
+            {
+                filterModels.AddRange(queryModel.FilterModels);
+            }
+
+            foreach (var linkModel in queryModel.LinkModels)
+            {
+                if (linkModel.FromQueryModel != null && !visitedQueryModels.Contains(linkModel.FromQueryModel))
+                {
+                    getFilterModelsRecursive(linkModel.FromQueryModel, visitedQueryModels, filterModels, false);
+                }
+                /*if (linkModel.ToQueryModel != null && !visitedQueryModels.Contains(linkModel.ToQueryModel))
+                {
+                    getFilterModelsRecursive(linkModel.ToQueryModel, visitedQueryModels, filterModels, false);
+                }*/
+            }
+        }
+
 
         private async Task<List<Dictionary<InputFieldModel, object>>> getDataFromWeb(int page, int sampleSize)
         {
             int count = 0;
-            var inputModels = QueryModel.InputOperationModels.Select(iom => iom.InputModel as InputFieldModel).ToList();
+            List<FilterModel> filterModels = new List<FilterModel>();
+            getFilterModelsRecursive(QueryModelClone, new List<QueryModel>(), filterModels, true);
+
+            var inputModels = QueryModelClone.InputOperationModels.Select(iom => iom.InputModel as InputFieldModel).ToList();
             JArray lines = await TuppleWareGateway.GetData(_originModel, inputModels, page, sampleSize);
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             List<Dictionary<InputFieldModel, object>> data = new List<Dictionary<InputFieldModel, object>>();
 
             foreach (var line in lines)
@@ -120,9 +149,14 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 data.Add(items);
                 count++;
             }
-
+            if (MainViewController.Instance.MainModel.Verbose)
+            {
+                Debug.WriteLine("TuppleWare Parse Time: " + sw.ElapsedMilliseconds);
+            }
             return data;
         }
+
+
 
         public override double Progress()
         {

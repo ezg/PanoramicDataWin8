@@ -32,9 +32,9 @@ namespace PanoramicDataWin8.controller.data.sim
         private int _nrProcessedSamples = 0;
         private StreamReader _streamReader = null;
 
-        public SimDataProvider(QueryModel queryModel, SimOriginModel simOriginModel)
+        public SimDataProvider(QueryModel queryModelClone, SimOriginModel simOriginModel)
         {
-            QueryModel = queryModel;
+            QueryModelClone = queryModelClone;
             _simOriginModel = simOriginModel;
             IsInitialized = false;
         }

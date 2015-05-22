@@ -175,20 +175,20 @@ namespace PanoramicDataWin8.model.view
 
         void initialize()
         {
-            AttachmentHeaderViewModels.Clear();
-            if (_visualizationViewModel.QueryModel.JobType == JobType.DB)
+            if (AttachmentHeaderViewModels.Count == 0)
             {
-                if (_attachmentOrientation == AttachmentOrientation.Bottom)
+                AttachmentHeaderViewModels.Clear();
+                if (_visualizationViewModel.QueryModel.JobType == JobType.DB)
                 {
-                    createDbBottom();
+                    if (_attachmentOrientation == AttachmentOrientation.Bottom)
+                    {
+                        createDbBottom();
+                    }
                 }
-            }
-            else if (_visualizationViewModel.QueryModel.JobType == JobType.logreg ||
-                _visualizationViewModel.QueryModel.JobType == JobType.tree ||
-                _visualizationViewModel.QueryModel.JobType == JobType.forest ||
-                _visualizationViewModel.QueryModel.JobType == JobType.svm)
-            {
-                if (AttachmentHeaderViewModels.Count == 0)
+                else if (_visualizationViewModel.QueryModel.JobType == JobType.logreg ||
+                    _visualizationViewModel.QueryModel.JobType == JobType.tree ||
+                    _visualizationViewModel.QueryModel.JobType == JobType.forest ||
+                    _visualizationViewModel.QueryModel.JobType == JobType.svm)
                 {
                     if (_attachmentOrientation == AttachmentOrientation.Bottom)
                     {

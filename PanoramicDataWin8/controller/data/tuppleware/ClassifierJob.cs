@@ -73,7 +73,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 var ys = labelResponse[2];
                 resultDescriptionModel.RocCurves.Add(labelInputFieldModel, new List<Pt>());
                 resultDescriptionModel.RocCurves[labelInputFieldModel].Add(new Pt(0, 0));
-                var step = ys.Count() > 300 ? 50 : 1;  
+                var step = 1;//ys.Count() > 300 ? 50 : 1;  
                 for(int i = 0; i < xs.Count(); i += step)
                 {
                     resultDescriptionModel.RocCurves[labelInputFieldModel].Add(new Pt((double)xs[i], (double)ys[i]));

@@ -112,17 +112,21 @@ namespace PanoramicDataWin8.view.vis.render
             }
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
             var roundedRect = new D2D.RoundedRectangle();
+            var h = 20f;
+            var w = 20f;
+            var xOff = 5;
+            var yOff = 25;
+
             for (int r = 0; r < _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]].Count; r++)
             {
+                drawString(d2dDeviceContext, dwFactory, _textFormat, toScreenX((float)r * w + xOff + w / 2.0f), toScreenY(yOff + h * 2 + 3), r+"", false, true, false);
+                drawString(d2dDeviceContext, dwFactory, _textFormat, toScreenX(xOff - 1), toScreenY(yOff + h / 2.0f + (1-r) * h), r + "", false, false, true);
+
                 var row = _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]][r];
                 var valueSum = (float) row.Sum();
                 for (int c = 0; c < row.Count; c++)
                 {
                     var value = (float) row[c] / valueSum;
-                    var h = 20f;
-                    var w = 20f;
-                    var xOff = 5;
-                    var yOff = 25;
                     var xFrom = toScreenX((float)r * w + xOff);
                     var yFrom = toScreenY((float)c * h + yOff);
                     var xTo = toScreenX((float)r * w + w + xOff);

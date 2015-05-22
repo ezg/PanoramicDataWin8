@@ -52,9 +52,9 @@ namespace PanoramicDataWin8.controller.data.sim
             var oldItems = dataJob.QueryModel.ResultModel.ResultItemModels;
 
             // do proper updateing if this is a table
-            /*if (DataJob.QueryModel.VisualizationType == VisualizationType.table)
+            /*if (DataJob.QueryModelClone.VisualizationType == VisualizationType.table)
             {
-                var cache = _updateIndexCache[DataJob.QueryModel];
+                var cache = _updateIndexCache[DataJob.QueryModelClone];
 
                 // update existing ones
                 for (int i = 0; i < jobEventArgs.Samples.Count; i++)

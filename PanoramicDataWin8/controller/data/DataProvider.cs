@@ -8,7 +8,7 @@ namespace PanoramicDataWin8.controller.data
     {
         public bool IsInitialized { get; set; }
         public int NrSamplesToCheck { get; set; }
-        public QueryModel QueryModel { get; set; }
+        public QueryModel QueryModelClone { get; set; }
         public abstract Task StartSampling();
         public abstract Task<List<DataRow>> GetSampleDataRows(int sampleSize);
         public abstract double Progress();

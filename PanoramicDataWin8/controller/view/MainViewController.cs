@@ -62,8 +62,8 @@ namespace PanoramicDataWin8.controller.view
                 var content = await Windows.Storage.FileIO.ReadTextAsync(file);
                 _mainModel.DatasetConfigurations.Add(DatasetConfiguration.FromContent(content, file.Name));
             }
-            LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("nba")).First());
-            //LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("mimic")).First());
+            //LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("nba")).First());
+            LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("mimic")).First());
             //LoadData(_mainModel.DatasetConfigurations.First());
         }
 

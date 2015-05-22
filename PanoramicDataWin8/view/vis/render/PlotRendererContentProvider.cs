@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Graphics.Display;
+using Windows.Networking.Sockets;
 using D2D = SharpDX.Direct2D1;
 using DW = SharpDX.DirectWrite;
 using PanoramicDataWin8.utils;
@@ -193,8 +194,6 @@ namespace PanoramicDataWin8.view.vis.render
             //var yLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelY.TrimTo(20), MinValue = bin.MinY, MaxValue = bin.MaxY }).Distinct().ToList();
             var xLabels = _xBinRange.GetLabels();
             var yLabels = _yBinRange.GetLabels();
-
-
             var maxXLabelLength = xLabels.Max(b => b.Label.Length);
             var maxXLabel = xLabels.First(b => b.Label.Length == maxXLabelLength);
             var maxYLabelLength = yLabels.Max(b => b.Label.Length);

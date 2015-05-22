@@ -39,19 +39,33 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             {
                 Debug.WriteLine(data.ToString());
             }
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var httpResponseMessage = await httpClient.PostAsync(endPoint, new StringContent(
                 data.ToString(),
                 Encoding.UTF8,
                 "application/json"));
-            var stringContent = await httpResponseMessage.Content.ReadAsStringAsync();
-            JToken jToken = JToken.Parse(stringContent);
-
             if (MainViewController.Instance.MainModel.Verbose)
             {
-                Debug.WriteLine(stringContent);
+                Debug.WriteLine("TuppleWare Roundtrip Time: " + sw.ElapsedMilliseconds);
             }
+            sw.Restart();
+
+            var stringContent = await httpResponseMessage.Content.ReadAsStringAsync();
+            if (MainViewController.Instance.MainModel.Verbose)
+            {
+                Debug.WriteLine("TuppleWare Read Content Time: " + sw.ElapsedMilliseconds);
+            }
+            sw.Restart();
+          
+            JToken jToken = JToken.Parse(stringContent);
+            if (MainViewController.Instance.MainModel.Verbose)
+            {
+                Debug.WriteLine("TuppleWare Json Parsing Time: " + sw.ElapsedMilliseconds);
+            }
+           
 
             return jToken;
         }
@@ -87,7 +101,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
         {
             JObject data = new JObject(
                 new JProperty("command", "data"),
-                new JProperty("project", string.Join(" ", inputModels.Select(im => im.Name))),
+                new JProperty("project", string.Join(" ", inputModels.Select(im => im.Name).Distinct())),
                 new JProperty("limit", samples),
                 new JProperty("page", page),
                 new JProperty("filename", tuppleWareOriginModel.Name));
