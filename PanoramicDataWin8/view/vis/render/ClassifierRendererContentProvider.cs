@@ -142,10 +142,10 @@ namespace PanoramicDataWin8.view.vis.render
                         yFrom - yTo);
                     roundedRect.RadiusX = roundedRect.RadiusY = 4;
                     d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
-                    if (r == 1 && c == 1)
+                    /*if (r == 1 && c == 1)
                     {
                         d2dDeviceContext.FillRoundedRectangle(roundedRect, white);
-                    }
+                    }*/
                     
                     //d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
 
