@@ -37,5 +37,12 @@ namespace PanoramicDataWin8.model.data.result
             get { return _f1s; }
             set { this.SetProperty(ref _f1s, value); }
         }
+
+        private Dictionary<InputFieldModel, double> _aucs = new Dictionary<InputFieldModel, double>();
+        public Dictionary<InputFieldModel, double> AUCs
+        {
+            get { return _aucs; }
+            set { this.SetProperty(ref _aucs, value); }
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace PanoramicDataWin8.controller.data
         public List<bool> IsAxisAggregated { get; set; }
         public List<double> NrOfBins { get; set; }
         public BinStructure BinStructure { get; set; }
-        public List<InputFieldModel> Dimensions { get; set; }
+        public List<InputOperationModel> Dimensions { get; set; }
 
         public void BinStep(List<DataRow> dataRows)
         {
@@ -71,7 +71,7 @@ namespace PanoramicDataWin8.controller.data
                 }
                 else if (AxisTypes[d] == AxisType.Quantitative)
                 {
-                    scale = QuantitativeBinRange.Initialize(dataMins[d], dataMax[d], NrOfBins[d], Dimensions[d].InputDataType == InputDataTypeConstants.INT);
+                    scale = QuantitativeBinRange.Initialize(dataMins[d], dataMax[d], NrOfBins[d], ((InputFieldModel) Dimensions[d].InputModel).InputDataType == InputDataTypeConstants.INT);
                 }
                 else
                 {

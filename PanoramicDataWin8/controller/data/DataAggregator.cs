@@ -89,7 +89,7 @@ namespace PanoramicDataWin8.controller.data
                 sampleValue = 0;
                 currentTempValue = 0d;
             }
-            else if (double.TryParse(sample.Entries[(InputFieldModel)aggregator.InputModel].ToString(), out d))
+            else if (double.TryParse(sample.Entries[aggregator.InputModel as InputFieldModel].ToString(), out d))
             {
                 sampleValue = d;
             }

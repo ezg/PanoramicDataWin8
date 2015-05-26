@@ -27,10 +27,10 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             schemaCommand.PopulateSchema(tuppleWareOriginModel);
         }
 
-        public async static Task<JArray> GetData(TuppleWareOriginModel tuppleWareOriginModel, List<InputFieldModel> inputModels, int page, int samples)
+        public async static Task<JArray> GetData(TuppleWareOriginModel tuppleWareOriginModel, List<InputFieldModel> inputModels, string select, int page, int samples)
         {
             DataCommand dataCommand = new DataCommand();
-            return await dataCommand.GetData(tuppleWareOriginModel, inputModels, page, samples);
+            return await dataCommand.GetData(tuppleWareOriginModel, inputModels, select, page, samples);
         }
 
         public static async Task<JToken> Request(string endPoint, JObject data)
@@ -97,7 +97,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
     public class DataCommand
     {
-        public async Task<JArray> GetData(TuppleWareOriginModel tuppleWareOriginModel, List<InputFieldModel> inputModels, int page, int samples)
+        public async Task<JArray> GetData(TuppleWareOriginModel tuppleWareOriginModel, List<InputFieldModel> inputModels, string select, int page, int samples)
         {
             JObject data = new JObject(
                 new JProperty("command", "data"),
@@ -105,6 +105,10 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 new JProperty("limit", samples),
                 new JProperty("page", page),
                 new JProperty("filename", tuppleWareOriginModel.Name));
+            if (!string.IsNullOrEmpty(select))
+            {
+                data.Add(new JProperty("select", select));
+            }
             JToken response = await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
 
             return response as JArray;

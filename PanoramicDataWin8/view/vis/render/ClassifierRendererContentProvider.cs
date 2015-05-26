@@ -119,7 +119,7 @@ namespace PanoramicDataWin8.view.vis.render
 
             for (int r = 0; r < _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]].Count; r++)
             {
-                drawString(d2dDeviceContext, dwFactory, _textFormat, toScreenX((float)r * w + xOff + w / 2.0f), toScreenY(yOff + h * 2 + 3), r+"", false, true, false);
+                drawString(d2dDeviceContext, dwFactory, _textFormat, toScreenX((float)r * w + xOff + w / 2.0f), toScreenY(yOff + h * 2) - 15, r+"", false, true, false);
                 drawString(d2dDeviceContext, dwFactory, _textFormat, toScreenX(xOff - 1), toScreenY(yOff + h / 2.0f + (1-r) * h), r + "", false, false, true);
 
                 var row = _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]][r];
@@ -127,10 +127,10 @@ namespace PanoramicDataWin8.view.vis.render
                 for (int c = 0; c < row.Count; c++)
                 {
                     var value = (float) row[c] / valueSum;
-                    var xFrom = toScreenX((float)r * w + xOff);
-                    var yFrom = toScreenY((float)c * h + yOff);
-                    var xTo = toScreenX((float)r * w + w + xOff);
-                    var yTo = toScreenY((float)c * h + h + yOff);
+                    var yFrom = toScreenY((float)(1 - r) * w + yOff);
+                    var xFrom = toScreenX((float)c * h + xOff);
+                    var yTo = toScreenY((float)(1 - r) * w + w + yOff);
+                    var xTo = toScreenX((float)c * h + h + xOff);
 
                     var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)(value));
                     var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
@@ -142,6 +142,11 @@ namespace PanoramicDataWin8.view.vis.render
                         yFrom - yTo);
                     roundedRect.RadiusX = roundedRect.RadiusY = 4;
                     d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
+                    if (r == 1 && c == 1)
+                    {
+                        d2dDeviceContext.FillRoundedRectangle(roundedRect, white);
+                    }
+                    
                     //d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
 
                     d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);

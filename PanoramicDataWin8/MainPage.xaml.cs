@@ -176,6 +176,20 @@ namespace PanoramicDataWin8
                     msgTextBlock.Opacity = 1;
                     _messageTimer.Start();
                 }
+                if (e.Key == VirtualKey.T)
+                {
+                    QueryModel q1 = new QueryModel(MainViewController.Instance.MainModel.SchemaModel, new ResultModel());
+                    QueryModel q2 = new QueryModel(MainViewController.Instance.MainModel.SchemaModel, new ResultModel());
+                    q1.FilterModels.Add(new FilterModel());
+                    LinkModel lm = new LinkModel();
+                    lm.FromQueryModel = q1;
+                    lm.ToQueryModel = q2;
+                    q1.LinkModels.Add(lm);
+                    q2.LinkModels.Add(lm);
+
+                    var tt = q1.Clone();
+
+                 }
             }
         }
 
@@ -380,8 +394,7 @@ namespace PanoramicDataWin8
                 var buttonBounds = addInputButton.GetBounds(this);
                 var inputModels =
                     mainModel.SchemaModel.OriginModels.First()
-                        .InputModels.Where(am => am.IsDisplayed)
-                        .OrderBy(am => am.Name);
+                        .InputModels.Where(am => am.IsDisplayed)/*.OrderBy(am => am.Name)*/;
 
                 if (inputMenu != null)
                 {
@@ -442,7 +455,7 @@ namespace PanoramicDataWin8
                 currentTileMenuItemViewModel.AttachPosition = AttachPosition.Right;
 
                 int count = 0;
-                foreach (var childInputModel in inputGroupModel.InputModels.OrderBy(am => am.Name))
+                foreach (var childInputModel in inputGroupModel.InputModels/*.OrderBy(am => am.Name)*/)
                 {
                     var childTileMenu = recursiveCreateTileMenu(childInputModel, currentTileMenuItemViewModel);
                     childTileMenu.Row = count; // TileMenuItemViewModel.Children.Count;
@@ -532,11 +545,6 @@ namespace PanoramicDataWin8
                 parentModel.Size = new Vec(buttonBounds.Width, buttonBounds.Height);
                 parentModel.AreChildrenExpanded = true;
             }
-        }
-
-        public void Load()
-        {
-           
         }
     }
 }

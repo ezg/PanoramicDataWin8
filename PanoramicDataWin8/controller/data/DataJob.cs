@@ -73,7 +73,7 @@ namespace PanoramicDataWin8.controller.data
                     Incremental = _isIncremental,
                     AxisTypes = _axisTypes,
                     IsAxisAggregated = _dimensions.Select(d => d.AggregateFunction != AggregateFunction.None).ToList(),
-                    Dimensions = _dimensions.Select(aom => aom.InputModel as InputFieldModel).ToList()
+                    Dimensions = _dimensions.ToList()
                 };
             }
             _dataProvider.NrSamplesToCheck = samplesToCheck;
@@ -175,7 +175,7 @@ namespace PanoramicDataWin8.controller.data
             {
                 for (int d = 0; d < _dimensions.Count; d++)
                 {
-                    sample.VisualizationValues[_dimensions[d].InputModel as InputFieldModel] = getVisualizationValue(_axisTypes[d], sample.Entries[(InputFieldModel)_dimensions[d].InputModel], _dimensions[d], _uniqueValues[d]);
+                    sample.VisualizationValues[_dimensions[d]] = getVisualizationValue(_axisTypes[d], sample.Entries[_dimensions[d].InputModel as InputFieldModel], _dimensions[d], _uniqueValues[d]);
                 }
             }
         }

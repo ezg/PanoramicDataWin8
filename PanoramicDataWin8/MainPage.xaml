@@ -49,8 +49,8 @@
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-
-            <Button Name="addVisualizationButton" Click="addVisualizationButton_Click" Margin="0,0,0,4">
+            
+            <Button Name="addVisualizationButton" Click="addVisualizationButton_Click" Margin="0,0,0,4" Visibility="Collapsed">
                 <Button.Template>
                     <ControlTemplate>
                         <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
@@ -66,7 +66,7 @@
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-
+            
             <Button Name="addJobButton" Click="addJobButton_Click" Visibility="Collapsed">
                 <Button.Template>
                     <ControlTemplate>

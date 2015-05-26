@@ -15,6 +15,7 @@ namespace PanoramicDataWin8.model.data
     public class QueryModel : ExtendedBindableBase
     {
         private static long _nextId = 0;
+        private bool _isClone = false;
 
         public delegate void QueryModelUpdatedHandler(object sender, QueryModelUpdatedEventArgs e);
         public event QueryModelUpdatedHandler QueryModelUpdated;
@@ -34,7 +35,10 @@ namespace PanoramicDataWin8.model.data
             _linkModels.CollectionChanged += LinkModels_CollectionChanged;
         }
 
-        public QueryModel() { }
+        public QueryModel()
+        {
+            _isClone = true; // disable event firing. 
+        }
 
 
         public QueryModel Clone()
@@ -123,12 +127,15 @@ namespace PanoramicDataWin8.model.data
         }
 
         private long _id = 0;
-        [JsonIgnore]
         public long Id
         {
             get
             {
                 return _id;
+            }
+            set
+            {
+                this.SetProperty(ref _id, value);
             }
         }
 
@@ -261,6 +268,10 @@ namespace PanoramicDataWin8.model.data
             {
                 return _filterModels;
             }
+            set
+            {
+                this.SetProperty(ref _filterModels, value);
+            }
         }
 
         public void ClearFilterModels()
@@ -301,18 +312,21 @@ namespace PanoramicDataWin8.model.data
 
         public void FireQueryModelUpdated(QueryModelUpdatedEventType type)
         {
-            if (type == QueryModelUpdatedEventType.Structure)
+            if (!_isClone)
             {
-                ClearFilterModels();
-            }
-            if (QueryModelUpdated != null)
-            {
-                QueryModelUpdated(this, new QueryModelUpdatedEventArgs(type));
-            }
+                if (type == QueryModelUpdatedEventType.Structure)
+                {
+                    ClearFilterModels();
+                }
+                if (QueryModelUpdated != null)
+                {
+                    QueryModelUpdated(this, new QueryModelUpdatedEventArgs(type));
+                }
 
-            if (type != QueryModelUpdatedEventType.FilterModels && SchemaModel.QueryExecuter != null)
-            {
-                SchemaModel.QueryExecuter.ExecuteQuery(this);
+                if (type != QueryModelUpdatedEventType.FilterModels && SchemaModel.QueryExecuter != null)
+                {
+                    SchemaModel.QueryExecuter.ExecuteQuery(this);
+                }
             }
         }
 

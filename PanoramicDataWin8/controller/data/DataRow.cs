@@ -5,7 +5,7 @@ namespace PanoramicDataWin8.controller.data
 {
     public class DataRow
     {
-        private  Dictionary<InputFieldModel, object> _entries = null;
+        private Dictionary<InputFieldModel, object> _entries = null;
         public Dictionary<InputFieldModel, object> Entries
         {
             get
@@ -18,8 +18,8 @@ namespace PanoramicDataWin8.controller.data
             }
         }
 
-        private Dictionary<InputFieldModel, double?> _visualizationValues = new Dictionary<InputFieldModel, double?>();
-        public Dictionary<InputFieldModel, double?> VisualizationValues
+        private Dictionary<InputOperationModel, double?> _visualizationValues = new Dictionary<InputOperationModel, double?>();
+        public Dictionary<InputOperationModel, double?> VisualizationValues
         {
             get
             {

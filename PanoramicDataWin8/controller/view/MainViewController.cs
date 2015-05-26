@@ -150,7 +150,6 @@ namespace PanoramicDataWin8.controller.view
                 TuppleWareGateway.PopulateSchema((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
                 //((_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter as TuppleWareQueryExecuter).LoadFileDescription((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
             }
-            MainPage.Load();
         }
         public VisualizationViewModel CreateVisualizationViewModel(JobType jobType, InputOperationModel inputOperationModel)
         {

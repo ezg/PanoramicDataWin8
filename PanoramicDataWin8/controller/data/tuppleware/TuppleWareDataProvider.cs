@@ -55,25 +55,44 @@ namespace PanoramicDataWin8.controller.data.tuppleware
         }
 
 
-        private void getFilterModelsRecursive(QueryModel queryModel, List<QueryModel> visitedQueryModels, List<FilterModel> filterModels, bool isFirst)
+        private string getFilterModelsRecursive(QueryModel queryModel, List<QueryModel> visitedQueryModels, List<FilterModel> filterModels, bool isFirst)
         {
+            string ret = "";
             visitedQueryModels.Add(queryModel);
-            if (!isFirst)
+            if (!isFirst && queryModel.FilterModels.Count > 0)
             {
                 filterModels.AddRange(queryModel.FilterModels);
+                ret = "(" + string.Join(" or ", queryModel.FilterModels.Select(fm => fm.ToPythonString())) + ")";
             }
 
+
+            List<string> children = new List<string>();
             foreach (var linkModel in queryModel.LinkModels)
             {
                 if (linkModel.FromQueryModel != null && !visitedQueryModels.Contains(linkModel.FromQueryModel))
                 {
-                    getFilterModelsRecursive(linkModel.FromQueryModel, visitedQueryModels, filterModels, false);
+                    var child = getFilterModelsRecursive(linkModel.FromQueryModel, visitedQueryModels, filterModels, false);
+                    if (child != "")
+                    {
+                        children.Add(child);
+                    }
                 }
-                /*if (linkModel.ToQueryModel != null && !visitedQueryModels.Contains(linkModel.ToQueryModel))
-                {
-                    getFilterModelsRecursive(linkModel.ToQueryModel, visitedQueryModels, filterModels, false);
-                }*/
             }
+
+            string childrenJoined = string.Join(queryModel.FilteringOperation.ToString().ToLower(), children);
+            if (children.Count > 0)
+            {
+                if (ret != "")
+                {
+                    ret = "(" + ret + " and " + childrenJoined + ")";
+                }
+                else
+                {
+                    ret = "(" + childrenJoined + ")";
+                }
+            }
+
+            return ret;
         }
 
 
@@ -81,10 +100,10 @@ namespace PanoramicDataWin8.controller.data.tuppleware
         {
             int count = 0;
             List<FilterModel> filterModels = new List<FilterModel>();
-            getFilterModelsRecursive(QueryModelClone, new List<QueryModel>(), filterModels, true);
+            string select = getFilterModelsRecursive(QueryModelClone, new List<QueryModel>(), filterModels, true);
 
             var inputModels = QueryModelClone.InputOperationModels.Select(iom => iom.InputModel as InputFieldModel).ToList();
-            JArray lines = await TuppleWareGateway.GetData(_originModel, inputModels, page, sampleSize);
+            JArray lines = await TuppleWareGateway.GetData(_originModel, inputModels, select, page, sampleSize);
             Stopwatch sw = new Stopwatch();
             sw.Start();
             List<Dictionary<InputFieldModel, object>> data = new List<Dictionary<InputFieldModel, object>>();

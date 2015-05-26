@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.VisualBasic.CompilerServices;
+using Newtonsoft.Json;
 using PanoramicDataWin8.model.data.result;
 // ReSharper disable All
 
 namespace PanoramicDataWin8.model.data
 {
+    [JsonObject(MemberSerialization.OptOut)]
     public class FilterModel
     {
         public List<ValueComparison> ValueComparisons { get; set; }
@@ -49,6 +52,12 @@ namespace PanoramicDataWin8.model.data
             }
             return true;
         }
+
+        public string ToPythonString()
+        {
+            string ret = "(" + string.Join("and", ValueComparisons.Select(vc => vc.ToPythonString())) + ")";
+            return ret;
+        }
     }
 
     public enum Predicate { EQUALS, LIKE, GREATER_THAN, LESS_THAN, GREATER_THAN_EQUAL, LESS_THAN_EQUAL }
@@ -88,6 +97,33 @@ namespace PanoramicDataWin8.model.data
             return false;
         }
 
+        public string ToPythonString()
+        {
+            string op = "";
+            switch (Predicate)
+            {
+                case Predicate.EQUALS:
+                    op = "==";
+                    break;
+                case Predicate.GREATER_THAN:
+                    op = ">";
+                    break;
+                case Predicate.GREATER_THAN_EQUAL:
+                    op = ">=";
+                    break;
+                case Predicate.LESS_THAN:
+                    op = "<";
+                    break;
+                case Predicate.LESS_THAN_EQUAL:
+                    op = "<=";
+                    break;
+                default:
+                    op = "==";
+                    break;
+            }
+            string ret = " " + InputOperationModel.InputModel.Name + " "  + op + " " + Value.ToString() + " ";
+            return ret;
+        }
 
         public bool Compare(object value)
         {

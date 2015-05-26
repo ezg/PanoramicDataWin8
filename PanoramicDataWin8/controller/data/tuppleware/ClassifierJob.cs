@@ -60,17 +60,17 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             foreach (var labelInputFieldModel in labels)
             {
                 var labelResponse = returnObject[labelInputFieldModel.Name];
-                var conf = labelResponse[0];
                 resultDescriptionModel.ConfusionMatrices.Add(labelInputFieldModel, new List<List<double>>());
                 resultDescriptionModel.ConfusionMatrices[labelInputFieldModel].Add(new List<double>());
-                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][0].Add((double)conf[0][0]);
-                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][0].Add((double)conf[0][1]);
-                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel].Add(new List<double>());
-                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][1].Add((double)conf[1][0]);
-                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][1].Add((double)conf[1][1]);
+                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][0].Add((double)labelResponse["tn"]);
+                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][0].Add((double)labelResponse["fn"]);
 
-                var xs = labelResponse[1];
-                var ys = labelResponse[2];
+                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel].Add(new List<double>());
+                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][1].Add((double)labelResponse["fp"]);
+                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][1].Add((double)labelResponse["tp"]);
+
+                var xs = labelResponse["fpr"];
+                var ys = labelResponse["tpr"];
                 resultDescriptionModel.RocCurves.Add(labelInputFieldModel, new List<Pt>());
                 resultDescriptionModel.RocCurves[labelInputFieldModel].Add(new Pt(0, 0));
                 var step = 1;//ys.Count() > 300 ? 50 : 1;  
@@ -80,8 +80,8 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 } 
                 resultDescriptionModel.RocCurves[labelInputFieldModel].Add(new Pt(1, 1));
 
-                var f1 = labelResponse[3];
-                resultDescriptionModel.F1s.Add(labelInputFieldModel, (double) f1);
+                resultDescriptionModel.F1s.Add(labelInputFieldModel, (double) labelResponse["f1"]);
+                resultDescriptionModel.AUCs.Add(labelInputFieldModel, (double)labelResponse["auc"]);
             }
 
 
