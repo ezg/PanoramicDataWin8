@@ -57,6 +57,7 @@ namespace PanoramicDataWin8.view.vis.render
         private InputOperationModel _xAom = null;
         private InputOperationModel _yAom = null;
         private Dictionary<BinIndex, List<VisualizationItemResultModel>> _binDictonary = null;
+        private Dictionary<BinIndex, BinPrimitive> _binPrimitives = new Dictionary<BinIndex, BinPrimitive>();
 
         public float CompositionScaleX { get; set; }
         public float CompositionScaleY { get; set; }
@@ -154,11 +155,7 @@ namespace PanoramicDataWin8.view.vis.render
 
             if (_resultModel != null && _resultModel.ResultItemModels.Count > 0)
             {
-                if (MainViewController.Instance.MainModel.GraphRenderOption == GraphRenderOptions.Grid)
-                {
-                    renderGrid(d2dDeviceContext, dwFactory);
-                }
-                else if (MainViewController.Instance.MainModel.GraphRenderOption == GraphRenderOptions.Cell)
+                if (MainViewController.Instance.MainModel.GraphRenderOption == GraphRenderOptions.Cell)
                 {
                     renderCell(d2dDeviceContext, dwFactory);
                 }
@@ -521,46 +518,6 @@ namespace PanoramicDataWin8.view.vis.render
             white.Dispose();
         }
 
-        private void renderGrid(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
-        {
-            computeSizesAndRenderLabels(d2dDeviceContext, dwFactory, _resultModel.ResultItemModels.Count < 10000);
-            if (_deviceHeight < 0 || _deviceWidth < 0)
-            {
-                return;
-            }
-
-            var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color(40, 170, 213));
-            var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
-
-            // draw data
-            /*foreach (var bin in _resultModel.ResultItemModels.Select(item => item.Bin).Where(bin => bin.Values.Any() && bin.Values.First().HasValue))
-            {
-                var roundedRect = new D2D.RoundedRectangle();
-                float xFrom = toScreenX((float)bin.MinX);
-                float yFrom = toScreenY((float)bin.MinY);
-                float xTo = toScreenX((float)bin.MaxX);
-                float yTo = toScreenY((float)bin.MaxY);
-                float w = (float)Math.Max((xTo - xFrom) * (float)bin.Values.First().Value, 5.0);
-                float h = (float)Math.Max((yFrom - yTo) * (float)bin.Values.First().Value, 5.0);
-
-                roundedRect.Rect = new RectangleF(
-                    xFrom + ((xTo - xFrom) - w) / 2.0f,
-                    yTo + ((yFrom - yTo) - h) / 2.0f,
-                    w,
-                    h);
-                roundedRect.RadiusX = roundedRect.RadiusY = 4;
-
-                if (bin.Values.First().Value > 0)
-                {
-                    d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
-                    d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 1f);
-
-                }
-            }*/
-            binColor.Dispose();
-            white.Dispose();
-        }
-
         public override void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
         {
             // reusable structure representing a text font with size and style
@@ -582,7 +539,38 @@ namespace PanoramicDataWin8.view.vis.render
             float retY = ((y - _minY) / _yScale) * (_deviceHeight);
             return _flipY ? (_deviceHeight) - retY + (_topOffset) : retY + (_topOffset);
         }
+    }
 
+    public class BinPrimitive
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float TargetX { get; set; }
+        public float TargetY { get; set; } 
+        public float W { get; set; }
+        public float H { get; set; }
+        public float TargetW { get; set; }
+        public float TargetH { get; set; }
+        public float A { get; set; }
+        public float TargetA { get; set; }
 
+        public void Render(D2D.DeviceContext d2dDeviceContext, D2D.SolidColorBrush brush, bool fill)
+        {
+            var roundedRect = new D2D.RoundedRectangle();
+            roundedRect.Rect = new RectangleF(
+                                    X,
+                                    Y,
+                                    W,
+                                    H);
+            roundedRect.RadiusX = roundedRect.RadiusY = 4;
+            if (fill)
+            {
+                d2dDeviceContext.FillRoundedRectangle(roundedRect, brush);
+            }
+            else
+            {
+                d2dDeviceContext.DrawRoundedRectangle(roundedRect, brush);
+            }
+        }
     }
 }

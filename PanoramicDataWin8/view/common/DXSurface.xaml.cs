@@ -84,6 +84,19 @@ namespace PanoramicDataWin8.view.common
             }
         }
 
+        private bool _isAnimated = false;
+        public bool IsAnimated
+        {
+            get
+            {
+                return _isAnimated;
+            }
+            set
+            {
+                _isAnimated = value;
+            }
+        }
+
         public void Dispose()
         {
             UnloadContent();
@@ -239,7 +252,7 @@ namespace PanoramicDataWin8.view.common
         {
             Debug.Assert(_graphicsDevice.Presenter != null);
 
-            if (!_isDirty) return;
+            if (!_isDirty && !_isAnimated) return;
             _isDirty = false;
 
             if (!BeginDrawFrame())
