@@ -391,25 +391,6 @@ namespace PanoramicDataWin8.view.vis.render
 
                     if (!_isXAxisAggregated && !_isYAxisAggregated)
                     {
-                        /*var oldTarget = d2dDeviceContext.Target;
-                        var dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
-                        var bitmapProperties = new D2D.BitmapProperties1(new SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.A8_UNorm, D2D.AlphaMode.Premultiplied),
-                                                             dpi,
-                                                             dpi,
-                                                             D2D.BitmapOptions.CannotDraw | D2D.BitmapOptions.Target);
-
-
-                        D2D.Bitmap bitmap = new D2D.Bitmap1(d2dDeviceContext, new Size2(100,100), bitmapProperties);
-                        d2dDeviceContext.Target = bitmap;
-                        d2dDeviceContext.BeginDraw();
-                        ....
-                        d2dDeviceContext.EndDraw();
-
-                        d2dDeviceContext.Target = oldTarget;
-                        d2dDeviceContext.FillOpacityMask(
-                            bitmap,
-                            white,
-                            D2D.OpacityMaskContent.Graphics);*/
                         xFrom = toScreenX((float) xBins[xi]);
                         yFrom = toScreenY((float) yBins[yi]);
                         xTo = toScreenX((float) xBins[xi + 1]);
@@ -468,66 +449,14 @@ namespace PanoramicDataWin8.view.vis.render
                     }
                 }
             }
-
-            /*foreach (var resultItem in _resultModel.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
-            {
-                if (resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.X).First()) &&
-                    resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.Y).First()))
-                {
-                    double? xValue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.X).First()].Value;
-                    double? yValue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Y).First()].Value;
-                    double? value = null;
-                    if (_queryModel.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()))
-                    {
-                        value = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()].NoramlizedValue;
-                    }
-                    else if (_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
-                    {
-                        value = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
-                    }
-
-                    if (value != null)
-                    {
-                        var roundedRect = new D2D.RoundedRectangle();
-                        float xFrom = toScreenX((float)xBins[_xBinRange.GetIndex(xValue.Value)]);
-                        float yFrom = toScreenY((float)yBins[_yBinRange.GetIndex(yValue.Value)]);
-                        float xTo = toScreenX((float)xBins[_xBinRange.GetIndex(_xBinRange.AddStep(xValue.Value))]);
-                        float yTo = toScreenY((float)yBins[_yBinRange.GetIndex(_yBinRange.AddStep(yValue.Value))]);
-                        float w = (float)Math.Max((xTo - xFrom) * (float)value.Value, 5.0);
-                        float h = (float)Math.Max((yFrom - yTo) * (float)value.Value, 5.0);
-
-                        float alpha = 0.1f * (float)Math.Log10(value.Value) + 1f;
-                        var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value.Value));
-                        var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
-
-                        roundedRect.Rect = new RectangleF(
-                            xFrom,
-                            yTo,
-                            xTo - xFrom,
-                            yFrom - yTo);
-                        roundedRect.RadiusX = roundedRect.RadiusY = 4;
-                        d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
-                        binColor.Dispose();
-                        if (_resultModel.ResultItemModels.Count < 10000)
-                        {
-                            d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
-                        }
-                    }
-                }
-            }*/
+            dark.Dispose();
             white.Dispose();
         }
 
         public override void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
         {
-            // reusable structure representing a text font with size and style
             _textFormat = disposeCollector.Collect(new DW.TextFormat(dwFactory, "Abel", SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, 11f));
-
-            // reusable brush structure
             _textBrush = disposeCollector.Collect(new D2D.SolidColorBrush(d2dDeviceContext, new Color(17, 17, 17)));
-
-            // prebaked text - useful for constant labels as it greatly improves performance
-            //_textLayout = disposeCollector.Collect(new DW.TextLayout(dwFactory, "Demo DirectWrite text here.", _textFormat, 100f, 100f));
         }
 
         private float toScreenX(float x)
@@ -556,12 +485,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         public void Render(D2D.DeviceContext d2dDeviceContext, D2D.SolidColorBrush brush, bool fill)
         {
-            var roundedRect = new D2D.RoundedRectangle();
-            roundedRect.Rect = new RectangleF(
-                                    X,
-                                    Y,
-                                    W,
-                                    H);
+            var roundedRect = new D2D.RoundedRectangle {Rect = new RectangleF(X, Y, W, H)};
             roundedRect.RadiusX = roundedRect.RadiusY = 4;
             if (fill)
             {
