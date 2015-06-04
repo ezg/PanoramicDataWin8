@@ -9,7 +9,6 @@ namespace PanoramicDataWin8.view.inq
 {
     public class InkStroke : IScribbable
     {
-        public Color Color = Colors.Black;
         private ObservableCollection<Point> _points = null;
 
         public InkStroke(IList<Point> points)
@@ -40,6 +39,8 @@ namespace PanoramicDataWin8.view.inq
         {
             get { return _points; }
         }
+
+        public bool IsErase { get; set; }
 
         public void Add(Point point)
         {
@@ -167,6 +168,7 @@ namespace PanoramicDataWin8.view.inq
         public InkStroke Clone()
         {
             var s = new InkStroke();
+            s.IsErase = this.IsErase;
             foreach (Point point in _points)
             {
                 s.Points.Add(new Point(point.X, point.Y));

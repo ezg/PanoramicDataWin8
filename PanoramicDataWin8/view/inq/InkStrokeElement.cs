@@ -1,4 +1,5 @@
-﻿using Windows.UI;
+﻿using PanoramicDataWin8.utils;
+using Windows.UI;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
@@ -8,6 +9,7 @@ namespace PanoramicDataWin8.view.inq
     public class InkStrokeElement : Canvas
     {
         private static SolidColorBrush COLOR = new SolidColorBrush(Color.FromArgb(255, 17, 17, 17));
+        private static SolidColorBrush ERASE_COLOR = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
 
         protected InkStroke _inkStroke;
         public InkStroke InkStroke { get { return _inkStroke; } }
@@ -32,7 +34,7 @@ namespace PanoramicDataWin8.view.inq
             this.RenderTransform = new MatrixTransform();
 
             Polyline pl = new Polyline();
-            pl.Stroke = COLOR;
+            pl.Stroke = _inkStroke.IsErase ? ERASE_COLOR : COLOR;
             pl.StrokeThickness = 3;
             pl.Points = new PointCollection();
 

@@ -47,6 +47,7 @@ namespace PanoramicDataWin8.controller.view
             VisualizationViewModels.CollectionChanged += VisualizationViewModels_CollectionChanged;
 
             _gesturizer.AddGesture(new ConnectGesture(_root));
+            _gesturizer.AddGesture(new EraseGesture(_root));
             _gesturizer.AddGesture(new ScribbleGesture(_root));
 
             loadConfigs();
@@ -473,7 +474,7 @@ namespace PanoramicDataWin8.controller.view
                     ConnectGesture connect = recognizedGesture as ConnectGesture;
                     LinkModel linkModel = new LinkModel()
                     {
-                        FromQueryModel= connect.FromVisualizationViewModel.QueryModel,
+                        FromQueryModel = connect.FromVisualizationViewModel.QueryModel,
                         ToQueryModel = connect.ToVisualizationViewModel.QueryModel
                     };
                     if (!linkModel.FromQueryModel.LinkModels.Contains(linkModel) &&
@@ -483,10 +484,10 @@ namespace PanoramicDataWin8.controller.view
                         linkModel.ToQueryModel.LinkModels.Add(linkModel);
                     }
                 }
-                else if (recognizedGesture is ScribbleGesture)
+                else if (recognizedGesture is HitGesture)
                 {
-                    ScribbleGesture scribble = recognizedGesture as ScribbleGesture;
-                    foreach (IScribbable hitScribbable in scribble.HitScribbables)
+                    HitGesture hitGesture = recognizedGesture as HitGesture;
+                    foreach (IScribbable hitScribbable in hitGesture.HitScribbables)
                     {
                         if (hitScribbable is InkStroke)
                         {

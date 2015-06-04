@@ -43,13 +43,14 @@ namespace PanoramicDataWin8.view.inq
             List<Point> pts = new List<Point>();
             pts.Add(e.GetCurrentPoint(this).Position);
             _currentInkStroke = new InkStroke(pts);
+            _currentInkStroke.IsErase = e.GetCurrentPoint(this).Properties.IsEraser;
             addDrawingInkStroke(_currentInkStroke);
         }
 
         void InkableCanvas_PointerMoved(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.LeftControl);
-            if (_isPointerPressed)//(e.Pointer.PointerDeviceType == PointerDeviceType.Pen || (state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down))
+            if (_isPointerPressed)
             {
                 handleMove(e.GetCurrentPoint(this).Position);
                 e.Handled = true;
@@ -65,7 +66,7 @@ namespace PanoramicDataWin8.view.inq
         void InkableCanvas_PointerReleased(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.LeftControl);
-            if (_isPointerPressed)// && (e.Pointer.PointerDeviceType == PointerDeviceType.Pen || (state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down))
+            if (_isPointerPressed)
             {
                 handleUp(e);
                 e.Handled = true;

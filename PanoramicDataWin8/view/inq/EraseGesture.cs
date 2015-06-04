@@ -6,26 +6,22 @@ using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.view.inq
 {
-    public class ScribbleGesture : HitGesture
+    public class EraseGesture : HitGesture
     {
         private InkableScene _inkableScene = null;
 
-        public ScribbleGesture(InkableScene inkableScene)
+        public EraseGesture(InkableScene inkableScene)
         {
             this._inkableScene = inkableScene;
         }
 
         public override bool Recognize(InkStroke inkStroke)
         {
-            inkStroke = inkStroke.GetResampled(20);
             _hitScribbables = new List<IScribbable>();
-
-            List<int> corners = ShortStraw.IStraw(inkStroke);
-
-            if (corners.Count >= 5)
+            if (inkStroke.IsErase)
             {
+                inkStroke = inkStroke.GetResampled(20);
                 ILineString inkStrokeLine = inkStroke.GetLineString();
-
                 IList<Vec> convexHull = Convexhull.convexhull(inkStroke.Points);
                 IGeometry convexHullPoly = convexHull.Select(vec => new Point(vec.X, vec.Y)).ToList().GetPolygon();
 
@@ -66,11 +62,11 @@ namespace PanoramicDataWin8.view.inq
                         }
                     }
                 }
-            }
 
-            if (_hitScribbables.Count > 0)
-            {
-                return true;
+                if (_hitScribbables.Count > 0)
+                {
+                    return true;
+                }
             }
             return false;
         }

@@ -234,6 +234,7 @@
     <Compile Include="view\inq\InkStrokeElement.cs" />
     <Compile Include="view\inq\IScribbable.cs" />
     <Compile Include="view\inq\IStroqConsumer.cs" />
+    <Compile Include="view\inq\EraseGesture.cs" />
     <Compile Include="view\inq\ScribbleGesture.cs" />
     <Compile Include="view\inq\ShortStraw.cs" />
     <Compile Include="view\common\InputFieldView.xaml.cs">

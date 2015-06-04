@@ -15,6 +15,9 @@ using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.view.vis.menu;
+using Windows.UI.Core;
+using Windows.System;
+using Windows.Devices.Input;
 
 namespace PanoramicDataWin8.view.vis
 {
@@ -220,11 +223,15 @@ namespace PanoramicDataWin8.view.vis
 
         void attachmentView_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
-            Debug.WriteLine("press");
-            (DataContext as AttachmentViewModel).ActiveStopwatch.Restart();
-            AttachmentItemViewModel model = (sender as AttachmentItemView).DataContext as AttachmentItemViewModel;
-            displayMenu(model);
-            e.Handled = true;
+            var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.LeftControl);
+            if (e.Pointer.PointerDeviceType != PointerDeviceType.Pen && (state & CoreVirtualKeyStates.Down) != CoreVirtualKeyStates.Down)
+            {
+                Debug.WriteLine("press");
+                (DataContext as AttachmentViewModel).ActiveStopwatch.Restart();
+                AttachmentItemViewModel model = (sender as AttachmentItemView).DataContext as AttachmentItemViewModel;
+                displayMenu(model);
+                e.Handled = true;
+            }
         }
 
         void AttachmentViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
