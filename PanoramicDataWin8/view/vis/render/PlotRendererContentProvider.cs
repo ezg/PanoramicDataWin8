@@ -25,21 +25,8 @@ namespace PanoramicDataWin8.view.vis.render
 {
     public class PlotRendererContentProvider : DXSurfaceContentProvider
     {
-        private float _leftOffset = 40;
-        private float _rightOffset = 10;
-        private float _topOffset = 10;
-        private float _bottomtOffset = 45;
-
-        private float _deviceWidth = 0;
-        private float _deviceHeight = 0;
-        private float _xScale = 0;
-        private float _yScale = 0;
-        private bool _flipY = true;
-        private float _minX = 0;
-        private float _minY = 0;
-        private float _maxX = 0;
-        private float _maxY = 0;
-
+        private DataScaler _dataScaler = new DataScaler();
+        private Stopwatch _frameStopwatch = new Stopwatch();
         private D2D.Brush _textBrush;
         private DW.TextFormat _textFormat;
 
@@ -71,6 +58,11 @@ namespace PanoramicDataWin8.view.vis.render
         public void UpdateFilterModels(List<FilterModel> filterModels)
         {
             _filterModels = filterModels;
+        }
+
+        public void ResetData()
+        {
+            _binPrimitives.Clear();
         }
 
         public void UpdateData(ResultModel resultModel, QueryModel queryModel, InputOperationModel xAom, InputOperationModel yAom)
@@ -201,18 +193,18 @@ namespace PanoramicDataWin8.view.vis.render
             var layoutY = new DW.TextLayout(dwFactory, maxYLabel.Label, _textFormat, 1000f, 1000f);
             var metricsY = layoutY.Metrics;
 
-            _leftOffset = Math.Max(10, metricsY.Width + 10 + 20);
+            _dataScaler.LeftOffset = Math.Max(10, metricsY.Width + 10 + 20);
 
-            _deviceWidth = (float)(d2dDeviceContext.Size.Width / CompositionScaleX - _leftOffset - _rightOffset);
-            _deviceHeight = (float)(d2dDeviceContext.Size.Height / CompositionScaleY - _topOffset - _bottomtOffset);
+            _dataScaler.DeviceWidth = (float)(d2dDeviceContext.Size.Width / CompositionScaleX - _dataScaler.LeftOffset - _dataScaler.RightOffset);
+            _dataScaler.DeviceHeight = (float)(d2dDeviceContext.Size.Height / CompositionScaleY - _dataScaler.TopOffset - _dataScaler.BottomtOffset);
 
-            _minX = (float)(xLabels.Min(dp => dp.MinValue));
-            _minY = (float)(yLabels.Min(dp => dp.MinValue));
-            _maxX = (float)(xLabels.Max(dp => dp.MaxValue));
-            _maxY = (float)(yLabels.Max(dp => dp.MaxValue));
+            _dataScaler.MinX = (float)(xLabels.Min(dp => dp.MinValue));
+            _dataScaler.MinY = (float)(yLabels.Min(dp => dp.MinValue));
+            _dataScaler.MaxX = (float)(xLabels.Max(dp => dp.MaxValue));
+            _dataScaler.MaxY = (float)(yLabels.Max(dp => dp.MaxValue));
 
-            _xScale = _maxX - _minX;
-            _yScale = _maxY - _minY;
+            _dataScaler.XScale = _dataScaler.MaxX - _dataScaler.MinX;
+            _dataScaler.YScale = _dataScaler.MaxY - _dataScaler.MinY;
 
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
 
@@ -223,14 +215,14 @@ namespace PanoramicDataWin8.view.vis.render
             bool lastLabel = false;
 
             // x labels and grid lines
-            int mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceWidth / (metricsX.Width + 5))) / xLabels.Count));
+            int mod = (int)Math.Ceiling(1.0 / (Math.Floor((_dataScaler.DeviceWidth / (metricsX.Width + 5))) / xLabels.Count));
             int count = 0;
             foreach (var label in xLabels)
             {
-                yFrom = toScreenY(_minY);
-                yTo = toScreenY(_maxY);
-                xFrom = toScreenX((float)label.MinValue);
-                xTo = toScreenX((float)label.MaxValue);
+                yFrom = _dataScaler.ToScreenY(_dataScaler.MinY);
+                yTo = _dataScaler.ToScreenY(_dataScaler.MaxY);
+                xFrom = _dataScaler.ToScreenX((float)label.MinValue);
+                xTo = _dataScaler.ToScreenX((float)label.MaxValue);
                 lastLabel = count + 1 == xLabels.Count;
 
                 if (renderLines)
@@ -256,14 +248,14 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             // y labels and grid lines
-            mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceHeight / (metricsY.Height + 0))) / yLabels.Count));
+            mod = (int)Math.Ceiling(1.0 / (Math.Floor((_dataScaler.DeviceHeight / (metricsY.Height + 0))) / yLabels.Count));
             count = 0;
             foreach (var label in yLabels)
             {
-                xFrom = toScreenX(_minX);
-                xTo = toScreenX(_maxX);
-                yFrom = toScreenY((float)label.MinValue);
-                yTo = toScreenY((float)label.MaxValue);
+                xFrom = _dataScaler.ToScreenX(_dataScaler.MinX);
+                xTo = _dataScaler.ToScreenX(_dataScaler.MaxX);
+                yFrom = _dataScaler.ToScreenY((float)label.MinValue);
+                yTo = _dataScaler.ToScreenY((float)label.MaxValue);
                 lastLabel = count + 1 == yLabels.Count;
 
                 if (renderLines)
@@ -288,27 +280,6 @@ namespace PanoramicDataWin8.view.vis.render
                 count++;
             }
 
-            /*foreach (var x in _xBinRange.GetBins())
-            {
-                foreach (var y in _yBinRange.GetBins())
-                {
-                    var roundedRect = new D2D.RoundedRectangle();
-                    xFrom = toScreenX((float)x);
-                    yFrom = toScreenY((float)y);
-                    xTo = toScreenX((float)_xBinRange.AddStep(x));
-                    yTo = toScreenY((float)_yBinRange.AddStep(y));
-
-                    roundedRect.Rect = new RectangleF(
-                        xFrom,
-                        yTo,
-                        xTo - xFrom,
-                        yFrom - yTo);
-                    roundedRect.RadiusX = roundedRect.RadiusY = 4;
-                   
-                    d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
-                }
-            }    */       
-
             white.Dispose();
             layoutX.Dispose();
             layoutY.Dispose();
@@ -317,10 +288,12 @@ namespace PanoramicDataWin8.view.vis.render
         private void renderCell(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
         {
             computeSizesAndRenderLabels(d2dDeviceContext, dwFactory, false);
-            if (_deviceHeight < 0 || _deviceWidth < 0)
+            if (_dataScaler.DeviceHeight < 0 || _dataScaler.DeviceWidth < 0)
             {
                 return;
             }
+
+            _frameStopwatch.Stop();
 
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
             var dark = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(11f / 255f, 11f / 255f, 11f / 255f, 1f));
@@ -347,54 +320,39 @@ namespace PanoramicDataWin8.view.vis.render
                     {
                         foreach (var resultItem in _binDictonary[binIndex])
                         {
-                            double? xValue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.X).First()].Value;
-                            double? yValue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Y).First()].Value;
-                            double? value = null;
-                            if (_queryModel.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()))
+                            BinIndex renderBinIndex = new BinIndex();
+                            for (int d = 0; d < resultDescriptionModel.Dimensions.Count; d++)
                             {
-                                value = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()].NoramlizedValue;
+                                renderBinIndex.Indices.Add(resultDescriptionModel.BinRanges[d].GetIndex((double) resultItem.Values[resultDescriptionModel.Dimensions[d]].Value));
                             }
-                            else if (_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
+                            BinPrimitive binPrimitive = null;
+                            if (_binPrimitives.ContainsKey(renderBinIndex))
                             {
-                                value = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
+                                binPrimitive = _binPrimitives[renderBinIndex];
+                                binPrimitive.Update(resultItem, _frameStopwatch.ElapsedMilliseconds, _queryModel, _xBinRange, _yBinRange, xBins, yBins, _dataScaler);
                             }
-
-                            if (value != null)
+                            else
                             {
-                                xFrom = toScreenX((float)xBins[_xBinRange.GetIndex(xValue.Value)]);
-                                yFrom = toScreenY((float)yBins[_yBinRange.GetIndex(yValue.Value)]);
-                                xTo = toScreenX((float)xBins[_xBinRange.GetIndex(_xBinRange.AddStep(xValue.Value))]);
-                                yTo = toScreenY((float)yBins[_yBinRange.GetIndex(_yBinRange.AddStep(yValue.Value))]);
-
-                                float alpha = 0.1f * (float)Math.Log10(value.Value) + 1f;
-                                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value.Value));
-                                var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
-
-                                roundedRect.Rect = new RectangleF(
-                                    xFrom,
-                                    yTo,
-                                    xTo - xFrom,
-                                    yFrom - yTo);
-                                roundedRect.RadiusX = roundedRect.RadiusY = 4;
-                                d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
-                                //d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
-                                binColor.Dispose();
-
-                                if (_isXAxisAggregated || _isYAxisAggregated)
-                                {
-                                    IGeometry hitGeom = new Rct(xFrom, yTo, xTo - xFrom, yFrom - yTo).GetPolygon();
-                                    //HitTargets.Add(hitGeom, resultItem);
-                                }
+                                binPrimitive = new BinPrimitive();
+                                //binPrimitive.Initialize(resultItem, _frameStopwatch.ElapsedMilliseconds, _queryModel, _xBinRange, _yBinRange, xBins, yBins, _dataScaler);
+                                _binPrimitives.Add(renderBinIndex, binPrimitive);
                             }
+                            binPrimitive.Animate(_frameStopwatch.ElapsedMilliseconds);
+
+                            var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(binPrimitive.A));
+                            var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
+                            binPrimitive.Render(d2dDeviceContext, binColor, true);
+                             
+                            binColor.Dispose();
                         }
                     }
 
                     if (!_isXAxisAggregated && !_isYAxisAggregated)
                     {
-                        xFrom = toScreenX((float) xBins[xi]);
-                        yFrom = toScreenY((float) yBins[yi]);
-                        xTo = toScreenX((float) xBins[xi + 1]);
-                        yTo = toScreenY((float) yBins[yi + 1]);
+                        xFrom = _dataScaler.ToScreenX((float) xBins[xi]);
+                        yFrom = _dataScaler.ToScreenY((float) yBins[yi]);
+                        xTo = _dataScaler.ToScreenX((float) xBins[xi + 1]);
+                        yTo = _dataScaler.ToScreenY((float) yBins[yi + 1]);
                         roundedRect.Rect = new RectangleF(
                             xFrom,
                             yTo,
@@ -424,10 +382,10 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     if (!_isXAxisAggregated && !_isYAxisAggregated)
                     {
-                        xFrom = toScreenX((float)xBins[xi]);
-                        yFrom = toScreenY((float)yBins[yi]);
-                        xTo = toScreenX((float)xBins[xi + 1]);
-                        yTo = toScreenY((float)yBins[yi + 1]);
+                        xFrom = _dataScaler.ToScreenX((float)xBins[xi]);
+                        yFrom = _dataScaler.ToScreenY((float)yBins[yi]);
+                        xTo = _dataScaler.ToScreenX((float)xBins[xi + 1]);
+                        yTo = _dataScaler.ToScreenY((float)yBins[yi + 1]);
                         roundedRect.Rect = new RectangleF(
                                     xFrom,
                                     yTo,
@@ -451,6 +409,8 @@ namespace PanoramicDataWin8.view.vis.render
             }
             dark.Dispose();
             white.Dispose();
+
+            _frameStopwatch.Start();
         }
 
         public override void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
@@ -459,11 +419,111 @@ namespace PanoramicDataWin8.view.vis.render
             _textBrush = disposeCollector.Collect(new D2D.SolidColorBrush(d2dDeviceContext, new Color(17, 17, 17)));
         }
 
-        private float toScreenX(float x)
+        
+    }
+
+    public class DataScaler
+    {
+        private float _leftOffset = 40;
+        private float _rightOffset = 10;
+        private float _topOffset = 10;
+        private float _bottomtOffset = 45;
+
+        private float _deviceWidth = 0;
+        private float _deviceHeight = 0;
+        private float _xScale = 0;
+        private float _yScale = 0;
+
+        private bool _flipY = true;
+        private float _minX = 0;
+        private float _minY = 0;
+        private float _maxX = 0;
+        private float _maxY = 0;
+
+        public float LeftOffset
+        {
+            get { return _leftOffset; }
+            set { _leftOffset = value; }
+        }
+
+        public float RightOffset
+        {
+            get { return _rightOffset; }
+            set { _rightOffset = value; }
+        }
+
+        public float TopOffset
+        {
+            get { return _topOffset; }
+            set { _topOffset = value; }
+        }
+
+        public float BottomtOffset
+        {
+            get { return _bottomtOffset; }
+            set { _bottomtOffset = value; }
+        }
+
+        public float DeviceWidth
+        {
+            get { return _deviceWidth; }
+            set { _deviceWidth = value; }
+        }
+
+        public float DeviceHeight
+        {
+            get { return _deviceHeight; }
+            set { _deviceHeight = value; }
+        }
+
+        public float XScale
+        {
+            get { return _xScale; }
+            set { _xScale = value; }
+        }
+
+        public float YScale
+        {
+            get { return _yScale; }
+            set { _yScale = value; }
+        }
+
+        public bool FlipY
+        {
+            get { return _flipY; }
+            set { _flipY = value; }
+        }
+
+        public float MinX
+        {
+            get { return _minX; }
+            set { _minX = value; }
+        }
+
+        public float MinY
+        {
+            get { return _minY; }
+            set { _minY = value; }
+        }
+
+        public float MaxX
+        {
+            get { return _maxX; }
+            set { _maxX = value; }
+        }
+
+        public float MaxY
+        {
+            get { return _maxY; }
+            set { _maxY = value; }
+        }
+
+        public float ToScreenX(float x)
         {
             return ((x - _minX) / _xScale) * (_deviceWidth) + (_leftOffset);
         }
-        private float toScreenY(float y)
+
+        public float ToScreenY(float y)
         {
             float retY = ((y - _minY) / _yScale) * (_deviceHeight);
             return _flipY ? (_deviceHeight) - retY + (_topOffset) : retY + (_topOffset);
@@ -472,29 +532,172 @@ namespace PanoramicDataWin8.view.vis.render
 
     public class BinPrimitive
     {
+        private double? _xValue = null;
+        private double? _yValue  = null;
+        private double? _value = null;
+        private List<double> _xBins = null;
+        private List<double> _yBins = null;
+
         public float X { get; set; }
         public float Y { get; set; }
         public float TargetX { get; set; }
-        public float TargetY { get; set; } 
+        public float TargetY { get; set; }
+        public float StartX { get; set; }
+        public float StartY { get; set; } 
         public float W { get; set; }
         public float H { get; set; }
         public float TargetW { get; set; }
         public float TargetH { get; set; }
+        public float StartW { get; set; }
+        public float StartH { get; set; }
         public float A { get; set; }
         public float TargetA { get; set; }
+        public float StartA { get; set; }
+        public long XAninmationStartTime { get; set; }
+        public long YAninmationStartTime { get; set; }
+        public long AAninmationStartTime { get; set; }
+
+        public bool IsInitialized { get; set; }
+
+        public void Initialize(VisualizationItemResultModel resultItem, long elapsedTime, QueryModel queryModel, BinRange xBinRange, BinRange yBinRange, List<double> xBins, List<double> yBins, DataScaler dataScaler)
+        {
+            //Update(resultItem, elapsedTime, queryModel, xBinRange, yBinRange, xBins, yBins, dataScaler);
+
+            IsInitialized = true;
+            A = StartA = 0;
+            X = StartX = TargetX;
+            Y = StartY = TargetY;
+            H = StartH = TargetH;
+            W = StartW = TargetW;
+            _xBins = xBins;
+            _yBins = yBins;
+        }
+
+        public void Update(VisualizationItemResultModel resultItem, long elapsedTime, QueryModel queryModel, BinRange xBinRange, BinRange yBinRange, List<double> xBins, List<double> yBins, DataScaler dataScaler)
+        {
+            double? newXValue = null;
+            double? newYValue = null;
+            double? newValue = null;
+            
+            getRawValues(out newXValue, out newYValue, out newValue, resultItem, queryModel);
+            float xFrom = 0;
+            float yFrom = 0;
+            float xTo = 0;
+            float yTo = 0;
+            float a = 0;
+
+            getScreenValues(out xFrom, out yFrom, out xTo, out yTo, out a, xBinRange, yBinRange, xBins, yBins, newXValue, newYValue, newValue, dataScaler);
+
+            if (newXValue.HasValue && newYValue.HasValue && newValue.HasValue)
+            {
+                if (newXValue != _xValue || _xBins.Count != xBins.Count || _yBins.Count != yBins.Count)
+                {
+                    _xValue = newXValue;
+                    _xBins = xBins;
+                    XAninmationStartTime = elapsedTime;
+                    TargetX = xFrom;
+                    TargetW = xTo - xFrom;
+                    StartX = X;
+                    StartW = W;
+                }
+                if (newYValue != _yValue || _yBins.Count != yBins.Count || _xBins.Count != xBins.Count)
+                {
+                    _yValue = newYValue;
+                    _yBins = yBins;
+                    YAninmationStartTime = elapsedTime;
+                    TargetY = yTo;
+                    TargetH = yFrom - yTo;
+                    StartY = Y;
+                    StartH = H;
+                }
+                if (newValue != _value)
+                {
+                    _value = newValue;
+                    AAninmationStartTime = elapsedTime;
+                    TargetA = (float) a;
+                    StartA = A;
+                }
+
+                if (!IsInitialized)
+                {
+                    Initialize(resultItem, elapsedTime, queryModel, xBinRange, yBinRange, xBins, yBins, dataScaler);
+                }
+            }
+        }
+
+        private void getRawValues(out double? xValue, out double? yValue, out double? value,
+            VisualizationItemResultModel resultItem, QueryModel queryModel)
+        {
+            xValue = (double?) resultItem.Values[queryModel.GetUsageInputOperationModel(InputUsage.X).First()].Value;
+            yValue = (double?) resultItem.Values[queryModel.GetUsageInputOperationModel(InputUsage.Y).First()].Value;
+            value = null;
+            if (queryModel.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(queryModel.GetUsageInputOperationModel(InputUsage.Value).First()))
+            {
+                value = (double?) resultItem.Values[queryModel.GetUsageInputOperationModel(InputUsage.Value).First()].NoramlizedValue;
+            }
+            else if (queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() &&
+                     resultItem.Values.ContainsKey(queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
+            {
+                value = (double?) resultItem.Values[queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
+            }
+        }
+
+        private bool getScreenValues(out float xFrom, out float yFrom, out float xTo, out float yTo, out float a,
+            BinRange xBinRange, BinRange yBinRange, List<double> xBins, List<double> yBins,
+            double? xValue, double? yValue, double? value, DataScaler dataScaler)
+        {
+            xFrom = 0;
+            yFrom = 0;
+            xTo = 0;
+            yTo = 0;
+            a = 0;
+
+            if (value.HasValue && xValue.HasValue && yValue.HasValue)
+            {
+                xFrom = dataScaler.ToScreenX((float) xBins[xBinRange.GetIndex(xValue.Value)]);
+                yFrom = dataScaler.ToScreenY((float) yBins[yBinRange.GetIndex(yValue.Value)]);
+                xTo = dataScaler.ToScreenX((float) xBins[xBinRange.GetIndex(xBinRange.AddStep(xValue.Value))]);
+                yTo = dataScaler.ToScreenY((float) yBins[yBinRange.GetIndex(yBinRange.AddStep(yValue.Value))]);
+                a = (float)Math.Sqrt(value.Value);
+                return true;
+            }
+            return false;
+        }
 
         public void Render(D2D.DeviceContext d2dDeviceContext, D2D.SolidColorBrush brush, bool fill)
         {
-            var roundedRect = new D2D.RoundedRectangle {Rect = new RectangleF(X, Y, W, H)};
-            roundedRect.RadiusX = roundedRect.RadiusY = 4;
-            if (fill)
+            if (_value.HasValue && _xValue.HasValue && _yValue.HasValue)
             {
-                d2dDeviceContext.FillRoundedRectangle(roundedRect, brush);
+                var roundedRect = new D2D.RoundedRectangle {Rect = new RectangleF(X, Y, W, H)};
+                roundedRect.RadiusX = roundedRect.RadiusY = 4;
+                if (fill)
+                {
+                    d2dDeviceContext.FillRoundedRectangle(roundedRect, brush);
+                }
+                else
+                {
+                    d2dDeviceContext.DrawRoundedRectangle(roundedRect, brush);
+                }
             }
-            else
-            {
-                d2dDeviceContext.DrawRoundedRectangle(roundedRect, brush);
-            }
+        }
+
+        public void Animate(long elapsedMilliseconds)
+        {
+            long animationDuration = 500;
+            A = QuadraticEaseInOut(elapsedMilliseconds - AAninmationStartTime, StartA, TargetA - StartA, animationDuration);
+            X = QuadraticEaseInOut(elapsedMilliseconds - XAninmationStartTime, StartX, TargetX - StartX, animationDuration);
+            Y = QuadraticEaseInOut(elapsedMilliseconds - YAninmationStartTime, StartY, TargetY - StartY, animationDuration);
+            H = QuadraticEaseInOut(elapsedMilliseconds - YAninmationStartTime, StartH, TargetH - StartH, animationDuration);
+            W = QuadraticEaseInOut(elapsedMilliseconds - XAninmationStartTime, StartW, TargetW - StartW, animationDuration);
+        }
+
+        private float QuadraticEaseInOut(long t, float b, float c, long d)
+        {
+           /* t /= d / 2;
+            if (t < 1) return c / 2.0f * t * t + b;
+            t--;
+            return -c / 2.0f * (t * (t - 2) - 1) + b;*/
+            return c * (float) Math.Min(1.0, (float)t / (float)d) + b;
         }
     }
 }

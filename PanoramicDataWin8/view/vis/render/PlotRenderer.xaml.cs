@@ -53,6 +53,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             _plotRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
             _plotRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
+            dxSurface.IsAnimated = true;
             dxSurface.ContentProvider = _plotRendererContentProvider;
         }
 
@@ -137,6 +138,7 @@ namespace PanoramicDataWin8.view.vis.render
         private void populateHeaders()
         {
             removeMenu();
+            _plotRendererContentProvider.ResetData();
             VisualizationViewModel visModel = (DataContext as VisualizationViewModel);
             QueryModel queryModel = visModel.QueryModel;
             if (queryModel.GetUsageInputOperationModel(InputUsage.X).Any())

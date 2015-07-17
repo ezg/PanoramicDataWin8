@@ -242,7 +242,10 @@ namespace PanoramicDataWin8.view.common
             if (_presenter == null) return;
 
             Redraw();
-
+            if (_contentProvider != null)
+            {
+                _contentProvider.SizeChanged = true;
+            }
             DisposeD2DRenderTarget();
             _presenter.Resize((int)(size.Width * swapChainPanel.CompositionScaleX), (int)(size.Height * swapChainPanel.CompositionScaleY), _presenter.Description.BackBufferFormat);
             CreateD2DRenderTarget();
@@ -262,8 +265,8 @@ namespace PanoramicDataWin8.view.common
             }
 
             _contentProvider.Clear(_graphicsDevice);
-
             DrawContent();
+            _contentProvider.SizeChanged = false;
 
             EndDrawFrame();
         }
@@ -342,6 +345,8 @@ namespace PanoramicDataWin8.view.common
 
     public class DXSurfaceContentProvider
     {
+        public bool SizeChanged { get; set; }
+
         public virtual void Clear(GraphicsDevice graphicsDevice)
         {
             graphicsDevice.Clear(Color.White);
