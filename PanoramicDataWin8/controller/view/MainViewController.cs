@@ -7,6 +7,7 @@ using Windows.ApplicationModel;
 using GeoAPI.Geometries;
 using PanoramicDataWin8.controller.data.sim;
 using PanoramicDataWin8.controller.data.tuppleware;
+using PanoramicDataWin8.controller.data.tuppleware.gateway;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.sim;
@@ -30,7 +31,7 @@ namespace PanoramicDataWin8.controller.view
             _mainPage = mainPage;
 
             _mainModel = new MainModel();
-
+            
             InputFieldViewModel.InputFieldViewModelDropped += InputFieldViewModelDropped;
             InputFieldViewModel.InputFieldViewModelMoved += InputFieldViewModelMoved;
 
@@ -49,28 +50,44 @@ namespace PanoramicDataWin8.controller.view
             _gesturizer.AddGesture(new ConnectGesture(_root));
             _gesturizer.AddGesture(new EraseGesture(_root));
             _gesturizer.AddGesture(new ScribbleGesture(_root));
-
-            loadConfigs();
         }
 
-        private async void loadConfigs()
+        public async void loadConfigs()
         {
             var installedLoc = Package.Current.InstalledLocation;
             var configLoc = await installedLoc.GetFolderAsync(@"Assets\data\config");
-            var configs = await configLoc.GetFilesAsync();
-            foreach (var file in configs)
+            string mainConifgContent = await installedLoc.GetFileAsync(@"Assets\data\config\main.ini").AsTask().ContinueWith(t => Windows.Storage.FileIO.ReadTextAsync(t.Result)).Result;
+            var backend = mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
+                .First(l => l.ToLower().StartsWith("backend"))
+                .Split(new string[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
+            var startDataSet = mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
+                .First(l => l.ToLower().StartsWith("startdataset"))
+                .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
+
+            if (backend.ToLower() == "sim")
             {
-                var content = await Windows.Storage.FileIO.ReadTextAsync(file);
-                _mainModel.DatasetConfigurations.Add(DatasetConfiguration.FromContent(content, file.Name));
+                var configs = await configLoc.GetFilesAsync();
+                foreach (var file in configs)
+                {
+                    var content = await Windows.Storage.FileIO.ReadTextAsync(file);
+                    _mainModel.DatasetConfigurations.Add(DatasetConfiguration.FromContent(content, file.Name));
+                }
+                LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains(startDataSet)));
             }
-            LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("nba")).First());
-            //LoadData(_mainModel.DatasetConfigurations.Where(ds => ds.Name.ToLower().Contains("mimic")).First());
-            //LoadData(_mainModel.DatasetConfigurations.First());
+            else
+            {
+                var loadedDatasetConfigs = await TuppleWareGateway.GetCatalog(backend);
+                foreach (var ds in loadedDatasetConfigs)
+                {
+                    _mainModel.DatasetConfigurations.Add(ds);
+                }
+            }
         }
 
         public static void CreateInstance(InkableScene root, MainPage mainPage)
         {
             _instance = new MainViewController(root, mainPage);
+            _instance.loadConfigs();
         }
         
         public static MainViewController Instance
@@ -148,7 +165,8 @@ namespace PanoramicDataWin8.controller.view
                 _mainModel.SampleSize = datasetConfiguration.SampleSize;
                 (_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter = new TuppleWareQueryExecuter();
                 (_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel = new TuppleWareOriginModel(datasetConfiguration);
-                TuppleWareGateway.PopulateSchema((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
+                (_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel.LoadInputFields();
+                //TuppleWareGateway.GetCatalog((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
                 //((_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter as TuppleWareQueryExecuter).LoadFileDescription((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
             }
         }

@@ -115,6 +115,10 @@
     <Compile Include="controller\data\DataRow.cs" />
     <Compile Include="controller\data\Job.cs" />
     <Compile Include="controller\data\tuppleware\ClassifierJob.cs" />
+    <Compile Include="controller\data\tuppleware\gateway\CatalogCommand.cs" />
+    <Compile Include="controller\data\tuppleware\gateway\ClassifyCommand.cs" />
+    <Compile Include="controller\data\tuppleware\gateway\DataCommand.cs" />
+    <Compile Include="controller\data\tuppleware\json\Catalog.cs" />
     <Compile Include="controller\data\tuppleware\TuppleWareDataProvider.cs" />
     <Compile Include="controller\data\virt\AsyncVirtualizedCollection.cs" />
     <Compile Include="controller\data\virt\DataPage.cs" />
@@ -171,7 +175,7 @@
     <Compile Include="model\data\tuppleware\TuppleWareInputGroupModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareOriginModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareSchemaModel.cs" />
-    <Compile Include="controller\data\tuppleware\TuppleWareGateway.cs" />
+    <Compile Include="controller\data\tuppleware\gateway\TuppleWareGateway.cs" />
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
@@ -310,9 +314,6 @@
     <Content Include="Assets\font\Lato-Bold.ttf" />
     <Content Include="Assets\font\Lato-Thin.ttf" />
     <Content Include="Assets\font\Abel-Regular.ttf" />
-    <Content Include="Assets\data\config\mimic2.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Assets\data\raw\census.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -338,6 +339,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\data\raw\nba_shots_shuff.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\data\config\main.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

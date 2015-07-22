@@ -12,6 +12,71 @@ namespace PanoramicDataWin8.model.data.tuppleware
             _datasetConfiguration = datasetConfiguration;
             
         }
+        
+       /* private static void recursiveCreateAttributeModels(JToken token, TuppleWareInputGroupModel parentGroupModel, TuppleWareOriginModel tuppleWareOriginModel)
+        {
+            if (token is JArray)
+            {
+                if (token[0] is JValue)
+                {
+                    if (token[1] is JValue)
+                    {
+                        TuppleWareFieldInputModel fieldInputModel = new TuppleWareFieldInputModel(token[0].ToString(), "float", token[1].ToString().ToLower() == "true" ? "numeric" : "enum");
+                        fieldInputModel.OriginModel = tuppleWareOriginModel;
+                        if (parentGroupModel != null)
+                        {
+                            parentGroupModel.InputModels.Add(fieldInputModel);
+                        }
+                        else
+                        {
+                            tuppleWareOriginModel.InputModels.Add(fieldInputModel);
+                        }
+                    }
+                    else
+                    {
+                        TuppleWareInputGroupModel groupModel = new TuppleWareInputGroupModel(token[0].ToString());
+                        groupModel.OriginModel = tuppleWareOriginModel;
+                        if (parentGroupModel != null)
+                        {
+                            parentGroupModel.InputModels.Add(groupModel);
+                        }
+                        else
+                        {
+                            tuppleWareOriginModel.InputModels.Add(groupModel);
+                        }
+                        foreach (var child in token[1])
+                        {
+                            recursiveCreateAttributeModels(child, groupModel, tuppleWareOriginModel);
+                        }
+                    }
+                }
+            }
+        */
+        public void LoadInputFields()
+        {
+           /* _idInputModel.OriginModel = this;
+
+            for (int i = 0; i < _datasetConfiguration.InputFieldNames.Count; i++)
+            {
+                InputFieldModel inputModel = new SimInputFieldModel(
+                    _datasetConfiguration.InputFieldNames[i],
+                    _datasetConfiguration.InputFieldDataTypes[i],
+                    _datasetConfiguration.InputFieldVisualizationTypes[i]);
+                inputModel.OriginModel = this;
+                _inputModels.Add(inputModel);
+            }
+
+            _idInputModel.IsDisplayed = false;
+            _inputModels.Add(_idInputModel);
+
+            for (int i = 0; i < _inputModels.Count; i++)
+            {
+                if (_datasetConfiguration.InputFieldIsDisplayed.Count > i && !_datasetConfiguration.InputFieldIsDisplayed[i])
+                {
+                    _inputModels[i].IsDisplayed = false;
+                }
+            }*/
+        }
 
         private DatasetConfiguration _datasetConfiguration = null;
         public DatasetConfiguration DatasetConfiguration

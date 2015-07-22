@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Practices.Prism.Mvvm;
+using PanoramicDataWin8.controller.data.tuppleware.json;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.controller.input
@@ -19,6 +20,20 @@ namespace PanoramicDataWin8.controller.input
             set
             {
                 this.SetProperty(ref _name, value);
+            }
+        }
+
+        private SchemaJson _schemaJson;
+
+        public SchemaJson SchemaJson
+        {
+            get
+            {
+                return _schemaJson;
+            }
+            set
+            {
+                this.SetProperty(ref _schemaJson, value);
             }
         }
 
