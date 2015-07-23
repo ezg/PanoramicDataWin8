@@ -419,7 +419,42 @@ namespace PanoramicDataWin8.view.vis.render
             _textBrush = disposeCollector.Collect(new D2D.SolidColorBrush(d2dDeviceContext, new Color(17, 17, 17)));
         }
 
-        
+        public override void Resize()
+        {
+            if (_resultModel != null)
+            {
+                var resultDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
+
+                var xBins = _xBinRange.GetBins();
+                xBins.Add(_xBinRange.AddStep(xBins.Max()));
+                var yBins = _yBinRange.GetBins();
+                yBins.Add(_yBinRange.AddStep(yBins.Max()));
+
+                for (int xi = 0; xi < resultDescriptionModel.BinRanges[_xIndex].GetBins().Count; xi++)
+                {
+                    for (int yi = 0; yi < resultDescriptionModel.BinRanges[_yIndex].GetBins().Count; yi++)
+                    {
+                        BinIndex binIndex = new BinIndex(xi, yi);
+                        if (_binDictonary.ContainsKey(binIndex))
+                        {
+                            foreach (var resultItem in _binDictonary[binIndex])
+                            {
+                                BinIndex renderBinIndex = new BinIndex();
+                                for (int d = 0; d < resultDescriptionModel.Dimensions.Count; d++)
+                                {
+                                    renderBinIndex.Indices.Add(resultDescriptionModel.BinRanges[d].GetIndex((double) resultItem.Values[resultDescriptionModel.Dimensions[d]].Value));
+                                }
+                                if (_binPrimitives.ContainsKey(renderBinIndex))
+                                {
+                                    var binPrimitive = _binPrimitives[renderBinIndex];
+                                    binPrimitive.Resize(resultItem, _queryModel, _xBinRange, _yBinRange, xBins, yBins, _dataScaler);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public class DataScaler
@@ -537,6 +572,7 @@ namespace PanoramicDataWin8.view.vis.render
         private double? _value = null;
         private List<double> _xBins = null;
         private List<double> _yBins = null;
+        private long _lastElapsedTime = 0;
 
         public float X { get; set; }
         public float Y { get; set; }
@@ -571,6 +607,29 @@ namespace PanoramicDataWin8.view.vis.render
             W = StartW = TargetW;
             _xBins = xBins;
             _yBins = yBins;
+        }
+
+        public void Resize(VisualizationItemResultModel resultItem, QueryModel queryModel, BinRange xBinRange, BinRange yBinRange, List<double> xBins, List<double> yBins, DataScaler dataScaler)
+        {
+            double? newXValue = null;
+            double? newYValue = null;
+            double? newValue = null;
+            
+            getRawValues(out newXValue, out newYValue, out newValue, resultItem, queryModel);
+            float xFrom = 0;
+            float yFrom = 0;
+            float xTo = 0;
+            float yTo = 0;
+            float a = 0;
+
+            getScreenValues(out xFrom, out yFrom, out xTo, out yTo, out a, xBinRange, yBinRange, xBins, yBins, newXValue, newYValue, newValue, dataScaler);
+
+            X = TargetX = xFrom;
+            Y = TargetY = yTo;
+            W = TargetW = xTo - xFrom;
+            H = TargetH = yFrom - yTo;
+            A = TargetA = a;
+            Animate(_lastElapsedTime);
         }
 
         public void Update(VisualizationItemResultModel resultItem, long elapsedTime, QueryModel queryModel, BinRange xBinRange, BinRange yBinRange, List<double> xBins, List<double> yBins, DataScaler dataScaler)
@@ -684,6 +743,7 @@ namespace PanoramicDataWin8.view.vis.render
         public void Animate(long elapsedMilliseconds)
         {
             long animationDuration = 500;
+            _lastElapsedTime = elapsedMilliseconds;
             A = QuadraticEaseInOut(elapsedMilliseconds - AAninmationStartTime, StartA, TargetA - StartA, animationDuration);
             X = QuadraticEaseInOut(elapsedMilliseconds - XAninmationStartTime, StartX, TargetX - StartX, animationDuration);
             Y = QuadraticEaseInOut(elapsedMilliseconds - YAninmationStartTime, StartY, TargetY - StartY, animationDuration);
@@ -693,11 +753,11 @@ namespace PanoramicDataWin8.view.vis.render
 
         private float QuadraticEaseInOut(long t, float b, float c, long d)
         {
-           /* t /= d / 2;
+            /* t /= d / 2;
             if (t < 1) return c / 2.0f * t * t + b;
             t--;
             return -c / 2.0f * (t * (t - 2) - 1) + b;*/
-            return c * (float) Math.Min(1.0, (float)t / (float)d) + b;
+            return c*(float) Math.Min(1.0, (float) t/(float) d) + b;
         }
     }
 }

@@ -9,6 +9,6 @@ namespace PanoramicDataWin8.controller.data.tuppleware.json
     public class SchemaJson
     {
         public int uuid { get; set; }
-        public List<List<string>> schema { get; set; }
+        public List<List<object>> schema { get; set; }
     }
 }

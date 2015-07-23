@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -15,22 +16,12 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
 
     public class TuppleWareGateway
     {
-        public async static Task<List<DatasetConfiguration>> GetCatalog(string url)
-        {
-            CatalogCommand catalogCommand = new CatalogCommand();
-            return await catalogCommand.GetCatalog(url);
-        }
+        private static Random _random = new Random();
+        private static long nextUuid = _random.Next(10000) * 1000;
 
-        public async static Task<JArray> Classify(TuppleWareOriginModel tuppleWareOriginModel, List<InputFieldModel> features, List<InputFieldModel> labels, JobType jobType)
+        public static long GetNextUuid()
         {
-            ClassifyCommand classifyCommand = new ClassifyCommand();
-            return await  classifyCommand.Classify(tuppleWareOriginModel, features, labels, jobType);
-        }
-
-        public async static Task<JArray> GetData(TuppleWareOriginModel tuppleWareOriginModel, List<InputFieldModel> inputModels, string select, int page, int samples)
-        {
-            DataCommand dataCommand = new DataCommand();
-            return await dataCommand.GetData(tuppleWareOriginModel, inputModels, select, page, samples);
+            return nextUuid++;
         }
 
         public static async Task<string> Request(string endPoint, JObject data)

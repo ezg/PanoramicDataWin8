@@ -388,9 +388,9 @@ namespace PanoramicDataWin8
 
         private void addInputButton_Click(object sender, RoutedEventArgs e)
         {
-            if (inputMenu == null || !(inputMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded)
+            MainModel mainModel = (DataContext as MainModel);
+            if (mainModel.SchemaModel != null &&(inputMenu == null || !(inputMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded))
             {
-                MainModel mainModel = (DataContext as MainModel);
                 var buttonBounds = addInputButton.GetBounds(this);
                 var inputModels =
                     mainModel.SchemaModel.OriginModels.First()

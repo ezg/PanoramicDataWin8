@@ -32,6 +32,7 @@ namespace PanoramicDataWin8.view.common
 
         // indicates if the frame needs to be redrawn
         private bool _isDirty;
+        private bool _isResized;
 
         private GraphicsDevice _graphicsDevice; // encapsulates Direct3D11 Device and DeviceContext
         private GraphicsPresenter _presenter; // encapsulates the SwapChain, Backbuffer and DepthStencil buffer
@@ -242,6 +243,7 @@ namespace PanoramicDataWin8.view.common
             if (_presenter == null) return;
 
             Redraw();
+            _isResized = true;
             if (_contentProvider != null)
             {
                 _contentProvider.SizeChanged = true;
@@ -265,7 +267,13 @@ namespace PanoramicDataWin8.view.common
             }
 
             _contentProvider.Clear(_graphicsDevice);
+            
             DrawContent();
+            if (_isResized)
+            {
+                _contentProvider.Resize();
+                _isResized = false;
+            }
             _contentProvider.SizeChanged = false;
 
             EndDrawFrame();
@@ -328,7 +336,7 @@ namespace PanoramicDataWin8.view.common
                 _d2dDeviceContext.BeginDraw();
                 beginDrawCalled = true;
                 _contentProvider.Draw(_d2dDeviceContext, _dwFactory);
-                if (MainViewController.Instance.MainModel.Verbose)
+                if (MainViewController.Instance.MainModel.Verbose && !IsAnimated)
                 {
                     Debug.WriteLine("Render time: " + sw.ElapsedMilliseconds);
                 }
@@ -350,6 +358,9 @@ namespace PanoramicDataWin8.view.common
         public virtual void Clear(GraphicsDevice graphicsDevice)
         {
             graphicsDevice.Clear(Color.White);
+        }
+        public virtual void Resize()
+        {
         }
 
         public virtual void Draw(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)

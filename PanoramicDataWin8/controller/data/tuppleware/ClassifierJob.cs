@@ -52,9 +52,9 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
             List<InputFieldModel> features = new List<InputFieldModel>();
             getInputFieldModelsRecursive(_queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(iom => iom.InputModel).ToList(), features);
-
-            JArray lines = await TuppleWareGateway.Classify(_originModel, features, labels, _queryModelClone.JobType);
-            JObject returnObject = lines[0] as JObject;
+            return;
+            //JArray lines = await TuppleWareGateway.Classify(_originModel, features, labels, _queryModelClone.JobType);
+            JObject returnObject = null;// lines[0] as JObject;
 
             ClassfierResultDescriptionModel resultDescriptionModel = new ClassfierResultDescriptionModel();
             resultDescriptionModel.Labels = labels;

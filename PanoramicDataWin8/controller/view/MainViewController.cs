@@ -56,13 +56,14 @@ namespace PanoramicDataWin8.controller.view
         {
             var installedLoc = Package.Current.InstalledLocation;
             var configLoc = await installedLoc.GetFolderAsync(@"Assets\data\config");
-            string mainConifgContent = await installedLoc.GetFileAsync(@"Assets\data\config\main.ini").AsTask().ContinueWith(t => Windows.Storage.FileIO.ReadTextAsync(t.Result)).Result;
+            string mainConifgContent = await installedLoc.GetFileAsync(@"Assets\data\main.ini").AsTask().ContinueWith(t => Windows.Storage.FileIO.ReadTextAsync(t.Result)).Result;
             var backend = mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
                 .First(l => l.ToLower().StartsWith("backend"))
                 .Split(new string[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
             var startDataSet = mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
                 .First(l => l.ToLower().StartsWith("startdataset"))
                 .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
+
 
             if (backend.ToLower() == "sim")
             {
@@ -72,15 +73,37 @@ namespace PanoramicDataWin8.controller.view
                     var content = await Windows.Storage.FileIO.ReadTextAsync(file);
                     _mainModel.DatasetConfigurations.Add(DatasetConfiguration.FromContent(content, file.Name));
                 }
-                LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains(startDataSet)));
+                if (_mainModel.DatasetConfigurations.Any(ds => ds.Name.ToLower().Contains(startDataSet)))
+                {
+                    LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains(startDataSet)));
+                }
+                else
+                {
+                    LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains("nba")));
+                }
             }
             else
             {
-                var loadedDatasetConfigs = await TuppleWareGateway.GetCatalog(backend);
+                var throttle = double.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                    .First(l => l.ToLower().StartsWith("throttle"))
+                    .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
+                var nrRecords = int.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                    .First(l => l.ToLower().StartsWith("nrofrecords"))
+                    .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
+                var sampleSize = double.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                    .First(l => l.ToLower().StartsWith("samplesize"))
+                    .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
+
+                CatalogCommand catalogCommand = new CatalogCommand();
+                var loadedDatasetConfigs = await catalogCommand.GetCatalog(backend);
                 foreach (var ds in loadedDatasetConfigs)
                 {
+                    ds.ThrottleInMillis = throttle;
+                    ds.SampleSize = sampleSize;
+                    ds.NrOfRecords = nrRecords;
                     _mainModel.DatasetConfigurations.Add(ds);
                 }
+                LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains(startDataSet)));
             }
         }
 

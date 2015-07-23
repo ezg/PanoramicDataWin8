@@ -115,9 +115,10 @@
     <Compile Include="controller\data\DataRow.cs" />
     <Compile Include="controller\data\Job.cs" />
     <Compile Include="controller\data\tuppleware\ClassifierJob.cs" />
+    <Compile Include="controller\data\tuppleware\gateway\Lookup.cs" />
+    <Compile Include="controller\data\tuppleware\gateway\ProjectCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\CatalogCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\ClassifyCommand.cs" />
-    <Compile Include="controller\data\tuppleware\gateway\DataCommand.cs" />
     <Compile Include="controller\data\tuppleware\json\Catalog.cs" />
     <Compile Include="controller\data\tuppleware\TuppleWareDataProvider.cs" />
     <Compile Include="controller\data\virt\AsyncVirtualizedCollection.cs" />
@@ -341,7 +342,7 @@
     <Content Include="Assets\data\raw\nba_shots_shuff.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\data\config\main.ini">
+    <Content Include="Assets\data\main.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />

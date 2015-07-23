@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.input;
+using Wintellect;
 
 namespace PanoramicDataWin8.model.data.tuppleware
 {
@@ -12,8 +15,8 @@ namespace PanoramicDataWin8.model.data.tuppleware
             _datasetConfiguration = datasetConfiguration;
             
         }
-        
-       /* private static void recursiveCreateAttributeModels(JToken token, TuppleWareInputGroupModel parentGroupModel, TuppleWareOriginModel tuppleWareOriginModel)
+
+        private void recursiveCreateAttributeModels(JToken token, TuppleWareInputGroupModel parentGroupModel, TuppleWareOriginModel tuppleWareOriginModel)
         {
             if (token is JArray)
             {
@@ -51,31 +54,14 @@ namespace PanoramicDataWin8.model.data.tuppleware
                     }
                 }
             }
-        */
+        }
+
         public void LoadInputFields()
         {
-           /* _idInputModel.OriginModel = this;
-
-            for (int i = 0; i < _datasetConfiguration.InputFieldNames.Count; i++)
+            foreach (var child in DatasetConfiguration.SchemaJson["schema"])
             {
-                InputFieldModel inputModel = new SimInputFieldModel(
-                    _datasetConfiguration.InputFieldNames[i],
-                    _datasetConfiguration.InputFieldDataTypes[i],
-                    _datasetConfiguration.InputFieldVisualizationTypes[i]);
-                inputModel.OriginModel = this;
-                _inputModels.Add(inputModel);
+                recursiveCreateAttributeModels(child, null, this);
             }
-
-            _idInputModel.IsDisplayed = false;
-            _inputModels.Add(_idInputModel);
-
-            for (int i = 0; i < _inputModels.Count; i++)
-            {
-                if (_datasetConfiguration.InputFieldIsDisplayed.Count > i && !_datasetConfiguration.InputFieldIsDisplayed[i])
-                {
-                    _inputModels[i].IsDisplayed = false;
-                }
-            }*/
         }
 
         private DatasetConfiguration _datasetConfiguration = null;

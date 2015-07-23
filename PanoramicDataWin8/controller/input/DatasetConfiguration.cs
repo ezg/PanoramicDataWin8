@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Practices.Prism.Mvvm;
+using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.tuppleware.json;
 using PanoramicDataWin8.utils;
 
@@ -10,6 +11,19 @@ namespace PanoramicDataWin8.controller.input
 {
     public class DatasetConfiguration :BindableBase
     {
+        private long _baseUUID;
+        public long BaseUUID
+        {
+            get
+            {
+                return _baseUUID;
+            }
+            set
+            {
+                this.SetProperty(ref _baseUUID, value);
+            }
+        }
+
         private string _name;
         public string Name
         {
@@ -23,9 +37,9 @@ namespace PanoramicDataWin8.controller.input
             }
         }
 
-        private SchemaJson _schemaJson;
+        private JToken _schemaJson;
 
-        public SchemaJson SchemaJson
+        public JToken SchemaJson
         {
             get
             {

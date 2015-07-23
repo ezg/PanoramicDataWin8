@@ -20,12 +20,14 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
             foreach (var child in jToken)
             {
                 var schemaName = ((JProperty) child).Name;
-                var schemaJson = ((JProperty)child).Value.ToObject<SchemaJson>();
+                var schemaJson = ((JProperty) child).Value;
                 var dataSetConfig = new DatasetConfiguration
                 {
                     Name = schemaName,
                     SchemaJson = schemaJson,
-                    EndPoint = url
+                    EndPoint = url,
+                    Backend = "tuppleware",
+                    BaseUUID = (long) ((JProperty) child).Value["uuid"]
                 };
                 dataSets.Add(dataSetConfig);
             }
