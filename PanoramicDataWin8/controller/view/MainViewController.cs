@@ -103,7 +103,14 @@ namespace PanoramicDataWin8.controller.view
                     ds.NrOfRecords = nrRecords;
                     _mainModel.DatasetConfigurations.Add(ds);
                 }
-                LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains(startDataSet)));
+                if (_mainModel.DatasetConfigurations.Any(ds => ds.Name.ToLower().Contains(startDataSet)))
+                {
+                    LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains(startDataSet)));
+                }
+                else
+                {
+                    LoadData(_mainModel.DatasetConfigurations.First());
+                }
             }
         }
 
