@@ -127,10 +127,10 @@ namespace PanoramicDataWin8.view.vis
                 
                 
             }
-            else if (visualizationViewModel.QueryModel.JobType == JobType.logreg ||
-                visualizationViewModel.QueryModel.JobType == JobType.tree ||
-                visualizationViewModel.QueryModel.JobType == JobType.forest ||
-                visualizationViewModel.QueryModel.JobType == JobType.svm)
+            else if (visualizationViewModel.QueryModel.JobType == JobType.logistic_regression ||
+                visualizationViewModel.QueryModel.JobType == JobType.random_forest ||
+                visualizationViewModel.QueryModel.JobType == JobType.svm ||
+                visualizationViewModel.QueryModel.JobType == JobType.naive_bayes)
             {
                 _renderer = new ClassifierRenderer();
                 contentGrid.Children.Add(_renderer);

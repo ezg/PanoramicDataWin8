@@ -9,7 +9,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
 {
     public class LookupCommand
     {
-        public async Task<JArray> Lookup(TuppleWareOriginModel tuppleWareOriginModel, long uuid, int page, int samples)
+        public async Task<JToken> Lookup(TuppleWareOriginModel tuppleWareOriginModel, long uuid, int page, int samples)
         {
             //{'type':'lookup','uuid':uuid,'page_size':page_size,'page_num':page_num}
             JObject data = new JObject(
@@ -19,7 +19,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
                 new JProperty("page_num", page));
             string response = await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
             JToken token = JToken.Parse(response);
-            return token as JArray;
+            return token;
         }
     }
 }

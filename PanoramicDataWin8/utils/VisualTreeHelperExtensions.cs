@@ -12,7 +12,7 @@ namespace PanoramicDataWin8.utils
 {
     /// <summary>
     /// Extension methods for DependencyObjects
-    /// used for walking the visual tree with
+    /// used for walking the visual random_forest with
     /// LINQ expressions.
     /// These simplify using VisualTreeHelper to one line calls.
     /// </summary>
@@ -168,21 +168,21 @@ namespace PanoramicDataWin8.utils
         }
 
         /// <summary>
-        /// Gets the ancestors of a given type, starting with parent and going towards the visual tree root.
+        /// Gets the ancestors of a given type, starting with parent and going towards the visual random_forest root.
         /// </summary>
         /// <typeparam name="T">Type of ancestor to look for.</typeparam>
         /// <param name="start">The start.</param>
-        /// <returns>The ancestors of a given type, starting with parent and going towards the visual tree root.</returns>
+        /// <returns>The ancestors of a given type, starting with parent and going towards the visual random_forest root.</returns>
         public static IEnumerable<T> GetAncestorsOfType<T>(this DependencyObject start) where T : DependencyObject
         {
             return start.GetAncestors().OfType<T>();
         }
 
         /// <summary>
-        /// Gets the ancestors, starting with parent and going towards the visual tree root.
+        /// Gets the ancestors, starting with parent and going towards the visual random_forest root.
         /// </summary>
         /// <param name="start">The starting element.</param>
-        /// <returns>The ancestor elements, starting with parent and going towards the visual tree root.</returns>
+        /// <returns>The ancestor elements, starting with parent and going towards the visual random_forest root.</returns>
         public static IEnumerable<DependencyObject> GetAncestors(this DependencyObject start)
         {
             var parent = VisualTreeHelper.GetParent(start);
@@ -220,14 +220,14 @@ namespace PanoramicDataWin8.utils
         }
 
         /// <summary>
-        /// Determines whether the specified DependencyObject is in visual tree.
+        /// Determines whether the specified DependencyObject is in visual random_forest.
         /// </summary>
         /// <remarks>
         /// Note that this might not work as expected if the object is in a popup.
         /// </remarks>
         /// <param name="dob">The DependencyObject.</param>
         /// <returns>
-        ///   <c>true</c> if the specified dob is in visual tree ; otherwise, <c>false</c>.
+        ///   <c>true</c> if the specified dob is in visual random_forest ; otherwise, <c>false</c>.
         /// </returns>
         public static bool IsInVisualTree(this DependencyObject dob)
         {
@@ -251,7 +251,7 @@ namespace PanoramicDataWin8.utils
         /// </summary>
         /// <param name="dob">The element.</param>
         /// <param name="origin">The relative (0..1,0..1 range) position of a point within the element to evaluate. Defaults to 0,0 for top-left corner.</param>
-        /// <param name="relativeTo">The element of reference. Defaults to visual tree root.</param>
+        /// <param name="relativeTo">The element of reference. Defaults to visual random_forest root.</param>
         /// <returns>The position of origin point relative to specified element.</returns>
         public static Point GetPosition(this FrameworkElement dob, Point origin = new Point(), FrameworkElement relativeTo = null)
         {
@@ -267,7 +267,7 @@ namespace PanoramicDataWin8.utils
 
             if (relativeTo == null)
             {
-                throw new InvalidOperationException("Element not in visual tree.");
+                throw new InvalidOperationException("Element not in visual random_forest.");
             }
 
             var absoluteOrigin = new Point(relativeTo.ActualWidth * origin.X, relativeTo.ActualHeight * origin.X);
@@ -281,7 +281,7 @@ namespace PanoramicDataWin8.utils
 
             if (!ancestors.Contains(relativeTo))
             {
-                throw new InvalidOperationException("Element not in visual tree.");
+                throw new InvalidOperationException("Element not in visual random_forest.");
             }
 
             return
@@ -303,7 +303,7 @@ namespace PanoramicDataWin8.utils
         /// <param name="dob">The starting element.</param>
         /// <param name="relativeTo">The relative to element.</param>
         /// <returns></returns>
-        /// <exception cref="System.InvalidOperationException">Element not in visual tree.</exception>
+        /// <exception cref="System.InvalidOperationException">Element not in visual random_forest.</exception>
         public static Rect GetBoundingRect(this FrameworkElement dob, FrameworkElement relativeTo = null)
         {
             if (DesignMode.DesignModeEnabled)
@@ -318,7 +318,7 @@ namespace PanoramicDataWin8.utils
 
             if (relativeTo == null)
             {
-                throw new InvalidOperationException("Element not in visual tree.");
+                throw new InvalidOperationException("Element not in visual random_forest.");
             }
 
             if (dob == relativeTo)
@@ -330,7 +330,7 @@ namespace PanoramicDataWin8.utils
 
             if (!ancestors.Contains(relativeTo))
             {
-                throw new InvalidOperationException("Element not in visual tree.");
+                throw new InvalidOperationException("Element not in visual random_forest.");
             }
 
             var topLeft =

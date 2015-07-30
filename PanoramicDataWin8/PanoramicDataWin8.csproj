@@ -119,7 +119,7 @@
     <Compile Include="controller\data\tuppleware\gateway\ProjectCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\CatalogCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\ClassifyCommand.cs" />
-    <Compile Include="controller\data\tuppleware\json\Catalog.cs" />
+    <Compile Include="controller\data\tuppleware\json\ClassifyResult.cs" />
     <Compile Include="controller\data\tuppleware\TuppleWareDataProvider.cs" />
     <Compile Include="controller\data\virt\AsyncVirtualizedCollection.cs" />
     <Compile Include="controller\data\virt\DataPage.cs" />

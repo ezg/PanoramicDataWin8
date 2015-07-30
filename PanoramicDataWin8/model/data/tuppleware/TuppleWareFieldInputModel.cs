@@ -5,11 +5,12 @@ namespace PanoramicDataWin8.model.data.tuppleware
     [JsonObject(MemberSerialization.OptOut)]
     public class TuppleWareFieldInputModel : InputFieldModel
     {
-        public TuppleWareFieldInputModel(string name, string inputDataType, string inputVisualizationType)
+        public TuppleWareFieldInputModel(string name, string inputDataType, string inputVisualizationType, bool isBoolean)
         {
             _name = name;
             _inputDataType = inputDataType;
             _inputVisualizationType = inputVisualizationType;
+            _isBoolean = isBoolean;
         }
 
         private string _name = "";
@@ -22,6 +23,19 @@ namespace PanoramicDataWin8.model.data.tuppleware
             set
             {
                 this.SetProperty(ref _name, value);
+            }
+        }
+
+        private bool _isBoolean = false;
+        public bool IsBoolean
+        {
+            get
+            {
+                return _isBoolean;
+            }
+            set
+            {
+                this.SetProperty(ref _isBoolean, value);
             }
         }
 

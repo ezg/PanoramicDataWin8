@@ -9,24 +9,20 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
 {
     public class ClassifyCommand
     {
-        public async Task<JArray> Classify(TuppleWareOriginModel tuppleWareOriginModel, List<InputFieldModel> features, List<InputFieldModel> labels, JobType jobType)
+        public async void Classify(TuppleWareOriginModel tuppleWareOriginModel, 
+            JobType jobType, long labelsUuid, long featuresUuid, long uuid)
         {
             JObject data = new JObject(
-                new JProperty("command", "classify"),
-                new JProperty("classifier", jobType.ToString()),
-                new JProperty("project", string.Join(" ", features.Concat(labels).Select(im => im.Name))),
-                new JProperty("labels", string.Join(" ", labels.Select(im => im.Name))),
-                new JProperty("filename", tuppleWareOriginModel.Name));
-            JToken response = await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
-            if (response is JObject)
-            {
-                JArray arr = new JArray(response);
-                return arr;
-            }
-            else
-            {
-                return response as JArray;
-            }
+                new JProperty("type", "execute"),
+                new JProperty("task",
+                    new JObject(
+                        new JProperty("type", "classify"),
+                        new JProperty("classifier", jobType.ToString()),
+                        new JProperty("params", new JObject()),
+                        new JProperty("labels", labelsUuid),
+                        new JProperty("features", featuresUuid),
+                        new JProperty("uuid", uuid))));
+            await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
         }
     }
 }

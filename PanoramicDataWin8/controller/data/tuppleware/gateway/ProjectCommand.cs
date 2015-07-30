@@ -9,7 +9,7 @@ using PanoramicDataWin8.model.data.tuppleware;
 
 namespace PanoramicDataWin8.controller.data.tuppleware.gateway
 {
-    public class ProjecCommand
+    public class ProjectCommand
     {
         public async void Project(TuppleWareOriginModel tuppleWareOriginModel, long uuid, long sourceUuid, List<InputFieldModel> inputModels)
         {

@@ -428,5 +428,5 @@ namespace PanoramicDataWin8.model.data
     
     public enum VisualizationType { table, bar, map, plot, line }
 
-    public enum JobType { DB, logreg, svm, forest, tree }
+    public enum JobType { DB, logistic_regression, naive_bayes, svm, random_forest }
 }

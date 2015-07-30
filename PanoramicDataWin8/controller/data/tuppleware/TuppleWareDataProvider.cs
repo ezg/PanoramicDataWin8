@@ -34,7 +34,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
             var inputModels = QueryModelClone.InputOperationModels.Select(iom => iom.InputModel as InputFieldModel).ToList();
 
-            ProjecCommand projectCommand = new ProjecCommand();
+            ProjectCommand projectCommand = new ProjectCommand();
             projectCommand.Project(_originModel, _uuid, _originModel.DatasetConfiguration.BaseUUID, inputModels);
             await Task.Delay(200);
         }
@@ -113,7 +113,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             var inputModels = QueryModelClone.InputOperationModels.Select(iom => iom.InputModel as InputFieldModel).ToList();
 
             LookupCommand lookupCommand = new LookupCommand();
-            JArray lines = await lookupCommand.Lookup(_originModel, _uuid, page, sampleSize);
+            JArray lines = await lookupCommand.Lookup(_originModel, _uuid, page, sampleSize) as JArray;
             
             Stopwatch sw = new Stopwatch();
             sw.Start();

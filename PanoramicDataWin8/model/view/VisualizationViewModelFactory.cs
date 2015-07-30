@@ -79,21 +79,21 @@ namespace PanoramicDataWin8.model.view
                     }
                 }
             }
-            else if (jobType == JobType.logreg)
+            else if (jobType == JobType.logistic_regression)
             {
-                visualizationViewModel.QueryModel.JobType = JobType.logreg;
+                visualizationViewModel.QueryModel.JobType = JobType.logistic_regression;
             }
-            else if (jobType == JobType.forest)
+            else if (jobType == JobType.random_forest)
             {
-                visualizationViewModel.QueryModel.JobType = JobType.forest;
+                visualizationViewModel.QueryModel.JobType = JobType.random_forest;
+            }
+            else if (jobType == JobType.naive_bayes)
+            {
+                visualizationViewModel.QueryModel.JobType = JobType.naive_bayes;
             }
             else if (jobType == JobType.svm)
             {
                 visualizationViewModel.QueryModel.JobType = JobType.svm;
-            }
-            else if (jobType == JobType.tree)
-            {
-                visualizationViewModel.QueryModel.JobType = JobType.tree;
             }
 
             return visualizationViewModel;

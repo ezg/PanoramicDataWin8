@@ -185,10 +185,10 @@ namespace PanoramicDataWin8.model.view
                         createDbBottom();
                     }
                 }
-                else if (_visualizationViewModel.QueryModel.JobType == JobType.logreg ||
-                    _visualizationViewModel.QueryModel.JobType == JobType.tree ||
-                    _visualizationViewModel.QueryModel.JobType == JobType.forest ||
-                    _visualizationViewModel.QueryModel.JobType == JobType.svm)
+                else if (_visualizationViewModel.QueryModel.JobType == JobType.logistic_regression ||
+                    _visualizationViewModel.QueryModel.JobType == JobType.random_forest ||
+                    _visualizationViewModel.QueryModel.JobType == JobType.svm ||
+                    _visualizationViewModel.QueryModel.JobType == JobType.naive_bayes)
                 {
                     if (_attachmentOrientation == AttachmentOrientation.Bottom)
                     {

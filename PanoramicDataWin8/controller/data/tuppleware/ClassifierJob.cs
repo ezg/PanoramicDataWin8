@@ -6,8 +6,10 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.tuppleware.gateway;
+using PanoramicDataWin8.controller.data.tuppleware.json;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
@@ -52,50 +54,65 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
             List<InputFieldModel> features = new List<InputFieldModel>();
             getInputFieldModelsRecursive(_queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(iom => iom.InputModel).ToList(), features);
-            return;
-            //JArray lines = await TuppleWareGateway.Classify(_originModel, features, labels, _queryModelClone.JobType);
-            JObject returnObject = null;// lines[0] as JObject;
+
+            long featuresUuid = TuppleWareGateway.GetNextUuid();
+            Dictionary<InputFieldModel, long> labelsUuid = new Dictionary<InputFieldModel, long>();
+            Dictionary<InputFieldModel, long> classifysUuid = new Dictionary<InputFieldModel, long>();
+
+            ProjectCommand projectCommand = new ProjectCommand();
+            ClassifyCommand classifyCommand = new ClassifyCommand();
+            LookupCommand lookupCommand = new LookupCommand();
+
+            projectCommand.Project(_originModel, featuresUuid, _originModel.DatasetConfiguration.BaseUUID, features);
+            
+            foreach (var label in labels)
+            {
+                long labelUuid = TuppleWareGateway.GetNextUuid();
+                labelsUuid.Add(label, labelUuid);
+                projectCommand.Project(_originModel, labelUuid, _originModel.DatasetConfiguration.BaseUUID, new List<InputFieldModel>(){label});
+            }
+
+            await Task.Delay(50);
+
+            foreach (var label in labels)
+            {
+                long clasifyUuid = TuppleWareGateway.GetNextUuid();
+                classifysUuid.Add(label, clasifyUuid);
+                classifyCommand.Classify(_originModel, _queryModelClone.JobType, labelsUuid[label], featuresUuid, clasifyUuid);
+            }
+
+            await Task.Delay(50);
 
             ClassfierResultDescriptionModel resultDescriptionModel = new ClassfierResultDescriptionModel();
             resultDescriptionModel.Labels = labels;
-            foreach (var labelInputFieldModel in labels)
+            foreach (var label in labels)
             {
-                var labelResponse = returnObject[labelInputFieldModel.Name];
-                resultDescriptionModel.ConfusionMatrices.Add(labelInputFieldModel, new List<List<double>>());
-                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel].Add(new List<double>());
-                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][0].Add((double)labelResponse["tn"]);
-                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][0].Add((double)labelResponse["fn"]);
+                JToken classifyResultTocken = await lookupCommand.Lookup(_originModel, classifysUuid[label], -1, -1);
+                var classifyResult = JsonConvert.DeserializeObject<ClassifyResult>(classifyResultTocken.ToString());
 
-                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel].Add(new List<double>());
-                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][1].Add((double)labelResponse["fp"]);
-                resultDescriptionModel.ConfusionMatrices[labelInputFieldModel][1].Add((double)labelResponse["tp"]);
+                resultDescriptionModel.ConfusionMatrices.Add(label, new List<List<double>>());
+                resultDescriptionModel.ConfusionMatrices[label].Add(new List<double>());
+                resultDescriptionModel.ConfusionMatrices[label][0].Add((double) classifyResult.tn);
+                resultDescriptionModel.ConfusionMatrices[label][0].Add((double) classifyResult.fn);
 
-                var xs = labelResponse["fpr"];
-                var ys = labelResponse["tpr"];
-                resultDescriptionModel.RocCurves.Add(labelInputFieldModel, new List<Pt>());
-                resultDescriptionModel.RocCurves[labelInputFieldModel].Add(new Pt(0, 0));
+                resultDescriptionModel.ConfusionMatrices[label].Add(new List<double>());
+                resultDescriptionModel.ConfusionMatrices[label][1].Add((double) classifyResult.fp);
+                resultDescriptionModel.ConfusionMatrices[label][1].Add((double) classifyResult.tp);
+
+                var xs = classifyResult.fpr;
+                var ys = classifyResult.tpr;
+                resultDescriptionModel.RocCurves.Add(label, new List<Pt>());
+                resultDescriptionModel.RocCurves[label].Add(new Pt(0, 0));
                 var step = 1;//ys.Count() > 300 ? 50 : 1;  
-                for(int i = 0; i < xs.Count(); i += step)
+                for (int i = 0; i < xs.Count(); i += step)
                 {
-                    resultDescriptionModel.RocCurves[labelInputFieldModel].Add(new Pt((double)xs[i], (double)ys[i]));
-                } 
-                resultDescriptionModel.RocCurves[labelInputFieldModel].Add(new Pt(1, 1));
+                    resultDescriptionModel.RocCurves[label].Add(new Pt((double)xs[i], (double)ys[i]));
+                }
+                resultDescriptionModel.RocCurves[label].Add(new Pt(1, 1));
 
-                resultDescriptionModel.F1s.Add(labelInputFieldModel, (double) labelResponse["f1"]);
-                resultDescriptionModel.AUCs.Add(labelInputFieldModel, (double)labelResponse["auc"]);
+                resultDescriptionModel.F1s.Add(label, classifyResult.f1);
+                resultDescriptionModel.AUCs.Add(label, classifyResult.auc);
             }
-
-
-            
-            {
-                /*BinRanges = _binner.BinStructure.BinRanges,
-                NullCount = _binner.BinStructure.NullCount,
-                Dimensions = _dimensions,
-                AxisTypes = _axisTypes,
-                MinValues = _binner.BinStructure.AggregatedMinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
-                MaxValues = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => entry.Value)*/
-            };
-
             await fireUpdated(new List<ResultItemModel>(), 1.0, resultDescriptionModel);
             await fireCompleted();
         }
