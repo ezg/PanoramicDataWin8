@@ -92,9 +92,9 @@ namespace PanoramicDataWin8.view.common
             foreach (var oldChildrenViews in _childernMenuItemViews)
             {
                 oldChildrenViews.Dispose();
-                if (MenuCanvas != null && MenuCanvas.Children.Contains(this))
+                if (MenuCanvas != null && MenuCanvas.Children.Contains(oldChildrenViews))
                 {
-                    MenuCanvas.Children.Remove(this);
+                    MenuCanvas.Children.Remove(oldChildrenViews);
                 }
             }
             _childernMenuItemViews.Clear();

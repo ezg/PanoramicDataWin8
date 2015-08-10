@@ -48,7 +48,7 @@ namespace PanoramicDataWin8
         private Point _mainPointerManagerPreviousPoint = new Point();
         private DispatcherTimer _messageTimer = new DispatcherTimer();
 
-        private TileMenuItemView inputMenu = null;
+        private TileMenuItemView _inputMenu = null;
         private TileMenuItemView _visualizationMenu = null;
         private TileMenuItemView _jobMenu = null;
 
@@ -199,12 +199,12 @@ namespace PanoramicDataWin8
             var ancestors = (e.OriginalSource as FrameworkElement).GetAncestors();
             if (!ancestors.Contains(addInputButton) && !ancestors.Contains(menuGrid))
             {
-                if (inputMenu != null)
+                if (_inputMenu != null)
                 {
-                    ((TileMenuItemViewModel) inputMenu.DataContext).AreChildrenExpanded = false;
-                    ((TileMenuItemViewModel) inputMenu.DataContext).IsBeingRemoved = true;
-                    inputMenu.Dispose();
-                    menuCanvas.Children.Remove(inputMenu);
+                    ((TileMenuItemViewModel) _inputMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel) _inputMenu.DataContext).IsBeingRemoved = true;
+                    _inputMenu.Dispose();
+                    menuCanvas.Children.Remove(_inputMenu);
                 }
             }
             if (!ancestors.Contains(addVisualizationButton) && !ancestors.Contains(menuGrid))
@@ -389,19 +389,19 @@ namespace PanoramicDataWin8
         private void addInputButton_Click(object sender, RoutedEventArgs e)
         {
             MainModel mainModel = (DataContext as MainModel);
-            if (mainModel.SchemaModel != null &&(inputMenu == null || !(inputMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded))
+            if (mainModel.SchemaModel != null &&(_inputMenu == null || !(_inputMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded))
             {
                 var buttonBounds = addInputButton.GetBounds(this);
                 var inputModels =
                     mainModel.SchemaModel.OriginModels.First()
                         .InputModels.Where(am => am.IsDisplayed)/*.OrderBy(am => am.Name)*/;
 
-                if (inputMenu != null)
+                if (_inputMenu != null)
                 {
-                    ((TileMenuItemViewModel) inputMenu.DataContext).AreChildrenExpanded = false;
-                    ((TileMenuItemViewModel) inputMenu.DataContext).IsBeingRemoved = true;
-                    inputMenu.Dispose();
-                    menuCanvas.Children.Remove(inputMenu);
+                    ((TileMenuItemViewModel) _inputMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel) _inputMenu.DataContext).IsBeingRemoved = true;
+                    _inputMenu.Dispose();
+                    menuCanvas.Children.Remove(_inputMenu);
                 }
 
                 TileMenuItemViewModel parentModel = new TileMenuItemViewModel(null);
@@ -425,8 +425,8 @@ namespace PanoramicDataWin8
                     }
                 }
 
-                inputMenu = new TileMenuItemView {MenuCanvas = menuCanvas, DataContext = parentModel};
-                menuCanvas.Children.Add(inputMenu);
+                _inputMenu = new TileMenuItemView {MenuCanvas = menuCanvas, DataContext = parentModel};
+                menuCanvas.Children.Add(_inputMenu);
 
                 parentModel.CurrentPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
                 parentModel.TargetPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
