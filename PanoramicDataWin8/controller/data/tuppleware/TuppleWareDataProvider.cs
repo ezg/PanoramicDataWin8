@@ -33,8 +33,17 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
             var inputModels = QueryModelClone.InputOperationModels.Select(iom => iom.InputModel as InputFieldModel).ToList();
 
+            _uuid = _originModel.DatasetConfiguration.BaseUUID;
+            List<FilterModel> filterModels = new List<FilterModel>();
+            string select = getFilterModelsRecursive(QueryModelClone, new List<QueryModel>(), filterModels, true);
+            if (select != "")
+            {
+                SelectCommand selectCommand = new SelectCommand();
+                _uuid = (await selectCommand.Select(_originModel, _uuid, select))["uuid"].Value<string>();
+            }
+            
             ProjectCommand projectCommand = new ProjectCommand();
-            _uuid = (await projectCommand.Project(_originModel, _originModel.DatasetConfiguration.BaseUUID, inputModels))["uuid"].Value<string>();
+            _uuid = (await projectCommand.Project(_originModel, _uuid, inputModels))["uuid"].Value<string>();
         }
 
         public override async Task<DataPage> GetSampleDataRows(int sampleSize)
@@ -116,10 +125,6 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
         private async Task<RawDataPage> getDataFromWeb(int page, int sampleSize)
         {
-            int count = 0;
-            List<FilterModel> filterModels = new List<FilterModel>();
-            string select = getFilterModelsRecursive(QueryModelClone, new List<QueryModel>(), filterModels, true);
-
             var inputModels = QueryModelClone.InputOperationModels.Select(iom => iom.InputModel as InputFieldModel).ToList();
 
             LookupCommand lookupCommand = new LookupCommand();
@@ -196,7 +201,6 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                             items[inputModel] = value;
                         }
                         data.Add(items);
-                        count++;
                     }
                 }
                 if (MainViewController.Instance.MainModel.Verbose)
