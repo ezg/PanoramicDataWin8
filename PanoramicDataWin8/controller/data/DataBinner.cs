@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.common;
+using PanoramicDataWin8.utils;
+using WinRTXamlToolkit.Tools;
 
 namespace PanoramicDataWin8.controller.data
 {
@@ -23,6 +25,7 @@ namespace PanoramicDataWin8.controller.data
 
             if (dataRows.Count == 0)
             {
+                BinStructure.Bins.Values.ForEach(bin => bin.Samples.Clear());
                 return;
             }
 

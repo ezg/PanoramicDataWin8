@@ -57,7 +57,7 @@ namespace PanoramicDataWin8.controller.data.sim
             _nrProcessedSamples = 0;
         }
 
-        public override async Task<List<DataRow>> GetSampleDataRows(int sampleSize)
+        public override async Task<DataPage> GetSampleDataRows(int sampleSize)
         {
             if (_nrProcessedSamples < GetNrTotalSamples())
             {
@@ -72,7 +72,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 {
                     Debug.WriteLine("From File Time: " + sw.ElapsedMilliseconds);
                 }
-                return returnList;
+                return new DataPage() {DataRow = returnList, IsEmpty = false};
             }
             else
             {

@@ -16,7 +16,7 @@ namespace PanoramicDataWin8.controller.data
             var aggregates = queryModel.GetUsageInputOperationModel(InputUsage.Value).Concat(
                              queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue)).Concat(
                              queryModel.GetUsageInputOperationModel(InputUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
-                             queryModel.GetUsageInputOperationModel(InputUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).ToList();
+                             queryModel.GetUsageInputOperationModel(InputUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
 
             // update aggregations and counts
             foreach (var bin in binStructure.Bins.Values)

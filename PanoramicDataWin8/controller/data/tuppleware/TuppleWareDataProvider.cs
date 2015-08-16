@@ -18,14 +18,13 @@ namespace PanoramicDataWin8.controller.data.tuppleware
     {
         private int _nrProcessedSamples = 0;
         private TuppleWareOriginModel _originModel = null;
-        private long _uuid = -1;
+        private string _uuid = "";
 
         public TuppleWareDataProvider(QueryModel queryModelClone, TuppleWareOriginModel originModel)
         {
             QueryModelClone = queryModelClone;
             _originModel = originModel;
             IsInitialized = false;
-            _uuid = TuppleWareGateway.GetNextUuid();
         }
 
         public override async Task StartSampling()
@@ -35,26 +34,37 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             var inputModels = QueryModelClone.InputOperationModels.Select(iom => iom.InputModel as InputFieldModel).ToList();
 
             ProjectCommand projectCommand = new ProjectCommand();
-            projectCommand.Project(_originModel, _uuid, _originModel.DatasetConfiguration.BaseUUID, inputModels);
-            await Task.Delay(200);
+            _uuid = (await projectCommand.Project(_originModel, _originModel.DatasetConfiguration.BaseUUID, inputModels))["uuid"].Value<string>();
         }
 
-        public override async Task<List<DataRow>> GetSampleDataRows(int sampleSize)
+        public override async Task<DataPage> GetSampleDataRows(int sampleSize)
         {
             if (_nrProcessedSamples < GetNrTotalSamples())
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
                 int page = (int) _nrProcessedSamples / sampleSize;
-                List<Dictionary<InputFieldModel, object>> data = await getDataFromWeb(page, sampleSize);
-                List<DataRow> returnList = data.Select(d => new DataRow() { Entries = d }).ToList();
-                _nrProcessedSamples += sampleSize;
-
-                if (MainViewController.Instance.MainModel.Verbose)
+                RawDataPage rawDataPage = await getDataFromWeb(page, sampleSize);
+                if (rawDataPage.IsEmpty)
                 {
-                    Debug.WriteLine("From File Time: " + sw.ElapsedMilliseconds);
+                    return new DataPage() {IsEmpty = true};
                 }
-                return returnList;
+                else
+                {
+                    List<DataRow> returnList = rawDataPage.Data.Select(d => new DataRow() { Entries = d }).ToList();
+                    _nrProcessedSamples += sampleSize;
+
+                    if (MainViewController.Instance.MainModel.Verbose)
+                    {
+                        Debug.WriteLine("From File Time: " + sw.ElapsedMilliseconds);
+                    }
+
+                    if (rawDataPage.Data.Count == 0)
+                    {
+                        _nrProcessedSamples = GetNrTotalSamples();
+                    }
+                    return new DataPage() {DataRow = returnList, IsEmpty = false};
+                }
             }
             else
             {
@@ -104,7 +114,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
         }
 
 
-        private async Task<List<Dictionary<InputFieldModel, object>>> getDataFromWeb(int page, int sampleSize)
+        private async Task<RawDataPage> getDataFromWeb(int page, int sampleSize)
         {
             int count = 0;
             List<FilterModel> filterModels = new List<FilterModel>();
@@ -113,82 +123,89 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             var inputModels = QueryModelClone.InputOperationModels.Select(iom => iom.InputModel as InputFieldModel).ToList();
 
             LookupCommand lookupCommand = new LookupCommand();
-            JArray lines = await lookupCommand.Lookup(_originModel, _uuid, page, sampleSize) as JArray;
-            
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            List<Dictionary<InputFieldModel, object>> data = new List<Dictionary<InputFieldModel, object>>();
-
-            if (lines != null)
+            JToken jToken = await lookupCommand.Lookup(_originModel, _uuid, page, sampleSize) as JToken;
+            if (jToken is JObject && jToken["empty"].Value<bool>())
             {
-                foreach (var line in lines)
+                return new RawDataPage() {IsEmpty = true};
+            }
+            else
+            {
+                JArray lines = (JArray) jToken;
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
+                List<Dictionary<InputFieldModel, object>> data = new List<Dictionary<InputFieldModel, object>>();
+
+                if (lines != null)
                 {
-                    Dictionary<InputFieldModel, object> items = new Dictionary<InputFieldModel, object>();
-
-                    foreach (var inputModel in inputModels)
+                    foreach (var line in lines)
                     {
-                        object value = null;
-                        if (inputModel.InputDataType == InputDataTypeConstants.NVARCHAR)
+                        Dictionary<InputFieldModel, object> items = new Dictionary<InputFieldModel, object>();
+
+                        foreach (var inputModel in inputModels)
                         {
-                            value = line[inputModel.Name].ToString();
-                        }
-                        else if (inputModel.InputDataType == InputDataTypeConstants.FLOAT)
-                        {
-                            double d = 0.0;
-                            if (double.TryParse(line[inputModel.Name].ToString(), out d))
+                            object value = null;
+                            if (inputModel.InputDataType == InputDataTypeConstants.NVARCHAR)
                             {
-                                value = d;
+                                value = line[inputModel.Name].ToString();
                             }
-                        }
-                        else if (inputModel.InputDataType == InputDataTypeConstants.INT)
-                        {
-                            int d = 0;
-                            if (int.TryParse(line[inputModel.Name].ToString(), out d))
+                            else if (inputModel.InputDataType == InputDataTypeConstants.FLOAT)
                             {
-                                value = d;
+                                double d = 0.0;
+                                if (double.TryParse(line[inputModel.Name].ToString(), out d))
+                                {
+                                    value = d;
+                                }
                             }
-                        }
-                        else if (inputModel.InputDataType == InputDataTypeConstants.TIME)
-                        {
-                            DateTime timeStamp = DateTime.Now;
-                            if (DateTime.TryParseExact(line[inputModel.Name].ToString(), new string[] {"HH:mm:ss", "mm:ss", "mm:ss.f", "m:ss"}, null, System.Globalization.DateTimeStyles.None,
-                                out timeStamp))
+                            else if (inputModel.InputDataType == InputDataTypeConstants.INT)
                             {
-                                value = timeStamp;
+                                int d = 0;
+                                if (int.TryParse(line[inputModel.Name].ToString(), out d))
+                                {
+                                    value = d;
+                                }
                             }
-                            else
+                            else if (inputModel.InputDataType == InputDataTypeConstants.TIME)
+                            {
+                                DateTime timeStamp = DateTime.Now;
+                                if (DateTime.TryParseExact(line[inputModel.Name].ToString(), new string[] {"HH:mm:ss", "mm:ss", "mm:ss.f", "m:ss"}, null, System.Globalization.DateTimeStyles.None,
+                                    out timeStamp))
+                                {
+                                    value = timeStamp;
+                                }
+                                else
+                                {
+                                    value = null;
+                                }
+                            }
+                            else if (inputModel.InputDataType == InputDataTypeConstants.DATE)
+                            {
+                                DateTime date = DateTime.Now;
+                                if (DateTime.TryParseExact(line[inputModel.Name].ToString(), new string[] {"MM/dd/yyyy HH:mm:ss", "M/d/yyyy"}, null, System.Globalization.DateTimeStyles.None, out date))
+                                {
+                                    value = date;
+                                }
+                                else
+                                {
+                                    value = null;
+                                }
+                            }
+                            if (value == null || value.ToString().Trim() == "")
                             {
                                 value = null;
                             }
+                            items[inputModel] = value;
                         }
-                        else if (inputModel.InputDataType == InputDataTypeConstants.DATE)
-                        {
-                            DateTime date = DateTime.Now;
-                            if (DateTime.TryParseExact(line[inputModel.Name].ToString(), new string[] {"MM/dd/yyyy HH:mm:ss", "M/d/yyyy"}, null, System.Globalization.DateTimeStyles.None, out date))
-                            {
-                                value = date;
-                            }
-                            else
-                            {
-                                value = null;
-                            }
-                        }
-                        if (value == null || value.ToString().Trim() == "")
-                        {
-                            value = null;
-                        }
-                        items[inputModel] = value;
+                        data.Add(items);
+                        count++;
                     }
-                    data.Add(items);
-                    count++;
                 }
+                if (MainViewController.Instance.MainModel.Verbose)
+                {
+                    Debug.WriteLine("TuppleWare Parse Time: " + sw.ElapsedMilliseconds);
+                }
+
+                return new RawDataPage() {IsEmpty = false, Data = data};
             }
-            if (MainViewController.Instance.MainModel.Verbose)
-            {
-                Debug.WriteLine("TuppleWare Parse Time: " + sw.ElapsedMilliseconds);
-            }
-            
-            return data;
         }
 
 
@@ -209,5 +226,11 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 return NrSamplesToCheck;
             }
         }
+    }
+
+    class RawDataPage
+    {
+        public List<Dictionary<InputFieldModel, object>> Data { get; set; }
+        public bool IsEmpty { get;set; }
     }
 }

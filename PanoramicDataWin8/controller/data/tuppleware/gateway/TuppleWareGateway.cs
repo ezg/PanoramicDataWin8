@@ -16,14 +16,6 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
 
     public class TuppleWareGateway
     {
-        private static Random _random = new Random();
-        private static long nextUuid = _random.Next(10000) * 1000;
-
-        public static long GetNextUuid()
-        {
-            return nextUuid++;
-        }
-
         public static async Task<string> Request(string endPoint, JObject data)
         {
             if (MainViewController.Instance.MainModel.Verbose)

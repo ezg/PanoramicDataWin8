@@ -11,18 +11,19 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
 {
     public class ProjectCommand
     {
-        public async void Project(TuppleWareOriginModel tuppleWareOriginModel, long uuid, long sourceUuid, List<InputFieldModel> inputModels)
+        public async Task<JToken> Project(TuppleWareOriginModel tuppleWareOriginModel, string sourceUuid, List<InputFieldModel> inputModels)
         {
             JObject data = new JObject(
                 new JProperty("type", "execute"),
                 new JProperty("task",
                     new JObject(
                         new JProperty("type", "project"),
-                        new JProperty("uuid", uuid),
                         new JProperty("source", sourceUuid),
                         new JProperty("attributes", 
                             new JArray(inputModels.Select(im => im.Name).Distinct())))));
-            await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
+            string response = await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
+            JObject jObject = JObject.Parse(response);
+            return jObject;
         }
     }
 }

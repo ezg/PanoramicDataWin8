@@ -109,10 +109,16 @@ namespace PanoramicDataWin8.controller.data
             {
                 await _dataProvider.StartSampling();
             }
-
-            List<DataRow> dataRows = await _dataProvider.GetSampleDataRows(_sampleSize);
+            
+            DataPage dataPage = await _dataProvider.GetSampleDataRows(_sampleSize);
+            while (dataPage.IsEmpty)
+            {
+                await Task.Delay(100);
+                dataPage = await _dataProvider.GetSampleDataRows(_sampleSize);
+            }
+            
             List<ResultItemModel> resultItemModels = new List<ResultItemModel>();
-            while (dataRows != null && _isRunning)
+            while (dataPage != null && _isRunning)
             {
                 Stopwatch sw = new Stopwatch();
                 sw.Start();
@@ -122,10 +128,10 @@ namespace PanoramicDataWin8.controller.data
                     {
                         _uniqueValues = _dimensions.Select(d => new Dictionary<object, double>()).ToList();
                     }
-                    setVisualizationValues(dataRows);
+                    setVisualizationValues(dataPage.DataRow);
                     if (_binner != null)
                     {
-                        _binner.BinStep(dataRows);
+                        _binner.BinStep(dataPage.DataRow);
                     }
                     if (_aggregator != null)
                     {
@@ -155,7 +161,7 @@ namespace PanoramicDataWin8.controller.data
                 {
                     Debug.WriteLine("DataJob Iteration Time: " + sw.ElapsedMilliseconds);
                 }
-                dataRows = await _dataProvider.GetSampleDataRows(_sampleSize);
+                dataPage = await _dataProvider.GetSampleDataRows(_sampleSize);
 
                 if (_throttle.Ticks > 0)
                 {

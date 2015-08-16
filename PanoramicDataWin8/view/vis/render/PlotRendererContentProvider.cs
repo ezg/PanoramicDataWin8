@@ -233,7 +233,7 @@ namespace PanoramicDataWin8.view.vis.render
                         d2dDeviceContext.DrawLine(new Vector2(xTo, yFrom), new Vector2(xTo, yTo), white, 0.5f);
                     }
                 }
-                if (count % mod == 0)
+                if (mod != 0 && count % mod == 0)
                 {
                     if (_visualizationDescriptionModel.AxisTypes[_xIndex] == AxisType.Quantitative)
                     {

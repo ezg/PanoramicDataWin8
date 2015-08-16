@@ -55,30 +55,27 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             List<InputFieldModel> features = new List<InputFieldModel>();
             getInputFieldModelsRecursive(_queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(iom => iom.InputModel).ToList(), features);
 
-            long featuresUuid = TuppleWareGateway.GetNextUuid();
-            Dictionary<InputFieldModel, long> labelsUuid = new Dictionary<InputFieldModel, long>();
-            Dictionary<InputFieldModel, long> classifysUuid = new Dictionary<InputFieldModel, long>();
+            Dictionary<InputFieldModel, string> labelsUuid = new Dictionary<InputFieldModel, string>();
+            Dictionary<InputFieldModel, string> classifysUuid = new Dictionary<InputFieldModel, string>();
 
             ProjectCommand projectCommand = new ProjectCommand();
             ClassifyCommand classifyCommand = new ClassifyCommand();
             LookupCommand lookupCommand = new LookupCommand();
 
-            projectCommand.Project(_originModel, featuresUuid, _originModel.DatasetConfiguration.BaseUUID, features);
+            string featuresUuid = (await projectCommand.Project(_originModel, _originModel.DatasetConfiguration.BaseUUID, features))["uuid"].Value<string>();
             
             foreach (var label in labels)
             {
-                long labelUuid = TuppleWareGateway.GetNextUuid();
+                string labelUuid = (await projectCommand.Project(_originModel, _originModel.DatasetConfiguration.BaseUUID, new List<InputFieldModel>(){label}))["uuid"].Value<string>();
                 labelsUuid.Add(label, labelUuid);
-                projectCommand.Project(_originModel, labelUuid, _originModel.DatasetConfiguration.BaseUUID, new List<InputFieldModel>(){label});
             }
 
             await Task.Delay(50);
 
             foreach (var label in labels)
             {
-                long clasifyUuid = TuppleWareGateway.GetNextUuid();
+                string clasifyUuid = (await classifyCommand.Classify(_originModel, _queryModelClone.JobType, labelsUuid[label], featuresUuid))["uuid"].Value<string>();
                 classifysUuid.Add(label, clasifyUuid);
-                classifyCommand.Classify(_originModel, _queryModelClone.JobType, labelsUuid[label], featuresUuid, clasifyUuid);
             }
 
             await Task.Delay(50);
@@ -87,7 +84,14 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             resultDescriptionModel.Labels = labels;
             foreach (var label in labels)
             {
-                JToken classifyResultTocken = await lookupCommand.Lookup(_originModel, classifysUuid[label], -1, -1);
+                JObject classifyResultTocken = await lookupCommand.Lookup(_originModel, classifysUuid[label], -1, -1) as JObject;
+
+                while (classifyResultTocken["empty"] != null && classifyResultTocken["empty"].Value<bool>())
+                {
+                    await Task.Delay(100);
+                    classifyResultTocken = await lookupCommand.Lookup(_originModel, classifysUuid[label], -1, -1) as JObject;
+                }
+
                 var classifyResult = JsonConvert.DeserializeObject<ClassifyResult>(classifyResultTocken.ToString());
 
                 resultDescriptionModel.ConfusionMatrices.Add(label, new List<List<double>>());
@@ -104,11 +108,15 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 resultDescriptionModel.RocCurves.Add(label, new List<Pt>());
                 resultDescriptionModel.RocCurves[label].Add(new Pt(0, 0));
                 var step = 1;//ys.Count() > 300 ? 50 : 1;  
-                for (int i = 0; i < xs.Count(); i += step)
+
+                if (xs != null && ys != null)
                 {
-                    resultDescriptionModel.RocCurves[label].Add(new Pt((double)xs[i], (double)ys[i]));
+                    for (int i = 0; i < xs.Count(); i += step)
+                    {
+                        resultDescriptionModel.RocCurves[label].Add(new Pt((double) xs[i], (double) ys[i]));
+                    }
+                    resultDescriptionModel.RocCurves[label].Add(new Pt(1, 1));
                 }
-                resultDescriptionModel.RocCurves[label].Add(new Pt(1, 1));
 
                 resultDescriptionModel.F1s.Add(label, classifyResult.f1);
                 resultDescriptionModel.AUCs.Add(label, classifyResult.auc);

@@ -9,8 +9,8 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
 {
     public class ClassifyCommand
     {
-        public async void Classify(TuppleWareOriginModel tuppleWareOriginModel, 
-            JobType jobType, long labelsUuid, long featuresUuid, long uuid)
+        public async Task<JToken> Classify(TuppleWareOriginModel tuppleWareOriginModel, 
+            JobType jobType, string labelsUuid, string featuresUuid)
         {
             JObject data = new JObject(
                 new JProperty("type", "execute"),
@@ -19,10 +19,11 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
                         new JProperty("type", "classify"),
                         new JProperty("classifier", jobType.ToString()),
                         new JProperty("params", new JObject()),
-                        new JProperty("labels", labelsUuid),
-                        new JProperty("features", featuresUuid),
-                        new JProperty("uuid", uuid))));
-            await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
+                        new JProperty("label", labelsUuid),
+                        new JProperty("features", featuresUuid))));
+            string response = await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
+            JObject jObject = JObject.Parse(response);
+            return jObject;
         }
     }
 }

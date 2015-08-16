@@ -11,8 +11,8 @@ namespace PanoramicDataWin8.controller.input
 {
     public class DatasetConfiguration :BindableBase
     {
-        private long _baseUUID;
-        public long BaseUUID
+        private string _baseUUID;
+        public string BaseUUID
         {
             get
             {

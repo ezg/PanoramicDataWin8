@@ -27,7 +27,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
                     SchemaJson = schemaJson,
                     EndPoint = url,
                     Backend = "tuppleware",
-                    BaseUUID = (long) ((JProperty) child).Value["uuid"]
+                    BaseUUID = ((JProperty) child).Value["uuid"].Value<string>()
                 };
                 dataSets.Add(dataSetConfig);
             }

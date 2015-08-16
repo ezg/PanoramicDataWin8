@@ -9,7 +9,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
 {
     public class LookupCommand
     {
-        public async Task<JToken> Lookup(TuppleWareOriginModel tuppleWareOriginModel, long uuid, int page, int samples)
+        public async Task<JToken> Lookup(TuppleWareOriginModel tuppleWareOriginModel, string uuid, int page, int samples)
         {
             //{'type':'lookup','uuid':uuid,'page_size':page_size,'page_num':page_num}
             JObject data = new JObject(
