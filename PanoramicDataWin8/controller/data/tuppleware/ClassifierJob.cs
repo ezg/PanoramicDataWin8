@@ -61,12 +61,25 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             ProjectCommand projectCommand = new ProjectCommand();
             ClassifyCommand classifyCommand = new ClassifyCommand();
             LookupCommand lookupCommand = new LookupCommand();
+            SelectCommand selectCommand = new SelectCommand();
 
-            string featuresUuid = (await projectCommand.Project(_originModel, _originModel.DatasetConfiguration.BaseUUID, features))["uuid"].Value<string>();
-            
+            List<FilterModel> filterModels = new List<FilterModel>();
+            string featuresUuid = _originModel.DatasetConfiguration.BaseUUID;
+            string select = FilterModel.GetFilterModelsRecursive(_queryModelClone, new List<QueryModel>(), filterModels, true);
+            if (select != "")
+            {
+                featuresUuid = (await selectCommand.Select(_originModel, featuresUuid, select))["uuid"].Value<string>();
+            }
+            featuresUuid = (await projectCommand.Project(_originModel, featuresUuid, features))["uuid"].Value<string>();
+      
             foreach (var label in labels)
             {
-                string labelUuid = (await projectCommand.Project(_originModel, _originModel.DatasetConfiguration.BaseUUID, new List<InputFieldModel>(){label}))["uuid"].Value<string>();
+                string labelUuid = _originModel.DatasetConfiguration.BaseUUID;
+                if (select != "")
+                {
+                    labelUuid = (await selectCommand.Select(_originModel, labelUuid, select))["uuid"].Value<string>();
+                }
+                labelUuid = (await projectCommand.Project(_originModel, labelUuid, new List<InputFieldModel>() { label }))["uuid"].Value<string>();
                 labelsUuid.Add(label, labelUuid);
             }
 

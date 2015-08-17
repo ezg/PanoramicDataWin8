@@ -48,6 +48,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private QueryModel _queryModel = null;
         private List<FilterModel> _filterModels = new List<FilterModel>();
+        private Dictionary<FilterModel, D2D.RoundedRectangle> _filterModelRects = new Dictionary<FilterModel, D2D.RoundedRectangle>(); 
         private BinRange _xBinRange = null;
         private BinRange _yBinRange = null;
         private bool _isXAxisAggregated = false;
@@ -115,6 +116,18 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 _isYAxisAggregated = true;
                 _yBinRange = QuantitativeBinRange.Initialize(_visualizationDescriptionModel.MinValues[yAom] * (1.0 - factor), _visualizationDescriptionModel.MaxValues[yAom] * (1.0 + factor), 10, false);
+            }
+
+            // scale axis to 0 if this is a bar chart
+            if (_isXAxisAggregated && !_isYAxisAggregated && 
+                (xAom.AggregateFunction == AggregateFunction.Count || xAom.AggregateFunction == AggregateFunction.Sum))
+            {
+                _xBinRange = QuantitativeBinRange.Initialize(0, _xBinRange.DataMaxValue, 10, false);
+            }
+            if (!_isXAxisAggregated && _isYAxisAggregated &&
+               (yAom.AggregateFunction == AggregateFunction.Count || yAom.AggregateFunction == AggregateFunction.Sum))
+            {
+                _yBinRange = QuantitativeBinRange.Initialize(0, _yBinRange.DataMaxValue, 10, false);
             }
 
             // create bin dictionary
@@ -222,91 +235,94 @@ namespace PanoramicDataWin8.view.vis.render
             float yTo = 0;
             bool lastLabel = false;
 
-            // x labels and grid lines
-            int mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceWidth / (metricsX.Width + 5))) / xLabels.Count));
-            int count = 0;
-            foreach (var label in xLabels)
+            if (_deviceWidth > 0 && _deviceHeight > 0)
             {
-                yFrom = toScreenY(_minY);
-                yTo = toScreenY(_maxY);
-                xFrom = toScreenX((float)label.MinValue);
-                xTo = toScreenX((float)label.MaxValue);
-                lastLabel = count + 1 == xLabels.Count;
+                // x labels and grid lines
+                int mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceWidth / (metricsX.Width + 5))) / xLabels.Count));
+                int count = 0;
+                foreach (var label in xLabels)
+                {
+                    yFrom = toScreenY(_minY);
+                    yTo = toScreenY(_maxY);
+                    xFrom = toScreenX((float)label.MinValue);
+                    xTo = toScreenX((float)label.MaxValue);
+                    lastLabel = count + 1 == xLabels.Count;
 
-                if (renderLines)
-                {
-                    d2dDeviceContext.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xFrom, yTo), white, 0.5f);
-                    if (lastLabel)
+                    if (renderLines)
                     {
-                        d2dDeviceContext.DrawLine(new Vector2(xTo, yFrom), new Vector2(xTo, yTo), white, 0.5f);
+                        d2dDeviceContext.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xFrom, yTo), white, 0.5f);
+                        if (lastLabel)
+                        {
+                            d2dDeviceContext.DrawLine(new Vector2(xTo, yFrom), new Vector2(xTo, yTo), white, 0.5f);
+                        }
                     }
+                    if (count % mod == 0)
+                    {
+                        if (_visualizationDescriptionModel.AxisTypes[_xIndex] == AxisType.Quantitative)
+                        {
+                            drawString(d2dDeviceContext, dwFactory, xFrom, yFrom + 5, label.Label.ToString(), true, true, false);
+                        }
+                        else
+                        {
+                            drawString(d2dDeviceContext, dwFactory, xFrom + (xTo - xFrom) / 2.0f, yFrom + 5, label.Label.ToString(), true, true, false);
+                        }
+                    }
+                    count++;
                 }
-                if (count % mod == 0)
-                {
-                    if (_visualizationDescriptionModel.AxisTypes[_xIndex] == AxisType.Quantitative)
-                    {
-                        drawString(d2dDeviceContext, dwFactory, xFrom, yFrom + 5, label.Label.ToString(), true, true, false);
-                    }
-                    else
-                    {
-                        drawString(d2dDeviceContext, dwFactory, xFrom + (xTo - xFrom) / 2.0f, yFrom + 5, label.Label.ToString(), true, true, false);
-                    }
-                }
-                count++;
-            }
 
-            // y labels and grid lines
-            mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceHeight / (metricsY.Height + 0))) / yLabels.Count));
-            count = 0;
-            foreach (var label in yLabels)
-            {
-                xFrom = toScreenX(_minX);
-                xTo = toScreenX(_maxX);
-                yFrom = toScreenY((float)label.MinValue);
-                yTo = toScreenY((float)label.MaxValue);
-                lastLabel = count + 1 == yLabels.Count;
+                // y labels and grid lines
+                mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceHeight / (metricsY.Height + 0))) / yLabels.Count));
+                count = 0;
+                foreach (var label in yLabels)
+                {
+                    xFrom = toScreenX(_minX);
+                    xTo = toScreenX(_maxX);
+                    yFrom = toScreenY((float)label.MinValue);
+                    yTo = toScreenY((float)label.MaxValue);
+                    lastLabel = count + 1 == yLabels.Count;
 
-                if (renderLines)
-                {
-                    d2dDeviceContext.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xTo, yFrom), white, 0.5f);
-                    if (lastLabel)
+                    if (renderLines)
                     {
-                        d2dDeviceContext.DrawLine(new Vector2(xFrom, yTo), new Vector2(xTo, yTo), white, 0.5f);
+                        d2dDeviceContext.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xTo, yFrom), white, 0.5f);
+                        if (lastLabel)
+                        {
+                            d2dDeviceContext.DrawLine(new Vector2(xFrom, yTo), new Vector2(xTo, yTo), white, 0.5f);
+                        }
                     }
+                    if (count % mod == 0)
+                    {
+                        if (_visualizationDescriptionModel.AxisTypes[_yIndex] == AxisType.Quantitative)
+                        {
+                            drawString(d2dDeviceContext, dwFactory, xFrom - 10, yFrom, label.Label.ToString(), false, false, true);
+                        }
+                        else
+                        {
+                            drawString(d2dDeviceContext, dwFactory, xFrom - 10, yFrom + (yTo - yFrom) / 2.0f, label.Label.ToString(), false, false, true);
+                        }
+                    }
+                    count++;
                 }
-                if (count % mod == 0)
-                {
-                    if (_visualizationDescriptionModel.AxisTypes[_yIndex] == AxisType.Quantitative)
-                    {
-                        drawString(d2dDeviceContext, dwFactory, xFrom - 10, yFrom, label.Label.ToString(), false, false, true);
-                    }
-                    else
-                    {
-                        drawString(d2dDeviceContext, dwFactory, xFrom - 10, yFrom + (yTo - yFrom) / 2.0f, label.Label.ToString(), false, false, true);
-                    }
-                }
-                count++;
-            }
 
-            /*foreach (var x in _xBinRange.GetBins())
-            {
-                foreach (var y in _yBinRange.GetBins())
+                /*foreach (var x in _xBinRange.GetBins())
                 {
-                    var roundedRect = new D2D.RoundedRectangle();
-                    xFrom = toScreenX((float)x);
-                    yFrom = toScreenY((float)y);
-                    xTo = toScreenX((float)_xBinRange.AddStep(x));
-                    yTo = toScreenY((float)_yBinRange.AddStep(y));
-                    roundedRect.Rect = new RectangleF(
-                        xFrom,
-                        yTo,
-                        xTo - xFrom,
-                        yFrom - yTo);
-                    roundedRect.RadiusX = roundedRect.RadiusY = 4;
+                    foreach (var y in _yBinRange.GetBins())
+                    {
+                        var roundedRect = new D2D.RoundedRectangle();
+                        xFrom = toScreenX((float)x);
+                        yFrom = toScreenY((float)y);
+                        xTo = toScreenX((float)_xBinRange.AddStep(x));
+                        yTo = toScreenY((float)_yBinRange.AddStep(y));
+                        roundedRect.Rect = new RectangleF(
+                            xFrom,
+                            yTo,
+                            xTo - xFrom,
+                            yFrom - yTo);
+                        roundedRect.RadiusX = roundedRect.RadiusY = 4;
                    
-                    d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
-                }
-            }    */
+                        d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                    }
+                }    */
+            }
 
             white.Dispose();
             layoutX.Dispose();
@@ -331,6 +347,7 @@ namespace PanoramicDataWin8.view.vis.render
 
             // draw data
             HitTargets.Clear();
+            _filterModelRects.Clear();
             var resultDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
             var roundedRect = new D2D.RoundedRectangle();
             float xFrom = 0;
@@ -361,7 +378,16 @@ namespace PanoramicDataWin8.view.vis.render
                             if (value != null)
                             {
                                 xFrom = toScreenX((float)xBins[_xBinRange.GetIndex(xValue.Value)]);
+                                if (_isXAxisAggregated && !_isYAxisAggregated)
+                                {
+                                    xFrom = toScreenX(0);
+                                }
                                 yFrom = toScreenY((float)yBins[_yBinRange.GetIndex(yValue.Value)]);
+                                if (!_isXAxisAggregated && _isYAxisAggregated)
+                                {
+                                    yFrom = toScreenY(0);
+                                }
+
                                 xTo = toScreenX((float)xBins[_xBinRange.GetIndex(_xBinRange.AddStep(xValue.Value))]);
                                 yTo = toScreenY((float)yBins[_yBinRange.GetIndex(_yBinRange.AddStep(yValue.Value))]);
 
@@ -376,62 +402,68 @@ namespace PanoramicDataWin8.view.vis.render
                                     yFrom - yTo);
                                 roundedRect.RadiusX = roundedRect.RadiusY = 4;
                                 d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
-                                //d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
-                                binColor.Dispose();
-
                                 if (_isXAxisAggregated || _isYAxisAggregated)
                                 {
-                                    IGeometry hitGeom = new Rct(xFrom, yTo, xTo - xFrom, yFrom - yTo).GetPolygon();
-                                    //HitTargets.Add(hitGeom, resultItem);
+                                    d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                                    
+                                    IGeometry hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
+                                    var filterModel = new FilterModel();
+                                    for (int i = 0; i < resultDescriptionModel.BinRanges.Count; i++)
+                                    {
+                                        if (!(resultDescriptionModel.BinRanges[i] is AggregateBinRange))
+                                        {
+                                            double? binRangeValue = (double?) resultItem.Values[resultDescriptionModel.Dimensions[i]].Value;
+                                            if (binRangeValue.HasValue)
+                                            {
+                                                var bins = resultDescriptionModel.BinRanges[i].GetBins();
+                                                bins.Add(resultDescriptionModel.BinRanges[i].AddStep(bins.Max()));
+                                                var v = resultDescriptionModel.BinRanges[i].GetIndex(binRangeValue.Value);
+                                                filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.GREATER_THAN_EQUAL, bins[v]));
+                                                filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.LESS_THAN, bins[v + 1]));
+                                            }
+                                        }
+                                    }
+                                    if (!HitTargets.ContainsKey(hitGeom))
+                                    {
+                                        HitTargets.Add(hitGeom, filterModel);
+                                        _filterModelRects.Add(filterModel, roundedRect);
+                                    }
                                 }
                             }
                         }
                     }
-
+                    xFrom = toScreenX((float)xBins[xi]);
+                    yFrom = toScreenY((float)yBins[yi]);
+                    xTo = toScreenX((float)xBins[xi + 1]);
+                    yTo = toScreenY((float)yBins[yi + 1]);
+                    roundedRect.Rect = new RectangleF(
+                                xFrom,
+                                yTo,
+                                xTo - xFrom,
+                                yFrom - yTo);
+                    roundedRect.RadiusX = roundedRect.RadiusY = 4;
                     if (!_isXAxisAggregated && !_isYAxisAggregated)
                     {
-                        xFrom = toScreenX((float)xBins[xi]);
-                        yFrom = toScreenY((float)yBins[yi]);
-                        xTo = toScreenX((float)xBins[xi + 1]);
-                        yTo = toScreenY((float)yBins[yi + 1]);
-                        roundedRect.Rect = new RectangleF(
-                            xFrom,
-                            yTo,
-                            xTo - xFrom,
-                            yFrom - yTo);
-                        roundedRect.RadiusX = roundedRect.RadiusY = 4;
-
-
-                        IGeometry hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
-                        var filterModel = new FilterModel();
-                        filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.GREATER_THAN_EQUAL,
-                            xBins[xi]));
-                        filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.LESS_THAN, xBins[xi + 1]));
-                        filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.GREATER_THAN_EQUAL,
-                            yBins[yi]));
-                        filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.LESS_THAN, yBins[yi + 1]));
-                        HitTargets.Add(hitGeom, filterModel);
-
                         d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
                     }
                 }
             }
 
-            for (int xi = 0; xi < resultDescriptionModel.BinRanges[_xIndex].GetBins().Count; xi++)
+            if (!_isXAxisAggregated && !_isYAxisAggregated)
             {
-                for (int yi = 0; yi < resultDescriptionModel.BinRanges[_yIndex].GetBins().Count; yi++)
+                for (int xi = 0; xi < resultDescriptionModel.BinRanges[_xIndex].GetBins().Count; xi++)
                 {
-                    if (!_isXAxisAggregated && !_isYAxisAggregated)
+                    for (int yi = 0; yi < resultDescriptionModel.BinRanges[_yIndex].GetBins().Count; yi++)
                     {
-                        xFrom = toScreenX((float)xBins[xi]);
-                        yFrom = toScreenY((float)yBins[yi]);
-                        xTo = toScreenX((float)xBins[xi + 1]);
-                        yTo = toScreenY((float)yBins[yi + 1]);
+                        xFrom = toScreenX((float) xBins[xi]);
+                        yFrom = toScreenY((float) yBins[yi]);
+                        xTo = toScreenX((float) xBins[xi + 1]);
+                        yTo = toScreenY((float) yBins[yi + 1]);
                         roundedRect.Rect = new RectangleF(
-                                    xFrom,
-                                    yTo,
-                                    xTo - xFrom,
-                                    yFrom - yTo);
+                            xFrom,
+                            yTo,
+                            xTo - xFrom,
+                            yFrom - yTo);
                         roundedRect.RadiusX = roundedRect.RadiusY = 4;
 
                         IGeometry hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
@@ -440,11 +472,22 @@ namespace PanoramicDataWin8.view.vis.render
                         filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.LESS_THAN, xBins[xi + 1]));
                         filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.GREATER_THAN_EQUAL, yBins[yi]));
                         filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.LESS_THAN, yBins[yi + 1]));
+                        HitTargets.Add(hitGeom, filterModel);
 
                         if (_filterModels.Contains(filterModel))
                         {
                             d2dDeviceContext.DrawRoundedRectangle(roundedRect, dark, 0.5f);
                         }
+                    }
+                }
+            }
+            else
+            {
+                foreach (var filterModel in _filterModelRects.Keys)
+                {
+                    if (_filterModels.Contains(filterModel))
+                    {
+                        d2dDeviceContext.DrawRoundedRectangle(_filterModelRects[filterModel], dark, 0.5f);
                     }
                 }
             }

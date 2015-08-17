@@ -244,12 +244,20 @@ namespace PanoramicDataWin8.utils
         public static Color GetColorFromString(string input)
         {
             Color result = Color.FromArgb(0, 0, 0, 0);
-            if (input.StartsWith("#"))
+            if (input.StartsWith("#") && input.Length == 7)
             {
                 byte red = Convert.ToByte(input.Substring(1, 2), 16);
                 byte green = Convert.ToByte(input.Substring(3, 2), 16);
                 byte blue = Convert.ToByte(input.Substring(5, 2), 16);
                 result = Color.FromArgb(255, red, green, blue);
+            }
+            if (input.StartsWith("#") && input.Length == 9)
+            {
+                byte alpha = Convert.ToByte(input.Substring(1, 2), 16);
+                byte red = Convert.ToByte(input.Substring(3, 2), 16);
+                byte green = Convert.ToByte(input.Substring(5, 2), 16);
+                byte blue = Convert.ToByte(input.Substring(7, 2), 16);
+                result = Color.FromArgb(alpha, red, green, blue);
             }
             return result;
         }

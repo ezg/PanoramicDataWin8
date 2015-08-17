@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
             _uuid = _originModel.DatasetConfiguration.BaseUUID;
             List<FilterModel> filterModels = new List<FilterModel>();
-            string select = getFilterModelsRecursive(QueryModelClone, new List<QueryModel>(), filterModels, true);
+            string select = FilterModel.GetFilterModelsRecursive(QueryModelClone, new List<QueryModel>(), filterModels, true);
             if (select != "")
             {
                 SelectCommand selectCommand = new SelectCommand();
@@ -80,48 +80,6 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 return null;
             }
         }
-
-
-        private string getFilterModelsRecursive(QueryModel queryModel, List<QueryModel> visitedQueryModels, List<FilterModel> filterModels, bool isFirst)
-        {
-            string ret = "";
-            visitedQueryModels.Add(queryModel);
-            if (!isFirst && queryModel.FilterModels.Count > 0)
-            {
-                filterModels.AddRange(queryModel.FilterModels);
-                ret = "(" + string.Join(" or ", queryModel.FilterModels.Select(fm => fm.ToPythonString())) + ")";
-            }
-
-
-            List<string> children = new List<string>();
-            foreach (var linkModel in queryModel.LinkModels)
-            {
-                if (linkModel.FromQueryModel != null && !visitedQueryModels.Contains(linkModel.FromQueryModel))
-                {
-                    var child = getFilterModelsRecursive(linkModel.FromQueryModel, visitedQueryModels, filterModels, false);
-                    if (child != "")
-                    {
-                        children.Add(child);
-                    }
-                }
-            }
-
-            string childrenJoined = string.Join(queryModel.FilteringOperation.ToString().ToLower(), children);
-            if (children.Count > 0)
-            {
-                if (ret != "")
-                {
-                    ret = "(" + ret + " and " + childrenJoined + ")";
-                }
-                else
-                {
-                    ret = "(" + childrenJoined + ")";
-                }
-            }
-
-            return ret;
-        }
-
 
         private async Task<RawDataPage> getDataFromWeb(int page, int sampleSize)
         {

@@ -43,7 +43,7 @@ namespace PanoramicDataWin8.model.data.common
         {
             NominalBinRange scale = new NominalBinRange(dataMinValue, dataMaxValue, targetBinNumber);
             scale.MinValue = dataMinValue;
-            scale.MaxValue = dataMaxValue + 1;
+            scale.MaxValue = dataMaxValue;
             scale.Step = 1;
             return scale;
         }
@@ -51,10 +51,11 @@ namespace PanoramicDataWin8.model.data.common
         public override List<double> GetBins()
         {
             List<double> scale = new List<double>();
-            for (double v = MinValue; v < MaxValue; v += Step)
+            for (double v = MinValue; v <= MaxValue; v += Step)
             {
                 scale.Add(v);
             }
+            
             return scale;
         }
         public override BinRange GetUpdatedBinRange(double dataMin, double dataMax)
@@ -62,7 +63,7 @@ namespace PanoramicDataWin8.model.data.common
             return new NominalBinRange(dataMin, dataMax, TargetBinNumber)
             {
                 MinValue = Math.Min(dataMin, this.MinValue),
-                MaxValue = Math.Max(dataMax + 1, this.MaxValue),
+                MaxValue = Math.Max(dataMax, this.MaxValue),
                 DataMinValue = Math.Min(dataMin, this.DataMinValue),
                 DataMaxValue = Math.Min(dataMax, this.DataMaxValue),
                 Step = 1

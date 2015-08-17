@@ -9,6 +9,11 @@ namespace PanoramicDataWin8.controller.data
     {
         public void AggregateStep(BinStructure binStructure, QueryModel queryModel, double progress)
         {
+            if (binStructure == null)
+            {
+                return;
+            }
+
             double maxCount = double.MinValue;
             binStructure.AggregatedMaxValues.Clear();
             binStructure.AggregatedMinValues.Clear();

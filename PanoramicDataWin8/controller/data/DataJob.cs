@@ -137,26 +137,24 @@ namespace PanoramicDataWin8.controller.data
                     {
                         _aggregator.AggregateStep(_binner.BinStructure, QueryModelClone, _dataProvider.Progress());
                     }
-                    resultItemModels = convertBinsToResultItemModels(_binner.BinStructure);
                 }
-
-                if (_isRunning)
+                ResultDescriptionModel resultDescriptionModel = null;
+                if (_binner != null && _binner.BinStructure != null)
                 {
-                    ResultDescriptionModel resultDescriptionModel = null;
-                    if (_binner != null)
+                    resultItemModels = convertBinsToResultItemModels(_binner.BinStructure);
+                    resultDescriptionModel = new VisualizationResultDescriptionModel()
                     {
-                        resultDescriptionModel = new VisualizationResultDescriptionModel()
-                        {
-                            BinRanges = _binner.BinStructure.BinRanges,
-                            NullCount = _binner.BinStructure.NullCount,
-                            Dimensions = _dimensions,
-                            AxisTypes = _axisTypes,
-                            MinValues = _binner.BinStructure.AggregatedMinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
-                            MaxValues = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => entry.Value)
-                        };
-                    }
+                        BinRanges = _binner.BinStructure.BinRanges,
+                        NullCount = _binner.BinStructure.NullCount,
+                        Dimensions = _dimensions,
+                        AxisTypes = _axisTypes,
+                        MinValues = _binner.BinStructure.AggregatedMinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
+                        MaxValues = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => entry.Value)
+                    };
+
                     await fireUpdated(resultItemModels, _dataProvider.Progress(), resultDescriptionModel);
                 }
+
                 if (MainViewController.Instance.MainModel.Verbose)
                 {
                     Debug.WriteLine("DataJob Iteration Time: " + sw.ElapsedMilliseconds);
@@ -168,11 +166,15 @@ namespace PanoramicDataWin8.controller.data
                     await Task.Delay(_throttle);
                 }
             }
+
+            if (_isRunning)
+            {
+                await fireCompleted();
+            }
             lock (_lock)
             {
                 _isRunning = false;
             }
-            await fireCompleted();
         }
 
         private void setVisualizationValues(List<DataRow> samples)
@@ -218,7 +220,7 @@ namespace PanoramicDataWin8.controller.data
             {
                 if (binStructure.BinRanges[d] is NominalBinRange)
                 {
-                    (binStructure.BinRanges[d] as NominalBinRange).Labels = _uniqueValues[d].OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key.ToString()).ToList();
+                    (binStructure.BinRanges[d] as NominalBinRange).Labels = _uniqueValues[d].OrderBy(kvp => kvp.Key.ToString()).Select(kvp => kvp.Key.ToString()).ToList();
                 }
             }
             foreach (var bin in binStructure.Bins.Values)

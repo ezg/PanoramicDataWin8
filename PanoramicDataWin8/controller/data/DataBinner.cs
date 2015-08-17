@@ -25,7 +25,10 @@ namespace PanoramicDataWin8.controller.data
 
             if (dataRows.Count == 0)
             {
-                BinStructure.Bins.Values.ForEach(bin => bin.Samples.Clear());
+                if (BinStructure != null)
+                {
+                    BinStructure.Bins.Values.ForEach(bin => bin.Samples.Clear());
+                }
                 return;
             }
 
@@ -102,8 +105,8 @@ namespace PanoramicDataWin8.controller.data
                     }
                     else
                     {
-                        dataMin -= 1;
-                        dataMax += 1;
+                        //dataMin -= 1;
+                        //dataMax += 1;
                     }
                 }
                 dataMins.Add(dataMin);

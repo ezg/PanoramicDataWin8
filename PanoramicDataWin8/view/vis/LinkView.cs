@@ -33,6 +33,7 @@ namespace PanoramicDataWin8.view.vis
 
         private SolidColorBrush _darkBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717"));
         private SolidColorBrush _highlightBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
+        private SolidColorBrush _highlightFaintBrush = new SolidColorBrush(Helpers.GetColorFromString("#3329aad5"));
         private SolidColorBrush _lightBrush = new SolidColorBrush(Helpers.GetColorFromString("#e6e6e6"));
         private SolidColorBrush _backgroundBrush = new SolidColorBrush(Helpers.GetColorFromString("#ffffff"));
 
@@ -309,7 +310,7 @@ namespace PanoramicDataWin8.view.vis
 
 
 
-                    Vec iconPos = (distanceVec.Normalized() * (distanceVec.Length * 0.2)) + incomingStart;
+                    /*Vec iconPos = (distanceVec.Normalized() * (distanceVec.Length * 0.2)) + incomingStart;
                     Canvas brushCanvas = new Canvas();
                     Ellipse e = new Ellipse();
                     e.Width = 30;
@@ -380,7 +381,7 @@ namespace PanoramicDataWin8.view.vis
 
                     Rect rr = new Rct(iconPos.X - 15, iconPos.Y - 15, iconPos.X + 15, iconPos.Y + 15);
                     _visualizationViewModelIconGeometries.Add(incomingModel,
-                        rr.GetPolygon());
+                        rr.GetPolygon());*/
                 }
 
             }
@@ -414,7 +415,7 @@ namespace PanoramicDataWin8.view.vis
             filterIcon.Points.Add(new Point(10, 14));
             filterIcon.Points.Add(new Point(5, 12));
             filterIcon.Points.Add(new Point(5, 6));
-            filterIcon.Fill = _highlightBrush;//sourceCount > 1 ? linkViewModel.ToVisualizationViewModel.FaintBrush : linkViewModel.ToVisualizationViewModel.Brush;
+            filterIcon.Fill = sourceCount > 1 ? _highlightFaintBrush : _highlightBrush;
             filterIcon.Width = _attachmentRectHalfSize * 2;
             filterIcon.Height = _attachmentRectHalfSize * 2;
             Mat mat = Mat.Translate(attachmentCenter.X - _attachmentRectHalfSize + 6,
@@ -434,17 +435,17 @@ namespace PanoramicDataWin8.view.vis
                 {
                     label.Text = "OR";
                 }
-                label.HorizontalAlignment = HorizontalAlignment.Center;
-                label.VerticalAlignment = VerticalAlignment.Center;
+                label.TextAlignment = TextAlignment.Center;
                 label.FontSize = 9;
                 label.FontWeight = FontWeights.Bold;
                 label.Width = _attachmentRectHalfSize * 2;
+                label.Foreground = _highlightBrush;
                 label.Height = _attachmentRectHalfSize * 2;
                 c.UseLayoutRounding = false;
                 label.RenderTransform = new TranslateTransform()
                 {
                     X = attachmentCenter.X - _attachmentRectHalfSize,
-                    Y = attachmentCenter.Y - _attachmentRectHalfSize
+                    Y = attachmentCenter.Y - _attachmentRectHalfSize + 10
                 };
                 c.Children.Add(label);
             }
@@ -521,7 +522,7 @@ namespace PanoramicDataWin8.view.vis
             IPoint p = e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position.GetVec().GetCoord().GetPoint();
             LinkViewModel linkViewModel = (DataContext as LinkViewModel);
 
-            foreach (var visModel in _visualizationViewModelIconGeometries.Keys)
+            /*foreach (var visModel in _visualizationViewModelIconGeometries.Keys)
             {
                 if (_visualizationViewModelIconGeometries[visModel].Buffer(3).Intersects(p))
                 {
@@ -531,7 +532,7 @@ namespace PanoramicDataWin8.view.vis
                     e.Handled = true;
                     break;
                 }
-            }
+            }*/
 
 
             if (_linkViewGeometry.Intersects(p))
