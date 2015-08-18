@@ -28,12 +28,13 @@ using GeoAPI.Geometries;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
+using PanoramicDataWin8.view.inq;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public sealed partial class PlotRenderer : Renderer, InputFieldViewModelEventHandler
+    public sealed partial class PlotRenderer : Renderer, InputFieldViewModelEventHandler, IScribbable
     {
         private MenuViewModel _menuViewModel = null;
         private MenuView _menuView = null;
@@ -82,7 +83,7 @@ namespace PanoramicDataWin8.view.vis.render
                 (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
                 ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
-                mainLabel.Text = (DataContext as VisualizationViewModel).QueryModel.VisualizationType.ToString();
+                //mainLabel.Text = (DataContext as VisualizationViewModel).QueryModel.VisualizationType.ToString();
                 populateHeaders();
             }
         }
@@ -537,6 +538,82 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void Renderer_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+        }
+
+        public bool IsDeletable
+        {
+            get { return false; }
+        }
+
+        public IGeometry Geometry
+        {
+            get
+            {
+                VisualizationViewModel model = this.DataContext as VisualizationViewModel;
+
+                Rct bounds = new Rct(model.Position, model.Size);
+                return bounds.GetPolygon();
+            }
+        }
+
+        public List<IScribbable> Children
+        {
+            get { return new List<IScribbable>(); }
+        }
+
+        public bool Consume(InkStroke inkStroke)
+        {
+            GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
+            List<Windows.Foundation.Point> selectionPoints = inkStroke.Points.Select(p => gt.TransformPoint(p)).ToList();
+
+            IList<Vec> convexHull = Convexhull.convexhull(selectionPoints);
+            IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon();
+
+            List<FilterModel> hits = new List<FilterModel>();
+            foreach (var geom in _plotRendererContentProvider.HitTargets.Keys)
+            {
+                if (convexHullPoly.Intersects(geom))
+                {
+                    hits.Add(_plotRendererContentProvider.HitTargets[geom]);
+                }
+            }
+            if (hits.Count > 0)
+            {
+                foreach (var valueComparison in hits[0].ValueComparisons)
+                {
+                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.Name + " " +
+                                     valueComparison.Value));
+                }
+
+                QueryModel queryModel = (DataContext as VisualizationViewModel).QueryModel;
+                var vcs = hits.SelectMany(h => h.ValueComparisons).ToList();
+
+                var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
+                var yAom = queryModel.GetUsageInputOperationModel(InputUsage.Y).First();
+                tbSelection.Text = xAom.InputModel.Name + ": " +
+                                   vcs.Where(vc => Equals(vc.InputOperationModel, xAom))
+                                       .Min(vc => vc.Value);
+                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.InputOperationModel, xAom)).Max(vc => vc.Value);
+                tbSelection.Text += ", " + yAom.InputModel.Name + ": " +
+                                   vcs.Where(vc => Equals(vc.InputOperationModel, yAom))
+                                       .Min(vc => vc.Value);
+                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.InputOperationModel, yAom)).Max(vc => vc.Value);
+
+                if (hits.Any(h => queryModel.FilterModels.Contains(h)))
+                {
+                    queryModel.RemoveFilterModels(hits);
+                }
+                else
+                {
+                    queryModel.AddFilterModels(hits);
+                }
+            }
+            else
+            {
+                tbSelection.Text = "";
+            }
+
+            return true;
         }
     }
 }

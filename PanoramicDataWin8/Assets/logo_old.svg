@@ -14,10 +14,7 @@
    id="svg3603"
    version="1.1"
    inkscape:version="0.48.5 r10040"
-   sodipodi:docname="logo.svg"
-   inkscape:export-filename="C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\Assets\img\logo140x140.png"
-   inkscape:export-xdpi="90"
-   inkscape:export-ydpi="90">
+   sodipodi:docname="logo.svg">
   <defs
      id="defs3605" />
   <sodipodi:namedview
@@ -27,9 +24,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1"
-     inkscape:cx="-137.63362"
-     inkscape:cy="260.72595"
+     inkscape:zoom="0.64"
+     inkscape:cx="229.37333"
+     inkscape:cy="434.00401"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -109,18 +106,18 @@
     <text
        sodipodi:linespacing="125%"
        id="text3778-7-5-0-5-1-8-7-6-0-8-8-3-9-6-2-7-8"
-       y="455.71585"
-       x="315.60068"
-       style="font-size:122.19813538px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;stroke:none;font-family:Abel;-inkscape-font-specification:Abel"
+       y="441.64795"
+       x="282.57477"
+       style="font-size:99.25041199px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;stroke:none;font-family:Abel;-inkscape-font-specification:Abel"
        xml:space="preserve"
        inkscape:export-filename="C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\Assets\img\Splash.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
-         style="font-size:122.19813538px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;font-family:Abel;-inkscape-font-specification:Abel"
-         y="455.71585"
-         x="315.60068"
+         style="font-size:99.25041199px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;font-family:Abel;-inkscape-font-specification:Abel"
+         y="441.64795"
+         x="282.57477"
          sodipodi:role="line"
-         id="tspan15848-5-1-8-4-0-6">vizdom</tspan></text>
+         id="tspan15848-5-1-8-4-0-6">pano data</tspan></text>
     <rect
        y="467.74783"
        x="105.31982"
@@ -162,44 +159,44 @@
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <rect
-       y="775.17419"
+       y="495.17468"
        x="-588.125"
-       height="30"
-       width="30"
+       height="310"
+       width="310"
        id="rect3755-7-5-21-5-0-2-8-3-3-0-1-0-3-1-6-1-5"
        style="fill:#e6e6e6;fill-opacity:1;stroke:none"
-       inkscape:export-filename="C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\Assets\img\logo30x30.png"
+       inkscape:export-filename="C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\Assets\img\logo310x310.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90" />
     <text
        sodipodi:linespacing="125%"
        id="text3778-7-5-0-5-1-8-7-6-0-8-8-3-9-6-2-7-8-1"
-       y="977.24786"
-       x="-523.54297"
-       style="font-size:92.83839417px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;stroke:none;font-family:Abel;-inkscape-font-specification:Abel"
+       y="971.90515"
+       x="-535.34296"
+       style="font-size:72.35453033px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;stroke:none;font-family:Abel;-inkscape-font-specification:Abel"
        xml:space="preserve"
        inkscape:export-filename="C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\Assets\img\logo310x150.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
-         style="font-size:92.83839417px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;font-family:Abel;-inkscape-font-specification:Abel"
-         y="977.24786"
-         x="-523.54297"
+         style="font-size:72.35453033px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;font-family:Abel;-inkscape-font-specification:Abel"
+         y="971.90515"
+         x="-535.34296"
          sodipodi:role="line"
-         id="tspan15848-5-1-8-4-0-6-7">vizdom</tspan></text>
+         id="tspan15848-5-1-8-4-0-6-7">pano data</tspan></text>
     <text
        sodipodi:linespacing="125%"
        id="text3778-7-5-0-5-1-8-7-6-0-8-8-3-9-6-2-7-8-1-4"
-       y="798.25189"
-       x="-583.73206"
-       style="font-size:25.69713211px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;stroke:none;font-family:Abel;-inkscape-font-specification:Abel"
+       y="718.45642"
+       x="-552.79401"
+       style="font-size:265.53701782px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;stroke:none;font-family:Abel;-inkscape-font-specification:Abel"
        xml:space="preserve"
-       inkscape:export-filename="C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\Assets\img\logo30x30.png"
+       inkscape:export-filename="C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\Assets\img\logo310x310.png"
        inkscape:export-xdpi="90"
        inkscape:export-ydpi="90"><tspan
-         style="font-size:25.69713211px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;font-family:Abel;-inkscape-font-specification:Abel"
-         y="798.25189"
-         x="-583.73206"
+         style="font-size:265.53701782px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#29aad4;fill-opacity:1;font-family:Abel;-inkscape-font-specification:Abel"
+         y="718.45642"
+         x="-552.79401"
          sodipodi:role="line"
-         id="tspan15848-5-1-8-4-0-6-7-0">vd</tspan></text>
+         id="tspan15848-5-1-8-4-0-6-7-0">pd</tspan></text>
   </g>
 </svg>

@@ -43,7 +43,8 @@ namespace PanoramicDataWin8.view.inq
                     }
                 }
                 List<IScribbable> allScribbables = new List<IScribbable>();
-                getScribbablesRecursive(allScribbables, _inkableScene.Elements.Where(e => e is IScribbable).Select(e => e as IScribbable).ToList());
+                IScribbleHelpers.GetScribbablesRecursive(allScribbables, _inkableScene.Elements.OfType<IScribbable>().ToList());
+                allScribbables = allScribbables.Where(e => e.IsDeletable).ToList();
                 foreach (IScribbable existingScribbable in allScribbables)
                 {
                     IGeometry geom = existingScribbable.Geometry;
@@ -71,20 +72,5 @@ namespace PanoramicDataWin8.view.inq
             return false;
         }
 
-        private void getScribbablesRecursive(List<IScribbable> allScribbable, List<IScribbable> currents)
-        {
-            foreach (var current in currents)
-            {
-                if (current.Children.Count > 0)
-                {
-                    allScribbable.AddRange(current.Children);
-                    getScribbablesRecursive(allScribbable, current.Children);
-                }
-                else
-                {
-                    allScribbable.Add(current);
-                }
-            }
-        }
     }
 }

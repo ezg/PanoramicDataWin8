@@ -49,7 +49,7 @@ namespace PanoramicDataWin8.controller.view
 
             _gesturizer.AddGesture(new ConnectGesture(_root));
             _gesturizer.AddGesture(new EraseGesture(_root));
-            _gesturizer.AddGesture(new ScribbleGesture(_root));
+            //_gesturizer.AddGesture(new ScribbleGesture(_root));
         }
 
         public async void loadConfigs()
@@ -566,9 +566,42 @@ namespace PanoramicDataWin8.controller.view
                 }
             }
 
-            if (recognizedGestures.Count == 0)
+            if (recognizedGestures.Count == 0 && !e.InkStroke.IsErase)
             {
-                _root.Add(e.InkStroke);
+                List<IScribbable> allScribbables = new List<IScribbable>();
+                IScribbleHelpers.GetScribbablesRecursive(allScribbables, InkableScene.Elements.OfType<IScribbable>().ToList());
+                var inkStroke = e.InkStroke.GetResampled(20);
+                ILineString inkStrokeLine = inkStroke.GetLineString();
+
+                bool consumed = false;
+                foreach (IScribbable existingScribbable in allScribbables)
+                {
+                    IGeometry geom = existingScribbable.Geometry;
+                    if (geom != null)
+                    {
+                        /*Polygon p = new Polygon();
+                        PointCollection pc = new PointCollection(existingScribbable.Geometry.Coordinates.Select(c => new System.Windows.Point(c.X, c.Y)));
+                        p.Points = pc;
+                        p.Stroke = Brushes.Blue;
+                        p.StrokeThickness = 5;
+                        _inkableScene.Add(p);*/
+
+                        if (inkStrokeLine.Intersects(geom))
+                        {
+                            //existingScribbable.Consume(e.InkStroke);
+                            consumed = existingScribbable.Consume(e.InkStroke);
+                            if (consumed)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (!consumed)
+                {
+                    _root.Add(e.InkStroke);
+                }
             }
         }
     }

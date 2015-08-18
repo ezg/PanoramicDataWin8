@@ -242,5 +242,16 @@ namespace PanoramicDataWin8.view.inq
                 return new List<IScribbable>();
             }
         }
+
+        public bool IsDeletable
+        {
+            get { return true; }
+        }
+
+
+        public bool Consume(InkStroke inkStroke)
+        {
+            return false;
+        }
     }
 }

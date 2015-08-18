@@ -663,6 +663,16 @@ namespace PanoramicDataWin8.view.vis
             get { return null; }
         }
 
+        public bool IsDeletable
+        {
+            get { return false; }
+        }
+
+        public bool Consume(InkStroke inkStroke)
+        {
+            return false;
+        }
+
         public List<IScribbable> Children
         {
             get

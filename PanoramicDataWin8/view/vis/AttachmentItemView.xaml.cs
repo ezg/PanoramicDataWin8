@@ -50,6 +50,10 @@ namespace PanoramicDataWin8.view.vis
                 return new Rct(model.Position, model.Size).GetPolygon();
             }
         }
+        public bool IsDeletable
+        {
+            get { return true; }
+        }
 
         public List<IScribbable> Children
         {
@@ -57,6 +61,11 @@ namespace PanoramicDataWin8.view.vis
             {
                 return new List<IScribbable>();
             }
+        }
+
+        public bool Consume(InkStroke inkStroke)
+        {
+            return false;
         }
     }
 }

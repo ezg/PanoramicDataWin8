@@ -29,8 +29,11 @@ namespace PanoramicDataWin8.view.vis
 {
     public sealed partial class VisualizationContainerView : UserControl, IScribbable, InputFieldViewModelEventHandler
     {
-        private PointerManager _mainPointerManager = new PointerManager();
-        private Point _mainPointerManagerPreviousPoint = new Point();
+        private Point _previousPoint = new Point();
+        private Point _initialPoint = new Point();
+        private Stopwatch _tapStart = new Stopwatch();
+        private bool _movingStarted = false;
+        private bool _fingerDown = false;
 
         private PointerManager _resizePointerManager = new PointerManager();
         private Point _resizePointerManagerPreviousPoint = new Point();
@@ -50,7 +53,7 @@ namespace PanoramicDataWin8.view.vis
         private void InkableScene_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             var ancestors = (e.OriginalSource as FrameworkElement).GetAncestors();
-            if (!ancestors.Contains(this) && _mainPointerManager.GetNumActiveContacts() > 0)
+            if (!ancestors.Contains(this) && _fingerDown)
             {
                 MainViewController.Instance.CopyVisualisationViewModel(this.DataContext as VisualizationViewModel, e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position);
             }
@@ -58,10 +61,7 @@ namespace PanoramicDataWin8.view.vis
 
         void VisualizationContainerView_Loaded(object sender, RoutedEventArgs e)
         {
-            _mainPointerManager.Added += mainPointerManager_Added;
-            _mainPointerManager.Moved += mainPointerManager_Moved;
-            _mainPointerManager.Removed += mainPointerManager_Removed;
-            _mainPointerManager.Attach(this);
+            this.PointerPressed += VisualizationContainerView_PointerPressed;
 
             _resizePointerManager.Added += resizePointerManager_Added;
             _resizePointerManager.Moved += resizePointerManager_Moved;
@@ -137,23 +137,18 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
-        private int _status = 0; // 0: unknonw, 1: single, 2: double
-        private bool _moved = false;
-        private Stopwatch _firstDownTime = new Stopwatch();
-
-        void mainPointerManager_Added(object sender, PointerManagerEvent e)
+        void VisualizationContainerView_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            if (e.NumActiveContacts == 1)
-            {
-                GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
-                _mainPointerManagerPreviousPoint = gt.TransformPoint(e.CurrentContacts[e.CurrentPointers.First().PointerId].Position);
-                _firstDownTime.Restart();
-            }
-            else if (e.NumActiveContacts == 2)
-            {
-                _firstDownTime.Stop();
-            }
-            _moved = false;
+            _tapStart.Restart();
+            _previousPoint = e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position;
+            _initialPoint = _previousPoint;
+            _movingStarted = false;
+            e.Handled = true;
+            this.CapturePointer(e.Pointer);
+            this.PointerMoved += VisualizationContainerView_PointerMoved;
+            this.PointerReleased += VisualizationContainerView_PointerReleased;
+            _fingerDown = true;
+
             this.SendToFront();
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
             foreach (var avm in model.AttachementViewModels)
@@ -161,79 +156,38 @@ namespace PanoramicDataWin8.view.vis
                 avm.IsDisplayed = true;
             }
         }
-        
-        void mainPointerManager_Moved(object sender, PointerManagerEvent e)
+
+        async void VisualizationContainerView_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
-            _moved = true;
-            GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
-            if (e.NumActiveContacts == 2 && e.TriggeringPointer.PointerId == e.CurrentPointers.First().PointerId)
+            var currentPoint = e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position;
+            if ((_initialPoint.GetVec() - currentPoint.GetVec()).Length2 > 100 || _movingStarted)
             {
-                if (_status != 2 && _firstDownTime.ElapsedMilliseconds < 50)
-                {
-                    _status = 2;
-                }
-                if (_status == 2)
-                {
-                    performMoved(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
-                }
+                _movingStarted = true;
+                Vec delta = _previousPoint.GetVec() - currentPoint.GetVec();
+                VisualizationViewModel model = (DataContext as VisualizationViewModel);
+                model.Position -= delta;
+                
             }
-            else if (e.NumActiveContacts == 1)
-            {
-                var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift);
-                if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
-                {
-                    performMoved(e.CurrentContacts[e.CurrentPointers.First().PointerId]);
-                }
-                else
-                {
-                    if (_status != 1 && _firstDownTime.ElapsedMilliseconds > 50)
-                    {
-                        _status = 1;
-                        Point currentPoint =
-                            gt.TransformPoint(e.CurrentContacts[e.CurrentPointers.First().PointerId].Position);
-                        _renderer.StartSelection(currentPoint);
-                        _renderer.MoveSelection(currentPoint);
-                    }
-                    if (_status == 1)
-                    {
-                        Point currentPoint =
-                            gt.TransformPoint(e.CurrentContacts[e.CurrentPointers.First().PointerId].Position);
-                        _renderer.MoveSelection(currentPoint);
-                    }
-                }
-            }
+            _previousPoint = currentPoint;
+            e.Handled = true;
         }
 
-        void performMoved(PointerPoint pp)
+        void VisualizationContainerView_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
-            GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
-            Point currentPoint = gt.TransformPoint(pp.Position);
-
-            Vec delta = _mainPointerManagerPreviousPoint.GetVec() - currentPoint.GetVec();
-            VisualizationViewModel model = (DataContext as VisualizationViewModel);
-            model.Position -= delta;
-            _mainPointerManagerPreviousPoint = currentPoint;
-        }
-
-        void mainPointerManager_Removed(object sender, PointerManagerEvent e)
-        {
-            if (_status == 0)
+            if (_movingStarted)
             {
-                if (_firstDownTime.IsRunning && !_moved)
-                {
-                    _renderer.StartSelection(_mainPointerManagerPreviousPoint);
-                    _renderer.EndSelection();
-                }
+                _movingStarted = false;
             }
-            if (_status == 1)
+            else if (_tapStart.ElapsedMilliseconds < 300)
             {
+                _renderer.StartSelection(e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position);
                 _renderer.EndSelection();
-                _status = 0;
             }
-            if (_status == 2)
-            {
-                _status = 0;
-            }
+            _fingerDown = false;
+            this.ReleasePointerCapture(e.Pointer);
+            this.PointerMoved -= VisualizationContainerView_PointerMoved;
+            this.PointerReleased -= VisualizationContainerView_PointerReleased;
+
 
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
             foreach (var avm in model.AttachementViewModels)
@@ -289,6 +243,12 @@ namespace PanoramicDataWin8.view.vis
         {
             get
             {
+                IScribbable scribbable = _renderer as IScribbable;
+                if (scribbable != null)
+                {
+                    return new List<IScribbable>() { scribbable };
+                }
+
                 return new List<IScribbable>();
             }
         }
@@ -325,6 +285,16 @@ namespace PanoramicDataWin8.view.vis
                     return null;
                 }
             }
+        }
+
+        public bool Consume(InkStroke inkStroke)
+        {
+            return false;
+        }
+
+        public bool IsDeletable
+        {
+            get { return true; }
         }
     }
 }

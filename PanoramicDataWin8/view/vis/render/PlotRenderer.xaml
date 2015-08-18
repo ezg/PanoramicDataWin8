@@ -28,7 +28,7 @@
         
         <Grid Grid.Column="1" Grid.Row="1" Background="{StaticResource lightBrush}">
             <Viewbox MaxWidth="150" CacheMode="BitmapCache">
-                <TextBlock Name="mainLabel" Text="bar" Foreground="{StaticResource highlightBrush}"/>
+                <TextBlock Name="mainLabel" Text="" Foreground="{StaticResource highlightBrush}"/>
             </Viewbox>
             <Grid Name="dxSurfaceGrid" Opacity="0">
                 <common:DXSurface x:Name="dxSurface"/>

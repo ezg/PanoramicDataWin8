@@ -78,6 +78,10 @@ namespace PanoramicDataWin8.model.data
                     var child = GetFilterModelsRecursive(linkModel.FromQueryModel, visitedQueryModels, filterModels, false);
                     if (child != "")
                     {
+                        if (linkModel.IsInverted)
+                        {
+                            child = "not " + child;
+                        }
                         children.Add(child);
                     }
                 }

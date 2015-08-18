@@ -82,6 +82,15 @@ namespace PanoramicDataWin8.view.common
                 border.BorderThickness = model.BorderThicknes;
             }
 
+            if (model.TextAngle == 0)
+            {
+                txtBlock.MaxWidth = model.Size.X;
+            }
+            else
+            {
+                txtBlock.MaxWidth = model.Size.Y;
+            }
+
             toggleHighlighted(model.IsHighlighted);
         }
 

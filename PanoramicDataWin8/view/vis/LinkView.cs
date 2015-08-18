@@ -580,6 +580,27 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
+        public bool Consume(InkStroke inkStroke)
+        {
+            LinkViewModel linkViewModel = (DataContext as LinkViewModel);
+            List<LinkModel> models = new List<LinkModel>();
+            foreach (var model in _visualizationViewModelGeometries.Keys.ToArray())
+            {
+                if (_visualizationViewModelGeometries[model].Buffer(3).Intersects(inkStroke.GetLineString()))
+                {
+                    var linkModel = (linkViewModel.LinkModels.First(lm => lm.FromQueryModel == model.QueryModel));
+                    linkModel.IsInverted = !linkModel.IsInverted;
+                    linkModel.ToQueryModel.FireQueryModelUpdated(QueryModelUpdatedEventType.Links);
+                }
+            }
+            return true;
+        }
+
+        public bool IsDeletable
+        {
+            get { return true; }
+        }
+
         public List<LinkModel> GetLinkModelsToRemove(IGeometry scribble)
         {
             LinkViewModel linkViewModel = (DataContext as LinkViewModel);

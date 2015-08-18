@@ -7,19 +7,23 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:transform="using:WinRTXamlToolkit.Controls"
     xmlns:view="using:PanoramicDataWin8.model.view"
+    xmlns:utils="using:PanoramicDataWin8.utils"
     mc:Ignorable="d"
-    d:DesignHeight="100"
-    d:DesignWidth="100"
+    d:DesignHeight="200"
+    d:DesignWidth="54"
     Width="{Binding Size.X}" Height="{Binding Size.Y}"
     FontFamily="{StaticResource abel}">
 
     <d:DesignProperties.DataContext>
         <view:InputFieldViewModel>
             <view:InputFieldViewModel.IsNoChrome>False</view:InputFieldViewModel.IsNoChrome>
-            <view:InputFieldViewModel.MainLabel>Cancellation code</view:InputFieldViewModel.MainLabel>
+            <view:InputFieldViewModel.MainLabel>Count(blood)</view:InputFieldViewModel.MainLabel>
             <view:InputFieldViewModel.SubLabel>Test dsafdsa</view:InputFieldViewModel.SubLabel>
             <view:InputFieldViewModel.IsShadow>False</view:InputFieldViewModel.IsShadow>
-            <view:InputFieldViewModel.TextAngle>0</view:InputFieldViewModel.TextAngle>
+            <view:InputFieldViewModel.TextAngle>270</view:InputFieldViewModel.TextAngle>
+            <view:InputFieldViewModel.Size>
+                <utils:Vec X="54" Y="200"/>
+            </view:InputFieldViewModel.Size>
         </view:InputFieldViewModel>
     </d:DesignProperties.DataContext>
 

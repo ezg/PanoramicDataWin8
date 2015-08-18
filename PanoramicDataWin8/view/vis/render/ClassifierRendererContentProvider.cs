@@ -126,22 +126,28 @@ namespace PanoramicDataWin8.view.vis.render
                 var valueSum = (float) row.Sum();
                 for (int c = 0; c < row.Count; c++)
                 {
-                    var value = (float) row[c] / valueSum;
+                    var value = valueSum == 0.0 ? 0.0 : (float) row[c] / valueSum;
                     var yFrom = toScreenY((float)(1 - r) * w + yOff);
                     var xFrom = toScreenX((float)c * h + xOff);
                     var yTo = toScreenY((float)(1 - r) * w + w + yOff);
                     var xTo = toScreenX((float)c * h + h + xOff);
-
-                    var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)(value));
-                    var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R / 255f, lerpColor.G / 255f, lerpColor.B / 255f, 1f));
-
+                    
                     roundedRect.Rect = new RectangleF(
                         xFrom,
                         yTo,
                         xTo - xFrom,
                         yFrom - yTo);
                     roundedRect.RadiusX = roundedRect.RadiusY = 4;
-                    d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
+
+                    if (value > 0)
+                    {
+                        var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float) (value));
+                        var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R/255f, lerpColor.G/255f, lerpColor.B/255f, 1f));
+
+                        d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
+                        binColor.Dispose();
+                    }
+
                     /*if (r == 1 && c == 1)
                     {
                         d2dDeviceContext.FillRoundedRectangle(roundedRect, white);
@@ -150,7 +156,6 @@ namespace PanoramicDataWin8.view.vis.render
                     //d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
 
                     d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
-                    binColor.Dispose();
                 }
             }
             white.Dispose();
