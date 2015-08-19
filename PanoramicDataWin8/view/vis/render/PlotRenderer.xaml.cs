@@ -251,7 +251,7 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Children.Add(animation);
                 Storyboard.SetTarget(animation, mainLabel);
                 Storyboard.SetTargetProperty(animation, "Opacity");
-                storyboard.Begin();
+                //storyboard.Begin();
 
                 animation = new DoubleAnimation();
                 animation.Duration = TimeSpan.FromMilliseconds(300);
@@ -285,7 +285,7 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Children.Add(animation);
                 Storyboard.SetTarget(animation, mainLabel);
                 Storyboard.SetTargetProperty(animation, "Opacity");
-                storyboard.Begin();
+                //storyboard.Begin();
 
                 animation = new DoubleAnimation();
                 animation.Duration = TimeSpan.FromMilliseconds(300);

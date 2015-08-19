@@ -41,6 +41,10 @@ namespace PanoramicDataWin8.model.data.common
 
         public static QuantitativeBinRange Initialize(double dataMinValue, double dataMaxValue, double targetBinNumber, bool isIntegerRange)
         {
+            if (dataMinValue == 0 && dataMaxValue == 0)
+            {
+                dataMaxValue = 1;
+            }
             QuantitativeBinRange scale = new QuantitativeBinRange(dataMinValue, dataMaxValue, targetBinNumber, isIntegerRange);
             double[] extent = scale.getExtent(scale.DataMinValue, scale.DataMaxValue, scale.TargetBinNumber);
             scale.MinValue = extent[0];
