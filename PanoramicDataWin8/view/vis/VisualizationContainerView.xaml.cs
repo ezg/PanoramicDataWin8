@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Devices.Input;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -139,6 +140,10 @@ namespace PanoramicDataWin8.view.vis
 
         void VisualizationContainerView_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+            if (e.Pointer.PointerDeviceType == PointerDeviceType.Pen)
+            {
+                return;
+            }
             _tapStart.Restart();
             _previousPoint = e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position;
             _initialPoint = _previousPoint;
