@@ -97,6 +97,7 @@ namespace PanoramicDataWin8.view.vis.render
                 if (_visualizationDescriptionModel.MinValues[xAom] - _visualizationDescriptionModel.MaxValues[xAom] == 0)
                 {
                     factor = 0.1;
+                    factor *= _visualizationDescriptionModel.MinValues[xAom] < 0 ? -1f : 1f;
                 }
                 _isXAxisAggregated = true;
                 _xBinRange = QuantitativeBinRange.Initialize(_visualizationDescriptionModel.MinValues[xAom] * (1.0 - factor), _visualizationDescriptionModel.MaxValues[xAom] * (1.0 + factor), 10, false);
@@ -113,6 +114,7 @@ namespace PanoramicDataWin8.view.vis.render
                 if (_visualizationDescriptionModel.MinValues[yAom] - _visualizationDescriptionModel.MaxValues[yAom] == 0)
                 {
                     factor = 0.1;
+                    factor *= _visualizationDescriptionModel.MinValues[yAom] < 0 ? -1f : 1f;
                 }
                 _isYAxisAggregated = true;
                 _yBinRange = QuantitativeBinRange.Initialize(_visualizationDescriptionModel.MinValues[yAom] * (1.0 - factor), _visualizationDescriptionModel.MaxValues[yAom] * (1.0 + factor), 10, false);

@@ -54,13 +54,13 @@ namespace PanoramicDataWin8.controller.data
             }
             else
             {
-                _dimensions = QueryModel.GetUsageInputOperationModel(InputUsage.X).Concat(
-                                 QueryModel.GetUsageInputOperationModel(InputUsage.Y)).Concat(
-                                 QueryModel.GetUsageInputOperationModel(InputUsage.Group)).ToList();
+                _dimensions = QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Concat(
+                                 QueryModelClone.GetUsageInputOperationModel(InputUsage.Y)).Concat(
+                                 QueryModelClone.GetUsageInputOperationModel(InputUsage.Group)).ToList();
 
                 _uniqueValues = _dimensions.Select(d => new Dictionary<object, double>()).ToList();
 
-                _axisTypes = _dimensions.Select(d => QueryModel.GetAxisType(d)).ToList();
+                _axisTypes = _dimensions.Select(d => QueryModelClone.GetAxisType(d)).ToList();
                 QueryModel.ResultModel.ResultDescriptionModel = new VisualizationResultDescriptionModel();
                 (QueryModel.ResultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).AxisTypes = _axisTypes;
 
