@@ -470,6 +470,7 @@ namespace PanoramicDataWin8.view.vis.render
                 if (queryModel.FilterModels.Any(fm => fm.Value.HasValue))
                 {
                     tbSelection.Text += ", avg value: " + queryModel.FilterModels.Where(fm => fm.Value.HasValue).Average(fm => fm.Value.Value).ToString("F1");
+                    tbSelection.Text += ", sum value: " + queryModel.FilterModels.Where(fm => fm.Value.HasValue).Sum(fm => fm.Value.Value).ToString("F1");
                 }
                 //tbSelection.Text = "" + queryModel.FilterModels.Count;
             }
