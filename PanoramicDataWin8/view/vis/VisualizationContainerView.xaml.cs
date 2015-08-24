@@ -50,6 +50,14 @@ namespace PanoramicDataWin8.view.vis
             MainViewController.Instance.InkableScene.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
         }
 
+        public void Dispose()
+        {
+            if (_renderer != null)
+            {
+                _renderer.Dispose();
+            }
+        }
+
 
         private void InkableScene_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
@@ -98,7 +106,7 @@ namespace PanoramicDataWin8.view.vis
             }
             contentGrid.Children.Clear();
 
-            if (visualizationViewModel.QueryModel.JobType == JobType.DB)
+            if (visualizationViewModel.QueryModel.TaskType == "")
             {
                 if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.bar)
                 {
@@ -128,10 +136,7 @@ namespace PanoramicDataWin8.view.vis
                 
                 
             }
-            else if (visualizationViewModel.QueryModel.JobType == JobType.logistic_regression ||
-                visualizationViewModel.QueryModel.JobType == JobType.random_forest ||
-                visualizationViewModel.QueryModel.JobType == JobType.svm ||
-                visualizationViewModel.QueryModel.JobType == JobType.naive_bayes)
+            else if (visualizationViewModel.QueryModel.TaskType != "")
             {
                 _renderer = new ClassifierRenderer();
                 contentGrid.Children.Add(_renderer);
@@ -140,7 +145,9 @@ namespace PanoramicDataWin8.view.vis
 
         void VisualizationContainerView_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            if (e.Pointer.PointerDeviceType == PointerDeviceType.Pen)
+            var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
+            if (e.Pointer.PointerDeviceType == PointerDeviceType.Pen ||
+                (state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
             {
                 return;
             }

@@ -76,16 +76,16 @@ namespace PanoramicDataWin8.view.vis.render
                 ResultModel resultModel = ((VisualizationViewModel) DataContext).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
                 mainLabel.Text = ((VisualizationViewModel) DataContext).QueryModel.VisualizationType.ToString();
-                mainLabel.Text = ((VisualizationViewModel) DataContext).QueryModel.JobType.ToString();
-                tbType.Text = ((VisualizationViewModel) DataContext).QueryModel.JobType.ToString();
+                mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskType.Replace("_", " ").ToString();
+                tbType.Text = ((VisualizationViewModel) DataContext).QueryModel.TaskType.Replace("_", " ").ToString();
             }
         }
 
         void QueryModel_QueryModelUpdated(object sender, QueryModelUpdatedEventArgs e)
         {
             QueryModel queryModel = ((VisualizationViewModel) DataContext).QueryModel;
-            mainLabel.Text = queryModel.JobType.ToString();
-            tbType.Text = queryModel.JobType.ToString();
+            mainLabel.Text = queryModel.TaskType.Replace("_", " ").ToString();
+            tbType.Text = queryModel.TaskType.Replace("_", " ").ToString();
             render();
         }
 
@@ -107,7 +107,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 setMenuViewModelAnkerPosition();
             }
-            mainLabel.Text = ((VisualizationViewModel) DataContext).QueryModel.JobType.ToString();
+            mainLabel.Text = ((VisualizationViewModel) DataContext).QueryModel.TaskType.ToString();
         }
 
         private void updateProgressAndNullVisualization()
@@ -115,13 +115,13 @@ namespace PanoramicDataWin8.view.vis.render
             ResultModel resultModel = ((VisualizationViewModel) DataContext).QueryModel.ResultModel;
             ClassfierResultDescriptionModel descriptionModel = (resultModel.ResultDescriptionModel as ClassfierResultDescriptionModel);
 
-            if (descriptionModel != null)
+            /*if (descriptionModel != null)
             {
-                tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.JobType.ToString() + " : " + (descriptionModel.F1s[descriptionModel.Labels[0]] * 100.0).ToString("F1") + "%";
+                tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskType.ToString() + " : " + (descriptionModel.F1s[descriptionModel.Labels[0]] * 100.0).ToString("F1") + "%";
             }
-            else
+            else*/
             {
-                tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.JobType.ToString();
+                tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskType.Replace("_", " ").ToString();
             }
 
             // progress

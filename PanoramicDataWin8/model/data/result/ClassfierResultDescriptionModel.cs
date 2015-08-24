@@ -38,6 +38,20 @@ namespace PanoramicDataWin8.model.data.result
             set { this.SetProperty(ref _f1s, value); }
         }
 
+        private Dictionary<InputFieldModel, double> _precisions = new Dictionary<InputFieldModel, double>();
+        public Dictionary<InputFieldModel, double> Precisions
+        {
+            get { return _precisions; }
+            set { this.SetProperty(ref _precisions, value); }
+        }
+
+        private Dictionary<InputFieldModel, double> _recalls = new Dictionary<InputFieldModel, double>();
+        public Dictionary<InputFieldModel, double> Recalls
+        {
+            get { return _recalls; }
+            set { this.SetProperty(ref _recalls, value); }
+        }
+
         private Dictionary<InputFieldModel, double> _aucs = new Dictionary<InputFieldModel, double>();
         public Dictionary<InputFieldModel, double> AUCs
         {

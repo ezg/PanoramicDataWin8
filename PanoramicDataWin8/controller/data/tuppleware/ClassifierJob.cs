@@ -51,9 +51,11 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
             List<InputFieldModel> labels = new List<InputFieldModel>();
             getInputFieldModelsRecursive(_queryModelClone.GetUsageInputOperationModel(InputUsage.Label).Select(iom => iom.InputModel).ToList(), labels);
+            labels = labels.Distinct().ToList();
 
             List<InputFieldModel> features = new List<InputFieldModel>();
             getInputFieldModelsRecursive(_queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(iom => iom.InputModel).ToList(), features);
+            features = features.Distinct().ToList();
 
             Dictionary<InputFieldModel, string> labelsUuid = new Dictionary<InputFieldModel, string>();
             Dictionary<InputFieldModel, string> classifysUuid = new Dictionary<InputFieldModel, string>();
@@ -87,7 +89,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
             foreach (var label in labels)
             {
-                string clasifyUuid = (await classifyCommand.Classify(_originModel, _queryModelClone.JobType, labelsUuid[label], featuresUuid))["uuid"].Value<string>();
+                string clasifyUuid = (await classifyCommand.Classify(_originModel, _queryModelClone.TaskType, labelsUuid[label], featuresUuid))["uuid"].Value<string>();
                 classifysUuid.Add(label, clasifyUuid);
             }
 
@@ -109,12 +111,12 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
                 resultDescriptionModel.ConfusionMatrices.Add(label, new List<List<double>>());
                 resultDescriptionModel.ConfusionMatrices[label].Add(new List<double>());
-                resultDescriptionModel.ConfusionMatrices[label][0].Add((double) classifyResult.tn);
-                resultDescriptionModel.ConfusionMatrices[label][0].Add((double) classifyResult.fn);
+                resultDescriptionModel.ConfusionMatrices[label][0].Add((double) classifyResult.tp);
+                resultDescriptionModel.ConfusionMatrices[label][0].Add((double) classifyResult.fp);
 
                 resultDescriptionModel.ConfusionMatrices[label].Add(new List<double>());
-                resultDescriptionModel.ConfusionMatrices[label][1].Add((double) classifyResult.fp);
-                resultDescriptionModel.ConfusionMatrices[label][1].Add((double) classifyResult.tp);
+                resultDescriptionModel.ConfusionMatrices[label][1].Add((double) classifyResult.fn);
+                resultDescriptionModel.ConfusionMatrices[label][1].Add((double) classifyResult.tn);
 
                 var xs = classifyResult.fpr;
                 var ys = classifyResult.tpr;
@@ -133,6 +135,8 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
                 resultDescriptionModel.F1s.Add(label, classifyResult.f1);
                 resultDescriptionModel.AUCs.Add(label, classifyResult.auc);
+                resultDescriptionModel.Precisions.Add(label, classifyResult.precision);
+                resultDescriptionModel.Recalls.Add(label, classifyResult.recall);
             }
             await fireUpdated(new List<ResultItemModel>(), 1.0, resultDescriptionModel);
             await fireCompleted();

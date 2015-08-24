@@ -75,6 +75,11 @@ namespace PanoramicDataWin8.model.data.common
 
         public abstract int GetIndex(double value);
 
+        public virtual int GetDisplayIndex(double value)
+        {
+            return GetIndex(value);
+        }
+
         public abstract double AddStep(double value);
 
         public virtual string GetLabel(double value)
@@ -89,6 +94,7 @@ namespace PanoramicDataWin8.model.data.common
             {
                 labels.Add(new BinLabel()
                 {
+                    Value = bin,
                     MinValue = bin,
                     MaxValue = AddStep(bin),
                     Label = GetLabel(bin)
@@ -101,6 +107,7 @@ namespace PanoramicDataWin8.model.data.common
 
     public class BinLabel
     {
+        public double Value { get; set; }
         public double MinValue { get; set; }
         public double MaxValue { get; set; }
         public string Label { get; set; }

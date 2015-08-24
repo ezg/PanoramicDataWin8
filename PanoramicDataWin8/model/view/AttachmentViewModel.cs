@@ -166,7 +166,7 @@ namespace PanoramicDataWin8.model.view
 
         void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == _visualizationViewModel.QueryModel.GetPropertyName(() => _visualizationViewModel.QueryModel.JobType) |
+            if (e.PropertyName == _visualizationViewModel.QueryModel.GetPropertyName(() => _visualizationViewModel.QueryModel.TaskType) |
                 e.PropertyName == _visualizationViewModel.QueryModel.GetPropertyName(() => _visualizationViewModel.QueryModel.VisualizationType))
             {
                 initialize();
@@ -178,18 +178,19 @@ namespace PanoramicDataWin8.model.view
             if (AttachmentHeaderViewModels.Count == 0)
             {
                 AttachmentHeaderViewModels.Clear();
-                if (_visualizationViewModel.QueryModel.JobType == JobType.DB)
+                if (_visualizationViewModel.QueryModel.TaskType == "")
                 {
                     if (_attachmentOrientation == AttachmentOrientation.Bottom)
                     {
                         createDbBottom();
                     }
                 }
-                else if (_visualizationViewModel.QueryModel.JobType == JobType.logistic_regression ||
-                    _visualizationViewModel.QueryModel.JobType == JobType.random_forest ||
-                    _visualizationViewModel.QueryModel.JobType == JobType.svm ||
-                    _visualizationViewModel.QueryModel.JobType == JobType.naive_bayes)
+                else if (_visualizationViewModel.QueryModel.TaskType != "")
                 {
+                    if (_attachmentOrientation == AttachmentOrientation.Top)
+                    {
+                        createLogregTop();
+                    }
                     if (_attachmentOrientation == AttachmentOrientation.Bottom)
                     {
                         createLogregBottom();
@@ -200,6 +201,25 @@ namespace PanoramicDataWin8.model.view
                     }
                 }
             }
+        }
+
+        void createLogregTop()
+        {
+            AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
+            {
+                InputUsage = InputUsage.Label,
+                AcceptsInputGroupModels = false,
+                AcceptsInputModels = false
+            };
+
+            header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
+            {
+                AttachmentHeaderViewModel = header,
+                //Size = new Vec(25,25),
+                //TargetSize = new Vec(25, 25),
+                Label = "generate code"
+            };
+            AttachmentHeaderViewModels.Add(header);
         }
 
         void createLogregLeft()

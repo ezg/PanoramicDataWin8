@@ -60,12 +60,14 @@ namespace PanoramicDataWin8.view.vis.render
         public override void Dispose()
         {
             base.Dispose();
+            removeMenu();
             InputFieldView.InputFieldViewModelTapped -= InputFieldViewInputFieldViewModelTapped;
             if (DataContext != null)
             {
                 (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
                 (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged -= X_CollectionChanged;
                 (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged -= Y_CollectionChanged;
+                (DataContext as VisualizationViewModel).QueryModel.FilterModels.CollectionChanged -= FilterModels_CollectionChanged;
                 (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated -= QueryModel_QueryModelUpdated;
                 ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated -= resultModel_ResultModelUpdated;
@@ -81,6 +83,7 @@ namespace PanoramicDataWin8.view.vis.render
                 (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged += X_CollectionChanged;
                 (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged += Y_CollectionChanged;
                 (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
+                (DataContext as VisualizationViewModel).QueryModel.FilterModels.CollectionChanged += FilterModels_CollectionChanged;
                 ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
                 //mainLabel.Text = (DataContext as VisualizationViewModel).QueryModel.VisualizationType.ToString();
@@ -92,7 +95,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (e.QueryModelUpdatedEventType == QueryModelUpdatedEventType.FilterModels)
             {
-                _plotRendererContentProvider.UpdateFilterModels((sender as QueryModel).FilterModels);
+                _plotRendererContentProvider.UpdateFilterModels((sender as QueryModel).FilterModels.ToList());
                 render();
             }
         }
@@ -424,18 +427,6 @@ namespace PanoramicDataWin8.view.vis.render
                 }
 
                 QueryModel queryModel = (DataContext as VisualizationViewModel).QueryModel;
-                var vcs = hits.SelectMany(h => h.ValueComparisons).ToList();
-
-                var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
-                var yAom = queryModel.GetUsageInputOperationModel(InputUsage.Y).First();
-                tbSelection.Text = xAom.InputModel.Name + ": " +
-                                   vcs.Where(vc => Equals(vc.InputOperationModel, xAom))
-                                       .Min(vc => vc.Value);
-                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.InputOperationModel, xAom)).Max(vc => vc.Value);
-                tbSelection.Text += ", " + yAom.InputModel.Name + ": " +
-                                   vcs.Where(vc => Equals(vc.InputOperationModel, yAom))
-                                       .Min(vc => vc.Value);
-                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.InputOperationModel, yAom)).Max(vc => vc.Value);
 
                 if (hits.Any(h => queryModel.FilterModels.Contains(h)))
                 {
@@ -446,11 +437,48 @@ namespace PanoramicDataWin8.view.vis.render
                     queryModel.AddFilterModels(hits);
                 }
             }
+        }
+
+
+        void FilterModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+
+            QueryModel queryModel = (DataContext as VisualizationViewModel).QueryModel;
+            if (queryModel.FilterModels.Count > 0 &&
+                queryModel.GetUsageInputOperationModel(InputUsage.X).Count > 0 &&
+                queryModel.GetUsageInputOperationModel(InputUsage.Y).Count > 0)
+            {
+                var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
+                var yAom = queryModel.GetUsageInputOperationModel(InputUsage.Y).First();
+
+                if (queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Count(vc => Equals(vc.InputOperationModel, xAom)) > 0)
+                {
+                    tbSelection.Text = xAom.InputModel.Name + ": " +
+                                       queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, xAom))
+                                           .Min(vc => vc.Value);
+                    tbSelection.Text += " - " + queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, xAom)).Max(vc => vc.Value);
+                }
+                if (!xAom.Equals(yAom) &&
+                    queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Count(vc => Equals(vc.InputOperationModel, yAom)) > 0)
+                {
+                    tbSelection.Text += ", " + yAom.InputModel.Name + ": " +
+                                        queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, yAom))
+                                            .Min(vc => vc.Value);
+                    tbSelection.Text += " - " + queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, yAom)).Max(vc => vc.Value);
+                }
+
+                if (queryModel.FilterModels.Any(fm => fm.Value.HasValue))
+                {
+                    tbSelection.Text += ", avg value: " + queryModel.FilterModels.Where(fm => fm.Value.HasValue).Average(fm => fm.Value.Value).ToString("F1");
+                }
+                //tbSelection.Text = "" + queryModel.FilterModels.Count;
+            }
             else
             {
                 tbSelection.Text = "";
             }
         }
+
 
         void render()
         {
@@ -590,14 +618,6 @@ namespace PanoramicDataWin8.view.vis.render
 
                 var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
                 var yAom = queryModel.GetUsageInputOperationModel(InputUsage.Y).First();
-                tbSelection.Text = xAom.InputModel.Name + ": " +
-                                   vcs.Where(vc => Equals(vc.InputOperationModel, xAom))
-                                       .Min(vc => vc.Value);
-                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.InputOperationModel, xAom)).Max(vc => vc.Value);
-                tbSelection.Text += ", " + yAom.InputModel.Name + ": " +
-                                   vcs.Where(vc => Equals(vc.InputOperationModel, yAom))
-                                       .Min(vc => vc.Value);
-                tbSelection.Text += " - " + vcs.Where(vc => Equals(vc.InputOperationModel, yAom)).Max(vc => vc.Value);
 
                 if (hits.Any(h => queryModel.FilterModels.Contains(h)))
                 {
@@ -608,11 +628,6 @@ namespace PanoramicDataWin8.view.vis.render
                     queryModel.AddFilterModels(hits);
                 }
             }
-            else
-            {
-                tbSelection.Text = "";
-            }
-
             return true;
         }
     }

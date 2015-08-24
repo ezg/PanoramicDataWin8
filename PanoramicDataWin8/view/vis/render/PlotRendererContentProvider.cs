@@ -122,12 +122,12 @@ namespace PanoramicDataWin8.view.vis.render
 
             // scale axis to 0 if this is a bar chart
             if (_isXAxisAggregated && !_isYAxisAggregated && 
-                (xAom.AggregateFunction == AggregateFunction.Count || xAom.AggregateFunction == AggregateFunction.Sum))
+                (xAom.AggregateFunction == AggregateFunction.Count))
             {
                 _xBinRange = QuantitativeBinRange.Initialize(0, _xBinRange.DataMaxValue, 10, false);
             }
             if (!_isXAxisAggregated && _isYAxisAggregated &&
-               (yAom.AggregateFunction == AggregateFunction.Count || yAom.AggregateFunction == AggregateFunction.Sum))
+               (yAom.AggregateFunction == AggregateFunction.Count))
             {
                 _yBinRange = QuantitativeBinRange.Initialize(0, _yBinRange.DataMaxValue, 10, false);
             }
@@ -368,30 +368,42 @@ namespace PanoramicDataWin8.view.vis.render
                             double? xValue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.X).First()].Value;
                             double? yValue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Y).First()].Value;
                             double? value = null;
+                            double? unNormalizedvalue = null;
                             if (_queryModel.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()))
                             {
+                                unNormalizedvalue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()].Value;
                                 value = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()].NoramlizedValue;
                             }
                             else if (_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
                             {
+                                unNormalizedvalue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value;
                                 value = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
                             }
 
                             if (value != null)
                             {
-                                xFrom = toScreenX((float)xBins[_xBinRange.GetIndex(xValue.Value)]);
-                                if (_isXAxisAggregated && !_isYAxisAggregated)
+                                if (_isXAxisAggregated && !_isYAxisAggregated &&
+                                    (_xAom.AggregateFunction == AggregateFunction.Count))
                                 {
                                     xFrom = toScreenX(0);
                                 }
-                                yFrom = toScreenY((float)yBins[_yBinRange.GetIndex(yValue.Value)]);
-                                if (!_isXAxisAggregated && _isYAxisAggregated)
+                                else
+                                {
+                                    xFrom = toScreenX((float)xBins[_xBinRange.GetDisplayIndex(xValue.Value)]);
+                                }
+                                
+                                if (!_isXAxisAggregated && _isYAxisAggregated &&
+                                    (_yAom.AggregateFunction == AggregateFunction.Count))
                                 {
                                     yFrom = toScreenY(0);
                                 }
+                                else
+                                {
+                                    yFrom = toScreenY((float)yBins[_yBinRange.GetDisplayIndex(yValue.Value)]);
+                                }
 
-                                xTo = toScreenX((float)xBins[_xBinRange.GetIndex(_xBinRange.AddStep(xValue.Value))]);
-                                yTo = toScreenY((float)yBins[_yBinRange.GetIndex(_yBinRange.AddStep(yValue.Value))]);
+                                xTo = toScreenX((float)xBins[_xBinRange.GetDisplayIndex(_xBinRange.AddStep(xValue.Value))]);
+                                yTo = toScreenY((float)yBins[_yBinRange.GetDisplayIndex(_yBinRange.AddStep(yValue.Value))]);
 
                                 float alpha = 0.1f * (float)Math.Log10(value.Value) + 1f;
                                 var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value.Value));
@@ -420,6 +432,7 @@ namespace PanoramicDataWin8.view.vis.render
                                                 var bins = resultDescriptionModel.BinRanges[i].GetBins();
                                                 bins.Add(resultDescriptionModel.BinRanges[i].AddStep(bins.Max()));
                                                 var v = resultDescriptionModel.BinRanges[i].GetIndex(binRangeValue.Value);
+                                                filterModel.Value = unNormalizedvalue;
                                                 filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.GREATER_THAN_EQUAL, bins[v]));
                                                 filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.LESS_THAN, bins[v + 1]));
                                             }
@@ -457,6 +470,23 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     for (int yi = 0; yi < resultDescriptionModel.BinRanges[_yIndex].GetBins().Count; yi++)
                     {
+                        BinIndex binIndex = new BinIndex(xi, yi);
+                        double? unNormalizedvalue = null;
+                        if (_binDictonary.ContainsKey(binIndex))
+                        {
+                            foreach (var resultItem in _binDictonary[binIndex])
+                            {
+                                if (_queryModel.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()))
+                                {
+                                    unNormalizedvalue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.Value).First()].Value;
+                                }
+                                else if (_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
+                                {
+                                    unNormalizedvalue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value;
+                                }
+                            }
+                        }
+
                         xFrom = toScreenX((float) xBins[xi]);
                         yFrom = toScreenY((float) yBins[yi]);
                         xTo = toScreenX((float) xBins[xi + 1]);
@@ -470,6 +500,7 @@ namespace PanoramicDataWin8.view.vis.render
 
                         IGeometry hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
                         var filterModel = new FilterModel();
+                        filterModel.Value = unNormalizedvalue;
                         filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.GREATER_THAN_EQUAL, xBins[xi]));
                         filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.LESS_THAN, xBins[xi + 1]));
                         filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.GREATER_THAN_EQUAL, yBins[yi]));

@@ -261,28 +261,30 @@ namespace PanoramicDataWin8.model.data
             }
         }
 
-        private List<FilterModel> _filterModels = new List<FilterModel>();
-        public List<FilterModel> FilterModels
+        private ObservableCollection<FilterModel> _filterModels = new ObservableCollection<FilterModel>();
+        public ObservableCollection<FilterModel> FilterModels
         {
             get
             {
                 return _filterModels;
             }
-            set
-            {
-                this.SetProperty(ref _filterModels, value);
-            }
         }
 
         public void ClearFilterModels()
         {
-            _filterModels.Clear();
+            foreach (var filterModel in _filterModels.ToArray())
+            {
+                _filterModels.Remove(filterModel);
+            }
             FireQueryModelUpdated(QueryModelUpdatedEventType.FilterModels);
         }
 
         public void AddFilterModels(List<FilterModel> filterModels)
         {
-            _filterModels.AddRange(filterModels);
+            foreach (var filterModel in filterModels)
+            {
+                _filterModels.Add(filterModel);
+            }
             FireQueryModelUpdated(QueryModelUpdatedEventType.FilterModels);
         }
 
@@ -314,7 +316,7 @@ namespace PanoramicDataWin8.model.data
         {
             if (!_isClone)
             {
-                if (type == QueryModelUpdatedEventType.Structure)
+                if (type == QueryModelUpdatedEventType.Structure || type == QueryModelUpdatedEventType.Links)
                 {
                     ClearFilterModels();
                 }
@@ -380,16 +382,16 @@ namespace PanoramicDataWin8.model.data
             return AxisType.Nominal;
         }
 
-        private JobType _jobType;
-        public JobType JobType
+        private string _taskType;
+        public string TaskType
         {
             get
             {
-                return _jobType;
+                return _taskType;
             }
             set
             {
-                this.SetProperty(ref _jobType, value);
+                this.SetProperty(ref _taskType, value);
                 FireQueryModelUpdated(QueryModelUpdatedEventType.Structure);
             }
         }
@@ -427,6 +429,4 @@ namespace PanoramicDataWin8.model.data
     public enum QueryModelUpdatedEventType { Structure, Links, FilterModels }
     
     public enum VisualizationType { table, bar, map, plot, line }
-
-    public enum JobType { DB, logistic_regression, naive_bayes, svm, random_forest }
 }

@@ -30,17 +30,17 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private JobType _jobType;
-        public JobType JobType
+        private string _taskType;
+        public string TaskType
         {
             get
             {
-                return _jobType;
+                return _taskType;
             }
             set
             {
-                _mainLabel = value.ToString();
-                this.SetProperty(ref _jobType, value);
+                _mainLabel = value.Replace("_", " ").ToString();
+                this.SetProperty(ref _taskType, value);
             }
         }
 

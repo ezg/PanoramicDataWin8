@@ -28,7 +28,7 @@ namespace PanoramicDataWin8.view.vis.render
         private float _leftOffset = 10;
         private float _rightOffset = 10;
         private float _topOffset = 10;
-        private float _bottomtOffset = 10;
+        private float _bottomtOffset = 20;
 
         private float _deviceWidth = 0;
         private float _deviceHeight = 0;
@@ -43,7 +43,7 @@ namespace PanoramicDataWin8.view.vis.render
         private D2D.Brush _textBrush;
         private DW.TextFormat _textFormat;
         private DW.TextFormat _textFormatBig;
-
+        
         private ResultModel _resultModel = null;
         private ClassfierResultDescriptionModel _classfierResultDescriptionModel = null;
 
@@ -97,46 +97,153 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 computeSizes(d2dDeviceContext, dwFactory);
 
-                drawString(d2dDeviceContext, dwFactory, _textFormatBig, toScreenX(50), toScreenY(90), _classfierResultDescriptionModel.Labels[_labelIndex].Name, false, true, true);
-                
-                renderConfusionMatrix(d2dDeviceContext, dwFactory);
-                renderRoc(d2dDeviceContext, dwFactory);
+                if (_deviceHeight < 0 || _deviceWidth < 0)
+                {
+                    return;
+                }
+                var centerX =  _deviceWidth/2.0f + _leftOffset;
+                var centerY =  _deviceHeight/2.0f + _topOffset;
+                drawString(d2dDeviceContext, dwFactory, _textFormatBig, centerX, _topOffset, _classfierResultDescriptionModel.Labels[_labelIndex].Name, false, true, false);
+
+                var w = (_deviceWidth - 20)/3.0f;
+                var h = Math.Max(0, _deviceHeight/2.0f - 50);
+
+                renderGauge(d2dDeviceContext, dwFactory,
+                    _leftOffset, 
+                    40,
+                    w,
+                    h, 
+                    (float)_classfierResultDescriptionModel.Precisions[_classfierResultDescriptionModel.Labels[_labelIndex]], "precision");
+
+                renderGauge(d2dDeviceContext, dwFactory,
+                   _leftOffset + w + 10,
+                   40,
+                   w,
+                   h,
+                   (float)_classfierResultDescriptionModel.Recalls[_classfierResultDescriptionModel.Labels[_labelIndex]], "recall");
+
+                renderGauge(d2dDeviceContext, dwFactory,
+                   _leftOffset + (w + 10)  * 2,
+                   40,
+                   w,
+                   h,
+                    (float)_classfierResultDescriptionModel.F1s[_classfierResultDescriptionModel.Labels[_labelIndex]], "f1");
+
+                renderConfusionMatrix(d2dDeviceContext, dwFactory,
+                    _leftOffset, centerY, _deviceWidth / 2.0f - 10, _deviceHeight / 2.0f);
+                renderRoc(d2dDeviceContext, dwFactory,
+                    centerX + 10, centerY, _deviceWidth / 2.0f - 10, _deviceHeight / 2.0f);
             };
         }
 
-        private void renderConfusionMatrix(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
+        private void renderGauge(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory,
+            float xStart, float yStart, float width, float height, float value, string name)
         {
-            if (_deviceHeight < 0 || _deviceWidth < 0)
+            value = (float) Math.Min(1.0, Math.Max(0.0, value));
+            var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
+            var blue = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(41f / 255f, 170f / 255f, 213f / 255f, 255f / 255f));
+
+            var roundedRect = new D2D.RoundedRectangle();
+
+            var rect = new RectangleF(xStart,
+                yStart,
+                width,
+                height);
+            //d2dDeviceContext.DrawRectangle(rect, white);
+            drawString(d2dDeviceContext, dwFactory, _textFormat, width / 2.0f + xStart, height + yStart - 20, name, false, true, false);
+
+            height -= 25;
+            var radius = Math.Min(width / 2.0f, height / 2.0f) - 4;
+
+            D2D.Ellipse ell = new D2D.Ellipse(new Vector2(
+                (width / 2.0f) + xStart,
+                (height / 2.0f) + yStart), radius, radius);
+            d2dDeviceContext.DrawEllipse(ell, white, 4);
+
+            var thickness = 4.0f;
+
+            float angle = 2.0f * (float)Math.PI * value - (float) Math.PI / 2.0f;
+
+            if (width > 0 && height > 0)
             {
-                return;
+                D2D.PathGeometry geom = new D2D.PathGeometry(d2dDeviceContext.Factory);
+                using (var sink = geom.Open())
+                {
+                    sink.BeginFigure(new Vector2((width/2.0f) + xStart, (height/2.0f) + yStart - (radius)), D2D.FigureBegin.Hollow);
+                    var arc = new D2D.ArcSegment();
+                    arc.ArcSize = value > 0.5 ? D2D.ArcSize.Large : D2D.ArcSize.Small;
+                    float x = (width/2.0f) + xStart;
+                    float y = (height/2.0f) + yStart;
+                    arc.Point = new Vector2(
+                        (float) Math.Cos(angle)*(radius) + x,
+                        (float) Math.Sin(angle)*(radius) + y);
+                    arc.SweepDirection = D2D.SweepDirection.Clockwise;
+                    arc.Size = new Size2F((radius), (radius));
+                    sink.AddArc(arc);
+                    sink.EndFigure(D2D.FigureEnd.Open);
+                    sink.Close();
+                }
+                d2dDeviceContext.DrawGeometry(geom, blue, 4);
+
+                drawString(d2dDeviceContext, dwFactory, _textFormat,
+                    (width/2.0f) + xStart,
+                    (height/2.0f) + yStart,
+                    (value*100.0).ToString("F1") + "%", false, true, true);
             }
+            blue.Dispose();
+            white.Dispose();
+        }
+
+
+        private void renderConfusionMatrix(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory,
+            float xStart, float yStart, float width, float height)
+        {
+           // width -= 20;
+            height -= 20;
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
             var roundedRect = new D2D.RoundedRectangle();
-            var h = 20f;
-            var w = 20f;
-            var xOff = 5;
-            var yOff = 25;
+            
+            var rect = new RectangleF(xStart,
+                       yStart,
+                       width,
+                       height);
+            //d2dDeviceContext.DrawRectangle(rect, white);
+
+            drawString(d2dDeviceContext, dwFactory, _textFormatBig, xStart + width / 2.0f + 20, yStart, "confusion matrix", false, true, false);
+
+            yStart += 20;
+            drawString(d2dDeviceContext, dwFactory, _textFormat, xStart + width / 2.0f + 20, yStart, "predicted", false, true, false);
+
+            var oldTransform = d2dDeviceContext.Transform;
+            var mat = Matrix3x2.Rotation((-90f * (float)Math.PI) / 180.0f, new Vector2(xStart, yStart + height / 2.0f + 10f));
+            d2dDeviceContext.Transform = mat * oldTransform;
+            drawString(d2dDeviceContext, dwFactory, _textFormat, xStart, yStart + height / 2.0f + 10, "actual", false, true, false);
+            d2dDeviceContext.Transform = oldTransform;
+
+            var xOff = xStart + 40;
+            var yOff = yStart + 40;
+            var h = (height - 60) / 2.0f;
+            var w = (width - 40) / 2.0f;
 
             for (int r = 0; r < _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]].Count; r++)
             {
-                drawString(d2dDeviceContext, dwFactory, _textFormat, toScreenX((float)r * w + xOff + w / 2.0f), toScreenY(yOff + h * 2) - 15, r+"", false, true, false);
-                drawString(d2dDeviceContext, dwFactory, _textFormat, toScreenX(xOff - 1), toScreenY(yOff + h / 2.0f + (1-r) * h), r + "", false, false, true);
+                drawString(d2dDeviceContext, dwFactory, _textFormat, xOff + w / 2.0f + (r * w), yOff - 20, (1 - r) + "", false, true, false);
+                drawString(d2dDeviceContext, dwFactory, _textFormat, xOff - 10, yOff + h / 2.0f + (r * h), (1 - r) + "", false, true, true);
 
                 var row = _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]][r];
+                var total = _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]].SelectMany(t => t).Sum();
                 var valueSum = (float) row.Sum();
                 for (int c = 0; c < row.Count; c++)
                 {
-                    var value = valueSum == 0.0 ? 0.0 : (float) row[c] / valueSum;
-                    var yFrom = toScreenY((float)(1 - r) * w + yOff);
-                    var xFrom = toScreenX((float)c * h + xOff);
-                    var yTo = toScreenY((float)(1 - r) * w + w + yOff);
-                    var xTo = toScreenX((float)c * h + h + xOff);
+                    var value = total == 0.0 ? 0.0 : (float)row[c] / total;
+                    var yFrom = ((float)r * h + yOff);
+                    var xFrom = (float)c * w + xOff;
                     
                     roundedRect.Rect = new RectangleF(
                         xFrom,
-                        yTo,
-                        xTo - xFrom,
-                        yFrom - yTo);
+                        yFrom,
+                        w,
+                        h);
                     roundedRect.RadiusX = roundedRect.RadiusY = 4;
 
                     if (value > 0)
@@ -147,13 +254,7 @@ namespace PanoramicDataWin8.view.vis.render
                         d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
                         binColor.Dispose();
                     }
-
-                    /*if (r == 1 && c == 1)
-                    {
-                        d2dDeviceContext.FillRoundedRectangle(roundedRect, white);
-                    }*/
-                    
-                    //d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                    drawString(d2dDeviceContext, dwFactory, _textFormat, xFrom + w / 2.0f, yFrom + h / 2.0f, row[c].ToString("N0"), false, true, true);
 
                     d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
                 }
@@ -161,43 +262,52 @@ namespace PanoramicDataWin8.view.vis.render
             white.Dispose();
         }
 
-        private void renderRoc(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
+        private void renderRoc(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory,
+            float xStart, float yStart, float width, float height)
         {
-            if (_deviceHeight < 0 || _deviceWidth < 0)
-            {
-                return;
-            }
-
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
             var blue = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(41f / 255f, 170f / 255f, 213f / 255f, 255f / 255f));
-            var h = 40f;
-            var w = 40f;
-            var xOff = 55;
-            var yOff = 25;
-            var xFrom = toScreenX((float)xOff);
-            var yFrom = toScreenY((float)yOff);
-            var xTo = toScreenX((float)w + xOff);
-            var yTo = toScreenY((float)h + yOff);
-            var rect = new RectangleF(xFrom,
-                        yTo,
-                        xTo - xFrom,
-                        yFrom - yTo);
+
+            drawString(d2dDeviceContext, dwFactory, _textFormatBig, xStart + width / 2.0f + 5, yStart, "roc curve", false, true, false);
+
+            yStart += 60;
+
+            float xOff = xStart + 20f;
+            float yOff = yStart;
+            float h = (height - 80f);
+            float w = (width - 20f);
+            drawString(d2dDeviceContext, dwFactory, _textFormat, xOff + w / 2.0f, yStart + h + 5, "fpr", false, true, false);
+
+            var oldTransform = d2dDeviceContext.Transform;
+            var mat = Matrix3x2.Rotation((-90f * (float)Math.PI) / 180.0f, new Vector2(xStart + 5, yStart + h / 2.0f));
+            d2dDeviceContext.Transform = mat * oldTransform;
+            drawString(d2dDeviceContext, dwFactory, _textFormat, xStart + 5, yStart + h / 2.0f, "tpr", false, true, false);
+            d2dDeviceContext.Transform = oldTransform;
+
+
+            var rect = new RectangleF(xOff,
+                        yOff,
+                        w,
+                        h);
             d2dDeviceContext.DrawRectangle(rect, white);
-            d2dDeviceContext.DrawLine(new Vector2(xTo, yTo), new Vector2(xFrom, yFrom), white, 0.5f);
+            d2dDeviceContext.DrawLine(new Vector2(xOff, yOff + h), new Vector2(xOff + w, yOff), white, 0.5f);
 
             Pt last = new Pt(0,0);
             foreach (var pt in _classfierResultDescriptionModel.RocCurves[_classfierResultDescriptionModel.Labels[_labelIndex]])
             {
                 d2dDeviceContext.DrawLine(
                     new Vector2(
-                        toScreenX((float)last.X * w + xOff), 
-                        toScreenY((float)last.Y * h + yOff)), 
+                        (float) (last.X*w + xOff),
+                        (float) ((1.0 - last.Y) * h + yOff)), 
                     new Vector2(
-                        toScreenX((float)pt.X * w + xOff),
-                        toScreenY((float)pt.Y * h + yOff)), blue, 1f);
+                        (float)pt.X * w + xOff,
+                        (float)(1.0 - pt.Y) * h + yOff), blue, 1f);
                 last = pt;
             }
 
+            var auc = _classfierResultDescriptionModel.AUCs[_classfierResultDescriptionModel.Labels[_labelIndex]];
+            drawString(d2dDeviceContext, dwFactory, _textFormat, xOff + w - 4, yOff + h - 15, "auc: " + auc.ToString("F2"), false, false, false);
+            
             blue.Dispose();
             white.Dispose();
         }
@@ -251,17 +361,5 @@ namespace PanoramicDataWin8.view.vis.render
             // prebaked text - useful for constant labels as it greatly improves performance
             //_textLayout = disposeCollector.Collect(new DW.TextLayout(dwFactory, "Demo DirectWrite text here.", _textFormat, 100f, 100f));
         }
-
-        private float toScreenX(float x)
-        {
-            return ((x - _minX) / _xScale) * (_deviceWidth) + (_leftOffset);
-        }
-        private float toScreenY(float y)
-        {
-            float retY = ((y - _minY) / _yScale) * (_deviceHeight);
-            return _flipY ? (_deviceHeight) - retY + (_topOffset) : retY + (_topOffset);
-        }
-
-
     }
 }

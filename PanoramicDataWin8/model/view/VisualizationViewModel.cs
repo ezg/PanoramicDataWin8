@@ -11,8 +11,8 @@ namespace PanoramicDataWin8.model.view
 {
     public class VisualizationViewModel : ExtendedBindableBase
     {
-        public static double WIDTH = 200;
-        public static double HEIGHT = 200;
+        public static double WIDTH = 300;
+        public static double HEIGHT = 300;
 
         public static double MIN_WIDTH = 100;
         public static double MIN_HEIGHT = 100;

@@ -18,6 +18,8 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <NuGetPackageImportStamp>9e41b74f</NuGetPackageImportStamp>
+    <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+    <AppxBundlePlatforms>neutral</AppxBundlePlatforms>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -119,6 +121,7 @@
     <Compile Include="controller\data\tuppleware\gateway\ProjectCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\CatalogCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\ClassifyCommand.cs" />
+    <Compile Include="controller\data\tuppleware\gateway\TasksCommand.cs" />
     <Compile Include="controller\data\tuppleware\json\ClassifyResult.cs" />
     <Compile Include="controller\data\tuppleware\gateway\SelectCommand.cs" />
     <Compile Include="controller\data\tuppleware\TuppleWareDataProvider.cs" />
@@ -347,7 +350,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
-    <None Include="PanoramicDataWin8_TemporaryKey.pfx" />
+    <None Include="pano_data_win8_key.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\img\BadgeLogo.scale-100.png" />
@@ -518,6 +521,12 @@
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
     <VisualStudioVersion>12.0</VisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>pano_data_win8_key.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

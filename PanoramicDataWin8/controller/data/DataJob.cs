@@ -26,7 +26,7 @@ namespace PanoramicDataWin8.controller.data
         private Stopwatch _stopWatch = new Stopwatch();
 
         private List<InputOperationModel> _dimensions = new List<InputOperationModel>();
-        private List<Dictionary<object, double>> _uniqueValues = new List<Dictionary<object, double>>();
+        private List<Dictionary<string, double>> _uniqueValues = new List<Dictionary<string, double>>();
 
         public QueryModel QueryModel { get; set; }
         public QueryModel QueryModelClone { get; set; }
@@ -58,7 +58,7 @@ namespace PanoramicDataWin8.controller.data
                                  QueryModelClone.GetUsageInputOperationModel(InputUsage.Y)).Concat(
                                  QueryModelClone.GetUsageInputOperationModel(InputUsage.Group)).ToList();
 
-                _uniqueValues = _dimensions.Select(d => new Dictionary<object, double>()).ToList();
+                _uniqueValues = _dimensions.Select(d => new Dictionary<string, double>()).ToList();
 
                 _axisTypes = _dimensions.Select(d => QueryModelClone.GetAxisType(d)).ToList();
                 QueryModel.ResultModel.ResultDescriptionModel = new VisualizationResultDescriptionModel();
@@ -126,7 +126,7 @@ namespace PanoramicDataWin8.controller.data
                 {
                     if (!_isIncremental)
                     {
-                        _uniqueValues = _dimensions.Select(d => new Dictionary<object, double>()).ToList();
+                        _uniqueValues = _dimensions.Select(d => new Dictionary<string, double>()).ToList();
                     }
                     setVisualizationValues(dataPage.DataRow);
                     if (_binner != null)
@@ -188,7 +188,7 @@ namespace PanoramicDataWin8.controller.data
             }
         }
 
-        private double? getVisualizationValue(AxisType axisType, object value, InputOperationModel inputOperationModel, Dictionary<object, double> uniqueValues) 
+        private double? getVisualizationValue(AxisType axisType, object value, InputOperationModel inputOperationModel, Dictionary<string, double> uniqueValues) 
         {
             if (axisType == AxisType.Quantitative)
             {
@@ -220,7 +220,7 @@ namespace PanoramicDataWin8.controller.data
             {
                 if (binStructure.BinRanges[d] is NominalBinRange)
                 {
-                    (binStructure.BinRanges[d] as NominalBinRange).Labels = _uniqueValues[d].OrderBy(kvp => kvp.Key.ToString()).Select(kvp => kvp.Key.ToString()).ToList();
+                    (binStructure.BinRanges[d] as NominalBinRange).SetLabels(_uniqueValues[d]);
                 }
             }
             foreach (var bin in binStructure.Bins.Values)

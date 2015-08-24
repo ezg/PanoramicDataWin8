@@ -332,7 +332,7 @@ namespace PanoramicDataWin8
             {
                 MainModel mainModel = (DataContext as MainModel);
                 var buttonBounds = addJobButton.GetBounds(this);
-                var jobTypes = Enum.GetValues(typeof(JobType)).Cast<JobType>().Where(jt => jt != JobType.DB).ToList();
+                var taskTypes = MainViewController.Instance.MainModel.Tasks;
 
                 if (_jobMenu != null)
                 {
@@ -343,20 +343,20 @@ namespace PanoramicDataWin8
                 }
 
                 TileMenuItemViewModel parentModel = new TileMenuItemViewModel(null);
-                parentModel.ChildrenNrColumns = (int)Math.Ceiling(jobTypes.Count() / 8.0);
-                parentModel.ChildrenNrRows = (int)Math.Min(8.0, jobTypes.Count());
+                parentModel.ChildrenNrColumns = (int)Math.Ceiling(taskTypes.Count() / 8.0);
+                parentModel.ChildrenNrRows = (int)Math.Min(8.0, taskTypes.Count());
                 parentModel.Alignment = Alignment.Center;
                 parentModel.AttachPosition = AttachPosition.Right;
 
                 int count = 0;
-                foreach (var jobType in jobTypes)
+                foreach (var jobType in taskTypes)
                 {
                     TileMenuItemViewModel tileMenuItemViewModel = new TileMenuItemViewModel(parentModel);
                     tileMenuItemViewModel.Alignment = Alignment.Center;
                     tileMenuItemViewModel.AttachPosition = AttachPosition.Right;
                     JobTypeViewModel jobTypeViewModel = new JobTypeViewModel()
                     {
-                        JobType = jobType
+                        TaskType = jobType
                     };
                     tileMenuItemViewModel.TileMenuContentViewModel = new JobTypeViewTileMenuContentViewModel()
                     {

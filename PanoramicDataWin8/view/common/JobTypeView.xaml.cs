@@ -155,7 +155,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow = new JobTypeView();
                 _shadow.DataContext = new JobTypeViewModel()
                 {
-                    JobType = (DataContext as JobTypeViewModel).JobType,
+                    TaskType = (DataContext as JobTypeViewModel).TaskType,
                     IsShadow = true
                 };
 

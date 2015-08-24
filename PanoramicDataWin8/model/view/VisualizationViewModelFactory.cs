@@ -7,10 +7,10 @@ namespace PanoramicDataWin8.model.view
 {
     public class VisualizationViewModelFactory
     {
-        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType, VisualizationType visualizationType)
+        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, string taskType, VisualizationType visualizationType)
         {
             VisualizationViewModel visualizationViewModel = new VisualizationViewModel(schemaModel);
-            visualizationViewModel.QueryModel.JobType = jobType;
+            visualizationViewModel.QueryModel.TaskType = taskType;
 
             foreach (var attachmentOrientation in Enum.GetValues(typeof(AttachmentOrientation)).Cast<AttachmentOrientation>())
             {
@@ -25,11 +25,11 @@ namespace PanoramicDataWin8.model.view
             return visualizationViewModel;
         }
 
-        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, JobType jobType, InputModel inputModel)
+        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, string taskType, InputModel inputModel)
         {
-            VisualizationViewModel visualizationViewModel = CreateDefault(schemaModel, jobType, VisualizationType.table);
+            VisualizationViewModel visualizationViewModel = CreateDefault(schemaModel, taskType, VisualizationType.table);
 
-            if (jobType == JobType.DB)
+            if (taskType == "")
             {
                 if (inputModel is InputFieldModel)
                 {
@@ -79,21 +79,9 @@ namespace PanoramicDataWin8.model.view
                     }
                 }
             }
-            else if (jobType == JobType.logistic_regression)
+            else
             {
-                visualizationViewModel.QueryModel.JobType = JobType.logistic_regression;
-            }
-            else if (jobType == JobType.random_forest)
-            {
-                visualizationViewModel.QueryModel.JobType = JobType.random_forest;
-            }
-            else if (jobType == JobType.naive_bayes)
-            {
-                visualizationViewModel.QueryModel.JobType = JobType.naive_bayes;
-            }
-            else if (jobType == JobType.svm)
-            {
-                visualizationViewModel.QueryModel.JobType = JobType.svm;
+                visualizationViewModel.QueryModel.TaskType = taskType;
             }
 
             return visualizationViewModel;

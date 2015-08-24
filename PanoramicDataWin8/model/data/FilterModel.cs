@@ -10,6 +10,7 @@ namespace PanoramicDataWin8.model.data
     [JsonObject(MemberSerialization.OptOut)]
     public class FilterModel
     {
+        public double? Value { get; set; }
         public List<ValueComparison> ValueComparisons { get; set; }
         
         public FilterModel()

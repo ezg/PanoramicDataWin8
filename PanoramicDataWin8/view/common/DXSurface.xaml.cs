@@ -221,6 +221,10 @@ namespace PanoramicDataWin8.view.common
 
         private void StopRendering()
         {
+            if (_graphicsDevice == null || _graphicsDevice.Presenter == null)
+            {
+                return;
+            }
             Debug.Assert(_presenter != null);
             Debug.Assert(_graphicsDevice.Presenter != null);
 
@@ -255,6 +259,10 @@ namespace PanoramicDataWin8.view.common
 
         private void PerformRendering()
         {
+            if (_graphicsDevice == null || _graphicsDevice.Presenter == null)
+            {
+                return;
+            }
             Debug.Assert(_graphicsDevice.Presenter != null);
 
             if (!_isDirty && !_isAnimated) return;

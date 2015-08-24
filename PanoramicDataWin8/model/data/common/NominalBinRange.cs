@@ -1,22 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PanoramicDataWin8.model.data.common
 {
     public class NominalBinRange : BinRange
     {
-        private List<string> _labels = new List<string>();
-        public List<string> Labels
-        {
-            get
-            {
-                return _labels;
-            }
-            set
-            {
-                _labels = value;
-            }
-        }
+        private Dictionary<double, string> _labelsValue = new Dictionary<double, string>();
 
         private double _step = 0;
         public double Step
@@ -55,9 +45,27 @@ namespace PanoramicDataWin8.model.data.common
             {
                 scale.Add(v);
             }
+            //scale = _labelsValue.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
             
             return scale;
         }
+
+        public override List<BinLabel> GetLabels()
+        {
+            List<BinLabel> labels = new List<BinLabel>();
+            int count = 0;
+            labels = _labelsValue.OrderBy(kvp => kvp.Value).Select(kvp => new BinLabel()
+            {
+                Label = kvp.Value,
+                MinValue = count++,
+                MaxValue = count,
+                Value = kvp.Key
+
+            }).ToList();
+
+            return labels;
+        }
+
         public override BinRange GetUpdatedBinRange(double dataMin, double dataMax)
         {
             return new NominalBinRange(dataMin, dataMax, TargetBinNumber)
@@ -75,15 +83,29 @@ namespace PanoramicDataWin8.model.data.common
             return (int)Math.Floor((value - this.MinValue) / this.Step);
         }
 
+        public override int GetDisplayIndex(double value)
+        {
+            var index = _labelsValue.Keys.ToList().IndexOf((int)Math.Floor((value - this.MinValue) / this.Step));
+            if (index == -1)
+            {
+                index = _labelsValue.Keys.ToList().IndexOf((int)Math.Floor(((value - 1) - this.MinValue) / this.Step)) + 1;
+            }
+            return index;
+        }
+
         public override double AddStep(double value)
         {
             return value + Step;
         }
 
+        public void SetLabels(Dictionary<string, double> labels)
+        {
+            _labelsValue = labels.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+        }
+
         public override string GetLabel(double value)
         {
-            int index = GetIndex(value);
-            return Labels[index];
+            return _labelsValue[value];
         }
     }
 

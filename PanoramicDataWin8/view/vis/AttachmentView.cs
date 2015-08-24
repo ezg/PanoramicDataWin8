@@ -437,6 +437,65 @@ namespace PanoramicDataWin8.view.vis
                     }
                 }
             }
+            else if (model.AttachmentOrientation == AttachmentOrientation.Top)
+            {
+                var availableWidth = model.VisualizationViewModel.Size.X;
+                var tt = this.Opacity;
+                if (availableWidth > calculateMinPreferedSizeX(model.AttachmentHeaderViewModels))
+                {
+                    var remainingHeaders = model.AttachmentHeaderViewModels.ToList();
+                    var maxX = 0d;
+                    foreach (var header in model.AttachmentHeaderViewModels)
+                    {
+                        var startX = model.VisualizationViewModel.Position.X;
+                        var offsetX = (model.VisualizationViewModel.QueryModel.VisualizationType != VisualizationType.table ? 50 + GAP : 0);
+                        var currentX = startX;
+                        remainingHeaders.Remove(header);
+                        double headerWidth = header.PreferedItemSize.X;
+                        int nrCols = (availableWidth - calculateMinPreferedSizeX(remainingHeaders)) + GAP > 2 * header.PreferedItemSize.X + GAP ? 2 : 1;
+                        int leftNrElemPerCol = (int)Math.Ceiling((double)header.AttachmentItemViewModels.Count / (double)nrCols);
+                        int rightNrElemPercol = (int)Math.Floor((double)header.AttachmentItemViewModels.Count / (double)nrCols);
+                        double currentY = (model.VisualizationViewModel.Position.Y ) - GAP;// -(upperNrElemPerCol * header.PreferedItemSize.Y + (upperNrElemPerCol) * GAP);
+
+                        int currentCol = 0;
+                        int count = 0;
+                        foreach (var item in header.AttachmentItemViewModels)
+                        {
+                            var itemView = _attachmentItemViews[header].FirstOrDefault(v => v.DataContext == item);
+                            item.TargetPosition = new Pt(maxX + currentX + offsetX, currentY - header.PreferedItemSize.Y);
+                            currentY -= header.PreferedItemSize.Y + GAP;
+                            count++;
+                            if (count == leftNrElemPerCol)
+                            {
+                                currentCol++;
+                                currentY = (model.VisualizationViewModel.Position.Y + model.VisualizationViewModel.Size.Y) + GAP;
+                                currentX = startX + header.PreferedItemSize.Y + GAP;
+                            }
+                        }
+                        if (header.AddAttachmentItemViewModel != null)
+                        {
+                            header.AddAttachmentItemViewModel.TargetPosition = new Pt(
+                                maxX + startX + offsetX,
+                                (model.VisualizationViewModel.Position.Y) - GAP - header.PreferedItemSize.Y -
+                                leftNrElemPerCol * header.PreferedItemSize.Y - leftNrElemPerCol * GAP);
+                            // header.AddAttachmentItemViewModel.Size = new Vec(300, 300);
+
+                            _maxY = Math.Max(_maxY, header.AddAttachmentItemViewModel.TargetPosition.Y + header.AddAttachmentItemViewModel.Size.Y);
+                        }
+
+                        if (header.AttachmentItemViewModels.Count > 0)
+                        {
+                            maxX = header.AttachmentItemViewModels.Max(item => item.TargetPosition.X) + header.PreferedItemSize.X - model.VisualizationViewModel.Position.X + GAP - offsetX;
+                        }
+                        else
+                        {
+                            maxX += header.PreferedItemSize.X + GAP;
+                        }
+                        availableWidth -= headerWidth;
+
+                    }
+                }
+            }
             // update menu anker
             setMenuViewModelAnkerPosition();
         }
@@ -595,7 +654,8 @@ namespace PanoramicDataWin8.view.vis
             model.IsDisplayed = true;
 
             var closestModel = overElement ? getClosestModel(e.Bounds) : null;
-            if (closestModel != null && closestModel is AddAttachmentItemViewModel)
+            if (closestModel != null && closestModel is AddAttachmentItemViewModel &&
+                (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AcceptsInputModels)
             {
                 (closestModel as AddAttachmentItemViewModel).IsActive = true;
             }

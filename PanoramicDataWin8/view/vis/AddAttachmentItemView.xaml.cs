@@ -25,6 +25,12 @@ namespace PanoramicDataWin8.view.vis
         {
             this.InitializeComponent();
             this.DataContextChanged += AddAttachmentItemView_DataContextChanged;
+            this.PointerPressed += AttachmentItemView_PointerPressed;
+        }
+
+        void AttachmentItemView_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+
         }
 
         void AddAttachmentItemView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)

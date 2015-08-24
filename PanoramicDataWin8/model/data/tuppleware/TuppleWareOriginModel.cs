@@ -24,7 +24,19 @@ namespace PanoramicDataWin8.model.data.tuppleware
                 {
                     if (token[1] is JValue)
                     {
-                        TuppleWareFieldInputModel fieldInputModel = new TuppleWareFieldInputModel(token[0].ToString(), "float", token[1].ToString().ToLower() == "true" ? "numeric" : "enum", token[1].ToString().ToLower() == "true");
+                        var datatype = InputDataTypeConstants.NVARCHAR;
+                        if (token[1].ToString().ToLower() == "int64")
+                        {
+                            datatype = InputDataTypeConstants.INT;
+                        }
+                        else if (token[1].ToString().ToLower() == "float64")
+                        {
+                            datatype = InputDataTypeConstants.FLOAT;
+                        }
+
+                        TuppleWareFieldInputModel fieldInputModel = new TuppleWareFieldInputModel(token[0].ToString(),
+                            datatype, 
+                            token[1].ToString().ToLower() == "object" ? "enum" : "numeric");
                         fieldInputModel.OriginModel = tuppleWareOriginModel;
                         if (parentGroupModel != null)
                         {

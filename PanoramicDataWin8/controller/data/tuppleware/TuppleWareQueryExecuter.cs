@@ -29,7 +29,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 ActiveJobs.Remove(queryModel);
             }
             // determine if new job is even needed (i.e., are all relevant inputfieldmodels set)
-            if (queryModel.JobType == JobType.DB)
+            if (queryModel.TaskType == "")
             {
                 if ((queryModel.VisualizationType == VisualizationType.table && queryModel.InputOperationModels.Count > 0) ||
                     (queryModel.VisualizationType != VisualizationType.table && queryModel.GetUsageInputOperationModel(InputUsage.X).Any() && queryModel.GetUsageInputOperationModel(InputUsage.Y).Any()))

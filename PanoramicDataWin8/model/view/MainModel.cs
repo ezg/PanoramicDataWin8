@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Microsoft.Practices.Prism.Mvvm;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.model.data;
@@ -13,6 +14,19 @@ namespace PanoramicDataWin8.model.view
             get
             {
                 return _datasetConfigurations;
+            }
+        }
+
+        private List<string> _tasks = null;
+        public List<string> Tasks
+        {
+            get
+            {
+                return _tasks;
+            }
+            set
+            {
+                this.SetProperty(ref _tasks, value);
             }
         }
 
