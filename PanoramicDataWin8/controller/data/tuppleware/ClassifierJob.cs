@@ -112,10 +112,10 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 resultDescriptionModel.ConfusionMatrices.Add(label, new List<List<double>>());
                 resultDescriptionModel.ConfusionMatrices[label].Add(new List<double>());
                 resultDescriptionModel.ConfusionMatrices[label][0].Add((double) classifyResult.tp);
-                resultDescriptionModel.ConfusionMatrices[label][0].Add((double) classifyResult.fp);
+                resultDescriptionModel.ConfusionMatrices[label][0].Add((double) classifyResult.fn);
 
                 resultDescriptionModel.ConfusionMatrices[label].Add(new List<double>());
-                resultDescriptionModel.ConfusionMatrices[label][1].Add((double) classifyResult.fn);
+                resultDescriptionModel.ConfusionMatrices[label][1].Add((double) classifyResult.fp);
                 resultDescriptionModel.ConfusionMatrices[label][1].Add((double) classifyResult.tn);
 
                 var xs = classifyResult.fpr;
