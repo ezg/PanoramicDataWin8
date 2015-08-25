@@ -325,7 +325,7 @@ namespace PanoramicDataWin8.view.vis.render
 
             List<FilterModel> hits = new List<FilterModel>();
 
-             VisualizationViewModel model = ((VisualizationViewModel) DataContext);
+            VisualizationViewModel model = ((VisualizationViewModel) DataContext);
             if (model.QueryModel.ResultModel != null && model.QueryModel.ResultModel.ResultDescriptionModel != null)
             {
                 ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel) model.QueryModel.ResultModel.ResultDescriptionModel);

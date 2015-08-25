@@ -455,7 +455,7 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     tbSelection.Text = xAom.InputModel.Name + ": " +
                                        queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, xAom))
-                                           .Min(vc => vc.Value);
+                                           .Min(vc => vc.Value).ToString();
                     tbSelection.Text += " - " + queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, xAom)).Max(vc => vc.Value);
                 }
                 if (!xAom.Equals(yAom) &&
@@ -463,7 +463,7 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     tbSelection.Text += ", " + yAom.InputModel.Name + ": " +
                                         queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, yAom))
-                                            .Min(vc => vc.Value);
+                                            .Min(vc => vc.Value).ToString();
                     tbSelection.Text += " - " + queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, yAom)).Max(vc => vc.Value);
                 }
 

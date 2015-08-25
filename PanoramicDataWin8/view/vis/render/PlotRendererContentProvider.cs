@@ -389,9 +389,9 @@ namespace PanoramicDataWin8.view.vis.render
                                 }
                                 else
                                 {
-                                    xFrom = toScreenX((float)xBins[_xBinRange.GetDisplayIndex(xValue.Value)]);
+                                    xFrom = toScreenX((float) xBins[_xBinRange.GetDisplayIndex(xValue.Value)]);
                                 }
-                                
+
                                 if (!_isXAxisAggregated && _isYAxisAggregated &&
                                     (_yAom.AggregateFunction == AggregateFunction.Count))
                                 {
@@ -399,11 +399,26 @@ namespace PanoramicDataWin8.view.vis.render
                                 }
                                 else
                                 {
-                                    yFrom = toScreenY((float)yBins[_yBinRange.GetDisplayIndex(yValue.Value)]);
+                                    yFrom = toScreenY((float) yBins[_yBinRange.GetDisplayIndex(yValue.Value)]);
                                 }
 
-                                xTo = toScreenX((float)xBins[_xBinRange.GetDisplayIndex(_xBinRange.AddStep(xValue.Value))]);
-                                yTo = toScreenY((float)yBins[_yBinRange.GetDisplayIndex(_yBinRange.AddStep(yValue.Value))]);
+                                if (_xBinRange is NominalBinRange)
+                                {
+                                    xTo = toScreenX((float) xBins[_xBinRange.GetDisplayIndex(xValue.Value) + 1]);
+                                }
+                                else
+                                {
+                                    xTo = toScreenX((float) xBins[_xBinRange.GetDisplayIndex(_xBinRange.AddStep(xValue.Value))]);
+                                }
+
+                                if (_yBinRange is NominalBinRange)
+                                {
+                                    yTo = toScreenY((float) yBins[_yBinRange.GetDisplayIndex(yValue.Value) + 1]);
+                                }
+                                else
+                                {
+                                    yTo = toScreenY((float) yBins[_yBinRange.GetDisplayIndex(_yBinRange.AddStep(yValue.Value))]);
+                                }
 
                                 float alpha = 0.1f * (float)Math.Log10(value.Value) + 1f;
                                 var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value.Value));
@@ -433,8 +448,16 @@ namespace PanoramicDataWin8.view.vis.render
                                                 bins.Add(resultDescriptionModel.BinRanges[i].AddStep(bins.Max()));
                                                 var v = resultDescriptionModel.BinRanges[i].GetIndex(binRangeValue.Value);
                                                 filterModel.Value = unNormalizedvalue;
-                                                filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.GREATER_THAN_EQUAL, bins[v]));
-                                                filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.LESS_THAN, bins[v + 1]));
+                                                if (resultDescriptionModel.BinRanges[i] is NominalBinRange)
+                                                {
+                                                    filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.EQUALS,
+                                                          resultDescriptionModel.BinRanges[i].GetLabel(v)));
+                                                }
+                                                else 
+                                                {                                                
+                                                    filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.GREATER_THAN_EQUAL, bins[v]));
+                                                    filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.LESS_THAN, bins[v + 1]));
+                                                }
                                             }
                                         }
                                     }
@@ -501,10 +524,26 @@ namespace PanoramicDataWin8.view.vis.render
                         IGeometry hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
                         var filterModel = new FilterModel();
                         filterModel.Value = unNormalizedvalue;
-                        filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.GREATER_THAN_EQUAL, xBins[xi]));
-                        filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.LESS_THAN, xBins[xi + 1]));
-                        filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.GREATER_THAN_EQUAL, yBins[yi]));
-                        filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.LESS_THAN, yBins[yi + 1]));
+                        if (resultDescriptionModel.BinRanges[_xIndex] is NominalBinRange)
+                        {
+                            filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.EQUALS,
+                                  resultDescriptionModel.BinRanges[_xIndex].GetLabels()[xi].Label));
+                        }
+                        else
+                        {
+                            filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.GREATER_THAN_EQUAL, xBins[xi]));
+                            filterModel.ValueComparisons.Add(new ValueComparison(_xAom, Predicate.LESS_THAN, xBins[xi + 1]));
+                        }
+                        if (resultDescriptionModel.BinRanges[_yIndex] is NominalBinRange)
+                        {
+                            filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.EQUALS,
+                                  resultDescriptionModel.BinRanges[_yIndex].GetLabels()[yi].Label));
+                        }
+                        else
+                        {
+                            filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.GREATER_THAN_EQUAL, yBins[yi]));
+                            filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.LESS_THAN, yBins[yi + 1]));
+                        }
                         HitTargets.Add(hitGeom, filterModel);
 
                         if (_filterModels.Contains(filterModel))

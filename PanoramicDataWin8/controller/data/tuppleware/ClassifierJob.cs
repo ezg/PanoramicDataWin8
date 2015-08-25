@@ -85,6 +85,19 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 labelsUuid.Add(label, labelUuid);
             }
 
+            if (labels.Count > 1)
+            {
+                var labelUuids = (await projectCommand.Project(_originModel, _originModel.DatasetConfiguration.BaseUUID, labels))["uuid"].Value<string>();
+                CorrelateCommand correlateCommand = new CorrelateCommand();
+                var correlateUuid = (await correlateCommand.Correlate(_originModel, labelUuids))["uuid"].Value<string>();
+                JToken correlationToken = await lookupCommand.Lookup(_originModel, correlateUuid, 0, 100) as JToken;
+                while (correlationToken is JObject && correlationToken["empty"] != null && correlationToken["empty"].Value<bool>())
+                {
+                    await Task.Delay(100);
+                    correlationToken = await lookupCommand.Lookup(_originModel, correlateUuid, 0, 100) as JToken;
+                }
+            }
+
             await Task.Delay(50);
 
             foreach (var label in labels)

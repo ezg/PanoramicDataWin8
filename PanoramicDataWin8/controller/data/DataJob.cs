@@ -190,15 +190,16 @@ namespace PanoramicDataWin8.controller.data
 
         private double? getVisualizationValue(AxisType axisType, object value, InputOperationModel inputOperationModel, Dictionary<string, double> uniqueValues) 
         {
-            if (axisType == AxisType.Quantitative)
+            if (((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.FLOAT ||
+                ((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.INT)
             {
                 return value == null ? null : (double?)double.Parse(value.ToString());
             }
-            else if (axisType == AxisType.Time)
+            else if (((InputFieldModel)inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.TIME)
             {
                 return value == null ? null : (double?)((DateTime)value).TimeOfDay.Ticks;
             }
-            else if (axisType == AxisType.Date)
+            else if (((InputFieldModel)inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.DATE)
             {
                 return value == null ? null : (double?)((DateTime)value).Ticks;
             }

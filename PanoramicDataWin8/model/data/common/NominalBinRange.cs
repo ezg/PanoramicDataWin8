@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MathNet.Numerics.Interpolation;
 
 namespace PanoramicDataWin8.model.data.common
 {
@@ -85,12 +86,14 @@ namespace PanoramicDataWin8.model.data.common
 
         public override int GetDisplayIndex(double value)
         {
+            var ordered = _labelsValue.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key).ToList().IndexOf(value);
             var index = _labelsValue.Keys.ToList().IndexOf((int)Math.Floor((value - this.MinValue) / this.Step));
-            if (index == -1)
+            if (ordered == -1)
             {
                 index = _labelsValue.Keys.ToList().IndexOf((int)Math.Floor(((value - 1) - this.MinValue) / this.Step)) + 1;
+                ordered =(int) this.MaxValue + 1;
             }
-            return index;
+            return ordered;
         }
 
         public override double AddStep(double value)

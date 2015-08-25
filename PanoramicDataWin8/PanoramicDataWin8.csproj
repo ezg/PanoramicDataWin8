@@ -121,6 +121,7 @@
     <Compile Include="controller\data\tuppleware\gateway\ProjectCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\CatalogCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\ClassifyCommand.cs" />
+    <Compile Include="controller\data\tuppleware\gateway\CorrelateCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\TasksCommand.cs" />
     <Compile Include="controller\data\tuppleware\json\ClassifyResult.cs" />
     <Compile Include="controller\data\tuppleware\gateway\SelectCommand.cs" />

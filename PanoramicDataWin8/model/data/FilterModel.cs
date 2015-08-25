@@ -166,7 +166,12 @@ namespace PanoramicDataWin8.model.data
                     op = "==";
                     break;
             }
-            string ret = " " + InputOperationModel.InputModel.Name + " "  + op + " " + Value.ToString() + " ";
+            string val = Value.ToString();
+            if (Value is string)
+            {
+                val = "'" + val + "'";
+            }
+            string ret = " " + InputOperationModel.InputModel.Name + " "  + op + " " + val + " ";
             return ret;
         }
 
