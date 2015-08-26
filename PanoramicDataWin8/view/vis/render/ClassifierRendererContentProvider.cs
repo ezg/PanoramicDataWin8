@@ -149,7 +149,7 @@ namespace PanoramicDataWin8.view.vis.render
         private void renderGauge(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory,
             float xStart, float yStart, float width, float height, float value, string name)
         {
-            value = (float) Math.Min(1.0, Math.Max(0.0, value));
+            value = (float) Math.Min(0.9999, Math.Max(0.0, value));
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
             var blue = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(41f / 255f, 170f / 255f, 213f / 255f, 255f / 255f));
 

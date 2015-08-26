@@ -48,15 +48,22 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             }
             else
             {
-                if (queryModel.GetUsageInputOperationModel(InputUsage.Feature).Any() && queryModel.GetUsageInputOperationModel(InputUsage.Label).Any())
+                if (queryModel.TaskType != "frequent_itemsets")
                 {
-                    var queryModelClone = queryModel.Clone();
-                    ClassifierJob classifierJob = new ClassifierJob(queryModel, queryModelClone, (queryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel), TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis));
+                    if (queryModel.GetUsageInputOperationModel(InputUsage.Feature).Any() && queryModel.GetUsageInputOperationModel(InputUsage.Label).Any())
+                    {
+                        var queryModelClone = queryModel.Clone();
+                        ClassifierJob classifierJob = new ClassifierJob(queryModel, queryModelClone, (queryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel),
+                            TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis));
 
-                    ActiveJobs.Add(queryModel, classifierJob);
-                    classifierJob.JobUpdate += job_JobUpdate;
-                    classifierJob.JobCompleted += job_JobCompleted;
-                    classifierJob.Start();
+                        ActiveJobs.Add(queryModel, classifierJob);
+                        classifierJob.JobUpdate += job_JobUpdate;
+                        classifierJob.JobCompleted += job_JobCompleted;
+                        classifierJob.Start();
+                    }
+                }
+                else if (queryModel.TaskType == "frequent_itemsets")
+                {
                 }
             }
 

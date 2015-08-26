@@ -29,6 +29,7 @@ using Windows.UI.Text;
 using Windows.UI.Xaml.Documents;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using PanoramicDataWin8.controller.data.tuppleware.gateway;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
@@ -554,10 +555,19 @@ namespace PanoramicDataWin8
             codeGrid.Visibility = Visibility.Collapsed;
         }
 
-        internal void FireCodeGeneration(VisualizationViewModel vis)
+        public async void FireCodeGeneration(VisualizationViewModel vis)
         {
             codeGrid.Visibility = Visibility.Visible;
-            editBox.Document.SetText(TextSetOptions.ApplyRtfDocumentDefaults, "UUIDS : \n" + string.Join(", ", vis.QueryModel.GenerateCodeUuids));
+
+            string text = "";
+            foreach (var generateCodeUuid in vis.QueryModel.GenerateCodeUuids)
+            {
+                CodeGenCommand cmd = new CodeGenCommand();
+                string response = await cmd.CodeGen((vis.QueryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel), generateCodeUuid);
+                text += response + "\n";
+            }
+
+            editBox.Document.SetText(TextSetOptions.ApplyRtfDocumentDefaults, text);
         }
     }
 }

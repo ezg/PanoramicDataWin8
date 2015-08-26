@@ -117,6 +117,7 @@
     <Compile Include="controller\data\DataRow.cs" />
     <Compile Include="controller\data\Job.cs" />
     <Compile Include="controller\data\tuppleware\ClassifierJob.cs" />
+    <Compile Include="controller\data\tuppleware\gateway\CodeGenCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\Lookup.cs" />
     <Compile Include="controller\data\tuppleware\gateway\ProjectCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\CatalogCommand.cs" />

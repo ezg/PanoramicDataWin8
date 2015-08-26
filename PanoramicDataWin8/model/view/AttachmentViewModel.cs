@@ -162,7 +162,7 @@ namespace PanoramicDataWin8.model.view
             else if (attachedTo is AddAttachmentItemViewModel)
             {
                 var addAttachmentItemViewModel = attachedTo as AddAttachmentItemViewModel;
-                //if (addAttachmentItemViewModel.Label == "min support")
+                if (addAttachmentItemViewModel.Label == "minimum support")
                 {
                     menuViewModel.NrRows = 1;
                     menuViewModel.NrColumns = 1;

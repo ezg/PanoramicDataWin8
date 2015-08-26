@@ -9,9 +9,53 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
 
-    <Grid Background="{StaticResource lightBrush}">
-        <Viewbox MaxWidth="150" CacheMode="BitmapCache">
-            <TextBlock Name="mainLabel" Text="logistic_regression" Foreground="{StaticResource highlightBrush}"/>
-        </Viewbox>
+    <Grid>
+        <Grid Name="mainGrid" Background="{StaticResource lightBrush}">
+            <Viewbox MaxWidth="150" CacheMode="BitmapCache">
+                <TextBlock Name="mainLabel" Text="logistic_regression" Foreground="{StaticResource highlightBrush}"/>
+            </Viewbox>
+        </Grid>
+        <Grid Name="tableGrid" Opacity="1">
+            <Grid Background="{StaticResource lightBrush}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="4"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <ItemsControl
+                    Grid.Row="0"
+                    Name="headerItemsControl">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Grid 
+             Grid.Row="1"
+            Height="4" Background="{StaticResource backgroundBrush}">
+                </Grid>
+                <ListView
+                    Grid.Row="2"
+                    Name="listView"
+                    SelectionMode="Multiple"
+                    Style="{StaticResource ListViewStyle1}"
+                    ItemContainerStyle="{StaticResource ListViewItemStyle2}">
+                    <!--<ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel Orientation="Vertical"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>-->
+                    <ListView.ItemTemplate >
+                        <DataTemplate>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Grid>
     </Grid>
 </local:Renderer>
