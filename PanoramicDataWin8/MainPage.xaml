@@ -50,7 +50,7 @@
                 </Button.Template>
             </Button>
             
-            <Button Name="addVisualizationButton" Click="addVisualizationButton_Click" Margin="0,0,0,4" Visibility="Collapsed">
+            <Button Name="addVisualizationButton" Click="addVisualizationButton_Click" Margin="0,0,0,4" Visibility="Visible">
                 <Button.Template>
                     <ControlTemplate>
                         <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
@@ -85,6 +85,20 @@
             </Button>
         </StackPanel>
         <TextBlock Name="msgTextBlock" Text="" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="{StaticResource darkBrush}" Margin="10" Opacity="0"/>
+
+        <Grid Name="codeGrid" Visibility="Collapsed">
+            <RichEditBox Name="editBox"/>
+            <Grid Name="closeButton" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="4" PointerPressed="CloseButton_OnPointerPressed" Background="#01000000">
+                <Path StrokeThickness="4" Stroke="{StaticResource highlightBrush}" HorizontalAlignment="Right" VerticalAlignment="Top">
+                    <Path.Data>
+                    <GeometryGroup>
+                            <LineGeometry StartPoint="0,0" EndPoint="30,30" />
+                            <LineGeometry StartPoint="30,0" EndPoint="0,30" />
+                    </GeometryGroup>
+                </Path.Data>
+                </Path>
+            </Grid>
+        </Grid>
     </Grid>
 
     <Page.BottomAppBar >

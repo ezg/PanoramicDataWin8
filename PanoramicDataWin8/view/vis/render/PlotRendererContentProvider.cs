@@ -121,15 +121,15 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             // scale axis to 0 if this is a bar chart
-            if (_isXAxisAggregated && !_isYAxisAggregated && 
-                (xAom.AggregateFunction == AggregateFunction.Count))
+            if (_isXAxisAggregated && !_isYAxisAggregated &&
+                (xAom.AggregateFunction == AggregateFunction.Count || xAom.AggregateFunction == AggregateFunction.Sum || xAom.AggregateFunction == AggregateFunction.Avg || xAom.AggregateFunction == AggregateFunction.Min || xAom.AggregateFunction == AggregateFunction.Max))
             {
-                _xBinRange = QuantitativeBinRange.Initialize(0, _xBinRange.DataMaxValue, 10, false);
+                _xBinRange = QuantitativeBinRange.Initialize(Math.Min(0, _visualizationDescriptionModel.MinValues[xAom]), _xBinRange.DataMaxValue, 10, false);
             }
             if (!_isXAxisAggregated && _isYAxisAggregated &&
-               (yAom.AggregateFunction == AggregateFunction.Count))
+               (yAom.AggregateFunction == AggregateFunction.Count || yAom.AggregateFunction == AggregateFunction.Sum || yAom.AggregateFunction == AggregateFunction.Avg || yAom.AggregateFunction == AggregateFunction.Min || yAom.AggregateFunction == AggregateFunction.Max))
             {
-                _yBinRange = QuantitativeBinRange.Initialize(0, _yBinRange.DataMaxValue, 10, false);
+                _yBinRange = QuantitativeBinRange.Initialize(Math.Min(0, _visualizationDescriptionModel.MinValues[yAom]), _yBinRange.DataMaxValue, 10, false);
             }
 
             // create bin dictionary
@@ -383,9 +383,10 @@ namespace PanoramicDataWin8.view.vis.render
                             if (value != null)
                             {
                                 if (_isXAxisAggregated && !_isYAxisAggregated &&
-                                    (_xAom.AggregateFunction == AggregateFunction.Count))
+                                    (_xAom.AggregateFunction == AggregateFunction.Count || _xAom.AggregateFunction == AggregateFunction.Sum || _xAom.AggregateFunction == AggregateFunction.Avg ||
+                                     _xAom.AggregateFunction == AggregateFunction.Min || _xAom.AggregateFunction == AggregateFunction.Max))
                                 {
-                                    xFrom = toScreenX(0);
+                                    xFrom = toScreenX((float)Math.Min(0, xValue.Value));
                                 }
                                 else
                                 {
@@ -393,9 +394,10 @@ namespace PanoramicDataWin8.view.vis.render
                                 }
 
                                 if (!_isXAxisAggregated && _isYAxisAggregated &&
-                                    (_yAom.AggregateFunction == AggregateFunction.Count))
+                                    (_yAom.AggregateFunction == AggregateFunction.Count || _yAom.AggregateFunction == AggregateFunction.Sum || _yAom.AggregateFunction == AggregateFunction.Avg ||
+                                     _yAom.AggregateFunction == AggregateFunction.Min || _yAom.AggregateFunction == AggregateFunction.Max))
                                 {
-                                    yFrom = toScreenY(0);
+                                    yFrom = toScreenY((float)Math.Min(0, yValue.Value));
                                 }
                                 else
                                 {
@@ -419,6 +421,7 @@ namespace PanoramicDataWin8.view.vis.render
                                 {
                                     yTo = toScreenY((float) yBins[_yBinRange.GetDisplayIndex(_yBinRange.AddStep(yValue.Value))]);
                                 }
+
 
                                 float alpha = 0.1f * (float)Math.Log10(value.Value) + 1f;
                                 var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value.Value));

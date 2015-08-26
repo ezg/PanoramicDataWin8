@@ -36,7 +36,7 @@ namespace PanoramicDataWin8.model.view
                     var inputFieldModel = inputModel as InputFieldModel;
                     if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.ENUM)
                     {
-                        visualizationViewModel.QueryModel.VisualizationType = VisualizationType.bar;
+                        visualizationViewModel.QueryModel.VisualizationType = VisualizationType.plot;
 
                         InputOperationModel x = new InputOperationModel(inputFieldModel);
                         x.AggregateFunction = AggregateFunction.None;
@@ -53,7 +53,7 @@ namespace PanoramicDataWin8.model.view
                     }
                     else if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
                     {
-                        visualizationViewModel.QueryModel.VisualizationType = VisualizationType.bar;
+                        visualizationViewModel.QueryModel.VisualizationType = VisualizationType.plot;
 
                         InputOperationModel x = new InputOperationModel(inputFieldModel);
                         x.AggregateFunction = AggregateFunction.None;

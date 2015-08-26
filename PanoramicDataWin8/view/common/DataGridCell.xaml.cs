@@ -15,6 +15,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using PanoramicDataWin8.controller.data;
+using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
@@ -89,14 +91,14 @@ namespace PanoramicDataWin8.view.common
 
         private void updateValue()
         {
-            ResultItemModel resultItemModel = DataContext as ResultItemModel;
+            DataRow resultItemModel = DataContext as DataRow;
             if (resultItemModel != null && HeaderObject != null && HeaderObject.InputFieldViewModel != null)
             {
-                /*if (resultItemModel.AttributeValues.ContainsKey(HeaderObject.InputFieldViewModel.InputFieldViewModel))
+                if (resultItemModel.Entries.ContainsKey(HeaderObject.InputFieldViewModel.InputOperationModel.InputModel as InputFieldModel))
                 {
-                    textBlock.Text = resultItemModel.AttributeValues[HeaderObject.InputFieldViewModel.InputFieldViewModel].ShortStringValue;
+                    textBlock.Text = resultItemModel.Entries[HeaderObject.InputFieldViewModel.InputOperationModel.InputModel as InputFieldModel].ToString();
                     return;
-                }*/
+                }
             }
             textBlock.Text = "";
         }

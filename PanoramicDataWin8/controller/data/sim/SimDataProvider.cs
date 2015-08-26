@@ -72,7 +72,7 @@ namespace PanoramicDataWin8.controller.data.sim
                 {
                     Debug.WriteLine("From File Time: " + sw.ElapsedMilliseconds);
                 }
-                return new DataPage() {DataRow = returnList, IsEmpty = false};
+                return new DataPage() {DataRows = returnList, IsEmpty = false};
             }
             else
             {

@@ -108,12 +108,12 @@ namespace PanoramicDataWin8.view.vis
 
             if (visualizationViewModel.QueryModel.TaskType == "")
             {
-                if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.bar)
+                /*if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.bar)
                 {
                     _renderer = new PlotRenderer();
                     contentGrid.Children.Add(_renderer);
-                }
-                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.table)
+                }*/
+                if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.table)
                 {
                     _renderer = new TableRenderer();
                     contentGrid.Children.Add(_renderer);
@@ -123,7 +123,7 @@ namespace PanoramicDataWin8.view.vis
                     _renderer = new PlotRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
-                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.line)
+                /*else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.line)
                 {
                     _renderer = new PlotRenderer();
                     contentGrid.Children.Add(_renderer);
@@ -132,14 +132,22 @@ namespace PanoramicDataWin8.view.vis
                 {
                     _renderer = new PlotRenderer();
                     contentGrid.Children.Add(_renderer);
-                }
+                }*/
                 
                 
             }
             else if (visualizationViewModel.QueryModel.TaskType != "")
             {
-                _renderer = new ClassifierRenderer();
-                contentGrid.Children.Add(_renderer);
+                if (visualizationViewModel.QueryModel.TaskType != "frequent_itemsets")
+                {
+                    _renderer = new ClassifierRenderer();
+                    contentGrid.Children.Add(_renderer);
+                }
+                else if (visualizationViewModel.QueryModel.TaskType == "frequent_itemsets")
+                {
+                    _renderer = new FrequentItemsetRenderer();
+                    contentGrid.Children.Add(_renderer);
+                }
             }
         }
 

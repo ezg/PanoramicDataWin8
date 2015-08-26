@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                     (queryModel.VisualizationType != VisualizationType.table && queryModel.GetUsageInputOperationModel(InputUsage.X).Any() && queryModel.GetUsageInputOperationModel(InputUsage.Y).Any()))
                 {
                     var queryModelClone = queryModel.Clone();
-                    TuppleWareDataProvider dataProvider = new TuppleWareDataProvider(queryModelClone, (queryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel));
+                    TuppleWareDataProvider dataProvider = new TuppleWareDataProvider(queryModelClone, queryModel, (queryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel));
                     DataJob dataJob = new DataJob(
                         queryModel, queryModelClone, dataProvider,
                         TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
@@ -87,7 +87,6 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                     oldItems.Add(sample);
                 }
             }
-
             queryModel.ResultModel.Progress = jobEventArgs.Progress;
             queryModel.ResultModel.ResultDescriptionModel = jobEventArgs.ResultDescriptionModel;
             queryModel.ResultModel.FireResultModelUpdated();

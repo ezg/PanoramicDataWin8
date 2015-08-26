@@ -87,72 +87,113 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        public MenuViewModel CreateMenuViewModel(AttachmentItemViewModel attachmentItemViewModel)
+        public MenuViewModel CreateMenuViewModel(AttachedTo attachedTo)
         {
             MenuViewModel menuViewModel = new MenuViewModel()
             {
                 AttachmentViewModel = this,
-                AttachmentItemViewModel = attachmentItemViewModel,
+                AttachedTo = attachedTo,
                 AttachmentOrientation = this.AttachmentOrientation
             };
 
             // is value InputOperationModel
-            if (_visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Value).Contains(attachmentItemViewModel.InputOperationModel))
+            if (attachedTo is AttachmentItemViewModel)
             {
-                var aom = attachmentItemViewModel.InputOperationModel;
-                if (((InputFieldModel)aom.InputModel).InputDataType == InputDataTypeConstants.INT ||
-                    ((InputFieldModel)aom.InputModel).InputDataType == InputDataTypeConstants.FLOAT)
+                var attachmentItemViewModel = attachedTo as AttachmentItemViewModel;
+                if (_visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Value).Contains(attachmentItemViewModel.InputOperationModel))
                 {
-                    menuViewModel.NrRows = 3;
-                    menuViewModel.NrColumns = 4;
-
-                    List<ToggleMenuItemComponentViewModel> toggles = new List<ToggleMenuItemComponentViewModel>();
-                    List<MenuItemViewModel> items = new List<MenuItemViewModel>();
-
-                    int count = 0;
-                    foreach (var aggregationFunction in Enum.GetValues(typeof(AggregateFunction)).Cast<AggregateFunction>().Where(af => af != AggregateFunction.None))
+                    var aom = attachmentItemViewModel.InputOperationModel;
+                    if (((InputFieldModel) aom.InputModel).InputDataType == InputDataTypeConstants.INT ||
+                        ((InputFieldModel) aom.InputModel).InputDataType == InputDataTypeConstants.FLOAT)
                     {
-                        var menuItem = new MenuItemViewModel()
+                        menuViewModel.NrRows = 3;
+                        menuViewModel.NrColumns = 4;
+
+                        List<ToggleMenuItemComponentViewModel> toggles = new List<ToggleMenuItemComponentViewModel>();
+                        List<MenuItemViewModel> items = new List<MenuItemViewModel>();
+
+                        int count = 0;
+                        foreach (var aggregationFunction in Enum.GetValues(typeof (AggregateFunction)).Cast<AggregateFunction>().Where(af => af != AggregateFunction.None))
                         {
-                            MenuViewModel = menuViewModel,
-                            Row = count <= 2 ? 0 : 1,
-                            RowSpan = count <= 2 ? 1 : 2,
-                            Column = count % 3 + 1,
-                            Size = new Vec(32, 50),
-                            TargetSize = new Vec(32, 50)
-                        };
-                        menuItem.Position = attachmentItemViewModel.Position;
-                        ToggleMenuItemComponentViewModel toggle = new ToggleMenuItemComponentViewModel()
-                        {
-                            Label = aggregationFunction.ToString(),
-                            IsChecked = attachmentItemViewModel.InputOperationModel.AggregateFunction == aggregationFunction
-                        };
-                        toggles.Add(toggle);
-                        menuItem.MenuItemComponentViewModel = toggle;
-                        menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
-                        {
-                            var model = (sender as ToggleMenuItemComponentViewModel);
-                            if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                            var menuItem = new MenuItemViewModel()
                             {
-                                if (model.IsChecked)
+                                MenuViewModel = menuViewModel,
+                                Row = count <= 2 ? 0 : 1,
+                                RowSpan = count <= 2 ? 1 : 2,
+                                Column = count%3 + 1,
+                                Size = new Vec(32, 50),
+                                TargetSize = new Vec(32, 50)
+                            };
+                            menuItem.Position = attachmentItemViewModel.Position;
+                            ToggleMenuItemComponentViewModel toggle = new ToggleMenuItemComponentViewModel()
+                            {
+                                Label = aggregationFunction.ToString(),
+                                IsChecked = attachmentItemViewModel.InputOperationModel.AggregateFunction == aggregationFunction
+                            };
+                            toggles.Add(toggle);
+                            menuItem.MenuItemComponentViewModel = toggle;
+                            menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
+                            {
+                                var model = (sender as ToggleMenuItemComponentViewModel);
+                                if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
                                 {
-                                    attachmentItemViewModel.InputOperationModel.AggregateFunction = aggregationFunction;
-                                    foreach (var tg in model.OtherToggles)
+                                    if (model.IsChecked)
                                     {
-                                        tg.IsChecked = false;
+                                        attachmentItemViewModel.InputOperationModel.AggregateFunction = aggregationFunction;
+                                        foreach (var tg in model.OtherToggles)
+                                        {
+                                            tg.IsChecked = false;
+                                        }
                                     }
                                 }
-                            }
-                        };
-                        menuViewModel.MenuItemViewModels.Add(menuItem);
-                        items.Add(menuItem);
-                        count++;
-                    }
+                            };
+                            menuViewModel.MenuItemViewModels.Add(menuItem);
+                            items.Add(menuItem);
+                            count++;
+                        }
 
-                    foreach (var mi in items)
-                    {
-                        (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
+                        foreach (var mi in items)
+                        {
+                            (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
+                        }
                     }
+                }
+            }
+            else if (attachedTo is AddAttachmentItemViewModel)
+            {
+                var addAttachmentItemViewModel = attachedTo as AddAttachmentItemViewModel;
+                //if (addAttachmentItemViewModel.Label == "min support")
+                {
+                    menuViewModel.NrRows = 1;
+                    menuViewModel.NrColumns = 1;
+
+                    var menuItem = new MenuItemViewModel()
+                    {
+                        MenuViewModel = menuViewModel,
+                        Row = 0,
+                        RowSpan = 1,
+                        Column = 0,
+                        Size = new Vec(100, 50),
+                        TargetSize = new Vec(100, 50)
+                    };
+                    menuItem.Position = attachedTo.Position;
+                    SliderMenuItemComponentViewModel slider = new SliderMenuItemComponentViewModel()
+                    {
+                        Label = "percentage",
+                        Value = 10,
+                        MaxValue = 100,
+                        MinValue = 0
+                    };
+                    menuItem.MenuItemComponentViewModel = slider;
+                    menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
+                    {
+                        var model = (sender as SliderMenuItemComponentViewModel);
+                        if (args.PropertyName == model.GetPropertyName(() => model.Value))
+                        {
+                            
+                        }
+                    };
+                    menuViewModel.MenuItemViewModels.Add(menuItem);
                 }
             }
 
@@ -178,7 +219,7 @@ namespace PanoramicDataWin8.model.view
             if (AttachmentHeaderViewModels.Count == 0)
             {
                 AttachmentHeaderViewModels.Clear();
-                if (_visualizationViewModel.QueryModel.TaskType == "")
+                if (_visualizationViewModel.QueryModel.TaskType == "" && _visualizationViewModel.QueryModel.VisualizationType != VisualizationType.table)
                 {
                     if (_attachmentOrientation == AttachmentOrientation.Bottom)
                     {
@@ -187,20 +228,49 @@ namespace PanoramicDataWin8.model.view
                 }
                 else if (_visualizationViewModel.QueryModel.TaskType != "")
                 {
-                    if (_attachmentOrientation == AttachmentOrientation.Top)
+                    if (_visualizationViewModel.QueryModel.TaskType != "frequent_itemsets")
                     {
-                        createLogregTop();
+                        if (_attachmentOrientation == AttachmentOrientation.Bottom)
+                        {
+                            createLogregBottom();
+                        }
                     }
-                    if (_attachmentOrientation == AttachmentOrientation.Bottom)
+                    else
                     {
-                        createLogregBottom();
+                        if (_attachmentOrientation == AttachmentOrientation.Bottom)
+                        {
+                            createFrequentItemsetBottom();
+                        }
                     }
                     if (_attachmentOrientation == AttachmentOrientation.Left)
                     {
                         createLogregLeft();
                     }
                 }
+
+                if (_attachmentOrientation == AttachmentOrientation.Right)
+                {
+                    createLogregTop();
+                }
             }
+        }
+
+        void createFrequentItemsetBottom()
+        {
+            AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
+            {
+                InputUsage = InputUsage.Label,
+                AcceptsInputGroupModels = false,
+                AcceptsInputModels = false
+            };
+            header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
+            {
+                AttachmentHeaderViewModel = header,
+                //Size = new Vec(25,25),
+                //TargetSize = new Vec(25, 25),
+                Label = "minimum support"
+            };
+            AttachmentHeaderViewModels.Add(header);
         }
 
         void createLogregTop()
@@ -211,7 +281,6 @@ namespace PanoramicDataWin8.model.view
                 AcceptsInputGroupModels = false,
                 AcceptsInputModels = false
             };
-
             header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
             {
                 AttachmentHeaderViewModel = header,

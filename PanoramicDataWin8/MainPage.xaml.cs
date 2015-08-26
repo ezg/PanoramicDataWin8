@@ -25,6 +25,8 @@ using PanoramicDataWin8.utils;
 using Windows.UI.Notifications;
 using Windows.UI.Core;
 using Windows.System;
+using Windows.UI.Text;
+using Windows.UI.Xaml.Documents;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PanoramicDataWin8.controller.input;
@@ -545,6 +547,17 @@ namespace PanoramicDataWin8
                 parentModel.Size = new Vec(buttonBounds.Width, buttonBounds.Height);
                 parentModel.AreChildrenExpanded = true;
             }
+        }
+
+        private void CloseButton_OnPointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            codeGrid.Visibility = Visibility.Collapsed;
+        }
+
+        internal void FireCodeGeneration(VisualizationViewModel vis)
+        {
+            codeGrid.Visibility = Visibility.Visible;
+            editBox.Document.SetText(TextSetOptions.ApplyRtfDocumentDefaults, "UUIDS : \n" + string.Join(", ", vis.QueryModel.GenerateCodeUuids));
         }
     }
 }

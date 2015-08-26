@@ -541,8 +541,16 @@ namespace PanoramicDataWin8.view.vis.render
                 (yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
             }
 
-
             QueryModel qModel = (DataContext as VisualizationViewModel).QueryModel;
+
+            // if both are empty before hand add default value
+            if (!qModel.GetUsageInputOperationModel(InputUsage.X).Any() && !qModel.GetUsageInputOperationModel(InputUsage.Y).Any())
+            {
+                InputOperationModel value = new InputOperationModel(e.InputOperationModel.InputModel);
+                value.AggregateFunction = AggregateFunction.Count;
+
+                qModel.AddUsageInputOperationModel(InputUsage.DefaultValue, value);
+            }
 
             var xBounds = xInputFieldView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             if (xBounds.Intersects(e.Bounds.GetPolygon()))
@@ -563,6 +571,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 qModel.AddUsageInputOperationModel(InputUsage.Y, e.InputOperationModel);
             }
+
         }
 
         private void Renderer_PointerPressed(object sender, PointerRoutedEventArgs e)

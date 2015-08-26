@@ -396,6 +396,20 @@ namespace PanoramicDataWin8.model.data
             }
         }
 
+
+        private List<string> _generateCodeUuids = new List<string>();
+        public List<string> GenerateCodeUuids
+        {
+            get
+            {
+                return _generateCodeUuids;
+            }
+            set
+            {
+                this.SetProperty(ref _generateCodeUuids, value);
+            }
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is QueryModel)
@@ -428,5 +442,5 @@ namespace PanoramicDataWin8.model.data
 
     public enum QueryModelUpdatedEventType { Structure, Links, FilterModels }
     
-    public enum VisualizationType { table, bar, map, plot, line }
+    public enum VisualizationType { table, plot }
 }

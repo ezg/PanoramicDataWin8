@@ -9,7 +9,7 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
     
-    <Grid Background="{StaticResource lightBrush}">
+    <Grid>
         <TextBlock Name="textBlock" Foreground="{StaticResource darkBrush}" HorizontalAlignment="Center" VerticalAlignment="Center"/> 
     </Grid>
 </UserControl>

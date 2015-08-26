@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.tuppleware.gateway;
 using PanoramicDataWin8.controller.view;
@@ -19,11 +21,13 @@ namespace PanoramicDataWin8.controller.data.tuppleware
         private int _nrProcessedSamples = 0;
         private TuppleWareOriginModel _originModel = null;
         private string _uuid = "";
+        private QueryModel _queryModelOriginal = null;
 
-        public TuppleWareDataProvider(QueryModel queryModelClone, TuppleWareOriginModel originModel)
+        public TuppleWareDataProvider(QueryModel queryModelClone, QueryModel queryModelOriginal, TuppleWareOriginModel originModel)
         {
             QueryModelClone = queryModelClone;
             _originModel = originModel;
+            _queryModelOriginal = queryModelOriginal;
             IsInitialized = false;
         }
 
@@ -44,6 +48,12 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             
             ProjectCommand projectCommand = new ProjectCommand();
             _uuid = (await projectCommand.Project(_originModel, _uuid, inputModels))["uuid"].Value<string>();
+
+            var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                _queryModelOriginal.GenerateCodeUuids = new List<string>() {_uuid};
+            });
         }
 
         public override async Task<DataPage> GetSampleDataRows(int sampleSize)
@@ -72,7 +82,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                     {
                         _nrProcessedSamples = GetNrTotalSamples();
                     }
-                    return new DataPage() {DataRow = returnList, IsEmpty = false};
+                    return new DataPage() {DataRows = returnList, IsEmpty = false};
                 }
             }
             else

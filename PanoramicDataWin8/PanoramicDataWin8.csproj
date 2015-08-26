@@ -276,6 +276,9 @@
       <DependentUpon>ToggleMenuItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\ClassifierRendererContentProvider.cs" />
+    <Compile Include="view\vis\render\FrequentItemsetRenderer.xaml.cs">
+      <DependentUpon>FrequentItemsetRenderer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\render\PlotRenderer.xaml.cs">
       <DependentUpon>PlotRenderer.xaml</DependentUpon>
     </Compile>
@@ -438,6 +441,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\menu\ToggleMenuItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\FrequentItemsetRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

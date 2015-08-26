@@ -35,6 +35,7 @@ namespace PanoramicDataWin8.view.vis.menu
             {
                 model.IsChecked = true;
             }
+            e.Handled = true;
         }
 
         void ToggleMenuItemView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)

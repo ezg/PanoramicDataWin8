@@ -18,6 +18,6 @@ namespace PanoramicDataWin8.controller.data
     public class DataPage
     {
         public bool IsEmpty { get; set; }
-        public List<DataRow> DataRow {get; set; }
+        public List<DataRow> DataRows {get; set; }
     }
 }

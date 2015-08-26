@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.result;
 
 namespace PanoramicDataWin8.controller.data
 {
-    public class DataRow
+    public class DataRow : ResultItemModel
     {
         private Dictionary<InputFieldModel, object> _entries = null;
         public Dictionary<InputFieldModel, object> Entries

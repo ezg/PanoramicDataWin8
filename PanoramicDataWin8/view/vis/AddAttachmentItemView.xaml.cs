@@ -14,6 +14,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.utils;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -25,12 +27,6 @@ namespace PanoramicDataWin8.view.vis
         {
             this.InitializeComponent();
             this.DataContextChanged += AddAttachmentItemView_DataContextChanged;
-            this.PointerPressed += AttachmentItemView_PointerPressed;
-        }
-
-        void AttachmentItemView_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-
         }
 
         void AddAttachmentItemView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)

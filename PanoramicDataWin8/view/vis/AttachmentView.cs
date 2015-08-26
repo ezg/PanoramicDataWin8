@@ -206,6 +206,7 @@ namespace PanoramicDataWin8.view.vis
                     if (header.AddAttachmentItemViewModel != null)
                     {
                         AddAttachmentItemView addView = new AddAttachmentItemView();
+                        addView.PointerPressed += attachmentView_PointerPressed;
                         addView.DataContext = header.AddAttachmentItemViewModel;
                         _addAttachmentViews.Add(header, addView);
                         _contentCanvas.Children.Add(addView);
@@ -223,14 +224,31 @@ namespace PanoramicDataWin8.view.vis
 
         void attachmentView_PointerPressed(object sender, Windows.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
+
             var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.LeftControl);
             if (e.Pointer.PointerDeviceType != PointerDeviceType.Pen && (state & CoreVirtualKeyStates.Down) != CoreVirtualKeyStates.Down)
             {
-                Debug.WriteLine("press");
-                (DataContext as AttachmentViewModel).ActiveStopwatch.Restart();
-                AttachmentItemViewModel model = (sender as AttachmentItemView).DataContext as AttachmentItemViewModel;
-                displayMenu(model);
-                e.Handled = true;
+                if (sender is AttachmentItemView)
+                {
+                    Debug.WriteLine("press");
+                    (DataContext as AttachmentViewModel).ActiveStopwatch.Restart();
+                    AttachmentItemViewModel model = (sender as AttachmentItemView).DataContext as AttachmentItemViewModel;
+                    displayMenu(model);
+                    e.Handled = true;
+                }
+                if (sender is AddAttachmentItemView)
+                {
+                    var model = (sender as AddAttachmentItemView).DataContext as AddAttachmentItemViewModel;
+                    if (model.Label == "generate code")
+                    {
+                        var vis = (this.DataContext as AttachmentViewModel).VisualizationViewModel;
+                        MainViewController.Instance.MainPage.FireCodeGeneration(vis);
+                    }
+                    else
+                    {
+                        displayMenu(model);
+                    }
+                }                
             }
         }
 
@@ -378,6 +396,49 @@ namespace PanoramicDataWin8.view.vis
                     }
                 }
             }
+            else if (model.AttachmentOrientation == AttachmentOrientation.Right)
+            {
+                var availableHeight = model.VisualizationViewModel.Size.Y;
+                var currentY = model.VisualizationViewModel.Position.Y + model.VisualizationViewModel.Size.Y;
+                if (availableHeight > calculateMinPreferedSizeY(model.AttachmentHeaderViewModels))
+                {
+                    var remainingHeaders = model.AttachmentHeaderViewModels.ToList();
+                    foreach (var header in model.AttachmentHeaderViewModels)
+                    {
+                        remainingHeaders.Remove(header);
+                        double headerHeight = header.PreferedItemSize.Y;
+                        int nrRows = (availableHeight - calculateMinPreferedSizeY(remainingHeaders)) + GAP > 2 * header.PreferedItemSize.Y + GAP ? 2 : 1;
+                        int upperNrElemPerRow = (int)Math.Ceiling((double)header.AttachmentItemViewModels.Count / (double)nrRows);
+                        int lowerNrElemPerRow = (int)Math.Floor((double)header.AttachmentItemViewModels.Count / (double)nrRows);
+                        double currentX = model.VisualizationViewModel.Position.X  + model.VisualizationViewModel.Size.X + (upperNrElemPerRow * header.PreferedItemSize.Y + (upperNrElemPerRow) * GAP);
+                        currentY -= header.PreferedItemSize.Y;
+                        if (header.AddAttachmentItemViewModel != null)
+                        {
+                            header.AddAttachmentItemViewModel.TargetPosition = new Pt(currentX + GAP, currentY);
+                            _maxX = Math.Max(_maxX, header.AddAttachmentItemViewModel.TargetPosition.X);
+                            // header.AddAttachmentItemViewModel.Size = new Vec(300, 300);
+                        }
+
+
+                        int currentRow = 0;
+                        int count = 0;
+                        foreach (var item in header.AttachmentItemViewModels)
+                        {
+                            var itemView = _attachmentItemViews[header].FirstOrDefault(v => v.DataContext == item);
+                            item.TargetPosition = new Pt(currentX, currentY);
+                            currentX += GAP;
+                            count++;
+                            if (count == upperNrElemPerRow)
+                            {
+                                currentRow++;
+                                currentY += header.PreferedItemSize.X + GAP;
+                                currentX = model.VisualizationViewModel.Position.X + (lowerNrElemPerRow * header.PreferedItemSize.X + (lowerNrElemPerRow) * GAP);
+                            }
+                        }
+                        availableHeight -= headerHeight;
+                    }
+                }
+            }
             else if (model.AttachmentOrientation == AttachmentOrientation.Bottom)
             {
                 var availableWidth = model.VisualizationViewModel.Size.X;
@@ -500,17 +561,17 @@ namespace PanoramicDataWin8.view.vis
             setMenuViewModelAnkerPosition();
         }
 
-        private void displayMenu(AttachmentItemViewModel itemModel)
+        private void displayMenu(AttachedTo itemModel)
         {
             AttachmentViewModel model = (DataContext as AttachmentViewModel);
             bool createNew = true;
 
             if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
             {
-                createNew = _menuViewModel.AttachmentItemViewModel != itemModel;
+                createNew = _menuViewModel.AttachedTo != itemModel;
                 foreach (var menuItem in _menuViewModel.MenuItemViewModels)
                 {
-                    menuItem.TargetPosition = _menuViewModel.AttachmentItemViewModel.Position;
+                    menuItem.TargetPosition = _menuViewModel.AttachedTo.Position;
                 }
                 _menuViewModel.IsToBeRemoved = true;
                 _menuViewModel.IsDisplayed = false;
@@ -541,7 +602,7 @@ namespace PanoramicDataWin8.view.vis
                 {
                     foreach (var menuItem in _menuViewModel.MenuItemViewModels)
                     {
-                        menuItem.TargetPosition = _menuViewModel.AttachmentItemViewModel.TargetPosition;
+                        menuItem.TargetPosition = _menuViewModel.AttachedTo.TargetPosition;
                     }
                 }
                 else
@@ -550,11 +611,11 @@ namespace PanoramicDataWin8.view.vis
 
                     if (model.AttachmentOrientation == AttachmentOrientation.Left)
                     {
-                        _menuViewModel.AnkerPosition = new Pt(_maxX, _menuViewModel.AttachmentItemViewModel.TargetPosition.Y);
+                        _menuViewModel.AnkerPosition = new Pt(_maxX, _menuViewModel.AttachedTo.TargetPosition.Y);
                     }
                     else if (model.AttachmentOrientation == AttachmentOrientation.Bottom)
                     {
-                        _menuViewModel.AnkerPosition = new Pt(_menuViewModel.AttachmentItemViewModel.TargetPosition.X, _maxY);
+                        _menuViewModel.AnkerPosition = new Pt(_menuViewModel.AttachedTo.TargetPosition.X, _maxY);
                     }
                 }
             }

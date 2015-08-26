@@ -119,16 +119,16 @@ namespace PanoramicDataWin8.model.view
         }
 
 
-        private AttachmentItemViewModel _attachmentItemViewModel = null;
-        public AttachmentItemViewModel AttachmentItemViewModel
+        private AttachedTo _attachedTo = null;
+        public AttachedTo AttachedTo
         {
             get
             {
-                return _attachmentItemViewModel;
+                return _attachedTo;
             }
             set
             {
-                this.SetProperty(ref _attachmentItemViewModel, value);
+                this.SetProperty(ref _attachedTo, value);
             }
         }
 
@@ -142,6 +142,49 @@ namespace PanoramicDataWin8.model.view
             set
             {
                 this.SetProperty(ref _attachmentOrientation, value);
+            }
+        }
+    }
+
+    public class AttachedTo :ExtendedBindableBase
+    {
+
+        private Pt _targetPosition = new Pt(0, 0);
+        public Pt TargetPosition
+        {
+            get
+            {
+                return _targetPosition;
+            }
+            set
+            {
+                this.SetProperty(ref _targetPosition, value);
+            }
+        }
+
+        private Vec _size = new Vec(50, 50);
+        public Vec Size
+        {
+            get
+            {
+                return _size;
+            }
+            set
+            {
+                this.SetProperty(ref _size, value);
+            }
+        }
+
+        private Pt _position = new Pt(0, 0);
+        public Pt Position
+        {
+            get
+            {
+                return _position;
+            }
+            set
+            {
+                this.SetProperty(ref _position, value);
             }
         }
     }

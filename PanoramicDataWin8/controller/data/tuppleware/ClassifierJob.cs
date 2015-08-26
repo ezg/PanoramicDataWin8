@@ -106,6 +106,12 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 classifysUuid.Add(label, clasifyUuid);
             }
 
+            var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                QueryModel.GenerateCodeUuids = classifysUuid.Select(kvp => kvp.Value).ToList();
+            });
+            
             await Task.Delay(50);
 
             ClassfierResultDescriptionModel resultDescriptionModel = new ClassfierResultDescriptionModel();

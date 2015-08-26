@@ -10,17 +10,18 @@
     xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" 
     xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" 
     xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
+    xmlns:view="using:PanoramicDataWin8.model.view"
     mc:Ignorable="d"
     d:DesignHeight="50"
     d:DesignWidth="100"
     FontFamily="{StaticResource abel}">
 
     <d:DesignProperties.DataContext>
-        <model:MenuItemViewModel>
-            <model:MenuItemViewModel.MenuItemComponentViewModel>
-                <model:SliderMenuItemComponentViewModel Label="bin size" Value="0"/>
-            </model:MenuItemViewModel.MenuItemComponentViewModel>
-        </model:MenuItemViewModel>
+        <view:MenuItemViewModel>
+            <view:MenuItemViewModel.MenuItemComponentViewModel>
+                <view:SliderMenuItemComponentViewModel Label="bin size" Value="0"/>
+            </view:MenuItemViewModel.MenuItemComponentViewModel>
+        </view:MenuItemViewModel>
     </d:DesignProperties.DataContext>
 
 

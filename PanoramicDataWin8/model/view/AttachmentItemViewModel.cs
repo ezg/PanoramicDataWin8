@@ -8,7 +8,7 @@ using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
 {
-    public class AttachmentItemViewModel : ExtendedBindableBase
+    public class AttachmentItemViewModel : AttachedTo
     {
         public AttachmentItemViewModel()
         {
@@ -94,19 +94,6 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private Pt _targetPosition = new Pt(0, 0);
-        public Pt TargetPosition
-        {
-            get
-            {
-                return _targetPosition;
-            }
-            set
-            {
-                this.SetProperty(ref _targetPosition, value);
-            }
-        }
-
         private Vec _size = new Vec(50, 50);
         public Vec Size
         {
@@ -120,18 +107,6 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private Pt _position = new Pt(0, 0);
-        public Pt Position
-        {
-            get
-            {
-                return _position;
-            }
-            set
-            {
-                this.SetProperty(ref _position, value);
-            }
-        }
         public Rct Bounds
         {
             get

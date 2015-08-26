@@ -51,6 +51,9 @@ namespace PanoramicDataWin8.controller.data
             {
                 _binner = null;
                 samplesToCheck = 1000;
+                _dimensions = QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Concat(
+                                 QueryModelClone.GetUsageInputOperationModel(InputUsage.Y)).Concat(
+                                 QueryModelClone.GetUsageInputOperationModel(InputUsage.Group)).ToList();
             }
             else
             {
@@ -128,31 +131,48 @@ namespace PanoramicDataWin8.controller.data
                     {
                         _uniqueValues = _dimensions.Select(d => new Dictionary<string, double>()).ToList();
                     }
-                    setVisualizationValues(dataPage.DataRow);
+                    setVisualizationValues(dataPage.DataRows);
                     if (_binner != null)
                     {
-                        _binner.BinStep(dataPage.DataRow);
+                        _binner.BinStep(dataPage.DataRows);
                     }
                     if (_aggregator != null)
                     {
                         _aggregator.AggregateStep(_binner.BinStructure, QueryModelClone, _dataProvider.Progress());
                     }
-                }
-                ResultDescriptionModel resultDescriptionModel = null;
-                if (_binner != null && _binner.BinStructure != null)
-                {
-                    resultItemModels = convertBinsToResultItemModels(_binner.BinStructure);
-                    resultDescriptionModel = new VisualizationResultDescriptionModel()
-                    {
-                        BinRanges = _binner.BinStructure.BinRanges,
-                        NullCount = _binner.BinStructure.NullCount,
-                        Dimensions = _dimensions,
-                        AxisTypes = _axisTypes,
-                        MinValues = _binner.BinStructure.AggregatedMinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
-                        MaxValues = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => entry.Value)
-                    };
 
-                    await fireUpdated(resultItemModels, _dataProvider.Progress(), resultDescriptionModel);
+                    ResultDescriptionModel resultDescriptionModel = null;
+                    if (_binner != null && _binner.BinStructure != null)
+                    {
+                        resultItemModels = convertBinsToResultItemModels(_binner.BinStructure);
+                        resultDescriptionModel = new VisualizationResultDescriptionModel()
+                        {
+                            BinRanges = _binner.BinStructure.BinRanges,
+                            NullCount = _binner.BinStructure.NullCount,
+                            Dimensions = _dimensions,
+                            AxisTypes = _axisTypes,
+                            MinValues = _binner.BinStructure.AggregatedMinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
+                            MaxValues = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => entry.Value)
+                        };
+
+                        await fireUpdated(resultItemModels, _dataProvider.Progress(), resultDescriptionModel);
+                    }
+                }
+                else
+                {
+                    var resultItems = dataPage.DataRows.Select(dr => dr as ResultItemModel).ToList();
+                    foreach (var dimension in _dimensions.Where(d => d.SortMode != SortMode.None))
+                    {
+                        if (dimension.SortMode == SortMode.Asc)
+                        {
+                            resultItems = resultItems.OrderBy(rs => (rs as DataRow).Entries[dimension.InputModel as InputFieldModel].ToString()).ToList();
+                        }
+                        if (dimension.SortMode == SortMode.Desc)
+                        {
+                            resultItems = resultItems.OrderByDescending(rs => (rs as DataRow).Entries[dimension.InputModel as InputFieldModel].ToString()).ToList();
+                        }
+                    }
+                    await fireUpdated(resultItems, _dataProvider.Progress(), null);
                 }
 
                 if (MainViewController.Instance.MainModel.Verbose)
