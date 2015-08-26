@@ -92,7 +92,7 @@ namespace PanoramicDataWin8.view.vis.render
         private void populateData()
         {
             ClassfierResultDescriptionModel resultModel = ((VisualizationViewModel)DataContext).QueryModel.ResultModel.ResultDescriptionModel as ClassfierResultDescriptionModel;
-            if (resultModel != null)
+            /*if (resultModel != null)
             {
                 ExponentialEase easingFunction = new ExponentialEase();
                 easingFunction.EasingMode = EasingMode.EaseInOut;
@@ -154,7 +154,7 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Begin();
                 tableGrid.Opacity = 0;
                 mainGrid.Opacity = 1;
-            }
+            }*/
         }
     }
 }

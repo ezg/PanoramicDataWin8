@@ -177,9 +177,9 @@
                                 <Border x:Name="ScrollBarSeparator" BorderBrush="{ThemeResource ScrollBarTrackBorderThemeBrush}" BorderThickness="0,0,1,1" Background="{ThemeResource ScrollBarTrackBackgroundThemeBrush}" Grid.Column="1" Grid.Row="1"/>
                             </Grid>
                             <Grid Background="#01000000">
-                                <!--<Interactivity:Interaction.Behaviors>
+                                <Interactivity:Interaction.Behaviors>
                                     <local:TwoFingerScrollBehavior />
-                                </Interactivity:Interaction.Behaviors>-->
+                                </Interactivity:Interaction.Behaviors>
                             </Grid>
                         </Grid>
                     </Border>
