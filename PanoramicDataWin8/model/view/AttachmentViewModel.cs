@@ -180,7 +180,7 @@ namespace PanoramicDataWin8.model.view
                     SliderMenuItemComponentViewModel slider = new SliderMenuItemComponentViewModel()
                     {
                         Label = "percentage",
-                        Value = 10,
+                        Value = _visualizationViewModel.QueryModel.MinimumSupport * 100.0,
                         MaxValue = 100,
                         MinValue = 0
                     };
@@ -188,9 +188,9 @@ namespace PanoramicDataWin8.model.view
                     menuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
                     {
                         var model = (sender as SliderMenuItemComponentViewModel);
-                        if (args.PropertyName == model.GetPropertyName(() => model.Value))
+                        if (args.PropertyName == model.GetPropertyName(() => model.FinalValue))
                         {
-                            
+                            _visualizationViewModel.QueryModel.MinimumSupport = model.FinalValue / 100.0;
                         }
                     };
                     menuViewModel.MenuItemViewModels.Add(menuItem);
@@ -356,7 +356,7 @@ namespace PanoramicDataWin8.model.view
                         header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                         {
                             InputOperationModel = item as InputOperationModel,
-                            SubLabel = iom != null ? iom.InputModel.Name.Replace("_", "") : "",
+                            SubLabel = iom != null ? iom.InputModel.Name.Replace("_", "") : " ",
                             MainLabel = "label",
                             AttachmentHeaderViewModel = header
                         });
@@ -432,7 +432,7 @@ namespace PanoramicDataWin8.model.view
                         header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                         {
                             InputOperationModel = item as InputOperationModel,
-                            SubLabel = iom != null ? iom.InputModel.Name.Replace("_", "") : "",
+                            SubLabel = iom != null ? iom.InputModel.Name.Replace("_", "") : " ",
                             MainLabel = "feature",
                             AttachmentHeaderViewModel = header
                         });

@@ -397,6 +397,22 @@ namespace PanoramicDataWin8.model.data
         }
 
 
+        private double _minimumSupport = 0.1;
+        public double MinimumSupport
+        {
+            get
+            {
+                return _minimumSupport;
+            }
+            set
+            {
+                this.SetProperty(ref _minimumSupport, value);
+                FireQueryModelUpdated(QueryModelUpdatedEventType.Structure);
+            }
+        }
+
+
+
         private List<string> _generateCodeUuids = new List<string>();
         public List<string> GenerateCodeUuids
         {

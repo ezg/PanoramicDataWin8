@@ -247,6 +247,19 @@ namespace PanoramicDataWin8.model.view
 
     public class SliderMenuItemComponentViewModel : MenuItemComponentViewModel
     {
+        private double _finalValue = 0;
+        public double FinalValue
+        {
+            get
+            {
+                return _finalValue;
+            }
+            set
+            {
+                this.SetProperty(ref _finalValue, value);
+            }
+        }
+
         private double _value = 0;
         public double Value
         {

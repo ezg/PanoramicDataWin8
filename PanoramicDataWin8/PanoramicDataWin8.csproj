@@ -116,7 +116,9 @@
     <Compile Include="controller\data\DataProvider.cs" />
     <Compile Include="controller\data\DataRow.cs" />
     <Compile Include="controller\data\Job.cs" />
+    <Compile Include="controller\data\tuppleware\FrequentItemsetJob.cs" />
     <Compile Include="controller\data\tuppleware\ClassifierJob.cs" />
+    <Compile Include="controller\data\tuppleware\gateway\FrequentItemsetsCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\CodeGenCommand.cs" />
     <Compile Include="controller\data\tuppleware\gateway\Lookup.cs" />
     <Compile Include="controller\data\tuppleware\gateway\ProjectCommand.cs" />
@@ -290,6 +292,9 @@
     <Compile Include="view\vis\render\Renderer.cs" />
     <Compile Include="view\vis\render\RendererResources.cs" />
     <Compile Include="view\vis\render\TableRenderer.cs" />
+    <Compile Include="view\vis\render\TableRenderer2.xaml.cs">
+      <DependentUpon>TableRenderer2.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\VisualizationContainerView.xaml.cs">
       <DependentUpon>VisualizationContainerView.xaml</DependentUpon>
     </Compile>
@@ -454,6 +459,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\render\ClassifierRenderer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\TableRenderer2.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

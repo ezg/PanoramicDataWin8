@@ -64,6 +64,17 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 }
                 else if (queryModel.TaskType == "frequent_itemsets")
                 {
+                    if (queryModel.GetUsageInputOperationModel(InputUsage.Label).Any())
+                    {
+                        var queryModelClone = queryModel.Clone();
+                        FrequentItemsetJob frequentItemsetJob = new FrequentItemsetJob(queryModel, queryModelClone, (queryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel),
+                            TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis));
+
+                        ActiveJobs.Add(queryModel, frequentItemsetJob);
+                        frequentItemsetJob.JobUpdate += job_JobUpdate;
+                        frequentItemsetJob.JobCompleted += job_JobCompleted;
+                        frequentItemsetJob.Start();
+                    }
                 }
             }
 
@@ -84,6 +95,11 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             else if (sender is ClassifierJob)
             {
                 ClassifierJob job = sender as ClassifierJob;
+                queryModel = job.QueryModel;
+            }
+            else if (sender is FrequentItemsetJob)
+            {
+                FrequentItemsetJob job = sender as FrequentItemsetJob;
                 queryModel = job.QueryModel;
             }
             var oldItems = queryModel.ResultModel.ResultItemModels;

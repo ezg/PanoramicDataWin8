@@ -97,6 +97,9 @@ namespace PanoramicDataWin8.view.vis.menu
 
         void mainPointerManager_Removed(object sender, PointerManagerEvent e)
         {
+            var menuItemModel = (DataContext as MenuItemViewModel);
+            var sliderModel = menuItemModel.MenuItemComponentViewModel as SliderMenuItemComponentViewModel;
+            sliderModel.FinalValue = sliderModel.Value;
         }
     }
 }

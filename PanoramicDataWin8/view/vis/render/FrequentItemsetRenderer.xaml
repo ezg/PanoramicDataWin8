@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    Name="_this"
     d:DesignHeight="300"
     d:DesignWidth="400">
 
@@ -15,7 +16,7 @@
                 <TextBlock Name="mainLabel" Text="logistic_regression" Foreground="{StaticResource highlightBrush}"/>
             </Viewbox>
         </Grid>
-        <Grid Name="tableGrid" Opacity="1">
+        <Grid Name="tableGrid" Opacity="0">
             <Grid Background="{StaticResource lightBrush}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -36,8 +37,9 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
                 <Grid 
-             Grid.Row="1"
-            Height="4" Background="{StaticResource backgroundBrush}">
+                    Name="speratorGrid"
+                     Grid.Row="1"
+                    Height="4" Background="{StaticResource backgroundBrush}">
                 </Grid>
                 <ListView
                     Grid.Row="2"

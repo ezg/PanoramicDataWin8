@@ -86,7 +86,7 @@ namespace PanoramicDataWin8.view.vis.render
                 (DataContext as VisualizationViewModel).QueryModel.FilterModels.CollectionChanged += FilterModels_CollectionChanged;
                 ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
-                //mainLabel.Text = (DataContext as VisualizationViewModel).QueryModel.VisualizationType.ToString();
+                mainLabel.Text = (DataContext as VisualizationViewModel).QueryModel.VisualizationType.ToString();
                 populateHeaders();
             }
         }
@@ -242,11 +242,11 @@ namespace PanoramicDataWin8.view.vis.render
             ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
             if (resultModel.ResultItemModels.Count > 0)
             {
-                ExponentialEase easingFunction = new ExponentialEase();
+                /*ExponentialEase easingFunction = new ExponentialEase();
                 easingFunction.EasingMode = EasingMode.EaseInOut;
 
                 DoubleAnimation animation = new DoubleAnimation();
-                animation.Duration = TimeSpan.FromMilliseconds(300);
+                animation.Duration = TimeSpan.FromMilliseconds(100);
                 animation.From = mainLabel.Opacity;
                 animation.To = 0;
                 animation.EasingFunction = easingFunction;
@@ -254,10 +254,10 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Children.Add(animation);
                 Storyboard.SetTarget(animation, mainLabel);
                 Storyboard.SetTargetProperty(animation, "Opacity");
-                //storyboard.Begin();
+                storyboard.Begin();
 
                 animation = new DoubleAnimation();
-                animation.Duration = TimeSpan.FromMilliseconds(300);
+                animation.Duration = TimeSpan.FromMilliseconds(100);
                 animation.From = dxSurfaceGrid.Opacity;
                 animation.To = 1;
                 animation.EasingFunction = easingFunction;
@@ -265,7 +265,7 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Children.Add(animation);
                 Storyboard.SetTarget(animation, dxSurfaceGrid);
                 Storyboard.SetTargetProperty(animation, "Opacity");
-                // storyboard.Begin();
+                storyboard.Begin();*/
 
                 dxSurfaceGrid.Opacity = 1;
                 mainLabel.Opacity = 0;
@@ -273,7 +273,7 @@ namespace PanoramicDataWin8.view.vis.render
                 loadResultItemModels(resultModel);
                 render();
             }
-            else
+            /*else
             {
                 // animate between render canvas and label
                 ExponentialEase easingFunction = new ExponentialEase();
@@ -288,7 +288,7 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Children.Add(animation);
                 Storyboard.SetTarget(animation, mainLabel);
                 Storyboard.SetTargetProperty(animation, "Opacity");
-                //storyboard.Begin();
+                storyboard.Begin();
 
                 animation = new DoubleAnimation();
                 animation.Duration = TimeSpan.FromMilliseconds(300);
@@ -299,10 +299,10 @@ namespace PanoramicDataWin8.view.vis.render
                 storyboard.Children.Add(animation);
                 Storyboard.SetTarget(animation, dxSurfaceGrid);
                 Storyboard.SetTargetProperty(animation, "Opacity");
-                //storyboard.Begin();
+                storyboard.Begin();
                 dxSurfaceGrid.Opacity = 0;
                 mainLabel.Opacity = 1;
-            }
+            }*/
         }
 
         void loadResultItemModels(ResultModel resultModel)

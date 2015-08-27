@@ -116,7 +116,7 @@ namespace PanoramicDataWin8.view.vis
                 }*/
                 if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.table)
                 {
-                    _renderer = new TableRenderer();
+                    _renderer = new TableRenderer2();
                     contentGrid.Children.Add(_renderer);
                 }
                 else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.plot)
@@ -193,8 +193,11 @@ namespace PanoramicDataWin8.view.vis
             else if (_tapStart.ElapsedMilliseconds < 300)
             {
                 var trans = sender.TransformToVisual(MainViewController.Instance.InkableScene);
-                _renderer.StartSelection( trans.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position));
-                _renderer.EndSelection();
+                if (e.CurrentContacts.ContainsKey(e.TriggeringPointer.PointerId))
+                {
+                    _renderer.StartSelection(trans.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position));
+                    _renderer.EndSelection();
+                }
             }
             _fingerDown = false;
 
