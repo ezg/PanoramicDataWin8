@@ -84,17 +84,16 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
             DataPage dataPage = new DataPage();
             dataPage.DataRows = new List<DataRow>();
-            JToken frequentItemsetToken = await lookupCommand.Lookup(_originModel, frequentItemsetsUuid, 0, 1000) as JObject;
+            JToken frequentItemsetToken = await lookupCommand.Lookup(_originModel, frequentItemsetsUuid, 0, 1000) as JToken;
 
-            if (false)
+            while (frequentItemsetToken is JObject && frequentItemsetToken["empty"] != null && frequentItemsetToken["empty"].Value<bool>())
             {
-                while (frequentItemsetToken["empty"] != null && frequentItemsetToken["empty"].Value<bool>())
-                {
-                    await Task.Delay(100);
-                    frequentItemsetToken = await lookupCommand.Lookup(_originModel, frequentItemsetsUuid, 0, 1000) as JObject;
-                }
+                await Task.Delay(100);
+                frequentItemsetToken = await lookupCommand.Lookup(_originModel, frequentItemsetsUuid, 0, 1000) as JToken;
             }
-            DataRow r1 = new DataRow();
+
+
+            /*DataRow r1 = new DataRow();
             r1.Entries = new Dictionary<InputFieldModel, object>();
             r1.Entries.Add(pattern, "asdfj");
             r1.Entries.Add(minsupport, "0.5");
@@ -103,9 +102,24 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             r1.Entries = new Dictionary<InputFieldModel, object>();
             r1.Entries.Add(pattern, "asdfj");
             r1.Entries.Add(minsupport, "0.5");
-            dataPage.DataRows.Add(r1);
+            dataPage.DataRows.Add(r1);*/
+
+            foreach (var child in frequentItemsetToken as JArray)
+            {
+                string p = child["items"].Value<string>();
+                p = p.Replace("(", "");
+                p = p.Replace(",)", "");
+                double s = child["support"].Value<double>();
+
+                DataRow r1 = new DataRow();
+                r1.Entries = new Dictionary<InputFieldModel, object>();
+                r1.Entries.Add(pattern, p);
+                r1.Entries.Add(minsupport, s);
+                dataPage.DataRows.Add(r1);
+            }
 
             var resultItems = dataPage.DataRows.Select(dr => dr as ResultItemModel).ToList();
+            resultItems = resultItems.OrderByDescending(rs => (rs as DataRow).Entries[minsupport]).ToList();
             await fireUpdated(resultItems, 1.0, null);
             await fireCompleted();
         }

@@ -62,6 +62,7 @@ namespace PanoramicDataWin8.view.vis.render
             VisualizationViewModel model = ((VisualizationViewModel)DataContext);
             if (e.PropertyName == model.GetPropertyName(() => model.Size))
             {
+                updateSize(null);
             }
             if (e.PropertyName == model.GetPropertyName(() => model.Size) ||
                 e.PropertyName == model.GetPropertyName(() => model.Position))
