@@ -24,6 +24,7 @@ namespace PanoramicDataWin8.view.style
         private Pointer scrollPointer = null;
         private Point _startPoint = new Point();
         private double _startVerticalOffset = 0;
+        private IOneFingerListener _oneFingerListener = null;
 
         public DependencyObject AssociatedObject
         {
@@ -58,11 +59,17 @@ namespace PanoramicDataWin8.view.style
         {
             _scrollViewer = _frameworkElement.GetFirstAncestorOfType<ScrollViewer>();
             _inertiaHandler = new InertiaHandler(_scrollViewer);
+            _oneFingerListener = _frameworkElement.GetAncestors().FirstOrDefault(a => a is IOneFingerListener) as IOneFingerListener;
         }
 
         void _pointerManager_Added(object sender, PointerManagerEvent e)
         {
-            if (e.NumActiveContacts == 2 && _scrollViewer != null)
+            if (e.NumActiveContacts == 1 && _oneFingerListener != null)
+            {
+                var tt = e.CurrentContacts[e.TriggeringPointer.PointerId].Position;
+                _oneFingerListener.Pressed(_frameworkElement, e);
+            }
+            else if (e.NumActiveContacts == 2 && _scrollViewer != null)
             {
                 scrollPointer = e.TriggeringPointer;
                 _startPoint = e.CurrentContacts[scrollPointer.PointerId].Position;
@@ -74,7 +81,11 @@ namespace PanoramicDataWin8.view.style
 
         void _pointerManager_Moved(object sender, PointerManagerEvent e)
         {
-            if (_scrollViewer != null && e.NumActiveContacts == 2 && scrollPointer != null && e.CurrentPointers.Contains(scrollPointer) && e.TriggeringPointer.PointerId == scrollPointer.PointerId)
+            if (e.NumActiveContacts == 1 && _oneFingerListener != null)
+            {
+                _oneFingerListener.Pressed(_frameworkElement, e);
+            }
+            else if (_scrollViewer != null && e.NumActiveContacts == 2 && scrollPointer != null && e.CurrentPointers.Contains(scrollPointer) && e.TriggeringPointer.PointerId == scrollPointer.PointerId)
             {
                 Point currentPoint = e.CurrentContacts[scrollPointer.PointerId].Position;
                 double yDelta = _startPoint.Y - currentPoint.Y;
@@ -95,7 +106,11 @@ namespace PanoramicDataWin8.view.style
         {
             if (e.NumActiveContacts < 2)
             {
-                _inertiaHandler.InertiaActive = true; 
+                _inertiaHandler.InertiaActive = true;
+                if (e.NumActiveContacts < 1 && _oneFingerListener != null)
+                {
+                    _oneFingerListener.Pressed(_frameworkElement, e);
+                }
             }
             if (scrollPointer != null && e.TriggeringPointer.PointerId == scrollPointer.PointerId)
             {
@@ -158,5 +173,12 @@ namespace PanoramicDataWin8.view.style
         {
             animationTimer.Stop();
         }
+    }
+
+    public interface IOneFingerListener
+    {
+        void Pressed(FrameworkElement sender, PointerManagerEvent e);
+        void Moved(FrameworkElement sender, PointerManagerEvent e);
+        void Released(FrameworkElement sender, PointerManagerEvent e);
     }
 }

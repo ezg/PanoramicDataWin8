@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.utils;
+using PanoramicDataWin8.view.style;
+using WinRTXamlToolkit.Controls.Extensions;
 
 namespace PanoramicDataWin8.view.vis.render
 {
@@ -17,6 +20,11 @@ namespace PanoramicDataWin8.view.vis.render
             _dataGrid.CanReorder = true;
             _dataGrid.CanResize = true;
             _dataGrid.CanExplore = true;
+            this.Loaded += TableRenderer_Loaded;
+        }
+
+        void TableRenderer_Loaded(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
             this.Content = _dataGrid;
         }
 

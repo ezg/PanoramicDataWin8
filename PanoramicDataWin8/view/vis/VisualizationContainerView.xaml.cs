@@ -23,12 +23,13 @@ using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.inq;
+using PanoramicDataWin8.view.style;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace PanoramicDataWin8.view.vis
 {
-    public sealed partial class VisualizationContainerView : UserControl, IScribbable, InputFieldViewModelEventHandler
+    public sealed partial class VisualizationContainerView : UserControl, IScribbable, InputFieldViewModelEventHandler, IOneFingerListener
     {
         private Point _previousPoint = new Point();
         private Point _initialPoint = new Point();
@@ -151,6 +152,59 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
+        public void Pressed(FrameworkElement sender, PointerManagerEvent e)
+        {
+            _tapStart.Restart();
+            var trans = sender.TransformToVisual(MainViewController.Instance.InkableScene);
+            _previousPoint = trans.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position);
+            _initialPoint = _previousPoint;
+            _movingStarted = false;
+            _fingerDown = true;
+
+            this.SendToFront();
+            VisualizationViewModel model = (DataContext as VisualizationViewModel);
+            foreach (var avm in model.AttachementViewModels)
+            {
+                avm.IsDisplayed = true;
+            }
+        }
+
+        public void Moved(FrameworkElement sender, PointerManagerEvent e)
+        {
+            var trans = sender.TransformToVisual(MainViewController.Instance.InkableScene);
+            var currentPoint = trans.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position);
+            if ((_initialPoint.GetVec() - currentPoint.GetVec()).Length2 > 100 || _movingStarted)
+            {
+                _movingStarted = true;
+                Vec delta = _previousPoint.GetVec() - currentPoint.GetVec();
+                VisualizationViewModel model = (DataContext as VisualizationViewModel);
+                model.Position -= delta;
+
+            }
+            _previousPoint = currentPoint;
+        }
+
+        public void Released(FrameworkElement sender, PointerManagerEvent e)
+        {
+            if (_movingStarted)
+            {
+                _movingStarted = false;
+            }
+            else if (_tapStart.ElapsedMilliseconds < 300)
+            {
+                var trans = sender.TransformToVisual(MainViewController.Instance.InkableScene);
+                _renderer.StartSelection( trans.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position));
+                _renderer.EndSelection();
+            }
+            _fingerDown = false;
+
+            VisualizationViewModel model = (DataContext as VisualizationViewModel);
+            foreach (var avm in model.AttachementViewModels)
+            {
+                avm.IsDisplayed = false;
+            }
+        }
+
         void VisualizationContainerView_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
@@ -215,6 +269,7 @@ namespace PanoramicDataWin8.view.vis
                 avm.IsDisplayed = false;
             }
         }
+
 
         void resizePointerManager_Added(object sender, PointerManagerEvent e)
         {
