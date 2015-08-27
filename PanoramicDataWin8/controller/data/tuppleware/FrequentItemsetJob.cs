@@ -107,8 +107,8 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             foreach (var child in frequentItemsetToken as JArray)
             {
                 string p = child["items"].Value<string>();
-                p = p.Replace("(", "");
-                p = p.Replace(",)", "");
+                //p = p.Replace("(", "");
+                //p = p.Replace(",)", "");
                 double s = child["support"].Value<double>();
 
                 DataRow r1 = new DataRow();
