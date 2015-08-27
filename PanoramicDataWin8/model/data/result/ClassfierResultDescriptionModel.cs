@@ -58,5 +58,28 @@ namespace PanoramicDataWin8.model.data.result
             get { return _aucs; }
             set { this.SetProperty(ref _aucs, value); }
         }
+
+        private double _avgPrecision = 0;
+        public double AvgPrecision
+        {
+            get { return _avgPrecision; }
+            set { this.SetProperty(ref _avgPrecision, value); }
+        }
+
+
+        private double _avgRecall = 0;
+        public double AvRecall
+        {
+            get { return _avgRecall; }
+            set { this.SetProperty(ref _avgRecall, value); }
+        }
+
+
+        private double _avgF1 = 0;
+        public double AvgF1
+        {
+            get { return _avgF1; }
+            set { this.SetProperty(ref _avgF1, value); }
+        }
     }
 }

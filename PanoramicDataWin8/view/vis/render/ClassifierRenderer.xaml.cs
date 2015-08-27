@@ -223,7 +223,8 @@ namespace PanoramicDataWin8.view.vis.render
         void loadResults(ResultModel resultModel)
         {
             VisualizationViewModel model = ((VisualizationViewModel) DataContext);
-            _classifierRendererContentProvider.UpdateData(resultModel, model.QueryModel.Clone(), 0);
+            ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel) model.QueryModel.ResultModel.ResultDescriptionModel);
+            _classifierRendererContentProvider.UpdateData(resultModel, model.QueryModel.Clone(), descriptionModel.Labels.Count > 1 ? -1 : 0);
 
             render(); render();
         }
@@ -329,7 +330,22 @@ namespace PanoramicDataWin8.view.vis.render
             if (model.QueryModel.ResultModel != null && model.QueryModel.ResultModel.ResultDescriptionModel != null)
             {
                 ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel) model.QueryModel.ResultModel.ResultDescriptionModel);
-                _classifierRendererContentProvider.LabelIndex = (_classifierRendererContentProvider.LabelIndex + 1)%descriptionModel.Labels.Count;
+
+                if (descriptionModel.Labels.Count > 1)
+                {
+                    if (_classifierRendererContentProvider.LabelIndex + 1 == descriptionModel.Labels.Count)
+                    {
+                        _classifierRendererContentProvider.LabelIndex = -1;
+                    }
+                    else
+                    {
+                        _classifierRendererContentProvider.LabelIndex += 1;
+                    }
+                }
+                else
+                {
+                    _classifierRendererContentProvider.LabelIndex = (_classifierRendererContentProvider.LabelIndex + 1) % descriptionModel.Labels.Count;
+                }
                 render();
             }
             

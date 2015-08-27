@@ -152,11 +152,21 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                     resultDescriptionModel.RocCurves[label].Add(new Pt(1, 1));
                 }
 
-                resultDescriptionModel.F1s.Add(label, classifyResult.f1);
                 resultDescriptionModel.AUCs.Add(label, classifyResult.auc);
+
+                resultDescriptionModel.F1s.Add(label, classifyResult.f1);
+                resultDescriptionModel.AvgF1 += classifyResult.f1;
+
                 resultDescriptionModel.Precisions.Add(label, classifyResult.precision);
+                resultDescriptionModel.AvgPrecision += classifyResult.precision;
+
                 resultDescriptionModel.Recalls.Add(label, classifyResult.recall);
+                resultDescriptionModel.AvRecall += classifyResult.recall;
             }
+            resultDescriptionModel.AvgF1 /= (double)labels.Count;
+            resultDescriptionModel.AvgPrecision /= (double)labels.Count;
+            resultDescriptionModel.AvRecall /= (double)labels.Count;
+
             await fireUpdated(new List<ResultItemModel>(), 1.0, resultDescriptionModel);
             await fireCompleted();
         }

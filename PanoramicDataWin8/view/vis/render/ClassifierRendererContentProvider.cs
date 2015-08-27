@@ -103,13 +103,15 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 var centerX =  _deviceWidth/2.0f + _leftOffset;
                 var centerY =  _deviceHeight/2.0f + _topOffset;
-                drawString(d2dDeviceContext, dwFactory, _textFormatBig, centerX, _topOffset, _classfierResultDescriptionModel.Labels[_labelIndex].Name, false, true, false);
+
+                string label = _labelIndex != -1 ? _classfierResultDescriptionModel.Labels[_labelIndex].Name : "avg across labels";
+                drawString(d2dDeviceContext, dwFactory, _textFormatBig, centerX, _topOffset, label, false, true, false);
 
                 var w = (_deviceWidth - 20)/3.0f;
                 var h = Math.Max(0, _deviceHeight/2.0f - 50);
                 var yOff = 40f;
 
-                if (_deviceHeight <= 200 || _deviceWidth <= 180)
+                if ((_deviceHeight <= 200 || _deviceWidth <= 180) || _labelIndex == -1)
                 {
                     //yOff = centerY - h /2.0f;
                     h = Math.Max(0, _deviceHeight - 50);
@@ -119,24 +121,27 @@ namespace PanoramicDataWin8.view.vis.render
                     _leftOffset,
                     yOff,
                     w,
-                    h, 
-                    (float)_classfierResultDescriptionModel.Precisions[_classfierResultDescriptionModel.Labels[_labelIndex]], "precision");
+                    h,
+                    _labelIndex != -1 ? (float)_classfierResultDescriptionModel.Precisions[_classfierResultDescriptionModel.Labels[_labelIndex]] :(float) _classfierResultDescriptionModel.AvgPrecision, 
+                    "precision");
 
                 renderGauge(d2dDeviceContext, dwFactory,
                    _leftOffset + w + 10,
                    yOff,
                    w,
                    h,
-                   (float)_classfierResultDescriptionModel.Recalls[_classfierResultDescriptionModel.Labels[_labelIndex]], "recall");
+                   _labelIndex != -1 ? (float)_classfierResultDescriptionModel.Recalls[_classfierResultDescriptionModel.Labels[_labelIndex]] :(float) _classfierResultDescriptionModel.AvRecall, 
+                   "recall");
 
                 renderGauge(d2dDeviceContext, dwFactory,
                    _leftOffset + (w + 10)  * 2,
                    yOff,
                    w,
                    h,
-                    (float)_classfierResultDescriptionModel.F1s[_classfierResultDescriptionModel.Labels[_labelIndex]], "f1");
+                   _labelIndex != -1 ? (float)_classfierResultDescriptionModel.F1s[_classfierResultDescriptionModel.Labels[_labelIndex]] : (float)_classfierResultDescriptionModel.AvgF1, 
+                   "f1");
 
-                if (_deviceHeight > 200 && _deviceWidth > 180)
+                if (_deviceHeight > 200 && _deviceWidth > 180 && _labelIndex != -1)
                 {
                     renderConfusionMatrix(d2dDeviceContext, dwFactory,
                         _leftOffset, centerY, _deviceWidth/2.0f - 10, _deviceHeight/2.0f);

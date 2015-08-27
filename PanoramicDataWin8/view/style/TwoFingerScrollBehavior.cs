@@ -83,7 +83,7 @@ namespace PanoramicDataWin8.view.style
         {
             if (e.NumActiveContacts == 1 && _oneFingerListener != null)
             {
-                _oneFingerListener.Pressed(_frameworkElement, e);
+                _oneFingerListener.Moved(_frameworkElement, e);
             }
             else if (_scrollViewer != null && e.NumActiveContacts == 2 && scrollPointer != null && e.CurrentPointers.Contains(scrollPointer) && e.TriggeringPointer.PointerId == scrollPointer.PointerId)
             {
@@ -109,7 +109,7 @@ namespace PanoramicDataWin8.view.style
                 _inertiaHandler.InertiaActive = true;
                 if (e.NumActiveContacts < 1 && _oneFingerListener != null)
                 {
-                    _oneFingerListener.Pressed(_frameworkElement, e);
+                    _oneFingerListener.Released(_frameworkElement, e);
                 }
             }
             if (scrollPointer != null && e.TriggeringPointer.PointerId == scrollPointer.PointerId)
