@@ -286,7 +286,7 @@ namespace PanoramicDataWin8.model.view
                 AttachmentHeaderViewModel = header,
                 //Size = new Vec(25,25),
                 //TargetSize = new Vec(25, 25),
-                Label = "generate code"
+                Label = "codegen"
             };
             AttachmentHeaderViewModels.Add(header);
         }

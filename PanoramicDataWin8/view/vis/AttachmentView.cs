@@ -239,7 +239,7 @@ namespace PanoramicDataWin8.view.vis
                 if (sender is AddAttachmentItemView)
                 {
                     var model = (sender as AddAttachmentItemView).DataContext as AddAttachmentItemViewModel;
-                    if (model.Label == "generate code")
+                    if (model.Label == "codegen")
                     {
                         var vis = (this.DataContext as AttachmentViewModel).VisualizationViewModel;
                         MainViewController.Instance.MainPage.FireCodeGeneration(vis);
@@ -399,7 +399,7 @@ namespace PanoramicDataWin8.view.vis
             else if (model.AttachmentOrientation == AttachmentOrientation.Right)
             {
                 var availableHeight = model.VisualizationViewModel.Size.Y;
-                var currentY = model.VisualizationViewModel.Position.Y + model.VisualizationViewModel.Size.Y;
+                var currentY = model.VisualizationViewModel.Position.Y;
                 if (availableHeight > calculateMinPreferedSizeY(model.AttachmentHeaderViewModels))
                 {
                     var remainingHeaders = model.AttachmentHeaderViewModels.ToList();
@@ -411,7 +411,7 @@ namespace PanoramicDataWin8.view.vis
                         int upperNrElemPerRow = (int)Math.Ceiling((double)header.AttachmentItemViewModels.Count / (double)nrRows);
                         int lowerNrElemPerRow = (int)Math.Floor((double)header.AttachmentItemViewModels.Count / (double)nrRows);
                         double currentX = model.VisualizationViewModel.Position.X  + model.VisualizationViewModel.Size.X + (upperNrElemPerRow * header.PreferedItemSize.Y + (upperNrElemPerRow) * GAP);
-                        currentY -= header.PreferedItemSize.Y;
+                        //currentY -= header.PreferedItemSize.Y;
                         if (header.AddAttachmentItemViewModel != null)
                         {
                             header.AddAttachmentItemViewModel.TargetPosition = new Pt(currentX + GAP, currentY);
