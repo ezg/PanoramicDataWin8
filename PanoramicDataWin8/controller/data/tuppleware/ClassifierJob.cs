@@ -85,7 +85,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 labelsUuid.Add(label, labelUuid);
             }
 
-            if (labels.Count > 1)
+            if (labels.Count > 1 && false)
             {
                 var labelUuids = (await projectCommand.Project(_originModel, _originModel.DatasetConfiguration.BaseUUID, labels))["uuid"].Value<string>();
                 CorrelateCommand correlateCommand = new CorrelateCommand();
