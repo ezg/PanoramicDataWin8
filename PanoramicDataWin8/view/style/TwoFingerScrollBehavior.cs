@@ -87,6 +87,8 @@ namespace PanoramicDataWin8.view.style
             }
             else if (_scrollViewer != null && e.NumActiveContacts == 2 && scrollPointer != null && e.CurrentPointers.Contains(scrollPointer) && e.TriggeringPointer.PointerId == scrollPointer.PointerId)
             {
+                _oneFingerListener.TwoFingerMoved();
+
                 Point currentPoint = e.CurrentContacts[scrollPointer.PointerId].Position;
                 double yDelta = _startPoint.Y - currentPoint.Y;
                 _scrollViewer.ChangeView(0, yDelta + _startVerticalOffset, 1);
@@ -180,5 +182,6 @@ namespace PanoramicDataWin8.view.style
         void Pressed(FrameworkElement sender, PointerManagerEvent e);
         void Moved(FrameworkElement sender, PointerManagerEvent e);
         void Released(FrameworkElement sender, PointerManagerEvent e);
+        void TwoFingerMoved();
     }
 }

@@ -169,11 +169,17 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
+        public void TwoFingerMoved()
+        {
+            _tapStart.Restart();
+        }
+
         public void Moved(FrameworkElement sender, PointerManagerEvent e)
         {
             var trans = sender.TransformToVisual(MainViewController.Instance.InkableScene);
             var currentPoint = trans.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position);
-            if ((_initialPoint.GetVec() - currentPoint.GetVec()).Length2 > 100 || _movingStarted)
+            if ((_initialPoint.GetVec() - currentPoint.GetVec()).Length2 > 100 || _movingStarted &&
+                _tapStart.ElapsedMilliseconds > 150)
             {
                 _movingStarted = true;
                 Vec delta = _previousPoint.GetVec() - currentPoint.GetVec();
