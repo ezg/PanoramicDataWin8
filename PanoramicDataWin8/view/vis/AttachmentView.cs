@@ -561,6 +561,14 @@ namespace PanoramicDataWin8.view.vis
             setMenuViewModelAnkerPosition();
         }
 
+        public void Dispose()
+        {
+            if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
+            {
+                MainViewController.Instance.InkableScene.Remove(_menuView);
+            }
+        }
+
         private void displayMenu(AttachedTo itemModel)
         {
             AttachmentViewModel model = (DataContext as AttachmentViewModel);

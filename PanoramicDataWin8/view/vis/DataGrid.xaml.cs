@@ -89,6 +89,7 @@ namespace PanoramicDataWin8.view.vis
                 (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
                 ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
                 resultModel.PropertyChanged -= ResultModel_PropertyChanged;
+                removeMenu();
             }
             InputFieldView.InputFieldViewModelTapped -= InputFieldViewInputFieldViewModelTapped;
         }

@@ -11,6 +11,7 @@ using Windows.UI.Core;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Input;
+using PanoramicDataWin8.controller.view;
 
 namespace PanoramicDataWin8.utils
 {
@@ -85,7 +86,7 @@ namespace PanoramicDataWin8.utils
             _currentContacts[pt.PointerId] = pt;
             _startContacts[pt.PointerId] = pt;
             ++_numActiveContacts;
-            fireAdded(e.Pointer);
+            fireAdded(e.Pointer, e);
             e.Handled = true;
         }
 
@@ -101,7 +102,7 @@ namespace PanoramicDataWin8.utils
                 _currentContacts.Remove(pt.PointerId);
                 _startContacts.Remove(pt.PointerId);
                 --_numActiveContacts;
-                fireRemoved(e.Pointer);
+                fireRemoved(e.Pointer, e);
 
                 e.Handled = true;
             }
@@ -138,13 +139,13 @@ namespace PanoramicDataWin8.utils
                 if (_startContacts.ContainsKey(pt.PointerId))
                 {
                     _currentContacts[pt.PointerId] = pt;
-                    fireMoved(e.Pointer);
+                    fireMoved(e.Pointer, e);
                     e.Handled = true;
                 }
             }
         }
 
-        PointerManagerEvent createPointerManagerEvent(Pointer triggeringPointer)
+        PointerManagerEvent createPointerManagerEvent(Pointer triggeringPointer, PointerRoutedEventArgs e)
         {
             Dictionary<uint, PointerPoint> currentContactsCopy = new Dictionary<uint, PointerPoint>();
             foreach (var k in _currentContacts.Keys)
@@ -164,42 +165,55 @@ namespace PanoramicDataWin8.utils
                 currentPointerCopy.Add(k);
             }
 
+
+            bool rightMouse = false;
+            if (triggeringPointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+            {
+                var properties = e.GetCurrentPoint(_frameworkElement).Properties;
+                if (properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
+                {
+                    rightMouse = true;
+                }
+            }
+
             return new PointerManagerEvent()
             {
                 TriggeringPointer = triggeringPointer,
                 NumActiveContacts = _numActiveContacts,
                 CurrentContacts = currentContactsCopy,
                 CurrentPointers = currentPointerCopy,
-                StartContacts = startContactsCopy
+                StartContacts = startContactsCopy,
+                IsRightMouse = rightMouse
             };
         }
 
-        void fireAdded(Pointer triggeringPointer)
+        void fireAdded(Pointer triggeringPointer, PointerRoutedEventArgs e)
         {
             if (Added != null)
             {
-                Added(this, createPointerManagerEvent(triggeringPointer));
+                Added(this, createPointerManagerEvent(triggeringPointer, e));
             }
         }
 
-        void fireMoved(Pointer triggeringPointer)
+        void fireMoved(Pointer triggeringPointer, PointerRoutedEventArgs e)
         {
             if (Moved != null)
             {
-                Moved(this, createPointerManagerEvent(triggeringPointer));
+                Moved(this, createPointerManagerEvent(triggeringPointer, e));
             }
         }
 
-        void fireRemoved(Pointer triggeringPointer)
+        void fireRemoved(Pointer triggeringPointer, PointerRoutedEventArgs e)
         {
             if (Removed != null)
             {
-                Removed(this, createPointerManagerEvent(triggeringPointer));
+                Removed(this, createPointerManagerEvent(triggeringPointer, e));
             }
         }
     }
     public class PointerManagerEvent : EventArgs
     {
+        public bool IsRightMouse { get; set; }
         public Pointer TriggeringPointer { get; set; }
         public uint NumActiveContacts { get; set; }
         public List<Pointer> CurrentPointers { get; set; }

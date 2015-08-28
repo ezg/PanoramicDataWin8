@@ -7,10 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Foundation;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using PanoramicDataWin8.controller.view;
 
 namespace PanoramicDataWin8.view.style
 {
@@ -111,7 +113,7 @@ namespace PanoramicDataWin8.view.style
                 _inertiaHandler.InertiaActive = true;
                 if (e.NumActiveContacts < 1 && _oneFingerListener != null)
                 {
-                    _oneFingerListener.Released(_frameworkElement, e);
+                    _oneFingerListener.Released(_frameworkElement, e, e.IsRightMouse);
                 }
             }
             if (scrollPointer != null && e.TriggeringPointer.PointerId == scrollPointer.PointerId)
@@ -181,7 +183,7 @@ namespace PanoramicDataWin8.view.style
     {
         void Pressed(FrameworkElement sender, PointerManagerEvent e);
         void Moved(FrameworkElement sender, PointerManagerEvent e);
-        void Released(FrameworkElement sender, PointerManagerEvent e);
+        void Released(FrameworkElement sender, PointerManagerEvent e, bool isRightMouse);
         void TwoFingerMoved();
     }
 }

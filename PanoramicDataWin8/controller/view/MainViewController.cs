@@ -271,6 +271,7 @@ namespace PanoramicDataWin8.controller.view
             {
                 if ((attachmentView.DataContext as AttachmentViewModel).VisualizationViewModel == visualizationContainerView.DataContext as VisualizationViewModel)
                 {
+                    (attachmentView as AttachmentView).Dispose();
                     MainViewController.Instance.InkableScene.Remove(attachmentView);
                 }
             }

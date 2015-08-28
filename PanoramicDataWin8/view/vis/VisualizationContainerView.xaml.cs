@@ -190,7 +190,7 @@ namespace PanoramicDataWin8.view.vis
             _previousPoint = currentPoint;
         }
 
-        public void Released(FrameworkElement sender, PointerManagerEvent e)
+        public void Released(FrameworkElement sender, PointerManagerEvent e, bool isRightMouse)
         {
             if (_movingStarted)
             {
@@ -211,6 +211,11 @@ namespace PanoramicDataWin8.view.vis
             foreach (var avm in model.AttachementViewModels)
             {
                 avm.IsDisplayed = false;
+            }
+
+            if (isRightMouse)
+            {
+                MainViewController.Instance.RemoveVisualizationViewModel(this);
             }
         }
 
@@ -276,6 +281,15 @@ namespace PanoramicDataWin8.view.vis
             foreach (var avm in model.AttachementViewModels)
             {
                 avm.IsDisplayed = false;
+            }
+
+            if (e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+            {
+                var properties = e.GetCurrentPoint(this).Properties;
+                if (properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
+                {
+                    MainViewController.Instance.RemoveVisualizationViewModel(this);
+                }
             }
         }
 
