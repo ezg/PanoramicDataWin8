@@ -28,6 +28,7 @@ using Windows.System;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Documents;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using PanoramicDataWin8.controller.data.tuppleware.gateway;
 using PanoramicDataWin8.controller.input;
@@ -564,7 +565,8 @@ namespace PanoramicDataWin8
             {
                 CodeGenCommand cmd = new CodeGenCommand();
                 string response = await cmd.CodeGen((vis.QueryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel), generateCodeUuid);
-                text += response + "\n";
+                JObject obj = JObject.Parse(response);
+                text += obj["code"] + "\n";
             }
 
             editBox.Document.SetText(TextSetOptions.ApplyRtfDocumentDefaults, text);
