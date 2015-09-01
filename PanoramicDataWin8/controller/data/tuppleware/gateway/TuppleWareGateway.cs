@@ -25,6 +25,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
             Stopwatch sw = new Stopwatch();
             sw.Start();
             var httpClient = new HttpClient();
+            httpClient.Timeout = TimeSpan.FromMinutes(5);
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             var httpResponseMessage = await httpClient.PostAsync(endPoint, new StringContent(
                 data.ToString(),

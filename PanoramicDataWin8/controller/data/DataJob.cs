@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+using PanoramicDataWin8.controller.data.tuppleware;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.common;
@@ -96,104 +97,98 @@ namespace PanoramicDataWin8.controller.data
 
         private async void run()
         {
-            /*for (long i = 0; i < 100000; i++)
+            try
             {
-                for (long j = 0; j < 100000; j++)
+                if (!_dataProvider.IsInitialized)
                 {
-                    var tt = j * i;
-                   
+                    await _dataProvider.StartSampling();
                 }
-                //await Task.Delay(5);
-            }
-            await fireCompleted();
-            return;*/
-
-            if (!_dataProvider.IsInitialized)
-            {
-                await _dataProvider.StartSampling();
-            }
-            
-            DataPage dataPage = await _dataProvider.GetSampleDataRows(_sampleSize);
-            while (dataPage.IsEmpty)
-            {
-                await Task.Delay(100);
-                dataPage = await _dataProvider.GetSampleDataRows(_sampleSize);
-            }
-            
-            List<ResultItemModel> resultItemModels = new List<ResultItemModel>();
-            while (dataPage != null && _isRunning)
-            {
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
-                if (QueryModelClone.VisualizationType != VisualizationType.table)
+                DataPage dataPage = await _dataProvider.GetSampleDataRows(_sampleSize);
+                while (dataPage.IsEmpty)
                 {
-                    if (!_isIncremental)
-                    {
-                        _uniqueValues = _dimensions.Select(d => new Dictionary<string, double>()).ToList();
-                    }
-                    setVisualizationValues(dataPage.DataRows);
-                    if (_binner != null)
-                    {
-                        _binner.BinStep(dataPage.DataRows);
-                    }
-                    if (_aggregator != null)
-                    {
-                        _aggregator.AggregateStep(_binner.BinStructure, QueryModelClone, _dataProvider.Progress());
-                    }
-
-                    ResultDescriptionModel resultDescriptionModel = null;
-                    if (_binner != null && _binner.BinStructure != null)
-                    {
-                        resultItemModels = convertBinsToResultItemModels(_binner.BinStructure);
-                        resultDescriptionModel = new VisualizationResultDescriptionModel()
-                        {
-                            BinRanges = _binner.BinStructure.BinRanges,
-                            NullCount = _binner.BinStructure.NullCount,
-                            Dimensions = _dimensions,
-                            AxisTypes = _axisTypes,
-                            MinValues = _binner.BinStructure.AggregatedMinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
-                            MaxValues = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => entry.Value)
-                        };
-
-                        await fireUpdated(resultItemModels, _dataProvider.Progress(), resultDescriptionModel);
-                    }
+                    await Task.Delay(100);
+                    dataPage = await _dataProvider.GetSampleDataRows(_sampleSize);
                 }
-                else
+
+                List<ResultItemModel> resultItemModels = new List<ResultItemModel>();
+                while (dataPage != null && _isRunning)
                 {
-                    var resultItems = dataPage.DataRows.Select(dr => dr as ResultItemModel).ToList();
-                    foreach (var dimension in _dimensions.Where(d => d.SortMode != SortMode.None))
+                    Stopwatch sw = new Stopwatch();
+                    sw.Start();
+                    if (QueryModelClone.VisualizationType != VisualizationType.table)
                     {
-                        if (dimension.SortMode == SortMode.Asc)
+                        if (!_isIncremental)
                         {
-                            resultItems = resultItems.OrderBy(rs => (rs as DataRow).Entries[dimension.InputModel as InputFieldModel].ToString()).ToList();
+                            _uniqueValues = _dimensions.Select(d => new Dictionary<string, double>()).ToList();
                         }
-                        if (dimension.SortMode == SortMode.Desc)
+                        setVisualizationValues(dataPage.DataRows);
+                        if (_binner != null)
                         {
-                            resultItems = resultItems.OrderByDescending(rs => (rs as DataRow).Entries[dimension.InputModel as InputFieldModel].ToString()).ToList();
+                            _binner.BinStep(dataPage.DataRows);
+                        }
+                        if (_aggregator != null)
+                        {
+                            _aggregator.AggregateStep(_binner.BinStructure, QueryModelClone, _dataProvider.Progress());
+                        }
+
+                        ResultDescriptionModel resultDescriptionModel = null;
+                        if (_binner != null && _binner.BinStructure != null)
+                        {
+                            resultItemModels = convertBinsToResultItemModels(_binner.BinStructure);
+                            resultDescriptionModel = new VisualizationResultDescriptionModel()
+                            {
+                                BinRanges = _binner.BinStructure.BinRanges,
+                                NullCount = _binner.BinStructure.NullCount,
+                                Dimensions = _dimensions,
+                                AxisTypes = _axisTypes,
+                                MinValues = _binner.BinStructure.AggregatedMinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
+                                MaxValues = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => entry.Value)
+                            };
+
+                            await fireUpdated(resultItemModels, _dataProvider.Progress(), resultDescriptionModel);
                         }
                     }
-                    await fireUpdated(resultItems, _dataProvider.Progress(), null);
+                    else
+                    {
+                        var resultItems = dataPage.DataRows.Select(dr => dr as ResultItemModel).ToList();
+                        foreach (var dimension in _dimensions.Where(d => d.SortMode != SortMode.None))
+                        {
+                            if (dimension.SortMode == SortMode.Asc)
+                            {
+                                resultItems = resultItems.OrderBy(rs => (rs as DataRow).Entries[dimension.InputModel as InputFieldModel].ToString()).ToList();
+                            }
+                            if (dimension.SortMode == SortMode.Desc)
+                            {
+                                resultItems = resultItems.OrderByDescending(rs => (rs as DataRow).Entries[dimension.InputModel as InputFieldModel].ToString()).ToList();
+                            }
+                        }
+                        await fireUpdated(resultItems, _dataProvider.Progress(), null);
+                    }
+
+                    if (MainViewController.Instance.MainModel.Verbose)
+                    {
+                        Debug.WriteLine("DataJob Iteration Time: " + sw.ElapsedMilliseconds);
+                    }
+                    dataPage = await _dataProvider.GetSampleDataRows(_sampleSize);
+
+                    if (_throttle.Ticks > 0)
+                    {
+                        await Task.Delay(_throttle);
+                    }
                 }
 
-                if (MainViewController.Instance.MainModel.Verbose)
+                if (_isRunning)
                 {
-                    Debug.WriteLine("DataJob Iteration Time: " + sw.ElapsedMilliseconds);
+                    await fireCompleted();
                 }
-                dataPage = await _dataProvider.GetSampleDataRows(_sampleSize);
-
-                if (_throttle.Ticks > 0)
+                lock (_lock)
                 {
-                    await Task.Delay(_throttle);
+                    _isRunning = false;
                 }
             }
-
-            if (_isRunning)
+            catch (Exception exc)
             {
-                await fireCompleted();
-            }
-            lock (_lock)
-            {
-                _isRunning = false;
+                ErrorHandler.HandleError(exc.Message);
             }
         }
 

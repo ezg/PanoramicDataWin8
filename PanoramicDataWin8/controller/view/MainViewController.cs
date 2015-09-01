@@ -84,37 +84,44 @@ namespace PanoramicDataWin8.controller.view
             }
             else
             {
-                var throttle = double.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                    .First(l => l.ToLower().StartsWith("throttle"))
-                    .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-                var nrRecords = int.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                    .First(l => l.ToLower().StartsWith("nrofrecords"))
-                    .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-                var sampleSize = double.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                    .First(l => l.ToLower().StartsWith("samplesize"))
-                    .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
+                try
+                {
+                    var throttle = double.Parse(mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
+                        .First(l => l.ToLower().StartsWith("throttle"))
+                        .Split(new string[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
+                    var nrRecords = int.Parse(mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
+                        .First(l => l.ToLower().StartsWith("nrofrecords"))
+                        .Split(new string[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
+                    var sampleSize = double.Parse(mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
+                        .First(l => l.ToLower().StartsWith("samplesize"))
+                        .Split(new string[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
 
-                CatalogCommand catalogCommand = new CatalogCommand();
-                var loadedDatasetConfigs = await catalogCommand.GetCatalog(backend);
-                foreach (var ds in loadedDatasetConfigs)
-                {
-                    ds.ThrottleInMillis = throttle;
-                    ds.SampleSize = sampleSize;
-                    ds.NrOfRecords = nrRecords;
-                    _mainModel.DatasetConfigurations.Add(ds);
-                }
-                if (_mainModel.DatasetConfigurations.Any(ds => ds.Name.ToLower().Contains(startDataSet)))
-                {
-                    LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains(startDataSet)));
-                }
-                else
-                {
-                    LoadData(_mainModel.DatasetConfigurations.First());
-                }
+                    CatalogCommand catalogCommand = new CatalogCommand();
+                    var loadedDatasetConfigs = await catalogCommand.GetCatalog(backend);
+                    foreach (var ds in loadedDatasetConfigs)
+                    {
+                        ds.ThrottleInMillis = throttle;
+                        ds.SampleSize = sampleSize;
+                        ds.NrOfRecords = nrRecords;
+                        _mainModel.DatasetConfigurations.Add(ds);
+                    }
+                    if (_mainModel.DatasetConfigurations.Any(ds => ds.Name.ToLower().Contains(startDataSet)))
+                    {
+                        LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains(startDataSet)));
+                    }
+                    else
+                    {
+                        LoadData(_mainModel.DatasetConfigurations.First());
+                    }
 
-                TasksCommand tasksCommand = new TasksCommand();
-                var loadedTasks = await tasksCommand.GetTasks(backend);
-                _mainModel.Tasks = loadedTasks;
+                    TasksCommand tasksCommand = new TasksCommand();
+                    var loadedTasks = await tasksCommand.GetTasks(backend);
+                    _mainModel.Tasks = loadedTasks;
+                }
+                catch (Exception exc)
+                {
+                    ErrorHandler.HandleError(exc.Message);
+                }
             }
         }
 

@@ -116,6 +116,7 @@
     <Compile Include="controller\data\DataProvider.cs" />
     <Compile Include="controller\data\DataRow.cs" />
     <Compile Include="controller\data\Job.cs" />
+    <Compile Include="controller\data\tuppleware\ErrorHandler.cs" />
     <Compile Include="controller\data\tuppleware\FrequentItemsetJob.cs" />
     <Compile Include="controller\data\tuppleware\ClassifierJob.cs" />
     <Compile Include="controller\data\tuppleware\gateway\FrequentItemsetsCommand.cs" />
