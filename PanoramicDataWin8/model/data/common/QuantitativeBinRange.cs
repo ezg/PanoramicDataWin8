@@ -110,6 +110,11 @@ namespace PanoramicDataWin8.model.data.common
 
         private double[] getExtent(double dataMin, double dataMax, double m)
         {
+            if (dataMin == dataMax)
+            {
+                dataMin -= 0.1;
+                dataMax += 0.1;
+            }
             double span = dataMax - dataMin;
 
             double step = Math.Pow(10, Math.Floor(Math.Log10(span / m)));
