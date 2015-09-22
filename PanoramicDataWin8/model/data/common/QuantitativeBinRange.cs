@@ -43,7 +43,7 @@ namespace PanoramicDataWin8.model.data.common
         {
             if (dataMinValue == 0 && dataMaxValue == 0)
             {
-                dataMaxValue = 1;
+               //dataMaxValue = 1;
             }
             QuantitativeBinRange scale = new QuantitativeBinRange(dataMinValue, dataMaxValue, targetBinNumber, isIntegerRange);
             double[] extent = scale.getExtent(scale.DataMinValue, scale.DataMaxValue, scale.TargetBinNumber);
@@ -112,7 +112,7 @@ namespace PanoramicDataWin8.model.data.common
         {
             if (dataMin == dataMax)
             {
-                dataMin -= 0.1;
+                //dataMin -= 0.1;
                 dataMax += 0.1;
             }
             double span = dataMax - dataMin;
