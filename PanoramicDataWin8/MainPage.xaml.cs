@@ -419,9 +419,10 @@ namespace PanoramicDataWin8
                 {
                     TileMenuItemViewModel tileMenuItemViewModel = recursiveCreateTileMenu(inputModel, parentModel);
                     tileMenuItemViewModel.Row = count;
-                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor(parentModel.Children.Count/8.0) - 1;
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor((parentModel.Children.Count-1)/8.0) - 1;
                     tileMenuItemViewModel.RowSpan = 1;
                     tileMenuItemViewModel.ColumnSpan = 1;
+                    Debug.WriteLine(inputModel.Name + " c: " + tileMenuItemViewModel.Column + " r : " + tileMenuItemViewModel.Row);
                     count++;
                     if (count == 8.0)
                     {
