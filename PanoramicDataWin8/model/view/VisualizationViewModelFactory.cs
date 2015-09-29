@@ -7,10 +7,10 @@ namespace PanoramicDataWin8.model.view
 {
     public class VisualizationViewModelFactory
     {
-        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, string taskType, VisualizationType visualizationType)
+        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, TaskModel taskModel, VisualizationType visualizationType)
         {
             VisualizationViewModel visualizationViewModel = new VisualizationViewModel(schemaModel);
-            visualizationViewModel.QueryModel.TaskType = taskType;
+            visualizationViewModel.QueryModel.TaskModel = taskModel;
 
             foreach (var attachmentOrientation in Enum.GetValues(typeof(AttachmentOrientation)).Cast<AttachmentOrientation>())
             {
@@ -25,11 +25,11 @@ namespace PanoramicDataWin8.model.view
             return visualizationViewModel;
         }
 
-        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, string taskType, InputModel inputModel)
+        public static VisualizationViewModel CreateDefault(SchemaModel schemaModel, TaskModel taskModel, InputModel inputModel)
         {
-            VisualizationViewModel visualizationViewModel = CreateDefault(schemaModel, taskType, VisualizationType.table);
+            VisualizationViewModel visualizationViewModel = CreateDefault(schemaModel, taskModel, VisualizationType.table);
 
-            if (taskType == "")
+            if (taskModel == null)
             {
                 if (inputModel is InputFieldModel)
                 {
@@ -81,7 +81,7 @@ namespace PanoramicDataWin8.model.view
             }
             else
             {
-                visualizationViewModel.QueryModel.TaskType = taskType;
+                visualizationViewModel.QueryModel.TaskModel = taskModel;
             }
 
             return visualizationViewModel;

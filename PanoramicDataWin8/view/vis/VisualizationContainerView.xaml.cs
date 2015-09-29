@@ -107,7 +107,7 @@ namespace PanoramicDataWin8.view.vis
             }
             contentGrid.Children.Clear();
 
-            if (visualizationViewModel.QueryModel.TaskType == "")
+            if (visualizationViewModel.QueryModel.TaskModel == null)
             {
                 /*if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.bar)
                 {
@@ -137,14 +137,14 @@ namespace PanoramicDataWin8.view.vis
                 
                 
             }
-            else if (visualizationViewModel.QueryModel.TaskType != "")
+            else if (visualizationViewModel.QueryModel.TaskModel != null)
             {
-                if (visualizationViewModel.QueryModel.TaskType != "frequent_itemsets")
+                if (visualizationViewModel.QueryModel.TaskModel.Name != "frequent_itemsets")
                 {
                     _renderer = new ClassifierRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
-                else if (visualizationViewModel.QueryModel.TaskType == "frequent_itemsets")
+                else if (visualizationViewModel.QueryModel.TaskModel.Name == "frequent_itemsets")
                 {
                     _renderer = new FrequentItemsetRenderer();
                     contentGrid.Children.Add(_renderer);

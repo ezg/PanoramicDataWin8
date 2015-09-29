@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using Microsoft.Practices.Prism.Mvvm;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.tuppleware;
 
 namespace PanoramicDataWin8.model.view
 {
@@ -17,16 +18,16 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private List<string> _tasks = null;
-        public List<string> Tasks
+        private List<TaskModel> _taskModels = null;
+        public List<TaskModel> TaskModels
         {
             get
             {
-                return _tasks;
+                return _taskModels;
             }
             set
             {
-                this.SetProperty(ref _tasks, value);
+                this.SetProperty(ref _taskModels, value);
             }
         }
 

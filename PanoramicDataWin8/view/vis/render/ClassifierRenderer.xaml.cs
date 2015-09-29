@@ -76,16 +76,16 @@ namespace PanoramicDataWin8.view.vis.render
                 ResultModel resultModel = ((VisualizationViewModel) DataContext).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
                 mainLabel.Text = ((VisualizationViewModel) DataContext).QueryModel.VisualizationType.ToString();
-                mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskType.Replace("_", " ").ToString();
-                tbType.Text = ((VisualizationViewModel) DataContext).QueryModel.TaskType.Replace("_", " ").ToString();
+                mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
+                tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
             }
         }
 
         void QueryModel_QueryModelUpdated(object sender, QueryModelUpdatedEventArgs e)
         {
             QueryModel queryModel = ((VisualizationViewModel) DataContext).QueryModel;
-            mainLabel.Text = queryModel.TaskType.Replace("_", " ").ToString();
-            tbType.Text = queryModel.TaskType.Replace("_", " ").ToString();
+            mainLabel.Text = queryModel.TaskModel.Name.Replace("_", " ").ToString();
+            tbType.Text = queryModel.TaskModel.Name.Replace("_", " ").ToString();
             render();
         }
 
@@ -107,7 +107,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 setMenuViewModelAnkerPosition();
             }
-            mainLabel.Text = ((VisualizationViewModel) DataContext).QueryModel.TaskType.ToString();
+            mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.ToString();
         }
 
         private void updateProgressAndNullVisualization()
@@ -121,7 +121,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else*/
             {
-                tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskType.Replace("_", " ").ToString();
+                tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
             }
 
             // progress

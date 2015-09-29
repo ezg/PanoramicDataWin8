@@ -130,13 +130,22 @@ namespace PanoramicDataWin8.view.common
                             ((VisualizationTypeViewTileMenuContentViewModel)model.TileMenuContentViewModel).VisualizationTypeViewModel
                     });
                 }
-                else if (model.TileMenuContentViewModel is JobTypeViewTileMenuContentViewModel)
+                else if (model.TileMenuContentViewModel is TaskViewTileMenuContentViewModel)
                 {
                     mainGrid.Children.Clear();
-                    mainGrid.Children.Add(new JobTypeView()
+                    mainGrid.Children.Add(new TaskView()
                     {
                         DataContext =
-                            ((JobTypeViewTileMenuContentViewModel)model.TileMenuContentViewModel).JobTypeViewModel
+                            ((TaskViewTileMenuContentViewModel)model.TileMenuContentViewModel).TaskModel
+                    });
+                }
+                else if (model.TileMenuContentViewModel is TaskGroupViewTileMenuContentViewModel)
+                {
+                    mainGrid.Children.Clear();
+                    mainGrid.Children.Add(new TaskView()
+                    {
+                        DataContext =
+                            ((TaskGroupViewTileMenuContentViewModel)model.TileMenuContentViewModel).TaskGroupModel
                     });
                 }
                 else if (model.TileMenuContentViewModel is InputGroupViewTileMenuContentViewModel)

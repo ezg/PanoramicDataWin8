@@ -181,6 +181,8 @@
     <Compile Include="model\data\sim\SimInputFieldModel.cs" />
     <Compile Include="model\data\sim\SimOriginModel.cs" />
     <Compile Include="model\data\sim\SimSchemaModel.cs" />
+    <Compile Include="model\data\tuppleware\TaskGroupModel.cs" />
+    <Compile Include="model\data\tuppleware\TaskModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareFieldInputModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareInputGroupModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareOriginModel.cs" />
@@ -192,7 +194,6 @@
     <Compile Include="model\view\tilemenu\TileMenuItemView.cs" />
     <Compile Include="model\view\tilemenu\TileMenuContentViewModel.cs" />
     <Compile Include="model\view\VisualizationTypeViewModel.cs" />
-    <Compile Include="model\view\JobTypeViewModel.cs" />
     <Compile Include="model\view\MenuViewModel.cs" />
     <Compile Include="model\view\MenuItemViewModel.cs" />
     <Compile Include="model\view\AttachmentItemViewModel.cs" />
@@ -224,14 +225,14 @@
     <Compile Include="view\common\InputGroupView.xaml.cs">
       <DependentUpon>InputGroupView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\common\TaskView.xaml.cs">
+      <DependentUpon>TaskView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\common\TileMenuItemView.xaml.cs">
       <DependentUpon>TileMenuItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\common\VisualizationTypeView.xaml.cs">
       <DependentUpon>VisualizationTypeView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="view\common\JobTypeView.xaml.cs">
-      <DependentUpon>JobTypeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\common\DataGridCell.xaml.cs">
       <DependentUpon>DataGridCell.xaml</DependentUpon>
@@ -394,15 +395,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="view\common\TaskView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="view\common\TileMenuItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\common\VisualizationTypeView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="view\common\JobTypeView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

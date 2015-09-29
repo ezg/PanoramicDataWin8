@@ -103,7 +103,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
                 foreach (var label in labels)
                 {
-                    string clasifyUuid = (await classifyCommand.Classify(_originModel, _queryModelClone.TaskType, labelsUuid[label], featuresUuid))["uuid"].Value<string>();
+                    string clasifyUuid = (await classifyCommand.Classify(_originModel, _queryModelClone.TaskModel.Name, labelsUuid[label], featuresUuid))["uuid"].Value<string>();
                     classifysUuid.Add(label, clasifyUuid);
                 }
 

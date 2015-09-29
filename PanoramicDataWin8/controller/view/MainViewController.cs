@@ -38,8 +38,8 @@ namespace PanoramicDataWin8.controller.view
             InputGroupViewModel.InputGroupViewModelDropped += InputGroupViewModelDropped;
             InputGroupViewModel.InputGroupViewModelMoved += InputGroupViewModelMoved;
 
-            JobTypeViewModel.JobTypeViewModelDropped += JobTypeViewModelDropped;
-            JobTypeViewModel.JobTypeViewModelMoved += JobTypeViewModelMoved;
+            TaskModel.JobTypeViewModelDropped += TaskModelDropped;
+            TaskModel.JobTypeViewModelMoved += TaskModelMoved;
 
             VisualizationTypeViewModel.VisualizationTypeViewModelDropped += VisualizationTypeViewModel_VisualizationTypeViewModelDropped;
             VisualizationTypeViewModel.VisualizationTypeViewModelMoved += VisualizationTypeViewModel_VisualizationTypeViewModelMoved;
@@ -116,7 +116,7 @@ namespace PanoramicDataWin8.controller.view
 
                     TasksCommand tasksCommand = new TasksCommand();
                     var loadedTasks = await tasksCommand.GetTasks(backend);
-                    _mainModel.Tasks = loadedTasks;
+                    _mainModel.TaskModels = loadedTasks;
                 }
                 catch (Exception exc)
                 {
@@ -211,17 +211,17 @@ namespace PanoramicDataWin8.controller.view
                 //((_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter as TuppleWareQueryExecuter).LoadFileDescription((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
             }
         }
-        public VisualizationViewModel CreateVisualizationViewModel(string taskType, InputOperationModel inputOperationModel)
+        public VisualizationViewModel CreateVisualizationViewModel(TaskModel taskModel, InputOperationModel inputOperationModel)
         {
-            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, taskType, inputOperationModel != null ? inputOperationModel.InputModel : null);
+            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, taskModel, inputOperationModel != null ? inputOperationModel.InputModel : null);
             addAttachmentViews(visModel);
             _visualizationViewModels.Add(visModel);
             return visModel;
         }
 
-        public VisualizationViewModel CreateVisualizationViewModel(string taskType, VisualizationType visualizationType)
+        public VisualizationViewModel CreateVisualizationViewModel(TaskModel taskModel, VisualizationType visualizationType)
         {
-            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, taskType, visualizationType);
+            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, taskModel, visualizationType);
             addAttachmentViews(visModel);
             _visualizationViewModels.Add(visModel);
             return visModel;
@@ -230,7 +230,7 @@ namespace PanoramicDataWin8.controller.view
         public void CopyVisualisationViewModel(VisualizationViewModel visualizationViewModel, Pt centerPoint)
         {
             VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-            VisualizationViewModel newVisualizationViewModel = CreateVisualizationViewModel(visualizationViewModel.QueryModel.TaskType, null);
+            VisualizationViewModel newVisualizationViewModel = CreateVisualizationViewModel(visualizationViewModel.QueryModel.TaskModel, null);
             
             newVisualizationViewModel.Position = centerPoint - (visualizationViewModel.Size / 2.0);
             newVisualizationViewModel.Size = visualizationViewModel.Size;
@@ -323,12 +323,12 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        void JobTypeViewModelMoved(object sender, JobTypeViewModelEventArgs e)
+        void TaskModelMoved(object sender, TaskModelEventArgs e)
         {
             
         }
 
-        void JobTypeViewModelDropped(object sender, JobTypeViewModelEventArgs e)
+        void TaskModelDropped(object sender, TaskModelEventArgs e)
         {
             double width = VisualizationViewModel.WIDTH;
             double height = VisualizationViewModel.HEIGHT;
@@ -349,9 +349,9 @@ namespace PanoramicDataWin8.controller.view
             bool found = false;
             foreach (var element in hits)
             {
-                if ((element.DataContext as VisualizationViewModel).QueryModel.TaskType != "")
+                if ((element.DataContext as VisualizationViewModel).QueryModel.TaskModel != null)
                 {
-                    (element.DataContext as VisualizationViewModel).QueryModel.TaskType = (sender as JobTypeViewModel).TaskType;
+                    (element.DataContext as VisualizationViewModel).QueryModel.TaskModel = (sender as TaskModel);
                     found = true;
                     break;
                 }
@@ -360,7 +360,7 @@ namespace PanoramicDataWin8.controller.view
             if (!found)
             {
                 VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-                VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel((sender as JobTypeViewModel).TaskType, null);
+                VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel((sender as TaskModel), null);
                 visualizationViewModel.Position = position;
                 visualizationViewModel.Size = size;
                 visualizationContainerView.DataContext = visualizationViewModel;
@@ -380,7 +380,7 @@ namespace PanoramicDataWin8.controller.view
             Pt position = (Pt)new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
 
             VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-            VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel("", (sender as VisualizationTypeViewModel).VisualizationType);
+            VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel(null, (sender as VisualizationTypeViewModel).VisualizationType);
             visualizationViewModel.Position = position;
             visualizationViewModel.Size = size;
             visualizationContainerView.DataContext = visualizationViewModel;
@@ -483,7 +483,7 @@ namespace PanoramicDataWin8.controller.view
             if (hits.Count() == 0)
             {
                 VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-                VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel("", e.InputOperationModel);
+                VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel(null, e.InputOperationModel);
                 visualizationViewModel.Position = position;
                 visualizationViewModel.Size = size;
                 visualizationContainerView.DataContext = visualizationViewModel;

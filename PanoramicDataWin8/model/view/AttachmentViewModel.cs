@@ -207,7 +207,7 @@ namespace PanoramicDataWin8.model.view
 
         void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == _visualizationViewModel.QueryModel.GetPropertyName(() => _visualizationViewModel.QueryModel.TaskType) |
+            if (e.PropertyName == _visualizationViewModel.QueryModel.GetPropertyName(() => _visualizationViewModel.QueryModel.TaskModel) |
                 e.PropertyName == _visualizationViewModel.QueryModel.GetPropertyName(() => _visualizationViewModel.QueryModel.VisualizationType))
             {
                 initialize();
@@ -219,16 +219,16 @@ namespace PanoramicDataWin8.model.view
             if (AttachmentHeaderViewModels.Count == 0)
             {
                 AttachmentHeaderViewModels.Clear();
-                if (_visualizationViewModel.QueryModel.TaskType == "" && _visualizationViewModel.QueryModel.VisualizationType != VisualizationType.table)
+                if (_visualizationViewModel.QueryModel.TaskModel == null && _visualizationViewModel.QueryModel.VisualizationType != VisualizationType.table)
                 {
                     if (_attachmentOrientation == AttachmentOrientation.Bottom)
                     {
                         createDbBottom();
                     }
                 }
-                else if (_visualizationViewModel.QueryModel.TaskType != "")
+                else if (_visualizationViewModel.QueryModel.TaskModel != null)
                 {
-                    if (_visualizationViewModel.QueryModel.TaskType != "frequent_itemsets")
+                    if (_visualizationViewModel.QueryModel.TaskModel.Name != "frequent_itemsets")
                     {
                         if (_attachmentOrientation == AttachmentOrientation.Bottom)
                         {

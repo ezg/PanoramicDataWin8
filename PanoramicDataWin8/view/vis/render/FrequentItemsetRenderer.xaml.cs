@@ -68,7 +68,7 @@ namespace PanoramicDataWin8.view.vis.render
                 e.PropertyName == model.GetPropertyName(() => model.Position))
             {
             }
-            mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskType.Replace("_", " ").ToString();
+            mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
         }
 
         void PlotRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
@@ -80,7 +80,7 @@ namespace PanoramicDataWin8.view.vis.render
                 ResultModel resultModel = ((VisualizationViewModel)DataContext).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
                 mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.VisualizationType.ToString();
-                mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskType.Replace("_", " ").ToString();
+                mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
             }
         }
 
@@ -93,7 +93,7 @@ namespace PanoramicDataWin8.view.vis.render
         void QueryModel_QueryModelUpdated(object sender, QueryModelUpdatedEventArgs e)
         {
             QueryModel queryModel = ((VisualizationViewModel)DataContext).QueryModel;
-            mainLabel.Text = queryModel.TaskType.Replace("_", " ").ToString();
+            mainLabel.Text = queryModel.TaskModel.Name.Replace("_", " ").ToString();
         }
 
         private void populateData()

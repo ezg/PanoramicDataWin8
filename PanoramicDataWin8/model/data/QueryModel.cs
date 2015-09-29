@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.model.data.result;
+using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.data
@@ -382,16 +383,16 @@ namespace PanoramicDataWin8.model.data
             return AxisType.Nominal;
         }
 
-        private string _taskType;
-        public string TaskType
+        private TaskModel taskModel;
+        public TaskModel TaskModel
         {
             get
             {
-                return _taskType;
+                return taskModel;
             }
             set
             {
-                this.SetProperty(ref _taskType, value);
+                this.SetProperty(ref taskModel, value);
                 FireQueryModelUpdated(QueryModelUpdatedEventType.Structure);
             }
         }

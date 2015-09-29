@@ -21,15 +21,16 @@ using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
 using System.Diagnostics;
 using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.view.inq;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace PanoramicDataWin8.view.common
 {
-    public sealed partial class JobTypeView : UserControl
+    public sealed partial class TaskView : UserControl
     {
-        private JobTypeView _shadow = null;
+        private TaskView _shadow = null;
         private long _manipulationStartTime = 0;
         private Pt _startDrag = new Point(0, 0);
         private Pt _currentFromInkableScene = new Point(0, 0);
@@ -37,7 +38,7 @@ namespace PanoramicDataWin8.view.common
         private PointerManager _mainPointerManager = new PointerManager();
         private Point _mainPointerManagerPreviousPoint = new Point();
 
-        public JobTypeView()
+        public TaskView()
         {
             this.InitializeComponent();
             this.DataContextChanged += JobTypeView_DataContextChanged;
@@ -50,21 +51,21 @@ namespace PanoramicDataWin8.view.common
 
         void JobTypeView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (args.NewValue != null && args.NewValue is JobTypeViewModel)
+            if (args.NewValue != null && args.NewValue is TaskModel)
             {
-                (args.NewValue as JobTypeViewModel).PropertyChanged += JobTypeViewModel_PropertyChanged;
+                (args.NewValue as TaskModel).PropertyChanged += TaskModel_PropertyChanged;
                 updateRendering();
             }
         }
 
-        void JobTypeViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void TaskModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             updateRendering();
         }
 
         void updateRendering()
         {
-            JobTypeViewModel model = DataContext as JobTypeViewModel;
+            TaskModel model = DataContext as TaskModel;
 
             if (model.IsShadow)
             {
@@ -76,6 +77,17 @@ namespace PanoramicDataWin8.view.common
                 mainGrid.Background = Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush;
                 border.BorderThickness = new Thickness(0);
             }
+
+            if (model is TaskGroupModel)
+            {
+                tbLabel.Foreground = Application.Current.Resources.MergedDictionaries[0]["darkBrush"] as SolidColorBrush;
+            }
+            else
+            {
+                tbLabel.Foreground = Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush;
+            }
+
+            tbLabel.Text = model.Name.Replace("_", "\n");
         }
 
         void mainPointerManager_Added(object sender, PointerManagerEvent e)
@@ -115,7 +127,7 @@ namespace PanoramicDataWin8.view.common
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        (DataContext as JobTypeViewModel).FireMoved(bounds);
+                        (DataContext as TaskModel).FireMoved(bounds);
                     }
                 }
 
@@ -137,7 +149,7 @@ namespace PanoramicDataWin8.view.common
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as JobTypeViewModel).FireDropped(bounds);
+                (DataContext as TaskModel).FireDropped(bounds);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -152,10 +164,10 @@ namespace PanoramicDataWin8.view.common
             if (inkableScene != null && DataContext != null)
             {
                 _currentFromInkableScene = fromInkableScene;
-                _shadow = new JobTypeView();
-                _shadow.DataContext = new JobTypeViewModel()
+                _shadow = new TaskView();
+                _shadow.DataContext = new TaskModel()
                 {
-                    TaskType = (DataContext as JobTypeViewModel).TaskType,
+                    Name = (DataContext as TaskModel).Name,
                     IsShadow = true
                 };
 
@@ -177,7 +189,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow.SendToFront();
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as JobTypeViewModel).FireMoved(bounds);
+                (DataContext as TaskModel).FireMoved(bounds);
             }
         }
     }

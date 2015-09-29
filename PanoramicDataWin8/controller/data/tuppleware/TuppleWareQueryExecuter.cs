@@ -29,7 +29,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 ActiveJobs.Remove(queryModel);
             }
             // determine if new job is even needed (i.e., are all relevant inputfieldmodels set)
-            if (queryModel.TaskType == "")
+            if (queryModel.TaskModel == null)
             {
                 if ((queryModel.VisualizationType == VisualizationType.table && queryModel.InputOperationModels.Count > 0) ||
                     (queryModel.VisualizationType != VisualizationType.table && queryModel.GetUsageInputOperationModel(InputUsage.X).Any() && queryModel.GetUsageInputOperationModel(InputUsage.Y).Any()))
@@ -48,7 +48,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             }
             else
             {
-                if (queryModel.TaskType != "frequent_itemsets")
+                if (queryModel.TaskModel.Name != "frequent_itemsets")
                 {
                     if (queryModel.GetUsageInputOperationModel(InputUsage.Feature).Any() && queryModel.GetUsageInputOperationModel(InputUsage.Label).Any())
                     {
@@ -62,7 +62,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                         classifierJob.Start();
                     }
                 }
-                else if (queryModel.TaskType == "frequent_itemsets")
+                else if (queryModel.TaskModel.Name == "frequent_itemsets")
                 {
                     if (queryModel.GetUsageInputOperationModel(InputUsage.Label).Any())
                     {

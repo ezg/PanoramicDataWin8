@@ -70,7 +70,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
                 await Task.Delay(50);
 
-                string frequentItemsetsUuid = (await frequentItemsetsCommand.Frequent(_originModel, _queryModelClone.TaskType, labelsUuid, _queryModelClone.MinimumSupport))["uuid"].Value<string>();
+                string frequentItemsetsUuid = (await frequentItemsetsCommand.Frequent(_originModel, _queryModelClone.TaskModel.Name, labelsUuid, _queryModelClone.MinimumSupport))["uuid"].Value<string>();
 
                 var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
                 await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>

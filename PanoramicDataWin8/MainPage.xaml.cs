@@ -332,47 +332,36 @@ namespace PanoramicDataWin8
 
         private void addJobButton_Click(object sender, RoutedEventArgs e)
         {
+            MainModel mainModel = (DataContext as MainModel);
             if (_jobMenu == null || !(_jobMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded)
             {
-                MainModel mainModel = (DataContext as MainModel);
                 var buttonBounds = addJobButton.GetBounds(this);
-                var taskTypes = MainViewController.Instance.MainModel.Tasks;
+                var taskModels =
+                    mainModel.TaskModels;
 
                 if (_jobMenu != null)
                 {
-                    ((TileMenuItemViewModel)_jobMenu.DataContext).AreChildrenExpanded = false;
-                    ((TileMenuItemViewModel)_jobMenu.DataContext).IsBeingRemoved = true;
+                    ((TileMenuItemViewModel) _jobMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel) _jobMenu.DataContext).IsBeingRemoved = true;
                     _jobMenu.Dispose();
                     menuCanvas.Children.Remove(_jobMenu);
                 }
 
                 TileMenuItemViewModel parentModel = new TileMenuItemViewModel(null);
-                parentModel.ChildrenNrColumns = (int)Math.Ceiling(taskTypes.Count() / 8.0);
-                parentModel.ChildrenNrRows = (int)Math.Min(8.0, taskTypes.Count());
+                parentModel.ChildrenNrColumns = (int) Math.Ceiling(taskModels.Count()/8.0);
+                parentModel.ChildrenNrRows = (int) Math.Min(8.0, taskModels.Count());
                 parentModel.Alignment = Alignment.Center;
                 parentModel.AttachPosition = AttachPosition.Right;
 
                 int count = 0;
-                foreach (var jobType in taskTypes)
+                foreach (var inputModel in taskModels)
                 {
-                    TileMenuItemViewModel tileMenuItemViewModel = new TileMenuItemViewModel(parentModel);
-                    tileMenuItemViewModel.Alignment = Alignment.Center;
-                    tileMenuItemViewModel.AttachPosition = AttachPosition.Right;
-                    JobTypeViewModel jobTypeViewModel = new JobTypeViewModel()
-                    {
-                        TaskType = jobType
-                    };
-                    tileMenuItemViewModel.TileMenuContentViewModel = new JobTypeViewTileMenuContentViewModel()
-                    {
-                        Name = jobType.ToString(),
-                        JobTypeViewModel = jobTypeViewModel
-                    };
-
+                    TileMenuItemViewModel tileMenuItemViewModel = recursiveCreateTileMenu(inputModel, parentModel);
                     tileMenuItemViewModel.Row = count;
-                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int)Math.Floor(parentModel.Children.Count / 8.0) - 1;
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor((parentModel.Children.Count-1)/8.0) - 1;
                     tileMenuItemViewModel.RowSpan = 1;
                     tileMenuItemViewModel.ColumnSpan = 1;
-                    parentModel.Children.Add(tileMenuItemViewModel);
+                    Debug.WriteLine(inputModel.Name + " c: " + tileMenuItemViewModel.Column + " r : " + tileMenuItemViewModel.Row);
                     count++;
                     if (count == 8.0)
                     {
@@ -380,7 +369,7 @@ namespace PanoramicDataWin8
                     }
                 }
 
-                _jobMenu = new TileMenuItemView { MenuCanvas = menuCanvas, DataContext = parentModel };
+                _jobMenu = new TileMenuItemView {MenuCanvas = menuCanvas, DataContext = parentModel};
                 menuCanvas.Children.Add(_jobMenu);
 
                 parentModel.CurrentPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
@@ -440,7 +429,7 @@ namespace PanoramicDataWin8
             }
         }
 
-        private TileMenuItemViewModel recursiveCreateTileMenu(InputModel inputModel, TileMenuItemViewModel parent)
+        private TileMenuItemViewModel recursiveCreateTileMenu(object inputModel, TileMenuItemViewModel parent)
         {
             TileMenuItemViewModel currentTileMenuItemViewModel = null;
             if (inputModel is InputGroupModel)
@@ -450,7 +439,7 @@ namespace PanoramicDataWin8
                 InputGroupViewModel inputGroupViewModel = new InputGroupViewModel(null, inputGroupModel);
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new InputGroupViewTileMenuContentViewModel()
                 {
-                    Name = inputModel.Name,
+                    Name = inputGroupModel.Name,
                     InputGroupViewModel = inputGroupViewModel
                 };
 
@@ -481,8 +470,48 @@ namespace PanoramicDataWin8
                 InputFieldViewModel inputFieldViewModel = new InputFieldViewModel(null, new InputOperationModel(inputModel as InputFieldModel));
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new InputFieldViewTileMenuContentViewModel()
                 {
-                    Name = inputModel.Name,
+                    Name = (inputModel as InputFieldModel).Name,
                     InputFieldViewModel = inputFieldViewModel
+                };
+            } 
+            else if (inputModel is TaskGroupModel)
+            {
+                var taskGroupModel = inputModel as TaskGroupModel;
+                currentTileMenuItemViewModel = new TileMenuItemViewModel(parent);
+                currentTileMenuItemViewModel.TileMenuContentViewModel = new TaskGroupViewTileMenuContentViewModel()
+                {
+                    Name = taskGroupModel.Name,
+                    TaskGroupModel = taskGroupModel
+                };
+
+                currentTileMenuItemViewModel.ChildrenNrColumns = (int)Math.Ceiling(taskGroupModel.TaskModels.Count() / 8.0);
+                currentTileMenuItemViewModel.ChildrenNrRows = (int)Math.Min(8.0, taskGroupModel.TaskModels.Count());
+                currentTileMenuItemViewModel.Alignment = Alignment.Center;
+                currentTileMenuItemViewModel.AttachPosition = AttachPosition.Right;
+
+                int count = 0;
+                foreach (var childInputModel in taskGroupModel.TaskModels/*.OrderBy(am => am.Name)*/)
+                {
+                    var childTileMenu = recursiveCreateTileMenu(childInputModel, currentTileMenuItemViewModel);
+                    childTileMenu.Row = count; // TileMenuItemViewModel.Children.Count;
+                    childTileMenu.Column = (currentTileMenuItemViewModel.ChildrenNrColumns - 1) - (int)Math.Floor((currentTileMenuItemViewModel.Children.Count - 1) / 8.0);
+                    childTileMenu.RowSpan = 1;
+                    childTileMenu.ColumnSpan = 1;
+                    //currentTileMenuItemViewModel.Children.Add(childTileMenu);
+                    count++;
+                    if (count == 8.0)
+                    {
+                        count = 0;
+                    }
+                }
+            }
+            else if (inputModel is TaskModel)
+            {
+                currentTileMenuItemViewModel = new TileMenuItemViewModel(parent);
+                currentTileMenuItemViewModel.TileMenuContentViewModel = new TaskViewTileMenuContentViewModel()
+                {
+                    Name = (inputModel as TaskModel).Name,
+                    TaskModel = (inputModel as TaskModel)
                 };
             }
             parent.Children.Add(currentTileMenuItemViewModel);
