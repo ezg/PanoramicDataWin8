@@ -303,8 +303,33 @@ namespace PanoramicDataWin8.controller.view
                 linkViewModel.LinkModels.Add(linkModel);
                 linkViewModel.FromVisualizationViewModels.Add(VisualizationViewModels.Where(vvm => vvm.QueryModel == linkModel.FromQueryModel).First());
             }
-            
+
             return linkViewModel;
+        }
+
+        private bool isLinkAllowed(LinkModel linkModel)
+        {
+            List<LinkModel> linkModels = linkModel.FromQueryModel.LinkModels.Where(lm => lm.FromQueryModel == linkModel.FromQueryModel).ToList();
+            linkModels.Add(linkModel);
+            return !recursiveCheckForCiruclarLinking(linkModels, linkModel.FromQueryModel, new HashSet<QueryModel>());
+        } 
+
+        private bool recursiveCheckForCiruclarLinking(List<LinkModel> links, QueryModel current, HashSet<QueryModel> chain)
+        {
+            if (!chain.Contains(current))
+            {
+                chain.Add(current);
+                bool ret = false;
+                foreach (var link in links)
+                {
+                    ret = ret || recursiveCheckForCiruclarLinking(link.ToQueryModel.LinkModels.Where(lm => lm.FromQueryModel == link.ToQueryModel).ToList(), link.ToQueryModel, chain);
+                }
+                return ret;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public void RemoveLinkViewModel(LinkModel linkModel)
@@ -540,16 +565,20 @@ namespace PanoramicDataWin8.controller.view
                 if (recognizedGesture is ConnectGesture)
                 {
                     ConnectGesture connect = recognizedGesture as ConnectGesture;
+
                     LinkModel linkModel = new LinkModel()
                     {
                         FromQueryModel = connect.FromVisualizationViewModel.QueryModel,
                         ToQueryModel = connect.ToVisualizationViewModel.QueryModel
                     };
-                    if (!linkModel.FromQueryModel.LinkModels.Contains(linkModel) &&
-                        !linkModel.ToQueryModel.LinkModels.Contains(linkModel))
+                    if (isLinkAllowed(linkModel))
                     {
-                        linkModel.FromQueryModel.LinkModels.Add(linkModel);
-                        linkModel.ToQueryModel.LinkModels.Add(linkModel);
+                        if (!linkModel.FromQueryModel.LinkModels.Contains(linkModel) &&
+                            !linkModel.ToQueryModel.LinkModels.Contains(linkModel))
+                        {
+                            linkModel.FromQueryModel.LinkModels.Add(linkModel);
+                            linkModel.ToQueryModel.LinkModels.Add(linkModel);
+                        }
                     }
                 }
                 else if (recognizedGesture is HitGesture)
