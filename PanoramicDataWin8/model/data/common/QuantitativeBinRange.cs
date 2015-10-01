@@ -101,7 +101,7 @@ namespace PanoramicDataWin8.model.data.common
 
         public override int GetIndex(double value)
         {
-            return (int)Math.Floor(Math.Round((value - this.MinValue) / this.Step, 5));
+            return (int)Math.Floor(Math.Round((value - this.MinValue) / this.Step, 8));
         }
         public override double AddStep(double value)
         {
@@ -132,8 +132,8 @@ namespace PanoramicDataWin8.model.data.common
                 step = Math.Ceiling(step);
             }
             double[] ret = new double[3];
-            ret[0] = (double)(Math.Floor(Math.Round(dataMin, 5) / step) * step);
-            ret[1] = (double)(Math.Floor(Math.Round(dataMax, 5) / step) * step + step);
+            ret[0] = (double)(Math.Floor(Math.Round(dataMin, 8) / step) * step);
+            ret[1] = (double)(Math.Floor(Math.Round(dataMax, 8) / step) * step + step);
             ret[2] = (double)step;
 
             return ret;
