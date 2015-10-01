@@ -103,7 +103,7 @@
 
     <Page.BottomAppBar >
         <CommandBar Name="commandBar" Style="{StaticResource CommandBarStyle1}">
-            <AppBarButton Label="Refresh" Icon="Refresh" Style="{StaticResource AppBarButtonStyle1}"/>
+            <AppBarButton Label="Refresh" Icon="Refresh" Style="{StaticResource AppBarButtonStyle1}" Click="Refresh_OnClick"/>
             <AppBarButton Label="Help" Icon="Help"  Style="{StaticResource AppBarButtonStyle1}"/>
 
             <CommandBar.SecondaryCommands >

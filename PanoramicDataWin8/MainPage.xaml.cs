@@ -601,5 +601,10 @@ namespace PanoramicDataWin8
 
             editBox.Document.SetText(TextSetOptions.ApplyRtfDocumentDefaults, text);
         }
+
+        private void Refresh_OnClick(object sender, RoutedEventArgs e)
+        {
+            MainViewController.Instance.LoadConfigs();
+        }
     }
 }

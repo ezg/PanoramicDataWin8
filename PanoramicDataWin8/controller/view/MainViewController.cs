@@ -52,7 +52,7 @@ namespace PanoramicDataWin8.controller.view
             //_gesturizer.AddGesture(new ScribbleGesture(_root));
         }
 
-        public async void loadConfigs()
+        public async void LoadConfigs()
         {
             var installedLoc = Package.Current.InstalledLocation;
             var configLoc = await installedLoc.GetFolderAsync(@"Assets\data\config");
@@ -64,7 +64,7 @@ namespace PanoramicDataWin8.controller.view
                 .First(l => l.ToLower().StartsWith("startdataset"))
                 .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
 
-
+            _mainModel.DatasetConfigurations.Clear();
             if (backend.ToLower() == "sim")
             {
                 var configs = await configLoc.GetFilesAsync();
@@ -128,7 +128,7 @@ namespace PanoramicDataWin8.controller.view
         public static void CreateInstance(InkableScene root, MainPage mainPage)
         {
             _instance = new MainViewController(root, mainPage);
-            _instance.loadConfigs();
+            _instance.LoadConfigs();
         }
         
         public static MainViewController Instance
