@@ -24,7 +24,7 @@ namespace PanoramicDataWin8.view.common
 {
     public sealed partial class InputGroupView : UserControl
     {
-        private TaskView _shadow = null;
+        private InputGroupView _shadow = null;
         private long _manipulationStartTime = 0;
         private Pt _startDrag = new Point(0, 0);
         private Pt _currentFromInkableScene = new Point(0, 0);
@@ -147,7 +147,7 @@ namespace PanoramicDataWin8.view.common
             if (inkableScene != null && DataContext != null)
             {
                 _currentFromInkableScene = fromInkableScene;
-                _shadow = new TaskView();
+                _shadow = new InputGroupView();
                 _shadow.DataContext = new InputGroupViewModel()
                 {
                     InputOperationModel = (DataContext as InputGroupViewModel).InputOperationModel,

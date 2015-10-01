@@ -161,7 +161,7 @@ namespace PanoramicDataWin8.view.common
         public void createShadow(Point fromInkableScene)
         {
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
-            if (inkableScene != null && DataContext != null)
+            if (inkableScene != null && DataContext != null && !((DataContext as TaskModel) is TaskGroupModel))
             {
                 _currentFromInkableScene = fromInkableScene;
                 _shadow = new TaskView();

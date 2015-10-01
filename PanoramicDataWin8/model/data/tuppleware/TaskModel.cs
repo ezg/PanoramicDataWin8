@@ -56,6 +56,19 @@ namespace PanoramicDataWin8.model.data.tuppleware
                 this.SetProperty(ref _name, value);
             }
         }
+
+        private Vec _size = new Vec(50, 50);
+        public Vec Size
+        {
+            get
+            {
+                return _size;
+            }
+            set
+            {
+                this.SetProperty(ref _size, value);
+            }
+        }
     }
 
     
