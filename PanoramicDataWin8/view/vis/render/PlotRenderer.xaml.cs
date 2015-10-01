@@ -240,7 +240,7 @@ namespace PanoramicDataWin8.view.vis.render
         private void populateData()
         {
             ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
-            if (resultModel.ResultItemModels.Count > 0)
+            //if (resultModel.ResultItemModels.Count > 0)
             {
                 /*ExponentialEase easingFunction = new ExponentialEase();
                 easingFunction.EasingMode = EasingMode.EaseInOut;

@@ -540,6 +540,10 @@ namespace PanoramicDataWin8.view.vis
                 FilteringOperation op = linkViewModel.ToVisualizationViewModel.QueryModel.FilteringOperation;
                 linkViewModel.ToVisualizationViewModel.QueryModel.FilteringOperation = op == FilteringOperation.AND ? FilteringOperation.OR : FilteringOperation.AND;
                 e.Handled = true;
+                foreach (var linkModel in linkViewModel.LinkModels)
+                {
+                    linkModel.ToQueryModel.FireQueryModelUpdated(QueryModelUpdatedEventType.Links);
+                }
             }
         }
         public GeoAPI.Geometries.IGeometry Geometry

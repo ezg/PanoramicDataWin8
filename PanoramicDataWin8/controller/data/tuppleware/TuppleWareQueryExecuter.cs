@@ -82,6 +82,24 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
         private void job_JobCompleted(object sender, EventArgs e)
         {
+            QueryModel queryModel = null;
+            if (sender is DataJob)
+            {
+                DataJob job = sender as DataJob;
+                queryModel = job.QueryModel;
+            }
+            else if (sender is ClassifierJob)
+            {
+                ClassifierJob job = sender as ClassifierJob;
+                queryModel = job.QueryModel;
+            }
+            else if (sender is FrequentItemsetJob)
+            {
+                FrequentItemsetJob job = sender as FrequentItemsetJob;
+                queryModel = job.QueryModel;
+            }
+            queryModel.ResultModel.Progress = 1.0;
+            queryModel.ResultModel.FireResultModelUpdated();
         }
 
         private void job_JobUpdate(object sender, JobEventArgs jobEventArgs)

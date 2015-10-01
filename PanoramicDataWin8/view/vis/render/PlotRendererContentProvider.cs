@@ -25,6 +25,8 @@ namespace PanoramicDataWin8.view.vis.render
 {
     public class PlotRendererContentProvider : DXSurfaceContentProvider
     {
+        private bool _isResultEmpty = false;
+
         private float _leftOffset = 40;
         private float _rightOffset = 10;
         private float _topOffset = 10;
@@ -83,77 +85,89 @@ namespace PanoramicDataWin8.view.vis.render
 
             _visualizationDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
 
-            _xIndex = _visualizationDescriptionModel.Dimensions.IndexOf(xAom);
-            _yIndex = _visualizationDescriptionModel.Dimensions.IndexOf(yAom);
+            if (resultModel.ResultItemModels.Count > 0)
+            {
+                _xIndex = _visualizationDescriptionModel.Dimensions.IndexOf(xAom);
+                _yIndex = _visualizationDescriptionModel.Dimensions.IndexOf(yAom);
+                _isResultEmpty = false;
 
-            if (!(_visualizationDescriptionModel.BinRanges[_xIndex] is AggregateBinRange))
-            {
-                _xBinRange = _visualizationDescriptionModel.BinRanges[_xIndex];
-                _isXAxisAggregated = false;
-            }
-            else
-            {
-                double factor = 0.0;
-                if (_visualizationDescriptionModel.MinValues[xAom] - _visualizationDescriptionModel.MaxValues[xAom] == 0)
+                if (!(_visualizationDescriptionModel.BinRanges[_xIndex] is AggregateBinRange))
                 {
-                    factor = 0.1;
-                    factor *= _visualizationDescriptionModel.MinValues[xAom] < 0 ? -1f : 1f;
+                    _xBinRange = _visualizationDescriptionModel.BinRanges[_xIndex];
+                    _isXAxisAggregated = false;
                 }
-                _isXAxisAggregated = true;
-                _xBinRange = QuantitativeBinRange.Initialize(_visualizationDescriptionModel.MinValues[xAom] * (1.0 - factor), _visualizationDescriptionModel.MaxValues[xAom] * (1.0 + factor), 10, false);
-            }
-
-            if (!(_visualizationDescriptionModel.BinRanges[_yIndex] is AggregateBinRange))
-            {
-                _yBinRange = _visualizationDescriptionModel.BinRanges[_yIndex];
-                _isYAxisAggregated = false;
-            }
-            else
-            {
-                double factor = 0.0;
-                if (_visualizationDescriptionModel.MinValues[yAom] - _visualizationDescriptionModel.MaxValues[yAom] == 0)
+                else
                 {
-                    factor = 0.1;
-                    factor *= _visualizationDescriptionModel.MinValues[yAom] < 0 ? -1f : 1f;
-                }
-                _isYAxisAggregated = true;
-                _yBinRange = QuantitativeBinRange.Initialize(_visualizationDescriptionModel.MinValues[yAom] * (1.0 - factor), _visualizationDescriptionModel.MaxValues[yAom] * (1.0 + factor), 10, false);
-            }
-
-            // scale axis to 0 if this is a bar chart
-            if (_isXAxisAggregated && !_isYAxisAggregated &&
-                (xAom.AggregateFunction == AggregateFunction.Count || xAom.AggregateFunction == AggregateFunction.Sum || xAom.AggregateFunction == AggregateFunction.Avg || xAom.AggregateFunction == AggregateFunction.Min || xAom.AggregateFunction == AggregateFunction.Max))
-            {
-                _xBinRange = QuantitativeBinRange.Initialize(Math.Min(0, _visualizationDescriptionModel.MinValues[xAom]), _xBinRange.DataMaxValue, 10, false);
-            }
-            if (!_isXAxisAggregated && _isYAxisAggregated &&
-               (yAom.AggregateFunction == AggregateFunction.Count || yAom.AggregateFunction == AggregateFunction.Sum || yAom.AggregateFunction == AggregateFunction.Avg || yAom.AggregateFunction == AggregateFunction.Min || yAom.AggregateFunction == AggregateFunction.Max))
-            {
-                _yBinRange = QuantitativeBinRange.Initialize(Math.Min(0, _visualizationDescriptionModel.MinValues[yAom]), _yBinRange.DataMaxValue, 10, false);
-            }
-
-            // create bin dictionary
-            var resultDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
-            _binDictonary = new Dictionary<BinIndex, List<VisualizationItemResultModel>>();
-            foreach (var resultItem in _resultModel.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
-            {
-                if (resultItem.Values.ContainsKey(xAom) && resultItem.Values.ContainsKey(yAom))
-                {
-                    double? xValue = (double?)resultItem.Values[xAom].Value;
-                    double? yValue = (double?)resultItem.Values[yAom].Value;
-
-                    if (xValue.HasValue && yValue.HasValue)
+                    double factor = 0.0;
+                    if (_visualizationDescriptionModel.MinValues[xAom] - _visualizationDescriptionModel.MaxValues[xAom] == 0)
                     {
-                        BinIndex binIndex = new BinIndex(
-                            resultDescriptionModel.BinRanges[_xIndex].GetIndex(xValue.Value),
-                            resultDescriptionModel.BinRanges[_yIndex].GetIndex(yValue.Value));
-                        if (!_binDictonary.ContainsKey(binIndex))
+                        factor = 0.1;
+                        factor *= _visualizationDescriptionModel.MinValues[xAom] < 0 ? -1f : 1f;
+                    }
+                    _isXAxisAggregated = true;
+                    _xBinRange = QuantitativeBinRange.Initialize(_visualizationDescriptionModel.MinValues[xAom]*(1.0 - factor), _visualizationDescriptionModel.MaxValues[xAom]*(1.0 + factor), 10, false);
+                }
+
+                if (!(_visualizationDescriptionModel.BinRanges[_yIndex] is AggregateBinRange))
+                {
+                    _yBinRange = _visualizationDescriptionModel.BinRanges[_yIndex];
+                    _isYAxisAggregated = false;
+                }
+                else
+                {
+                    double factor = 0.0;
+                    if (_visualizationDescriptionModel.MinValues[yAom] - _visualizationDescriptionModel.MaxValues[yAom] == 0)
+                    {
+                        factor = 0.1;
+                        factor *= _visualizationDescriptionModel.MinValues[yAom] < 0 ? -1f : 1f;
+                    }
+                    _isYAxisAggregated = true;
+                    _yBinRange = QuantitativeBinRange.Initialize(_visualizationDescriptionModel.MinValues[yAom]*(1.0 - factor), _visualizationDescriptionModel.MaxValues[yAom]*(1.0 + factor), 10, false);
+                }
+
+                // scale axis to 0 if this is a bar chart
+                if (_isXAxisAggregated && !_isYAxisAggregated &&
+                    (xAom.AggregateFunction == AggregateFunction.Count || xAom.AggregateFunction == AggregateFunction.Sum || xAom.AggregateFunction == AggregateFunction.Avg || xAom.AggregateFunction == AggregateFunction.Min || xAom.AggregateFunction == AggregateFunction.Max))
+                {
+                    _xBinRange = QuantitativeBinRange.Initialize(Math.Min(0, _visualizationDescriptionModel.MinValues[xAom]), _xBinRange.DataMaxValue, 10, false);
+                }
+                if (!_isXAxisAggregated && _isYAxisAggregated &&
+                    (yAom.AggregateFunction == AggregateFunction.Count || yAom.AggregateFunction == AggregateFunction.Sum || yAom.AggregateFunction == AggregateFunction.Avg || yAom.AggregateFunction == AggregateFunction.Min || yAom.AggregateFunction == AggregateFunction.Max))
+                {
+                    _yBinRange = QuantitativeBinRange.Initialize(Math.Min(0, _visualizationDescriptionModel.MinValues[yAom]), _yBinRange.DataMaxValue, 10, false);
+                }
+
+                // create bin dictionary
+                var resultDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
+                _binDictonary = new Dictionary<BinIndex, List<VisualizationItemResultModel>>();
+                foreach (var resultItem in _resultModel.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
+                {
+                    if (resultItem.Values.ContainsKey(xAom) && resultItem.Values.ContainsKey(yAom))
+                    {
+                        double? xValue = (double?) resultItem.Values[xAom].Value;
+                        double? yValue = (double?) resultItem.Values[yAom].Value;
+
+                        if (xValue.HasValue && yValue.HasValue)
                         {
-                            _binDictonary.Add(binIndex, new List<VisualizationItemResultModel>());
+                            BinIndex binIndex = new BinIndex(
+                                resultDescriptionModel.BinRanges[_xIndex].GetIndex(xValue.Value),
+                                resultDescriptionModel.BinRanges[_yIndex].GetIndex(yValue.Value));
+                            if (!_binDictonary.ContainsKey(binIndex))
+                            {
+                                _binDictonary.Add(binIndex, new List<VisualizationItemResultModel>());
+                            }
+                            _binDictonary[binIndex].Add(resultItem);
                         }
-                        _binDictonary[binIndex].Add(resultItem);
                     }
                 }
+            }
+            else if (resultModel.ResultItemModels.Count == 0 && resultModel.Progress == 1.0)
+            {
+                _isResultEmpty = true;
+            }
+            else
+            {
+                
             }
         }
 
@@ -174,6 +188,13 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     renderCell(d2dDeviceContext, dwFactory);
                 }
+            }
+            if (_isResultEmpty)
+            {
+                _leftOffset = 10;
+                _deviceWidth = (float)(d2dDeviceContext.Size.Width / CompositionScaleX - _leftOffset - _rightOffset);
+                _deviceHeight = (float)(d2dDeviceContext.Size.Height / CompositionScaleY - _topOffset - _bottomtOffset);
+                drawString(d2dDeviceContext, dwFactory, _deviceWidth / 2.0f + _leftOffset, _deviceHeight / 2.0f + _topOffset, "no datapoints", true, true, true);
             }
         }
 
