@@ -580,6 +580,10 @@ namespace PanoramicDataWin8.controller.view
                             linkModel.ToQueryModel.LinkModels.Add(linkModel);
                         }
                     }
+                    else
+                    {
+                       ErrorHandler.HandleError("Link cycles are not supported."); 
+                    }
                 }
                 else if (recognizedGesture is HitGesture)
                 {
