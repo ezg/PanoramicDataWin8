@@ -27,7 +27,6 @@
                 </inq:InkableScene.RenderTransform>
             </inq:InkableScene>
         </Canvas>
-
         <Grid Name="menuGrid" Width="100" HorizontalAlignment="Left" Margin="60,0,0,0" Visibility="Visible">
             <Canvas Name="menuCanvas">
             </Canvas>
@@ -99,6 +98,8 @@
                 </Path>
             </Grid>
         </Grid>
+
+        <Canvas Name="fingerAndPenCanvas"></Canvas>
     </Grid>
 
     <Page.BottomAppBar >

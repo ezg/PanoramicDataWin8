@@ -134,6 +134,18 @@ namespace PanoramicDataWin8.model.view
                 this.SetProperty(ref _verbose, value);
             }
         }
+        private bool _renderFingersAndPen = false;
+        public bool RenderFingersAndPen
+        {
+            get
+            {
+                return _renderFingersAndPen;
+            }
+            set
+            {
+                this.SetProperty(ref _renderFingersAndPen, value);
+            }
+        }
 
         private GraphRenderOptions _graphRenderOption = GraphRenderOptions.Cell;
         public GraphRenderOptions GraphRenderOption
