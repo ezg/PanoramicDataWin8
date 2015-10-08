@@ -116,7 +116,7 @@ namespace PanoramicDataWin8.view.vis
                 }*/
                 if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.table)
                 {
-                    _renderer = new TableRenderer2();
+                    _renderer = new TableRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
                 else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.plot)

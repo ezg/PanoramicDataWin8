@@ -17,7 +17,7 @@
     <PackageCertificateKeyFile>PanoramicDataWin8_TemporaryKey.pfx</PackageCertificateKeyFile>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>9e41b74f</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>316a98ac</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>neutral</AppxBundlePlatforms>
   </PropertyGroup>
@@ -106,9 +106,6 @@
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
-  <ItemGroup>
-    <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
-  </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
@@ -292,10 +289,8 @@
     </Compile>
     <Compile Include="view\vis\render\PlotRendererContentProvider.cs" />
     <Compile Include="view\vis\render\Renderer.cs" />
-    <Compile Include="view\vis\render\RendererResources.cs" />
-    <Compile Include="view\vis\render\TableRenderer.cs" />
-    <Compile Include="view\vis\render\TableRenderer2.xaml.cs">
-      <DependentUpon>TableRenderer2.xaml</DependentUpon>
+    <Compile Include="view\vis\render\TableRenderer.xaml.cs">
+      <DependentUpon>TableRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\VisualizationContainerView.xaml.cs">
       <DependentUpon>VisualizationContainerView.xaml</DependentUpon>
@@ -464,7 +459,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="view\vis\render\TableRenderer2.xaml">
+    <Page Include="view\vis\render\TableRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

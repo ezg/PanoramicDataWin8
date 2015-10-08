@@ -38,8 +38,8 @@ namespace PanoramicDataWin8.view.common
         private GraphicsPresenter _presenter; // encapsulates the SwapChain, Backbuffer and DepthStencil buffer
 
         // ReSharper disable InconsistentNaming
-        private D2D.Device _d2dDevice;
-        private D2D.DeviceContext _d2dDeviceContext;
+        private D2D.Device1 _d2dDevice;
+        private D2D.DeviceContext1 _d2dDeviceContext;
         // ReSharper restore InconsistentNaming
         private DW.Factory1 _dwFactory;
 
@@ -150,14 +150,16 @@ namespace PanoramicDataWin8.view.common
             _graphicsDevice = _disposeCollector.Collect(GraphicsDevice.New(flags));
 
             // get the low-level DXGI device reference
-            using (var dxgiDevice = ((Device)_graphicsDevice).QueryInterface<SharpDX.DXGI.Device>())
+            using (var dxgiDevice = ((Device)_graphicsDevice).QueryInterface<SharpDX.DXGI.Device1>())
             {
                 // create D2D device sharing same GPU driver instance
-                _d2dDevice = _disposeCollector.Collect(new D2D.Device(dxgiDevice, new D2D.CreationProperties { DebugLevel = D2DDebugLevel }));
+                var factory2D = new SharpDX.Direct2D1.Factory2();
+                _d2dDevice = new SharpDX.Direct2D1.Device1(factory2D, dxgiDevice.QueryInterface<SharpDX.DXGI.Device1>());
+                //_d2dDevice = _disposeCollector.Collect(new D2D.Device1(dxgiDevice, new D2D.CreationProperties { DebugLevel = D2DDebugLevel }));
 
                 // create D2D device context used in drawing and resource creation
                 // this allows us to not recreate the resources if render target gets recreated because of size change
-                _d2dDeviceContext = _disposeCollector.Collect(new D2D.DeviceContext(_d2dDevice, D2D.DeviceContextOptions.EnableMultithreadedOptimizations));
+                _d2dDeviceContext = _disposeCollector.Collect(new D2D.DeviceContext1(_d2dDevice, D2D.DeviceContextOptions.EnableMultithreadedOptimizations));
             }
 
             // device-independent factory used to create all DirectWrite resources
@@ -236,6 +238,7 @@ namespace PanoramicDataWin8.view.common
             _disposeCollector.RemoveAndDispose(ref _presenter);
         }
 
+
         private void DisposeD2DRenderTarget()
         {
             _d2dDeviceContext.Target = null;
@@ -279,7 +282,6 @@ namespace PanoramicDataWin8.view.common
             DrawContent();
             if (_isResized)
             {
-                _contentProvider.Resize();
                 _isResized = false;
             }
             _contentProvider.SizeChanged = false;
@@ -367,15 +369,12 @@ namespace PanoramicDataWin8.view.common
         {
             graphicsDevice.Clear(Color.White);
         }
-        public virtual void Resize()
-        {
-        }
 
-        public virtual void Draw(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
+        public virtual void Draw(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory)
         {
 
         }
-        public virtual void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
+        public virtual void Load(D2D.DeviceContext1 d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
         {
 
         }

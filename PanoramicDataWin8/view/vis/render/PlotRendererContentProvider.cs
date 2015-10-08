@@ -36,7 +36,6 @@ namespace PanoramicDataWin8.view.vis.render
         private float _deviceHeight = 0;
         private float _xScale = 0;
         private float _yScale = 0;
-        private bool _flipY = true;
         private float _minX = 0;
         private float _minY = 0;
         private float _maxX = 0;
@@ -61,6 +60,9 @@ namespace PanoramicDataWin8.view.vis.render
         private InputOperationModel _yAom = null;
         private Dictionary<BinIndex, List<VisualizationItemResultModel>> _binDictonary = null;
         private Dictionary<BinIndex, BinPrimitive> _binPrimitives = new Dictionary<BinIndex, BinPrimitive>();
+
+        private D2D.GeometryRealization _fillRoundedRectGeom = null;
+        private D2D.GeometryRealization _strokeRoundedRectGeom = null;
 
         public float CompositionScaleX { get; set; }
         public float CompositionScaleY { get; set; }
@@ -176,7 +178,7 @@ namespace PanoramicDataWin8.view.vis.render
             graphicsDevice.Clear(new Color(230, 230, 230));
         }
 
-        public override void Draw(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
+        public override void Draw(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory)
         {
             var mat = Matrix3x2.Identity;
             mat.ScaleVector = new Vector2(CompositionScaleX, CompositionScaleY);
@@ -195,10 +197,10 @@ namespace PanoramicDataWin8.view.vis.render
                 _deviceWidth = (float)(d2dDeviceContext.Size.Width / CompositionScaleX - _leftOffset - _rightOffset);
                 _deviceHeight = (float)(d2dDeviceContext.Size.Height / CompositionScaleY - _topOffset - _bottomtOffset);
                 drawString(d2dDeviceContext, dwFactory, _deviceWidth / 2.0f + _leftOffset, _deviceHeight / 2.0f + _topOffset, "no datapoints", true, true, true);
-            }
+             }
         }
 
-        private void drawString(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory, float x, float y, string text,
+        private void drawString(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory, float x, float y, string text,
             bool leftAligned,
             bool horizontallyCentered, bool verticallyCentered)
         {
@@ -221,7 +223,7 @@ namespace PanoramicDataWin8.view.vis.render
             d2dDeviceContext.DrawTextLayout(new Vector2(x, y), layout, _textBrush);
         }
 
-        private void computeSizesAndRenderLabels(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory, bool renderLines)
+        private void computeSizesAndRenderLabels(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory, bool renderLines)
         {
             //var xLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelX.TrimTo(20), MinValue = bin.MinX, MaxValue = bin.MaxX }).Distinct().ToList();
             //var yLabels = BinnedDataPoints.Select(bin => new { Label = bin.LabelY.TrimTo(20), MinValue = bin.MinY, MaxValue = bin.MaxY }).Distinct().ToList();
@@ -326,25 +328,39 @@ namespace PanoramicDataWin8.view.vis.render
                     count++;
                 }
 
-                /*foreach (var x in _xBinRange.GetBins())
+                var m = Matrix3x2.Identity;
+                float flatteningTolerance = D2D.D2D1.ComputeFlatteningTolerance(ref m, d2dDeviceContext.DotsPerInch.Width, d2dDeviceContext.DotsPerInch.Height);
+                // create rounded rectangle 
+                //D2D.GeometryRealization g = new D2D.GeometryRealization(d2dDeviceContext.NativePointer, );
+                //d2dDeviceContext.draw
+                if (_fillRoundedRectGeom != null)
                 {
-                    foreach (var y in _yBinRange.GetBins())
+                    _fillRoundedRectGeom.Dispose();
+                }
+                if (_strokeRoundedRectGeom != null)
+                {
+                    _strokeRoundedRectGeom.Dispose();
+                }
+                var x = toScreenX((float)_xBinRange.AddStep(0)) - toScreenX(0);
+                var y = toScreenY((float)_yBinRange.AddStep(0), false) - toScreenY(0, false);
+
+                _fillRoundedRectGeom = new D2D.GeometryRealization(
+                    d2dDeviceContext,
+                    new D2D.RoundedRectangleGeometry(d2dDeviceContext.Factory, new D2D.RoundedRectangle()
                     {
-                        var roundedRect = new D2D.RoundedRectangle();
-                        xFrom = toScreenX((float)x);
-                        yFrom = toScreenY((float)y);
-                        xTo = toScreenX((float)_xBinRange.AddStep(x));
-                        yTo = toScreenY((float)_yBinRange.AddStep(y));
-                        roundedRect.Rect = new RectangleF(
-                            xFrom,
-                            yTo,
-                            xTo - xFrom,
-                            yFrom - yTo);
-                        roundedRect.RadiusX = roundedRect.RadiusY = 4;
-                   
-                        d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
-                    }
-                }    */
+                        RadiusX = 4,
+                        RadiusY = 4,
+                        Rect = new RectangleF(0, 0, x, y)
+                    }), flatteningTolerance);
+
+                _strokeRoundedRectGeom = new D2D.GeometryRealization(
+                    d2dDeviceContext,
+                    new D2D.RoundedRectangleGeometry(d2dDeviceContext.Factory, new D2D.RoundedRectangle()
+                    {
+                        RadiusX = 4,
+                        RadiusY = 4,
+                        Rect = new RectangleF(0, 0, x, y)
+                    }), flatteningTolerance, 0.5f, new D2D.StrokeStyle(d2dDeviceContext.Factory, new D2D.StrokeStyleProperties()));
             }
 
             white.Dispose();
@@ -352,7 +368,7 @@ namespace PanoramicDataWin8.view.vis.render
             layoutY.Dispose();
         }
 
-        private void renderCell(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
+        private void renderCell(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory)
         {
             computeSizesAndRenderLabels(d2dDeviceContext, dwFactory, false);
             if (_deviceHeight < 0 || _deviceWidth < 0)
@@ -454,7 +470,22 @@ namespace PanoramicDataWin8.view.vis.render
                                     xTo - xFrom,
                                     yFrom - yTo);
                                 roundedRect.RadiusX = roundedRect.RadiusY = 4;
-                                d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
+
+                                if (!_isXAxisAggregated && !_isYAxisAggregated)
+                                {
+                                    var currentMat = d2dDeviceContext.Transform;
+                                    var mat = Matrix3x2.Identity;
+                                    mat.TranslationVector = new Vector2(xFrom, yTo);
+                                    mat = currentMat*mat;
+                                    d2dDeviceContext.Transform = mat;
+                                    d2dDeviceContext.DrawGeometryRealization(_fillRoundedRectGeom, binColor);
+                                    d2dDeviceContext.Transform = currentMat;
+                                }
+                                else
+                                {
+                                    d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
+                                }
+
                                 if (_isXAxisAggregated || _isYAxisAggregated)
                                 {
                                     d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
@@ -498,15 +529,16 @@ namespace PanoramicDataWin8.view.vis.render
                     yFrom = toScreenY((float)yBins[yi]);
                     xTo = toScreenX((float)xBins[xi + 1]);
                     yTo = toScreenY((float)yBins[yi + 1]);
-                    roundedRect.Rect = new RectangleF(
-                                xFrom,
-                                yTo,
-                                xTo - xFrom,
-                                yFrom - yTo);
-                    roundedRect.RadiusX = roundedRect.RadiusY = 4;
                     if (!_isXAxisAggregated && !_isYAxisAggregated)
                     {
-                        d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                       // d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                        var currentMat = d2dDeviceContext.Transform;
+                        var mat = Matrix3x2.Identity;
+                        mat.TranslationVector = new Vector2(xFrom, yTo);
+                        mat = currentMat * mat;
+                        d2dDeviceContext.Transform = mat;
+                        d2dDeviceContext.DrawGeometryRealization(_strokeRoundedRectGeom, white);
+                        d2dDeviceContext.Transform = currentMat;
                     }
                 }
             }
@@ -591,7 +623,7 @@ namespace PanoramicDataWin8.view.vis.render
             white.Dispose();
         }
 
-        public override void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
+        public override void Load(D2D.DeviceContext1 d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
         {
             _textFormat = disposeCollector.Collect(new DW.TextFormat(dwFactory, "Abel", SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, 11f));
             _textBrush = disposeCollector.Collect(new D2D.SolidColorBrush(d2dDeviceContext, new Color(17, 17, 17)));
@@ -601,10 +633,10 @@ namespace PanoramicDataWin8.view.vis.render
         {
             return ((x - _minX) / _xScale) * (_deviceWidth) + (_leftOffset);
         }
-        private float toScreenY(float y)
+        private float toScreenY(float y, bool flip = true)
         {
             float retY = ((y - _minY) / _yScale) * (_deviceHeight);
-            return _flipY ? (_deviceHeight) - retY + (_topOffset) : retY + (_topOffset);
+            return flip ? (_deviceHeight) - retY + (_topOffset) : retY + (_topOffset);
         }
     }
 
@@ -621,7 +653,7 @@ namespace PanoramicDataWin8.view.vis.render
         public float A { get; set; }
         public float TargetA { get; set; }
 
-        public void Render(D2D.DeviceContext d2dDeviceContext, D2D.SolidColorBrush brush, bool fill)
+        public void Render(D2D.DeviceContext1 d2dDeviceContext, D2D.SolidColorBrush brush, bool fill)
         {
             var roundedRect = new D2D.RoundedRectangle { Rect = new RectangleF(X, Y, W, H) };
             roundedRect.RadiusX = roundedRect.RadiusY = 4;

@@ -18,6 +18,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
         public override void ExecuteQuery(QueryModel queryModel)
         {
             queryModel.ResultModel.ResultItemModels = new ObservableCollection<ResultItemModel>();
+            queryModel.ResultModel.Progress = 0.0;
             queryModel.ResultModel.ResultDescriptionModel = null;
             queryModel.ResultModel.FireResultModelUpdated();
 

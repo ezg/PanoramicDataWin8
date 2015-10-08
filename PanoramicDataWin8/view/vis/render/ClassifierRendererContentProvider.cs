@@ -87,7 +87,7 @@ namespace PanoramicDataWin8.view.vis.render
             graphicsDevice.Clear(new Color(230, 230, 230));
         }
 
-        public override void Draw(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
+        public override void Draw(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory)
         {
             var mat = Matrix3x2.Identity;
             mat.ScaleVector = new Vector2(CompositionScaleX, CompositionScaleY);
@@ -151,7 +151,7 @@ namespace PanoramicDataWin8.view.vis.render
             };
         }
 
-        private void renderGauge(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory,
+        private void renderGauge(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory,
             float xStart, float yStart, float width, float height, float value, string name)
         {
             value = (float) Math.Min(0.9999, Math.Max(0.0, value));
@@ -208,7 +208,7 @@ namespace PanoramicDataWin8.view.vis.render
         }
 
 
-        private void renderConfusionMatrix(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory,
+        private void renderConfusionMatrix(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory,
             float xStart, float yStart, float width, float height)
         {
            // width -= 20;
@@ -275,7 +275,7 @@ namespace PanoramicDataWin8.view.vis.render
             white.Dispose();
         }
 
-        private void renderRoc(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory,
+        private void renderRoc(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory,
             float xStart, float yStart, float width, float height)
         {
             var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
@@ -325,7 +325,7 @@ namespace PanoramicDataWin8.view.vis.render
             white.Dispose();
         }
 
-        private void drawString(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory, DW.TextFormat textFormat, float x, float y, string text,
+        private void drawString(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory, DW.TextFormat textFormat, float x, float y, string text,
             bool leftAligned,
             bool horizontallyCentered, bool verticallyCentered)
         {
@@ -348,7 +348,7 @@ namespace PanoramicDataWin8.view.vis.render
             d2dDeviceContext.DrawTextLayout(new Vector2(x, y), layout, _textBrush);
         }
 
-        private void computeSizes(D2D.DeviceContext d2dDeviceContext, DW.Factory1 dwFactory)
+        private void computeSizes(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory)
         {
             _deviceWidth = (float)(d2dDeviceContext.Size.Width / CompositionScaleX - _leftOffset - _rightOffset);
             _deviceHeight = (float)(d2dDeviceContext.Size.Height / CompositionScaleY - _topOffset - _bottomtOffset);
@@ -362,7 +362,7 @@ namespace PanoramicDataWin8.view.vis.render
             _yScale = _maxY - _minY;
         }
 
-        public override void Load(D2D.DeviceContext d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
+        public override void Load(D2D.DeviceContext1 d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
         {
             // reusable structure representing a text font with size and style
             _textFormat = disposeCollector.Collect(new DW.TextFormat(dwFactory, "Abel", SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, 11f));

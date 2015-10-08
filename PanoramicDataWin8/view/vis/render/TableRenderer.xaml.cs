@@ -22,10 +22,10 @@ using PanoramicDataWin8.view.vis.render;
 
 namespace PanoramicDataWin8.view.vis
 {
-    public sealed partial class TableRenderer2 : Renderer, InputFieldViewModelEventHandler
+    public sealed partial class TableRenderer : Renderer, InputFieldViewModelEventHandler
     {
         private DataGrid _dataGrid = new DataGrid();
-        public TableRenderer2()
+        public TableRenderer()
         {
             _dataGrid.CanDrag = false;
             _dataGrid.CanReorder = true;

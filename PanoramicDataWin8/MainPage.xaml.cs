@@ -380,8 +380,11 @@ namespace PanoramicDataWin8
             };
             BindingOperations.SetBinding(p, Windows.UI.Xaml.Shapes.Path.DataProperty, b);
 
-            p.Fill = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
-            p.Stroke = new SolidColorBrush(Helpers.GetColorFromString("#ffffff"));
+
+            var brush = (SolidColorBrush)Application.Current.Resources["highlightBrush"];
+            p.Fill = brush;
+            brush = (SolidColorBrush)Application.Current.Resources["backgroundBrush"];
+            p.Stroke = brush;
             p.StrokeThickness = 1;
             p.RenderTransform = new MatrixTransform() { Matrix = new Matrix(1.8108176, -0.86759842, -0.98659698, -2.0591868, 2.4069217, 0.87161333) };
         
