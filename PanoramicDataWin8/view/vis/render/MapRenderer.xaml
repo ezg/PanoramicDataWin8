@@ -1,15 +1,19 @@
 ﻿<local:Renderer
-    x:Class="PanoramicDataWin8.view.vis.render.PlotRenderer"
+    x:Class="PanoramicDataWin8.view.vis.render.MapRenderer"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:PanoramicDataWin8.view.vis.render"
     xmlns:common="using:PanoramicDataWin8.view.common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:bm="using:Bing.Maps"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400"
     FontFamily="{StaticResource abel}">
     <local:XYRenderer x:Name="xyRenderer">
+        <bm:Map x:Name="map" 
+                Credentials="AvEXTJAXOlPdAHWwrAm8tQ8CCiyK3DtKVy1RDHUVfThltB9w2ywRdKVV_e5ccvSZ"
+                ShowNavigationBar="False"/>
     </local:XYRenderer>
 </local:Renderer>

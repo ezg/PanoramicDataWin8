@@ -459,5 +459,5 @@ namespace PanoramicDataWin8.model.data
 
     public enum QueryModelUpdatedEventType { Structure, Links, FilterModels }
     
-    public enum VisualizationType { table, plot }
+    public enum VisualizationType { table, plot, map, line }
 }

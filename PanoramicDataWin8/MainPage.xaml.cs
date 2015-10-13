@@ -218,9 +218,6 @@ namespace PanoramicDataWin8
                 if (_inputMenu != null)
                 {
                     ((TileMenuItemViewModel) _inputMenu.DataContext).AreChildrenExpanded = false;
-                    ((TileMenuItemViewModel) _inputMenu.DataContext).IsBeingRemoved = true;
-                    _inputMenu.Dispose();
-                    menuCanvas.Children.Remove(_inputMenu);
                 }
             }
             if (!ancestors.Contains(addVisualizationButton) && !ancestors.Contains(menuGrid))
@@ -228,9 +225,6 @@ namespace PanoramicDataWin8
                 if (_visualizationMenu != null)
                 {
                     ((TileMenuItemViewModel) _visualizationMenu.DataContext).AreChildrenExpanded = false;
-                    ((TileMenuItemViewModel) _visualizationMenu.DataContext).IsBeingRemoved = true;
-                    _visualizationMenu.Dispose();
-                    menuCanvas.Children.Remove(_visualizationMenu);
                 }
             }
             if (!ancestors.Contains(addJobButton) && !ancestors.Contains(menuGrid))
@@ -238,9 +232,6 @@ namespace PanoramicDataWin8
                 if (_jobMenu != null)
                 {
                     ((TileMenuItemViewModel)_jobMenu.DataContext).AreChildrenExpanded = false;
-                    ((TileMenuItemViewModel)_jobMenu.DataContext).IsBeingRemoved = true;
-                    _jobMenu.Dispose();
-                    menuCanvas.Children.Remove(_jobMenu);
                 }
             }
         }
@@ -397,6 +388,7 @@ namespace PanoramicDataWin8
 
         void appBarButton_Click(object sender, RoutedEventArgs e)
         {
+            clearAndDisposeMenus();
             DatasetConfiguration ds = (sender as AppBarButton).DataContext as DatasetConfiguration;
             MainViewController.Instance.LoadData(ds);
         }
@@ -442,9 +434,17 @@ namespace PanoramicDataWin8
 
         private void addJobButton_Click(object sender, RoutedEventArgs e)
         {
-            MainModel mainModel = (DataContext as MainModel);
-            if (_jobMenu == null || !(_jobMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded)
+            if (_jobMenu != null && ((TileMenuItemViewModel) _jobMenu.DataContext).AreChildrenExpanded)
             {
+                ((TileMenuItemViewModel) _jobMenu.DataContext).AreChildrenExpanded = false;
+            }
+            else if (_jobMenu != null && !((TileMenuItemViewModel)_jobMenu.DataContext).AreChildrenExpanded)
+            {
+                ((TileMenuItemViewModel)_jobMenu.DataContext).AreChildrenExpanded = true;
+            }
+            else if (_jobMenu == null)
+            {
+                MainModel mainModel = (DataContext as MainModel);
                 var buttonBounds = addJobButton.GetBounds(this);
                 var taskModels =
                     mainModel.TaskModels;
@@ -468,7 +468,7 @@ namespace PanoramicDataWin8
                 {
                     TileMenuItemViewModel tileMenuItemViewModel = recursiveCreateTileMenu(inputModel, parentModel);
                     tileMenuItemViewModel.Row = count;
-                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor((parentModel.Children.Count-1)/8.0) - 1;
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor((parentModel.Children.Count - 1)/8.0) - 1;
                     tileMenuItemViewModel.RowSpan = 1;
                     tileMenuItemViewModel.ColumnSpan = 1;
                     Debug.WriteLine(inputModel.Name + " c: " + tileMenuItemViewModel.Column + " r : " + tileMenuItemViewModel.Row);
@@ -492,12 +492,20 @@ namespace PanoramicDataWin8
         private void addInputButton_Click(object sender, RoutedEventArgs e)
         {
             MainModel mainModel = (DataContext as MainModel);
-            if (mainModel.SchemaModel != null &&(_inputMenu == null || !(_inputMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded))
+            if (_inputMenu != null && ((TileMenuItemViewModel) _inputMenu.DataContext).AreChildrenExpanded)
+            {
+                ((TileMenuItemViewModel) _inputMenu.DataContext).AreChildrenExpanded = false;
+            }
+            else if (_inputMenu != null && !((TileMenuItemViewModel)_inputMenu.DataContext).AreChildrenExpanded)
+            {
+                ((TileMenuItemViewModel)_inputMenu.DataContext).AreChildrenExpanded = true;
+            }
+            else if (_inputMenu == null && mainModel.SchemaModel != null)
             {
                 var buttonBounds = addInputButton.GetBounds(this);
                 var inputModels =
                     mainModel.SchemaModel.OriginModels.First()
-                        .InputModels.Where(am => am.IsDisplayed)/*.OrderBy(am => am.Name)*/;
+                        .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.Name)*/;
 
                 if (_inputMenu != null)
                 {
@@ -518,7 +526,7 @@ namespace PanoramicDataWin8
                 {
                     TileMenuItemViewModel tileMenuItemViewModel = recursiveCreateTileMenu(inputModel, parentModel);
                     tileMenuItemViewModel.Row = count;
-                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor((parentModel.Children.Count-1)/8.0) - 1;
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor((parentModel.Children.Count - 1)/8.0) - 1;
                     tileMenuItemViewModel.RowSpan = 1;
                     tileMenuItemViewModel.ColumnSpan = 1;
                     Debug.WriteLine(inputModel.Name + " c: " + tileMenuItemViewModel.Column + " r : " + tileMenuItemViewModel.Row);
@@ -632,23 +640,23 @@ namespace PanoramicDataWin8
 
         private void addVisualizationButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_visualizationMenu == null || !(_visualizationMenu.DataContext as TileMenuItemViewModel).AreChildrenExpanded)
+            MainModel mainModel = (DataContext as MainModel);
+            var buttonBounds = addVisualizationButton.GetBounds(this);
+            var visualizationTypes = Enum.GetValues(typeof(VisualizationType)).Cast<VisualizationType>().ToList();
+
+            if (_visualizationMenu != null && ((TileMenuItemViewModel) _visualizationMenu.DataContext).AreChildrenExpanded)
             {
-                MainModel mainModel = (DataContext as MainModel);
-                var buttonBounds = addVisualizationButton.GetBounds(this);
-                var visualizationTypes = Enum.GetValues(typeof(VisualizationType)).Cast<VisualizationType>().ToList();
-
-                if (_visualizationMenu != null)
-                {
-                    ((TileMenuItemViewModel)_visualizationMenu.DataContext).AreChildrenExpanded = false;
-                    ((TileMenuItemViewModel)_visualizationMenu.DataContext).IsBeingRemoved = true;
-                    _visualizationMenu.Dispose();
-                    menuCanvas.Children.Remove(_visualizationMenu);
-                }
-
+                ((TileMenuItemViewModel) _visualizationMenu.DataContext).AreChildrenExpanded = false;
+            }
+            else if (_visualizationMenu != null && !((TileMenuItemViewModel)_visualizationMenu.DataContext).AreChildrenExpanded)
+            {
+                ((TileMenuItemViewModel)_visualizationMenu.DataContext).AreChildrenExpanded = true;
+            }
+            else if (_visualizationMenu == null)
+            {
                 TileMenuItemViewModel parentModel = new TileMenuItemViewModel(null);
-                parentModel.ChildrenNrColumns = (int)Math.Ceiling(visualizationTypes.Count() / 8.0);
-                parentModel.ChildrenNrRows = (int)Math.Min(8.0, visualizationTypes.Count());
+                parentModel.ChildrenNrColumns = (int) Math.Ceiling(visualizationTypes.Count()/8.0);
+                parentModel.ChildrenNrRows = (int) Math.Min(8.0, visualizationTypes.Count());
                 parentModel.Alignment = Alignment.Center;
                 parentModel.AttachPosition = AttachPosition.Right;
 
@@ -669,8 +677,8 @@ namespace PanoramicDataWin8
                         VisualizationTypeViewModel = visualizationTypeViewModel
                     };
 
-                    tileMenuItemViewModel.Row = count; 
-                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int)Math.Floor(parentModel.Children.Count / 8.0) - 1;
+                    tileMenuItemViewModel.Row = count;
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor(parentModel.Children.Count/8.0) - 1;
                     tileMenuItemViewModel.RowSpan = 1;
                     tileMenuItemViewModel.ColumnSpan = 1;
                     parentModel.Children.Add(tileMenuItemViewModel);
@@ -681,7 +689,7 @@ namespace PanoramicDataWin8
                     }
                 }
 
-                _visualizationMenu = new TileMenuItemView { MenuCanvas = menuCanvas, DataContext = parentModel };
+                _visualizationMenu = new TileMenuItemView {MenuCanvas = menuCanvas, DataContext = parentModel};
                 menuCanvas.Children.Add(_visualizationMenu);
 
                 parentModel.CurrentPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
@@ -712,8 +720,38 @@ namespace PanoramicDataWin8
             editBox.Document.SetText(TextSetOptions.ApplyRtfDocumentDefaults, text);
         }
 
+        private void clearAndDisposeMenus()
+        {
+            if (_jobMenu != null)
+            {
+                ((TileMenuItemViewModel)_jobMenu.DataContext).AreChildrenExpanded = false;
+                ((TileMenuItemViewModel)_jobMenu.DataContext).IsBeingRemoved = true;
+                _jobMenu.Dispose();
+                menuCanvas.Children.Remove(_jobMenu);
+                _jobMenu = null;
+            }
+            if (_inputMenu != null)
+            {
+                ((TileMenuItemViewModel)_inputMenu.DataContext).AreChildrenExpanded = false;
+                ((TileMenuItemViewModel)_inputMenu.DataContext).IsBeingRemoved = true;
+                _inputMenu.Dispose();
+                menuCanvas.Children.Remove(_inputMenu);
+                _inputMenu = null;
+            }
+            if (_visualizationMenu != null)
+            {
+                ((TileMenuItemViewModel)_visualizationMenu.DataContext).AreChildrenExpanded = false;
+                ((TileMenuItemViewModel)_visualizationMenu.DataContext).IsBeingRemoved = true;
+                _visualizationMenu.Dispose();
+                menuCanvas.Children.Remove(_visualizationMenu);
+                _visualizationMenu = null;
+            }
+
+        }
+
         private void Refresh_OnClick(object sender, RoutedEventArgs e)
         {
+            clearAndDisposeMenus();
             MainViewController.Instance.LoadConfigs();
         }
     }

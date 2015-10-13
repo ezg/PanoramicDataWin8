@@ -8,7 +8,7 @@ using Windows.UI.Xaml.Controls;
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public class Renderer : UserControl
+    public class Renderer : UserControl 
     {
         public virtual void Dispose() { }
         public virtual void StartSelection(Point point) { }

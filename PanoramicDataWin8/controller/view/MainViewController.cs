@@ -416,7 +416,7 @@ namespace PanoramicDataWin8.controller.view
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
             List<InputGroupViewModelEventHandler> hits = new List<InputGroupViewModelEventHandler>();
-            foreach (var element in InkableScene.Elements.Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
+            foreach (var element in InkableScene.GetDescendants().Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
             {
                 var geom = element.BoundsGeometry;
                 if (geom != null && mainPageBounds.Intersects(geom))
@@ -426,7 +426,7 @@ namespace PanoramicDataWin8.controller.view
             }
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
 
-            foreach (var element in InkableScene.Elements.Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
+            foreach (var element in InkableScene.GetDescendants().Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
             {
                 element.InputGroupViewModelMoved(
                         sender as InputGroupViewModel, e,
@@ -439,7 +439,7 @@ namespace PanoramicDataWin8.controller.view
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
             List<InputGroupViewModelEventHandler> hits = new List<InputGroupViewModelEventHandler>();
-            foreach (var element in InkableScene.Elements.Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
+            foreach (var element in InkableScene.GetDescendants().OfType<InputGroupViewModelEventHandler>())
             {
                 var geom = element.BoundsGeometry;
                 if (geom != null && mainPageBounds.Intersects(geom))
@@ -449,11 +449,11 @@ namespace PanoramicDataWin8.controller.view
             }
 
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
-            foreach (var element in InkableScene.Elements.Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
+            foreach (var element in InkableScene.GetDescendants().OfType<InputGroupViewModelEventHandler>())
             {
                 element.InputGroupViewModelDropped(
                         sender as InputGroupViewModel, e,
-                        hits.Count() > 0 ? orderderHits[0] == element : false);
+                        hits.Count() > 0 && orderderHits[0] == element);
             }
         }
         
@@ -461,7 +461,7 @@ namespace PanoramicDataWin8.controller.view
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
             List<InputFieldViewModelEventHandler> hits = new List<InputFieldViewModelEventHandler>();
-            foreach (var element in InkableScene.Elements.Where(ele => ele is InputFieldViewModelEventHandler).Select(ele => ele as InputFieldViewModelEventHandler))
+            foreach (var element in InkableScene.GetDescendants().OfType<InputFieldViewModelEventHandler>())
             {
                 var geom = element.BoundsGeometry;
                 if (geom != null && mainPageBounds.Intersects(geom)) 
@@ -471,11 +471,11 @@ namespace PanoramicDataWin8.controller.view
             }
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
 
-            foreach (var element in InkableScene.Elements.Where(ele => ele is InputFieldViewModelEventHandler).Select(ele => ele as InputFieldViewModelEventHandler))
+            foreach (var element in InkableScene.GetDescendants().OfType<InputFieldViewModelEventHandler>())
             {
                 element.InputFieldViewModelMoved(
                         sender as InputFieldViewModel, e,
-                        hits.Count() > 0 ? orderderHits[0] == element : false);
+                        hits.Count() > 0 && orderderHits[0] == element);
             }
         }
 
@@ -483,7 +483,7 @@ namespace PanoramicDataWin8.controller.view
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
             List<InputFieldViewModelEventHandler> hits = new List<InputFieldViewModelEventHandler>();
-            foreach (var element in InkableScene.Elements.Where(ele => ele is InputFieldViewModelEventHandler).Select(ele => ele as InputFieldViewModelEventHandler))
+            foreach (var element in InkableScene.GetDescendants().OfType<InputFieldViewModelEventHandler>())
             {
                 var geom = element.BoundsGeometry;
                 if (geom != null && mainPageBounds.Intersects(geom))
@@ -498,14 +498,14 @@ namespace PanoramicDataWin8.controller.view
             Pt position = (Pt) new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
 
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
-            foreach (var element in InkableScene.Elements.Where(ele => ele is InputFieldViewModelEventHandler).Select(ele => ele as InputFieldViewModelEventHandler))
+            foreach (var element in InkableScene.GetDescendants().OfType<InputFieldViewModelEventHandler>())
             {
                 element.InputFieldViewModelDropped(
                         sender as InputFieldViewModel, e,
-                        hits.Count() > 0 ? orderderHits[0] == element : false);
+                        hits.Count() > 0 && orderderHits[0] == element);
             }
 
-            if (hits.Count() == 0)
+            if (!hits.Any())
             {
                 VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
                 VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel(null, e.InputOperationModel);

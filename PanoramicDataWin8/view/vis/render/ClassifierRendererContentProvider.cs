@@ -48,14 +48,6 @@ namespace PanoramicDataWin8.view.vis.render
         private ClassfierResultDescriptionModel _classfierResultDescriptionModel = null;
 
         private QueryModel _queryModel = null;
-        private BinRange _xBinRange = null;
-        private BinRange _yBinRange = null;
-        private bool _isXAxisAggregated = false;
-        private bool _isYAxisAggregated = false;
-        private int _xIndex = -1;
-        private int _yIndex = -1;
-        private InputOperationModel _xAom = null;
-        private InputOperationModel _yAom = null;
         
         private int _labelIndex = 0;
 

@@ -56,7 +56,6 @@ namespace PanoramicDataWin8.view.common
             set
             {
                 _contentProvider = value;
-                _contentProvider.Load(_d2dDeviceContext, _disposeCollector, _dwFactory);
             }
         }
 
@@ -117,7 +116,10 @@ namespace PanoramicDataWin8.view.common
         {
             // create the device only on first load after that it can be reused
             if (_graphicsDevice == null)
+            {
                 CreateDevice();
+                _contentProvider.Load(_d2dDeviceContext, _disposeCollector, _dwFactory);
+            }
 
             StartRendering();
         }
