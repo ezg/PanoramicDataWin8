@@ -476,7 +476,7 @@ namespace PanoramicDataWin8.view.vis.render
                                     var currentMat = d2dDeviceContext.Transform;
                                     var mat = Matrix3x2.Identity;
                                     mat.TranslationVector = new Vector2(xFrom, yTo);
-                                    mat = currentMat*mat;
+                                    mat = mat * currentMat;
                                     d2dDeviceContext.Transform = mat;
                                     d2dDeviceContext.DrawGeometryRealization(_fillRoundedRectGeom, binColor);
                                     d2dDeviceContext.Transform = currentMat;
@@ -535,7 +535,7 @@ namespace PanoramicDataWin8.view.vis.render
                         var currentMat = d2dDeviceContext.Transform;
                         var mat = Matrix3x2.Identity;
                         mat.TranslationVector = new Vector2(xFrom, yTo);
-                        mat = currentMat * mat;
+                        mat = mat * currentMat;
                         d2dDeviceContext.Transform = mat;
                         d2dDeviceContext.DrawGeometryRealization(_strokeRoundedRectGeom, white);
                         d2dDeviceContext.Transform = currentMat;
