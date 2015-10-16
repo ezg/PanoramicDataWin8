@@ -35,10 +35,6 @@ namespace PanoramicDataWin8.view.vis.render
         private Point _startCenterPixels = new Point();
         private double _startZoom = 0;
 
-
-        private Location _startFingerLocation = new Location();
-        private Location _previousFingerLocation = new Location();
-
         public MapRenderer()
         {
             this.InitializeComponent();
@@ -112,7 +108,15 @@ namespace PanoramicDataWin8.view.vis.render
                 _startCenter = _mapInertiaHandler.Map.Center;
                 _startZoom = _mapInertiaHandler.Map.ZoomLevel;
 
-                _mapInertiaHandler.Map.TryPixelToLocation(_startPoint, out _startFingerLocation);
+                _mapInertiaHandler.Map.TryLocationToPixel(_startCenter, out _startCenterPixels);
+                _mapInertiaHandler.Center = _mapInertiaHandler.Map.Center;
+                _mapInertiaHandler.StartCenter = _mapInertiaHandler.Map.Center;
+
+                //Location newLocation = new Location();
+                //_mapInertiaHandler.Map.TryPixelToLocation((originalPoint.GetVec() + new Vec(100, 0)).GetWindowsPoint(), out newLocation);
+
+                //_mapInertiaHandler.Center = newLocation;
+                //_mapInertiaHandler.Map.Center = newLocation;
 
                 _mapInertiaHandler.InertiaActive = false;
             }
@@ -129,35 +133,24 @@ namespace PanoramicDataWin8.view.vis.render
                 _oneFingerListener.TwoFingerMoved();
 
                 Point currentPoint = e.CurrentContacts[scrollPointer.PointerId].Position;
-                Location currentLocation = new Location();
-                _mapInertiaHandler.Map.TryPixelToLocation(currentPoint, out currentLocation);
-
-                var delta = _previousPoint.GetVec() - currentPoint.GetVec();
+                var delta = _startPoint.GetVec() - currentPoint.GetVec();
                 
                 _mapInertiaHandler.InertiaActive = false;
-                
-                Point originalPoint = new Point();
-                _mapInertiaHandler.Map.TryLocationToPixel(_startCenter, out originalPoint);
+                _mapInertiaHandler.Map.Center = _startCenter;
 
                 Location newLocation = new Location();
-                _mapInertiaHandler.Map.TryPixelToLocation((originalPoint.GetVec() + delta).GetWindowsPoint(), out newLocation);
-
-                //_mapInertiaHandler.Center = newLocation;
-                //_mapInertiaHandler.Map.Center = newLocation;
-
-                //_mapInertiaHandler.Map.Center = new Location(delta.Latitude + _mapInertiaHandler.Map.Center.Latitude, delta.Longitude + _mapInertiaHandler.Map.Center.Longitude);
-                
-
-                //Debug.WriteLine(delta.Latitude + " " + delta.Longitude);
-
+                if (_mapInertiaHandler.Map.TryPixelToLocation((_startCenterPixels.GetVec() + delta).GetWindowsPoint(), out newLocation))
+                {
+                    _mapInertiaHandler.Map.Center = newLocation;
+                    _mapInertiaHandler.Center = newLocation;
+                }
 
                 if (_previousPoint.Y - currentPoint.Y != 0)
                 {
-                    _mapInertiaHandler.Velocity = new Vec(0, _previousPoint.Y - currentPoint.Y);
+                    _mapInertiaHandler.Velocity = (_previousPoint.GetVec() - currentPoint.GetVec());
                 }
 
                 _previousPoint = currentPoint;
-                _previousFingerLocation = currentLocation;
             }
         }
 
@@ -191,6 +184,12 @@ namespace PanoramicDataWin8.view.vis.render
             set { _center = value; }
         }
 
+        private Location _startCenter;
+        public Location StartCenter
+        {
+            get { return _startCenter; }
+            set { _startCenter = value; }
+        }
 
         private Map _map;
         public Map Map
@@ -235,15 +234,16 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 if (velocity.Length > 1)
                 {
-                    /*Point pixel = new Point();
+                    Point pixel = new Point();
                     _map.TryLocationToPixel(_center, out pixel);
 
                     Location newLocation = new Location();
-                    _map.TryPixelToLocation((pixel.GetVec() + velocity).GetWindowsPoint(), out newLocation);
-
-                    //_map.Center = newLocation;
-                    _center = newLocation;
-                    velocity *= 0.95;*/
+                    if (_map.TryPixelToLocation((pixel.GetVec() + velocity).GetWindowsPoint(), out newLocation))
+                    {
+                        _map.Center = newLocation;
+                        _center = newLocation;
+                    }
+                    velocity *= 0.95;
                 }
             }
         }
