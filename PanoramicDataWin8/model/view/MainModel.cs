@@ -147,6 +147,19 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private bool _showCodeGen = false;
+        public bool ShowCodeGen
+        {
+            get
+            {
+                return _showCodeGen;
+            }
+            set
+            {
+                this.SetProperty(ref _showCodeGen, value);
+            }
+        }
+
         private GraphRenderOptions _graphRenderOption = GraphRenderOptions.Cell;
         public GraphRenderOptions GraphRenderOption
         {

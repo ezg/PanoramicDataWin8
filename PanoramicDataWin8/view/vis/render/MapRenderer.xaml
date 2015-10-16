@@ -12,8 +12,13 @@
     d:DesignWidth="400"
     FontFamily="{StaticResource abel}">
     <local:XYRenderer x:Name="xyRenderer">
-        <bm:Map x:Name="map" 
-                Credentials="AvEXTJAXOlPdAHWwrAm8tQ8CCiyK3DtKVy1RDHUVfThltB9w2ywRdKVV_e5ccvSZ"
-                ShowNavigationBar="False"/>
+        <Grid>
+            <bm:Map x:Name="map" 
+                    Background="{StaticResource lightBrush}"
+                    Loaded="MapRenderer_Loaded"
+                    Credentials="AvEXTJAXOlPdAHWwrAm8tQ8CCiyK3DtKVy1RDHUVfThltB9w2ywRdKVV_e5ccvSZ"
+                    ShowNavigationBar="False"/>
+            <Grid Background="#01000000"></Grid>
+        </Grid>
     </local:XYRenderer>
 </local:Renderer>

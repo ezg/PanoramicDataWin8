@@ -96,6 +96,11 @@ namespace PanoramicDataWin8.controller.view
                         .First(l => l.ToLower().StartsWith("samplesize"))
                         .Split(new string[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
 
+                    var showCodeGen = bool.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                        .First(l => l.ToLower().StartsWith("showcodegen"))
+                        .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
+                    MainModel.ShowCodeGen = showCodeGen;
+
                     CatalogCommand catalogCommand = new CatalogCommand();
                     var loadedDatasetConfigs = await catalogCommand.GetCatalog(backend);
                     foreach (var ds in loadedDatasetConfigs)

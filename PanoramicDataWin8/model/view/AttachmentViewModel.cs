@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.utils;
 
@@ -275,20 +276,23 @@ namespace PanoramicDataWin8.model.view
 
         void createLogregTop()
         {
-            AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
+            if (MainViewController.Instance.MainModel.ShowCodeGen)
             {
-                InputUsage = InputUsage.Label,
-                AcceptsInputGroupModels = false,
-                AcceptsInputModels = false
-            };
-            header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
-            {
-                AttachmentHeaderViewModel = header,
-                //Size = new Vec(25,25),
-                //TargetSize = new Vec(25, 25),
-                Label = "codegen"
-            };
-            AttachmentHeaderViewModels.Add(header);
+                AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
+                {
+                    InputUsage = InputUsage.Label,
+                    AcceptsInputGroupModels = false,
+                    AcceptsInputModels = false
+                };
+                header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
+                {
+                    AttachmentHeaderViewModel = header,
+                    //Size = new Vec(25,25),
+                    //TargetSize = new Vec(25, 25),
+                    Label = "codegen"
+                };
+                AttachmentHeaderViewModels.Add(header);
+            }
         }
 
         void createLogregLeft()

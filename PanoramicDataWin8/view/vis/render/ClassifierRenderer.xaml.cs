@@ -41,6 +41,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             this.InitializeComponent();
 
+            dxSurface.ContentProvider = _classifierRendererContentProvider;
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
             InputFieldView.InputFieldViewModelTapped += InputFieldViewInputFieldViewModelTapped;
@@ -50,7 +51,6 @@ namespace PanoramicDataWin8.view.vis.render
         {
             _classifierRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
             _classifierRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
-            dxSurface.ContentProvider = _classifierRendererContentProvider;
         }
 
         public override void Dispose()
