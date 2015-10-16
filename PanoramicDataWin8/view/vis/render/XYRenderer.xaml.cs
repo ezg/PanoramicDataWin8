@@ -37,12 +37,13 @@ namespace PanoramicDataWin8.view.vis.render
 
         private MenuViewModel _menuViewModel = null;
         private MenuView _menuView = null;
+        private VisualizationViewModel _visualizationViewModel = null;
 
         public XYRenderer()
         {
             this.InitializeComponent();
 
-            this.DataContextChanged += PlotRenderer_DataContextChanged;
+            DataContextChanged += PlotRenderer_DataContextChanged;
             InputFieldView.InputFieldViewModelTapped += InputFieldViewInputFieldViewModelTapped;
         }
 
@@ -50,13 +51,19 @@ namespace PanoramicDataWin8.view.vis.render
         {
             removeMenu();
             InputFieldView.InputFieldViewModelTapped -= InputFieldViewInputFieldViewModelTapped;
-            if (DataContext != null)
+            DataContextChanged -= PlotRenderer_DataContextChanged;
+            removeEventHandlers();
+        }
+
+        private void removeEventHandlers()
+        {
+            if (_visualizationViewModel != null)
             {
-                (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
-                (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged -= X_CollectionChanged;
-                (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged -= Y_CollectionChanged;
-                (DataContext as VisualizationViewModel).QueryModel.FilterModels.CollectionChanged -= FilterModels_CollectionChanged;
-                ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+                _visualizationViewModel.PropertyChanged -= VisualizationViewModel_PropertyChanged;
+                _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged -= X_CollectionChanged;
+                _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged -= Y_CollectionChanged;
+                _visualizationViewModel.QueryModel.FilterModels.CollectionChanged -= FilterModels_CollectionChanged;
+                ResultModel resultModel = _visualizationViewModel.QueryModel.ResultModel;
                 resultModel.ResultModelUpdated -= resultModel_ResultModelUpdated;
             }
         }
@@ -69,14 +76,17 @@ namespace PanoramicDataWin8.view.vis.render
 
         void PlotRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
+            removeEventHandlers();
             if (args.NewValue != null)
             {
-                (DataContext as VisualizationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
-                (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged += X_CollectionChanged;
-                (DataContext as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged += Y_CollectionChanged;
-                (DataContext as VisualizationViewModel).QueryModel.FilterModels.CollectionChanged += FilterModels_CollectionChanged;
-                ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+                _visualizationViewModel = (VisualizationViewModel) DataContext;
+                _visualizationViewModel.PropertyChanged += VisualizationViewModel_PropertyChanged;
+                _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged += X_CollectionChanged;
+                _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged += Y_CollectionChanged;
+                _visualizationViewModel.QueryModel.FilterModels.CollectionChanged += FilterModels_CollectionChanged;
+                ResultModel resultModel = _visualizationViewModel.QueryModel.ResultModel;
                 resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
+                ApplyTemplate();
             }
         }
 

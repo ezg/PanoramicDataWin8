@@ -148,7 +148,10 @@ namespace PanoramicDataWin8.view.vis.render
 
         void render()
         {
-            dxSurface.Redraw();
+            if (dxSurface != null)
+            {
+                dxSurface.Redraw();
+            }
         }
 
         public GeoAPI.Geometries.IGeometry BoundsGeometry

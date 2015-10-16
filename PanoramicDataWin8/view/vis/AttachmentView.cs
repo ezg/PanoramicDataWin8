@@ -76,6 +76,10 @@ namespace PanoramicDataWin8.view.vis
                             var deltaNorm = delta.Normalized();
                             var t = delta.Length;
                             item.Position = t <= 1 ? item.TargetPosition : item.Position + deltaNorm * (t / item.DampingFactor);
+                            if (t > 1)
+                            {
+                                _geometryCache = null;
+                            }
                         }
 
                         // size
@@ -89,6 +93,10 @@ namespace PanoramicDataWin8.view.vis
                             var deltaNorm = delta.Normalized();
                             var t = delta.Length;
                             item.Size = t <= 1 ? item.TargetSize : item.Size + deltaNorm * (t / item.DampingFactor);
+                            if (t > 1)
+                            {
+                                _geometryCache = null;
+                            }
                         }
                     }
                     if (header.AddAttachmentItemViewModel != null)
@@ -105,6 +113,10 @@ namespace PanoramicDataWin8.view.vis
                             var deltaNorm = delta.Normalized();
                             var t = delta.Length;
                             item.Position = t <= 1 ? item.TargetPosition : item.Position + deltaNorm * (t / item.DampingFactor);
+                            if (t > 1)
+                            {
+                                _geometryCache = null;
+                            }
                         }
 
                         // size
@@ -118,6 +130,10 @@ namespace PanoramicDataWin8.view.vis
                             var deltaNorm = delta.Normalized();
                             var t = delta.Length;
                             item.Size = t <= 1 ? item.TargetSize : item.Size + deltaNorm * (t / item.DampingFactor);
+                            if (t > 1)
+                            {
+                                _geometryCache = null;
+                            }
                         }
                     }
                 }
@@ -604,6 +620,7 @@ namespace PanoramicDataWin8.view.vis
 
         private void setMenuViewModelAnkerPosition()
         {
+            _geometryCache = null;
             if (_menuViewModel != null)
             {
                 if (_menuViewModel.IsToBeRemoved)
@@ -639,40 +656,43 @@ namespace PanoramicDataWin8.view.vis
             return headers.Sum(h => h.PreferedItemSize.Y) + (headers.Count() - 1) * GAP;
         }
 
+        private GeoAPI.Geometries.IGeometry _geometryCache = null;
         public GeoAPI.Geometries.IGeometry BoundsGeometry
         {
             get
             {
-                GeoAPI.Geometries.IGeometry geom = null;
-                foreach (var h in _attachmentItemViews.Keys)
+                if (_geometryCache == null)
                 {
-                    foreach (var v in _attachmentItemViews[h])
+                    foreach (var h in _attachmentItemViews.Keys)
                     {
-                        var bounds = v.GetBounds(MainViewController.Instance.InkableScene);
-                        if (geom == null)
+                        foreach (var v in _attachmentItemViews[h])
                         {
-                            geom = bounds.GetPolygon();
+                            var bounds = v.GetBounds(MainViewController.Instance.InkableScene);
+                            if (_geometryCache == null)
+                            {
+                                _geometryCache = bounds.GetPolygon();
+                            }
+                            else
+                            {
+                                _geometryCache = _geometryCache.Union(bounds.GetPolygon().Buffer(5));
+                            }
                         }
-                        else
+                        if (_addAttachmentViews.ContainsKey(h))
                         {
-                            geom = geom.Union(bounds.GetPolygon().Buffer(5));
-                        }
-                    }
-                    if (_addAttachmentViews.ContainsKey(h))
-                    {
-                        var bounds = _addAttachmentViews[h].GetBounds(MainViewController.Instance.InkableScene);
-                        if (geom == null)
-                        {
-                            geom = bounds.GetPolygon();
-                        }
-                        else
-                        {
-                            geom = geom.Union(bounds.GetPolygon().Buffer(5));
+                            var bounds = _addAttachmentViews[h].GetBounds(MainViewController.Instance.InkableScene);
+                            if (_geometryCache == null)
+                            {
+                                _geometryCache = bounds.GetPolygon();
+                            }
+                            else
+                            {
+                                _geometryCache = _geometryCache.Union(bounds.GetPolygon().Buffer(5));
+                            }
                         }
                     }
                 }
-                
-                return geom;
+
+                return _geometryCache;
             }
         }
 

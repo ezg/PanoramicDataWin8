@@ -466,7 +466,8 @@ namespace PanoramicDataWin8.controller.view
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
             List<InputFieldViewModelEventHandler> hits = new List<InputFieldViewModelEventHandler>();
-            foreach (var element in InkableScene.GetDescendants().OfType<InputFieldViewModelEventHandler>())
+            var tt = InkableScene.GetDescendants().OfType<InputFieldViewModelEventHandler>().ToList();
+            foreach (var element in tt)
             {
                 var geom = element.BoundsGeometry;
                 if (geom != null && mainPageBounds.Intersects(geom)) 
