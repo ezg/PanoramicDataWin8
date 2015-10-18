@@ -7,6 +7,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
@@ -33,6 +34,9 @@ namespace PanoramicDataWin8.view.vis.render
         private Point _startPoint = new Point();
         private Location _startCenter = new Location();
         private Point _startCenterPixels = new Point();
+        private Vec _initalFingerDiff = new Vec();
+        private Vec _initialFingerCenter = new Vec();
+        private Location _initialFingerCenterLocation = new Location();
         private double _startZoom = 0;
 
         public MapRenderer()
@@ -108,9 +112,16 @@ namespace PanoramicDataWin8.view.vis.render
                 _startCenter = _mapInertiaHandler.Map.Center;
                 _startZoom = _mapInertiaHandler.Map.ZoomLevel;
 
+                _initalFingerDiff = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() - ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec();
+                
+
                 _mapInertiaHandler.Map.TryLocationToPixel(_startCenter, out _startCenterPixels);
                 _mapInertiaHandler.Center = _mapInertiaHandler.Map.Center;
                 _mapInertiaHandler.StartCenter = _mapInertiaHandler.Map.Center;
+
+                _initialFingerCenter = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() + ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec() / 2.0f;
+                _mapInertiaHandler.Map.TryPixelToLocation(_initialFingerCenter.GetWindowsPoint(), out _initialFingerCenterLocation);
+
 
                 //Location newLocation = new Location();
                 //_mapInertiaHandler.Map.TryPixelToLocation((originalPoint.GetVec() + new Vec(100, 0)).GetWindowsPoint(), out newLocation);
@@ -134,14 +145,31 @@ namespace PanoramicDataWin8.view.vis.render
 
                 Point currentPoint = e.CurrentContacts[scrollPointer.PointerId].Position;
                 var delta = _startPoint.GetVec() - currentPoint.GetVec();
-                
-                _mapInertiaHandler.InertiaActive = false;
-                _mapInertiaHandler.Map.Center = _startCenter;
 
+                Vec currentFingerDiff = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() - ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec();
+
+                GeneralTransform tg = this.TransformToVisual(_mapInertiaHandler.Map);
+
+                Vec currentCenter = ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() + ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec() / 2.0f;
+                Point newCenter = new Point();
+                //_mapInertiaHandler.Map.Center = _startCenter;
+                if (_mapInertiaHandler.Map.TryLocationToPixel(_initialFingerCenterLocation, out newCenter))
+                {
+                    Debug.WriteLine(_mapInertiaHandler.Map.Center.Latitude +  " " + _mapInertiaHandler.Map.Center.Longitude);
+                    //_mapInertiaHandler.Map.Center = newLocation;
+                    var zoomFactor = currentFingerDiff.Length /_initalFingerDiff.Length;
+                    //_mapInertiaHandler.Map.SetView(newLocation, _startZoom*zoomFactor);
+                    _mapInertiaHandler.Map.SetZoomLevelAroundPoint(_startZoom * zoomFactor, newCenter, MapAnimationDuration.None);
+                    //_mapInertiaHandler.Map.ZoomLevel = _startZoom*zoomFactor;
+
+                }
+                _mapInertiaHandler.InertiaActive = false;
+                
+                //_mapInertiaHandler.Map.Center = _startCenter;
                 Location newLocation = new Location();
                 if (_mapInertiaHandler.Map.TryPixelToLocation((_startCenterPixels.GetVec() + delta).GetWindowsPoint(), out newLocation))
                 {
-                    _mapInertiaHandler.Map.Center = newLocation;
+                    //_mapInertiaHandler.Map.Center = newLocation;
                     _mapInertiaHandler.Center = newLocation;
                 }
 
@@ -158,7 +186,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (e.NumActiveContacts < 2)
             {
-                _mapInertiaHandler.InertiaActive = true;
+                //_mapInertiaHandler.InertiaActive = true;
                 if (e.NumActiveContacts < 1 && _oneFingerListener != null)
                 {
                     _oneFingerListener.Released(this, e, e.IsRightMouse);
