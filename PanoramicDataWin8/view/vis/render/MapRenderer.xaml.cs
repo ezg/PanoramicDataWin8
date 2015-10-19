@@ -60,6 +60,7 @@ namespace PanoramicDataWin8.view.vis.render
             (sender as Map).PointerReleasedOverride += map_PointerReleasedOverride;
 
             (sender as Map).IsHitTestVisible = false;
+            (sender as Map).ViewChanged += MapRenderer_ViewChanged;
 
             _pointerManager = new PointerManager();
             _pointerManager.Added += _pointerManager_Added;
@@ -71,6 +72,8 @@ namespace PanoramicDataWin8.view.vis.render
 
             _mapInertiaHandler = new MapInertiaHandler(sender as Map);
         }
+
+     
 
         void map_PointerReleasedOverride(object sender, PointerRoutedEventArgs e)
         {
@@ -103,7 +106,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 _oneFingerListener.Pressed(this, e);
             }
-            else if (e.NumActiveContacts == 2)
+            else if (e.NumActiveContacts == 2 && scrollPointer == null)
             {
                 scrollPointer = e.TriggeringPointer;
                 _startPoint = e.CurrentContacts[scrollPointer.PointerId].Position;
@@ -114,12 +117,15 @@ namespace PanoramicDataWin8.view.vis.render
 
                 _initalFingerDiff = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() - ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec();
                 
+                _previousFingerDiff = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() - ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec();
+                _previousCenterPoint = (((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() + ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec()) / 2.0f;
+                _mapInertiaHandler.Map.TryPixelToLocation(_previousCenterPoint.GetWindowsPoint(), out _previousCenterLocation);
 
                 _mapInertiaHandler.Map.TryLocationToPixel(_startCenter, out _startCenterPixels);
                 _mapInertiaHandler.Center = _mapInertiaHandler.Map.Center;
                 _mapInertiaHandler.StartCenter = _mapInertiaHandler.Map.Center;
 
-                _initialFingerCenter = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() + ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec() / 2.0f;
+                _initialFingerCenter = (((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() + ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec()) / 2.0f;
                 _mapInertiaHandler.Map.TryPixelToLocation(_initialFingerCenter.GetWindowsPoint(), out _initialFingerCenterLocation);
 
 
@@ -133,6 +139,15 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
+        void MapRenderer_ViewChanged(object sender, ViewChangedEventArgs e)
+        {
+            
+        }
+
+        private Vec _previousCenterPoint = new Vec();
+        private Vec _previousFingerDiff = new Vec();
+        private Location _previousCenterLocation = new Location();
+
         void _pointerManager_Moved(object sender, PointerManagerEvent e)
         {
             if (e.NumActiveContacts == 1 && _oneFingerListener != null)
@@ -143,30 +158,73 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 _oneFingerListener.TwoFingerMoved();
 
-                Point currentPoint = e.CurrentContacts[scrollPointer.PointerId].Position;
+                Vec currentFingerDiff = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() - ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec();
+                Vec currentCenterPoint = (((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() + ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec()) / 2.0f;
+                Location currentCenterLocation = new Location();
+                _mapInertiaHandler.Map.TryPixelToLocation(currentCenterPoint.GetWindowsPoint(), out currentCenterLocation);
+
+                Point p1 = new Point();
+                _mapInertiaHandler.Map.TryLocationToPixel(_previousCenterLocation, out p1);
+                Point p2 = new Point();
+                _mapInertiaHandler.Map.TryLocationToPixel(currentCenterLocation, out p2);
+
+                Vec delta = (p1.GetVec() - p2.GetVec());
+                Debug.WriteLine(delta);
+
+                Point center = new Point();
+                _mapInertiaHandler.Map.TryLocationToPixel(_mapInertiaHandler.Map.Center, out center);
+
+                Vec vv = new Vec(_mapInertiaHandler.Map.ActualWidth/2.0f, _mapInertiaHandler.Map.ActualHeight/2.0);
+
+                Location newLocation = new Location();
+                _mapInertiaHandler.Map.TryPixelToLocation((center.GetVec() + delta).GetWindowsPoint(), out newLocation);
+                _mapInertiaHandler.Map.Center = newLocation;
+
+              /*  Point currentPoint = e.CurrentContacts[scrollPointer.PointerId].Position;
                 var delta = _startPoint.GetVec() - currentPoint.GetVec();
 
-                Vec currentFingerDiff = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() - ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec();
+                //Vec currentFingerDiff = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() - ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec();
 
                 GeneralTransform tg = this.TransformToVisual(_mapInertiaHandler.Map);
 
                 Vec currentCenter = ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() + ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec() / 2.0f;
-                Point newCenter = new Point();
+                Location currentLocation = new Location();
+                _mapInertiaHandler.Map.TryPixelToLocation(currentCenter.GetWindowsPoint(), out currentLocation);
+               
+                Point newCenter1 = new Point();
+                Point newCenter2 = new Point();
+                _mapInertiaHandler.Map.ZoomLevel = 15;
+                _mapInertiaHandler.Map.SetView(new Location(41.8320617, -71.4002502), MapAnimationDuration.None);
+                _mapInertiaHandler.Map.TryLocationToPixel(new Location(41.8320617, -71.4002502), out newCenter1);
+                _mapInertiaHandler.Map.SetView(new Location(45.9813652, 13.2393494), MapAnimationDuration.None);
+                _mapInertiaHandler.Map.TryLocationToPixel(new Location(41.8320617, -71.4002502), out newCenter2);
+
+
+                var startLocation = _mapInertiaHandler.Map.Center;
+                */
                 //_mapInertiaHandler.Map.Center = _startCenter;
-                if (_mapInertiaHandler.Map.TryLocationToPixel(_initialFingerCenterLocation, out newCenter))
+                /*if (_mapInertiaHandler.Map.TryLocationToPixel(currentLocation, out newCenter1))
                 {
-                    Debug.WriteLine(_mapInertiaHandler.Map.Center.Latitude +  " " + _mapInertiaHandler.Map.Center.Longitude);
                     //_mapInertiaHandler.Map.Center = newLocation;
                     var zoomFactor = currentFingerDiff.Length /_initalFingerDiff.Length;
                     //_mapInertiaHandler.Map.SetView(newLocation, _startZoom*zoomFactor);
-                    _mapInertiaHandler.Map.SetZoomLevelAroundPoint(_startZoom * zoomFactor, newCenter, MapAnimationDuration.None);
-                    //_mapInertiaHandler.Map.ZoomLevel = _startZoom*zoomFactor;
+                    //_mapInertiaHandler.Map.SetZoomLevelAroundPoint(_startZoom * zoomFactor, _startCenterPixels, MapAnimationDuration.None);
+                    //_mapInertiaHandler.Map.UpdateLayout();
+                    var tt = _mapInertiaHandler.Map.ZoomLevel;
+                    _mapInertiaHandler.Map.Center = new Location(41.8320617, -71.4002502); 
+                    //_mapInertiaHandler.Map.Center = new Location(45.9813652, 13.2393494);
+                    _mapInertiaHandler.Map.ZoomLevel = _startZoom*zoomFactor;
 
-                }
+                    if (_mapInertiaHandler.Map.TryLocationToPixel(currentLocation, out newCenter2))
+                    {
+                        Debug.WriteLine(tt + " " + (_startZoom * zoomFactor) + " / " + newCenter1 + " --- " + newCenter2);
+                    }
+
+                }*/
                 _mapInertiaHandler.InertiaActive = false;
                 
                 //_mapInertiaHandler.Map.Center = _startCenter;
-                Location newLocation = new Location();
+                /*Location newLocation = new Location();
                 if (_mapInertiaHandler.Map.TryPixelToLocation((_startCenterPixels.GetVec() + delta).GetWindowsPoint(), out newLocation))
                 {
                     //_mapInertiaHandler.Map.Center = newLocation;
@@ -177,8 +235,12 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     _mapInertiaHandler.Velocity = (_previousPoint.GetVec() - currentPoint.GetVec());
                 }
+                */
+                //_previousPoint = currentPoint;
 
-                _previousPoint = currentPoint;
+                _previousCenterLocation = currentCenterLocation;
+                _previousCenterPoint = currentCenterPoint;
+                _previousFingerDiff = currentFingerDiff;
             }
         }
 
@@ -192,10 +254,10 @@ namespace PanoramicDataWin8.view.vis.render
                     _oneFingerListener.Released(this, e, e.IsRightMouse);
                 }
             }
-            /*if (scrollPointer != null && e.TriggeringPointer.PointerId == scrollPointer.PointerId)
+            if (scrollPointer != null && e.TriggeringPointer.PointerId == scrollPointer.PointerId)
             {
                 scrollPointer = null;
-            }*/
+            }
         }
     }
 
