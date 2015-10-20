@@ -30,7 +30,7 @@
                     <Viewbox MaxWidth="150" CacheMode="BitmapCache">
                         <TextBlock x:Name="mainLabel" Text="" Foreground="{StaticResource highlightBrush}"/>
                     </Viewbox>
-                    <Grid x:Name="dxSurfaceGrid" Opacity="0">
+                    <Grid x:Name="contentGrid" Opacity="0">
                         <ContentPresenter x:Name="contentPresenter"/>
                         <StackPanel Orientation="Horizontal"  HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4">
                             <StackPanel>

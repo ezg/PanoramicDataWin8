@@ -252,19 +252,19 @@ namespace PanoramicDataWin8.view.vis.render
 
                 animation = new DoubleAnimation();
                 animation.Duration = TimeSpan.FromMilliseconds(100);
-                animation.From = dxSurfaceGrid.Opacity;
+                animation.From = contentGrid.Opacity;
                 animation.To = 1;
                 animation.EasingFunction = easingFunction;
                 storyboard = new Storyboard();
                 storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, dxSurfaceGrid);
+                Storyboard.SetTarget(animation, contentGrid);
                 Storyboard.SetTargetProperty(animation, "Opacity");
                 storyboard.Begin();*/
 
-                var dxSurfaceGrid = (Grid)GetTemplateChild("dxSurfaceGrid");
+                var contentGrid = (Grid)GetTemplateChild("contentGrid");
                 var mainLabel = (TextBlock)GetTemplateChild("mainLabel");
                 
-                dxSurfaceGrid.Opacity = 1;
+                contentGrid.Opacity = 1;
                 mainLabel.Opacity = 0;
 
                 loadResultItemModels(resultModel);
@@ -289,15 +289,15 @@ namespace PanoramicDataWin8.view.vis.render
 
                 animation = new DoubleAnimation();
                 animation.Duration = TimeSpan.FromMilliseconds(300);
-                animation.From = dxSurfaceGrid.Opacity;
+                animation.From = contentGrid.Opacity;
                 animation.To = 0;
                 animation.EasingFunction = easingFunction;
                 storyboard = new Storyboard();
                 storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, dxSurfaceGrid);
+                Storyboard.SetTarget(animation, contentGrid);
                 Storyboard.SetTargetProperty(animation, "Opacity");
                 storyboard.Begin();
-                dxSurfaceGrid.Opacity = 0;
+                contentGrid.Opacity = 0;
                 mainLabel.Opacity = 1;
             }*/
         }
@@ -341,31 +341,34 @@ namespace PanoramicDataWin8.view.vis.render
         {
             InputFieldViewModel model = (sender as InputFieldView).DataContext as InputFieldViewModel;
             var visModel = model.VisualizationViewModel;
-            visModel.ActiveStopwatch.Restart();
-
-            //if (HeaderObjects.Any(ho => ho.InputFieldViewModel == model))
+            if (DataContext == visModel)
             {
-                bool createNew = true;
-                if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
-                {
-                    createNew = _menuViewModel.InputFieldViewModel != model;
-                    removeMenu();
-                }
+                visModel.ActiveStopwatch.Restart();
 
-                if (createNew)
+                //if (HeaderObjects.Any(ho => ho.InputFieldViewModel == model))
                 {
-                    InputFieldView inputFieldView = sender as InputFieldView;
-                    var menuViewModel = model.CreateMenuViewModel(inputFieldView.GetBounds(MainViewController.Instance.InkableScene));
-                    if (menuViewModel.MenuItemViewModels.Count > 0)
+                    bool createNew = true;
+                    if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
                     {
-                        _menuViewModel = menuViewModel;
-                        _menuView = new MenuView()
+                        createNew = _menuViewModel.InputFieldViewModel != model;
+                        removeMenu();
+                    }
+
+                    if (createNew)
+                    {
+                        InputFieldView inputFieldView = sender as InputFieldView;
+                        var menuViewModel = model.CreateMenuViewModel(inputFieldView.GetBounds(MainViewController.Instance.InkableScene));
+                        if (menuViewModel.MenuItemViewModels.Count > 0)
                         {
-                            DataContext = _menuViewModel
-                        };
-                        setMenuViewModelAnkerPosition();
-                        MainViewController.Instance.InkableScene.Add(_menuView);
-                        _menuViewModel.IsDisplayed = true;
+                            _menuViewModel = menuViewModel;
+                            _menuView = new MenuView()
+                            {
+                                DataContext = _menuViewModel
+                            };
+                            setMenuViewModelAnkerPosition();
+                            MainViewController.Instance.InkableScene.Add(_menuView);
+                            _menuViewModel.IsDisplayed = true;
+                        }
                     }
                 }
             }

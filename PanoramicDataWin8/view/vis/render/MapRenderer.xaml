@@ -17,7 +17,9 @@
                     Background="{StaticResource lightBrush}"
                     Loaded="MapRenderer_Loaded"
                     Credentials="AvEXTJAXOlPdAHWwrAm8tQ8CCiyK3DtKVy1RDHUVfThltB9w2ywRdKVV_e5ccvSZ"
-                    ShowNavigationBar="False"/>
+                    ShowNavigationBar="False">
+                <bm:Map.TileLayers></bm:Map.TileLayers>
+            </bm:Map>
             <Grid Background="#01000000"></Grid>
         </Grid>
     </local:XYRenderer>
