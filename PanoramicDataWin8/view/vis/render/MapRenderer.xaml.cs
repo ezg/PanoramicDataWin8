@@ -14,7 +14,10 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using Bing.Maps;
+using Esri.ArcGISRuntime.Controls;
+using Esri.ArcGISRuntime.Geometry;
+using Esri.ArcGISRuntime.Layers;
+using GeoAPI.Geometries;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
@@ -32,6 +35,9 @@ namespace PanoramicDataWin8.view.vis.render
 
         private MapInertiaHandler _mapInertiaHandler = null;
         private Pointer scrollPointer = null;
+
+        private Viewpoint _startViewPoint = null;
+
         private Location _startCenter = new Location();
         private Point _startCenterPixels = new Point();
         private Vec _initalFingerDiff = new Vec();
@@ -48,23 +54,13 @@ namespace PanoramicDataWin8.view.vis.render
             this.DataContextChanged += PlotRenderer_DataContextChanged;
         }
 
-        void MapRenderer_Loaded(object sender, RoutedEventArgs args)
+        void MapView_Loaded(object sender, RoutedEventArgs args)
         {
-            (sender as Map).TileLayers.Clear();
-            MapTileLayer layer2 = new MapTileLayer();
-            layer2.GetTileUri += (s, e) =>
-            {
-                //e.Uri = new Uri(string.Format("http://a.tile.openstreetmap.org/{0}/{1}/{2}.png", e.LevelOfDetail, e.X, e.Y));
-                e.Uri = new Uri(string.Format("https://api.mapbox.com/v4/ezgraggen.41f60101/{0}/{1}/{2}@2x.png?access_token=pk.eyJ1IjoiZXpncmFnZ2VuIiwiYSI6ImNpZm9tbmdteWhpeTRzNG03M3J1bnpneHAifQ.tTw2Dwj64wUza2n_dJPk9A", e.LevelOfDetail, e.X, e.Y));
-            };
-
-            (sender as Map).TileLayers.Add(layer2);
-
-            (sender as Map).PointerPressedOverride += map_PointerPressedOverride;
-            (sender as Map).PointerMovedOverride += map_PointerMovedOverride;
-            (sender as Map).PointerReleasedOverride += map_PointerReleasedOverride;
-
-            (sender as Map).IsHitTestVisible = false;
+            (sender as MapView).Map.Layers.Remove("tiledLayer");
+            WebTiledLayer tiledLayer = new WebTiledLayer() { ID = "tiledLayer" };
+            tiledLayer.TemplateUri = "https://api.mapbox.com/v4/ezgraggen.41f60101/{level}/{col}/{row}@2x.png?access_token=pk.eyJ1IjoiZXpncmFnZ2VuIiwiYSI6ImNpZm9tbmdteWhpeTRzNG03M3J1bnpneHAifQ.tTw2Dwj64wUza2n_dJPk9A";
+            tiledLayer.SubDomains = new string[] { "a", "b", "c", "d" };
+            (sender as MapView).Map.Layers.Add(tiledLayer);
 
             _pointerManager = new PointerManager();
             _pointerManager.Added += _pointerManager_Added;
@@ -74,7 +70,7 @@ namespace PanoramicDataWin8.view.vis.render
 
             _oneFingerListener = this.GetAncestors().FirstOrDefault(a => a is IOneFingerListener) as IOneFingerListener;
 
-            _mapInertiaHandler = new MapInertiaHandler(sender as Map);
+            _mapInertiaHandler = new MapInertiaHandler(sender as MapView);
 
             xyRenderer.Render += render;
             xyRenderer.LoadResultItemModels += loadResultItemModels;
@@ -82,7 +78,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         void render()
         {
-            VisualizationViewModel model = (DataContext as VisualizationViewModel);
+            /*VisualizationViewModel model = (DataContext as VisualizationViewModel);
 
             _mapInertiaHandler.Map.ShapeLayers.Clear();
             if (model.QueryModel.ResultModel != null && model.QueryModel.ResultModel.ResultItemModels.Any())
@@ -119,26 +115,44 @@ namespace PanoramicDataWin8.view.vis.render
                             var yFrom = yBins[yBinRange.GetDisplayIndex(yValue.Value)];
                             var yTo = yBins[yBinRange.GetDisplayIndex(yValue.Value) + 1];
 
-                            MapPolygon polygon = new MapPolygon();
-                            polygon.Locations = new LocationCollection() 
-                            {   
-                                new Location(xFrom, yFrom), 
-                                new Location(xTo, yFrom),
-                                new Location(xTo, yTo), 
-                                new Location(xFrom, yTo) 
-                            };
-                            var color = Windows.UI.Colors.Orange;
-                            color.A = 150;
+                            double? value = null;
+                            double? unNormalizedvalue = null;
+                            if (model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()))
+                            {
+                                unNormalizedvalue = (double?)resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()].Value;
+                                value = (double?)resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()].NoramlizedValue;
+                            }
+                            else if (model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
+                            {
+                                unNormalizedvalue = (double?)resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value;
+                                value = (double?)resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
+                            }
 
-                            polygon.FillColor = color;
+                            if (value != null)
+                            {
 
-                            shapeLayer.Shapes.Add(polygon);
+                                MapPolygon polygon = new MapPolygon();
+                                polygon.Locations = new LocationCollection()
+                                {
+                                    new Location(yFrom, xFrom),
+                                    new Location(yFrom, xTo),
+                                    new Location(yTo, xTo),
+                                    new Location(yTo, xFrom)
+                                };
+
+                                float alpha = 0.1f * (float)Math.Log10(value.Value) + 1f;
+                                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value.Value));
+                                lerpColor.A = 150;
+                                polygon.FillColor = lerpColor;
+
+                                shapeLayer.Shapes.Add(polygon);
+                            }
                         }
                     }
                 }
 
                 _mapInertiaHandler.Map.ShapeLayers.Add(shapeLayer);
-            }
+            }*/
         }
         
         void PlotRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
@@ -191,8 +205,21 @@ namespace PanoramicDataWin8.view.vis.render
                 _oneFingerListener.Pressed(this, e);
             }
             else if (e.NumActiveContacts == 2 && scrollPointer == null)
-            {
+            {   
                 scrollPointer = e.TriggeringPointer;
+                _startViewPoint = _mapInertiaHandler.MapView.GetCurrentViewpoint(ViewpointType.CenterAndScale);
+                _startCenterPixels = _mapInertiaHandler.MapView.LocationToScreen(_startViewPoint.TargetGeometry as MapPoint);
+
+                _initalFingerDiff = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() - ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec();
+
+                var tg = this.TransformToVisual(_mapInertiaHandler.MapView);
+                _startFingerCenterPoint = (((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() + ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec()) / 2.0f;
+
+                _initialFingerCenter = (((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() + ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec()) / 2.0f;
+
+                _mapInertiaHandler.InertiaActive = false;
+
+                /*scrollPointer = e.TriggeringPointer;
                 _mapInertiaHandler.Map.TryLocationToPixel(_mapInertiaHandler.Map.Center, out _startCenterPixels);
                 _startCenter = _mapInertiaHandler.Map.Center;
                 _startZoom = _mapInertiaHandler.Map.ZoomLevel;
@@ -208,7 +235,7 @@ namespace PanoramicDataWin8.view.vis.render
 
                 _initialFingerCenter = (((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() + ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec()) / 2.0f;
 
-                _mapInertiaHandler.InertiaActive = false;
+                _mapInertiaHandler.InertiaActive = false;*/
             }
         }
 
@@ -222,25 +249,30 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 _oneFingerListener.TwoFingerMoved();
 
-                var tg = this.TransformToVisual(_mapInertiaHandler.Map);
-
-                _mapInertiaHandler.Map.Center = _startCenter;
-                _mapInertiaHandler.Map.ZoomLevel = _startZoom;
-
+                var tg = this.TransformToVisual(_mapInertiaHandler.MapView);
                 Vec currentFingerDiff = ((Pt) tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() - ((Pt) tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec();
                 Vec currentFingerCenterPoint = (((Pt) tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() + ((Pt) tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec())/2.0f;
 
                 Vec delta = (_startFingerCenterPoint - currentFingerCenterPoint);
+                var zoomFactor = _initalFingerDiff.Length / currentFingerDiff.Length;
+                
+                //_mapInertiaHandler.MapView.SetView(_startViewPoint);
+                var startMapPointInPixels = _mapInertiaHandler.MapView.LocationToScreen(_startViewPoint.TargetGeometry as MapPoint);
 
-                Location newLocation = new Location();
-                _mapInertiaHandler.Map.TryPixelToLocation((_startCenterPixels.GetVec()  + delta).GetWindowsPoint(), out newLocation);
-                _mapInertiaHandler.Map.Center = newLocation;
+                var tt = _mapInertiaHandler.MapView.Map;
+                
+                var centerDiff = startMapPointInPixels.GetVec() - currentFingerCenterPoint;
 
+                zoomFactor = 1;
+                Mat mat = Mat.Translate(1 * currentFingerCenterPoint) * Mat.Scale(zoomFactor, zoomFactor) * Mat.Translate(-1*currentFingerCenterPoint) * Mat.Translate(delta);
+                Pt newCenter = mat * startMapPointInPixels;
+                Debug.WriteLine(_startCenterPixels + " / " + newCenter );
 
-                var zoomFactor = Math.Sqrt(currentFingerDiff.Length / _initalFingerDiff.Length);
-                _mapInertiaHandler.Map.SetZoomLevelAroundPoint(_startZoom * zoomFactor, currentFingerCenterPoint.GetWindowsPoint(), MapAnimationDuration.None);
+                var newMapPoint = _mapInertiaHandler.MapView.ScreenToLocation((newCenter.GetVec()).GetWindowsPoint());
+                _mapInertiaHandler.MapView.SetView(newMapPoint, zoomFactor * _startViewPoint.TargetScale.Value);
+                //_mapInertiaHandler.Map.SetZoomLevelAroundPoint(_startZoom * zoomFactor, currentFingerCenterPoint.GetWindowsPoint(), MapAnimationDuration.None);
 
-
+                Debug.WriteLine(centerDiff);
                 _mapInertiaHandler.InertiaActive = false;
             }
         }
@@ -249,7 +281,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (e.NumActiveContacts < 2)
             {
-                //_mapInertiaHandler.InertiaActive = true;
+                _mapInertiaHandler.InertiaActive = true;
                 if (e.NumActiveContacts < 1 && _oneFingerListener != null)
                 {
                     _oneFingerListener.Released(this, e, e.IsRightMouse);
@@ -282,10 +314,10 @@ namespace PanoramicDataWin8.view.vis.render
             set { _startCenter = value; }
         }
 
-        private Map _map;
-        public Map Map
+        private MapView _mapView;
+        public MapView MapView
         {
-            get { return _map; }
+            get { return _mapView; }
         }
 
         private double _zoomLevel;
@@ -309,9 +341,9 @@ namespace PanoramicDataWin8.view.vis.render
             set { velocity = value; }
         }
 
-        public MapInertiaHandler(Map map)
+        public MapInertiaHandler(MapView mapView)
         {
-            this._map = map;
+            this._mapView = mapView;
             this.InertiaActive = false;
             _animationTimer = new DispatcherTimer();
             _animationTimer.Interval = new TimeSpan(0, 0, 0, 0, 20);
@@ -325,7 +357,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 if (velocity.Length > 1)
                 {
-                    Point pixel = new Point();
+                    /*Point pixel = new Point();
                     _map.TryLocationToPixel(_center, out pixel);
 
                     Location newLocation = new Location();
@@ -334,7 +366,7 @@ namespace PanoramicDataWin8.view.vis.render
                         _map.Center = newLocation;
                         _center = newLocation;
                     }
-                    velocity *= 0.95;
+                    velocity *= 0.95;*/
                 }
             }
         }

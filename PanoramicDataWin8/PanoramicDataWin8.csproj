@@ -17,7 +17,7 @@
     <PackageCertificateKeyFile>PanoramicDataWin8_TemporaryKey.pfx</PackageCertificateKeyFile>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
-    <NuGetPackageImportStamp>dbce037e</NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>4aa295fa</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>neutral</AppxBundlePlatforms>
   </PropertyGroup>
@@ -547,9 +547,6 @@
     <SDKReference Include="BehaviorsXamlSDKManaged, Version=12.0">
       <Name>Behaviors SDK %28XAML%29</Name>
     </SDKReference>
-    <SDKReference Include="Bing.Maps.Xaml, Version=1.313.0825.0">
-      <Name>Bing Maps for C#, C++, or Visual Basic</Name>
-    </SDKReference>
     <SDKReference Include="Microsoft.VCLibs, version=12.0">
       <Name>Microsoft Visual C++ 2013 Runtime Package for Windows</Name>
     </SDKReference>
@@ -572,9 +569,11 @@
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
     <Error Condition="!Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SharpDX.2.6.3\build\SharpDX.targets'))" />
     <Error Condition="!Exists('..\packages\SharpDX.Toolkit.2.6.3\build\SharpDX.Toolkit.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SharpDX.Toolkit.2.6.3\build\SharpDX.Toolkit.targets'))" />
+    <Error Condition="!Exists('..\packages\Esri.ArcGISRuntime.10.2.6.1026\build\win81\Esri.ArcGISRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Esri.ArcGISRuntime.10.2.6.1026\build\win81\Esri.ArcGISRuntime.targets'))" />
   </Target>
   <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
   <Import Project="..\packages\SharpDX.Toolkit.2.6.3\build\SharpDX.Toolkit.targets" Condition="Exists('..\packages\SharpDX.Toolkit.2.6.3\build\SharpDX.Toolkit.targets')" />
+  <Import Project="..\packages\Esri.ArcGISRuntime.10.2.6.1026\build\win81\Esri.ArcGISRuntime.targets" Condition="Exists('..\packages\Esri.ArcGISRuntime.10.2.6.1026\build\win81\Esri.ArcGISRuntime.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

@@ -5,21 +5,20 @@
     xmlns:local="using:PanoramicDataWin8.view.vis.render"
     xmlns:common="using:PanoramicDataWin8.view.common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:bm="using:Bing.Maps"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:esri="using:Esri.ArcGISRuntime.Controls"
+    xmlns:layers="using:Esri.ArcGISRuntime.Layers"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400"
     FontFamily="{StaticResource abel}">
     <local:XYRenderer x:Name="xyRenderer">
         <Grid>
-            <bm:Map x:Name="map" 
-                    Background="{StaticResource lightBrush}"
-                    Loaded="MapRenderer_Loaded"
-                    Credentials="AvEXTJAXOlPdAHWwrAm8tQ8CCiyK3DtKVy1RDHUVfThltB9w2ywRdKVV_e5ccvSZ"
-                    ShowNavigationBar="False">
-                <bm:Map.TileLayers></bm:Map.TileLayers>
-            </bm:Map>
+            <esri:MapView x:Name="mapView" Loaded="MapView_Loaded">
+                <esri:Map>
+                    <layers:WebTiledLayer ID="tiledLayer" />
+                </esri:Map>
+            </esri:MapView>
             <Grid Background="#01000000"></Grid>
         </Grid>
     </local:XYRenderer>
