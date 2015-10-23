@@ -36,16 +36,13 @@ namespace PanoramicDataWin8.view.vis.render
         private MapInertiaHandler _mapInertiaHandler = null;
         private Pointer scrollPointer = null;
 
-        private Viewpoint _startViewPoint = null;
+        private Viewpoint _previousViewpoint = null;
 
         private Location _startCenter = new Location();
-        private Point _startCenterPixels = new Point();
-        private Vec _initalFingerDiff = new Vec();
-        private Vec _initialFingerCenter = new Vec();
+        private Vec _previousFingerDiff = new Vec();
+        private Vec _previousFingerCenter = new Vec();
+
         private double _startZoom = 0;
-
-
-        private Vec _startFingerCenterPoint = new Vec();
 
         public MapRenderer()
         {
@@ -207,35 +204,13 @@ namespace PanoramicDataWin8.view.vis.render
             else if (e.NumActiveContacts == 2 && scrollPointer == null)
             {   
                 scrollPointer = e.TriggeringPointer;
-                _startViewPoint = _mapInertiaHandler.MapView.GetCurrentViewpoint(ViewpointType.CenterAndScale);
-                _startCenterPixels = _mapInertiaHandler.MapView.LocationToScreen(_startViewPoint.TargetGeometry as MapPoint);
-
-                _initalFingerDiff = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() - ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec();
-
+                _previousViewpoint = _mapInertiaHandler.MapView.GetCurrentViewpoint(ViewpointType.CenterAndScale);
+                
                 var tg = this.TransformToVisual(_mapInertiaHandler.MapView);
-                _startFingerCenterPoint = (((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() + ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec()) / 2.0f;
-
-                _initialFingerCenter = (((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() + ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec()) / 2.0f;
+                _previousFingerDiff = ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() - ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec();
+                _previousFingerCenter = (((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() + ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec()) / 2.0f;
 
                 _mapInertiaHandler.InertiaActive = false;
-
-                /*scrollPointer = e.TriggeringPointer;
-                _mapInertiaHandler.Map.TryLocationToPixel(_mapInertiaHandler.Map.Center, out _startCenterPixels);
-                _startCenter = _mapInertiaHandler.Map.Center;
-                _startZoom = _mapInertiaHandler.Map.ZoomLevel;
-
-                _initalFingerDiff = ((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() - ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec();
-
-                var tg = this.TransformToVisual(_mapInertiaHandler.Map);
-                 _startFingerCenterPoint = (((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() + ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec()) / 2.0f;
-   
-                _mapInertiaHandler.Map.TryLocationToPixel(_startCenter, out _startCenterPixels);
-                _mapInertiaHandler.Center = _mapInertiaHandler.Map.Center;
-                _mapInertiaHandler.StartCenter = _mapInertiaHandler.Map.Center;
-
-                _initialFingerCenter = (((Pt)e.CurrentContacts[e.CurrentPointers[0].PointerId].Position).GetVec() + ((Pt)e.CurrentContacts[e.CurrentPointers[1].PointerId].Position).GetVec()) / 2.0f;
-
-                _mapInertiaHandler.InertiaActive = false;*/
             }
         }
 
@@ -250,29 +225,27 @@ namespace PanoramicDataWin8.view.vis.render
                 _oneFingerListener.TwoFingerMoved();
 
                 var tg = this.TransformToVisual(_mapInertiaHandler.MapView);
-                Vec currentFingerDiff = ((Pt) tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() - ((Pt) tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec();
-                Vec currentFingerCenterPoint = (((Pt) tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() + ((Pt) tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec())/2.0f;
+                Vec currentFingerDiff = ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() - ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec();
+                Vec currentFingerCenter = (((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[0].PointerId].Position)).GetVec() + ((Pt)tg.TransformPoint(e.CurrentContacts[e.CurrentPointers[1].PointerId].Position)).GetVec()) / 2.0f;
 
-                Vec delta = (_startFingerCenterPoint - currentFingerCenterPoint);
-                var zoomFactor = _initalFingerDiff.Length / currentFingerDiff.Length;
-                
-                //_mapInertiaHandler.MapView.SetView(_startViewPoint);
-                var startMapPointInPixels = _mapInertiaHandler.MapView.LocationToScreen(_startViewPoint.TargetGeometry as MapPoint);
+                Vec delta = (_previousFingerCenter - currentFingerCenter);
+                var zoomFactor = _previousFingerDiff.Length / currentFingerDiff.Length;
 
-                var tt = _mapInertiaHandler.MapView.Map;
-                
-                var centerDiff = startMapPointInPixels.GetVec() - currentFingerCenterPoint;
+                var previousCenterInPixel = _mapInertiaHandler.MapView.LocationToScreen(_previousViewpoint.TargetGeometry as MapPoint);
+               
+                Mat mat = Mat.Translate(1 * currentFingerCenter) * Mat.Scale(zoomFactor, zoomFactor) * Mat.Translate(-1 * currentFingerCenter) * Mat.Translate(delta);
+                Pt newCenterInPixel = mat * previousCenterInPixel;
 
-                zoomFactor = 1;
-                Mat mat = Mat.Translate(1 * currentFingerCenterPoint) * Mat.Scale(zoomFactor, zoomFactor) * Mat.Translate(-1*currentFingerCenterPoint) * Mat.Translate(delta);
-                Pt newCenter = mat * startMapPointInPixels;
-                Debug.WriteLine(_startCenterPixels + " / " + newCenter );
+                var newCenterMapPoint = _mapInertiaHandler.MapView.ScreenToLocation(newCenterInPixel);
 
-                var newMapPoint = _mapInertiaHandler.MapView.ScreenToLocation((newCenter.GetVec()).GetWindowsPoint());
-                _mapInertiaHandler.MapView.SetView(newMapPoint, zoomFactor * _startViewPoint.TargetScale.Value);
-                //_mapInertiaHandler.Map.SetZoomLevelAroundPoint(_startZoom * zoomFactor, currentFingerCenterPoint.GetWindowsPoint(), MapAnimationDuration.None);
+                Viewpoint currentViewpoint = new ViewpointCenter(newCenterMapPoint, _previousViewpoint.TargetScale.Value * zoomFactor);
 
-                Debug.WriteLine(centerDiff);
+                _mapInertiaHandler.MapView.SetView(currentViewpoint);
+
+                _previousViewpoint = currentViewpoint;
+                _previousFingerDiff = currentFingerDiff;
+                _previousFingerCenter = currentFingerCenter;
+
                 _mapInertiaHandler.InertiaActive = false;
             }
         }
