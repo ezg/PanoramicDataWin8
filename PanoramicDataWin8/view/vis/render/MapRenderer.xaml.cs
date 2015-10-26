@@ -6,6 +6,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Automation.Peers;
 using Windows.UI.Xaml.Controls;
@@ -17,12 +18,14 @@ using Windows.UI.Xaml.Navigation;
 using Esri.ArcGISRuntime.Controls;
 using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Layers;
+using Esri.ArcGISRuntime.Symbology;
 using GeoAPI.Geometries;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.style;
+using PointCollection = Esri.ArcGISRuntime.Geometry.PointCollection;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -73,83 +76,129 @@ namespace PanoramicDataWin8.view.vis.render
             xyRenderer.LoadResultItemModels += loadResultItemModels;
         }
 
-        void render()
+        void render(bool sizeChanged = false)
         {
-            /*VisualizationViewModel model = (DataContext as VisualizationViewModel);
-
-            _mapInertiaHandler.Map.ShapeLayers.Clear();
-            if (model.QueryModel.ResultModel != null && model.QueryModel.ResultModel.ResultItemModels.Any())
+            if (!sizeChanged)
             {
-                MapShapeLayer shapeLayer = new MapShapeLayer();
-                var resultDescriptionModel = model.QueryModel.ResultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
+                VisualizationViewModel model = (DataContext as VisualizationViewModel);
+                var graphicsOverlay = _mapInertiaHandler.MapView.GraphicsOverlays["graphicsOverlay"];
+                List<Graphic> graphics = new List<Graphic>();
 
-                var xAom = model.QueryModel.GetUsageInputOperationModel(InputUsage.X).FirstOrDefault();
-                var yAom = model.QueryModel.GetUsageInputOperationModel(InputUsage.Y).FirstOrDefault();
-
-                var xIndex = resultDescriptionModel.Dimensions.IndexOf(xAom);
-                var yIndex = resultDescriptionModel.Dimensions.IndexOf(yAom);
-
-                var xBinRange = resultDescriptionModel.BinRanges[xIndex];
-                var yBinRange = resultDescriptionModel.BinRanges[yIndex];
-
-                var xBins = xBinRange.GetBins();
-                xBins.Add(xBinRange.AddStep(xBins.Max()));
-                var yBins = yBinRange.GetBins();
-                yBins.Add(yBinRange.AddStep(yBins.Max()));
-
-                if (xAom != null && yAom != null)
+                if (model.QueryModel.ResultModel != null && model.QueryModel.ResultModel.ResultItemModels.Any())
                 {
-                    foreach (var resultItem in model.QueryModel.ResultModel.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
+                    var resultDescriptionModel = model.QueryModel.ResultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
+
+                    var xAom = model.QueryModel.GetUsageInputOperationModel(InputUsage.X).FirstOrDefault();
+                    var yAom = model.QueryModel.GetUsageInputOperationModel(InputUsage.Y).FirstOrDefault();
+
+                    var xIndex = resultDescriptionModel.Dimensions.IndexOf(xAom);
+                    var yIndex = resultDescriptionModel.Dimensions.IndexOf(yAom);
+
+                    var xBinRange = resultDescriptionModel.BinRanges[xIndex];
+                    var yBinRange = resultDescriptionModel.BinRanges[yIndex];
+
+                    var xBins = xBinRange.GetBins();
+                    xBins.Add(xBinRange.AddStep(xBins.Max()));
+                    var yBins = yBinRange.GetBins();
+                    yBins.Add(yBinRange.AddStep(yBins.Max()));
+
+                    if (xAom != null && yAom != null)
                     {
-                        double? xValue = (double?) resultItem.Values[xAom].Value;
-                        double? yValue = (double?) resultItem.Values[yAom].Value;
-
-                        if (xValue.HasValue && yValue.HasValue)
+                        foreach (var resultItem in model.QueryModel.ResultModel.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
                         {
-                            var xFrom = xBins[xBinRange.GetDisplayIndex(xValue.Value)];
-                            var xTo = xBins[xBinRange.GetDisplayIndex(xValue.Value) + 1];
+                            double? xValue = (double?) resultItem.Values[xAom].Value;
+                            double? yValue = (double?) resultItem.Values[yAom].Value;
 
-                            var yFrom = yBins[yBinRange.GetDisplayIndex(yValue.Value)];
-                            var yTo = yBins[yBinRange.GetDisplayIndex(yValue.Value) + 1];
-
-                            double? value = null;
-                            double? unNormalizedvalue = null;
-                            if (model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()))
+                            if (xValue.HasValue && yValue.HasValue)
                             {
-                                unNormalizedvalue = (double?)resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()].Value;
-                                value = (double?)resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()].NoramlizedValue;
-                            }
-                            else if (model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
-                            {
-                                unNormalizedvalue = (double?)resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value;
-                                value = (double?)resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
-                            }
+                                var xFrom = xBins[xBinRange.GetDisplayIndex(xValue.Value)];
+                                var xTo = xBins[xBinRange.GetDisplayIndex(xValue.Value) + 1];
 
-                            if (value != null)
-                            {
+                                var yFrom = yBins[yBinRange.GetDisplayIndex(yValue.Value)];
+                                var yTo = yBins[yBinRange.GetDisplayIndex(yValue.Value) + 1];
 
-                                MapPolygon polygon = new MapPolygon();
-                                polygon.Locations = new LocationCollection()
+                                double? value = null;
+                                double? unNormalizedvalue = null;
+                                if (model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()))
                                 {
-                                    new Location(yFrom, xFrom),
-                                    new Location(yFrom, xTo),
-                                    new Location(yTo, xTo),
-                                    new Location(yTo, xFrom)
-                                };
+                                    unNormalizedvalue = (double?) resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()].Value;
+                                    value = (double?) resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()].NoramlizedValue;
+                                }
+                                else if (model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
+                                {
+                                    unNormalizedvalue = (double?) resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value;
+                                    value = (double?) resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
+                                }
 
-                                float alpha = 0.1f * (float)Math.Log10(value.Value) + 1f;
-                                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value.Value));
-                                lerpColor.A = 150;
-                                polygon.FillColor = lerpColor;
+                                if (value != null)
+                                {
+                                    //if (MyMapView.WrapAround)
+                                    //mapPoint = GeometryEngine.NormalizeCentralMeridian(mapPoint) as MapPoint;
 
-                                shapeLayer.Shapes.Add(polygon);
+                                    PointCollection coords = new PointCollection();
+                                    coords.Add(new MapPoint(xFrom, yFrom));
+                                    coords.Add(new MapPoint(xTo, yFrom));
+                                    coords.Add(new MapPoint(xTo, yTo));
+                                    coords.Add(new MapPoint(xFrom, yTo));
+                                    coords.Add(new MapPoint(xFrom, yFrom));
+
+                                    Polygon polygon = new Polygon(
+                                        new List<PointCollection> {coords},
+                                        SpatialReferences.Wgs84);
+
+
+
+                                    float alpha = 0.1f*(float) Math.Log10(value.Value) + 1f;
+                                    var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float) Math.Sqrt(value.Value));
+                                    lerpColor.A = 150;
+                                    var redSymbol = new SimpleFillSymbol() {Color = lerpColor, Outline = new SimpleLineSymbol() {Color = Colors.White, Width = 0.5}};
+
+                                    graphics.Add(new Graphic() {Geometry = polygon, Symbol = redSymbol});
+                                }
                             }
                         }
                     }
+                    graphicsOverlay.GraphicsSource = graphics;
                 }
+            }
+        }
 
-                _mapInertiaHandler.Map.ShapeLayers.Add(shapeLayer);
-            }*/
+        private Point ToGeographic(Point pnt)
+        {
+            double mercatorX_lon = pnt.X;
+            double mercatorY_lat = pnt.Y;
+            if (Math.Abs(mercatorX_lon) < 180 && Math.Abs(mercatorY_lat) < 90)
+                return pnt;
+
+            if ((Math.Abs(mercatorX_lon) > 20037508.3427892) || (Math.Abs(mercatorY_lat) > 20037508.3427892))
+                return pnt;
+
+            double x = mercatorX_lon;
+            double y = mercatorY_lat;
+            double num3 = x / 6378137.0;
+            double num4 = num3 * 57.295779513082323;
+            double num5 = Math.Floor((double)((num4 + 180.0) / 360.0));
+            double num6 = num4 - (num5 * 360.0);
+            double num7 = 1.5707963267948966 - (2.0 * Math.Atan(Math.Exp((-1.0 * y) / 6378137.0)));
+            mercatorX_lon = num6;
+            mercatorY_lat = num7 * 57.295779513082323;
+            return new Point(mercatorX_lon, mercatorY_lat);
+        }
+
+        private Point ToWebMercator(Point pnt)
+        {
+            double mercatorX_lon = pnt.X;
+            double mercatorY_lat = pnt.Y;
+            if ((Math.Abs(mercatorX_lon) > 180 || Math.Abs(mercatorY_lat) > 90))
+                return pnt;
+
+            double num = mercatorX_lon * 0.017453292519943295;
+            double x = 6378137.0 * num;
+            double a = mercatorY_lat * 0.017453292519943295;
+
+            mercatorX_lon = x;
+            mercatorY_lat = 3189068.5 * Math.Log((1.0 + Math.Sin(a)) / (1.0 - Math.Sin(a)));
+            return new Point(mercatorX_lon, mercatorY_lat);
         }
         
         void PlotRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
@@ -237,14 +286,15 @@ namespace PanoramicDataWin8.view.vis.render
                 Pt newCenterInPixel = mat * previousCenterInPixel;
 
                 var newCenterMapPoint = _mapInertiaHandler.MapView.ScreenToLocation(newCenterInPixel);
+                if (newCenterMapPoint != null)
+                {
+                    Viewpoint currentViewpoint = new ViewpointCenter(newCenterMapPoint, _previousViewpoint.TargetScale.Value*zoomFactor);
+                    _mapInertiaHandler.MapView.SetView(currentViewpoint);
 
-                Viewpoint currentViewpoint = new ViewpointCenter(newCenterMapPoint, _previousViewpoint.TargetScale.Value * zoomFactor);
-
-                _mapInertiaHandler.MapView.SetView(currentViewpoint);
-
-                _previousViewpoint = currentViewpoint;
-                _previousFingerDiff = currentFingerDiff;
-                _previousFingerCenter = currentFingerCenter;
+                    _previousViewpoint = currentViewpoint;
+                    _previousFingerDiff = currentFingerDiff;
+                    _previousFingerCenter = currentFingerCenter;
+                }
 
                 _mapInertiaHandler.InertiaActive = false;
             }

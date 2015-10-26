@@ -146,7 +146,7 @@ namespace PanoramicDataWin8.view.vis.render
         }
         
 
-        void render()
+        void render(bool sizeChanged = false)
         {
             if (dxSurface != null)
             {

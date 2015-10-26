@@ -18,6 +18,9 @@
                 <esri:Map>
                     <layers:WebTiledLayer ID="tiledLayer" />
                 </esri:Map>
+                <esri:MapView.GraphicsOverlays>
+                    <esri:GraphicsOverlay ID="graphicsOverlay" />
+                </esri:MapView.GraphicsOverlays>
             </esri:MapView>
             <Grid Background="#01000000"></Grid>
         </Grid>

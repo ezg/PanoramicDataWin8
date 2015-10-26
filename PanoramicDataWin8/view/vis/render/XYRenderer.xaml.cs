@@ -29,7 +29,7 @@ namespace PanoramicDataWin8.view.vis.render
 {
     public partial class XYRenderer : ContentControl, InputFieldViewModelEventHandler
     {
-        public delegate void EventHandler();
+        public delegate void EventHandler(bool sizeChanged = false);
         public event EventHandler Render;
 
         public delegate void LoadResultItemModelsHandler(ResultModel resultModel);
@@ -119,7 +119,7 @@ namespace PanoramicDataWin8.view.vis.render
                     (((InputFieldView)GetTemplateChild("yInputFieldView")).DataContext as InputFieldViewModel).Size = new Vec(54, model.Size.Y - 54);
                 }
 
-                render();
+                render(true);
             }
             if (e.PropertyName == model.GetPropertyName(() => model.Size) ||
                 e.PropertyName == model.GetPropertyName(() => model.Position))
@@ -310,11 +310,11 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        private void render()
+        private void render(bool sizeChanged = false)
         {
             if (Render != null)
             {
-                Render();
+                Render(sizeChanged);
             }
         }
 
