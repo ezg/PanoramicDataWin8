@@ -6,6 +6,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using System.Collections.ObjectModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -21,7 +22,6 @@ using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
-using SharpDX.Collections;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -264,14 +264,14 @@ namespace PanoramicDataWin8.view.vis.render
         private void updateSize(HeaderObject exclude)
         {
             double totalHeaderWidth = HeaderObjects.Sum(ho => ho.Width);
-            double availableWidth = (DataContext as VisualizationViewModel).Size.X - (HeaderObjects.Count) * 8;
+            double availableWidth = (DataContext as VisualizationViewModel).Size.X - (HeaderObjects.Count()) * 8;
 
             if (exclude != null)
             {
                 totalHeaderWidth -= exclude.Width;
                 availableWidth -= exclude.Width;
 
-                exclude.Width = Math.Min(exclude.Width, (DataContext as VisualizationViewModel).Size.X - (HeaderObjects.Count - 1) * 28);
+                exclude.Width = Math.Min(exclude.Width, (DataContext as VisualizationViewModel).Size.X - (HeaderObjects.Count() - 1) * 28);
 
                 double ratio = availableWidth / totalHeaderWidth;
                 HeaderObjects.Where(ho => ho != exclude).ToList().ForEach(ho => ho.Value.Width *= ratio);

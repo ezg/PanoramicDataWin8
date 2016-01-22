@@ -12,40 +12,18 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using SharpDX;
-using SharpDX.Direct3D11;
-using SharpDX.Toolkit.Graphics;
-using D2D = SharpDX.Direct2D1;
-using DW = SharpDX.DirectWrite;
 using System.Diagnostics;
+using System.Numerics;
 using Windows.Graphics.Display;
+using Windows.UI;
 using PanoramicDataWin8.controller.view;
+using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.Text;
 
 namespace PanoramicDataWin8.view.common
 {
     public sealed partial class DXSurface : UserControl
     {
-        private const D2D.DebugLevel D2DDebugLevel = D2D.DebugLevel.Information; //D2D.DebugLevel.Error
-
-        // will hold all disposable resources to dispose them all at once
-        private readonly DisposeCollector _disposeCollector = new DisposeCollector();
-
-        // indicates if the frame needs to be redrawn
-        private bool _isDirty;
-        private bool _isResized;
-
-        private GraphicsDevice _graphicsDevice; // encapsulates Direct3D11 Device and DeviceContext
-        private GraphicsPresenter _presenter; // encapsulates the SwapChain, Backbuffer and DepthStencil buffer
-
-        // ReSharper disable InconsistentNaming
-        private D2D.Device1 _d2dDevice;
-        private D2D.DeviceContext1 _d2dDeviceContext;
-        // ReSharper restore InconsistentNaming
-        private DW.Factory1 _dwFactory;
-
-        // main render target (the backbuffer) - needs to be disposed before resizing the SwapChain otherwise the resize call will fail.
-        private D2D.Bitmap1 _bitmapTarget;
-
         private DXSurfaceContentProvider _contentProvider = null;
         public DXSurfaceContentProvider ContentProvider
         {
@@ -62,17 +40,24 @@ namespace PanoramicDataWin8.view.common
         public DXSurface()
         {
             this.InitializeComponent();
+        }
 
-            swapChainPanel.Loaded += HandleLoaded;
-            swapChainPanel.Unloaded += HandleUnloaded;
-            swapChainPanel.SizeChanged += HandleSizeChanged;
+        public void Dispose()
+        {
+            this.canvasControl.RemoveFromVisualTree();
+            this.canvasControl = null;
+        }
+
+        public void Redraw()
+        {
+            canvasControl.Invalidate();
         }
 
         public float CompositionScaleX
         {
             get
             {
-                return swapChainPanel.CompositionScaleX;
+                return 1;
             }
         }
 
@@ -80,305 +65,72 @@ namespace PanoramicDataWin8.view.common
         {
             get
             {
-                return swapChainPanel.CompositionScaleY;
+                return 1;
             }
         }
 
-        private bool _isAnimated = false;
-        public bool IsAnimated
+        private void canvasControl_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
         {
-            get
-            {
-                return _isAnimated;
-            }
-            set
-            {
-                _isAnimated = value;
-            }
-        }
-
-        public void Dispose()
-        {
-            UnloadContent();
-            _d2dDeviceContext = null;
-            _d2dDevice = null;
-            _dwFactory = null;
-            _presenter = null;
-            _graphicsDevice = null;
-        }
-
-        public void Redraw()
-        {
-            _isDirty = true;
-        }
-
-        private void HandleLoaded(object sender, RoutedEventArgs e)
-        {
-            // create the device only on first load after that it can be reused
-            if (_graphicsDevice == null)
-            {
-                CreateDevice();
-                _contentProvider.Load(_d2dDeviceContext, _disposeCollector, _dwFactory);
-            }
-
-            StartRendering();
-        }
-
-        private void HandleUnloaded(object sender, RoutedEventArgs e)
-        {
-            StopRendering();
-        }
-
-        private void HandleSizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (e == null) throw new ArgumentNullException("e");
-
-            ResetSize(e.NewSize);
-        }
-
-        private void HandleRendering(object sender, object e)
-        {
-            PerformRendering();
-        }
-
-        private void CreateDevice()
-        {
-            Debug.Assert(_graphicsDevice == null);
-
-            var flags = GetDeviceCreationFlags();
-            Debug.Assert(flags.HasFlag(DeviceCreationFlags.BgraSupport)); // mandatory for D2D support
-
-            // initialize Direct3D11 - this is the bridge between Direct2D and control surface
-            _graphicsDevice = _disposeCollector.Collect(GraphicsDevice.New(flags));
-
-            // get the low-level DXGI device reference
-            using (var dxgiDevice = ((Device)_graphicsDevice).QueryInterface<SharpDX.DXGI.Device1>())
-            {
-                // create D2D device sharing same GPU driver instance
-                var factory2D = new SharpDX.Direct2D1.Factory2();
-                _d2dDevice = new SharpDX.Direct2D1.Device1(factory2D, dxgiDevice.QueryInterface<SharpDX.DXGI.Device1>());
-                //_d2dDevice = _disposeCollector.Collect(new D2D.Device1(dxgiDevice, new D2D.CreationProperties { DebugLevel = D2DDebugLevel }));
-
-                // create D2D device context used in drawing and resource creation
-                // this allows us to not recreate the resources if render target gets recreated because of size change
-                _d2dDeviceContext = _disposeCollector.Collect(new D2D.DeviceContext1(_d2dDevice, D2D.DeviceContextOptions.EnableMultithreadedOptimizations));
-            }
-
-            // device-independent factory used to create all DirectWrite resources
-            _dwFactory = _disposeCollector.Collect(new SharpDX.DirectWrite.Factory1());
-        }
-
-        private DeviceCreationFlags GetDeviceCreationFlags()
-        {
-            return DeviceCreationFlags.BgraSupport;
-            //#if DEBUG
-            // | DeviceCreationFlags.Debug
-            //#endif
-            //;
-        }
-
-        private void UnloadContent()
-        {
-            _disposeCollector.DisposeAndClear();
-        }
-
-        private void StartRendering()
-        {
-            Debug.Assert(_presenter == null);
-            Debug.Assert(_graphicsDevice.Presenter == null);
-            Debug.Assert(_graphicsDevice != null);
-
-            Redraw();
-
-            var parameters = new PresentationParameters((int)ActualWidth, (int)ActualHeight, swapChainPanel);
-
-            _presenter = _disposeCollector.Collect(new SwapChainGraphicsPresenter(_graphicsDevice, parameters));
-            _graphicsDevice.Presenter = _presenter;
-
-            Debug.Assert(_bitmapTarget == null);
-
-            CreateD2DRenderTarget();
-
-            CompositionTarget.Rendering += HandleRendering;
-
-            ResetSize(new Size(ActualWidth, ActualHeight));
-        }
-
-        private void CreateD2DRenderTarget()
-        {
-            var renderTarget = _presenter.BackBuffer;
-
-            var dpi = DisplayInformation.GetForCurrentView().LogicalDpi;
-
-            // 1. Use same format as the underlying render target with premultiplied alpha mode
-            // 2. Use correct DPI
-            // 3. Deny drawing direct calls and specify that this is a render target.
-            var bitmapProperties = new D2D.BitmapProperties1(new SharpDX.Direct2D1.PixelFormat(renderTarget.Format, D2D.AlphaMode.Premultiplied),
-                                                             dpi,
-                                                             dpi,
-                                                             D2D.BitmapOptions.CannotDraw | D2D.BitmapOptions.Target);
-
-            // create the bitmap render target and assign it to the device context
-            _bitmapTarget = _disposeCollector.Collect(new D2D.Bitmap1(_d2dDeviceContext, renderTarget, bitmapProperties));
-            _d2dDeviceContext.Target = _bitmapTarget;
-        }
-
-        private void StopRendering()
-        {
-            if (_graphicsDevice == null || _graphicsDevice.Presenter == null)
-            {
-                return;
-            }
-            Debug.Assert(_presenter != null);
-            Debug.Assert(_graphicsDevice.Presenter != null);
-
-            CompositionTarget.Rendering -= HandleRendering;
-
-            DisposeD2DRenderTarget();
-
-            _graphicsDevice.Presenter = null;
-            _disposeCollector.RemoveAndDispose(ref _presenter);
-        }
-
-
-        private void DisposeD2DRenderTarget()
-        {
-            _d2dDeviceContext.Target = null;
-            _disposeCollector.RemoveAndDispose(ref _bitmapTarget);
-        }
-
-        private void ResetSize(Size size)
-        {
-            if (_presenter == null) return;
-
-            Redraw();
-            _isResized = true;
             if (_contentProvider != null)
             {
-                _contentProvider.SizeChanged = true;
-            }
-            DisposeD2DRenderTarget();
-            _presenter.Resize((int)(size.Width * swapChainPanel.CompositionScaleX), (int)(size.Height * swapChainPanel.CompositionScaleY), _presenter.Description.BackBufferFormat);
-            CreateD2DRenderTarget();
-        }
-
-        private void PerformRendering()
-        {
-            if (_graphicsDevice == null || _graphicsDevice.Presenter == null)
-            {
-                return;
-            }
-            Debug.Assert(_graphicsDevice.Presenter != null);
-
-            if (!_isDirty && !_isAnimated) return;
-            _isDirty = false;
-
-            if (!BeginDrawFrame())
-            {
-                Redraw();
-                return;
-            }
-
-            _contentProvider.Clear(_graphicsDevice);
-            
-            DrawContent();
-            if (_isResized)
-            {
-                _isResized = false;
-            }
-            _contentProvider.SizeChanged = false;
-
-            EndDrawFrame();
-        }
-
-        private bool BeginDrawFrame()
-        {
-            switch (_graphicsDevice.GraphicsDeviceStatus)
-            {
-                case GraphicsDeviceStatus.Normal:
-                    // graphics device is okay
-                    _graphicsDevice.ClearState();
-                    if (_graphicsDevice.BackBuffer != null)
-                    {
-                        _graphicsDevice.SetRenderTargets(_graphicsDevice.DepthStencilBuffer, _graphicsDevice.BackBuffer);
-                        _graphicsDevice.SetViewport(0, 0, _graphicsDevice.BackBuffer.Width, _graphicsDevice.BackBuffer.Height);
-                    }
-
-                    return true;
-
-                default:
-                    // graphics device needs to be recreated - give GPU driver some time to recover
-                    Utilities.Sleep(TimeSpan.FromMilliseconds(20));
-
-                    StopRendering();
-                    Dispose();
-                    CreateDevice();
-                    if (_contentProvider != null)
-                    {
-                        _contentProvider.Load(_d2dDeviceContext, _disposeCollector, _dwFactory);
-                    }
-                    StartRendering();
-
-                    return false;
+                _contentProvider.Load(sender, args);
             }
         }
 
-        private void EndDrawFrame()
+        private void canvasControl_Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs args)
         {
-            try
+            if (_contentProvider != null)
             {
-                _graphicsDevice.Present();
-            }
-            catch (SharpDXException ex)
-            {
-                Debug.WriteLine(ex);
-                if (ex.ResultCode != SharpDX.DXGI.ResultCode.DeviceRemoved && ex.ResultCode != SharpDX.DXGI.ResultCode.DeviceReset)
-                    throw;
+                _contentProvider.Draw(sender, args);
             }
         }
 
-        private void DrawContent()
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            bool beginDrawCalled = false;
-            try
-            {
-                Stopwatch sw = new Stopwatch();
-                sw.Start();
+            this.canvasControl.RemoveFromVisualTree();
+            this.canvasControl = null;
 
-                _d2dDeviceContext.BeginDraw();
-                beginDrawCalled = true;
-                _contentProvider.Draw(_d2dDeviceContext, _dwFactory);
-                if (MainViewController.Instance.MainModel.Verbose && !IsAnimated)
-                {
-                    Debug.WriteLine("Render time: " + sw.ElapsedMilliseconds);
-                }
-            }
-            finally
-            {
-                // end a draw batch
-                if (beginDrawCalled)
-                    _d2dDeviceContext.EndDraw();
-
-            }
+            //clear color 230, 230, 230
         }
     }
 
     public class DXSurfaceContentProvider
     {
-        public bool SizeChanged { get; set; }
-
-        public virtual void Clear(GraphicsDevice graphicsDevice)
-        {
-            graphicsDevice.Clear(Color.White);
-        }
-
-        public virtual void Draw(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory)
+        public virtual void Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
         {
 
         }
-        public virtual void Load(D2D.DeviceContext1 d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
+        public virtual void Load(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs canvasArgs)
         {
 
+        }
+
+        protected void DrawString(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, CanvasTextFormat textFormat, float x, float y, string text, Color textColor,
+            bool leftAligned,
+            bool horizontallyCentered, bool verticallyCentered)
+        {
+            CanvasTextFormat ctf = new CanvasTextFormat()
+            {
+                FontSize = textFormat.FontSize,
+                FontFamily = textFormat.FontFamily,
+                HorizontalAlignment = CanvasHorizontalAlignment.Left,
+                VerticalAlignment = CanvasVerticalAlignment.Top
+            };
+            
+            if (horizontallyCentered)
+            {
+                ctf.HorizontalAlignment = CanvasHorizontalAlignment.Center;
+            }
+            if (verticallyCentered)
+            {
+                ctf.VerticalAlignment = CanvasVerticalAlignment.Center; ;
+            }
+            if (!leftAligned && !horizontallyCentered)
+            {
+                ctf.HorizontalAlignment = CanvasHorizontalAlignment.Right;
+            }
+
+            canvasArgs.DrawingSession.DrawText(text, new Vector2(x, y), textColor, ctf);
         }
     }
 }

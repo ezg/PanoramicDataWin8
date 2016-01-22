@@ -501,6 +501,11 @@ namespace PanoramicDataWin8.view.vis.render
                 (yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
             }
 
+            if (!overElement)
+            {
+                return;
+            }
+
             QueryModel qModel = (DataContext as VisualizationViewModel).QueryModel;
 
             // if both are empty before hand add default value

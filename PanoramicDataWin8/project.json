@@ -1,0 +1,27 @@
+﻿{
+  "dependencies": {
+    "GeoAPI": "1.7.4",
+    "MathNet.Numerics": "3.10.0",
+    "Microsoft.ApplicationInsights": "1.0.0",
+    "Microsoft.ApplicationInsights.PersistenceChannel": "1.0.0",
+    "Microsoft.ApplicationInsights.WindowsApps": "1.0.0",
+    "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
+    "NetTopologySuite": "1.14.0",
+    "Newtonsoft.Json": "8.0.2",
+    "Prism.Mvvm": "1.1.1",
+    "Rx-Main": "2.2.5",
+    "Win2D.uwp": "1.14.0",
+    "WinRTXamlToolkit.UWP": "1.9.4"
+  },
+  "frameworks": {
+    "uap10.0": {}
+  },
+  "runtimes": {
+    "win10-arm": {},
+    "win10-arm-aot": {},
+    "win10-x86": {},
+    "win10-x86-aot": {},
+    "win10-x64": {},
+    "win10-x64-aot": {}
+  }
+}

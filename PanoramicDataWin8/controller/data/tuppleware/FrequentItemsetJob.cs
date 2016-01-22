@@ -15,7 +15,6 @@ using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.utils;
-using SharpDX.WIC;
 
 namespace PanoramicDataWin8.controller.data.tuppleware
 {

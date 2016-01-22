@@ -1,44 +1,29 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{978BC51D-FF87-4A49-93CC-E9C70AE6F5A8}</ProjectGuid>
     <OutputType>AppContainerExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>PanoramicDataWin8</RootNamespace>
     <AssemblyName>PanoramicDataWin8</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <TargetPlatformVersion>8.1</TargetPlatformVersion>
-    <MinimumVisualStudioVersion>12</MinimumVisualStudioVersion>
+    <TargetPlatformVersion>10.0.10586.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
+    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
+    <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
-    <ProjectTypeGuids>{BC8A1FFA-BEE3-4634-8014-F334798102B3};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <EnableDotNetNativeCompatibleProfile>True</EnableDotNetNativeCompatibleProfile>
+    <UapDefaultAssetScale>100</UapDefaultAssetScale>
+    <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <PackageCertificateKeyFile>PanoramicDataWin8_TemporaryKey.pfx</PackageCertificateKeyFile>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <NuGetPackageImportStamp>4aa295fa</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>neutral</AppxBundlePlatforms>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE;NETFX_CORE;WINDOWS_APP</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NETFX_CORE;WINDOWS_APP</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -61,6 +46,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -83,6 +69,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
     <DebugSymbols>true</DebugSymbols>
@@ -105,6 +92,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
+    <UseDotNetNativeToolchain>true</UseDotNetNativeToolchain>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -306,6 +294,8 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="project.json" />
+    <Content Include="Assets\BadgeLogo.scale-400.png" />
     <Content Include="Assets\data\config\test_large.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -327,11 +317,21 @@
     <Content Include="Assets\data\raw\Titanic.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Assets\font\Lato-Light.ttf" />
-    <Content Include="Assets\font\Lato-Regular.ttf" />
-    <Content Include="Assets\font\Lato-Bold.ttf" />
-    <Content Include="Assets\font\Lato-Thin.ttf" />
-    <Content Include="Assets\font\Abel-Regular.ttf" />
+    <Content Include="Assets\font\Lato-Light.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\font\Lato-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\font\Lato-Bold.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\font\Lato-Thin.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Assets\font\Abel-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Assets\data\raw\census.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -366,6 +366,17 @@
     <None Include="pano_data_win8_key.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\img\logo310x310.scale-100.png" />
+    <Content Include="Assets\img\logo310x310.scale-200.png" />
+    <Content Include="Assets\Square150x150Logo.scale-100.png" />
+    <Content Include="Assets\Square44x44Logo.scale-125.png" />
+    <Content Include="Assets\Square44x44Logo.scale-200.png" />
+    <Content Include="Assets\Square71x71Logo.scale-100.png" />
+    <Content Include="Assets\StoreLogo.scale-100.png" />
+    <Content Include="Assets\StoreLogo.scale-200.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-100.png" />
+    <Content Include="Assets\Wide310x150Logo.scale-400.png" />
+    <Content Include="Properties\default.rd.xml" />
     <Content Include="Assets\img\BadgeLogo.scale-100.png" />
     <Content Include="Assets\img\logo.png" />
     <Content Include="Assets\img\logo1000x100.scale-100.png" />
@@ -483,67 +494,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="GeoAPI">
-      <HintPath>..\packages\GeoAPI.1.7.3.1\lib\portable-net403+sl5+win8+wp8+MonoAndroid+MonoTouch\GeoAPI.dll</HintPath>
-    </Reference>
-    <Reference Include="GeoAPI.Bootstrapper.NetTopologySuite">
-      <HintPath>..\packages\NetTopologySuite.1.13.3.2\lib\portable-net403+sl5+netcore45+wp8+MonoAndroid1+MonoTouch1\GeoAPI.Bootstrapper.NetTopologySuite.dll</HintPath>
-    </Reference>
-    <Reference Include="MathNet.Numerics">
-      <HintPath>..\packages\MathNet.Numerics.3.5.0\lib\portable-net45+netcore45+MonoAndroid1+MonoTouch1\MathNet.Numerics.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Mvvm">
-      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\windows8\Microsoft.Practices.Prism.Mvvm.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.Mvvm.Store">
-      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\windows8\Microsoft.Practices.Prism.Mvvm.Store.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Practices.Prism.SharedInterfaces">
-      <HintPath>..\packages\Prism.Mvvm.1.1.1\lib\windows8\Microsoft.Practices.Prism.SharedInterfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="NetTopologySuite">
-      <HintPath>..\packages\NetTopologySuite.1.13.3.2\lib\portable-net403+sl5+netcore45+wp8+MonoAndroid1+MonoTouch1\NetTopologySuite.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.8\lib\netcore45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="PowerCollections">
-      <HintPath>..\packages\NetTopologySuite.1.13.3.2\lib\portable-net403+sl5+netcore45+wp8+MonoAndroid1+MonoTouch1\PowerCollections.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(SharpDXPackageBinDir)\SharpDX.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Direct2D1, Version=2.6.3.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL" />
-    <Reference Include="SharpDX.Direct3D11">
-      <HintPath>$(SharpDXPackageBinDir)\SharpDX.Direct3D11.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.DXGI">
-      <HintPath>$(SharpDXPackageBinDir)\SharpDX.DXGI.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Toolkit">
-      <HintPath>$(SharpDXPackageBinDir)\SharpDX.Toolkit.dll</HintPath>
-    </Reference>
-    <Reference Include="SharpDX.Toolkit.Graphics">
-      <HintPath>$(SharpDXPackageBinDir)\SharpDX.Toolkit.Graphics.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Core">
-      <HintPath>..\packages\Rx-Core.2.2.5\lib\windows8\System.Reactive.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Interfaces">
-      <HintPath>..\packages\Rx-Interfaces.2.2.5\lib\windows8\System.Reactive.Interfaces.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.Linq">
-      <HintPath>..\packages\Rx-Linq.2.2.5\lib\windows8\System.Reactive.Linq.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Reactive.PlatformServices">
-      <HintPath>..\packages\Rx-PlatformServices.2.2.5\lib\windows8\System.Reactive.PlatformServices.dll</HintPath>
-    </Reference>
-    <Reference Include="WinRTXamlToolkit">
-      <HintPath>..\packages\WinRTXamlToolkit.Windows.1.8.1.0\lib\netcore451\WinRTXamlToolkit.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
     <SDKReference Include="BehaviorsXamlSDKManaged, Version=12.0">
       <Name>Behaviors SDK %28XAML%29</Name>
     </SDKReference>
@@ -551,8 +501,8 @@
       <Name>Microsoft Visual C++ 2013 Runtime Package for Windows</Name>
     </SDKReference>
   </ItemGroup>
-  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '12.0' ">
-    <VisualStudioVersion>12.0</VisualStudioVersion>
+  <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
+    <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
@@ -567,12 +517,8 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
-    <Error Condition="!Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SharpDX.2.6.3\build\SharpDX.targets'))" />
-    <Error Condition="!Exists('..\packages\SharpDX.Toolkit.2.6.3\build\SharpDX.Toolkit.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\SharpDX.Toolkit.2.6.3\build\SharpDX.Toolkit.targets'))" />
     <Error Condition="!Exists('..\packages\Esri.ArcGISRuntime.10.2.6.1026\build\win81\Esri.ArcGISRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Esri.ArcGISRuntime.10.2.6.1026\build\win81\Esri.ArcGISRuntime.targets'))" />
   </Target>
-  <Import Project="..\packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('..\packages\SharpDX.2.6.3\build\SharpDX.targets')" />
-  <Import Project="..\packages\SharpDX.Toolkit.2.6.3\build\SharpDX.Toolkit.targets" Condition="Exists('..\packages\SharpDX.Toolkit.2.6.3\build\SharpDX.Toolkit.targets')" />
   <Import Project="..\packages\Esri.ArcGISRuntime.10.2.6.1026\build\win81\Esri.ArcGISRuntime.targets" Condition="Exists('..\packages\Esri.ArcGISRuntime.10.2.6.1026\build\win81\Esri.ArcGISRuntime.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

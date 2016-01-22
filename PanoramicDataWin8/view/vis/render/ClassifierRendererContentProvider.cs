@@ -1,8 +1,6 @@
 ﻿using NetTopologySuite.Geometries;
 using PanoramicDataWin8.controller.data.sim;
 using PanoramicDataWin8.view.common;
-using SharpDX;
-using SharpDX.Toolkit.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,8 +8,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Graphics.Display;
-using D2D = SharpDX.Direct2D1;
-using DW = SharpDX.DirectWrite;
 using PanoramicDataWin8.utils;
 using GeoAPI.Geometries;
 using PanoramicDataWin8.controller.view;
@@ -19,7 +15,11 @@ using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
-using WinRTXamlToolkit.Controls.Extensions;
+using System.Numerics;
+using Windows.Foundation;
+using Windows.UI;
+using Microsoft.Graphics.Canvas.Geometry;
+using Microsoft.Graphics.Canvas.Text;
 
 namespace PanoramicDataWin8.view.vis.render
 {
@@ -40,9 +40,9 @@ namespace PanoramicDataWin8.view.vis.render
         private float _maxX = 0;
         private float _maxY = 0;
 
-        private D2D.Brush _textBrush;
-        private DW.TextFormat _textFormat;
-        private DW.TextFormat _textFormatBig;
+        private Color _textColor;
+        private CanvasTextFormat _textFormat;
+        private CanvasTextFormat _textFormatBig;
         
         private ResultModel _resultModel = null;
         private ClassfierResultDescriptionModel _classfierResultDescriptionModel = null;
@@ -74,20 +74,13 @@ namespace PanoramicDataWin8.view.vis.render
             _classfierResultDescriptionModel = _resultModel.ResultDescriptionModel as ClassfierResultDescriptionModel;
         }
 
-        public override void Clear(GraphicsDevice graphicsDevice)
+        public override void Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
         {
-            graphicsDevice.Clear(new Color(230, 230, 230));
-        }
-
-        public override void Draw(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory)
-        {
-            var mat = Matrix3x2.Identity;
-            mat.ScaleVector = new Vector2(CompositionScaleX, CompositionScaleY);
-            d2dDeviceContext.Transform = mat;
-            var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 0f, 0f, 1f));
+            var mat = Matrix3x2.CreateScale(new Vector2(CompositionScaleX, CompositionScaleY));
+            canvasArgs.DrawingSession.Transform = mat;
             if (_resultModel != null && _classfierResultDescriptionModel != null)
             {
-                computeSizes(d2dDeviceContext, dwFactory);
+                computeSizes(canvas, canvasArgs);
 
                 if (_deviceHeight < 0 || _deviceWidth < 0)
                 {
@@ -97,7 +90,7 @@ namespace PanoramicDataWin8.view.vis.render
                 var centerY =  _deviceHeight/2.0f + _topOffset;
 
                 string label = _labelIndex != -1 ? _classfierResultDescriptionModel.Labels[_labelIndex].Name : "avg across labels";
-                drawString(d2dDeviceContext, dwFactory, _textFormatBig, centerX, _topOffset, label, false, true, false);
+                DrawString(canvasArgs, _textFormatBig, centerX, _topOffset, label, _textColor, false, true, false);
 
                 var w = (_deviceWidth - 20)/3.0f;
                 var h = Math.Max(0, _deviceHeight/2.0f - 50);
@@ -109,7 +102,7 @@ namespace PanoramicDataWin8.view.vis.render
                     h = Math.Max(0, _deviceHeight - 50);
                 }
 
-                renderGauge(d2dDeviceContext, dwFactory,
+                renderGauge(canvas, canvasArgs,
                     _leftOffset,
                     yOff,
                     w,
@@ -117,7 +110,7 @@ namespace PanoramicDataWin8.view.vis.render
                     _labelIndex != -1 ? (float)_classfierResultDescriptionModel.Precisions[_classfierResultDescriptionModel.Labels[_labelIndex]] :(float) _classfierResultDescriptionModel.AvgPrecision, 
                     "precision");
 
-                renderGauge(d2dDeviceContext, dwFactory,
+                renderGauge(canvas, canvasArgs,
                    _leftOffset + w + 10,
                    yOff,
                    w,
@@ -125,7 +118,7 @@ namespace PanoramicDataWin8.view.vis.render
                    _labelIndex != -1 ? (float)_classfierResultDescriptionModel.Recalls[_classfierResultDescriptionModel.Labels[_labelIndex]] :(float) _classfierResultDescriptionModel.AvRecall, 
                    "recall");
 
-                renderGauge(d2dDeviceContext, dwFactory,
+                renderGauge(canvas, canvasArgs,
                    _leftOffset + (w + 10)  * 2,
                    yOff,
                    w,
@@ -135,95 +128,84 @@ namespace PanoramicDataWin8.view.vis.render
 
                 if (_deviceHeight > 200 && _deviceWidth > 180 && _labelIndex != -1)
                 {
-                    renderConfusionMatrix(d2dDeviceContext, dwFactory,
+                    renderConfusionMatrix(canvas, canvasArgs,
                         _leftOffset, centerY, _deviceWidth/2.0f - 10, _deviceHeight/2.0f);
-                    renderRoc(d2dDeviceContext, dwFactory,
+                    renderRoc(canvas, canvasArgs,
                         centerX + 10, centerY, _deviceWidth/2.0f - 10, _deviceHeight/2.0f);
                 }
             };
         }
 
-        private void renderGauge(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory,
+        private void renderGauge(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs,
             float xStart, float yStart, float width, float height, float value, string name)
         {
             value = (float) Math.Min(0.9999, Math.Max(0.0, value));
-            var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
-            var blue = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(41f / 255f, 170f / 255f, 213f / 255f, 255f / 255f));
-
-            var roundedRect = new D2D.RoundedRectangle();
-
-            var rect = new RectangleF(xStart,
+            var white = Color.FromArgb(255, 255, 255, 255);
+            var blue = Color.FromArgb(255, 41, 170, 213); 
+            
+            var rect = new Rect(xStart,
                 yStart,
                 width,
                 height);
             //d2dDeviceContext.DrawRectangle(rect, white);
                   height -= 25;
             var radius = Math.Min(width / 2.0f, height / 2.0f) - 4;
-            drawString(d2dDeviceContext, dwFactory, _textFormat, width / 2.0f + xStart, (height / 2.0f) + radius+ yStart + 10, name, false, true, false);
+            DrawString(canvasArgs, _textFormat, width / 2.0f + xStart, (height / 2.0f) + radius+ yStart + 10, name, _textColor, false, true, false);
             
             if (width > 0 && height > 0 && radius > 15)
             {
-                D2D.Ellipse ell = new D2D.Ellipse(new Vector2(
+                canvasArgs.DrawingSession.DrawEllipse(new Vector2(
                     (width / 2.0f) + xStart,
-                    (height / 2.0f) + yStart), radius, radius);
-                d2dDeviceContext.DrawEllipse(ell, white, 4);
+                    (height / 2.0f) + yStart), radius, radius, white, 4);
 
                 var thickness = 4.0f;
 
                 float angle = 2.0f * (float)Math.PI * value - (float) Math.PI / 2.0f;
+                float x = (width / 2.0f) + xStart;
+                float y = (height / 2.0f) + yStart;
 
-                D2D.PathGeometry geom = new D2D.PathGeometry(d2dDeviceContext.Factory);
-                using (var sink = geom.Open())
-                {
-                    sink.BeginFigure(new Vector2((width/2.0f) + xStart, (height/2.0f) + yStart - (radius)), D2D.FigureBegin.Hollow);
-                    var arc = new D2D.ArcSegment();
-                    arc.ArcSize = value > 0.5 ? D2D.ArcSize.Large : D2D.ArcSize.Small;
-                    float x = (width/2.0f) + xStart;
-                    float y = (height/2.0f) + yStart;
-                    arc.Point = new Vector2(
-                        (float) Math.Cos(angle)*(radius) + x,
-                        (float) Math.Sin(angle)*(radius) + y);
-                    arc.SweepDirection = D2D.SweepDirection.Clockwise;
-                    arc.Size = new Size2F((radius), (radius));
-                    sink.AddArc(arc);
-                    sink.EndFigure(D2D.FigureEnd.Open);
-                    sink.Close();
-                }
-                d2dDeviceContext.DrawGeometry(geom, blue, 4);
+                CanvasPathBuilder pathBuilder = new CanvasPathBuilder(canvas);
+                pathBuilder.BeginFigure(new Vector2((width / 2.0f) + xStart, (height / 2.0f) + yStart - (radius)), CanvasFigureFill.DoesNotAffectFills);
+                pathBuilder.AddArc(new Vector2(
+                    (float) Math.Cos(angle)*(radius) + x,
+                    (float) Math.Sin(angle)*(radius) + y), radius, radius, 0, CanvasSweepDirection.Clockwise, value > 0.5 ? CanvasArcSize.Large : CanvasArcSize.Small);
+                pathBuilder.EndFigure(CanvasFigureLoop.Open);
+
+                CanvasGeometry pathGeometry = CanvasGeometry.CreatePath(pathBuilder);
+                canvasArgs.DrawingSession.DrawGeometry(pathGeometry, blue, 4);
+
+                pathBuilder.Dispose();
             }
-            drawString(d2dDeviceContext, dwFactory, _textFormat,
+            DrawString(canvasArgs, _textFormat,
                  (width / 2.0f) + xStart,
                  (height / 2.0f) + yStart,
-                 (value * 100.0).ToString("F1") + "%", false, true, true);
-            blue.Dispose();
-            white.Dispose();
+                 (value * 100.0).ToString("F1") + "%", _textColor, false, true, true);
         }
 
 
-        private void renderConfusionMatrix(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory,
+        private void renderConfusionMatrix(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs,
             float xStart, float yStart, float width, float height)
         {
            // width -= 20;
             height -= 20;
-            var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
-            var roundedRect = new D2D.RoundedRectangle();
+            var white = Color.FromArgb(255, 255, 255, 255);
             
-            var rect = new RectangleF(xStart,
+            var rect = new Rect(xStart,
                        yStart,
                        width,
                        height);
             //d2dDeviceContext.DrawRectangle(rect, white);
 
-            drawString(d2dDeviceContext, dwFactory, _textFormatBig, xStart + width / 2.0f + 20, yStart, "confusion matrix", false, true, false);
+            DrawString(canvasArgs, _textFormatBig, xStart + width / 2.0f + 20, yStart, "confusion matrix", _textColor, false, true, false);
 
             yStart += 20;
-            drawString(d2dDeviceContext, dwFactory, _textFormat, xStart + width / 2.0f + 20, yStart, "predicted", false, true, false);
+            DrawString(canvasArgs, _textFormat, xStart + width / 2.0f + 20, yStart, "predicted", _textColor, false, true, false);
 
-            var oldTransform = d2dDeviceContext.Transform;
-            var mat = Matrix3x2.Rotation((-90f * (float)Math.PI) / 180.0f, new Vector2(xStart, yStart + height / 2.0f + 10f));
-            d2dDeviceContext.Transform = mat * oldTransform;
-            drawString(d2dDeviceContext, dwFactory, _textFormat, xStart, yStart + height / 2.0f + 10, "actual", false, true, false);
-            d2dDeviceContext.Transform = oldTransform;
+            var oldTransform = canvasArgs.DrawingSession.Transform;
+            var mat = Matrix3x2.CreateRotation((-90f * (float)Math.PI) / 180.0f, new Vector2(xStart, yStart + height / 2.0f + 10f));
+            canvasArgs.DrawingSession.Transform = mat * oldTransform;
+            DrawString(canvasArgs, _textFormat, xStart, yStart + height / 2.0f + 10, "actual", _textColor, false, true, false);
+            canvasArgs.DrawingSession.Transform = oldTransform;
 
             var xOff = xStart + 40;
             var yOff = yStart + 40;
@@ -232,8 +214,8 @@ namespace PanoramicDataWin8.view.vis.render
 
             for (int r = 0; r < _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]].Count; r++)
             {
-                drawString(d2dDeviceContext, dwFactory, _textFormat, xOff + w / 2.0f + (r * w), yOff - 20, (1 - r) + "", false, true, false);
-                drawString(d2dDeviceContext, dwFactory, _textFormat, xOff - 10, yOff + h / 2.0f + (r * h), (1 - r) + "", false, true, true);
+                DrawString(canvasArgs, _textFormat, xOff + w / 2.0f + (r * w), yOff - 20, (1 - r) + "", _textColor, false, true, false);
+                DrawString(canvasArgs, _textFormat, xOff - 10, yOff + h / 2.0f + (r * h), (1 - r) + "", _textColor, false, true, true);
 
                 var row = _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]][r];
                 var total = _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]].SelectMany(t => t).Sum();
@@ -244,36 +226,33 @@ namespace PanoramicDataWin8.view.vis.render
                     var yFrom = ((float)r * h + yOff);
                     var xFrom = (float)c * w + xOff;
                     
-                    roundedRect.Rect = new RectangleF(
+                    var roundedRect = new Rect(
                         xFrom,
                         yFrom,
                         w,
                         h);
-                    roundedRect.RadiusX = roundedRect.RadiusY = 4;
 
                     if (value > 0)
                     {
                         var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float) (value));
-                        var binColor = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(lerpColor.R/255f, lerpColor.G/255f, lerpColor.B/255f, 1f));
+                        var binColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
 
-                        d2dDeviceContext.FillRoundedRectangle(roundedRect, binColor);
-                        binColor.Dispose();
+                        canvasArgs.DrawingSession.FillRoundedRectangle(roundedRect, 4, 4, binColor);
                     }
-                    drawString(d2dDeviceContext, dwFactory, _textFormat, xFrom + w / 2.0f, yFrom + h / 2.0f, row[c].ToString("N0"), false, true, true);
+                    DrawString(canvasArgs, _textFormat, xFrom + w / 2.0f, yFrom + h / 2.0f, row[c].ToString("N0"), _textColor, false, true, true);
 
-                    d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
+                    canvasArgs.DrawingSession.DrawRoundedRectangle(roundedRect, 4, 4, white, 0.5f);
                 }
             }
-            white.Dispose();
         }
 
-        private void renderRoc(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory,
+        private void renderRoc(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs,
             float xStart, float yStart, float width, float height)
         {
-            var white = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(1f, 1f, 1f, 1f));
-            var blue = new D2D.SolidColorBrush(d2dDeviceContext, new Color4(41f / 255f, 170f / 255f, 213f / 255f, 255f / 255f));
+            var white = Color.FromArgb(255, 255, 255, 255);
+            var blue = Color.FromArgb(255, 41, 170, 213);
 
-            drawString(d2dDeviceContext, dwFactory, _textFormatBig, xStart + width / 2.0f + 5, yStart, "roc curve", false, true, false);
+            DrawString(canvasArgs, _textFormatBig, xStart + width / 2.0f + 5, yStart, "roc curve", _textColor, false, true, false);
 
             yStart += 60;
 
@@ -281,26 +260,26 @@ namespace PanoramicDataWin8.view.vis.render
             float yOff = yStart;
             float h = (height - 80f);
             float w = (width - 20f);
-            drawString(d2dDeviceContext, dwFactory, _textFormat, xOff + w / 2.0f, yStart + h + 5, "fpr", false, true, false);
+            DrawString(canvasArgs, _textFormat, xOff + w / 2.0f, yStart + h + 5, "fpr", _textColor, false, true, false);
 
-            var oldTransform = d2dDeviceContext.Transform;
-            var mat = Matrix3x2.Rotation((-90f * (float)Math.PI) / 180.0f, new Vector2(xStart + 5, yStart + h / 2.0f));
-            d2dDeviceContext.Transform = mat * oldTransform;
-            drawString(d2dDeviceContext, dwFactory, _textFormat, xStart + 5, yStart + h / 2.0f, "tpr", false, true, false);
-            d2dDeviceContext.Transform = oldTransform;
+            var oldTransform = canvasArgs.DrawingSession.Transform;
+            var mat = Matrix3x2.CreateRotation((-90f * (float)Math.PI) / 180.0f, new Vector2(xStart + 5, yStart + h / 2.0f));
+            canvasArgs.DrawingSession.Transform = mat * oldTransform;
+            DrawString(canvasArgs, _textFormat, xStart + 5, yStart + h / 2.0f, "tpr", _textColor, false, true, false);
+            canvasArgs.DrawingSession.Transform = oldTransform;
 
 
-            var rect = new RectangleF(xOff,
+            var rect = new Rect(xOff,
                         yOff,
                         w,
                         h);
-            d2dDeviceContext.DrawRectangle(rect, white);
-            d2dDeviceContext.DrawLine(new Vector2(xOff, yOff + h), new Vector2(xOff + w, yOff), white, 0.5f);
+            canvasArgs.DrawingSession.DrawRectangle(rect, white);
+            canvasArgs.DrawingSession.DrawLine(new Vector2(xOff, yOff + h), new Vector2(xOff + w, yOff), white, 0.5f);
 
             Pt last = new Pt(0,0);
             foreach (var pt in _classfierResultDescriptionModel.RocCurves[_classfierResultDescriptionModel.Labels[_labelIndex]])
             {
-                d2dDeviceContext.DrawLine(
+                canvasArgs.DrawingSession.DrawLine(
                     new Vector2(
                         (float) (last.X*w + xOff),
                         (float) ((1.0 - last.Y) * h + yOff)), 
@@ -311,39 +290,13 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             var auc = _classfierResultDescriptionModel.AUCs[_classfierResultDescriptionModel.Labels[_labelIndex]];
-            drawString(d2dDeviceContext, dwFactory, _textFormat, xOff + w - 4, yOff + h - 15, "auc: " + auc.ToString("F2"), false, false, false);
-            
-            blue.Dispose();
-            white.Dispose();
+            DrawString(canvasArgs, _textFormat, xOff + w - 4, yOff + h - 15, "auc: " + auc.ToString("F2"), _textColor, false, false, false);
         }
 
-        private void drawString(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory, DW.TextFormat textFormat, float x, float y, string text,
-            bool leftAligned,
-            bool horizontallyCentered, bool verticallyCentered)
+        private void computeSizes(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
         {
-            var layout = new DW.TextLayout(dwFactory, text, textFormat, 1000f, 1000f);
-            var metrics = layout.Metrics;
-
-            if (horizontallyCentered)
-            {
-                x += metrics.Width / 2.0f;
-            }
-            if (verticallyCentered)
-            {
-                y -= metrics.Height / 2.0f;
-            }
-            if (!leftAligned)
-            {
-                x -= metrics.Width;
-            }
-
-            d2dDeviceContext.DrawTextLayout(new Vector2(x, y), layout, _textBrush);
-        }
-
-        private void computeSizes(D2D.DeviceContext1 d2dDeviceContext, DW.Factory1 dwFactory)
-        {
-            _deviceWidth = (float)(d2dDeviceContext.Size.Width / CompositionScaleX - _leftOffset - _rightOffset);
-            _deviceHeight = (float)(d2dDeviceContext.Size.Height / CompositionScaleY - _topOffset - _bottomtOffset);
+            _deviceWidth = (float)(canvas.ActualWidth / CompositionScaleX - _leftOffset - _rightOffset);
+            _deviceHeight = (float)(canvas.ActualHeight / CompositionScaleY - _topOffset - _bottomtOffset);
 
             _minX = (float) 0;
             _minY = (float) 0;
@@ -354,17 +307,21 @@ namespace PanoramicDataWin8.view.vis.render
             _yScale = _maxY - _minY;
         }
 
-        public override void Load(D2D.DeviceContext1 d2dDeviceContext, DisposeCollector disposeCollector, DW.Factory1 dwFactory)
+        public override void Load(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs canvasArgs)
         {
-            // reusable structure representing a text font with size and style
-            _textFormat = disposeCollector.Collect(new DW.TextFormat(dwFactory, "Abel", SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, 11f));
-            _textFormatBig = disposeCollector.Collect(new DW.TextFormat(dwFactory, "Abel", SharpDX.DirectWrite.FontWeight.Normal, SharpDX.DirectWrite.FontStyle.Normal, 16f));
+            _textFormat = new CanvasTextFormat()
+            {
+                FontSize = 11,
+                FontFamily = "/Assets/font/Abel-Regular.ttf#Abel"
+            };
 
-            // reusable brush structure
-            _textBrush = disposeCollector.Collect(new D2D.SolidColorBrush(d2dDeviceContext, new Color(17, 17, 17)));
-
-            // prebaked text - useful for constant labels as it greatly improves performance
-            //_textLayout = disposeCollector.Collect(new DW.TextLayout(dwFactory, "Demo DirectWrite text here.", _textFormat, 100f, 100f));
+            _textFormatBig = new CanvasTextFormat()
+            {
+                FontSize = 16,
+                FontFamily = "/Assets/font/Abel-Regular.ttf#Abel"
+            };
+            
+            _textColor = Color.FromArgb(255, 17, 17, 17);
         }
     }
 }

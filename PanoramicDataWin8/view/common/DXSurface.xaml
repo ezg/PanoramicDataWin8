@@ -5,11 +5,15 @@
     xmlns:local="using:PanoramicDataWin8.view.common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
     mc:Ignorable="d"
+    Unloaded="UserControl_Unloaded"
     d:DesignHeight="300"
     d:DesignWidth="400">
 
     <Grid>
-        <SwapChainPanel Name="swapChainPanel"/>
+        <canvas:CanvasControl x:Name="canvasControl" ClearColor="#E6E6E6" 
+                              Draw="canvasControl_Draw"
+                              CreateResources="canvasControl_CreateResources"/>
     </Grid>
 </UserControl>
