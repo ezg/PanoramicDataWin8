@@ -87,10 +87,11 @@ namespace PanoramicDataWin8.view.common
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            this.canvasControl.RemoveFromVisualTree();
-            this.canvasControl = null;
-
-            //clear color 230, 230, 230
+            if (canvasControl != null)
+            {
+                this.canvasControl.RemoveFromVisualTree();
+                this.canvasControl = null;
+            }
         }
     }
 
