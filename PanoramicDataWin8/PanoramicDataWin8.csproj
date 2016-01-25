@@ -362,7 +362,6 @@
     <Content Include="Assets\data\main.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="packages.config" />
     <None Include="pano_data_win8_key.pfx" />
   </ItemGroup>
   <ItemGroup>
