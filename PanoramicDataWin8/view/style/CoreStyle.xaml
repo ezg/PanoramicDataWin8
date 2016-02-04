@@ -13,7 +13,7 @@
     <Color x:Key="highlightColor">#29aad5</Color>
     <Color x:Key="backgroundColor">#ffffff</Color>
 
-    <FontFamily x:Key="abel">/Assets/font/Abel-Regular#Abel</FontFamily>
+    <FontFamily x:Key="abel">Assets/font/Abel-Regular.ttf#Abel</FontFamily>
 
     <Style x:Key="FlyoutPresenterStyle1" TargetType="FlyoutPresenter">
         <Setter Property="RequestedTheme" Value="Light"/>
