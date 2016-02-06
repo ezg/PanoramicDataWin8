@@ -99,7 +99,13 @@ namespace PanoramicDataWin8.controller.view
                     var showCodeGen = bool.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
                         .First(l => l.ToLower().StartsWith("showcodegen"))
                         .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
+
+                    var renderShadingIn1DHistograms = bool.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                        .First(l => l.ToLower().StartsWith("rendershadingin1dhistograms"))
+                        .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
+
                     MainModel.ShowCodeGen = showCodeGen;
+                    MainModel.RenderShadingIn1DHistograms = renderShadingIn1DHistograms;
 
                     CatalogCommand catalogCommand = new CatalogCommand();
                     var loadedDatasetConfigs = await catalogCommand.GetCatalog(backend);

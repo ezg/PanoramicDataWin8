@@ -12,10 +12,10 @@
                 <ResourceDictionary>
                     <ResourceDictionary.ThemeDictionaries>
                         <ResourceDictionary x:Key="Default">
-                            <FontFamily x:Key="ContentControlThemeFontFamily">/Assets/font/Abel-Regular#Abel</FontFamily>
+                            <FontFamily x:Key="ContentControlThemeFontFamily">Assets/font/Abel-Regular.ttf#Abel</FontFamily>
                         </ResourceDictionary>
                         <ResourceDictionary x:Key="HighContrast">
-                            <FontFamily x:Key="ContentControlThemeFontFamily">/Assets/font/Abel-Regular#Abel</FontFamily>
+                            <FontFamily x:Key="ContentControlThemeFontFamily">Assets/font/Abel-Regular.ttf#Abel</FontFamily>
                         </ResourceDictionary>
                     </ResourceDictionary.ThemeDictionaries>
                 </ResourceDictionary>

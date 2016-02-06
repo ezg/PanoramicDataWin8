@@ -412,7 +412,8 @@ namespace PanoramicDataWin8.view.vis.render
 
 
                                 float alpha = 0.1f * (float)Math.Log10(value.Value) + 1f;
-                                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value.Value));
+                                var baseColor = Windows.UI.Color.FromArgb(255, 40, 170, 213);
+                                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), baseColor, (float)Math.Sqrt(value.Value));
                                 var binColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
 
                                 rect = new Rect(
@@ -432,7 +433,14 @@ namespace PanoramicDataWin8.view.vis.render
                                 }
                                 else
                                 {
-                                    canvasArgs.DrawingSession.FillRoundedRectangle(rect, 4, 4, binColor);
+                                    if (MainViewController.Instance.MainModel.RenderShadingIn1DHistograms)
+                                    {
+                                        canvasArgs.DrawingSession.FillRoundedRectangle(rect, 4, 4, binColor);
+                                    }
+                                    else
+                                    {
+                                        canvasArgs.DrawingSession.FillRoundedRectangle(rect, 4, 4, baseColor);
+                                    }
                                 }
 
                                 if (_isXAxisAggregated || _isYAxisAggregated)

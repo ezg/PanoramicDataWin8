@@ -44,8 +44,11 @@ namespace PanoramicDataWin8.view.common
 
         public void Dispose()
         {
-            this.canvasControl.RemoveFromVisualTree();
-            this.canvasControl = null;
+            if (this.canvasControl != null)
+            {
+                this.canvasControl.RemoveFromVisualTree();
+                this.canvasControl = null;
+            }
         }
 
         public void Redraw()
