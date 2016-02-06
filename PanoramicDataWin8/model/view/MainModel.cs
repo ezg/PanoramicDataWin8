@@ -160,6 +160,19 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private bool _renderShadingIn1DHistograms = false;
+        public bool RenderShadingIn1DHistograms
+        {
+            get
+            {
+                return _renderShadingIn1DHistograms;
+            }
+            set
+            {
+                this.SetProperty(ref _renderShadingIn1DHistograms, value);
+            }
+        }
+
         private GraphRenderOptions _graphRenderOption = GraphRenderOptions.Cell;
         public GraphRenderOptions GraphRenderOption
         {
