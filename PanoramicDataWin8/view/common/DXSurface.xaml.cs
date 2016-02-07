@@ -53,7 +53,10 @@ namespace PanoramicDataWin8.view.common
 
         public void Redraw()
         {
-            canvasControl.Invalidate();
+            if (this.canvasControl != null)
+            {
+                canvasControl.Invalidate();
+            }
         }
 
         public float CompositionScaleX

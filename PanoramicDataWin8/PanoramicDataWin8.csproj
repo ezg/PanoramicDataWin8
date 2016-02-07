@@ -24,6 +24,7 @@
     <NuGetPackageImportStamp>4aa295fa</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
     <AppxBundlePlatforms>neutral</AppxBundlePlatforms>
+    <PackageCertificateThumbprint>B654F35035F6C3A9FDCC3B3E136D9C5F59705753</PackageCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -294,6 +295,7 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <None Include="PanoramicDataWin8_TemporaryKey.pfx" />
     <None Include="project.json" />
     <Content Include="Assets\BadgeLogo.scale-400.png" />
     <Content Include="Assets\data\config\test_large.ini">
@@ -504,7 +506,7 @@
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>pano_data_win8_key.pfx</AssemblyOriginatorKeyFile>
