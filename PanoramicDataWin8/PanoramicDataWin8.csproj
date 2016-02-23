@@ -295,7 +295,6 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
-    <None Include="PanoramicDataWin8_TemporaryKey.pfx" />
     <None Include="project.json" />
     <Content Include="Assets\BadgeLogo.scale-400.png" />
     <Content Include="Assets\data\config\test_large.ini">
@@ -364,7 +363,6 @@
     <Content Include="Assets\data\main.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="pano_data_win8_key.pfx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\img\logo310x310.scale-100.png" />
@@ -509,7 +507,8 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>pano_data_win8_key.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
