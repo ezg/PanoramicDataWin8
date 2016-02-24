@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using Microsoft.ApplicationInsights;
 
 // The Blank Application template is documented at http://go.microsoft.com/fwlink/?LinkId=234227
 
@@ -30,8 +31,13 @@ namespace PanoramicDataWin8
         /// </summary>
         public App()
         {
+            WindowsAppInitializer.InitializeAsync();
+
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+
+            var tc = new TelemetryClient();
+            tc.TrackEvent("VizdomStarted");
         }
 
         /// <summary>

@@ -3,10 +3,10 @@
   "version": 1,
   "targets": {
     "UAP,Version=v10.0": {
-      "Esri.ArcGISRuntime/10.2.6.1026": {},
-      "Esri.ArcGISRuntime.Toolkit/10.2.6.1026": {
+      "Esri.ArcGISRuntime/10.2.7.1234": {},
+      "Esri.ArcGISRuntime.Toolkit/10.2.7.1234": {
         "dependencies": {
-          "Esri.ArcGISRuntime": "[10.2.6.1026, )"
+          "Esri.ArcGISRuntime": "[10.2.7.1234, )"
         }
       },
       "GeoAPI/1.7.4": {
@@ -17,7 +17,7 @@
           "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.dll": {}
         }
       },
-      "MathNet.Numerics/3.10.0": {
+      "MathNet.Numerics/3.11.0": {
         "frameworkAssemblies": [
           "System.Numerics"
         ],
@@ -28,7 +28,7 @@
           "lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1/MathNet.Numerics.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights/1.0.0": {
+      "Microsoft.ApplicationInsights/1.2.3": {
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         },
@@ -36,9 +36,9 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.PersistenceChannel/1.0.0": {
+      "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, )"
         },
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
@@ -47,10 +47,10 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.WindowsApps/1.0.0": {
+      "Microsoft.ApplicationInsights.WindowsApps/1.1.1": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )",
-          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, 1.2.3]",
+          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.2.3, 1.2.3]"
         },
         "compile": {
           "lib/win81/Microsoft.ApplicationInsights.Extensibility.Windows.dll": {}
@@ -1681,7 +1681,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Win2D.uwp/1.14.0": {
+      "Win2D.uwp/1.16.0": {
         "compile": {
           "lib/uap10.0/Microsoft.Graphics.Canvas.winmd": {}
         },
@@ -1699,10 +1699,10 @@
       }
     },
     "UAP,Version=v10.0/win10-arm": {
-      "Esri.ArcGISRuntime/10.2.6.1026": {},
-      "Esri.ArcGISRuntime.Toolkit/10.2.6.1026": {
+      "Esri.ArcGISRuntime/10.2.7.1234": {},
+      "Esri.ArcGISRuntime.Toolkit/10.2.7.1234": {
         "dependencies": {
-          "Esri.ArcGISRuntime": "[10.2.6.1026, )"
+          "Esri.ArcGISRuntime": "[10.2.7.1234, )"
         }
       },
       "GeoAPI/1.7.4": {
@@ -1713,7 +1713,7 @@
           "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.dll": {}
         }
       },
-      "MathNet.Numerics/3.10.0": {
+      "MathNet.Numerics/3.11.0": {
         "frameworkAssemblies": [
           "System.Numerics"
         ],
@@ -1724,7 +1724,7 @@
           "lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1/MathNet.Numerics.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights/1.0.0": {
+      "Microsoft.ApplicationInsights/1.2.3": {
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         },
@@ -1732,9 +1732,9 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.PersistenceChannel/1.0.0": {
+      "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, )"
         },
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
@@ -1743,10 +1743,10 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.WindowsApps/1.0.0": {
+      "Microsoft.ApplicationInsights.WindowsApps/1.1.1": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )",
-          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, 1.2.3]",
+          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.2.3, 1.2.3]"
         },
         "compile": {
           "lib/win81/Microsoft.ApplicationInsights.Extensibility.Windows.dll": {}
@@ -3467,7 +3467,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Win2D.uwp/1.14.0": {
+      "Win2D.uwp/1.16.0": {
         "compile": {
           "lib/uap10.0/Microsoft.Graphics.Canvas.winmd": {}
         },
@@ -3488,10 +3488,10 @@
       }
     },
     "UAP,Version=v10.0/win10-arm-aot": {
-      "Esri.ArcGISRuntime/10.2.6.1026": {},
-      "Esri.ArcGISRuntime.Toolkit/10.2.6.1026": {
+      "Esri.ArcGISRuntime/10.2.7.1234": {},
+      "Esri.ArcGISRuntime.Toolkit/10.2.7.1234": {
         "dependencies": {
-          "Esri.ArcGISRuntime": "[10.2.6.1026, )"
+          "Esri.ArcGISRuntime": "[10.2.7.1234, )"
         }
       },
       "GeoAPI/1.7.4": {
@@ -3502,7 +3502,7 @@
           "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.dll": {}
         }
       },
-      "MathNet.Numerics/3.10.0": {
+      "MathNet.Numerics/3.11.0": {
         "frameworkAssemblies": [
           "System.Numerics"
         ],
@@ -3513,7 +3513,7 @@
           "lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1/MathNet.Numerics.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights/1.0.0": {
+      "Microsoft.ApplicationInsights/1.2.3": {
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         },
@@ -3521,9 +3521,9 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.PersistenceChannel/1.0.0": {
+      "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, )"
         },
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
@@ -3532,10 +3532,10 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.WindowsApps/1.0.0": {
+      "Microsoft.ApplicationInsights.WindowsApps/1.1.1": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )",
-          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, 1.2.3]",
+          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.2.3, 1.2.3]"
         },
         "compile": {
           "lib/win81/Microsoft.ApplicationInsights.Extensibility.Windows.dll": {}
@@ -5228,7 +5228,7 @@
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Win2D.uwp/1.14.0": {
+      "Win2D.uwp/1.16.0": {
         "compile": {
           "lib/uap10.0/Microsoft.Graphics.Canvas.winmd": {}
         },
@@ -5249,10 +5249,10 @@
       }
     },
     "UAP,Version=v10.0/win10-x64": {
-      "Esri.ArcGISRuntime/10.2.6.1026": {},
-      "Esri.ArcGISRuntime.Toolkit/10.2.6.1026": {
+      "Esri.ArcGISRuntime/10.2.7.1234": {},
+      "Esri.ArcGISRuntime.Toolkit/10.2.7.1234": {
         "dependencies": {
-          "Esri.ArcGISRuntime": "[10.2.6.1026, )"
+          "Esri.ArcGISRuntime": "[10.2.7.1234, )"
         }
       },
       "GeoAPI/1.7.4": {
@@ -5263,7 +5263,7 @@
           "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.dll": {}
         }
       },
-      "MathNet.Numerics/3.10.0": {
+      "MathNet.Numerics/3.11.0": {
         "frameworkAssemblies": [
           "System.Numerics"
         ],
@@ -5274,7 +5274,7 @@
           "lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1/MathNet.Numerics.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights/1.0.0": {
+      "Microsoft.ApplicationInsights/1.2.3": {
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         },
@@ -5282,9 +5282,9 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.PersistenceChannel/1.0.0": {
+      "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, )"
         },
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
@@ -5293,10 +5293,10 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.WindowsApps/1.0.0": {
+      "Microsoft.ApplicationInsights.WindowsApps/1.1.1": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )",
-          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, 1.2.3]",
+          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.2.3, 1.2.3]"
         },
         "compile": {
           "lib/win81/Microsoft.ApplicationInsights.Extensibility.Windows.dll": {}
@@ -7022,7 +7022,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Win2D.uwp/1.14.0": {
+      "Win2D.uwp/1.16.0": {
         "compile": {
           "lib/uap10.0/Microsoft.Graphics.Canvas.winmd": {}
         },
@@ -7043,10 +7043,10 @@
       }
     },
     "UAP,Version=v10.0/win10-x64-aot": {
-      "Esri.ArcGISRuntime/10.2.6.1026": {},
-      "Esri.ArcGISRuntime.Toolkit/10.2.6.1026": {
+      "Esri.ArcGISRuntime/10.2.7.1234": {},
+      "Esri.ArcGISRuntime.Toolkit/10.2.7.1234": {
         "dependencies": {
-          "Esri.ArcGISRuntime": "[10.2.6.1026, )"
+          "Esri.ArcGISRuntime": "[10.2.7.1234, )"
         }
       },
       "GeoAPI/1.7.4": {
@@ -7057,7 +7057,7 @@
           "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.dll": {}
         }
       },
-      "MathNet.Numerics/3.10.0": {
+      "MathNet.Numerics/3.11.0": {
         "frameworkAssemblies": [
           "System.Numerics"
         ],
@@ -7068,7 +7068,7 @@
           "lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1/MathNet.Numerics.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights/1.0.0": {
+      "Microsoft.ApplicationInsights/1.2.3": {
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         },
@@ -7076,9 +7076,9 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.PersistenceChannel/1.0.0": {
+      "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, )"
         },
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
@@ -7087,10 +7087,10 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.WindowsApps/1.0.0": {
+      "Microsoft.ApplicationInsights.WindowsApps/1.1.1": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )",
-          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, 1.2.3]",
+          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.2.3, 1.2.3]"
         },
         "compile": {
           "lib/win81/Microsoft.ApplicationInsights.Extensibility.Windows.dll": {}
@@ -8783,7 +8783,7 @@
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Win2D.uwp/1.14.0": {
+      "Win2D.uwp/1.16.0": {
         "compile": {
           "lib/uap10.0/Microsoft.Graphics.Canvas.winmd": {}
         },
@@ -8804,10 +8804,10 @@
       }
     },
     "UAP,Version=v10.0/win10-x86": {
-      "Esri.ArcGISRuntime/10.2.6.1026": {},
-      "Esri.ArcGISRuntime.Toolkit/10.2.6.1026": {
+      "Esri.ArcGISRuntime/10.2.7.1234": {},
+      "Esri.ArcGISRuntime.Toolkit/10.2.7.1234": {
         "dependencies": {
-          "Esri.ArcGISRuntime": "[10.2.6.1026, )"
+          "Esri.ArcGISRuntime": "[10.2.7.1234, )"
         }
       },
       "GeoAPI/1.7.4": {
@@ -8818,7 +8818,7 @@
           "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.dll": {}
         }
       },
-      "MathNet.Numerics/3.10.0": {
+      "MathNet.Numerics/3.11.0": {
         "frameworkAssemblies": [
           "System.Numerics"
         ],
@@ -8829,7 +8829,7 @@
           "lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1/MathNet.Numerics.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights/1.0.0": {
+      "Microsoft.ApplicationInsights/1.2.3": {
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         },
@@ -8837,9 +8837,9 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.PersistenceChannel/1.0.0": {
+      "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, )"
         },
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
@@ -8848,10 +8848,10 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.WindowsApps/1.0.0": {
+      "Microsoft.ApplicationInsights.WindowsApps/1.1.1": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )",
-          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, 1.2.3]",
+          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.2.3, 1.2.3]"
         },
         "compile": {
           "lib/win81/Microsoft.ApplicationInsights.Extensibility.Windows.dll": {}
@@ -10577,7 +10577,7 @@
           "lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Win2D.uwp/1.14.0": {
+      "Win2D.uwp/1.16.0": {
         "compile": {
           "lib/uap10.0/Microsoft.Graphics.Canvas.winmd": {}
         },
@@ -10598,10 +10598,10 @@
       }
     },
     "UAP,Version=v10.0/win10-x86-aot": {
-      "Esri.ArcGISRuntime/10.2.6.1026": {},
-      "Esri.ArcGISRuntime.Toolkit/10.2.6.1026": {
+      "Esri.ArcGISRuntime/10.2.7.1234": {},
+      "Esri.ArcGISRuntime.Toolkit/10.2.7.1234": {
         "dependencies": {
-          "Esri.ArcGISRuntime": "[10.2.6.1026, )"
+          "Esri.ArcGISRuntime": "[10.2.7.1234, )"
         }
       },
       "GeoAPI/1.7.4": {
@@ -10612,7 +10612,7 @@
           "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.dll": {}
         }
       },
-      "MathNet.Numerics/3.10.0": {
+      "MathNet.Numerics/3.11.0": {
         "frameworkAssemblies": [
           "System.Numerics"
         ],
@@ -10623,7 +10623,7 @@
           "lib/portable-net45+netcore45+MonoAndroid1+MonoTouch1/MathNet.Numerics.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights/1.0.0": {
+      "Microsoft.ApplicationInsights/1.2.3": {
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         },
@@ -10631,9 +10631,9 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.PersistenceChannel/1.0.0": {
+      "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, )"
         },
         "compile": {
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
@@ -10642,10 +10642,10 @@
           "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll": {}
         }
       },
-      "Microsoft.ApplicationInsights.WindowsApps/1.0.0": {
+      "Microsoft.ApplicationInsights.WindowsApps/1.1.1": {
         "dependencies": {
-          "Microsoft.ApplicationInsights": "[1.0.0, )",
-          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.0.0, )"
+          "Microsoft.ApplicationInsights": "[1.2.3, 1.2.3]",
+          "Microsoft.ApplicationInsights.PersistenceChannel": "[1.2.3, 1.2.3]"
         },
         "compile": {
           "lib/win81/Microsoft.ApplicationInsights.Extensibility.Windows.dll": {}
@@ -12338,7 +12338,7 @@
           "runtimes/win8-aot/lib/netcore50/System.Xml.XmlSerializer.dll": {}
         }
       },
-      "Win2D.uwp/1.14.0": {
+      "Win2D.uwp/1.16.0": {
         "compile": {
           "lib/uap10.0/Microsoft.Graphics.Canvas.winmd": {}
         },
@@ -12360,8 +12360,8 @@
     }
   },
   "libraries": {
-    "Esri.ArcGISRuntime/10.2.6.1026": {
-      "sha512": "gHav8R/wnjvCf78IEtxbk4hDwsUIKVQbFm3O7bXmvQys+jURuHd1xAiGGvP2UvP5nWht+WETiI9n9DTPgl0y/w==",
+    "Esri.ArcGISRuntime/10.2.7.1234": {
+      "sha512": "AfTY8sRMgtFebWyfmOkGfObQcfPNbdX2i5ai8HoQgr0yo4rXbv8vf491Je4YObkymdj8BgNOLs+JE+nQ9VSWCA==",
       "type": "Package",
       "files": [
         "[Content_Types].xml",
@@ -12370,317 +12370,315 @@
         "build/win81/Esri.ArcGISRuntime.targets",
         "build/wpa81/Esri.ArcGISRuntime.targets",
         "Esri.ArcGISRuntime.nuspec",
-        "package/services/metadata/core-properties/02b19a12245346dfa5fa66883395284e.psmdcp",
-        "sdk/net45/arcgisruntime10.2.6/client32/ArcGISRuntimeLogging.dll",
-        "sdk/net45/arcgisruntime10.2.6/client32/log4cxx.dll",
-        "sdk/net45/arcgisruntime10.2.6/client32/msvcp120.dll",
-        "sdk/net45/arcgisruntime10.2.6/client32/msvcr120.dll",
-        "sdk/net45/arcgisruntime10.2.6/client32/RuntimeCoreNETDesktop.dll",
-        "sdk/net45/arcgisruntime10.2.6/client64/ArcGISRuntimeLogging.dll",
-        "sdk/net45/arcgisruntime10.2.6/client64/log4cxx.dll",
-        "sdk/net45/arcgisruntime10.2.6/client64/msvcp120.dll",
-        "sdk/net45/arcgisruntime10.2.6/client64/msvcr120.dll",
-        "sdk/net45/arcgisruntime10.2.6/client64/RuntimeCoreNETDesktop.dll",
-        "sdk/net45/arcgisruntime10.2.6/resources/pedata/gtdefaults.json",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_light_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_light_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_light_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_light_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_light_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_light_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_shadow_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_shadow_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_shadow_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_shadow_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_shadow_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/atlas_texture_shadow_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/depth_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/depth_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/depth_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/depth_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/depth_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/depth_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/depth_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/image_renderer_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/image_renderer_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/image_renderer_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/image_renderer_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/image_renderer_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/image_renderer_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/image_renderer_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/magnifier_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/magnifier_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/magnifier_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/magnifier_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/magnifier_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/magnifier_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/magnifier_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_light_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_light_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_light_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_light_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_light_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_light_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_light_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_shadow_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_shadow_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_shadow_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_shadow_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_shadow_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_shadow_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/model_shadow_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_point_draw_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_point_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_point_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_point_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_point_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_point_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_point_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_selected_point_draw_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_selected_point_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_selected_point_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_selected_point_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_selected_point_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_selected_point_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/off_center_selected_point_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/offscreen_buffer_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/offscreen_buffer_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/offscreen_buffer_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/offscreen_buffer_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/offscreen_buffer_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/offscreen_buffer_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/offscreen_buffer_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/outline_effect_instanced_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/outline_effect_instanced_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/outline_effect_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/outline_effect_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phone_effect_instanced_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phone_effect_instanced_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phone_effect_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phone_effect_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phone_effect_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phone_effect_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phone_effect_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phone_effect_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phone_effect_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phong_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phong_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phong_instanced_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phong_instanced_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phong_texture_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phong_texture_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phong_texture_instanced_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/phong_texture_instanced_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/point_draw_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/point_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/point_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/point_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/point_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/point_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/point_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_draw_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_extrusion_draw_instanced_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_extrusion_draw_instanced_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_extrusion_draw_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_extrusion_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_extrusion_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_extrusion_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_extrusion_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_extrusion_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_extrusion_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_overlay_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_overlay_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_selected_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polygon_selected_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_draw_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_extrusion_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_extrusion_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_overlay_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_overlay_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_selected_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/polyline_selected_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_image_renderer_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_image_renderer_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_image_renderer_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_image_renderer_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_image_renderer_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_image_renderer_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_image_renderer_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_overlay_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_overlay_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_overlay_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_overlay_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_overlay_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_overlay_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/screen_overlay_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_pick_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_pick_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_pick_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_pick_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_pick_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_pick_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_pick_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_area_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_halo_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_halo_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_halo_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_halo_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_halo_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_halo_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_halo_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_pick_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_pick_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_pick_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_pick_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_pick_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_pick_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_pick_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_line_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_halo_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_halo_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_halo_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_halo_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_halo_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_halo_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_halo_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_pick_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_pick_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_pick_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_pick_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_pick_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_pick_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_pick_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/seq_render_point_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_draw_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_grid_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_grid_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_grid_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_grid_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_grid_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_grid_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/simple_grid_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/skybox_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/skybox_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/star_draw_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/star_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/star_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/star_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/star_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/star_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/star_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_coor_to_tex_coor_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_coor_to_tex_coor_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_coor_to_tex_coor_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_coor_to_tex_coor_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_coor_to_tex_coor_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_coor_to_tex_coor_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_coor_to_tex_coor_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_advanced_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_advanced_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_advanced_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_advanced_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_advanced_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_advanced_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tex_quad_shader_program_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/text_draw_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/text_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/text_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/text_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/text_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/text_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/text_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/texture_draw_instanced_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/texture_draw_instanced_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/texture_draw_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/texture_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/texture_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/texture_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/texture_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/texture_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/texture_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/textured_atmosphere_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/textured_atmosphere_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/textured_atmosphere_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/textured_atmosphere_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/textured_atmosphere_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/textured_atmosphere_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/textured_atmosphere_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_cavas_draw_low_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_cavas_draw_low_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_cavas_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_cavas_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_draw_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_draw_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_draw_vs_1_1.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_draw_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_draw_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_ground_overlay_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_ground_overlay_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_light_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_light_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_shadow_ps_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_shadow_ps_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_shadow_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_shadow_vs_1_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_shadow_vs_2_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_shadow_vs_3_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tile_shadow_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tube_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tube_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tube_outline_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/tube_outline_draw_vs_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/water_draw_ps_4_0.cso",
-        "sdk/net45/arcgisruntime10.2.6/resources/shaders/water_draw_vs_4_0.cso",
+        "package/services/metadata/core-properties/a54c02c6befe467e9c25d4523d2acd41.psmdcp",
+        "sdk/net45/arcgisruntime10.2.7/client32/ArcGISRuntimeLogging.dll",
+        "sdk/net45/arcgisruntime10.2.7/client32/log4cxx.dll",
+        "sdk/net45/arcgisruntime10.2.7/client32/msvcp120.dll",
+        "sdk/net45/arcgisruntime10.2.7/client32/msvcr120.dll",
+        "sdk/net45/arcgisruntime10.2.7/client32/RuntimeCoreNETDesktop.dll",
+        "sdk/net45/arcgisruntime10.2.7/client64/ArcGISRuntimeLogging.dll",
+        "sdk/net45/arcgisruntime10.2.7/client64/log4cxx.dll",
+        "sdk/net45/arcgisruntime10.2.7/client64/msvcp120.dll",
+        "sdk/net45/arcgisruntime10.2.7/client64/msvcr120.dll",
+        "sdk/net45/arcgisruntime10.2.7/client64/RuntimeCoreNETDesktop.dll",
+        "sdk/net45/arcgisruntime10.2.7/resources/pedata/gtdefaults.json",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/accurate_atmosphere_outerspace_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/accurate_atmosphere_outerspace_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/accurate_atmosphere_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/accurate_atmosphere_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/atmosphere_tile_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/atmosphere_tile_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/depth_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/depth_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/depth_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/depth_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/depth_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/depth_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/depth_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/image_renderer_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/image_renderer_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/image_renderer_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/image_renderer_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/image_renderer_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/image_renderer_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/image_renderer_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/magnifier_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/magnifier_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/magnifier_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/magnifier_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/magnifier_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/magnifier_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/magnifier_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_light_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_light_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_light_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_light_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_light_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_light_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_light_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_shadow_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_shadow_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_shadow_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_shadow_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_shadow_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_shadow_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_shadow_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_world_depth_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_world_depth_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_world_instance_depth_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/model_world_instance_depth_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_point_draw_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_point_draw_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_point_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_point_draw_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_point_draw_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_point_draw_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_point_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_selected_point_draw_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_selected_point_draw_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_selected_point_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_selected_point_draw_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_selected_point_draw_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_selected_point_draw_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/off_center_selected_point_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/offscreen_buffer_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/offscreen_buffer_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/offscreen_buffer_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/offscreen_buffer_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/offscreen_buffer_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/offscreen_buffer_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/offscreen_buffer_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/outline_effect_instanced_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/outline_effect_instanced_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/outline_effect_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/outline_effect_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phone_effect_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phone_effect_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phone_effect_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phone_effect_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phone_effect_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phong_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phong_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phong_instanced_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phong_instanced_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phong_texture_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phong_texture_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phong_texture_instanced_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/phong_texture_instanced_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/point_billboard_depth_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/point_billboard_depth_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/point_draw_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/point_draw_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/point_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/point_draw_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/point_draw_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/point_draw_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/point_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_draw_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_draw_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_draw_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_draw_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_draw_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_draw_instanced_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_draw_instanced_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_draw_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_draw_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_draw_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_draw_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_draw_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_world_depth_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_world_depth_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_world_instance_depth_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_extrusion_world_instance_depth_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_overlay_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_overlay_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_world_depth_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polygon_world_depth_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_billboard_depth_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_billboard_depth_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_draw_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_draw_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_draw_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_draw_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_draw_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_extrusion_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_extrusion_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_overlay_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/polyline_overlay_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_image_renderer_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_image_renderer_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_image_renderer_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_image_renderer_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_image_renderer_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_image_renderer_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_image_renderer_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_overlay_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_overlay_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_overlay_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_overlay_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_overlay_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_overlay_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/screen_overlay_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_pick_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_pick_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_pick_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_pick_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_pick_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_pick_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_pick_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_area_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_halo_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_halo_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_halo_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_halo_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_halo_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_halo_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_halo_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_pick_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_pick_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_pick_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_pick_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_pick_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_pick_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_pick_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_line_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_halo_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_halo_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_halo_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_halo_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_halo_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_halo_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_halo_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_pick_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_pick_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_pick_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_pick_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_pick_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_pick_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_pick_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/seq_render_point_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_draw_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_draw_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_draw_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_draw_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_draw_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_grid_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_grid_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_grid_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_grid_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_grid_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_grid_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/simple_grid_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/skybox_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/skybox_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/star_draw_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/star_draw_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/star_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/star_draw_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/star_draw_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/star_draw_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/star_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_coor_to_tex_coor_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_coor_to_tex_coor_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_coor_to_tex_coor_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_coor_to_tex_coor_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_coor_to_tex_coor_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_coor_to_tex_coor_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_coor_to_tex_coor_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_advanced_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_advanced_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_advanced_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_advanced_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_advanced_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_advanced_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tex_quad_shader_program_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/text_draw_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/text_draw_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/text_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/text_draw_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/text_draw_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/text_draw_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/text_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/texture_draw_instanced_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/texture_draw_instanced_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/texture_draw_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/texture_draw_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/texture_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/texture_draw_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/texture_draw_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/texture_draw_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/texture_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/textured_atmosphere_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/textured_atmosphere_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/textured_atmosphere_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/textured_atmosphere_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/textured_atmosphere_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/textured_atmosphere_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/textured_atmosphere_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_cavas_draw_low_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_cavas_draw_low_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_cavas_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_cavas_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_draw_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_draw_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_draw_vs_1_1.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_draw_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_draw_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_ground_overlay_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_ground_overlay_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_light_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_light_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_shadow_ps_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_shadow_ps_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_shadow_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_shadow_vs_1_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_shadow_vs_2_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_shadow_vs_3_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_shadow_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_world_depth_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tile_world_depth_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tube_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tube_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tube_outline_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tube_outline_draw_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tube_world_depth_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/tube_world_depth_vs_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/water_draw_ps_4_0.cso",
+        "sdk/net45/arcgisruntime10.2.7/resources/shaders/water_draw_vs_4_0.cso",
         "sdk/net45/Design/Esri.ArcGISRuntime.Design.dll",
         "sdk/net45/Esri.ArcGISRuntime.dll",
         "sdk/net45/Esri.ArcGISRuntime.xml",
@@ -12696,6 +12694,12 @@
         "sdk/win81/ARM/RuntimeCoreNet.pri",
         "sdk/win81/ARM/RuntimeCoreNet.winmd",
         "sdk/win81/ARM/RuntimeCoreNet/resources/pedata/gtdefaults.json",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/accurate_atmosphere_outerspace_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/accurate_atmosphere_outerspace_vs_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/accurate_atmosphere_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/accurate_atmosphere_vs_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/atmosphere_tile_draw_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/atmosphere_tile_draw_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/depth_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/depth_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/image_renderer_ps_4_0.cso",
@@ -12706,6 +12710,10 @@
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/model_light_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/model_shadow_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/model_shadow_vs_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/model_world_depth_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/model_world_depth_vs_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/model_world_instance_depth_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/model_world_instance_depth_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/off_center_point_draw_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/off_center_point_draw_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/off_center_selected_point_draw_ps_4_0.cso",
@@ -12724,6 +12732,8 @@
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/phong_texture_draw_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/phong_texture_instanced_draw_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/phong_texture_instanced_draw_vs_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/point_billboard_depth_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/point_billboard_depth_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/point_draw_overlay_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/point_draw_overlay_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/point_draw_ps_4_0.cso",
@@ -12734,8 +12744,16 @@
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_instanced_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_vs_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_depth_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_depth_vs_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_instance_depth_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_instance_depth_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polygon_overlay_draw_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polygon_overlay_draw_vs_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polygon_world_depth_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polygon_world_depth_vs_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polyline_billboard_depth_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polyline_billboard_depth_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polyline_draw_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polyline_draw_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/polyline_extrusion_draw_ps_4_0.cso",
@@ -12794,10 +12812,14 @@
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/tile_light_draw_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/tile_shadow_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/tile_shadow_vs_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/tile_world_depth_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/tile_world_depth_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/tube_draw_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/tube_draw_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/tube_outline_draw_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/tube_outline_draw_vs_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/tube_world_depth_ps_4_0.cso",
+        "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/tube_world_depth_vs_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/water_draw_ps_4_0.cso",
         "sdk/win81/ARM/RuntimeCoreNet/resources/shaders/water_draw_vs_4_0.cso",
         "sdk/win81/x64/Esri.ArcGISRuntime.dll",
@@ -12812,6 +12834,12 @@
         "sdk/win81/x64/RuntimeCoreNet.pri",
         "sdk/win81/x64/RuntimeCoreNet.winmd",
         "sdk/win81/x64/RuntimeCoreNet/resources/pedata/gtdefaults.json",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/accurate_atmosphere_outerspace_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/accurate_atmosphere_outerspace_vs_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/accurate_atmosphere_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/accurate_atmosphere_vs_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/atmosphere_tile_draw_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/atmosphere_tile_draw_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/depth_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/depth_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/image_renderer_ps_4_0.cso",
@@ -12822,6 +12850,10 @@
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/model_light_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/model_shadow_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/model_shadow_vs_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/model_world_depth_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/model_world_depth_vs_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/model_world_instance_depth_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/model_world_instance_depth_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/off_center_point_draw_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/off_center_point_draw_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/off_center_selected_point_draw_ps_4_0.cso",
@@ -12840,6 +12872,8 @@
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/phong_texture_draw_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/phong_texture_instanced_draw_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/phong_texture_instanced_draw_vs_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/point_billboard_depth_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/point_billboard_depth_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/point_draw_overlay_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/point_draw_overlay_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/point_draw_ps_4_0.cso",
@@ -12850,8 +12884,16 @@
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_instanced_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_vs_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_depth_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_depth_vs_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_instance_depth_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_instance_depth_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polygon_overlay_draw_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polygon_overlay_draw_vs_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polygon_world_depth_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polygon_world_depth_vs_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polyline_billboard_depth_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polyline_billboard_depth_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polyline_draw_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polyline_draw_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/polyline_extrusion_draw_ps_4_0.cso",
@@ -12910,10 +12952,14 @@
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/tile_light_draw_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/tile_shadow_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/tile_shadow_vs_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/tile_world_depth_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/tile_world_depth_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/tube_draw_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/tube_draw_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/tube_outline_draw_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/tube_outline_draw_vs_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/tube_world_depth_ps_4_0.cso",
+        "sdk/win81/x64/RuntimeCoreNet/resources/shaders/tube_world_depth_vs_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/water_draw_ps_4_0.cso",
         "sdk/win81/x64/RuntimeCoreNet/resources/shaders/water_draw_vs_4_0.cso",
         "sdk/win81/x86/Esri.ArcGISRuntime.Design.dll",
@@ -12929,6 +12975,12 @@
         "sdk/win81/x86/RuntimeCoreNet.pri",
         "sdk/win81/x86/RuntimeCoreNet.winmd",
         "sdk/win81/x86/RuntimeCoreNet/resources/pedata/gtdefaults.json",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/accurate_atmosphere_outerspace_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/accurate_atmosphere_outerspace_vs_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/accurate_atmosphere_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/accurate_atmosphere_vs_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/atmosphere_tile_draw_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/atmosphere_tile_draw_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/depth_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/depth_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/image_renderer_ps_4_0.cso",
@@ -12939,6 +12991,10 @@
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/model_light_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/model_shadow_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/model_shadow_vs_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/model_world_depth_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/model_world_depth_vs_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/model_world_instance_depth_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/model_world_instance_depth_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/off_center_point_draw_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/off_center_point_draw_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/off_center_selected_point_draw_ps_4_0.cso",
@@ -12957,6 +13013,8 @@
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/phong_texture_draw_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/phong_texture_instanced_draw_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/phong_texture_instanced_draw_vs_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/point_billboard_depth_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/point_billboard_depth_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/point_draw_overlay_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/point_draw_overlay_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/point_draw_ps_4_0.cso",
@@ -12967,8 +13025,16 @@
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_instanced_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_vs_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_depth_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_depth_vs_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_instance_depth_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_instance_depth_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polygon_overlay_draw_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polygon_overlay_draw_vs_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polygon_world_depth_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polygon_world_depth_vs_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polyline_billboard_depth_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polyline_billboard_depth_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polyline_draw_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polyline_draw_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/polyline_extrusion_draw_ps_4_0.cso",
@@ -13027,10 +13093,14 @@
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/tile_light_draw_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/tile_shadow_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/tile_shadow_vs_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/tile_world_depth_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/tile_world_depth_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/tube_draw_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/tube_draw_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/tube_outline_draw_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/tube_outline_draw_vs_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/tube_world_depth_ps_4_0.cso",
+        "sdk/win81/x86/RuntimeCoreNet/resources/shaders/tube_world_depth_vs_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/water_draw_ps_4_0.cso",
         "sdk/win81/x86/RuntimeCoreNet/resources/shaders/water_draw_vs_4_0.cso",
         "sdk/wpa81/ARM/Esri.ArcGISRuntime.dll",
@@ -13045,6 +13115,12 @@
         "sdk/wpa81/ARM/RuntimeCoreNet.pri",
         "sdk/wpa81/ARM/RuntimeCoreNet.winmd",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/pedata/gtdefaults.json",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/accurate_atmosphere_outerspace_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/accurate_atmosphere_outerspace_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/accurate_atmosphere_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/accurate_atmosphere_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/atmosphere_tile_draw_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/atmosphere_tile_draw_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/depth_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/depth_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/image_renderer_ps_4_0.cso",
@@ -13055,6 +13131,10 @@
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/model_light_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/model_shadow_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/model_shadow_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/model_world_depth_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/model_world_depth_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/model_world_instance_depth_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/model_world_instance_depth_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/off_center_point_draw_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/off_center_point_draw_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/off_center_selected_point_draw_ps_4_0.cso",
@@ -13073,6 +13153,8 @@
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/phong_texture_draw_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/phong_texture_instanced_draw_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/phong_texture_instanced_draw_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/point_billboard_depth_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/point_billboard_depth_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/point_draw_overlay_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/point_draw_overlay_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/point_draw_ps_4_0.cso",
@@ -13083,8 +13165,16 @@
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_instanced_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_depth_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_depth_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_instance_depth_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_instance_depth_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polygon_overlay_draw_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polygon_overlay_draw_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polygon_world_depth_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polygon_world_depth_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polyline_billboard_depth_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polyline_billboard_depth_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polyline_draw_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polyline_draw_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/polyline_extrusion_draw_ps_4_0.cso",
@@ -13131,6 +13221,8 @@
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/texture_draw_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/textured_atmosphere_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/textured_atmosphere_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tile_cavas_draw_low_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tile_cavas_draw_low_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tile_cavas_draw_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tile_cavas_draw_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tile_draw_ps_4_0.cso",
@@ -13141,10 +13233,14 @@
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tile_light_draw_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tile_shadow_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tile_shadow_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tile_world_depth_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tile_world_depth_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tube_draw_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tube_draw_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tube_outline_draw_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tube_outline_draw_vs_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tube_world_depth_ps_4_0.cso",
+        "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/tube_world_depth_vs_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/water_draw_ps_4_0.cso",
         "sdk/wpa81/ARM/RuntimeCoreNet/resources/shaders/water_draw_vs_4_0.cso",
         "sdk/wpa81/x86/Esri.ArcGISRuntime.Design.dll",
@@ -13160,6 +13256,12 @@
         "sdk/wpa81/x86/RuntimeCoreNet.pri",
         "sdk/wpa81/x86/RuntimeCoreNet.winmd",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/pedata/gtdefaults.json",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/accurate_atmosphere_outerspace_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/accurate_atmosphere_outerspace_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/accurate_atmosphere_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/accurate_atmosphere_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/atmosphere_tile_draw_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/atmosphere_tile_draw_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/depth_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/depth_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/image_renderer_ps_4_0.cso",
@@ -13170,6 +13272,10 @@
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/model_light_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/model_shadow_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/model_shadow_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/model_world_depth_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/model_world_depth_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/model_world_instance_depth_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/model_world_instance_depth_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/off_center_point_draw_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/off_center_point_draw_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/off_center_selected_point_draw_ps_4_0.cso",
@@ -13188,6 +13294,8 @@
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/phong_texture_draw_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/phong_texture_instanced_draw_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/phong_texture_instanced_draw_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/point_billboard_depth_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/point_billboard_depth_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/point_draw_overlay_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/point_draw_overlay_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/point_draw_ps_4_0.cso",
@@ -13198,8 +13306,16 @@
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_instanced_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_draw_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_depth_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_depth_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_instance_depth_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polygon_extrusion_world_instance_depth_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polygon_overlay_draw_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polygon_overlay_draw_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polygon_world_depth_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polygon_world_depth_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polyline_billboard_depth_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polyline_billboard_depth_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polyline_draw_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polyline_draw_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/polyline_extrusion_draw_ps_4_0.cso",
@@ -13246,6 +13362,8 @@
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/texture_draw_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/textured_atmosphere_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/textured_atmosphere_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tile_cavas_draw_low_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tile_cavas_draw_low_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tile_cavas_draw_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tile_cavas_draw_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tile_draw_ps_4_0.cso",
@@ -13256,18 +13374,22 @@
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tile_light_draw_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tile_shadow_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tile_shadow_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tile_world_depth_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tile_world_depth_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tube_draw_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tube_draw_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tube_outline_draw_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tube_outline_draw_vs_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tube_world_depth_ps_4_0.cso",
+        "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/tube_world_depth_vs_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/water_draw_ps_4_0.cso",
         "sdk/wpa81/x86/RuntimeCoreNet/resources/shaders/water_draw_vs_4_0.cso",
         "tools/Install.ps1",
         "tools/Uninstall.ps1"
       ]
     },
-    "Esri.ArcGISRuntime.Toolkit/10.2.6.1026": {
-      "sha512": "UxGbNL4L/+K9xHltvP74DIolo0AyEUHjdAUKcbh8Lr3w+YJCLrAUxjXdZ0owL1fXrrHlXhfcsfzZPhFq7U5OKg==",
+    "Esri.ArcGISRuntime.Toolkit/10.2.7.1234": {
+      "sha512": "aVccsotjnyLq+31NU0zJv+4rfbQueSzcQ5ab89CrSXzmNQcEDp0ocQG2nTfJsbQiTObj9fKg635jc+irMGcsrQ==",
       "type": "Package",
       "files": [
         "[Content_Types].xml",
@@ -13276,7 +13398,7 @@
         "build/win81/Esri.ArcGISRuntime.Toolkit.targets",
         "build/wpa81/Esri.ArcGISRuntime.Toolkit.targets",
         "Esri.ArcGISRuntime.Toolkit.nuspec",
-        "package/services/metadata/core-properties/f38db6f0cd14459b85ff19bd86054179.psmdcp",
+        "package/services/metadata/core-properties/dd832668aac547dda8ee4cdb692534a5.psmdcp",
         "sdk/net45/Esri.ArcGISRuntime.Toolkit.dll",
         "sdk/net45/Esri.ArcGISRuntime.Toolkit.xml",
         "sdk/win81/ARM/Esri.ArcGISRuntime.Toolkit.WindowsStore.dll",
@@ -13335,8 +13457,8 @@
         "package/services/metadata/core-properties/73d27ef44fba499e9a54255075e791ef.psmdcp"
       ]
     },
-    "MathNet.Numerics/3.10.0": {
-      "sha512": "PTptF9PoSuwJOEPofaPbVSMj+EIgSllW/P3dQp+dNaJ6vsuaASOOjRAZpiGs3hEtYo9hXvlVL4ZXiMm2uCYBlw==",
+    "MathNet.Numerics/3.11.0": {
+      "sha512": "/6p3quR3E9gg8UL5/uiYJgpn+D5Bc2j3LEfRs3yz9jCLjN297ir9Dn+NiHivQmMzHHkD844PjmP2Bo9Xd3N4kw==",
       "type": "Package",
       "files": [
         "[Content_Types].xml",
@@ -13357,12 +13479,12 @@
         "lib/portable-net45+sl5+netcore45+MonoAndroid1+MonoTouch1/MathNet.Numerics.XML",
         "license.txt",
         "MathNet.Numerics.nuspec",
-        "package/services/metadata/core-properties/4fb281a02b1243cc9e0e0f50f49e982c.psmdcp",
+        "package/services/metadata/core-properties/c973e5f9e3664419b7ac087ea65740bb.psmdcp",
         "readme.txt"
       ]
     },
-    "Microsoft.ApplicationInsights/1.0.0": {
-      "sha512": "HZ47/thX57SOuIivSvIbsR6L9CCb/Yt3IyB2i4KHmmNlf3DO+lqFwWIKDdbDNWKX+qh0Rg20/JSMPK0dwUsYYw==",
+    "Microsoft.ApplicationInsights/1.2.3": {
+      "sha512": "a34atobxpucCTTX9VCD7aIu6Ydzry+Va7TxK2tTQcfaMvefGW4kUKtg9GHKIn19IaXe+A4oZt/GBqsOt5vQrBA==",
       "type": "Package",
       "files": [
         "[Content_Types].xml",
@@ -13376,27 +13498,29 @@
         "lib/wp8/Microsoft.ApplicationInsights.dll",
         "lib/wp8/Microsoft.ApplicationInsights.XML",
         "Microsoft.ApplicationInsights.nuspec",
-        "package/services/metadata/core-properties/b9e7bc7ab2454491af07046165ff01d0.psmdcp"
+        "package/services/metadata/core-properties/3b36eef276524f5d883c618d5fd8c500.psmdcp"
       ]
     },
-    "Microsoft.ApplicationInsights.PersistenceChannel/1.0.0": {
-      "sha512": "0qQXC+CtbyF2RPuld5pF74fxsnP6ml0LUnzQ6GL9AXXY64LPsLDsPUAymoUffo7LZvPDppZboTYX59TfVxKA7A==",
+    "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
+      "sha512": "5MGcvPQVaGlGyAVh9adg4sSkIVSYDKn+H3+YnZa9hi1gH/g6UsRt4HLc8vp/IxjlbmXbJyAB7dYJV/NHmAGAgA==",
       "type": "Package",
       "files": [
         "[Content_Types].xml",
         "_rels/.rels",
         "lib/net40/Microsoft.ApplicationInsights.PersistenceChannel.dll",
         "lib/net40/Microsoft.ApplicationInsights.PersistenceChannel.XML",
-        "lib/portable-win8+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.XML",
+        "lib/net45/Microsoft.ApplicationInsights.PersistenceChannel.dll",
+        "lib/net45/Microsoft.ApplicationInsights.PersistenceChannel.XML",
         "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll",
+        "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.XML",
         "lib/wp8/Microsoft.ApplicationInsights.PersistenceChannel.dll",
         "lib/wp8/Microsoft.ApplicationInsights.PersistenceChannel.XML",
         "Microsoft.ApplicationInsights.PersistenceChannel.nuspec",
-        "package/services/metadata/core-properties/dc9ebba80e7343fdbd0a39a3cdeb672c.psmdcp"
+        "package/services/metadata/core-properties/f973733421c14c3594986b3f2c22213a.psmdcp"
       ]
     },
-    "Microsoft.ApplicationInsights.WindowsApps/1.0.0": {
-      "sha512": "fNCAjIwvbTV+G0dT14bgM5tptsqeSaKQaCrlq7QknOq1Xdm8ZmgsDYddMgXkvykyKLjWyU6fKuOpj6fsQJy+wQ==",
+    "Microsoft.ApplicationInsights.WindowsApps/1.1.1": {
+      "sha512": "Orj0UQrjQ2z0aWZZoexl734Ge7Q4oVev3VFSsk6t8l2kImrfJ1eygkJWtQ1d7u0kF6MLLrvUvsMSxo+0rgPiMQ==",
       "type": "Package",
       "files": [
         "[Content_Types].xml",
@@ -13408,7 +13532,7 @@
         "lib/wpa81/Microsoft.ApplicationInsights.Extensibility.Windows.dll",
         "lib/wpa81/Microsoft.ApplicationInsights.Extensibility.Windows.XML",
         "Microsoft.ApplicationInsights.WindowsApps.nuspec",
-        "package/services/metadata/core-properties/4f6f732debe548beaa1183418e8d65cc.psmdcp"
+        "package/services/metadata/core-properties/8265b8c93c244c80b4e8bce27f31849d.psmdcp"
       ]
     },
     "Microsoft.CSharp/4.0.0": {
@@ -16981,8 +17105,8 @@
         "System.Xml.XmlSerializer.nuspec"
       ]
     },
-    "Win2D.uwp/1.14.0": {
-      "sha512": "dg666DoGio82HBmJxpYYS1ZhnZb1olllyzXmPhnYN8KmE1UDVksN8XvACzLH0Z1VXIscVc4gYA59uZCT5T385A==",
+    "Win2D.uwp/1.16.0": {
+      "sha512": "95rW7qF76gzF5QiEiG/eauFGJ0J31M4AnqV+sq0vDSGZrie5PHSgSZVewB4A1fEdc3xn2ltyN3/M4PusBPPS7A==",
       "type": "Package",
       "files": [
         "[Content_Types].xml",
@@ -16990,10 +17114,9 @@
         "build/native/Win2D.uwp.targets",
         "include/Microsoft.Graphics.Canvas.h",
         "include/Microsoft.Graphics.Canvas.native.h",
-        "lib/uap10.0/en/Microsoft.Graphics.Canvas.xml",
         "lib/uap10.0/Microsoft.Graphics.Canvas.winmd",
         "lib/uap10.0/Microsoft.Graphics.Canvas.xml",
-        "package/services/metadata/core-properties/460bfe2859234b8eb1ddf622dbc5a7f1.psmdcp",
+        "package/services/metadata/core-properties/a485f2599c6f467eb43545ecc40c57a4.psmdcp",
         "runtimes/win10-arm/native/Microsoft.Graphics.Canvas.dll",
         "runtimes/win10-x64/native/Microsoft.Graphics.Canvas.dll",
         "runtimes/win10-x86/native/Microsoft.Graphics.Canvas.dll",
@@ -17259,18 +17382,18 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Esri.ArcGISRuntime.Toolkit >= 10.2.6.1026",
+      "Esri.ArcGISRuntime.Toolkit >= 10.2.7.1234",
       "GeoAPI >= 1.7.4",
-      "MathNet.Numerics >= 3.10.0",
-      "Microsoft.ApplicationInsights >= 1.0.0",
-      "Microsoft.ApplicationInsights.PersistenceChannel >= 1.0.0",
-      "Microsoft.ApplicationInsights.WindowsApps >= 1.0.0",
+      "MathNet.Numerics >= 3.11.0",
+      "Microsoft.ApplicationInsights >= 1.2.3",
+      "Microsoft.ApplicationInsights.PersistenceChannel >= 1.2.3",
+      "Microsoft.ApplicationInsights.WindowsApps >= 1.1.1",
       "Microsoft.NETCore.UniversalWindowsPlatform >= 5.0.0",
       "NetTopologySuite >= 1.14.0",
       "Newtonsoft.Json >= 8.0.2",
       "Prism.Mvvm >= 1.1.1",
       "Rx-Main >= 2.2.5",
-      "Win2D.uwp >= 1.14.0",
+      "Win2D.uwp >= 1.16.0",
       "WinRTXamlToolkit.UWP >= 1.9.4"
     ],
     "UAP,Version=v10.0": []

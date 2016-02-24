@@ -1,17 +1,17 @@
 ﻿{
   "dependencies": {
-    "Esri.ArcGISRuntime.Toolkit": "10.2.6.1026",
+    "Esri.ArcGISRuntime.Toolkit": "10.2.7.1234",
     "GeoAPI": "1.7.4",
-    "MathNet.Numerics": "3.10.0",
-    "Microsoft.ApplicationInsights": "1.0.0",
-    "Microsoft.ApplicationInsights.PersistenceChannel": "1.0.0",
-    "Microsoft.ApplicationInsights.WindowsApps": "1.0.0",
+    "MathNet.Numerics": "3.11.0",
+    "Microsoft.ApplicationInsights": "1.2.3",
+    "Microsoft.ApplicationInsights.PersistenceChannel": "1.2.3",
+    "Microsoft.ApplicationInsights.WindowsApps": "1.1.1",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.0.0",
     "NetTopologySuite": "1.14.0",
     "Newtonsoft.Json": "8.0.2",
     "Prism.Mvvm": "1.1.1",
     "Rx-Main": "2.2.5",
-    "Win2D.uwp": "1.14.0",
+    "Win2D.uwp": "1.16.0",
     "WinRTXamlToolkit.UWP": "1.9.4"
   },
   "frameworks": {

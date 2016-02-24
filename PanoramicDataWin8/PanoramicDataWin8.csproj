@@ -295,6 +295,10 @@
     <AppxManifest Include="Package.appxmanifest">
       <SubType>Designer</SubType>
     </AppxManifest>
+    <Content Include="ApplicationInsights.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
     <None Include="project.json" />
     <Content Include="Assets\BadgeLogo.scale-400.png" />
     <Content Include="Assets\data\config\test_large.ini">
