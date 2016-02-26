@@ -41,6 +41,22 @@ namespace PanoramicDataWin8.controller.data
                 }
             }
 
+            // interpolate if needed
+            foreach (var bin in binStructure.Bins.Values)
+            {
+                if (aggregates.Any())
+                {
+                    foreach (var aggregator in aggregates)
+                    {
+
+                        if (aggregator.AggregateFunction == AggregateFunction.Count && bin.Values.ContainsKey(aggregator) && bin.TemporaryValues.ContainsKey(aggregator))
+                        {
+                            bin.Values[aggregator] = progress < 1.0 ? (double)bin.TemporaryValues[aggregator] / progress : (double)bin.TemporaryValues[aggregator];
+                        }
+                    }
+                }
+            }
+
             // update max / min 
             foreach (var bin in binStructure.Bins.Values)
             {
@@ -139,7 +155,8 @@ namespace PanoramicDataWin8.controller.data
                 else if (aggregator.AggregateFunction == AggregateFunction.Count)
                 {
                     currentTempValue = (double)currentTempValue + 1;
-                    currentValue = progress < 1.0 ? (double)currentTempValue / progress : (double)currentTempValue;
+                    currentValue = (double)currentTempValue;
+                    //currentValue = progress < 1.0 ? (double)currentTempValue / progress : (double)currentTempValue;
                 }
                 else
                 {

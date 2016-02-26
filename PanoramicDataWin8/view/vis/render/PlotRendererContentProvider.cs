@@ -398,7 +398,14 @@ namespace PanoramicDataWin8.view.vis.render
                                 }
                                 else
                                 {
-                                    xTo = toScreenX((float) xBins[_xBinRange.GetDisplayIndex(_xBinRange.AddStep(xValue.Value))]);
+                                    if (_isXAxisAggregated)
+                                    {
+                                        xTo = toScreenX((float) xValue.Value);
+                                    }
+                                    else
+                                    {
+                                        xTo = toScreenX((float) xBins[_xBinRange.GetDisplayIndex(_xBinRange.AddStep(xValue.Value))]);
+                                    }
                                 }
 
                                 if (_yBinRange is NominalBinRange)
@@ -407,7 +414,14 @@ namespace PanoramicDataWin8.view.vis.render
                                 }
                                 else
                                 {
-                                    yTo = toScreenY((float) yBins[_yBinRange.GetDisplayIndex(_yBinRange.AddStep(yValue.Value))]);
+                                    if (_isYAxisAggregated)
+                                    {
+                                        yTo = toScreenY((float) yValue.Value);
+                                    }
+                                    else
+                                    {
+                                        yTo = toScreenY((float) yBins[_yBinRange.GetDisplayIndex(_yBinRange.AddStep(yValue.Value))]);
+                                    }
                                 }
 
 

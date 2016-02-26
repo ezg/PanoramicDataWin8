@@ -80,7 +80,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
                     if (rawDataPage.Data.Count == 0)
                     {
-                        _nrProcessedSamples = GetNrTotalSamples();
+                       // _nrProcessedSamples = GetNrTotalSamples();
                     }
                     return new DataPage() {DataRows = returnList, IsEmpty = false};
                 }
