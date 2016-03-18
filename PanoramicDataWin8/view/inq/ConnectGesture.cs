@@ -28,25 +28,28 @@ namespace PanoramicDataWin8.view.inq
 
         public bool Recognize(InkStroke inkStroke)
         {
-            _fromVisualizationViewModel = null;
-            _toVisualizationViewModel = null;
-
-            foreach (VisualizationContainerView view in _inkableScene.Elements.Where(e => e is VisualizationContainerView))
+            if (!inkStroke.IsErase)
             {
-                if (view.Geometry.Contains(inkStroke.Points[0].GetPoint()))
-                {
-                    _fromVisualizationViewModel = view.DataContext as VisualizationViewModel;
-                }
-                if (view.Geometry.Contains(inkStroke.Points[inkStroke.Points.Count - 1].GetPoint()) &&
-                    _fromVisualizationViewModel != view.DataContext as VisualizationViewModel)
-                {
-                    _toVisualizationViewModel = view.DataContext as VisualizationViewModel;
-                }
-            }
+                _fromVisualizationViewModel = null;
+                _toVisualizationViewModel = null;
 
-            if (_fromVisualizationViewModel != null && _toVisualizationViewModel != null)
-            {
-                return true;
+                foreach (VisualizationContainerView view in _inkableScene.Elements.Where(e => e is VisualizationContainerView))
+                {
+                    if (view.Geometry.Contains(inkStroke.Points[0].GetPoint()))
+                    {
+                        _fromVisualizationViewModel = view.DataContext as VisualizationViewModel;
+                    }
+                    if (view.Geometry.Contains(inkStroke.Points[inkStroke.Points.Count - 1].GetPoint()) &&
+                        _fromVisualizationViewModel != view.DataContext as VisualizationViewModel)
+                    {
+                        _toVisualizationViewModel = view.DataContext as VisualizationViewModel;
+                    }
+                }
+
+                if (_fromVisualizationViewModel != null && _toVisualizationViewModel != null)
+                {
+                    return true;
+                }
             }
             return false;
         }
