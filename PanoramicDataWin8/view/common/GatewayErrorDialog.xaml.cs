@@ -56,7 +56,7 @@ namespace PanoramicDataWin8.view.common
 
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            _content = tbIp.Text.Trim();
+            _ip = tbIp.Text.Trim();
         }
 
         private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
