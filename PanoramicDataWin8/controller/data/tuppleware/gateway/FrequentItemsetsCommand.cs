@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.tuppleware;
 
@@ -19,7 +20,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
                         new JProperty("type", "frequent_itemsets"),
                         new JProperty("source", sourceUuid),
                         new JProperty("support", support))));
-            string response = await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
+            string response = await TuppleWareGateway.Request(data);
             JToken jToken = JToken.Parse(response);
             return jToken;
         }

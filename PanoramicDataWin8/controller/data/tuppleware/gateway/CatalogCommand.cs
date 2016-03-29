@@ -12,7 +12,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
         {
             JObject data = new JObject(
                 new JProperty("type", "catalog"));
-            string response = await TuppleWareGateway.Request(url, data);
+            string response = await TuppleWareGateway.Request(data);
 
             JToken jToken = JToken.Parse(response);
 
@@ -25,7 +25,6 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
                 {
                     Name = schemaName,
                     SchemaJson = schemaJson,
-                    EndPoint = url,
                     Backend = "tuppleware",
                     BaseUUID = ((JProperty) child).Value["uuid"].Value<string>()
                 };

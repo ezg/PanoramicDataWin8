@@ -208,6 +208,9 @@
     <Compile Include="view\common\DXSurface.xaml.cs">
       <DependentUpon>DXSurface.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\common\GatewayErrorDialog.xaml.cs">
+      <DependentUpon>GatewayErrorDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\common\InputGroupView.xaml.cs">
       <DependentUpon>InputGroupView.xaml</DependentUpon>
     </Compile>
@@ -403,6 +406,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\common\DXSurface.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\common\GatewayErrorDialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

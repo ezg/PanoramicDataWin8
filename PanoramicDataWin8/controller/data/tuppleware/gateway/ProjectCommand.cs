@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.tuppleware.json;
 using PanoramicDataWin8.controller.input;
+using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.tuppleware;
 
@@ -21,7 +22,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
                         new JProperty("source", sourceUuid),
                         new JProperty("attributes", 
                             new JArray(inputModels.Select(im => im.Name).Distinct())))));
-            string response = await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
+            string response = await TuppleWareGateway.Request(data);
             JObject jObject = JObject.Parse(response);
             return jObject;
         }

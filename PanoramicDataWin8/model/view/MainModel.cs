@@ -44,6 +44,19 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private string _ip;
+        public string Ip
+        {
+            get
+            {
+                return _ip;
+            }
+            set
+            {
+                this.SetProperty(ref _ip, value);
+            }
+        }
+
         private SchemaModel _schemaModel;
         public SchemaModel SchemaModel
         {

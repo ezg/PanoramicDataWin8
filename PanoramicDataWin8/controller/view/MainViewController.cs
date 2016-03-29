@@ -107,8 +107,9 @@ namespace PanoramicDataWin8.controller.view
                     MainModel.ShowCodeGen = showCodeGen;
                     MainModel.RenderShadingIn1DHistograms = renderShadingIn1DHistograms;
 
+                    MainModel.Ip = backend;
                     CatalogCommand catalogCommand = new CatalogCommand();
-                    var loadedDatasetConfigs = await catalogCommand.GetCatalog(backend);
+                    var loadedDatasetConfigs = await catalogCommand.GetCatalog(MainModel.Ip);
                     foreach (var ds in loadedDatasetConfigs)
                     {
                         ds.ThrottleInMillis = throttle;

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.tuppleware.json;
 using PanoramicDataWin8.controller.input;
+using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data.tuppleware;
 
 namespace PanoramicDataWin8.controller.data.tuppleware.gateway
@@ -17,7 +18,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware.gateway
                 new JProperty("uuid", uuid),
                 new JProperty("page_size", samples),
                 new JProperty("page_num", page));
-            string response = await TuppleWareGateway.Request(tuppleWareOriginModel.DatasetConfiguration.EndPoint, data);
+            string response = await TuppleWareGateway.Request(data);
             JToken token = JToken.Parse(response);
             return token;
         }

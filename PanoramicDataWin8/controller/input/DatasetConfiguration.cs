@@ -50,20 +50,7 @@ namespace PanoramicDataWin8.controller.input
                 this.SetProperty(ref _schemaJson, value);
             }
         }
-
-        private string _endPoint;
-        public string EndPoint
-        {
-            get
-            {
-                return _endPoint;
-            }
-            set
-            {
-                this.SetProperty(ref _endPoint, value);
-            }
-        }
-
+        
         private double _sampleSize = 1;
         public double SampleSize
         {
@@ -254,10 +241,6 @@ namespace PanoramicDataWin8.controller.input
                     else if (parts[0] == "DataFile")
                     {
                         config.DataFile = parts[1].Trim();
-                    }
-                    else if (parts[0] == "EndPoint")
-                    {
-                        config.EndPoint = parts[1].Trim();
                     }
                     else if (parts[0] == "SampleSize")
                     {
