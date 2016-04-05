@@ -102,6 +102,9 @@
     <Compile Include="controller\data\DataProvider.cs" />
     <Compile Include="controller\data\DataRow.cs" />
     <Compile Include="controller\data\Job.cs" />
+    <Compile Include="controller\data\progressive\ProgressiveGateway.cs" />
+    <Compile Include="controller\data\progressive\ProgressiveQueryExecuter.cs" />
+    <Compile Include="controller\data\progressive\ProgressiveVisualizationJob.cs" />
     <Compile Include="controller\data\tuppleware\ErrorHandler.cs" />
     <Compile Include="controller\data\tuppleware\FrequentItemsetJob.cs" />
     <Compile Include="controller\data\tuppleware\ClassifierJob.cs" />
@@ -155,6 +158,10 @@
     <Compile Include="model\data\LinkType.cs" />
     <Compile Include="model\data\NamedInputModel.cs" />
     <Compile Include="model\data\OriginModel.cs" />
+    <Compile Include="model\data\progressive\ProgressiveFieldInputModel.cs" />
+    <Compile Include="model\data\progressive\ProgressiveInputGroupModel.cs" />
+    <Compile Include="model\data\progressive\ProgressiveOriginModel.cs" />
+    <Compile Include="model\data\progressive\ProgressiveSchemaModel.cs" />
     <Compile Include="model\data\QueryModel.cs" />
     <Compile Include="model\data\result\ClassfierResultDescriptionModel.cs" />
     <Compile Include="model\data\result\VisualizationItemResultModel.cs" />
@@ -167,8 +174,8 @@
     <Compile Include="model\data\sim\SimInputFieldModel.cs" />
     <Compile Include="model\data\sim\SimOriginModel.cs" />
     <Compile Include="model\data\sim\SimSchemaModel.cs" />
-    <Compile Include="model\data\tuppleware\TaskGroupModel.cs" />
-    <Compile Include="model\data\tuppleware\TaskModel.cs" />
+    <Compile Include="model\data\TaskGroupModel.cs" />
+    <Compile Include="model\data\TaskModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareFieldInputModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareInputGroupModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareOriginModel.cs" />
@@ -511,6 +518,7 @@
       <Name>Microsoft Visual C++ 2013 Runtime Package for Windows</Name>
     </SDKReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

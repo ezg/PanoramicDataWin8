@@ -35,6 +35,7 @@ using PanoramicDataWin8.controller.data.tuppleware.gateway;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.progressive;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.model.view;
@@ -250,7 +251,7 @@ namespace PanoramicDataWin8
             var model = DataContext as MainModel;
             if (model.SchemaModel != null)
             {
-                if (model.SchemaModel != null && model.SchemaModel is TuppleWareSchemaModel)
+                if (model.SchemaModel != null && (model.SchemaModel is TuppleWareSchemaModel || model.SchemaModel is ProgressiveSchemaModel))
                 {
                     addJobButton.Visibility = Visibility.Visible;
                 }
