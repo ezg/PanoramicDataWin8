@@ -35,8 +35,32 @@ namespace PanoramicDataWin8.controller.data.progressive
             _throttle = throttle;
             var psm = (queryModelClone.SchemaModel as ProgressiveSchemaModel);
             string filter = "";
+
             List<string> aggregateFunctions = new List<string>();
             List<string> aggregateDimensions = new List<string>();
+            List<string> dimensionAggregateFunctions = new List<string>();
+            List<string> dimensions = new List<string>();
+            List<string> brushes = new List<string>();
+            List<double> nrOfBins = new List<double>();
+
+            nrOfBins = new double[] {MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins}.Concat(
+                QueryModel.GetUsageInputOperationModel(InputUsage.Group).Select(qom => MainViewController.Instance.MainModel.NrOfGroupBins)).ToList();
+
+            dimensionAggregateFunctions = QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Select(iom => iom.AggregateFunction.ToString()).Concat(
+                     QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).Select(iom => iom.AggregateFunction.ToString())).Concat(
+                     QueryModelClone.GetUsageInputOperationModel(InputUsage.Group).Select(iom => iom.AggregateFunction.ToString())).ToList();
+
+            dimensions = QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Select(iom => iom.InputModel.Name).Concat(
+                                 QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).Select(iom => iom.InputModel.Name)).Concat(
+                                 QueryModelClone.GetUsageInputOperationModel(InputUsage.Group).Select(iom => iom.InputModel.Name)).ToList();
+
+            var aggregates = QueryModelClone.GetUsageInputOperationModel(InputUsage.Value).Concat(
+                 QueryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue)).Concat(
+                 QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
+                 QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
+
+            aggregateDimensions = aggregates.Select(iom => iom.InputModel.Name).ToList();
+            aggregateFunctions = aggregates.Select(iom => iom.AggregateFunction.ToString()).ToList();
 
             _query = new JObject(
                 new JProperty("type", "execute"),
@@ -48,40 +72,12 @@ namespace PanoramicDataWin8.controller.data.progressive
                         new JProperty("type", "visualization"),
                         new JProperty("chunkSize", sampleSize),
                         new JProperty("aggregateDimensions", aggregateDimensions),
+                        new JProperty("nrOfBins", nrOfBins),
+                        new JProperty("brushes", brushes),
+                        new JProperty("dimensionAggregateFunctions", dimensionAggregateFunctions),
+                        new JProperty("dimensions", dimensions)
                     ))
                 );
-
-            /*
-            job = {
-              "type": "execute",
-              "dataset": "cars_small.csv",
-              "task": {
-                "filter": "model_year > 70",
-                "aggregateFunctions": [
-                  "Count"
-                ],
-                "type": "visualization",
-                "chunkSize": 1000,
-                "aggregateDimensions": [
-                  "cylinders"
-                ],
-                "nrOfBins": [
-                  10
-                ],
-                "brushes": [
-                  "cylinders == 8",
-                  "mpg > 1"
-                ],
-                "dimensionAggregateFunctions": [
-                  "None"
-                ],
-                "dimensions": [
-                  "mpg"
-                ]
-              }
-            }
-            */
-
         }
         public override void Start()
         {
@@ -137,7 +133,10 @@ namespace PanoramicDataWin8.controller.data.progressive
                 if (_isRunning)
                 {
                     _isRunning = false;
-                    _webSocket.Close(1000, "");
+                    if (_webSocket != null)
+                    {
+                        _webSocket.Close(1000, "");
+                    }
                 }
             }
         }
