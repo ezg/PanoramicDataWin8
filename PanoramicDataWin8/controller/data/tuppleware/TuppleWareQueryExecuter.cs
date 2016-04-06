@@ -20,7 +20,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             queryModel.ResultModel.ResultItemModels = new ObservableCollection<ResultItemModel>();
             queryModel.ResultModel.Progress = 0.0;
             queryModel.ResultModel.ResultDescriptionModel = null;
-            queryModel.ResultModel.FireResultModelUpdated();
+            queryModel.ResultModel.FireResultModelUpdated(ResultType.Clear);
 
             if (ActiveJobs.ContainsKey(queryModel))
             {
@@ -100,7 +100,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 queryModel = job.QueryModel;
             }
             queryModel.ResultModel.Progress = 1.0;
-            queryModel.ResultModel.FireResultModelUpdated();
+            queryModel.ResultModel.FireResultModelUpdated(ResultType.Complete);
         }
 
         private void job_JobUpdate(object sender, JobEventArgs jobEventArgs)
@@ -131,7 +131,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
             }
             queryModel.ResultModel.Progress = jobEventArgs.Progress;
             queryModel.ResultModel.ResultDescriptionModel = jobEventArgs.ResultDescriptionModel;
-            queryModel.ResultModel.FireResultModelUpdated();
+            queryModel.ResultModel.FireResultModelUpdated(ResultType.Update);
         }
     }
 }

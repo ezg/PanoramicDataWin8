@@ -58,8 +58,8 @@ namespace PanoramicDataWin8.model.data.result
         }
 
 
-        private Dictionary<InputOperationModel, double> _maxValues = new Dictionary<InputOperationModel, double>();
-        public Dictionary<InputOperationModel, double> MaxValues
+        private Dictionary<InputOperationModel, Dictionary<BrushIndex, double>> _maxValues = new Dictionary<InputOperationModel, Dictionary<BrushIndex, double>>();
+        public Dictionary<InputOperationModel, Dictionary<BrushIndex, double>> MaxValues
         {
             get
             {
@@ -71,8 +71,8 @@ namespace PanoramicDataWin8.model.data.result
             }
         }
 
-        private Dictionary<InputOperationModel, double> _minValues = new Dictionary<InputOperationModel, double>();
-        public Dictionary<InputOperationModel, double> MinValues
+        private Dictionary<InputOperationModel, Dictionary<BrushIndex, double>> _minValues = new Dictionary<InputOperationModel, Dictionary<BrushIndex, double>>();
+        public Dictionary<InputOperationModel, Dictionary<BrushIndex, double>> MinValues
         {
             get
             {

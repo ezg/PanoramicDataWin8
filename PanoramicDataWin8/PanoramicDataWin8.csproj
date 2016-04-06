@@ -164,6 +164,7 @@
     <Compile Include="model\data\progressive\ProgressiveSchemaModel.cs" />
     <Compile Include="model\data\QueryModel.cs" />
     <Compile Include="model\data\result\ClassfierResultDescriptionModel.cs" />
+    <Compile Include="model\data\result\ProgressiveVisualizationResultItemModel.cs" />
     <Compile Include="model\data\result\VisualizationItemResultModel.cs" />
     <Compile Include="model\data\result\ResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultItemModel.cs" />

@@ -277,7 +277,7 @@ namespace PanoramicDataWin8.model.data
             {
                 _filterModels.Remove(filterModel);
             }
-            FireQueryModelUpdated(QueryModelUpdatedEventType.FilterModels);
+            FireQueryModelUpdated(QueryModelUpdatedEventType.ClearFilterModels);
         }
 
         public void AddFilterModels(List<FilterModel> filterModels)
@@ -457,7 +457,7 @@ namespace PanoramicDataWin8.model.data
         }
     }
 
-    public enum QueryModelUpdatedEventType { Structure, Links, FilterModels }
-    
+    public enum QueryModelUpdatedEventType { Structure, Links, FilterModels, ClearFilterModels }
+
     public enum VisualizationType { table, plot, map, line }
 }
