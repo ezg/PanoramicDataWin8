@@ -93,7 +93,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (e.QueryModelUpdatedEventType == QueryModelUpdatedEventType.FilterModels || e.QueryModelUpdatedEventType == QueryModelUpdatedEventType.ClearFilterModels)
             {
                 _plotRendererContentProvider.UpdateFilterModels((sender as QueryModel).FilterModels.ToList());
-                //  render();
+                render();
             }
         }
 
