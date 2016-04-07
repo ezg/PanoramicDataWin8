@@ -1,0 +1,39 @@
+<!doctype html> 
+<html>
+<head>
+<title>Websocket</title>
+<script src="http://code.jquery.com/jquery-2.0.0.js"></script>
+</head>
+<body>
+<h1>Websocket</h1>
+<label id="conn_text"></label><br />
+<input type="text" id="input_text"/>
+<input type="submit" id="button" value="Send" /><br />
+<div id="messages_txt" />
+<script>
+  $(document).ready(function () {
+    //change example.com with your IP or your host
+    var ws = new WebSocket("ws://localhost:8888/ws");
+    ws.onopen = function(evt) {
+      var conn_status = document.getElementById('conn_text');
+      conn_status.innerHTML = "Connection status: Connected!"
+    };
+    ws.onmessage = function(evt) {
+      var newMessage = document.createElement('p');
+      newMessage.textContent = "Server: " + evt.data;
+      document.getElementById('messages_txt').appendChild(newMessage);
+    };
+    ws.onclose = function(evt) {
+      alert ("Connection closed");
+    };
+    $("#button").click(function(evt) {
+      evt.preventDefault();
+      var message = $("#input_text").val();
+      ws.send(message);
+      var newMessage = document.createElement('p');
+      newMessage.textContent = "Client: " + message;
+      document.getElementById('messages_txt').appendChild(newMessage);
+    });
+  });
+</script>
+</body></html>
