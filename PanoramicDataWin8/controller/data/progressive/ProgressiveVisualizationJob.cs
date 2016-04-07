@@ -38,6 +38,9 @@ namespace PanoramicDataWin8.controller.data.progressive
             _throttle = throttle;
             var psm = (queryModelClone.SchemaModel as ProgressiveSchemaModel);
             string filter = "";
+            List<FilterModel> filterModels = new List<FilterModel>();
+            filter = FilterModel.GetFilterModelsRecursive(QueryModelClone, new List<QueryModel>(), filterModels, true);
+
 
             List<string> aggregateFunctions = new List<string>();
             List<string> aggregateDimensions = new List<string>();

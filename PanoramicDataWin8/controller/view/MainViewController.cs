@@ -430,6 +430,12 @@ namespace PanoramicDataWin8.controller.view
                     MainViewController.Instance.InkableScene.Remove(attachmentView);
                 }
             }
+            var qm = (visualizationContainerView.DataContext as VisualizationViewModel).QueryModel;
+            foreach (var model in qm.LinkModels.ToArray())
+            {
+                model.FromQueryModel.LinkModels.Remove(model);
+                model.ToQueryModel.LinkModels.Remove(model);
+            }
         }
 
         public LinkViewModel CreateLinkViewModel(LinkModel linkModel)
