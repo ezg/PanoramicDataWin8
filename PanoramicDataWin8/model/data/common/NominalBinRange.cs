@@ -9,6 +9,12 @@ namespace PanoramicDataWin8.model.data.common
     {
         private Dictionary<double, string> _labelsValue = new Dictionary<double, string>();
 
+        public Dictionary<double, string> LabelsValue
+        {
+            get { return _labelsValue; }
+            set { _labelsValue = value; }
+        }
+
         private double _step = 0;
         public double Step
         {
@@ -20,6 +26,11 @@ namespace PanoramicDataWin8.model.data.common
             {
                 _step = value;
             }
+        }
+
+        public NominalBinRange()
+        {
+            
         }
 
         public NominalBinRange(double dataMinValue, double dataMaxValue, double targetBinNumber)

@@ -411,7 +411,7 @@ namespace PanoramicDataWin8.view.vis.render
                                 valueMarginAbsolute = resultItem.MarginsAbsolute[iom][BrushIndex.ALL];
                             }
 
-                            if (value != null && value != 0.0)
+                            if (value != null && unNormalizedvalue != 0.0)
                             {
                                 if (_isXAxisAggregated && !_isYAxisAggregated &&
                                     (_xAom.AggregateFunction == AggregateFunction.Count || _xAom.AggregateFunction == AggregateFunction.Sum || _xAom.AggregateFunction == AggregateFunction.Avg ||
@@ -527,6 +527,7 @@ namespace PanoramicDataWin8.view.vis.render
                                 }
                                 else
                                 {
+                                    var tt = xValue;
                                     // draw data rect
                                     canvasArgs.DrawingSession.FillRoundedRectangle(rect, 4, 4, Windows.UI.Color.FromArgb(255, 40, 170, 213));
                                     //DrawString(canvasArgs, _textFormat, (float) rect.X + _leftOffset, (float)rect.Y + _topOffset, yMargin.Value.ToString("F2"), _textColor, true, true, false);

@@ -176,6 +176,27 @@ namespace PanoramicDataWin8.controller.data.progressive
                         resultDescriptionModel.BinRanges.Add(new AggregateBinRange());
                         binRangeBins.Add(new List<double>());
                     }
+                    else if (binRange["type"].ToString() == "NominalBinRange")
+                    {
+                        var valuesLabel = binRange["ValuesLabel"];
+                        var nbr = new NominalBinRange();
+                        resultDescriptionModel.BinRanges.Add(nbr);
+                        var count = 0;
+                        foreach (var token in valuesLabel)
+                        {
+                            var prop = (JProperty) token;
+                            nbr.LabelsValue.Add(double.Parse(prop.Name.ToString()), prop.Value.ToString());
+                            count++;
+                            if (count > 20)
+                            {
+                                //break
+                            }
+                        }
+                        nbr.MaxValue = nbr.LabelsValue.Count;
+                        nbr.Step = 1;
+
+                        binRangeBins.Add(nbr.GetBins());
+                    }
                 }
 
                 foreach (var bin in bins)
@@ -225,8 +246,9 @@ namespace PanoramicDataWin8.controller.data.progressive
                 }
                 await fireUpdated(resultItemModels, progress, resultDescriptionModel);
 
-                if (progress == 1.0)
+                if (progress > 1.0)
                 {
+                    Stop();
                     await fireCompleted();
                 }
                 /* if (_binner != null && _binner.BinStructure != null)
