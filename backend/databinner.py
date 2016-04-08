@@ -75,22 +75,80 @@ class DataBinner():
         for brushIndex, brushDataFrame in enumerate(brushDataFrames):
             toAggregateBrushes = [brushIndex, currentBrushes[-1]]
             dfDTypes = brushDataFrame.dtypes
-            for rowIndex, row in brushDataFrame.iterrows():
-                binIndex = []
-                for idx, binRange in enumerate(self.binStructure.binRanges):
-                    value = row[self.dimensions[idx]]
-                    if isinstance(binRange, NominalBinRange):
-                        binIndex.append(self.binStructure.binRanges[idx].getIndexFromValue(value))    
-                    else:
-                        binIndex.append(self.binStructure.binRanges[idx].getIndex(value))
+            
+            if len(brushDataFrame):
+                #brushDataFrame['binIndex'] = brushDataFrame.apply(lambda x: self.__createAggregateKey(x), axis=1).astype(object)
+                #grouped = brushDataFrame.groupby('binIndex', axis=1)
+                #print grouped.first()
+                #print grouped.apply(lambda x: len(x), axis=1)
+                brushDataFrame.apply(lambda x: self.__runAggregation(x, dfDTypes, toAggregateBrushes, currentBrushes, progress, brushDataFrame), axis=1).astype(object)
                 
-                binIndexTuple = tuple(binIndex)
-                if binIndexTuple in self.binStructure.bins:
-                    self.binStructure.aggregate(binIndexTuple, self.dimensions, self.toAggregate, self.toAggregateFunctions, toAggregateBrushes, brushDataFrame, row, dfDTypes, progress)
         end = time.time()
-        #print (end - start)
+        print (end - start)
         
         self.binStructure.endBatchAggregation(self.dimensions, self.toAggregate, self.toAggregateFunctions, currentBrushes, df, progress)
+    
+    def __runAggregation(self, row, dTypes, brushes, currentBrushes, progress, brushDataFrame):
+        binIndex = []
+        for idx, binRange in enumerate(self.binStructure.binRanges):
+            value = row[self.dimensions[idx]]
+            if isinstance(binRange, NominalBinRange):
+                binIndex.append(self.binStructure.binRanges[idx].getIndexFromValue(value))    
+            else:
+                binIndex.append(self.binStructure.binRanges[idx].getIndex(value))        
+        
+        maxCount = sys.float_info.max;
+        #bin = self.binStructure.bins[row['binIndex'].index]
+        bin = self.binStructure.bins[tuple(binIndex)]
+        bin.count += 1
+        for brushIndex in brushes:
+            for idx, aggregate in enumerate(self.toAggregate):
+                aggregateFunction = self.toAggregateFunctions[idx]
+                aggregateKey = (aggregate, aggregateFunction, brushIndex)
+                dType = dTypes[aggregate]
+                
+                currentValue = bin.values[aggregateKey]
+                value = row[aggregate]
+                
+                if aggregateFunction == 'Max':
+                    currentValue = max(currentValue, value)
+                    
+                elif aggregateFunction == 'Min':
+                    currentValue = min(currentValue, value)    
+                    
+                elif aggregateFunction == 'Sum':
+                    currentValue = currentValue + value
+                    
+                elif aggregateFunction == 'Avg':
+                    currentValue = ((currentValue * bin.counts[aggregateKey]) + value) / (bin.counts[aggregateKey] + 1)
+                    n = bin.ns[aggregateKey] + 1
+                    bin.ns[aggregateKey] = n
+                    x = value
+                    bin.means[aggregateKey] = bin.means[aggregateKey] + (x - bin.means[aggregateKey])/n
+                    bin.powerSumAverage[aggregateKey] = bin.powerSumAverage[aggregateKey] + (x*x - bin.powerSumAverage[aggregateKey])/n
+                    if (bin.ns[aggregateKey] - 1 > 0):
+                        mean = bin.means[aggregateKey]
+                        toSqrt = (bin.powerSumAverage[aggregateKey]*n - n*mean*mean)/(n - 1)
+                        bin.sampleStandardDeviations[aggregateKey] = math.sqrt(max(0, toSqrt))
+                    
+                elif aggregateFunction == 'Count':
+                   
+                    currentValue = bin.count / progress
+                
+                bin.values[aggregateKey] = currentValue   
+                bin.counts[aggregateKey] += 1.0          
+    
+    def __createAggregateKey(self, x):
+        binIndex = []
+        for idx, binRange in enumerate(self.binStructure.binRanges):
+            value = x[self.dimensions[idx]]
+            if isinstance(binRange, NominalBinRange):
+                binIndex.append(self.binStructure.binRanges[idx].getIndexFromValue(value))    
+            else:
+                binIndex.append(self.binStructure.binRanges[idx].getIndex(value))
+        
+        return AggregateKey(tuple(binIndex))
+
         
     def __initializeBinStructure(self, binRanges):
         binStructure = BinStructure(binRanges)
@@ -323,6 +381,18 @@ class Bin():
         self.powerSumAverage = bin.powerSumAverage
         self.sampleStandardDeviations = bin.sampleStandardDeviations
         self.ns = bin.ns
+
+class AggregateKey():
+    def __init__(self,index):
+        self.index = index  
+    def __eq__(self, other):
+        return other and self.index == other.index
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return index
         
 class Span():
     def __init__(self, min, max, index):

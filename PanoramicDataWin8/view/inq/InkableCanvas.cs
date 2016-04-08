@@ -43,7 +43,7 @@ namespace PanoramicDataWin8.view.inq
             List<Point> pts = new List<Point>();
             pts.Add(e.GetCurrentPoint(this).Position);
             _currentInkStroke = new InkStroke(pts);
-            _currentInkStroke.IsErase = e.GetCurrentPoint(this).Properties.IsEraser;
+            _currentInkStroke.IsErase = e.GetCurrentPoint(this).Properties.IsEraser || e.GetCurrentPoint(this).Properties.IsRightButtonPressed;
             addDrawingInkStroke(_currentInkStroke);
         }
 

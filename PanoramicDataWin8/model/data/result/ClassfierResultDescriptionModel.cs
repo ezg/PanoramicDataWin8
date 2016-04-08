@@ -10,76 +10,53 @@ namespace PanoramicDataWin8.model.data.result
 {
     public class ClassfierResultDescriptionModel : ResultDescriptionModel
     {
-        private List<InputFieldModel> _labels = new List<InputFieldModel>();
-        public List<InputFieldModel> Labels
-        {
-            get { return _labels; }
-            set { this.SetProperty(ref _labels, value); }
-        }
-
-        private Dictionary<InputFieldModel, List<List<double>>> _confusionMatrices = new Dictionary<InputFieldModel, List<List<double>>>();
-        public Dictionary<InputFieldModel, List<List<double>>> ConfusionMatrices
+        private List<List<double>> _confusionMatrices = new List<List<double>>();
+        public List<List<double>> ConfusionMatrices
         {
             get { return _confusionMatrices; }
             set { this.SetProperty(ref _confusionMatrices, value); }
         }
 
-        private Dictionary<InputFieldModel, List<Pt>> _rocCurves = new Dictionary<InputFieldModel, List<Pt>>();
-        public Dictionary<InputFieldModel, List<Pt>> RocCurves
+        private List<Pt> _rocCurve = new List<Pt>();
+        public List<Pt> RocCurve
         {
-            get { return _rocCurves; }
-            set { this.SetProperty(ref _rocCurves, value); }
+            get { return _rocCurve; }
+            set { this.SetProperty(ref _rocCurve, value); }
         }
 
-        private Dictionary<InputFieldModel, double> _f1s = new Dictionary<InputFieldModel, double>();
-        public Dictionary<InputFieldModel, double> F1s
+        private List<double> _f1s = new List<double>();
+        public List<double> F1s
         {
             get { return _f1s; }
             set { this.SetProperty(ref _f1s, value); }
         }
 
-        private Dictionary<InputFieldModel, double> _precisions = new Dictionary<InputFieldModel, double>();
-        public Dictionary<InputFieldModel, double> Precisions
+        private List<double> _progresses = new List<double>();
+        public List<double> Progresses
         {
-            get { return _precisions; }
-            set { this.SetProperty(ref _precisions, value); }
+            get { return _progresses; }
+            set { this.SetProperty(ref _progresses, value); }
         }
 
-        private Dictionary<InputFieldModel, double> _recalls = new Dictionary<InputFieldModel, double>();
-        public Dictionary<InputFieldModel, double> Recalls
+        private double _precision = 0;
+        public double Precision
         {
-            get { return _recalls; }
-            set { this.SetProperty(ref _recalls, value); }
+            get { return _precision; }
+            set { this.SetProperty(ref _precision, value); }
         }
 
-        private Dictionary<InputFieldModel, double> _aucs = new Dictionary<InputFieldModel, double>();
-        public Dictionary<InputFieldModel, double> AUCs
+        private double _recall = 0;
+        public double Recall
         {
-            get { return _aucs; }
-            set { this.SetProperty(ref _aucs, value); }
+            get { return _recall; }
+            set { this.SetProperty(ref _recall, value); }
         }
 
-        private double _avgPrecision = 0;
-        public double AvgPrecision
+        private double _auc = 0;
+        public double AUC
         {
-            get { return _avgPrecision; }
-            set { this.SetProperty(ref _avgPrecision, value); }
-        }
-
-
-        private double _avgRecall = 0;
-        public double AvRecall
-        {
-            get { return _avgRecall; }
-            set { this.SetProperty(ref _avgRecall, value); }
-        }
-
-
-        private double _avgF1 = 0;
-        public double AvgF1
-        {
-            get { return _avgF1; }
-            set { this.SetProperty(ref _avgF1, value); }
+            get { return _auc; }
+            set { this.SetProperty(ref _auc, value); }
         }
     }
 }

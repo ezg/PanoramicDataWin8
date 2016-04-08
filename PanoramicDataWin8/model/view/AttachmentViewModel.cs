@@ -297,6 +297,7 @@ namespace PanoramicDataWin8.model.view
 
         void createLogregLeft()
         {
+            return;
             AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
             {
                 InputUsage = InputUsage.Label,

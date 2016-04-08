@@ -34,6 +34,7 @@ namespace PanoramicDataWin8.view.vis.render
     {
         private MenuViewModel _menuViewModel = null;
         private MenuView _menuView = null;
+        private int _currentViewIndex = 0;
 
         private ClassifierRendererContentProvider _classifierRendererContentProvider = new ClassifierRendererContentProvider();
 
@@ -224,7 +225,9 @@ namespace PanoramicDataWin8.view.vis.render
         {
             VisualizationViewModel model = ((VisualizationViewModel) DataContext);
             ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel) model.QueryModel.ResultModel.ResultDescriptionModel);
-            _classifierRendererContentProvider.UpdateData(resultModel, model.QueryModel.Clone(), descriptionModel.Labels.Count > 1 ? -1 : 0);
+            int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
+            _currentViewIndex = (_currentViewIndex + 1) % max;
+            _classifierRendererContentProvider.UpdateData(resultModel, model.QueryModel.Clone(), _currentViewIndex);
 
             render(); render();
         }
@@ -330,22 +333,11 @@ namespace PanoramicDataWin8.view.vis.render
             if (model.QueryModel.ResultModel != null && model.QueryModel.ResultModel.ResultDescriptionModel != null)
             {
                 ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel) model.QueryModel.ResultModel.ResultDescriptionModel);
+                int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
+                
+                _currentViewIndex = (_currentViewIndex + 1) % max;
+                _classifierRendererContentProvider.ViewIndex = _currentViewIndex;
 
-                if (descriptionModel.Labels.Count > 1)
-                {
-                    if (_classifierRendererContentProvider.LabelIndex + 1 == descriptionModel.Labels.Count)
-                    {
-                        _classifierRendererContentProvider.LabelIndex = -1;
-                    }
-                    else
-                    {
-                        _classifierRendererContentProvider.LabelIndex += 1;
-                    }
-                }
-                else
-                {
-                    _classifierRendererContentProvider.LabelIndex = (_classifierRendererContentProvider.LabelIndex + 1) % descriptionModel.Labels.Count;
-                }
                 render();
             }
             

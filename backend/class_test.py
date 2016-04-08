@@ -1,16 +1,22 @@
 from dataprovider import SequentialDataProvider
-from sklearn.metrics import roc_curve
+
 from databinner import DataBinner
 import json
-from sklearn.utils import compute_class_weight
+
 import numpy as np
 import time
+from sklearn.metrics import roc_curve
+from sklearn.metrics import confusion_matrix
+from sklearn.utils import compute_class_weight
+from sklearn.metrics import auc
+from sklearn.metrics import classification_report
+from sklearn.metrics import roc_curve
 from sklearn.linear_model import SGDClassifier
 from sklearn.linear_model import PassiveAggressiveClassifier
 from sklearn.linear_model import Perceptron
 from sklearn.naive_bayes import MultinomialNB
 
-def get_classifier(classifier):
+def getClassifier(classifier):
     print classifier
     if classifier == 'sgd':
         return SGDClassifier()
@@ -22,19 +28,47 @@ def get_classifier(classifier):
         return PassiveAggressiveClassifier()
     raise NotImplementedError()
     
+def classifyStats( cm, y_test, y_prob, tile_size):
+    #print cm
+    #print classification_report(y_test, y_pred)
+    tp = float(cm[1][1])
+    fp = float(cm[0][1])
+    tn = float(cm[0][0])
+    fn = float(cm[1][0])
+    #precision = tp / (tp + fp)
+    #recall = tp / (tp + fn)
+    #f1 = 2 * tp / (2 * tp + fp + fn)
+    p_support = (tp + fn) / tile_size
+    n_support = (tn + fp) / tile_size
+    precision = tp / max((tp + fp), 1) * p_support + tn / max((tn + fn), 1) * n_support
+    recall = tp / max((tp + fn), 1) * p_support + tn / max((tn + fp), 1) * n_support
+    f1 = 2 * precision * recall / (precision + recall)
+    fpr, tpr, thresholds = roc_curve(y_test, y_prob[:, 1])
+    roc_auc = auc(fpr, tpr)
+    stats = {'tp': tp,
+             'fp': fp,
+             'tn': tn,
+             'fn': fn,
+             'precision': precision,
+             'recall': recall,
+             'f1': f1,
+             'fpr': fpr.tolist(),
+             'tpr': tpr.tolist(),
+             'auc': roc_auc}
+    return stats    
     
     
 job = {
   "type": "execute",
-  "dataset": "cars_small.csv_5000",
+  "dataset": "cars_small.csv_1000",
   "task": {
     "type": "classify",
     "classifier": "passive_aggressive",
-    "chunkSize": 2500,
+    "chunkSize": 1000,
     "features": [
       "acceleration", "model_year", "horsepower", "displacement" 
     ],
-    "label": "mpg < 25",
+    "label": "mpg < 10",
     "filter": ""
   }
 }
@@ -44,7 +78,7 @@ print json.dumps(job)
 task = job['task']
 
 dp = SequentialDataProvider(job['dataset'], 'C:\\data\\', task['chunkSize'], 0)
-cls = get_classifier(task['classifier'])
+cls = getClassifier(task['classifier'])
 
 def default(o):
     if isinstance(o, np.integer): return int(o)
@@ -79,9 +113,21 @@ while True:
             X_train = df[task['features']]
             cls.partial_fit(X_train, y_train, classes=np.array([0, 1]))
             
-            y_pred = cls.predict(X_train).sum()
-            print y_pred, np.array([1 if x else 0 for x in np.array(df.eval(task['label']))]).sum()
 
+            y_prob = None
+            y_pred = None
+            if cls_name in ['sgd', 'perceptron', 'passive_aggressive']:
+                y_pred = cls.predict(X_test)
+                y_prob = np.array([[0,y] for y in y_pred])
+            else:
+                y_prob = cls.predict_proba(X_test)
+                print y_prob
+                y_pred = [1 if t[0] >= 0.5 else 0 for t in y_prob]
+
+            cm = confusion_matrix(y_test, y_pred)
+            stats = classifyStats(cm, y_test, y_prob, len(y_test))
+            print stats
+            
             # accumulate test accuracy stats
             cls_stats[cls_name]['total_fit_time'] += time.time() - tick
             cls_stats[cls_name]['n_train'] += X_train.shape[0]

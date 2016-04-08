@@ -252,7 +252,7 @@ namespace PanoramicDataWin8.view.vis.render
                     {
                         if (_visualizationDescriptionModel.AxisTypes[_xIndex] == AxisType.Quantitative)
                         {
-                            DrawString(canvasArgs, _textFormat, xFrom, yFrom + 5, label.Label.ToString(), _textColor, true, true, false);
+                            DrawString(canvasArgs, _textFormat, xFrom, yFrom + 5, double.Parse(label.Label).ToString(), _textColor, true, true, false);
                             if (lastLabel)
                             {
                                 DrawString(canvasArgs, _textFormat, xTo, yFrom + 5, label.MaxValue.ToString(), _textColor, true, true, false);
@@ -289,7 +289,7 @@ namespace PanoramicDataWin8.view.vis.render
                     {
                         if (_visualizationDescriptionModel.AxisTypes[_yIndex] == AxisType.Quantitative)
                         {
-                            DrawString(canvasArgs, _textFormat, xFrom - 10, yFrom, label.Label.ToString(), _textColor, false, false, true);
+                            DrawString(canvasArgs, _textFormat, xFrom - 10, yFrom, double.Parse(label.Label).ToString(), _textColor, false, false, true);
                             if (lastLabel)
                             {
                                 DrawString(canvasArgs, _textFormat, xFrom - 10, yTo, label.MaxValue.ToString(), _textColor, false, false, true);

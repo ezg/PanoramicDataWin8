@@ -49,12 +49,12 @@ namespace PanoramicDataWin8.view.vis.render
 
         private QueryModel _queryModel = null;
         
-        private int _labelIndex = 0;
+        private int _viewIndex = 0;
 
-        public int LabelIndex
+        public int ViewIndex
         {
-            get { return _labelIndex; }
-            set { _labelIndex = value; }
+            get { return _viewIndex; }
+            set { _viewIndex = value; }
         }
 
         public float CompositionScaleX { get; set; }
@@ -65,11 +65,11 @@ namespace PanoramicDataWin8.view.vis.render
         {
         }
         
-        public void UpdateData(ResultModel resultModel, QueryModel queryModel, int labelIndex )
+        public void UpdateData(ResultModel resultModel, QueryModel queryModel, int viewIndex )
         {
             _resultModel = resultModel;
             _queryModel = queryModel;
-            _labelIndex = labelIndex;
+            _viewIndex = viewIndex;
 
             _classfierResultDescriptionModel = _resultModel.ResultDescriptionModel as ClassfierResultDescriptionModel;
         }
@@ -89,14 +89,14 @@ namespace PanoramicDataWin8.view.vis.render
                 var centerX =  _deviceWidth/2.0f + _leftOffset;
                 var centerY =  _deviceHeight/2.0f + _topOffset;
 
-                string label = _labelIndex != -1 ? _classfierResultDescriptionModel.Labels[_labelIndex].Name : "avg across labels";
+                string label = "details";//_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].Name : "avg across labels";
                 DrawString(canvasArgs, _textFormatBig, centerX, _topOffset, label, _textColor, false, true, false);
 
                 var w = (_deviceWidth - 20)/3.0f;
                 var h = Math.Max(0, _deviceHeight/2.0f - 50);
                 var yOff = 40f;
 
-                if ((_deviceHeight <= 200 || _deviceWidth <= 180) || _labelIndex == -1)
+                if ((_deviceHeight <= 200 || _deviceWidth <= 180) || _viewIndex == -1)
                 {
                     //yOff = centerY - h /2.0f;
                     h = Math.Max(0, _deviceHeight - 50);
@@ -107,7 +107,7 @@ namespace PanoramicDataWin8.view.vis.render
                     yOff,
                     w,
                     h,
-                    _labelIndex != -1 ? (float)_classfierResultDescriptionModel.Precisions[_classfierResultDescriptionModel.Labels[_labelIndex]] :(float) _classfierResultDescriptionModel.AvgPrecision, 
+                    (float) _classfierResultDescriptionModel.Precision, 
                     "precision");
 
                 renderGauge(canvas, canvasArgs,
@@ -115,7 +115,7 @@ namespace PanoramicDataWin8.view.vis.render
                    yOff,
                    w,
                    h,
-                   _labelIndex != -1 ? (float)_classfierResultDescriptionModel.Recalls[_classfierResultDescriptionModel.Labels[_labelIndex]] :(float) _classfierResultDescriptionModel.AvRecall, 
+                   (float) _classfierResultDescriptionModel.Recall, 
                    "recall");
 
                 renderGauge(canvas, canvasArgs,
@@ -123,10 +123,10 @@ namespace PanoramicDataWin8.view.vis.render
                    yOff,
                    w,
                    h,
-                   _labelIndex != -1 ? (float)_classfierResultDescriptionModel.F1s[_classfierResultDescriptionModel.Labels[_labelIndex]] : (float)_classfierResultDescriptionModel.AvgF1, 
+                   (float)_classfierResultDescriptionModel.F1s.Last(), 
                    "f1");
 
-                if (_deviceHeight > 200 && _deviceWidth > 180 && _labelIndex != -1)
+                if (_deviceHeight > 200 && _deviceWidth > 180 && _viewIndex != -1)
                 {
                     renderConfusionMatrix(canvas, canvasArgs,
                         _leftOffset, centerY, _deviceWidth/2.0f - 10, _deviceHeight/2.0f);
@@ -212,13 +212,13 @@ namespace PanoramicDataWin8.view.vis.render
             var h = (height - 60) / 2.0f;
             var w = (width - 40) / 2.0f;
 
-            for (int r = 0; r < _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]].Count; r++)
+            for (int r = 0; r < _classfierResultDescriptionModel.ConfusionMatrices.Count; r++)
             {
                 DrawString(canvasArgs, _textFormat, xOff + w / 2.0f + (r * w), yOff - 20, (1 - r) + "", _textColor, false, true, false);
                 DrawString(canvasArgs, _textFormat, xOff - 10, yOff + h / 2.0f + (r * h), (1 - r) + "", _textColor, false, true, true);
 
-                var row = _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]][r];
-                var total = _classfierResultDescriptionModel.ConfusionMatrices[_classfierResultDescriptionModel.Labels[_labelIndex]].SelectMany(t => t).Sum();
+                var row = _classfierResultDescriptionModel.ConfusionMatrices[r];
+                var total = _classfierResultDescriptionModel.ConfusionMatrices.SelectMany(t => t).Sum();
                 var valueSum = (float) row.Sum();
                 for (int c = 0; c < row.Count; c++)
                 {
@@ -277,7 +277,7 @@ namespace PanoramicDataWin8.view.vis.render
             canvasArgs.DrawingSession.DrawLine(new Vector2(xOff, yOff + h), new Vector2(xOff + w, yOff), white, 0.5f);
 
             Pt last = new Pt(0,0);
-            foreach (var pt in _classfierResultDescriptionModel.RocCurves[_classfierResultDescriptionModel.Labels[_labelIndex]])
+            foreach (var pt in _classfierResultDescriptionModel.RocCurve)
             {
                 canvasArgs.DrawingSession.DrawLine(
                     new Vector2(
@@ -289,7 +289,7 @@ namespace PanoramicDataWin8.view.vis.render
                 last = pt;
             }
 
-            var auc = _classfierResultDescriptionModel.AUCs[_classfierResultDescriptionModel.Labels[_labelIndex]];
+            var auc = _classfierResultDescriptionModel.AUC;
             DrawString(canvasArgs, _textFormat, xOff + w - 4, yOff + h - 15, "auc: " + auc.ToString("F2"), _textColor, false, false, false);
         }
 

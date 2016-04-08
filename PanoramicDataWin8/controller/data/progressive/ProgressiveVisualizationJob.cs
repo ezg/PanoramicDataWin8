@@ -126,7 +126,6 @@ namespace PanoramicDataWin8.controller.data.progressive
             {
                 reader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
                 string message = reader.ReadString(reader.UnconsumedBufferLength);
-                
 
                 JObject result = JObject.Parse(message);
 
@@ -145,7 +144,6 @@ namespace PanoramicDataWin8.controller.data.progressive
                 var axisTypes = dimensions.Select(d => QueryModelClone.GetAxisType(d)).ToList();
 
                 List<string> brushes = new List<string>();
-
 
                 foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)
                 {

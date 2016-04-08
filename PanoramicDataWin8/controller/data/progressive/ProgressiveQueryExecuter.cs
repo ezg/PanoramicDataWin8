@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using PanoramicDataWin8.controller.data.progressive;
+using PanoramicDataWin8.controller.data.tuppleware;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
@@ -61,33 +62,16 @@ namespace PanoramicDataWin8.controller.data.progressive
                         }
                         else
                         {
-                            if (queryModel.TaskModel.Name != "frequent_itemsets")
+                            if (queryModel.GetUsageInputOperationModel(InputUsage.Feature).Any() && queryModel.BrushQueryModels.Any())
                             {
-                                /*if (queryModel.GetUsageInputOperationModel(InputUsage.Feature).Any() && queryModel.GetUsageInputOperationModel(InputUsage.Label).Any())
-                                {
-                                    var queryModelClone = queryModel.Clone();
-                                    ClassifierJob classifierJob = new ClassifierJob(queryModel, queryModelClone, (queryModel.SchemaModel.OriginModels[0] as ProgressiveOriginModel),
-                                        TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis));
+                                var queryModelClone = queryModel.Clone();
+                                ProgressiveClassifyJob progressiveClassifyJob = new ProgressiveClassifyJob(
+                                    queryModel, queryModelClone, TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
 
-                                    ActiveJobs.Add(queryModel, classifierJob);
-                                    classifierJob.JobUpdate += job_JobUpdate;
-                                    classifierJob.JobCompleted += job_JobCompleted;
-                                    classifierJob.Start();
-                                }*/
-                            }
-                            else if (queryModel.TaskModel.Name == "frequent_itemsets")
-                            {
-                                /*if (queryModel.GetUsageInputOperationModel(InputUsage.Label).Any())
-                                {
-                                    var queryModelClone = queryModel.Clone();
-                                    FrequentItemsetJob frequentItemsetJob = new FrequentItemsetJob(queryModel, queryModelClone, (queryModel.SchemaModel.OriginModels[0] as ProgressiveOriginModel),
-                                        TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis));
-
-                                    ActiveJobs.Add(queryModel, frequentItemsetJob);
-                                    frequentItemsetJob.JobUpdate += job_JobUpdate;
-                                    frequentItemsetJob.JobCompleted += job_JobCompleted;
-                                    frequentItemsetJob.Start();
-                                }*/
+                                ActiveJobs.Add(queryModel, progressiveClassifyJob);
+                                progressiveClassifyJob.JobUpdate += job_JobUpdate;
+                                progressiveClassifyJob.JobCompleted += job_JobCompleted;
+                                progressiveClassifyJob.Start();
                             }
                         }
                     });
@@ -110,11 +94,11 @@ namespace PanoramicDataWin8.controller.data.progressive
                 ProgressiveVisualizationJob job = sender as ProgressiveVisualizationJob;
                 queryModel = job.QueryModel;
             }
-            /*else if (sender is ClassifierJob)
+            else if (sender is ProgressiveClassifyJob)
             {
-                ClassifierJob job = sender as ClassifierJob;
+                ProgressiveClassifyJob job = sender as ProgressiveClassifyJob;
                 queryModel = job.QueryModel;
-            }*/
+            }
             queryModel.ResultModel.Progress = 1.0;
             queryModel.ResultModel.FireResultModelUpdated(ResultType.Complete);
         }
@@ -127,11 +111,11 @@ namespace PanoramicDataWin8.controller.data.progressive
                 ProgressiveVisualizationJob job = sender as ProgressiveVisualizationJob;
                 queryModel = job.QueryModel;
             }
-            /*else if (sender is ClassifierJob)
+            else if (sender is ProgressiveClassifyJob)
             {
-                ClassifierJob job = sender as ClassifierJob;
+                ProgressiveClassifyJob job = sender as ProgressiveClassifyJob;
                 queryModel = job.QueryModel;
-            }*/
+            }
             var oldItems = queryModel.ResultModel.ResultItemModels;
             {
                 oldItems.Clear();

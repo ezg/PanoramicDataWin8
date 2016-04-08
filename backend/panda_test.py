@@ -27,12 +27,32 @@ tt = df.query('col2 == 1').eval(sub1)
 mt = pd.Series([False] * len(tt), index=tt.index)
 #print mt
 
+class Test():
+    def __init__(self,index):
+        self.index = index  
+    def __eq__(self, other):
+        return other and self.index == other.index
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __hash__(self):
+        return index
+        
 tt = tt[(mt | tt)]
 
-df = pd.DataFrame({'col1':[1,2,3,4,5,6], 'col2':[1,2,1,1,1,1]})
-vector = np.array([1 if x else 0 for x in np.array(df.eval("col1 > 3"))])
+def f(x):
+    return x['col1']
 
-print df[['col1', 'col2']]
+df = pd.DataFrame({'col1':[1,2,3,4,5,6], 'col2':[1,2,1,1,1,1]})
+print df[['col1','col2']]
+
+df['Flag'] = df.apply(lambda x: f(x), axis=1).astype(object)
+print df
+
+
+#df['Flag'] = df.applymap(f).astype(bool)
+#print df
 
 #print df[~(df.eval(sub1) | df.eval(sub2))]
 

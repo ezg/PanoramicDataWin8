@@ -709,7 +709,7 @@ namespace PanoramicDataWin8.controller.view
         {
             foreach (var inputVisualizationView in InputVisualizationViews)
             {
-                if (inputVisualizationView.Key.VisualizationViewModels.Contains(visModel))
+                if (visModel.QueryModel.TaskModel == null && inputVisualizationView.Key.VisualizationViewModels.Contains(visModel))
                 {
                     inputVisualizationView.Key.From = visModel;
                 }
