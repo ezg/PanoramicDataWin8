@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 import tornado.httpserver
 import tornado.websocket
 import tornado.ioloop
@@ -15,7 +16,7 @@ data  = pd.read_table("original_data\\cars_small.csv", sep=",", chunksize=chunks
 
 a = [3, 45,5, 6]
 
-print range(len((1,2,2)))
+#print range(len((1,2,2)))
 df = pd.DataFrame({'col1':[1,2,3,4,5,6], 'col2':[1,2,1,1,1,1]})
 
 sub1 = 'col1 > 4'
@@ -24,10 +25,14 @@ sub2 = 'col1 <= 1'
 
 tt = df.query('col2 == 1').eval(sub1)
 mt = pd.Series([False] * len(tt), index=tt.index)
-print mt
+#print mt
 
 tt = tt[(mt | tt)]
 
+df = pd.DataFrame({'col1':[1,2,3,4,5,6], 'col2':[1,2,1,1,1,1]})
+vector = np.array([1 if x else 0 for x in np.array(df.eval("col1 > 3"))])
+
+print df[['col1', 'col2']]
 
 #print df[~(df.eval(sub1) | df.eval(sub2))]
 

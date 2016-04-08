@@ -290,9 +290,10 @@ for i, (X_train_text, y_train) in enumerate(minibatch_iterators):
     tick = time.time()
     X_train = vectorizer.transform(X_train_text)
     total_vect_time += time.time() - tick
-
+    
     for cls_name, cls in partial_fit_classifiers.items():
         tick = time.time()
+        print(y_train)
         # update estimator with examples in the current mini-batch
         cls.partial_fit(X_train, y_train, classes=all_classes)
 
