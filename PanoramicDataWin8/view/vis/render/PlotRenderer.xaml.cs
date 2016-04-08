@@ -72,7 +72,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (args.NewValue != null)
             {
                 (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
-                //(DataContext as VisualizationViewModel).RequestRender += PlotRenderer_RequestRender;
+                (DataContext as VisualizationViewModel).QueryModel.RequestRender += PlotRenderer_RequestRender;
             }
         }
 

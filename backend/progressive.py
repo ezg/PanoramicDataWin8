@@ -166,9 +166,8 @@ class VisualizationExecutor(Executor):
             start = time.time()
             
             progress, df = dp.getDataFrame()
-            if not self.task['filter'] == '':
-                print "f", ':' + self.task['filter'] + ':'
-                df = df.query(self.task['filter'])
+            if not self.task['filter'].strip() == '':
+                df = df.query(self.task['filter'].strip())
                 
             if not df is None: 
                 db.bin(df, progress)

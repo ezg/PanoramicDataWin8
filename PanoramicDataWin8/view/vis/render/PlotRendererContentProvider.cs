@@ -373,43 +373,29 @@ namespace PanoramicDataWin8.view.vis.render
                             double valueMargin = 0;
                             double valueMarginAbsolute = 0;
 
+                            InputOperationModel iom = null;
                             if (_queryModelClone.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(_queryModelClone.GetUsageInputOperationModel(InputUsage.Value).First()))
                             {
-                                var iom = _queryModelClone.GetUsageInputOperationModel(InputUsage.Value).First();
-                                unNormalizedvalue = resultItem.Values[iom][BrushIndex.ALL];
-                                double min = resultDescriptionModel.MinValues[iom][BrushIndex.ALL];
-                                double max = resultDescriptionModel.MaxValues[iom][BrushIndex.ALL];
-
-                                if (min - max == 0.0)
-                                {
-                                    value = 1.0;
-                                }
-                                else
-                                {
-                                    value = (unNormalizedvalue - min)/(max - min);
-                                }
-
-                                valueMargin = resultItem.Margins[iom][BrushIndex.ALL];
-                                valueMarginAbsolute = resultItem.MarginsAbsolute[iom][BrushIndex.ALL];
+                                iom = _queryModelClone.GetUsageInputOperationModel(InputUsage.Value).First();
                             }
                             else if (_queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
                             {
-                                var iom = _queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).First();
-                                unNormalizedvalue = resultItem.Values[iom][BrushIndex.ALL];
-                                double min = resultDescriptionModel.MinValues[iom][BrushIndex.ALL];
-                                double max = resultDescriptionModel.MaxValues[iom][BrushIndex.ALL];
-
-                                if (min - max == 0.0)
-                                {
-                                    value = 1.0;
-                                }
-                                else
-                                {
-                                    value = (unNormalizedvalue - min) / (max - min);
-                                }
-                                valueMargin = resultItem.Margins[iom][BrushIndex.ALL];
-                                valueMarginAbsolute = resultItem.MarginsAbsolute[iom][BrushIndex.ALL];
+                                iom = _queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).First();
                             }
+                            unNormalizedvalue = resultItem.Values[iom][BrushIndex.ALL];
+                            double min = resultDescriptionModel.MinValues[iom][BrushIndex.ALL];
+                            double max = resultDescriptionModel.MaxValues[iom][BrushIndex.ALL];
+
+                            if (min - max == 0.0)
+                            {
+                                value = 1.0;
+                            }
+                            else
+                            {
+                                value = (unNormalizedvalue - min) / (max - min);
+                            }
+                            valueMargin = resultItem.Margins[iom][BrushIndex.ALL];
+                            valueMarginAbsolute = resultItem.MarginsAbsolute[iom][BrushIndex.ALL];
 
                             if (value != null && unNormalizedvalue != 0.0)
                             {
@@ -487,9 +473,9 @@ namespace PanoramicDataWin8.view.vis.render
                                 var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
 
                                 //var brushBaseColor = Windows.UI.Color.FromArgb(178, 77, 148, 125);
-                                var brushBaseColor = Windows.UI.Color.FromArgb(255, 178, 77, 148);
-                                lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 240, 219, 232), brushBaseColor, (float)Math.Sqrt(value));
-                                var brushColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
+                                //var brushBaseColor = Windows.UI.Color.FromArgb(255, 178, 77, 148);
+                                //lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 240, 219, 232), brushBaseColor, (float)Math.Sqrt(value));
+                                //var brushColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
 
                                 rect = new Rect(
                                     xFrom,
@@ -534,30 +520,58 @@ namespace PanoramicDataWin8.view.vis.render
 
 
                                     // draw brush rect
-                                    /*if (resultItem.BrushCount > 0 && resultItem.Count > 0 && MainViewController.Instance.MainModel.BrushQueryModel != _queryModel)
+                                    if (_queryModel.BrushQueryModels.Count > 0)
                                     {
-                                        var brushFactor = (double)resultItem.BrushCount / (double)resultItem.Count;
-                                        if (_isYAxisAggregated && _isXAxisAggregated)
+                                        var allUnNormalizedValue = resultItem.CountsInterpolated[iom][BrushIndex.ALL];
+                                        var brushCount = 0;
+                                        double sumBrushFactor = 0.0d;
+                                        foreach (var brushIndex in resultDescriptionModel.BrushIndices.Where(bi => bi != BrushIndex.ALL))
                                         {
-                                            var ratio = (rect.Width / rect.Height);
-                                            var newHeight = Math.Sqrt((1.0 / ratio) * ((rect.Width * rect.Height) * brushFactor));
-                                            var newWidth = newHeight * ratio;
+                                            var brushUnNormalizedValue = resultItem.CountsInterpolated[iom][brushIndex];
+                                            min = resultDescriptionModel.MinValues[iom][brushIndex];
+                                            max = resultDescriptionModel.MaxValues[iom][brushIndex];
 
-                                            var brushRect = new Rect(rect.X + (rect.Width - newWidth) / 2.0f, rect.Y + (rect.Height - newHeight) / 2.0f, newWidth, newHeight);
-                                            canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, brushBaseColor);
+                                            var brushValueMargin = resultItem.Margins[iom][brushIndex];
+                                            var brushValueMarginAbsolute = resultItem.MarginsAbsolute[iom][brushIndex];
 
+                                            Color brushColor = Color.FromArgb(255, 17, 17, 17);
+                                            if (_queryModelClone.BrushColors.Count > brushCount)
+                                            {
+                                                brushColor = _queryModelClone.BrushColors[brushCount];
+                                            }
+
+                                            var brushFactor = ( brushUnNormalizedValue / allUnNormalizedValue);
+                                            if (_isYAxisAggregated && _isXAxisAggregated)
+                                            {
+                                                var ratio = (rect.Width / rect.Height);
+                                                var newHeight = Math.Sqrt((1.0 / ratio) * ((rect.Width * rect.Height) * brushFactor));
+                                                var newWidth = newHeight * ratio;
+
+                                                var brushRect = new Rect(rect.X + (rect.Width - newWidth) / 2.0f, rect.Y + (rect.Height - newHeight) / 2.0f, newWidth, newHeight);
+                                                canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, brushColor);
+
+                                            }
+                                            else if (_isYAxisAggregated)
+                                            {
+                                                var brushRect = new Rect(rect.X, rect.Y + (rect.Height - rect.Height * brushFactor) - rect.Height * sumBrushFactor, rect.Width, rect.Height * brushFactor);
+                                                canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, brushColor);
+
+                                                double currentY = resultItem.Values[_queryModelClone.GetUsageInputOperationModel(InputUsage.Y).First()][brushIndex];
+                                                float pixel = toScreenY((float)(0)) - toScreenY((float)(brushValueMarginAbsolute));
+
+                                                canvasArgs.DrawingSession.DrawLine(
+                                                    new Vector2((float)(brushRect.X + rect.Width / 2.0f), (float)brushRect.Y - pixel),
+                                                    new Vector2((float)(brushRect.X + rect.Width / 2.0f), (float)brushRect.Y + pixel), dark, 1);
+                                            }
+                                            else if (_isXAxisAggregated)
+                                            {
+                                                var brushRect = new Rect(rect.X + rect.Width * sumBrushFactor, rect.Y, rect.Width * brushFactor, rect.Height);
+                                                canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, brushColor);
+                                            }
+                                            sumBrushFactor += brushFactor;
+                                            brushCount++;
                                         }
-                                        else if (_isYAxisAggregated)
-                                        {
-                                            var brushRect = new Rect(rect.X, rect.Y + (rect.Height - rect.Height * brushFactor), rect.Width, rect.Height * brushFactor);
-                                            canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, brushBaseColor);
-                                        }
-                                        else if (_isXAxisAggregated)
-                                        {
-                                            var brushRect = new Rect(rect.X, rect.Y, rect.Width * brushFactor, rect.Height);
-                                            canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, brushBaseColor);
-                                        }
-                                    }*/
+                                    }
 
                                     if (_isYAxisAggregated && !_isXAxisAggregated)
                                     {

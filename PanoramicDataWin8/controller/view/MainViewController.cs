@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
 using GeoAPI.Geometries;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.progressive;
@@ -27,6 +31,7 @@ namespace PanoramicDataWin8.controller.view
     {
         private Gesturizer _gesturizer = new Gesturizer();
         private static MainViewController _instance;
+        private DispatcherTimer _visualizationMovingTimer = new DispatcherTimer();
 
         private MainViewController(InkableScene root, MainPage mainPage)
         {
@@ -49,10 +54,15 @@ namespace PanoramicDataWin8.controller.view
 
             _root.InkCollectedEvent += root_InkCollectedEvent;
             VisualizationViewModels.CollectionChanged += VisualizationViewModels_CollectionChanged;
+            InputVisualizationViews.CollectionChanged += InputVisualizationViews_CollectionChanged;
 
             _gesturizer.AddGesture(new ConnectGesture(_root));
             _gesturizer.AddGesture(new EraseGesture(_root));
             //_gesturizer.AddGesture(new ScribbleGesture(_root));
+
+            _visualizationMovingTimer.Interval = TimeSpan.FromMilliseconds(20);
+            _visualizationMovingTimer.Tick += _visualizationMovingTimer_Tick;
+            _visualizationMovingTimer.Start();
         }
 
         public async void LoadConfigs()
@@ -678,6 +688,7 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var item in e.OldItems)
                 {
                     (item as VisualizationViewModel).QueryModel.LinkModels.CollectionChanged -= LinkModels_CollectionChanged;
+                    (item as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
                     foreach (var link in (item as VisualizationViewModel).QueryModel.LinkModels)
                     {
                         RemoveLinkViewModel(link);
@@ -688,7 +699,171 @@ namespace PanoramicDataWin8.controller.view
             {
                 foreach (var item in e.NewItems)
                 {
+                    (item as VisualizationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
                     (item as VisualizationViewModel).QueryModel.LinkModels.CollectionChanged += LinkModels_CollectionChanged;
+                }
+            }
+        }
+
+        public void VisualizationViewTapped(VisualizationViewModel visModel)
+        {
+            foreach (var inputVisualizationView in InputVisualizationViews)
+            {
+                if (inputVisualizationView.Key.VisualizationViewModels.Contains(visModel))
+                {
+                    inputVisualizationView.Key.From = visModel;
+                }
+            }
+        }
+        
+        private void InputVisualizationViews_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (var item in e.OldItems)
+                {
+                    var current = (((KeyValuePair<InputVisualizationViewModel, InputVisualizationView>)item).Key);
+                    foreach (var visualizationViewModel in current.VisualizationViewModels)
+                    {
+                        visualizationViewModel.QueryModel.InputVisualizationViewModels.Remove(current);
+                    }
+                }
+            }
+            if (e.NewItems != null)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    var current = (((KeyValuePair< InputVisualizationViewModel, InputVisualizationView>)item).Key);
+                    foreach (var visualizationViewModel in current.VisualizationViewModels)
+                    {
+                        visualizationViewModel.QueryModel.InputVisualizationViewModels.Add(current);
+                    }
+                }
+            }
+        }
+
+        private double boundHorizontalDistance(Rct b1, Rct b2)
+        {
+            return Math.Min(Math.Abs(b1.Right - b2.Left), Math.Abs(b1.Left - b2.Right));
+        }
+
+        public ObservableDictionary<InputVisualizationViewModel, InputVisualizationView> InputVisualizationViews = new ObservableDictionary<InputVisualizationViewModel, InputVisualizationView>();
+        private void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var current = sender as VisualizationViewModel;
+            if (e.PropertyName == current.GetPropertyName(() => current.Position))
+            {
+                // check if we need to create new setoperation views
+                foreach (var other in VisualizationViewModels.Where(c => c != null))
+                {
+                    var diff = current.Position - other.Position;
+                    if (Math.Abs(diff.Y) < 300 &&
+                        boundHorizontalDistance(current.Bounds, other.Bounds) < 50)
+                    {
+                        if (!InputVisualizationViews.Keys.Any(sov => sov.VisualizationViewModels.Contains(current) && sov.VisualizationViewModels.Contains(other)))
+                        {
+                            bool areLinked = false;
+                            foreach (var linkModel in current.QueryModel.LinkModels)
+                            {
+                                if ((linkModel.FromQueryModel == current.QueryModel && linkModel.ToQueryModel == other.QueryModel) ||
+                                    (linkModel.FromQueryModel == other.QueryModel && linkModel.ToQueryModel == current.QueryModel))
+                                {
+                                    areLinked = true;
+                                }
+                            }
+
+                            if (!areLinked)
+                            {
+                                List<InputVisualizationViewModel> inputCohorts = InputVisualizationViews.Keys.Where(icv => icv.To == other).ToList();
+
+                                var allColorIndex = Enumerable.Range(0, InputVisualizationViewModel.ColorScheme1.Count);
+                                allColorIndex = allColorIndex.Except(inputCohorts.Select(c => c.ColorIndex));
+                                var colorIndex = inputCohorts.Count % InputVisualizationViewModel.ColorScheme1.Count;
+                                if (allColorIndex.Any())
+                                {
+                                    colorIndex = allColorIndex.First();
+                                }
+
+                                InputVisualizationViewModel inputVisualizationViewModel = new InputVisualizationViewModel();
+                                inputVisualizationViewModel.ColorIndex = colorIndex;
+                                inputVisualizationViewModel.Color = InputVisualizationViewModel.ColorScheme1[colorIndex];
+                                inputVisualizationViewModel.VisualizationViewModels.Add(other);
+                                inputVisualizationViewModel.VisualizationViewModels.Add(current);
+                                inputVisualizationViewModel.Position =
+                                    (((inputVisualizationViewModel.VisualizationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec()))/2.0) - inputVisualizationViewModel.Size/2.0).GetWindowsPoint();
+
+                                inputVisualizationViewModel.InputVisualizationViewModelState = InputVisualizationViewModelState.Opening;
+                                inputVisualizationViewModel.DwellStartPosition = current.Position;
+                                inputVisualizationViewModel.From = current;
+                                inputVisualizationViewModel.TicksSinceDwellStart = DateTime.Now.Ticks;
+
+                                InputVisualizationView view = new InputVisualizationView();
+                                view.DataContext = inputVisualizationViewModel;
+                                InkableScene.Children.Add(view);
+                                InputVisualizationViews.Add(inputVisualizationViewModel, view);
+                            }
+                        }
+                        else
+                        {
+                            var inputModel = InputVisualizationViews.Keys.First(sov => sov.VisualizationViewModels.Contains(current) && sov.VisualizationViewModels.Contains(other));
+                            inputModel.From = current;
+                        }
+                    }
+                }
+            }
+        }
+
+        void _visualizationMovingTimer_Tick(object sender, object e)
+        {
+            checkOpenOrCloseInputVisualizationModels();
+        }
+
+        private void checkOpenOrCloseInputVisualizationModels(bool dropped = false)
+        {
+            // views that need to be opened or closed
+            foreach (var inputVisualizationViewModel in InputVisualizationViews.Keys.ToList())
+            {
+                var model = inputVisualizationViewModel;
+
+                var diff = inputVisualizationViewModel.VisualizationViewModels[0].Position - inputVisualizationViewModel.VisualizationViewModels[1].Position;
+
+                // views to open
+                if (Math.Abs(diff.Y) < 300 &&
+                    boundHorizontalDistance(inputVisualizationViewModel.VisualizationViewModels[0].Bounds, inputVisualizationViewModel.VisualizationViewModels[1].Bounds) < 50 &&
+                    (dropped || DateTime.Now.Ticks > TimeSpan.TicksPerSecond * 1 + model.TicksSinceDwellStart))
+                {
+                    inputVisualizationViewModel.InputVisualizationViewModelState = InputVisualizationViewModelState.Opened;
+                }
+
+                bool areLinked = false;
+                foreach (var linkModel in inputVisualizationViewModel.From.QueryModel.LinkModels)
+                {
+                    if ((linkModel.FromQueryModel == inputVisualizationViewModel.VisualizationViewModels[0].QueryModel && linkModel.ToQueryModel == inputVisualizationViewModel.VisualizationViewModels[1].QueryModel) ||
+                        (linkModel.FromQueryModel == inputVisualizationViewModel.VisualizationViewModels[1].QueryModel && linkModel.ToQueryModel == inputVisualizationViewModel.VisualizationViewModels[0].QueryModel))
+                    {
+                        areLinked = true;
+                    }
+                }
+
+
+                // Views to close
+                if (areLinked ||
+                    Math.Abs(diff.Y) >= 300 ||
+                    (inputVisualizationViewModel.InputVisualizationViewModelState == InputVisualizationViewModelState.Opening && boundHorizontalDistance(inputVisualizationViewModel.VisualizationViewModels[0].Bounds, inputVisualizationViewModel.VisualizationViewModels[1].Bounds) >= 50) ||
+                    (inputVisualizationViewModel.InputVisualizationViewModelState == InputVisualizationViewModelState.Opened && boundHorizontalDistance(inputVisualizationViewModel.VisualizationViewModels[0].Bounds, inputVisualizationViewModel.VisualizationViewModels[1].Bounds) >= 50) ||
+                    inputVisualizationViewModel.VisualizationViewModels.Any(c => !VisualizationViewModels.Contains(c)))
+                {
+                    inputVisualizationViewModel.InputVisualizationViewModelState = InputVisualizationViewModelState.Closing;
+                    var view = InputVisualizationViews[inputVisualizationViewModel];
+                    InputVisualizationViews.Remove(inputVisualizationViewModel);
+
+                    var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+                    dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(1000));
+                        InkableScene.Children.Remove(view);
+                    });
+
                 }
             }
         }

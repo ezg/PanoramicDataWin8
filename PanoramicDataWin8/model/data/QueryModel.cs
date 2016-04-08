@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using Windows.UI;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.data.tuppleware;
+using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.data
@@ -20,7 +22,10 @@ namespace PanoramicDataWin8.model.data
 
         public delegate void QueryModelUpdatedHandler(object sender, QueryModelUpdatedEventArgs e);
         public event QueryModelUpdatedHandler QueryModelUpdated;
-        
+
+        public delegate void RequestRenderHandler(object sender, EventArgs e);
+        public event RequestRenderHandler RequestRender;
+
         public QueryModel(SchemaModel schemaModel, ResultModel resultModel)
         {
             _id = _nextId++;
@@ -34,6 +39,7 @@ namespace PanoramicDataWin8.model.data
             }
 
             _linkModels.CollectionChanged += LinkModels_CollectionChanged;
+            _inputVisualizationViewModels.CollectionChanged += _inputVisualizationViewModels_CollectionChanged;
         }
 
         public QueryModel()
@@ -41,6 +47,13 @@ namespace PanoramicDataWin8.model.data
             _isClone = true; // disable event firing. 
         }
 
+        public void FireRequestRender()
+        {
+            if (RequestRender != null)
+            {
+                RequestRender(this, new EventArgs());
+            }
+        }
 
         public QueryModel Clone()
         {
@@ -65,6 +78,152 @@ namespace PanoramicDataWin8.model.data
             return deserializedQueryModel;
         }
 
+
+        private void _inputVisualizationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+
+            if (e.OldItems != null)
+            {
+                foreach (var item in e.OldItems)
+                {
+                    var current = (InputVisualizationViewModel) item;
+                    current.PropertyChanged -= InputVisualizationViewModel_PropertyChanged;
+                    foreach (var visualizationViewModel in current.VisualizationViewModels)
+                    {
+                        visualizationViewModel.QueryModel.QueryModelUpdated -= InputVisualizationViewModel_QueryModelUpdated;
+                    }
+                    updateBrushes();
+
+                    current.To.QueryModel.FireQueryModelUpdated(QueryModelUpdatedEventType.Brush);
+                }
+            }
+            if (e.NewItems != null)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    var current = (InputVisualizationViewModel)item;
+                    current.PropertyChanged += InputVisualizationViewModel_PropertyChanged;
+                    foreach (var visualizationViewModel in current.VisualizationViewModels)
+                    {
+                        if (visualizationViewModel.QueryModel != this && visualizationViewModel.QueryModel == current.From.QueryModel)
+                        {
+                            visualizationViewModel.QueryModel.QueryModelUpdated += InputVisualizationViewModel_QueryModelUpdated;
+                        }
+                    }
+
+                    if (current.From.QueryModel == this)
+                    {
+                        current.To.QueryModel.updateBrushes();
+                        current.To.QueryModel.FireQueryModelUpdated(QueryModelUpdatedEventType.Brush);
+                    }
+                }
+            }
+        }
+
+        private List<Color> _brushColors = new List<Color>();
+        public List<Color> BrushColors
+        {
+            get
+            {
+                return _brushColors;
+            }
+            set
+            {
+                this.SetProperty(ref _brushColors, value);
+            }
+        }
+
+        private List<QueryModel> _brushQueryModels = new List<QueryModel>();
+        public List<QueryModel> BrushQueryModels
+        {
+            get
+            {
+                return _brushQueryModels;
+            }
+            set
+            {
+                this.SetProperty(ref _brushQueryModels, value);
+            }
+        }
+
+        private void updateBrushes()
+        {
+            BrushQueryModels.Clear();
+            BrushColors.Clear();
+            foreach (var inputVisualizationViewModel in InputVisualizationViewModels)
+            {
+                if (inputVisualizationViewModel.From.QueryModel != this)
+                {
+                    List<FilterModel> filterModels = new List<FilterModel>();
+                    var brush = FilterModel.GetFilterModelsRecursive(inputVisualizationViewModel.From.QueryModel, new List<QueryModel>(), filterModels, false);
+                    if (brush != "")
+                    {
+                        BrushQueryModels.Add(inputVisualizationViewModel.From.QueryModel);
+                        BrushColors.Add(inputVisualizationViewModel.Color);
+                    }
+                }
+            }
+        }
+
+        private void InputVisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var current = sender as InputVisualizationViewModel;
+            if (e.PropertyName == current.GetPropertyName(() => current.From))
+            {
+                foreach (var visualizationViewModel in current.VisualizationViewModels)
+                {
+                    visualizationViewModel.QueryModel.QueryModelUpdated -= InputVisualizationViewModel_QueryModelUpdated;
+                }
+                foreach (var visualizationViewModel in current.VisualizationViewModels)
+                {
+                    if (visualizationViewModel.QueryModel != this && visualizationViewModel.QueryModel == current.From.QueryModel)
+                    {
+                        visualizationViewModel.QueryModel.QueryModelUpdated += InputVisualizationViewModel_QueryModelUpdated;
+                    }
+                }
+
+                if (current.From.QueryModel == this)
+                {
+                    current.To.QueryModel.updateBrushes();
+                    current.To.QueryModel.FireQueryModelUpdated(QueryModelUpdatedEventType.Brush);
+                    updateBrushes();
+                    FireRequestRender();
+                }
+
+                /*if (current.From.QueryModel != this)
+                {
+                    current.From.QueryModel.QueryModelUpdated -= InputVisualizationViewModel_QueryModelUpdated;
+                    current.From.QueryModel.QueryModelUpdated += InputVisualizationViewModel_QueryModelUpdated;
+                    List<FilterModel> filterModels = new List<FilterModel>();
+                    string select = FilterModel.GetFilterModelsRecursive(current.From.QueryModel, new List<QueryModel>(), filterModels, false);
+                    if (select != "")
+                    {
+                        updateBrushes();
+                        //FireQueryModelUpdated(QueryModelUpdatedEventType.Brush);
+                    }
+                }
+                else
+                {
+                    BrushQueryModels.Clear();
+                    BrushColors.Clear();
+                    this.FireRequestRender();
+                }*/
+            }
+            /*
+            if (e.PropertyName == current.GetPropertyName(() => current.To))
+            {
+                current.From.QueryModel.QueryModelUpdated -= InputVisualizationViewModel_QueryModelUpdated;
+                current.To.QueryModel.QueryModelUpdated -= InputVisualizationViewModel_QueryModelUpdated;
+                current.To.QueryModel.updateBrushes();
+                current.To.QueryModel.FireRequestRender();
+            }*/
+        }
+
+        private void InputVisualizationViewModel_QueryModelUpdated(object sender, QueryModelUpdatedEventArgs e)
+        {
+            updateBrushes();
+            FireQueryModelUpdated(QueryModelUpdatedEventType.Brush);
+        }
 
         void LinkModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -259,6 +418,20 @@ namespace PanoramicDataWin8.model.data
             set
             {
                 this.SetProperty(ref _linkModels, value);
+            }
+        }
+
+        private ObservableCollection<InputVisualizationViewModel> _inputVisualizationViewModels = new ObservableCollection<InputVisualizationViewModel>();
+        [JsonIgnore]
+        public ObservableCollection<InputVisualizationViewModel> InputVisualizationViewModels
+        {
+            get
+            {
+                return _inputVisualizationViewModels;
+            }
+            set
+            {
+                this.SetProperty(ref _inputVisualizationViewModels, value);
             }
         }
 
@@ -457,7 +630,7 @@ namespace PanoramicDataWin8.model.data
         }
     }
 
-    public enum QueryModelUpdatedEventType { Structure, Links, FilterModels, ClearFilterModels }
+    public enum QueryModelUpdatedEventType { Structure, Links, FilterModels, ClearFilterModels, Brush }
 
     public enum VisualizationType { table, plot, map, line }
 }

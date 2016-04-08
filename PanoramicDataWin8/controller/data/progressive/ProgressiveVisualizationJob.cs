@@ -40,13 +40,21 @@ namespace PanoramicDataWin8.controller.data.progressive
             string filter = "";
             List<FilterModel> filterModels = new List<FilterModel>();
             filter = FilterModel.GetFilterModelsRecursive(QueryModelClone, new List<QueryModel>(), filterModels, true);
-
-
+            
             List<string> aggregateFunctions = new List<string>();
             List<string> aggregateDimensions = new List<string>();
             List<string> dimensionAggregateFunctions = new List<string>();
             List<string> dimensions = new List<string>();
             List<string> brushes = new List<string>();
+
+
+            foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)
+            {
+                filterModels = new List<FilterModel>();
+                var brush = FilterModel.GetFilterModelsRecursive(brushQueryModel, new List<QueryModel>(), filterModels, false);
+                brushes.Add(brush);
+            }
+
             List<double> nrOfBins = new List<double>();
 
             nrOfBins = new double[] {MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins}.Concat(
@@ -136,7 +144,15 @@ namespace PanoramicDataWin8.controller.data.progressive
 
                 var axisTypes = dimensions.Select(d => QueryModelClone.GetAxisType(d)).ToList();
 
-                var brushes = new List<string>();
+                List<string> brushes = new List<string>();
+
+
+                foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)
+                {
+                    List<FilterModel> filterModels = new List<FilterModel>();
+                    var brush = FilterModel.GetFilterModelsRecursive(brushQueryModel, new List<QueryModel>(), filterModels, false);
+                    brushes.Add(brush);
+                }
 
                 VisualizationResultDescriptionModel resultDescriptionModel = new VisualizationResultDescriptionModel();
                 resultDescriptionModel.BinRanges = new List<BinRange>();
@@ -154,6 +170,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 }
                 brushIndices.Add(BrushIndex.OVERLAP);
                 brushIndices.Add(BrushIndex.ALL);
+                resultDescriptionModel.BrushIndices = brushIndices;
 
                 var binRangeBins = new List<List<double>>();
 

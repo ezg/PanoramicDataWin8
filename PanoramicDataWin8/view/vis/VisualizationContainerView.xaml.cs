@@ -65,7 +65,18 @@ namespace PanoramicDataWin8.view.vis
             var ancestors = (e.OriginalSource as FrameworkElement).GetAncestors();
             if (!ancestors.Contains(this) && _fingerDown)
             {
-                MainViewController.Instance.CopyVisualisationViewModel(this.DataContext as VisualizationViewModel, e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position);
+                bool found = false;
+                foreach (var ancest in ancestors)
+                {
+                    if (ancest is VisualizationContainerView)
+                    {
+                        found = true;
+                    }
+                }
+                if (!found)
+                {
+                    MainViewController.Instance.CopyVisualisationViewModel(this.DataContext as VisualizationViewModel, e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position);
+                }
             }
         }
 
@@ -116,7 +127,7 @@ namespace PanoramicDataWin8.view.vis
                 }*/
                 if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.table)
                 {
-                    _renderer = new TableRenderer();
+                    _renderer = new render.TableRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
                 else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.plot)
@@ -248,6 +259,8 @@ namespace PanoramicDataWin8.view.vis
             {
                 avm.IsDisplayed = true;
             }
+
+            MainViewController.Instance.VisualizationViewTapped((DataContext as VisualizationViewModel));
         }
 
         async void VisualizationContainerView_PointerMoved(object sender, PointerRoutedEventArgs e)

@@ -54,7 +54,9 @@ class DataBinner():
             
             restMask = fu
             for brush in self.brushes:
-                brushMask = df.eval(brush)
+                brushMask = fu
+                if brush != '':
+                    brushMask = df.eval(brush)
                 brushMasks.append(brushMask)
                 overlapMask = (overlapMask & brushMask)                
                 restMask = (restMask & ~brushMask)
@@ -86,7 +88,7 @@ class DataBinner():
                 if binIndexTuple in self.binStructure.bins:
                     self.binStructure.aggregate(binIndexTuple, self.dimensions, self.toAggregate, self.toAggregateFunctions, toAggregateBrushes, brushDataFrame, row, dfDTypes, progress)
         end = time.time()
-        print (end - start)
+        #print (end - start)
         
         self.binStructure.endBatchAggregation(self.dimensions, self.toAggregate, self.toAggregateFunctions, currentBrushes, df, progress)
         

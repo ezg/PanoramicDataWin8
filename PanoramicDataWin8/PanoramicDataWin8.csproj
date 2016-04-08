@@ -185,6 +185,11 @@
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
+    <Compile Include="utils\ObservableDictionary.cs" />
+    <Compile Include="view\vis\InputVisualizationView.xaml.cs">
+      <DependentUpon>InputVisualizationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="model\view\InputVisualizationViewModel.cs" />
     <Compile Include="model\view\tilemenu\TileMenuItemView.cs" />
     <Compile Include="model\view\tilemenu\TileMenuContentViewModel.cs" />
     <Compile Include="model\view\VisualizationTypeViewModel.cs" />
@@ -412,6 +417,10 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="view\vis\InputVisualizationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\common\DXSurface.xaml">
       <SubType>Designer</SubType>

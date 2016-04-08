@@ -44,6 +44,20 @@ namespace PanoramicDataWin8.model.data.result
             }
         }
 
+
+        private List<BrushIndex> _brushIndices = null;
+        public List<BrushIndex> BrushIndices
+        {
+            get
+            {
+                return _brushIndices;
+            }
+            set
+            {
+                this.SetProperty(ref _brushIndices, value);
+            }
+        }
+
         private List<InputOperationModel> _dimensions = new List<InputOperationModel>();
         public List<InputOperationModel> Dimensions
         {
