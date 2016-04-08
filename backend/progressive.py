@@ -56,12 +56,12 @@ class ExecutorWebSocket(WebSocket):
                     self.close()
                
                 if self.data in Shared().updator.clientsPerComputation and self.data in Shared().isRunningPerComputation and Shared().isRunningPerComputation[self.data]:
-                    print 'existing comp'
+                    print 'existing comp visualization'
                     clientList = Shared().updator.clientsPerComputation[self.data]
                     clientList.append(self)
                     Shared().updator.clientsPerComputation[self.data] = clientList
                 else:
-                    print 'new comp'
+                    print 'new comp visualization'
                     exe = VisualizationExecutor(self.data, job['task'], job['dataset'], Shared().resultsPerComputation, Shared().isRunningPerComputation)
                     if self.data in Shared().updator.clientsPerComputation:
                         Shared().updator.clientsPerComputation[self.data].append(self)
@@ -82,17 +82,36 @@ class ExecutorWebSocket(WebSocket):
                 schemas[subdir] = schema
             self.sendMessage(json.dumps(schemas, indent=2, default=default))
             
+        elif job['type'] == 'classify':
+            if Shared().updator == None:
+                    Shared().updator = Updator(Shared().resultsPerComputation)
+                    Shared().updator.start()
+               
+                # already full result available:
+                if self.data in Shared().resultsPerComputation and Shared().resultsPerComputation[self.data]['progress'] == 1.0:
+                    self.sendMessage(json.dumps(Shared().resultsPerComputation[self.data], indent=2, default=default))
+                    self.close()
+               
+                if self.data in Shared().updator.clientsPerComputation and self.data in Shared().isRunningPerComputation and Shared().isRunningPerComputation[self.data]:
+                    print 'existing comp classify'
+                    clientList = Shared().updator.clientsPerComputation[self.data]
+                    clientList.append(self)
+                    Shared().updator.clientsPerComputation[self.data] = clientList
+                else:
+                    print 'new comp classify'
+                    exe = ClassificationExecutor(self.data, job['task'], job['dataset'], Shared().resultsPerComputation, Shared().isRunningPerComputation)
+                    if self.data in Shared().updator.clientsPerComputation:
+                        Shared().updator.clientsPerComputation[self.data].append(self)
+                    else:
+                        Shared().updator.clientsPerComputation[self.data] = [self]
+                    exe.start()  
+            
         elif job['type'] == 'tasks':
-            self.sendMessage(json.dumps([['supervised',[
-                                      'logistic_regression',
+            self.sendMessage(json.dumps([['classify',[
+                                      'sgd',
                                       'naive_bayes',
                                       'perceptron',
-                                      'svm']],
-                                 ['unsupervised',[
-                                      'correlate',
-                                      'frequent_itemsets',
-                                      'kmeans',
-                                      'regression']]
+                                      'passive_aggressive']]
                                 ], default=default))
 
     def handleConnected(self):
@@ -185,6 +204,46 @@ class VisualizationExecutor(Executor):
                 break 
                 
         print 'VisualizationExecutor END'
+        
+class ClassificationExecutor(Executor): 
+
+    def __init__(self, computation, task, dataset, resultsPerComputation, isRunningPerComputation):
+        Executor.__init__(self, computation)
+        self.task = task
+        self.dataset = dataset
+        self.resultsPerComputation = resultsPerComputation
+        self.isRunningPerComputation = isRunningPerComputation
+        self.isRunningPerComputation[self.computation] = True
+        
+    def run(self):
+        dp = SequentialDataProvider(self.dataset, 'C:\\data', self.task['chunkSize'], 0)
+        db = DataBinner(self.task['dimensions'], self.task['dimensionAggregateFunctions'], self.task['nrOfBins'], self.task['aggregateDimensions'], self.task['aggregateFunctions'], self.task['brushes'])
+
+        while True:
+            if not self.isRunningPerComputation[self.computation]:
+                break
+            start = time.time()
+            
+            progress, df = dp.getDataFrame()
+            if not self.task['filter'].strip() == '':
+                df = df.query(self.task['filter'].strip())
+                
+            if not df is None: 
+                db.bin(df, progress)
+                data = {
+                    'binStructure' : db.binStructure.toJson(), 
+                    'progress' : progress
+                }
+                jsonMessage = json.dumps(data, indent=2, default=default)
+                self.resultsPerComputation[self.computation] = data
+                    
+            end = time.time()
+            print 'VisualizationExecutor : p= ' + '{0:.2f}'.format(progress) + ', t= ' + str(end - start)
+            if df is None or progress == 1.0:
+                self.isRunningPerComputation[self.computation] = False
+                break 
+                
+        print 'VisualizationExecutor END'        
 
 if __name__ == "__main__":
 
