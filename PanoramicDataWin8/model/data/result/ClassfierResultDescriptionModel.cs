@@ -16,6 +16,13 @@ namespace PanoramicDataWin8.model.data.result
             get { return _confusionMatrices; }
             set { this.SetProperty(ref _confusionMatrices, value); }
         }
+        
+        private List<ResultModel> _visualizationResultModel = new List<ResultModel>();
+        public List<ResultModel> VisualizationResultModel
+        {
+            get { return _visualizationResultModel; }
+            set { this.SetProperty(ref _visualizationResultModel, value); }
+        }
 
         private List<Pt> _rocCurve = new List<Pt>();
         public List<Pt> RocCurve

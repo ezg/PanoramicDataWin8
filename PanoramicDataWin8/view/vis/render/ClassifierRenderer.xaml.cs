@@ -226,7 +226,7 @@ namespace PanoramicDataWin8.view.vis.render
             VisualizationViewModel model = ((VisualizationViewModel) DataContext);
             ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel) model.QueryModel.ResultModel.ResultDescriptionModel);
             int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
-            _currentViewIndex = (_currentViewIndex + 1) % max;
+            _currentViewIndex = (_currentViewIndex) % max;
             _classifierRendererContentProvider.UpdateData(resultModel, model.QueryModel.Clone(), _currentViewIndex);
 
             render(); render();

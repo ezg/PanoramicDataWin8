@@ -144,7 +144,6 @@ namespace PanoramicDataWin8.controller.data.progressive
                 var axisTypes = dimensions.Select(d => QueryModelClone.GetAxisType(d)).ToList();
 
                 List<string> brushes = new List<string>();
-
                 foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)
                 {
                     List<FilterModel> filterModels = new List<FilterModel>();
@@ -153,115 +152,9 @@ namespace PanoramicDataWin8.controller.data.progressive
                 }
 
                 VisualizationResultDescriptionModel resultDescriptionModel = new VisualizationResultDescriptionModel();
-                resultDescriptionModel.BinRanges = new List<BinRange>();
-                List<ResultItemModel> resultItemModels = new List<ResultItemModel>();
+                List<ResultItemModel> resultItemModels = UpdateVisualizationResultDescriptionModel(resultDescriptionModel, result, brushes, dimensions, axisTypes, aggregates);
                 double progress = (double) result["progress"];
-                JObject binStruct = (JObject) result["binStructure"];
-                double nullCount = (double) binStruct["nullCount"];
-                JObject bins = (JObject)binStruct["bins"];
-                JArray binRanges = (JArray)binStruct["binRanges"];
-
-                List<BrushIndex> brushIndices = new List<BrushIndex>();
-                for (int b = 0; b < brushes.Count; b++)
-                {
-                    brushIndices.Add(new BrushIndex(b.ToString()));
-                }
-                brushIndices.Add(BrushIndex.OVERLAP);
-                brushIndices.Add(BrushIndex.ALL);
-                resultDescriptionModel.BrushIndices = brushIndices;
-
-                var binRangeBins = new List<List<double>>();
-
-                foreach (var binRange in binRanges)
-                {
-                    if (binRange["type"].ToString() == "QuantitativeBinRange")
-                    {
-                        var qbr = new QuantitativeBinRange()
-                        {
-                            DataMaxValue = (double) binRange["dataMaxValue"],
-                            DataMinValue = (double) binRange["dataMinValue"],
-                            MaxValue = (double) binRange["maxValue"],
-                            MinValue = (double) binRange["minValue"],
-                            Step = (double) binRange["step"],
-                            IsIntegerRange = (bool) binRange["isIntegerRange"],
-                            TargetBinNumber = (double) binRange["targetBinNumber"]
-                        };
-                        resultDescriptionModel.BinRanges.Add(qbr);
-                        binRangeBins.Add(qbr.GetBins());
-                    }
-                    else if (binRange["type"].ToString() == "AggregatedBinRange")
-                    {
-                        resultDescriptionModel.BinRanges.Add(new AggregateBinRange());
-                        binRangeBins.Add(new List<double>());
-                    }
-                    else if (binRange["type"].ToString() == "NominalBinRange")
-                    {
-                        var valuesLabel = binRange["ValuesLabel"];
-                        var nbr = new NominalBinRange();
-                        resultDescriptionModel.BinRanges.Add(nbr);
-                        var count = 0;
-                        foreach (var token in valuesLabel)
-                        {
-                            var prop = (JProperty) token;
-                            nbr.LabelsValue.Add(double.Parse(prop.Name.ToString()), prop.Value.ToString());
-                            count++;
-                            if (count > 20)
-                            {
-                                //break
-                            }
-                        }
-                        nbr.MaxValue = nbr.LabelsValue.Count;
-                        nbr.Step = 1;
-
-                        binRangeBins.Add(nbr.GetBins());
-                    }
-                }
-
-                foreach (var bin in bins)
-                {
-
-                    var marginsAbsolute = (JObject) (bin.Value)["marginsAbsolute"];
-                    var counts = (JObject) (bin.Value)["counts"];
-                    var values = (JObject) (bin.Value)["values"];
-                    var countsInterpolated = (JObject) (bin.Value)["countsInterpolated"];
-                    var margins = (JObject) (bin.Value)["margins"];
-
-                    ProgressiveVisualizationResultItemModel resultItem = new ProgressiveVisualizationResultItemModel();
-                    foreach (var inputOperationModel in aggregates)
-                    {
-                        for (int b = 0; b < brushIndices.Count; b++)
-                        {
-                            updateItemResultModel(resultItem, inputOperationModel, brushIndices[b], b, marginsAbsolute, margins, counts, values, countsInterpolated);
-                        }
-                    }
-
-                    var span = bin.Key.ToString().Replace("[", "").Replace("]", "").Split(new char[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(r => int.Parse(r.Trim())).ToList();
-                    for (int d = 0; d < span.Count; d++)
-                    {
-                        if (!(resultDescriptionModel.BinRanges[d] is AggregateBinRange))
-                        {
-                            resultItem.AddValue(dimensions[d], BrushIndex.ALL, binRangeBins[d][span[d]]);
-                        }
-                    }
-                    resultItemModels.Add(resultItem);
-                }
                 
-                resultDescriptionModel.Dimensions = dimensions;
-                resultDescriptionModel.AxisTypes = axisTypes;
-                resultDescriptionModel.MinValues = new Dictionary<InputOperationModel, Dictionary<BrushIndex, double>>();
-                resultDescriptionModel.MaxValues = new Dictionary<InputOperationModel, Dictionary<BrushIndex, double>>();
-                //resultDescriptionModel.MinValues = aggregates.Select(a => re).
-                foreach (var dim in aggregates)
-                {
-                    resultDescriptionModel.MinValues.Add(dim, new Dictionary<BrushIndex, double>());
-                    resultDescriptionModel.MaxValues.Add(dim, new Dictionary<BrushIndex, double>());
-                    foreach (var b in brushIndices)
-                    {
-                        resultDescriptionModel.MinValues[dim].Add(b, resultItemModels.Select(rim => (double)((ProgressiveVisualizationResultItemModel)rim).Values[dim][b]).Min());
-                        resultDescriptionModel.MaxValues[dim].Add(b, resultItemModels.Select(rim => (double)((ProgressiveVisualizationResultItemModel)rim).Values[dim][b]).Max());
-                    }
-                    
-                }
                 await fireUpdated(resultItemModels, progress, resultDescriptionModel);
 
                 if (progress > 1.0)
@@ -287,7 +180,123 @@ namespace PanoramicDataWin8.controller.data.progressive
             }
         }
 
-        private void updateItemResultModel(ProgressiveVisualizationResultItemModel resultItem, InputOperationModel iom, BrushIndex brushIndex, int brushIntIndex, JObject marginsAbsolute, JObject margins, JObject counts, JObject values, JObject countsInterpolated)
+        public static List<ResultItemModel> UpdateVisualizationResultDescriptionModel(VisualizationResultDescriptionModel resultDescriptionModel, 
+            JObject result, List<string> brushes, 
+            List<InputOperationModel> dimensions, List<AxisType> axisTypes, List<InputOperationModel> aggregates)
+        {
+            resultDescriptionModel.BinRanges = new List<BinRange>();
+            List<ResultItemModel> resultItemModels = new List<ResultItemModel>();
+            double progress = (double)result["progress"];
+            JObject binStruct = (JObject)result["binStructure"];
+            double nullCount = (double)binStruct["nullCount"];
+            JObject bins = (JObject)binStruct["bins"];
+            JArray binRanges = (JArray)binStruct["binRanges"];
+
+            List<BrushIndex> brushIndices = new List<BrushIndex>();
+            for (int b = 0; b < brushes.Count; b++)
+            {
+                brushIndices.Add(new BrushIndex(b.ToString()));
+            }
+            brushIndices.Add(BrushIndex.OVERLAP);
+            brushIndices.Add(BrushIndex.ALL);
+            resultDescriptionModel.BrushIndices = brushIndices;
+
+            var binRangeBins = new List<List<double>>();
+
+            foreach (var binRange in binRanges)
+            {
+                if (binRange["type"].ToString() == "QuantitativeBinRange")
+                {
+                    var qbr = new QuantitativeBinRange()
+                    {
+                        DataMaxValue = (double)binRange["dataMaxValue"],
+                        DataMinValue = (double)binRange["dataMinValue"],
+                        MaxValue = (double)binRange["maxValue"],
+                        MinValue = (double)binRange["minValue"],
+                        Step = (double)binRange["step"],
+                        IsIntegerRange = (bool)binRange["isIntegerRange"],
+                        TargetBinNumber = (double)binRange["targetBinNumber"]
+                    };
+                    resultDescriptionModel.BinRanges.Add(qbr);
+                    binRangeBins.Add(qbr.GetBins());
+                }
+                else if (binRange["type"].ToString() == "AggregatedBinRange")
+                {
+                    resultDescriptionModel.BinRanges.Add(new AggregateBinRange());
+                    binRangeBins.Add(new List<double>());
+                }
+                else if (binRange["type"].ToString() == "NominalBinRange")
+                {
+                    var valuesLabel = binRange["ValuesLabel"];
+                    var nbr = new NominalBinRange();
+                    resultDescriptionModel.BinRanges.Add(nbr);
+                    var count = 0;
+                    foreach (var token in valuesLabel)
+                    {
+                        var prop = (JProperty)token;
+                        nbr.LabelsValue.Add(double.Parse(prop.Name.ToString()), prop.Value.ToString());
+                        count++;
+                        if (count > 20)
+                        {
+                            //break
+                        }
+                    }
+                    nbr.MaxValue = nbr.LabelsValue.Count;
+                    nbr.Step = 1;
+
+                    binRangeBins.Add(nbr.GetBins());
+                }
+            }
+
+            foreach (var bin in bins)
+            {
+
+                var marginsAbsolute = (JObject)(bin.Value)["marginsAbsolute"];
+                var counts = (JObject)(bin.Value)["counts"];
+                var values = (JObject)(bin.Value)["values"];
+                var countsInterpolated = (JObject)(bin.Value)["countsInterpolated"];
+                var margins = (JObject)(bin.Value)["margins"];
+
+                ProgressiveVisualizationResultItemModel resultItem = new ProgressiveVisualizationResultItemModel();
+                foreach (var inputOperationModel in aggregates)
+                {
+                    for (int b = 0; b < brushIndices.Count; b++)
+                    {
+                        updateItemResultModel(resultItem, inputOperationModel, brushIndices[b], b, marginsAbsolute, margins, counts, values, countsInterpolated);
+                    }
+                }
+
+                var span = bin.Key.ToString().Replace("[", "").Replace("]", "").Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(r => int.Parse(r.Trim())).ToList();
+                for (int d = 0; d < span.Count; d++)
+                {
+                    if (!(resultDescriptionModel.BinRanges[d] is AggregateBinRange))
+                    {
+                        resultItem.AddValue(dimensions[d], BrushIndex.ALL, binRangeBins[d][span[d]]);
+                    }
+                }
+                resultItemModels.Add(resultItem);
+            }
+
+            resultDescriptionModel.Dimensions = dimensions;
+            resultDescriptionModel.AxisTypes = axisTypes;
+            resultDescriptionModel.MinValues = new Dictionary<InputOperationModel, Dictionary<BrushIndex, double>>();
+            resultDescriptionModel.MaxValues = new Dictionary<InputOperationModel, Dictionary<BrushIndex, double>>();
+            //resultDescriptionModel.MinValues = aggregates.Select(a => re).
+            foreach (var dim in aggregates)
+            {
+                resultDescriptionModel.MinValues.Add(dim, new Dictionary<BrushIndex, double>());
+                resultDescriptionModel.MaxValues.Add(dim, new Dictionary<BrushIndex, double>());
+                foreach (var b in brushIndices)
+                {
+                    resultDescriptionModel.MinValues[dim].Add(b, resultItemModels.Select(rim => (double)((ProgressiveVisualizationResultItemModel)rim).Values[dim][b]).Min());
+                    resultDescriptionModel.MaxValues[dim].Add(b, resultItemModels.Select(rim => (double)((ProgressiveVisualizationResultItemModel)rim).Values[dim][b]).Max());
+                }
+
+            }
+            return resultItemModels;
+        }
+
+        private static void updateItemResultModel(ProgressiveVisualizationResultItemModel resultItem, InputOperationModel iom, BrushIndex brushIndex, int brushIntIndex, JObject marginsAbsolute, JObject margins, JObject counts, JObject values, JObject countsInterpolated)
         {
             resultItem.AddCount(iom, brushIndex, getValue(counts, iom, brushIntIndex));
             resultItem.AddMargin(iom, brushIndex, getValue(margins, iom, brushIntIndex));
@@ -296,7 +305,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             resultItem.AddCountInterpolated(iom, brushIndex, getValue(countsInterpolated, iom, brushIntIndex));
         }
 
-        private double getValue(JObject dictionary, InputOperationModel iom, int brushIndex)
+        private static double getValue(JObject dictionary, InputOperationModel iom, int brushIndex)
         {
             return (double) dictionary[iom.InputModel.Name][iom.AggregateFunction.ToString()][brushIndex.ToString()];
         }

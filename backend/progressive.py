@@ -3,7 +3,9 @@ import timeit
 import sys
 import json
 import numpy as np
+import pandas as pd
 import threading
+import math
 import multiprocessing
 from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer, SimpleSSLWebSocketServer
 from dataprovider import SequentialDataProvider
@@ -271,19 +273,21 @@ class ClassificationExecutor(Executor):
         
     def run(self):
         dp = SequentialDataProvider(self.dataset, 'C:\\data', self.task['chunkSize'], 0)
-        cls_stats = {}
-        stats = {'n_train': 0, 'n_train_pos': 0,
-             'accuracy': 0.0, 'accuracy_history': [(0, 0)], 't0': time.time(),
-             'runtime_history': [(0, 0)], 'total_fit_time': 0.0}
-        cls_name = self.task['classifier']
-        cls_stats[cls_name] = stats
-        cls = self.getClassifier(cls_name)
         
+        dataBinners = {}
+        for feature in self.task['features']:
+            db = DataBinner([feature, feature], ['None', 'Count'], [10,10], [feature], ['Count'], 
+                ['actual and predicted', 'not actual and predicted', 'not actual and not predicted', 'actual and not predicted'])
+            dataBinners[feature] = db
+
+        cls_name = self.task['classifier']
+        cls = self.getClassifier(cls_name)
+                
         progressList = []
         f1List = []
         
-        X_test = None
-        y_test = None
+        X_test = []
+        y_test = []
         while True:
             if not self.isRunningPerComputation[self.computation]:
                 break
@@ -295,49 +299,62 @@ class ClassificationExecutor(Executor):
                 df = df.query(self.task['filter'].strip())
                 
             if not df is None: 
+                split = int(math.ceil(len(df) * 0.3))
+            
                  # retain first as test
-                if X_test == None:
-                    X_test =  np.array(df[self.task['features']])
-                    y_test =  np.array([1 if x else 0 for x in np.array(df.eval(self.task['label']))])
+                if len(X_test) == 0:
+                    X_test = df[self.task['features']]
+                    y_test = df.eval(self.task['label'])
+                    #X_test =  np.array(df[self.task['features']])
+                    #y_test =  np.array([1 if x else 0 for x in np.array(df.eval(self.task['label']))])
                     
                 else:
-                    y_train = np.array([1 if x else 0 for x in np.array(df.eval(self.task['label']))])
-                    X_train = df[self.task['features']]
-                    cls.partial_fit(X_train, y_train, classes=np.array([0, 1]))
+                    dfTest = df[:split]
+                    dfTrain = df[split:]
+                
+                    y_train = dfTrain.eval(self.task['label'])
+                    X_train = dfTrain[self.task['features']]
                     
-
+                    y_test_current = dfTest.eval(self.task['label'])
+                    X_test_current = dfTest[self.task['features']]
+                    
+                    cls.partial_fit(np.array(X_train), np.array([1 if x else 0 for x in np.array(y_train)]), classes=np.array([0, 1]))
+                    
                     y_prob = None
                     y_pred = None
+                    
                     if cls_name in ['sgd', 'perceptron', 'passive_aggressive']:
-                        y_pred = cls.predict(X_test)
+                        y_pred = cls.predict(np.array(pd.concat([X_test, X_test_current])))
                         y_prob = np.array([[0,y] for y in y_pred])
                     else:
-                        y_prob = cls.predict_proba(X_test)
+                        y_prob = cls.predict_proba(np.array(pd.concat([X_test, X_test_current])))
                         y_pred = [1 if t[0] >= 0.5 else 0 for t in y_prob]
                         
-                    cm = confusion_matrix(y_test, y_pred)
-                    stats = self.classifyStats(cm, y_test, y_prob, len(y_test), progress)
+                    y_test_concat = np.array([1 if x else 0 for x in np.array(pd.concat([y_test, y_test_current]))])
+                    cm = confusion_matrix(y_test_concat, y_pred)
+                    stats = self.classifyStats(cm, y_test_concat, y_prob, len(y_test_concat), progress)
                     progressList.append(progress)
                     f1List.append(stats['f1'])
                     stats['f1'] = f1List
                     stats['progress'] = progressList
                     
-                    # accumulate test accuracy stats
-                    cls_stats[cls_name]['total_fit_time'] += time.time() - tick
-                    cls_stats[cls_name]['n_train'] += X_train.shape[0]
-                    cls_stats[cls_name]['n_train_pos'] += sum(y_train)
-                    tick = time.time()
-                    cls_stats[cls_name]['accuracy'] = cls.score(X_test, y_test)
-                    cls_stats[cls_name]['prediction_time'] = time.time() - tick
-                    acc_history = (cls_stats[cls_name]['accuracy'],
-                                   cls_stats[cls_name]['n_train'])
-                    cls_stats[cls_name]['accuracy_history'].append(acc_history)
-                    run_history = (cls_stats[cls_name]['accuracy'],
-                                   cls_stats[cls_name]['total_fit_time'])
-                    cls_stats[cls_name]['runtime_history'].append(run_history)
-                
+                    dfTest = dfTest.copy(deep=True)
+                    dfTest['actual'] = dfTest.eval(self.task['label'])
+                    dfTest['predicted'] = [True if t == 1.0 else False for t in y_pred[len(y_test):]]
+                    
+                    histograms = {}
+                    for feature in self.task['features']:
+                        db = dataBinners[feature]
+                        
+                        db.bin(dfTest, progress)
+                        data = {
+                            'binStructure' : db.binStructure.toJson(), 
+                            'progress' : progress
+                        }
+                        histograms[feature] = data
+                    
                     jsonMessage = json.dumps(stats, indent=2, default=default)
-                    self.resultsPerComputation[self.computation] = {self.task['label'] : stats, 'progress' : progress }
+                    self.resultsPerComputation[self.computation] = {self.task['label'] : stats, 'progress' : progress, 'histograms' : histograms}
                     
                     self.modelsPerComputation = cls
                     

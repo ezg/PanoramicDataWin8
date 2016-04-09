@@ -284,6 +284,7 @@
       <DependentUpon>ToggleMenuItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\ClassifierRendererContentProvider.cs" />
+    <Compile Include="view\vis\render\ClassifierRendererPlotContentProvider.cs" />
     <Compile Include="view\vis\render\FrequentItemsetRenderer.xaml.cs">
       <DependentUpon>FrequentItemsetRenderer.xaml</DependentUpon>
     </Compile>

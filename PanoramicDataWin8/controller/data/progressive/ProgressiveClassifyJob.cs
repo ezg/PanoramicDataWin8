@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -116,7 +117,39 @@ namespace PanoramicDataWin8.controller.data.progressive
                 JObject result = JObject.Parse(message);
                 double progress = (double)result["progress"];
 
-                var classifyResult = JsonConvert.DeserializeObject<ClassifyResult>(result.ToString());
+                var features = QueryModelClone.GetUsageInputOperationModel(InputUsage.Feature).ToList();
+                foreach (var feature in features)
+                {
+                    //['actual and predicted', 'not actual and predicted', 'not actual and not predicted', 'actual and not predicted']
+                    List<string> visBrushes = new List<string>() {"0", "1", "2", "3"};
+
+                    JObject token = (JObject) result["histograms"][feature.InputModel.Name];
+                    VisualizationResultDescriptionModel visResultDescriptionModel = new VisualizationResultDescriptionModel();
+                    List<ResultItemModel> resultItemModels = ProgressiveVisualizationJob.UpdateVisualizationResultDescriptionModel(visResultDescriptionModel, token, visBrushes, 
+                        new List<InputOperationModel>() {new InputOperationModel(feature.InputModel)
+                        {
+                            AggregateFunction = AggregateFunction.None
+                        },
+                        new InputOperationModel(feature.InputModel)
+                        {
+                            AggregateFunction = AggregateFunction.Count
+                        } 
+                        }, new List<AxisType>() { AxisType.Quantitative, AxisType.Quantitative }, new List<InputOperationModel>()
+                        {
+                             new InputOperationModel(feature.InputModel)
+                        {
+                            AggregateFunction = AggregateFunction.Count
+                        }
+                        });
+                    resultDescriptionModel.VisualizationResultModel.Add(new ResultModel()
+                    {
+                        Progress = progress,
+                        ResultDescriptionModel = visResultDescriptionModel,
+                        ResultItemModels = new ObservableCollection<ResultItemModel>(resultItemModels)
+                    });
+                }
+                
+                var classifyResult = JsonConvert.DeserializeObject<ClassifyResult>(result[label].ToString());
 
 
                 resultDescriptionModel.ConfusionMatrices.Add(new List<double>());
@@ -142,10 +175,10 @@ namespace PanoramicDataWin8.controller.data.progressive
                     resultDescriptionModel.RocCurve.Add(new Pt(1, 1));
                 }
 
+                resultDescriptionModel.Precision = classifyResult.precision;
+                resultDescriptionModel.Recall = classifyResult.recall;
                 resultDescriptionModel.AUC = classifyResult.auc;
-
                 resultDescriptionModel.F1s = classifyResult.f1;
-
                 resultDescriptionModel.Progresses = classifyResult.progress;
 
 

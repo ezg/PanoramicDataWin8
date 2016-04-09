@@ -243,7 +243,7 @@ class BinStructure():
                     bin.countsInterpolated[aggregateKey] = bin.counts[aggregateKey] / progress
                     totalCountInterpolated = bin.countsInterpolated[aggregateKey]
                     
-                    if bin.counts[aggregateKey] > 1:
+                    if bin.counts[aggregateKey] > 1 and totalCountInterpolated > 0:
                         if aggregateFunction == 'Count':
                             toSqrt = (totalCountInterpolated - bin.counts[aggregateKey])/(totalCountInterpolated - 1)                        
                             fpc = math.sqrt(max(0, toSqrt))

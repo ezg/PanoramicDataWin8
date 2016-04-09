@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import math
 import tornado.httpserver
 import tornado.websocket
 import tornado.ioloop
@@ -20,7 +21,7 @@ a = [3, 45,5, 6]
 df = pd.DataFrame({'col1':[1,2,3,4,5,6], 'col2':[1,2,1,1,1,1]})
 
 sub1 = 'col1 > 4'
-sub2 = 'col1 <= 1'
+sub2 = 'col1 <= 5'
 #print len(df)
 
 tt = df.query('col2 == 1').eval(sub1)
@@ -41,14 +42,30 @@ class Test():
         
 tt = tt[(mt | tt)]
 
+
 def f(x):
     return x['col1']
 
 df = pd.DataFrame({'col1':[1,2,3,4,5,6], 'col2':[1,2,1,1,1,1]})
-print df[['col1','col2']]
+split = int(math.ceil(len(df) * 0.3))
+print len(df)
+print split
 
-df['Flag'] = df.apply(lambda x: f(x), axis=1).astype(object)
-print df
+h1 = df[:split]
+h2 = df[split:]
+print h1
+print 
+print h2
+print 
+print pd.concat([h1, h2])
+#print df[['col1','col2']]
+h1 = h1.copy(deep=True)
+h1['Flag1'] = h1.eval(sub1)
+h1['Flag2'] = h1.eval(sub2)
+print h1
+
+#df['Flag'] = df.apply(lambda x: f(x), axis=1).astype(object)
+#print df
 
 
 #df['Flag'] = df.applymap(f).astype(bool)

@@ -3,6 +3,7 @@ using PanoramicDataWin8.controller.data.sim;
 using PanoramicDataWin8.view.common;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -43,7 +44,8 @@ namespace PanoramicDataWin8.view.vis.render
         private Color _textColor;
         private CanvasTextFormat _textFormat;
         private CanvasTextFormat _textFormatBig;
-        
+        private CanvasTextFormat _textFormatLarge;
+
         private ResultModel _resultModel = null;
         private ClassfierResultDescriptionModel _classfierResultDescriptionModel = null;
 
@@ -71,6 +73,8 @@ namespace PanoramicDataWin8.view.vis.render
             _queryModel = queryModel;
             _viewIndex = viewIndex;
 
+            
+
             _classfierResultDescriptionModel = _resultModel.ResultDescriptionModel as ClassfierResultDescriptionModel;
         }
 
@@ -89,49 +93,142 @@ namespace PanoramicDataWin8.view.vis.render
                 var centerX =  _deviceWidth/2.0f + _leftOffset;
                 var centerY =  _deviceHeight/2.0f + _topOffset;
 
-                string label = "details";//_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].Name : "avg across labels";
-                DrawString(canvasArgs, _textFormatBig, centerX, _topOffset, label, _textColor, false, true, false);
+                int maxIndex = 3 + _queryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
 
-                var w = (_deviceWidth - 20)/3.0f;
-                var h = Math.Max(0, _deviceHeight/2.0f - 50);
-                var yOff = 40f;
-
-                if ((_deviceHeight <= 200 || _deviceWidth <= 180) || _viewIndex == -1)
+                if (_viewIndex == 0)
                 {
-                    //yOff = centerY - h /2.0f;
-                    h = Math.Max(0, _deviceHeight - 50);
+                    string label = (_classfierResultDescriptionModel.F1s.Last() * 100.0).ToString("F1");
+                    var layoutL = new CanvasTextLayout(canvas, label, _textFormatLarge, 1000f, 1000f);
+                    var metrics = layoutL.DrawBounds;
+
+                    var layoutP = new CanvasTextLayout(canvas, "%", _textFormatBig, 1000f, 1000f);
+                    var metricsPercentage = layoutP.DrawBounds;
+
+                    var totalX = metrics.Width + metricsPercentage.Width + 5;
+
+                    var blue = Color.FromArgb(255, 41, 170, 213);
+                    var white = Color.FromArgb(255, 255, 255, 255);
+                    DrawString(canvasArgs, _textFormatLarge, centerX - (float) totalX/2.0f, _topOffset, label, blue, true, false, false);
+                    DrawString(canvasArgs, _textFormatBig, centerX - (float)totalX / 2.0f + (float)metrics.Width +5, _topOffset + (float) metrics.Height +(float) metrics.Top - (float)metricsPercentage.Height - (float) metricsPercentage.Y, "%", blue, true, false, false);
+
+
+                    float width = _deviceWidth/1.7f;
+                    float height = _deviceHeight / 1.7f;
+
+                    float xStart = centerX - width/2.0f;
+                    float yStart = _topOffset + (float) (metrics.Height + metrics.Y) + 20;
+                    
+                    DrawString(canvasArgs, _textFormat, xStart + width / 2.0f, yStart + height + 5, "progress", _textColor, false, true, false);
+
+                    var oldTransform = canvasArgs.DrawingSession.Transform;
+                    mat = Matrix3x2.CreateRotation((-90f * (float)Math.PI) / 180.0f, new Vector2(xStart, yStart + height / 2.0f));
+                    canvasArgs.DrawingSession.Transform = mat * oldTransform;
+                    DrawString(canvasArgs, _textFormat, xStart, yStart + height / 2.0f - 20, "f1", _textColor, false, true, false);
+                    canvasArgs.DrawingSession.Transform = oldTransform;
+
+
+                    var rect = new Rect(xStart,
+                                yStart,
+                                width,
+                                height);
+                    canvasArgs.DrawingSession.DrawRectangle(rect, white);
+
+                    
+                    var index = 0;
+                    List<Pt> points = new List<Pt>();
+                    foreach (var f1 in _classfierResultDescriptionModel.F1s)
+                    {
+                        points.Add(new Pt(_classfierResultDescriptionModel.Progresses[index], f1));
+                        index++;
+                    }
+
+                    Pt last = new Pt(0, 0);
+                    foreach (var pt in points)
+                    {
+                        canvasArgs.DrawingSession.DrawLine(
+                            new Vector2(
+                                (float)(last.X * width + xStart),
+                                (float)((1.0 - last.Y) * height + yStart)),
+                            new Vector2(
+                                (float)pt.X * width + xStart,
+                                (float)(1.0 - pt.Y) * height + yStart), blue, 1f);
+                        last = pt;
+                        index++;
+                    }
                 }
-
-                renderGauge(canvas, canvasArgs,
-                    _leftOffset,
-                    yOff,
-                    w,
-                    h,
-                    (float) _classfierResultDescriptionModel.Precision, 
-                    "precision");
-
-                renderGauge(canvas, canvasArgs,
-                   _leftOffset + w + 10,
-                   yOff,
-                   w,
-                   h,
-                   (float) _classfierResultDescriptionModel.Recall, 
-                   "recall");
-
-                renderGauge(canvas, canvasArgs,
-                   _leftOffset + (w + 10)  * 2,
-                   yOff,
-                   w,
-                   h,
-                   (float)_classfierResultDescriptionModel.F1s.Last(), 
-                   "f1");
-
-                if (_deviceHeight > 200 && _deviceWidth > 180 && _viewIndex != -1)
+                else if (_viewIndex == 1)
                 {
-                    renderConfusionMatrix(canvas, canvasArgs,
-                        _leftOffset, centerY, _deviceWidth/2.0f - 10, _deviceHeight/2.0f);
-                    renderRoc(canvas, canvasArgs,
-                        centerX + 10, centerY, _deviceWidth/2.0f - 10, _deviceHeight/2.0f);
+                    string label = "details"; //_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].Name : "avg across labels";
+                    DrawString(canvasArgs, _textFormatBig, centerX, _topOffset, label, _textColor, false, true, false);
+
+                    var w = (_deviceWidth - 20)/3.0f;
+                    var h = Math.Max(0, _deviceHeight/2.0f - 50);
+                    var yOff = 40f;
+
+                    if ((_deviceHeight <= 200 || _deviceWidth <= 180) || _viewIndex == -1)
+                    {
+                        //yOff = centerY - h /2.0f;
+                        h = Math.Max(0, _deviceHeight - 50);
+                    }
+
+                    renderGauge(canvas, canvasArgs,
+                        _leftOffset,
+                        yOff,
+                        w,
+                        h,
+                        (float) _classfierResultDescriptionModel.Precision,
+                        "precision");
+
+                    renderGauge(canvas, canvasArgs,
+                        _leftOffset + w + 10,
+                        yOff,
+                        w,
+                        h,
+                        (float) _classfierResultDescriptionModel.Recall,
+                        "recall");
+
+                    renderGauge(canvas, canvasArgs,
+                        _leftOffset + (w + 10)*2,
+                        yOff,
+                        w,
+                        h,
+                        (float) _classfierResultDescriptionModel.F1s.Last(),
+                        "f1");
+
+                    if (_deviceHeight > 200 && _deviceWidth > 180 && _viewIndex != -1)
+                    {
+                        renderConfusionMatrix(canvas, canvasArgs,
+                            _leftOffset, centerY, _deviceWidth/2.0f - 10, _deviceHeight/2.0f);
+                        renderRoc(canvas, canvasArgs,
+                            centerX + 10, centerY, _deviceWidth/2.0f - 10, _deviceHeight/2.0f);
+                    }
+                }
+                else if (_viewIndex == maxIndex - 1)
+                {
+                    string label = "query panel";
+                    var layoutL = new CanvasTextLayout(canvas, label, _textFormatLarge, 1000f, 1000f);
+                    var metrics = layoutL.DrawBounds;
+
+                    var totalX = metrics.Width;
+
+                    var blue = Color.FromArgb(255, 41, 170, 213);
+                    var white = Color.FromArgb(255, 255, 255, 255);
+                    DrawString(canvasArgs, _textFormatLarge, centerX - (float) totalX/2.0f, _topOffset, label, blue, true, false, false);
+                }
+                else if (_viewIndex < maxIndex - 1)
+                {
+                    int histogramIndex = _viewIndex - 2;
+                    var feat = _queryModel.GetUsageInputOperationModel(InputUsage.Feature)[histogramIndex];
+
+                    string label = feat.InputModel.Name.Replace("_", " "); //_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].Name : "avg across labels";
+                    DrawString(canvasArgs, _textFormatBig, centerX, _topOffset, label, _textColor, false, true, false);
+
+                    var rr = new ClassifierRendererPlotContentProvider() {CompositionScaleX = CompositionScaleX, CompositionScaleY = CompositionScaleY};
+                    var xIom = new InputOperationModel(feat.InputModel) {AggregateFunction = AggregateFunction.None};
+                    var yIom = new InputOperationModel(feat.InputModel) { AggregateFunction = AggregateFunction.Count };
+                    var vIom = new InputOperationModel(feat.InputModel) { AggregateFunction = AggregateFunction.Count };
+                    rr.UpdateData(_classfierResultDescriptionModel.VisualizationResultModel[histogramIndex], xIom, yIom, vIom);
+                    rr.render(canvas, canvasArgs, 40, 20, 40, 45, _deviceWidth, _deviceHeight);
                 }
             };
         }
@@ -231,14 +328,28 @@ namespace PanoramicDataWin8.view.vis.render
                         yFrom,
                         w,
                         h);
+                    
+                    var binColor = Color.FromArgb(255, 178, 77, 148);
 
-                    if (value > 0)
+                    if (r == 0 && c == 0)
                     {
-                        var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float) (value));
-                        var binColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
-
-                        canvasArgs.DrawingSession.FillRoundedRectangle(roundedRect, 4, 4, binColor);
+                        binColor = Color.FromArgb(255, 178, 77, 148);
                     }
+                    else if (r == 1 && c == 0)
+                    {
+                        binColor = Color.FromArgb(125, 41, 170, 213);
+                    }
+                    else if (r == 1 && c == 1)
+                    {
+                        binColor = Color.FromArgb(255, 41, 170, 213);
+                    }
+                    else if (r == 0 && c == 1)
+                    {
+                        binColor = Color.FromArgb(125, 178, 77, 148);
+                    }
+
+                    canvasArgs.DrawingSession.FillRoundedRectangle(roundedRect, 4, 4, binColor);
+                    
                     DrawString(canvasArgs, _textFormat, xFrom + w / 2.0f, yFrom + h / 2.0f, row[c].ToString("N0"), _textColor, false, true, true);
 
                     canvasArgs.DrawingSession.DrawRoundedRectangle(roundedRect, 4, 4, white, 0.5f);
@@ -320,7 +431,13 @@ namespace PanoramicDataWin8.view.vis.render
                 FontSize = 16,
                 FontFamily = "/Assets/font/Abel-Regular.ttf#Abel"
             };
-            
+
+            _textFormatLarge = new CanvasTextFormat()
+            {
+                FontSize = 48,
+                FontFamily = "/Assets/font/Abel-Regular.ttf#Abel"
+            };
+
             _textColor = Color.FromArgb(255, 17, 17, 17);
         }
     }
