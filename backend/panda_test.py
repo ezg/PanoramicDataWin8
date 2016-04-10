@@ -43,14 +43,18 @@ class Test():
 tt = tt[(mt | tt)]
 
 
-def f(x):
-    print x.dtypes
+def vectorize(x, dt, feats, n):
     ret = []
-    ret.extend(x['col1'])
-    ret.extend([0,0])
+    for i, feat in enumerate(feats):
+        if dt[i] == 'object':
+            v = [0] * n
+            v[hash(x[feat]) % n] = 1
+            ret.extend(v)
+        else:
+            ret.append(x[feat])
     return ret
 
-
+print hash("D")
 
 def vecorize(df):
     ret = []
@@ -61,10 +65,10 @@ ret.extend([0,0])
 np.array(ret).flatten()
 
 df = pd.DataFrame({'col1':["a","B","a","a","C","C"], 'col2':[1,2,1,1,1,1]})
-print df.dtypes['col2']
-df['Flag'] = df.apply(lambda x: f(x), axis=1).astype(object)
-print df
-print np.array(df)
+
+df['Flag'] = df.apply(lambda x: f(x, df.dtypes, ['col1', 'col2'], 4), axis=1).astype(object)
+print df['Flag']
+print np.array(df['Flag'])
 
 
 #df['Flag'] = df.applymap(f).astype(bool)

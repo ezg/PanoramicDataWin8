@@ -65,11 +65,11 @@ job = {
   "task": {
     "type": "classify",
     "classifier": "passive_aggressive",
-    "chunkSize": 1000,
+    "chunkSize": 10000,
     "features": [
-      "mpg", "model_year", "horsepower", "displacement" 
+      "car_name", "model_year"
     ],
-    "label": "mpg < 15",
+    "label": "mpg < 30",
     "filter": ""
   }
 }
@@ -93,9 +93,18 @@ stats = {'n_train': 0, 'n_train_pos': 0,
          'runtime_history': [(0, 0)], 'total_fit_time': 0.0}
 cls_stats[cls_name] = stats
 
+def vectorize(x, dt, feats, n):
+    ret = []
+    for i, feat in enumerate(feats):
+        if dt[i] == 'object':
+            v = [0] * n
+            v[hash(x[feat]) % n] = 1
+            ret.extend(v)
+        else:
+            ret.append(x[feat])
+    return ret
 
-
-X_test = None
+X_test = []
 y_test = None
 while True:
     c, df = dp.getDataFrame()
@@ -107,18 +116,24 @@ while True:
     
     if not df is None:
         # retain first as test
-        if X_test == None:
-            df['test'] = df.apply(lambda x: 0, axis=1).astype(object)
-            X_test =  np.array(df[task['features']])
-            X_test =  np.array(df['test'])
+        if len(X_test) == 0:
+            dt = df[task['features']].dtypes
+            feats = task['features']
+            df['test'] = df.apply(lambda x: vectorize(x, dt, feats, 25), axis=1)
+            X_test = np.array([list(x) for x in df['test']])
+            
+            #X_test = df[task['features']]
             y_test =  np.array([1 if x else 0 for x in np.array(df.eval(task['label']))])
             
         else:
+            s = time.time()
+            
+            df['test'] = df.apply(lambda x: vectorize(x, dt, feats, 25), axis=1)
+            X_train = np.array([list(x) for x in df['test']])
+            
+            #X_train = df[task['features']]
+            print "time", (time.time() - s), X_train.shape
             y_train = np.array([1 if x else 0 for x in np.array(df.eval(task['label']))])
-            X_train = np.array(df[task['features']])
-            df['test'] = df.apply(lambda x: 0, axis=1).astype(object)
-            X_train = np.array(df['test'])
-            print X_train
             
             
             #print len(X_train), len(y_train)
@@ -137,7 +152,7 @@ while True:
 
             cm = confusion_matrix(y_test, y_pred)
             stats = classifyStats(cm, y_test, y_prob, len(y_test))
-            print stats
+            print stats['f1']
             
             # accumulate test accuracy stats
             cls_stats[cls_name]['total_fit_time'] += time.time() - tick
