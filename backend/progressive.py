@@ -58,41 +58,57 @@ class ExecutorWebSocket(WebSocket):
     def handleMessage(self):
         job = json.loads(self.data)
         logging.info('Request : ' + job['type'])
+        
+        key = json.dumps(job, indent=2, default=default)
+        
         if job['type'] == 'execute':            
             if Shared().updator == None:
                 Shared().updator = Updator(Shared().resultsPerComputation)
                 Shared().updator.start()
             # already full result available:
             
-            if self.data in Shared().resultsPerComputation and Shared().resultsPerComputation[self.data]['progress'] == 1.0:
-                self.sendMessage(json.dumps(Shared().resultsPerComputation[self.data], indent=2, default=default))
+            if key in Shared().resultsPerComputation and Shared().resultsPerComputation[key]['progress'] == 1.0:
+                self.sendMessage(json.dumps(Shared().resultsPerComputation[key], indent=2, default=default))
                 self.close()
 
-            elif self.data in Shared().updator.clientsPerComputation and self.data in Shared().isRunningPerComputation and Shared().isRunningPerComputation[self.data]:
+            elif key in Shared().updator.clientsPerComputation and key in Shared().isRunningPerComputation and Shared().isRunningPerComputation[key]:
                 print 'existing comp ' + job['task']['type']
-                clientList = Shared().updator.clientsPerComputation[self.data]
+                clientList = Shared().updator.clientsPerComputation[key]
                 clientList.append(self)
-                Shared().updator.clientsPerComputation[self.data] = clientList
+                Shared().updator.clientsPerComputation[key] = clientList
             else:   
                 if job['task']['type'] == 'visualization':
                     print 'new comp visualization'
                     print "1", str(time.time())
-                    exe = VisualizationExecutor(self.data, job['task'], job['dataset'], Shared().resultsPerComputation, Shared().isRunningPerComputation)
-                    if self.data in Shared().updator.clientsPerComputation:
-                        Shared().updator.clientsPerComputation[self.data].append(self)
+                    exe = VisualizationExecutor(key, job['task'], job['dataset'], Shared().resultsPerComputation, Shared().isRunningPerComputation)
+                    if key in Shared().updator.clientsPerComputation:
+                        Shared().updator.clientsPerComputation[key].append(self)
                     else:
-                        Shared().updator.clientsPerComputation[self.data] = [self]
+                        Shared().updator.clientsPerComputation[key] = [self]
                     exe.start()  
                     
                 elif job['task']['type'] == 'classify':
                     print 'new comp classify'
-                    exe = ClassificationExecutor(self.data, job['task'], job['dataset'], Shared().resultsPerComputation, Shared().isRunningPerComputation, Shared().modelsPerComputation)
-                    if self.data in Shared().updator.clientsPerComputation:
-                        Shared().updator.clientsPerComputation[self.data].append(self)
+                    exe = ClassificationExecutor(key, job['task'], job['dataset'], Shared().resultsPerComputation, Shared().isRunningPerComputation, Shared().modelsPerComputation)
+                    if key in Shared().updator.clientsPerComputation:
+                        Shared().updator.clientsPerComputation[key].append(self)
                     else:
-                        Shared().updator.clientsPerComputation[self.data] = [self]
+                        Shared().updator.clientsPerComputation[key] = [self]
                     exe.start()  
-
+                    
+        elif job['type'] == 'test':
+            print 'new comp test'
+            classify_model = json.dumps(job['key'], indent=2, default=default);
+            print  pd.DataFrame(job['features'])
+            if classify_model in Shared().modelsPerComputation:
+                model = Shared().modelsPerComputation[classify_model]
+                print model
+                result = model.predict(np.array(pd.DataFrame(job['features'])))[0]
+                print 'test result : ', result
+                self.sendMessage(json.dumps({'result' : result}, default=default))
+            else:
+                print ">>> not found"   
+                self.sendMessage(json.dumps({'result' : 0}, default=default))
                 
         elif job['type'] == 'catalog':
             subdirs = [name for name in os.listdir(Shared().dataFolder) if os.path.isdir(os.path.join(Shared().dataFolder, name))]
@@ -274,12 +290,6 @@ class ClassificationExecutor(Executor):
     def run(self):
         dp = SequentialDataProvider(self.dataset, 'C:\\data', self.task['chunkSize'], 0)
         
-        dataBinners = {}
-        for feature in self.task['features']:
-            db = DataBinner([feature, feature], ['None', 'Count'], [10,10], [feature], ['Count'], 
-                ['actual and predicted', 'not actual and predicted', 'not actual and not predicted', 'actual and not predicted'])
-            dataBinners[feature] = db
-
         cls_name = self.task['classifier']
         cls = self.getClassifier(cls_name)
                 
@@ -288,6 +298,7 @@ class ClassificationExecutor(Executor):
         
         X_test = []
         y_test = []
+        df_test = None
         while True:
             if not self.isRunningPerComputation[self.computation]:
                 break
@@ -305,6 +316,7 @@ class ClassificationExecutor(Executor):
                 if len(X_test) == 0:
                     X_test = df[self.task['features']]
                     y_test = df.eval(self.task['label'])
+                    df_test = df
                     #X_test =  np.array(df[self.task['features']])
                     #y_test =  np.array([1 if x else 0 for x in np.array(df.eval(self.task['label']))])
                     
@@ -338,25 +350,26 @@ class ClassificationExecutor(Executor):
                     stats['f1'] = f1List
                     stats['progress'] = progressList
                     
-                    dfTest = dfTest.copy(deep=True)
-                    dfTest['actual'] = dfTest.eval(self.task['label'])
-                    dfTest['predicted'] = [True if t == 1.0 else False for t in y_pred[len(y_test):]]
+                    dfTest = df_test.copy(deep=True)
+                    dfTest['actual'] = df_test.eval(self.task['label'])
+                    dfTest['predicted'] = [True if t == 1.0 else False for t in y_pred[:len(y_test)]]
                     
                     histograms = {}
                     for feature in self.task['features']:
-                        db = dataBinners[feature]
+                        db = DataBinner([feature, feature], ['None', 'Count'], [10,10], [feature], ['Count'], 
+                            ['actual and predicted', 'not actual and predicted', 'not actual and not predicted', 'actual and not predicted'])
                         
-                        db.bin(dfTest, progress)
+                        db.bin(dfTest, 1.0)
                         data = {
                             'binStructure' : db.binStructure.toJson(), 
-                            'progress' : progress
+                            'progress' : 1.0
                         }
                         histograms[feature] = data
                     
                     jsonMessage = json.dumps(stats, indent=2, default=default)
                     self.resultsPerComputation[self.computation] = {self.task['label'] : stats, 'progress' : progress, 'histograms' : histograms}
                     
-                    self.modelsPerComputation = cls
+                    self.modelsPerComputation[self.computation] = cls
                     
             end = time.time()
             print 'ClassificationExecutor : p= ' + '{0:.2f}'.format(progress) + ', t= ' + str(end - start)

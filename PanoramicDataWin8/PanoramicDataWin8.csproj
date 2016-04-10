@@ -187,6 +187,7 @@
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="utils\ObservableDictionary.cs" />
+    <Compile Include="view\inq\IInkable.cs" />
     <Compile Include="view\vis\InputVisualizationView.xaml.cs">
       <DependentUpon>InputVisualizationView.xaml</DependentUpon>
     </Compile>

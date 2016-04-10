@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.utils;
 
@@ -64,6 +65,13 @@ namespace PanoramicDataWin8.model.data.result
         {
             get { return _auc; }
             set { this.SetProperty(ref _auc, value); }
+        }
+
+        private JObject _query = null;
+        public JObject Query
+        {
+            get { return _query; }
+            set { this.SetProperty(ref _query, value); }
         }
     }
 }

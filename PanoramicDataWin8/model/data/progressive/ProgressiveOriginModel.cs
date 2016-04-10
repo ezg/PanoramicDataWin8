@@ -35,18 +35,21 @@ namespace PanoramicDataWin8.model.data.progressive
                         {
                             datatype = InputDataTypeConstants.FLOAT;
                         }
+                        if (!token[1].ToString().ToLower().StartsWith("unnamed"))
+                        {
+                            ProgressiveFieldInputModel fieldInputModel = new ProgressiveFieldInputModel(token[0].ToString(),
+                                datatype,
+                                token[1].ToString().ToLower() == "object" ? "enum" : "numeric");
+                            fieldInputModel.OriginModel = progressiveOriginModel;
 
-                        ProgressiveFieldInputModel fieldInputModel = new ProgressiveFieldInputModel(token[0].ToString(),
-                            datatype,
-                            token[1].ToString().ToLower() == "object" ? "enum" : "numeric");
-                        fieldInputModel.OriginModel = progressiveOriginModel;
-                        if (parentGroupModel != null)
-                        {
-                            parentGroupModel.InputModels.Add(fieldInputModel);
-                        }
-                        else
-                        {
-                            progressiveOriginModel.InputModels.Add(fieldInputModel);
+                            if (parentGroupModel != null)
+                            {
+                                parentGroupModel.InputModels.Add(fieldInputModel);
+                            }
+                            else
+                            {
+                                progressiveOriginModel.InputModels.Add(fieldInputModel);
+                            }
                         }
                     }
                     else

@@ -64,6 +64,8 @@ h1['Flag1'] = h1.eval(sub1)
 h1['Flag2'] = h1.eval(sub2)
 print h1
 
+gg = { 'mpg': [25]}
+print pd.DataFrame(gg)
 #df['Flag'] = df.apply(lambda x: f(x), axis=1).astype(object)
 #print df
 

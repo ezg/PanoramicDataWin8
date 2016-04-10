@@ -114,6 +114,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 var label = brushes[0];
 
                 ClassfierResultDescriptionModel resultDescriptionModel = new ClassfierResultDescriptionModel();
+                resultDescriptionModel.Query = _query;
                 JObject result = JObject.Parse(message);
                 double progress = (double)result["progress"];
 

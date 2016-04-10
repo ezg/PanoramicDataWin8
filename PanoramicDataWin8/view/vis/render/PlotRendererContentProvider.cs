@@ -494,16 +494,34 @@ namespace PanoramicDataWin8.view.vis.render
                                     canvasArgs.DrawingSession.Transform = currentMat;
 
                                     // draw brush rect
-                                    /*if (resultItem.BrushCount > 0 && resultItem.Count > 0 && MainViewController.Instance.MainModel.BrushQueryModel != _queryModel)
+                                    if (_queryModel.BrushQueryModels.Count > 0)
                                     {
-                                        var brushFactor = (double)resultItem.BrushCount / (double)resultItem.Count;
-                                        var ratio = (rect.Width / rect.Height);
-                                        var newHeight = Math.Sqrt((1.0 / ratio) * ((rect.Width * rect.Height) * brushFactor));
-                                        var newWidth = newHeight * ratio;
+                                        var allUnNormalizedValue = resultItem.CountsInterpolated[iom][BrushIndex.ALL];
+                                        var brushCount = 0;
+                                        foreach (var brushIndex in resultDescriptionModel.BrushIndices.Where(bi => bi != BrushIndex.ALL))
+                                        {
 
-                                        var brushRect = new Rect(rect.X + (rect.Width - newWidth) / 2.0f, rect.Y + (rect.Height - newHeight) / 2.0f, newWidth, newHeight);
-                                        canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, brushColor);
-                                    }*/
+                                            Color brushColor = Color.FromArgb(255, 17, 17, 17);
+                                            if (_queryModelClone.BrushColors.Count > brushCount)
+                                            {
+                                                brushColor = _queryModelClone.BrushColors[brushCount];
+                                            }
+
+                                            var brushLerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), brushColor, (float)Math.Sqrt(value));
+                                            var renderColor = Color.FromArgb(255, brushLerpColor.R, brushLerpColor.G, brushLerpColor.B);
+
+                                            var brushUnNormalizedValue = resultItem.CountsInterpolated[iom][brushIndex];
+                                            var brushFactor = (brushUnNormalizedValue / allUnNormalizedValue);
+
+                                            var ratio = (rect.Width/rect.Height);
+                                            var newHeight = Math.Sqrt((1.0/ratio)*((rect.Width*rect.Height)*brushFactor));
+                                            var newWidth = newHeight*ratio;
+
+                                            var brushRect = new Rect(rect.X + (rect.Width - newWidth)/2.0f, rect.Y + (rect.Height - newHeight)/2.0f, newWidth, newHeight);
+                                            canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, renderColor);
+                                            brushCount++;
+                                        }
+                                    }
                                     if (valueMargin != 0.0 && _resultModel.Progress < 1.0)
                                     {
                                         DrawString(canvasArgs, _textFormat,

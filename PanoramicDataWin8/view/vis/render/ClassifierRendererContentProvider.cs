@@ -19,8 +19,14 @@ using PanoramicDataWin8.model.view;
 using System.Numerics;
 using Windows.Foundation;
 using Windows.UI;
+using Windows.UI.Input.Inking;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
+using Newtonsoft.Json.Linq;
+using PanoramicDataWin8.controller.data.progressive;
+using PanoramicDataWin8.model.data.progressive;
+using PanoramicDataWin8.view.inq;
+using Point = Windows.Foundation.Point;
 
 namespace PanoramicDataWin8.view.vis.render
 {
@@ -45,12 +51,14 @@ namespace PanoramicDataWin8.view.vis.render
         private CanvasTextFormat _textFormat;
         private CanvasTextFormat _textFormatBig;
         private CanvasTextFormat _textFormatLarge;
+        private List<List<Windows.Foundation.Point>> _strokes = new List<List<Point>>();
 
         private ResultModel _resultModel = null;
         private ClassfierResultDescriptionModel _classfierResultDescriptionModel = null;
 
+        private QueryModel _queryModelClone = null;
         private QueryModel _queryModel = null;
-        
+
         private int _viewIndex = 0;
 
         public int ViewIndex
@@ -67,16 +75,72 @@ namespace PanoramicDataWin8.view.vis.render
         {
         }
         
-        public void UpdateData(ResultModel resultModel, QueryModel queryModel, int viewIndex )
+        public void UpdateData(ResultModel resultModel, QueryModel queryModel, QueryModel queryModelClone, int viewIndex )
         {
             _resultModel = resultModel;
+            _queryModelClone = queryModelClone;
             _queryModel = queryModel;
             _viewIndex = viewIndex;
 
-            
-
             _classfierResultDescriptionModel = _resultModel.ResultDescriptionModel as ClassfierResultDescriptionModel;
         }
+
+        private bool _testResult = false;
+        public void ProcessStroke(List<Windows.Foundation.Point> stroke, bool isErase)
+        {
+            if (isErase)
+            {
+                ILineString inputLineString = stroke.GetLineString();
+                foreach (var stroke1 in _strokes.ToArray())
+                {
+                    ILineString currenLineString = stroke1.GetLineString();
+                    if (inputLineString.Intersects(currenLineString))
+                    {
+                        _strokes.Remove(stroke1);
+                    }
+                }
+            }
+            else
+            {
+                _strokes.Add(stroke);
+            }
+
+            ProgressiveGateway pgTest = new ProgressiveGateway();
+            pgTest.Response += pgTest_Response;
+
+            var psm = (_queryModelClone.SchemaModel as ProgressiveSchemaModel);
+
+
+            JObject f = new JObject();
+            //_classfierResultDescriptionModel.Query
+            foreach (var feature in _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature))
+            {
+                f.Add(new JProperty(feature.InputModel.Name, new JArray(10)));
+            }
+
+            JObject request = new JObject(
+              new JProperty("type", "test"),
+              new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Name),
+              new JProperty("key", ""),
+              new JProperty("features", f));
+            request["key"] = _classfierResultDescriptionModel.Query;
+            pgTest.PostRequest(MainViewController.Instance.MainModel.Ip, request.ToString());
+        }
+
+        private void pgTest_Response(object sender, string e)
+        {
+            JToken jToken = JToken.Parse(e);
+            if ((double) jToken["result"] == 0)
+            {
+                _testResult = false;
+            }
+            else
+            {
+                _testResult = true;
+            }
+            _queryModel.FireRequestRender();
+        }
+
 
         public override void Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
         {
@@ -93,7 +157,7 @@ namespace PanoramicDataWin8.view.vis.render
                 var centerX =  _deviceWidth/2.0f + _leftOffset;
                 var centerY =  _deviceHeight/2.0f + _topOffset;
 
-                int maxIndex = 3 + _queryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
+                int maxIndex = 3 + _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Count;
 
                 if (_viewIndex == 0)
                 {
@@ -205,20 +269,59 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 else if (_viewIndex == maxIndex - 1)
                 {
-                    string label = "query panel";
+                    /*string label = "query panel";
                     var layoutL = new CanvasTextLayout(canvas, label, _textFormatLarge, 1000f, 1000f);
                     var metrics = layoutL.DrawBounds;
 
                     var totalX = metrics.Width;
+                                        
+                    var white = Color.FromArgb(255, 255, 255, 255);
+                    DrawString(canvasArgs, _textFormatLarge, centerX - (float) totalX/2.0f, _topOffset, label, blue, true, false, false);*/
 
                     var blue = Color.FromArgb(255, 41, 170, 213);
-                    var white = Color.FromArgb(255, 255, 255, 255);
-                    DrawString(canvasArgs, _textFormatLarge, centerX - (float) totalX/2.0f, _topOffset, label, blue, true, false, false);
+                    var brush = Color.FromArgb(255, 178, 77, 148);
+                    var h = _deviceHeight / (float)_queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Count;
+                    var x = _leftOffset + 20;
+                    var y = _topOffset;
+
+                    float count = 0;
+                    foreach (var feature in _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature))
+                    {
+                        var oldTransform = canvasArgs.DrawingSession.Transform;
+                        mat = Matrix3x2.CreateRotation((-90f*(float) Math.PI)/180.0f, new Vector2(x, y + (h/2.0f) + count * h));
+                        canvasArgs.DrawingSession.Transform = mat*oldTransform;
+                        DrawString(canvasArgs, _textFormat, x, y + (h / 2.0f) + count * h, feature.InputModel.Name, _textColor, false, true, false);
+                        canvasArgs.DrawingSession.Transform = oldTransform;
+
+                        count++;
+                    }
+
+                    // render strokes
+                    foreach (var stroke in _strokes.Where(s=> s.Count > 1))
+                    {
+                        Pt last = stroke[0];
+                        foreach (var pt in stroke.Skip(1))
+                        {
+                            canvasArgs.DrawingSession.DrawLine(
+                                new Vector2(
+                                    (float)last.X, (float) last.Y),
+                                new Vector2(
+                                    (float)pt.X, (float)pt.Y), _testResult ? brush : blue, 3f);
+                            last = pt;
+                        }
+                    }
+
+                    /*
+                    InkRecognizerContainer container = new InkRecognizerContainer();
+                    InkRecognizer inkrecog = new InkAna;
+                    container..
+                    var result = await container.RecognizeAsync(ink.InkPresenter.StrokeContainer, InkRecognitionTarget.);
+                    string s = result[0].GetTextCandidates()[0];*/
                 }
                 else if (_viewIndex < maxIndex - 1)
                 {
                     int histogramIndex = _viewIndex - 2;
-                    var feat = _queryModel.GetUsageInputOperationModel(InputUsage.Feature)[histogramIndex];
+                    var feat = _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature)[histogramIndex];
 
                     string label = feat.InputModel.Name.Replace("_", " "); //_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].Name : "avg across labels";
                     DrawString(canvasArgs, _textFormatBig, centerX, _topOffset, label, _textColor, false, true, false);

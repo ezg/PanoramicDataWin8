@@ -949,7 +949,7 @@ namespace PanoramicDataWin8.controller.view
                 }
             }
 
-            if (recognizedGestures.Count == 0 && !e.InkStroke.IsErase)
+            if (recognizedGestures.Count == 0)// && e.InkStroke.IsErase)
             {
                 List<IScribbable> allScribbables = new List<IScribbable>();
                 IScribbleHelpers.GetScribbablesRecursive(allScribbables, InkableScene.Elements.OfType<IScribbable>().ToList());
