@@ -288,6 +288,7 @@ total_vect_time = 0.0
 for i, (X_train_text, y_train) in enumerate(minibatch_iterators):
 
     tick = time.time()
+    print (X_train_text)
     X_train = vectorizer.transform(X_train_text)
     total_vect_time += time.time() - tick
     

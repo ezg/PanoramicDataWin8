@@ -15,6 +15,7 @@ from sklearn.linear_model import SGDClassifier
 from sklearn.linear_model import PassiveAggressiveClassifier
 from sklearn.linear_model import Perceptron
 from sklearn.naive_bayes import MultinomialNB
+from sklearn.feature_extraction.text import HashingVectorizer
 
 def getClassifier(classifier):
     print classifier
@@ -60,15 +61,15 @@ def classifyStats( cm, y_test, y_prob, tile_size):
     
 job = {
   "type": "execute",
-  "dataset": "cars_small.csv_1000",
+  "dataset": "cars.csv_100000",
   "task": {
     "type": "classify",
     "classifier": "passive_aggressive",
     "chunkSize": 1000,
     "features": [
-      "acceleration", "model_year", "horsepower", "displacement" 
+      "mpg", "model_year", "horsepower", "displacement" 
     ],
-    "label": "mpg < 10",
+    "label": "mpg < 15",
     "filter": ""
   }
 }
@@ -92,12 +93,14 @@ stats = {'n_train': 0, 'n_train_pos': 0,
          'runtime_history': [(0, 0)], 'total_fit_time': 0.0}
 cls_stats[cls_name] = stats
 
+
+
 X_test = None
 y_test = None
 while True:
     c, df = dp.getDataFrame()
     tick = time.time()
-    
+
     if not task['filter'] == '':
         df = df.query(task['filter'])
     print 'progress', str(c * 100.0) + '%'
@@ -105,12 +108,20 @@ while True:
     if not df is None:
         # retain first as test
         if X_test == None:
+            df['test'] = df.apply(lambda x: 0, axis=1).astype(object)
             X_test =  np.array(df[task['features']])
+            X_test =  np.array(df['test'])
             y_test =  np.array([1 if x else 0 for x in np.array(df.eval(task['label']))])
             
         else:
             y_train = np.array([1 if x else 0 for x in np.array(df.eval(task['label']))])
-            X_train = df[task['features']]
+            X_train = np.array(df[task['features']])
+            df['test'] = df.apply(lambda x: 0, axis=1).astype(object)
+            X_train = np.array(df['test'])
+            print X_train
+            
+            
+            #print len(X_train), len(y_train)
             cls.partial_fit(X_train, y_train, classes=np.array([0, 1]))
             
 

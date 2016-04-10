@@ -44,30 +44,27 @@ tt = tt[(mt | tt)]
 
 
 def f(x):
-    return x['col1']
+    print x.dtypes
+    ret = []
+    ret.extend(x['col1'])
+    ret.extend([0,0])
+    return ret
 
-df = pd.DataFrame({'col1':[1,2,3,4,5,6], 'col2':[1,2,1,1,1,1]})
-split = int(math.ceil(len(df) * 0.3))
-print len(df)
-print split
 
-h1 = df[:split]
-h2 = df[split:]
-print h1
-print 
-print h2
-print 
-print pd.concat([h1, h2])
-#print df[['col1','col2']]
-h1 = h1.copy(deep=True)
-h1['Flag1'] = h1.eval(sub1)
-h1['Flag2'] = h1.eval(sub2)
-print h1
 
-gg = { 'mpg': [25]}
-print pd.DataFrame(gg)
-#df['Flag'] = df.apply(lambda x: f(x), axis=1).astype(object)
-#print df
+def vecorize(df):
+    ret = []
+    
+ret = []
+ret.append('a')
+ret.extend([0,0])
+np.array(ret).flatten()
+
+df = pd.DataFrame({'col1':["a","B","a","a","C","C"], 'col2':[1,2,1,1,1,1]})
+print df.dtypes['col2']
+df['Flag'] = df.apply(lambda x: f(x), axis=1).astype(object)
+print df
+print np.array(df)
 
 
 #df['Flag'] = df.applymap(f).astype(bool)
