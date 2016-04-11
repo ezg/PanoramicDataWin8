@@ -111,7 +111,6 @@ class WebSocket(object):
       """
           Called when websocket frame is received.
           To access the frame data call self.data.
-
           If the frame is Text then self.data is a unicode object.
           If the frame is Binary then self.data is a bytearray object.
       """
@@ -286,7 +285,6 @@ class WebSocket(object):
        """
           Send Close frame to the client. The underlying socket is only closed
           when the client acknowledges the Close frame.
-
           status is the closing identifier.
           reason is the reason for the close.
         """
@@ -334,7 +332,6 @@ class WebSocket(object):
           Send the start of a data fragment stream to a websocket client.
           Subsequent data should be sent using sendFragment().
           A fragment stream is completed when sendFragmentEnd() is called.
-
           If data is a unicode object then the frame is sent as Text.
           If the data is a bytearray object then the frame is sent as Binary.
       """
@@ -346,7 +343,6 @@ class WebSocket(object):
    def sendFragment(self, data):
       """
           see sendFragmentStart()
-
           If data is a unicode object then the frame is sent as Text.
           If the data is a bytearray object then the frame is sent as Binary.
       """
@@ -355,7 +351,6 @@ class WebSocket(object):
    def sendFragmentEnd(self, data):
       """
           see sendFragmentEnd()
-
           If data is a unicode object then the frame is sent as Text.
           If the data is a bytearray object then the frame is sent as Binary.
       """
@@ -364,7 +359,6 @@ class WebSocket(object):
    def sendMessage(self, data):
       """
           Send websocket data frame to the client.
-
           If data is a unicode object then the frame is sent as Text.
           If the data is a bytearray object then the frame is sent as Binary.
       """
@@ -592,10 +586,10 @@ class SimpleWebSocketServer(object):
 
       for desc, conn in self.connections.items():
          conn.close()
-         #try:
-         conn.handleClose()
-         #except:
-         #pass
+         try:
+            conn.handleClose()
+         except:
+            pass
 
    def serveforever(self):
       while True:
@@ -632,11 +626,11 @@ class SimpleWebSocketServer(object):
                if client:
                   client.client.close()
 
-               #try:
-               if client:
-                  client.handleClose()
-               #except:
-               #   pass
+               try:
+                  if client:
+                     client.handleClose()
+               except:
+                  pass
 
                try:
                   del self.connections[ready]
@@ -663,10 +657,27 @@ class SimpleWebSocketServer(object):
             else:
                client = None
                try:
-                   client = self.connections[ready]
-                   client._handleData()  
-               except socket.error:
-                    self.close()
+                  client = self.connections[ready]
+                  client._handleData()
+               except Exception as n:
+                  if client:
+                     client.client.close()
+
+                  try:
+                     if client:
+                        client.handleClose()
+                  except:
+                     pass
+
+                  try:
+                     del self.connections[ready]
+                  except:
+                     pass
+
+                  try:
+                     self.listeners.remove(ready)
+                  except:
+                     pass
 
          for failed in xList:
             if failed == self.serversocket:
@@ -678,10 +689,10 @@ class SimpleWebSocketServer(object):
                    client = self.connections[failed]
                    client.client.close()
 
-                   #try:
-                   client.handleClose()
-                   #except:
-                   #   pass
+                   try:
+                      client.handleClose()
+                   except:
+                      pass
 
                    try:
                       self.listeners.remove(failed)

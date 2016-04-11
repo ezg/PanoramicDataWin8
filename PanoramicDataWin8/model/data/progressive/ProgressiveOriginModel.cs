@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.model.data.progressive
                         {
                             datatype = InputDataTypeConstants.FLOAT;
                         }
-                        if (!token[1].ToString().ToLower().StartsWith("unnamed"))
+                        if (!token[0].ToString().ToLower().StartsWith("unnamed"))
                         {
                             ProgressiveFieldInputModel fieldInputModel = new ProgressiveFieldInputModel(token[0].ToString(),
                                 datatype,

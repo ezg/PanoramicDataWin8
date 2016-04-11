@@ -20,6 +20,7 @@ using System.Numerics;
 using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Input.Inking;
+using Windows.UI.Xaml.Media;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using Newtonsoft.Json.Linq;
@@ -52,6 +53,7 @@ namespace PanoramicDataWin8.view.vis.render
         private CanvasTextFormat _textFormatBig;
         private CanvasTextFormat _textFormatLarge;
         private List<List<Windows.Foundation.Point>> _strokes = new List<List<Point>>();
+        private List<object> _recognizedText = new List<object>();
 
         private ResultModel _resultModel = null;
         private ClassfierResultDescriptionModel _classfierResultDescriptionModel = null;
@@ -86,45 +88,92 @@ namespace PanoramicDataWin8.view.vis.render
         }
 
         private bool _testResult = false;
-        public void ProcessStroke(List<Windows.Foundation.Point> stroke, bool isErase)
+        public async void ProcessStroke(List<Windows.Foundation.Point> stroke, bool isErase)
         {
-            if (isErase)
+            if (stroke.Count > 5)
             {
-                ILineString inputLineString = stroke.GetLineString();
-                foreach (var stroke1 in _strokes.ToArray())
+                if (isErase)
                 {
-                    ILineString currenLineString = stroke1.GetLineString();
-                    if (inputLineString.Intersects(currenLineString))
+                    ILineString inputLineString = stroke.GetLineString();
+                    foreach (var stroke1 in _strokes.ToArray())
                     {
-                        _strokes.Remove(stroke1);
+                        ILineString currenLineString = stroke1.GetLineString();
+                        if (inputLineString.Intersects(currenLineString))
+                        {
+                            _strokes.Remove(stroke1);
+                        }
                     }
                 }
+                else
+                {
+                    _strokes.Add(stroke);
+                }
+
+                ProgressiveGateway pgTest = new ProgressiveGateway();
+                pgTest.Response += pgTest_Response;
+
+                var psm = (_queryModelClone.SchemaModel as ProgressiveSchemaModel);
+
+                // get text for each feature
+                _recognizedText.Clear();
+                var h = _deviceHeight/(float) _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Count;
+                var x = _leftOffset + 20;
+                var y = _topOffset;
+
+                float count = 0;
+                foreach (var feature in _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature))
+                {
+                    var rect = new Rect(x, y + h*count, _deviceWidth, h);
+                    var geom = rect.GetPolygon();
+                    var inter = _strokes.Where(s => s.GetLineString().Intersects(geom));
+                    List<string> recog = await inkToText(inter);
+                    if (recog.Any())
+                    {
+                        var t = recog.First();
+                        double d = 0;
+                        if (double.TryParse(t, out d))
+                        {
+                            _recognizedText.Add(d);
+                        }
+                        else
+                        {
+                            _recognizedText.Add(t);
+                        }
+                    }
+                    else
+                    {
+                        _recognizedText.Add("");
+                    }
+                    count++;
+                }
+
+
+                if (_recognizedText.All(g => g.ToString() != ""))
+                {
+                    JObject f = new JObject();
+
+                    //_classfierResultDescriptionModel.Query
+                    var c = 0;
+                    foreach (var feature in _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature))
+                    {
+                        f.Add(new JProperty(feature.InputModel.Name, new JArray(_recognizedText[c] is string ? 0 : _recognizedText[c])));
+                        c++;
+                    }
+
+                    JObject request = new JObject(
+                        new JProperty("type", "test"),
+                        new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Name),
+                        new JProperty("key", ""),
+                        new JProperty("features", f));
+                    request["key"] = _classfierResultDescriptionModel.Query;
+                    pgTest.PostRequest(MainViewController.Instance.MainModel.Ip, request.ToString());
+                }
+                else
+                {
+                    _testResult = false;
+                    _queryModel.FireRequestRender();
+                }
             }
-            else
-            {
-                _strokes.Add(stroke);
-            }
-
-            ProgressiveGateway pgTest = new ProgressiveGateway();
-            pgTest.Response += pgTest_Response;
-
-            var psm = (_queryModelClone.SchemaModel as ProgressiveSchemaModel);
-
-
-            JObject f = new JObject();
-            //_classfierResultDescriptionModel.Query
-            foreach (var feature in _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature))
-            {
-                f.Add(new JProperty(feature.InputModel.Name, new JArray(10)));
-            }
-
-            JObject request = new JObject(
-              new JProperty("type", "test"),
-              new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Name),
-              new JProperty("key", ""),
-              new JProperty("features", f));
-            request["key"] = _classfierResultDescriptionModel.Query;
-            pgTest.PostRequest(MainViewController.Instance.MainModel.Ip, request.ToString());
         }
 
         private void pgTest_Response(object sender, string e)
@@ -139,6 +188,29 @@ namespace PanoramicDataWin8.view.vis.render
                 _testResult = true;
             }
             _queryModel.FireRequestRender();
+        }
+
+        private async Task<List<string>> inkToText(IEnumerable<List<Windows.Foundation.Point>> strokes)
+        {
+            if (!strokes.Any())
+            {
+                return new List<string>();
+            }
+            var im = new InkManager();
+            var b = new InkStrokeBuilder();
+
+            foreach (var inStroke in strokes)
+            {
+                var pc = new PointCollection() ;
+                foreach (var pt in inStroke)
+                {
+                    pc.Add(pt);
+                }
+                var stroke = b.CreateStroke(pc);
+                im.AddStroke(stroke);
+            }
+            var result = await im.RecognizeAsync(InkRecognitionTarget.All);
+            return result[0].GetTextCandidates().ToList();
         }
 
 
@@ -290,9 +362,14 @@ namespace PanoramicDataWin8.view.vis.render
                         var oldTransform = canvasArgs.DrawingSession.Transform;
                         mat = Matrix3x2.CreateRotation((-90f*(float) Math.PI)/180.0f, new Vector2(x, y + (h/2.0f) + count * h));
                         canvasArgs.DrawingSession.Transform = mat*oldTransform;
-                        DrawString(canvasArgs, _textFormat, x, y + (h / 2.0f) + count * h, feature.InputModel.Name, _textColor, false, true, false);
+                        DrawString(canvasArgs, _textFormatBig, x, y + (h / 2.0f) + count * h, feature.InputModel.Name, _textColor, false, true, false);
                         canvasArgs.DrawingSession.Transform = oldTransform;
 
+                        if (_recognizedText.Count > count)
+                        {
+                            var text = _recognizedText[(int) count];
+                            DrawString(canvasArgs, _textFormat, _leftOffset + _deviceWidth - 30, y + (h) + count*h, text.ToString(), _textColor, false, false, false);
+                        }
                         count++;
                     }
 

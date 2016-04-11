@@ -474,23 +474,23 @@ namespace PanoramicDataWin8.model.view
         {
             if (InputOperationModel.AggregateFunction == AggregateFunction.Avg)
             {
-                name = "Avg(" + name + ")";
+                name = "avg(" + name + ")";
             }
             else if (InputOperationModel.AggregateFunction == AggregateFunction.Count)
             {
-                name = "Count(" + name + ")";
+                name = "count";
             }
             else if (InputOperationModel.AggregateFunction == AggregateFunction.Max)
             {
-                name = "Max(" + name + ")";
+                name = "max(" + name + ")";
             }
             else if (InputOperationModel.AggregateFunction == AggregateFunction.Min)
             {
-                name = "Min(" + name + ")";
+                name = "min(" + name + ")";
             }
             else if (InputOperationModel.AggregateFunction == AggregateFunction.Sum)
             {
-                name = "Sum(" + name + ")";
+                name = "sum(" + name + ")";
             }
             /*else if (InputFieldViewModel.AggregateFunction == AggregateFunction.Bin)
             {

@@ -707,6 +707,8 @@ namespace PanoramicDataWin8.view.vis.render
                         }
                         if (resultDescriptionModel.BinRanges[_yIndex] is NominalBinRange)
                         {
+                            var gg = resultDescriptionModel.BinRanges[_yIndex].GetBins();
+
                             filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.EQUALS,
                                   resultDescriptionModel.BinRanges[_yIndex].GetLabels()[yi].Label));
                         }
