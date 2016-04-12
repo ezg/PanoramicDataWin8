@@ -7,7 +7,13 @@ import pandas as pd
 import threading
 import math
 import multiprocessing
-from SimpleWebSocketServer import WebSocket, SimpleWebSocketServer, SimpleSSLWebSocketServer
+import uuid
+import traceback
+
+from BaseHTTPServer import BaseHTTPRequestHandler
+from BaseHTTPServer import HTTPServer
+from multiprocessing import Manager
+from SocketServer import ThreadingMixIn
 from dataprovider import SequentialDataProvider
 from databinner import DataBinner
 from optparse import OptionParser
@@ -47,140 +53,109 @@ class Shared():
     __metaclass__ = Singleton
     def __init__(self):
         self.manager = multiprocessing.Manager()
-        self.resultsPerComputation = self.manager.dict()
-        self.isRunningPerComputation = self.manager.dict()
-        self.modelsPerComputation = self.manager.dict()
+        self.computationToUUIDLookup = self.manager.dict()
+        self.resultsPerUUID = self.manager.dict()
+        self.isRunningPerUUID = self.manager.dict()
+        self.modelsPerUUID = self.manager.dict()
         self.dataFolder = ''
-        self.updator = None
-
-class ExecutorWebSocket(WebSocket):
-
-    def handleMessage(self):
-        job = json.loads(self.data)
-        logging.info('Request : ' + job['type'])
         
-        key = json.dumps(job, indent=2, default=default)
-        
-        if job['type'] == 'execute':            
-            if Shared().updator == None:
-                Shared().updator = Updator(Shared().resultsPerComputation)
-                Shared().updator.start()
-            # already full result available:
+class Server(ThreadingMixIn, HTTPServer):
+    def __init__(self, addr, handler):
+        HTTPServer.__init__(self, addr, handler)        
+
+class RequestHandler(BaseHTTPRequestHandler):
+
+    def do_POST(self):
+        response = 200
+        result = None     
+        try:
+            content_length = int(self.headers.getheader('content-length'))
+            job = json.loads(self.rfile.read(content_length))
+            print job
+            logging.info('Request : ' + job['type'])
             
-            if key in Shared().resultsPerComputation and Shared().resultsPerComputation[key]['progress'] == 1.0:
-                self.sendMessage(json.dumps(Shared().resultsPerComputation[key], indent=2, default=default))
-                self.close()
-
-            elif key in Shared().updator.clientsPerComputation and key in Shared().isRunningPerComputation and Shared().isRunningPerComputation[key]:
-                print 'existing comp ' + job['task']['type']
-                clientList = Shared().updator.clientsPerComputation[key]
-                clientList.append(self)
-                Shared().updator.clientsPerComputation[key] = clientList
-            else:   
-                if job['task']['type'] == 'visualization':
-                    print 'new comp visualization'
-                    print "1", str(time.time())
-                    exe = VisualizationExecutor(key, job['task'], job['dataset'], Shared().resultsPerComputation, Shared().isRunningPerComputation)
-                    if key in Shared().updator.clientsPerComputation:
-                        Shared().updator.clientsPerComputation[key].append(self)
-                    else:
-                        Shared().updator.clientsPerComputation[key] = [self]
-                    exe.start()  
+            key = json.dumps(job, indent=2, default=default)
+            
+            if job['type'] == 'execute':            
+                if key in Shared().computationToUUIDLookup:
+                    print 'existing comp ' + job['task']['type']
+                    result = {'uuid' : Shared().computationToUUIDLookup[key]}
                     
-                elif job['task']['type'] == 'classify':
-                    print 'new comp classify'
-                    exe = ClassificationExecutor(key, job['task'], job['dataset'], Shared().resultsPerComputation, Shared().isRunningPerComputation, Shared().modelsPerComputation)
-                    if key in Shared().updator.clientsPerComputation:
-                        Shared().updator.clientsPerComputation[key].append(self)
-                    else:
-                        Shared().updator.clientsPerComputation[key] = [self]
-                    exe.start()  
-                    
-        elif job['type'] == 'test':
-            print 'new comp test'
-            classify_model = json.dumps(job['key'], indent=2, default=default);
-            print  pd.DataFrame(job['features'])
-            if classify_model in Shared().modelsPerComputation:
-                model = Shared().modelsPerComputation[classify_model]
-                print job['key']['task']['features']
-                #print np.array(pd.DataFrame(job['features']))[0]
-                result = model.predict(np.array(pd.DataFrame(job['features'])[job['key']['task']['features']]))[0]
-                print np.array(pd.DataFrame(job['features'])[job['key']['task']['features']])
-                print 'test result : ', result
-                print 
-                self.sendMessage(json.dumps({'result' : result}, default=default))
-            else:
-                print ">>> not found"   
-                self.sendMessage(json.dumps({'result' : 0}, default=default))
+                else:   
+                    if job['task']['type'] == 'visualization':
+                        print 'new comp visualization'
+                        newUUID = str(uuid.uuid4())
+                        exe = VisualizationExecutor(newUUID, job['task'], job['dataset'], Shared().resultsPerUUID, Shared().isRunningPerUUID)
+                        exe.start()  
+                        Shared().computationToUUIDLookup[key] = newUUID
+                        result = {'uuid' : newUUID}
+                        
+                    elif job['task']['type'] == 'classify':
+                        print 'new comp classify'
+                        newUUID = str(uuid.uuid4())
+                        exe = ClassificationExecutor(newUUID, job['task'], job['dataset'], Shared().resultsPerUUID, Shared().isRunningPerUUID, Shared().modelsPerUUID)
+                        exe.start()  
+                        Shared().computationToUUIDLookup[key] = newUUID
+                        result = {'uuid' : newUUID}
+                        
+            elif job['type'] == 'test':
+                print 'new comp test'
+                reqUuid = job['uuid']
+                print reqUuid
+                print  pd.DataFrame(job['features'])
                 
-        elif job['type'] == 'catalog':
-            subdirs = [name for name in os.listdir(Shared().dataFolder) if os.path.isdir(os.path.join(Shared().dataFolder, name))]
-            schemas = {}
-            print subdirs
-            for subdir in subdirs:
-                dp = SequentialDataProvider(subdir, Shared().dataFolder, 100, 0)
-                p, df = dp.getDataFrame()
-                attrs = df.columns
-                dtypes = df.dtypes
-                schema = { 'uuid' : -1, 'schema': [(attr,str(dtypes[attr])) for attr in attrs] }
-                schemas[subdir] = schema
-            self.sendMessage(json.dumps(schemas, indent=2, default=default))
-            
-        
-            
-        elif job['type'] == 'tasks':
-            self.sendMessage(json.dumps([['classify',[
-                                      'sgd',
-                                      'naive_bayes',
-                                      'perceptron',
-                                      'passive_aggressive']]
-                                ], default=default))
-
-    def handleConnected(self):
-        print (self.address, 'connected')
-        
-    def handleClose(self):
-        print (self.address, 'closed')
-        if Shared().updator != None:
-            for comp in Shared().updator.clientsPerComputation.keys():
-                if self in Shared().updator.clientsPerComputation[comp]:
-                    clientsList = Shared().updator.clientsPerComputation[comp]
-                    clientsList.remove(self)
-                    Shared().updator.clientsPerComputation[comp] = clientsList
-                    if len(Shared().updator.clientsPerComputation[comp]) == 0:
-                        Shared().isRunningPerComputation[comp] = False
-
-class Updator(threading.Thread):    
-                 
-    def __init__(self, resultsPerComputation):
-        threading.Thread.__init__(self)    
-        self.clientsPerComputation = {}
-        self.lastProgressUpdatePerCompuationAndClient = {}
-        self.resultsPerComputation = resultsPerComputation
-        self.running = True
-        
-    def run(self):
-        while self.running:
-            time.sleep(0.05)
-            for comp in self.clientsPerComputation.keys():
-                for client in self.clientsPerComputation[comp]:
-                    if not comp in self.lastProgressUpdatePerCompuationAndClient:
-                        self.lastProgressUpdatePerCompuationAndClient[comp] = {}
-                    if not client in self.lastProgressUpdatePerCompuationAndClient[comp]:
-                        self.lastProgressUpdatePerCompuationAndClient[comp][client] = 0
+                if reqUuid in Shared().modelsPerUUID:
+                    model = Shared().modelsPerUUID[reqUuid]
+                    #print np.array(pd.DataFrame(job['features']))[0]
+                    prediction = model.predict(np.array(pd.DataFrame(job['features'])[job['feature_dimensions']]))[0]
+                    print np.array(pd.DataFrame(job['features'])[job['feature_dimensions']])
+                    print 'test prediction : ', prediction
+                    result = json.dumps({'result' : prediction}, default=default)
+                else:
+                    print ">>> not found"   
+                    result = json.dumps({'result' : 0}, default=default)
                     
-                    if comp in self.resultsPerComputation:
-                        if self.lastProgressUpdatePerCompuationAndClient[comp][client] < self.resultsPerComputation[comp]['progress']:
-                            client.sendMessage(json.dumps(self.resultsPerComputation[comp], indent=2, default=default))
-                            self.lastProgressUpdatePerCompuationAndClient[comp][client] = self.resultsPerComputation[comp]['progress']
-                        if self.lastProgressUpdatePerCompuationAndClient[comp][client] == 1.0:
-                            client.close()
-                    
+            elif job['type'] == 'catalog':
+                subdirs = [name for name in os.listdir(Shared().dataFolder) if os.path.isdir(os.path.join(Shared().dataFolder, name))]
+                schemas = {}
+                print subdirs
+                for subdir in subdirs:
+                    dp = SequentialDataProvider(subdir, Shared().dataFolder, 100, 0)
+                    p, df = dp.getDataFrame()
+                    attrs = df.columns
+                    dtypes = df.dtypes
+                    schema = { 'uuid' : -1, 'schema': [(attr,str(dtypes[attr])) for attr in attrs] }
+                    schemas[subdir] = schema
+                result = json.dumps(schemas, indent=2, default=default)
+                
+            elif job['type'] == 'lookup':
+                if job['uuid'] in Shared().resultsPerUUID:
+                    result = json.dumps(Shared().resultsPerUUID[job['uuid']], indent=2, default=default)          
+            
+                
+            elif job['type'] == 'tasks':
+                result = json.dumps([['classify',[
+                                          'sgd',
+                                          'naive_bayes',
+                                          'perceptron',
+                                          'passive_aggressive']]
+                                    ], default=default)
+                                    
+        except:
+            print traceback.format_exc()
+            response = 500
+            result = 'malformed request\n'
+
+        self.send_response(response)
+        self.send_header('Content-type','application/json')
+        self.end_headers()
+        self.wfile.write(result)
+
 class Executor(multiprocessing.Process): 
 
-    def __init__(self, computation):
+    def __init__(self, uuid):
         multiprocessing.Process.__init__(self)
-        self.computation = computation    
+        self.uuid = uuid    
         self.count = 0
         
     def run(self):
@@ -189,14 +164,14 @@ class Executor(multiprocessing.Process):
 
 class VisualizationExecutor(Executor): 
 
-    def __init__(self, computation, task, dataset, resultsPerComputation, isRunningPerComputation):
-        Executor.__init__(self, computation)
+    def __init__(self, uuid, task, dataset, resultsPerUUID, isRunningPerUUID):
+        Executor.__init__(self, uuid)
         
         self.task = task
         self.dataset = dataset
-        self.resultsPerComputation = resultsPerComputation
-        self.isRunningPerComputation = isRunningPerComputation
-        self.isRunningPerComputation[self.computation] = True
+        self.resultsPerUUID = resultsPerUUID
+        self.isRunningPerUUID = isRunningPerUUID
+        self.isRunningPerUUID[self.uuid] = True
         
         #do first batch fast
         dp = SequentialDataProvider(self.dataset, 'C:\\data', self.task['chunkSize'], 0)
@@ -217,13 +192,13 @@ class VisualizationExecutor(Executor):
                 'progress' : progress
             }
             jsonMessage = json.dumps(data, indent=2, default=default)
-            self.resultsPerComputation[self.computation] = data
+            self.resultsPerUUID[self.uuid] = data
             
         if df is None or progress >= 1.0:
-            self.isRunningPerComputation[self.computation] = False
+            self.isRunningPerUUID[self.uuid] = False
             
         end = time.time()
-        #print 'VisualizationExecutor : p= ' + '{0:.2f}'.format(progress) + ', t= ' + str(end - start)    
+        print 'VisualizationExecutor : p= ' + '{0:.2f}'.format(progress) + ', t= ' + str(end - start)    
         return df, progress
         
     def run(self):
@@ -231,7 +206,7 @@ class VisualizationExecutor(Executor):
         db = DataBinner(self.task['dimensions'], self.task['dimensionAggregateFunctions'], self.task['nrOfBins'], self.task['aggregateDimensions'], self.task['aggregateFunctions'], self.task['brushes'])
 
         while True:
-            if not self.isRunningPerComputation[self.computation]:
+            if not self.isRunningPerUUID[self.uuid]:
                 break
             self.step(dp, db)
                 
@@ -239,14 +214,14 @@ class VisualizationExecutor(Executor):
         
 class ClassificationExecutor(Executor): 
 
-    def __init__(self, computation, task, dataset, resultsPerComputation, isRunningPerComputation, modelsPerComputation):
-        Executor.__init__(self, computation)
+    def __init__(self, uuid, task, dataset, resultsPerUUID, isRunningPerUUID, modelsPerUUID):
+        Executor.__init__(self, uuid)
         self.task = task
         self.dataset = dataset
-        self.resultsPerComputation = resultsPerComputation
-        self.isRunningPerComputation = isRunningPerComputation
-        self.modelsPerComputation = modelsPerComputation
-        self.isRunningPerComputation[self.computation] = True
+        self.resultsPerUUID = resultsPerUUID
+        self.isRunningPerUUID = isRunningPerUUID
+        self.modelsPerUUID = modelsPerUUID
+        self.isRunningPerUUID[self.uuid] = True
         
     def getClassifier(self, classifier):
         print classifier
@@ -302,7 +277,7 @@ class ClassificationExecutor(Executor):
         y_test = []
         df_test = None
         while True:
-            if not self.isRunningPerComputation[self.computation]:
+            if not self.isRunningPerUUID[self.uuid]:
                 break
             start = time.time()
             tick = time.time()
@@ -369,14 +344,14 @@ class ClassificationExecutor(Executor):
                         histograms[feature] = data
                     
                     jsonMessage = json.dumps(stats, indent=2, default=default)
-                    self.resultsPerComputation[self.computation] = {self.task['label'] : stats, 'progress' : progress, 'histograms' : histograms}
+                    self.resultsPerUUID[self.uuid] = {self.task['label'] : stats, 'progress' : progress, 'histograms' : histograms}
                     
-                    self.modelsPerComputation[self.computation] = cls
+                    self.modelsPerUUID[self.uuid] = cls
                     
             end = time.time()
             print 'ClassificationExecutor : p= ' + '{0:.2f}'.format(progress) + ', t= ' + str(end - start)
             if df is None or progress >= 1.0:
-                self.isRunningPerComputation[self.computation] = False
+                self.isRunningPerUUID[self.uuid] = False
                 break 
                 
         print 'ClassificationExecutor END'        
@@ -393,20 +368,18 @@ if __name__ == "__main__":
     Shared().dataFolder = options.data
     logging.info('Starting server on port: ' + str(options.port))
     logging.info('Data folder: ' + options.data)
-    
-    cls = ExecutorWebSocket
-    server = SimpleWebSocketServer('localhost', options.port, cls)
-    
+ 
+
     def close_sig_handler(signal, frame):
-        print "close"
-        if not Shared().updator == None:
-            Shared().updator.running = False        
-        for comp in Shared().isRunningPerComputation.keys():
-            Shared().isRunningPerComputation[comp] = False
+        print "close"   
+        for comp in Shared().isRunningPerUUID.keys():
+            Shared().isRunningPerUUID[comp] = False
 
         server.close()
         sys.exit()
 
     signal.signal(signal.SIGINT, close_sig_handler)
 
-    server.serveforever()
+       
+    server = Server(('', options.port), RequestHandler)
+    server.serve_forever()

@@ -22,10 +22,14 @@ namespace PanoramicDataWin8.controller.data.progressive
 {
     public class ProgressiveVisualizationJob : Job
     {
-        private MessageWebSocket _webSocket = null;
-        private int _sampleSize = 0;
+        private Object _lock = new Object();
+        private bool _isRunning = false;
+
         private Stopwatch _stopWatch = new Stopwatch();
         private JObject _query = null;
+
+        private string _requestUuid = "";
+        private int _sampleSize = 0;
 
         private TimeSpan _throttle = TimeSpan.FromMilliseconds(0);
         public QueryModel QueryModel { get; set; }
@@ -98,95 +102,69 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             _stopWatch.Start();
             run();
-            //Task.Run(() => run());
+            lock (_lock)
+            {
+                _isRunning = true;
+            }
         }
 
         private async void run()
         {
             try
             {
-                _webSocket = new MessageWebSocket();
-                _webSocket.Control.MessageType = SocketMessageType.Utf8;
-                _webSocket.MessageReceived += webSocket_MessageReceived;
+                string response = await ProgressiveGateway.Request(_query);
+                JObject dict = JObject.Parse(response);
+                _requestUuid = dict["uuid"].ToString();
 
-                _webSocket.Closed += webSocket_Closed;
-                await _webSocket.ConnectAsync(new Uri(MainViewController.Instance.MainModel.Ip));
-
-                var data = _query.ToString();
-                DataWriter messageWriter = new DataWriter(_webSocket.OutputStream);
-                messageWriter.WriteString(data);
-                await messageWriter.StoreAsync();
-            }
-            catch (Exception exc)
-            {
-                ErrorHandler.HandleError(exc.Message);
-            }
-        }
-
-        void webSocket_Closed(IWebSocket sender, WebSocketClosedEventArgs args)
-        {   
-        }
-
-        async void webSocket_MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
-        {
-            try
-            {
-                using (DataReader reader = args.GetDataReader())
+                // starting looping for updates
+                while (_isRunning)
                 {
-                    reader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
-                    string message = reader.ReadString(reader.UnconsumedBufferLength);
+                    JObject lookupData = new JObject(
+                        new JProperty("type", "lookup"),
+                        new JProperty("uuid", _requestUuid));
+                    string message = await ProgressiveGateway.Request(lookupData);
 
-                    JObject result = JObject.Parse(message);
-
-                    var aggregates = QueryModelClone.GetUsageInputOperationModel(InputUsage.Value).Concat(
-                        QueryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue)).Concat(
-                            QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
-                                QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
-
-                    var aggregateDimensions = aggregates.Select(iom => iom.InputModel.Name).ToList();
-                    var aggregateFunctions = aggregates.Select(iom => iom.AggregateFunction.ToString()).ToList();
-
-                    var dimensions = QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Concat(
-                                     QueryModelClone.GetUsageInputOperationModel(InputUsage.Y)).Concat(
-                                     QueryModelClone.GetUsageInputOperationModel(InputUsage.Group)).ToList();
-
-                    var axisTypes = dimensions.Select(d => QueryModelClone.GetAxisType(d)).ToList();
-
-                    List<string> brushes = new List<string>();
-                    foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)
+                    if (message != "None")
                     {
-                        List<FilterModel> filterModels = new List<FilterModel>();
-                        var brush = FilterModel.GetFilterModelsRecursive(brushQueryModel, new List<QueryModel>(), filterModels, false);
-                        brushes.Add(brush);
+                        JObject result = JObject.Parse(message);
+
+                        var aggregates = QueryModelClone.GetUsageInputOperationModel(InputUsage.Value).Concat(
+                            QueryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue)).Concat(
+                                QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
+                                    QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
+
+                        var aggregateDimensions = aggregates.Select(iom => iom.InputModel.Name).ToList();
+                        var aggregateFunctions = aggregates.Select(iom => iom.AggregateFunction.ToString()).ToList();
+
+                        var dimensions = QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Concat(
+                            QueryModelClone.GetUsageInputOperationModel(InputUsage.Y)).Concat(
+                                QueryModelClone.GetUsageInputOperationModel(InputUsage.Group)).ToList();
+
+                        var axisTypes = dimensions.Select(d => QueryModelClone.GetAxisType(d)).ToList();
+
+                        List<string> brushes = new List<string>();
+                        foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)
+                        {
+                            List<FilterModel> filterModels = new List<FilterModel>();
+                            var brush = FilterModel.GetFilterModelsRecursive(brushQueryModel, new List<QueryModel>(), filterModels, false);
+                            brushes.Add(brush);
+                        }
+
+                        VisualizationResultDescriptionModel resultDescriptionModel = new VisualizationResultDescriptionModel();
+                        List<ResultItemModel> resultItemModels = UpdateVisualizationResultDescriptionModel(resultDescriptionModel, result, brushes, dimensions, axisTypes, aggregates);
+                        double progress = (double) result["progress"];
+
+                        await fireUpdated(resultItemModels, progress, resultDescriptionModel);
+
+                        if (progress >= 1.0)
+                        {
+                            Stop();
+                            await fireCompleted();
+                        }
                     }
-
-                    VisualizationResultDescriptionModel resultDescriptionModel = new VisualizationResultDescriptionModel();
-                    List<ResultItemModel> resultItemModels = UpdateVisualizationResultDescriptionModel(resultDescriptionModel, result, brushes, dimensions, axisTypes, aggregates);
-                    double progress = (double)result["progress"];
-
-                    await fireUpdated(resultItemModels, progress, resultDescriptionModel);
-
-                    if (progress > 1.0)
-                    {
-                        Stop();
-                        await fireCompleted();
-                    }
-                    /* if (_binner != null && _binner.BinStructure != null)
-                     {
-                         resultItemModels = convertBinsToResultItemModels(_binner.BinStructure);
-                         resultDescriptionModel = new VisualizationResultDescriptionModel()
-                         {
-                             BinRanges = _binner.BinStructure.BinRanges,
-                             NullCount = _binner.BinStructure.NullCount,
-                             Dimensions = _dimensions,
-                             AxisTypes = _axisTypes,
-                             MinValues = _binner.BinStructure.AggregatedMinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
-                             MaxValues = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => entry.Value)
-                         };
-
-                         await fireUpdated(resultItemModels, _dataProvider.Progress(), resultDescriptionModel);
-                     }*/
+                    await Task.Delay(_throttle);
                 }
+
             }
             catch (Exception exc)
             {
@@ -350,17 +328,9 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         public override void Stop()
         {
-            if (_webSocket != null)
+            lock (_lock)
             {
-                try
-                {
-                    _webSocket.Close(1000, "");
-                    _webSocket = null;
-                }
-                catch (Exception exc)
-                {
-                    ErrorHandler.HandleError(exc.Message);
-                }
+                _isRunning = false;
             }
         }
     }

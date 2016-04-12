@@ -109,9 +109,6 @@ namespace PanoramicDataWin8.view.vis.render
                     _strokes.Add(stroke);
                 }
 
-                ProgressiveGateway pgTest = new ProgressiveGateway();
-                pgTest.Response += pgTest_Response;
-
                 var psm = (_queryModelClone.SchemaModel as ProgressiveSchemaModel);
 
                 // get text for each feature
@@ -163,10 +160,22 @@ namespace PanoramicDataWin8.view.vis.render
                     JObject request = new JObject(
                         new JProperty("type", "test"),
                         new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Name),
-                        new JProperty("key", ""),
-                        new JProperty("features", f));
-                    request["key"] = _classfierResultDescriptionModel.Query;
-                    pgTest.PostRequest(MainViewController.Instance.MainModel.Ip, request.ToString());
+                        new JProperty("uuid", ""),
+                        new JProperty("features", f),
+                        new JProperty("feature_dimensions", _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(fi => fi.InputModel.Name).ToList()));
+                    request["uuid"] = _classfierResultDescriptionModel.Uuid;
+
+                    string message = await ProgressiveGateway.Request(request);
+                    JToken jToken = JToken.Parse(message);
+                    if ((double)jToken["result"] == 0)
+                    {
+                        _testResult = false;
+                    }
+                    else
+                    {
+                        _testResult = true;
+                    }
+                    _queryModel.FireRequestRender();
                 }
                 else
                 {
@@ -174,20 +183,6 @@ namespace PanoramicDataWin8.view.vis.render
                     _queryModel.FireRequestRender();
                 }
             }
-        }
-
-        private void pgTest_Response(object sender, string e)
-        {
-            JToken jToken = JToken.Parse(e);
-            if ((double) jToken["result"] == 0)
-            {
-                _testResult = false;
-            }
-            else
-            {
-                _testResult = true;
-            }
-            _queryModel.FireRequestRender();
         }
 
         private async Task<List<string>> inkToText(IEnumerable<List<Windows.Foundation.Point>> strokes)

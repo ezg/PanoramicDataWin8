@@ -13,6 +13,10 @@ namespace PanoramicDataWin8.controller.data
             set { _activeJobs = value; }
         }
 
+        public virtual void RemoveJob(QueryModel queryModel)
+        {
+        }
+
         public abstract void ExecuteQuery(QueryModel queryModel);
     }
 }

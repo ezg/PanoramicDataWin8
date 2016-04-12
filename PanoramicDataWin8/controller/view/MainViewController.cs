@@ -173,15 +173,12 @@ namespace PanoramicDataWin8.controller.view
 
                     MainModel.Ip = ip;
 
-                    ProgressiveGateway pgCatalog = new ProgressiveGateway();
-                    pgCatalog.Response += PgCatalog_Response;
-                    pgCatalog.PostRequest(MainModel.Ip, new JObject(new JProperty("type", "catalog")).ToString());
-
-
-                    ProgressiveGateway pgTask = new ProgressiveGateway();
-                    pgTask.Response += PgTask_Response;
-                    pgTask.PostRequest(MainModel.Ip, new JObject(new JProperty("type", "tasks")).ToString());
+                    string message = await ProgressiveGateway.Request(new JObject(new JProperty("type", "catalog")));
+                    parsePgCatalogResponse(message);
                     
+                    message = await ProgressiveGateway.Request(new JObject(new JProperty("type", "tasks")));
+                    parsePgTaskResponse(message);
+
                 }
                 catch (Exception exc)
                 {
@@ -190,7 +187,7 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        private void PgTask_Response(object sender, string e)
+        private void parsePgTaskResponse(string e)
         {
             JToken jToken = JToken.Parse(e);
 
@@ -224,7 +221,7 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        private async void PgCatalog_Response(object sender, string e)
+        private async void parsePgCatalogResponse(string e)
         {
             var installedLoc = Package.Current.InstalledLocation;
             var configLoc = await installedLoc.GetFolderAsync(@"Assets\data\config");
@@ -427,6 +424,7 @@ namespace PanoramicDataWin8.controller.view
 
         public void RemoveVisualizationViewModel(VisualizationContainerView visualizationContainerView)
         {
+            _mainModel.SchemaModel.QueryExecuter.RemoveJob((visualizationContainerView.DataContext as VisualizationViewModel).QueryModel);
             _visualizationViewModels.Remove(visualizationContainerView.DataContext as VisualizationViewModel);
             //PhysicsController.Instance.RemovePhysicalObject(visualizationContainerView);
             MainViewController.Instance.InkableScene.Remove(visualizationContainerView);

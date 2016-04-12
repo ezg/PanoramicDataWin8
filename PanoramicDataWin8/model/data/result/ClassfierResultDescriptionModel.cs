@@ -67,11 +67,11 @@ namespace PanoramicDataWin8.model.data.result
             set { this.SetProperty(ref _auc, value); }
         }
 
-        private JObject _query = null;
-        public JObject Query
+        private string _uuid = null;
+        public string Uuid
         {
-            get { return _query; }
-            set { this.SetProperty(ref _query, value); }
+            get { return _uuid; }
+            set { this.SetProperty(ref _uuid, value); }
         }
     }
 }
