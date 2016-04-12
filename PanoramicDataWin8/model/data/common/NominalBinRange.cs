@@ -7,6 +7,9 @@ namespace PanoramicDataWin8.model.data.common
 {
     public class NominalBinRange : BinRange
     {
+        List<string> days = new List<string>() {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+        List<string> months = new List<string>() { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
+
         private Dictionary<double, string> _labelsValue = new Dictionary<double, string>();
 
         public Dictionary<double, string> LabelsValue
@@ -66,7 +69,7 @@ namespace PanoramicDataWin8.model.data.common
         {
             List<BinLabel> labels = new List<BinLabel>();
             int count = 0;
-            labels = _labelsValue.OrderBy(kvp => kvp.Value).Select(kvp => new BinLabel()
+            labels = _labelsValue.OrderBy(kvp => this.getOrderingIndex(kvp.Value)).Select(kvp => new BinLabel()
             {
                 Label = kvp.Value,
                 MinValue = count++,
@@ -76,6 +79,19 @@ namespace PanoramicDataWin8.model.data.common
             }).ToList();
 
             return labels;
+        }
+
+        private string getOrderingIndex(string v)
+        {
+            if (days.Contains(v))
+            {
+                return days.IndexOf(v).ToString("D8");
+            }
+            if (months.Contains(v))
+            {
+                return months.IndexOf(v).ToString("D8");
+            }
+            return v;
         }
 
         public override BinRange GetUpdatedBinRange(double dataMin, double dataMax)

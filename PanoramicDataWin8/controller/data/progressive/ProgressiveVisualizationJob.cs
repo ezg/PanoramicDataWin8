@@ -101,11 +101,11 @@ namespace PanoramicDataWin8.controller.data.progressive
         public override void Start()
         {
             _stopWatch.Start();
-            run();
             lock (_lock)
             {
                 _isRunning = true;
             }
+            Task.Run(() => run());
         }
 
         private async void run()
@@ -331,6 +331,11 @@ namespace PanoramicDataWin8.controller.data.progressive
             lock (_lock)
             {
                 _isRunning = false;
+
+                JObject lookupData = new JObject(
+                   new JProperty("type", "halt"),
+                   new JProperty("uuid", _requestUuid));
+                ProgressiveGateway.Request(lookupData);
             }
         }
     }

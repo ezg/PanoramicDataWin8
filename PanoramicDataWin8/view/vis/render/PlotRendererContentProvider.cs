@@ -252,10 +252,10 @@ namespace PanoramicDataWin8.view.vis.render
                     {
                         if (_visualizationDescriptionModel.AxisTypes[_xIndex] == AxisType.Quantitative)
                         {
-                            DrawString(canvasArgs, _textFormat, xFrom, yFrom + 5, double.Parse(label.Label).ToString(), _textColor, true, true, false);
+                            DrawString(canvasArgs, _textFormat, xFrom, yFrom + 5, double.Parse(label.Label).ToString("N0"), _textColor, true, true, false);
                             if (lastLabel)
                             {
-                                DrawString(canvasArgs, _textFormat, xTo, yFrom + 5, label.MaxValue.ToString(), _textColor, true, true, false);
+                                DrawString(canvasArgs, _textFormat, xTo, yFrom + 5, label.MaxValue.ToString("N0"), _textColor, true, true, false);
                             }
                         }
                         else
@@ -289,10 +289,10 @@ namespace PanoramicDataWin8.view.vis.render
                     {
                         if (_visualizationDescriptionModel.AxisTypes[_yIndex] == AxisType.Quantitative)
                         {
-                            DrawString(canvasArgs, _textFormat, xFrom - 10, yFrom, double.Parse(label.Label).ToString(), _textColor, false, false, true);
+                            DrawString(canvasArgs, _textFormat, xFrom - 10, yFrom, double.Parse(label.Label).ToString("N0"), _textColor, false, false, true);
                             if (lastLabel)
                             {
-                                DrawString(canvasArgs, _textFormat, xFrom - 10, yTo, label.MaxValue.ToString(), _textColor, false, false, true);
+                                DrawString(canvasArgs, _textFormat, xFrom - 10, yTo, label.MaxValue.ToString("N0"), _textColor, false, false, true);
                             }
                         }
                         else
@@ -524,9 +524,9 @@ namespace PanoramicDataWin8.view.vis.render
                                     }
                                     if (valueMargin != 0.0 && _resultModel.Progress < 1.0)
                                     {
-                                        DrawString(canvasArgs, _textFormat,
-                                            (float)(rect.Left + rect.Width / 2.0f),
-                                            (float)(rect.Top + rect.Height / 2.0f), '\u00B1' + (valueMargin * 100).ToString("F2") + "%", new Color() { A = 80, R = _textColor.R, G = _textColor.G, B = _textColor.B }, false, true, true);
+                                        //DrawString(canvasArgs, _textFormat,
+                                        //    (float)(rect.Left + rect.Width / 2.0f),
+                                        //    (float)(rect.Top + rect.Height / 2.0f), '\u00B1' + (valueMargin * 100).ToString("F2") + "%", new Color() { A = 80, R = _textColor.R, G = _textColor.G, B = _textColor.B }, false, true, true);
                                     }
                                 }
                                 else

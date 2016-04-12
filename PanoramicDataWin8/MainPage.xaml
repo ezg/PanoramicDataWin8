@@ -104,7 +104,7 @@
     </Grid>
 
     <Page.BottomAppBar >
-        <CommandBar Name="commandBar" IsSticky="False">
+        <CommandBar Name="commandBar" IsSticky="False" Background="White">
             <CommandBar.SecondaryCommands >
             </CommandBar.SecondaryCommands>
         </CommandBar>

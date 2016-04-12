@@ -86,6 +86,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                         print 'new comp visualization'
                         newUUID = str(uuid.uuid4())
                         exe = VisualizationExecutor(newUUID, job['task'], job['dataset'], Shared().resultsPerUUID, Shared().isRunningPerUUID)
+                        Shared().isRunningPerUUID[newUUID] = True
                         exe.start()  
                         Shared().computationToUUIDLookup[key] = newUUID
                         result = {'uuid' : newUUID}
@@ -94,6 +95,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                         print 'new comp classify'
                         newUUID = str(uuid.uuid4())
                         exe = ClassificationExecutor(newUUID, job['task'], job['dataset'], Shared().resultsPerUUID, Shared().isRunningPerUUID, Shared().modelsPerUUID)
+                        Shared().isRunningPerUUID[newUUID] = True
                         exe.start()  
                         Shared().computationToUUIDLookup[key] = newUUID
                         result = {'uuid' : newUUID}
@@ -132,6 +134,9 @@ class RequestHandler(BaseHTTPRequestHandler):
                 if job['uuid'] in Shared().resultsPerUUID:
                     result = json.dumps(Shared().resultsPerUUID[job['uuid']], indent=2, default=default)          
             
+            elif job['type'] == 'halt':
+                if job['uuid'] in Shared().isRunningPerUUID:
+                    Shared().isRunningPerUUID[job['uuid']] = False      
                 
             elif job['type'] == 'tasks':
                 result = json.dumps([['classify',[
@@ -171,7 +176,6 @@ class VisualizationExecutor(Executor):
         self.dataset = dataset
         self.resultsPerUUID = resultsPerUUID
         self.isRunningPerUUID = isRunningPerUUID
-        self.isRunningPerUUID[self.uuid] = True
         
         #do first batch fast
         dp = SequentialDataProvider(self.dataset, 'C:\\data', self.task['chunkSize'], 0)
@@ -208,6 +212,7 @@ class VisualizationExecutor(Executor):
         while True:
             if not self.isRunningPerUUID[self.uuid]:
                 break
+            time.sleep(0.2)
             self.step(dp, db)
                 
         print 'VisualizationExecutor END'
@@ -221,7 +226,6 @@ class ClassificationExecutor(Executor):
         self.resultsPerUUID = resultsPerUUID
         self.isRunningPerUUID = isRunningPerUUID
         self.modelsPerUUID = modelsPerUUID
-        self.isRunningPerUUID[self.uuid] = True
         
     def getClassifier(self, classifier):
         print classifier

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.data.tuppleware;
 using PanoramicDataWin8.controller.view;
@@ -24,7 +25,7 @@ namespace PanoramicDataWin8.controller.data.progressive
         public ProgressiveQueryExecuter()
         {
             var stream = Observable.FromEventPattern<ExecuteQueryEventArgs>(this, "ExecuteQueryEvent");
-            stream.GroupByUntil(k => k.EventArgs.QueryModel, g => Observable.Timer(TimeSpan.FromMilliseconds(20)))
+            stream.GroupByUntil(k => k.EventArgs.QueryModel, g => Observable.Timer(TimeSpan.FromMilliseconds(50)))
                 .SelectMany(y => y.FirstAsync())
                 .Subscribe((async (arg) =>
                 {
