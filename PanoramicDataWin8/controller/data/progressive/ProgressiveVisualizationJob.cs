@@ -65,9 +65,23 @@ namespace PanoramicDataWin8.controller.data.progressive
             nrOfBins = new double[] {MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins}.Concat(
                 QueryModel.GetUsageInputOperationModel(InputUsage.Group).Select(qom => MainViewController.Instance.MainModel.NrOfGroupBins)).ToList();
 
+
             dimensionAggregateFunctions = QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Select(iom => iom.AggregateFunction.ToString()).Concat(
                      QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).Select(iom => iom.AggregateFunction.ToString())).Concat(
                      QueryModelClone.GetUsageInputOperationModel(InputUsage.Group).Select(iom => iom.AggregateFunction.ToString())).ToList();
+
+
+            if (QueryModelClone.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name == "long" ||
+                QueryModelClone.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name == "lat")
+            {
+                nrOfBins[0] = 20;
+            }
+
+            if (QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name == "long" ||
+               QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name == "lat")
+            {
+                nrOfBins[0] = 20;
+            }
 
             dimensions = QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Select(iom => iom.InputModel.Name).Concat(
                                  QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).Select(iom => iom.InputModel.Name)).Concat(
