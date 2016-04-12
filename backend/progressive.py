@@ -102,9 +102,12 @@ class ExecutorWebSocket(WebSocket):
             print  pd.DataFrame(job['features'])
             if classify_model in Shared().modelsPerComputation:
                 model = Shared().modelsPerComputation[classify_model]
-                print model
-                result = model.predict(np.array(pd.DataFrame(job['features'])))[0]
+                print job['key']['task']['features']
+                #print np.array(pd.DataFrame(job['features']))[0]
+                result = model.predict(np.array(pd.DataFrame(job['features'])[job['key']['task']['features']]))[0]
+                print np.array(pd.DataFrame(job['features'])[job['key']['task']['features']])
                 print 'test result : ', result
+                print 
                 self.sendMessage(json.dumps({'result' : result}, default=default))
             else:
                 print ">>> not found"   
@@ -159,7 +162,7 @@ class Updator(threading.Thread):
     def run(self):
         while self.running:
             time.sleep(0.05)
-            for comp in self.clientsPerComputation:
+            for comp in self.clientsPerComputation.keys():
                 for client in self.clientsPerComputation[comp]:
                     if not comp in self.lastProgressUpdatePerCompuationAndClient:
                         self.lastProgressUpdatePerCompuationAndClient[comp] = {}
@@ -170,7 +173,6 @@ class Updator(threading.Thread):
                         if self.lastProgressUpdatePerCompuationAndClient[comp][client] < self.resultsPerComputation[comp]['progress']:
                             client.sendMessage(json.dumps(self.resultsPerComputation[comp], indent=2, default=default))
                             self.lastProgressUpdatePerCompuationAndClient[comp][client] = self.resultsPerComputation[comp]['progress']
-                            print "3", str(time.time()), str(self.resultsPerComputation[comp]['progress'])
                         if self.lastProgressUpdatePerCompuationAndClient[comp][client] == 1.0:
                             client.close()
                     
@@ -221,7 +223,7 @@ class VisualizationExecutor(Executor):
             self.isRunningPerComputation[self.computation] = False
             
         end = time.time()
-        print 'VisualizationExecutor : p= ' + '{0:.2f}'.format(progress) + ', t= ' + str(end - start)    
+        #print 'VisualizationExecutor : p= ' + '{0:.2f}'.format(progress) + ', t= ' + str(end - start)    
         return df, progress
         
     def run(self):

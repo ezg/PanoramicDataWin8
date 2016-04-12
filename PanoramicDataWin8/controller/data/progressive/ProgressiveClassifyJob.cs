@@ -13,6 +13,7 @@ using Windows.UI.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data;
+using PanoramicDataWin8.controller.data.tuppleware;
 using PanoramicDataWin8.controller.data.tuppleware.json;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
@@ -74,23 +75,29 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             _stopWatch.Start();
             run();
-            // Task.Run(() => run());
+            //Task.Run(() => run());
         }
 
         private async void run()
         {
-            _webSocket = new MessageWebSocket();
-            _webSocket.Control.MessageType = SocketMessageType.Utf8;
-            _webSocket.MessageReceived += webSocket_MessageReceived;
+            try
+            {
+                _webSocket = new MessageWebSocket();
+                _webSocket.Control.MessageType = SocketMessageType.Utf8;
+                _webSocket.MessageReceived += webSocket_MessageReceived;
 
-            _webSocket.Closed += webSocket_Closed;
-            await _webSocket.ConnectAsync(new Uri(MainViewController.Instance.MainModel.Ip));
+                _webSocket.Closed += webSocket_Closed;
+                await _webSocket.ConnectAsync(new Uri(MainViewController.Instance.MainModel.Ip));
 
-            var data = _query.ToString();
-            DataWriter messageWriter = new DataWriter(_webSocket.OutputStream);
-            messageWriter.WriteString(data);
-            await messageWriter.StoreAsync();
-
+                var data = _query.ToString();
+                DataWriter messageWriter = new DataWriter(_webSocket.OutputStream);
+                messageWriter.WriteString(data);
+                await messageWriter.StoreAsync();
+            }
+            catch (Exception exc)
+            {
+                ErrorHandler.HandleError(exc.Message);
+            }
         }
 
         void webSocket_Closed(IWebSocket sender, WebSocketClosedEventArgs args)
@@ -99,97 +106,106 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         async void webSocket_MessageReceived(MessageWebSocket sender, MessageWebSocketMessageReceivedEventArgs args)
         {
-            using (DataReader reader = args.GetDataReader())
+            try
             {
-                reader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
-                string message = reader.ReadString(reader.UnconsumedBufferLength);
-
-                List<string> brushes = new List<string>();
-                foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)
+                using (DataReader reader = args.GetDataReader())
                 {
-                    List<FilterModel> filterModels = new List<FilterModel>();
-                    var brush = FilterModel.GetFilterModelsRecursive(brushQueryModel, new List<QueryModel>(), filterModels, false);
-                    brushes.Add(brush);
-                }
-                var label = brushes[0];
+                    reader.UnicodeEncoding = Windows.Storage.Streams.UnicodeEncoding.Utf8;
+                    string message = reader.ReadString(reader.UnconsumedBufferLength);
 
-                ClassfierResultDescriptionModel resultDescriptionModel = new ClassfierResultDescriptionModel();
-                resultDescriptionModel.Query = _query;
-                JObject result = JObject.Parse(message);
-                double progress = (double)result["progress"];
-
-                var features = QueryModelClone.GetUsageInputOperationModel(InputUsage.Feature).ToList();
-                foreach (var feature in features)
-                {
-                    //['actual and predicted', 'not actual and predicted', 'not actual and not predicted', 'actual and not predicted']
-                    List<string> visBrushes = new List<string>() {"0", "1", "2", "3"};
-
-                    JObject token = (JObject) result["histograms"][feature.InputModel.Name];
-                    VisualizationResultDescriptionModel visResultDescriptionModel = new VisualizationResultDescriptionModel();
-                    List<ResultItemModel> resultItemModels = ProgressiveVisualizationJob.UpdateVisualizationResultDescriptionModel(visResultDescriptionModel, token, visBrushes, 
-                        new List<InputOperationModel>() {new InputOperationModel(feature.InputModel)
-                        {
-                            AggregateFunction = AggregateFunction.None
-                        },
-                        new InputOperationModel(feature.InputModel)
-                        {
-                            AggregateFunction = AggregateFunction.Count
-                        } 
-                        }, new List<AxisType>() { AxisType.Quantitative, AxisType.Quantitative }, new List<InputOperationModel>()
-                        {
-                             new InputOperationModel(feature.InputModel)
-                        {
-                            AggregateFunction = AggregateFunction.Count
-                        }
-                        });
-                    resultDescriptionModel.VisualizationResultModel.Add(new ResultModel()
+                    List<string> brushes = new List<string>();
+                    foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)
                     {
-                        Progress = progress,
-                        ResultDescriptionModel = visResultDescriptionModel,
-                        ResultItemModels = new ObservableCollection<ResultItemModel>(resultItemModels)
-                    });
-                }
-                
-                var classifyResult = JsonConvert.DeserializeObject<ClassifyResult>(result[label].ToString());
-
-
-                resultDescriptionModel.ConfusionMatrices.Add(new List<double>());
-                resultDescriptionModel.ConfusionMatrices[0].Add((double) classifyResult.tp);
-                resultDescriptionModel.ConfusionMatrices[0].Add((double) classifyResult.fn);
-
-                resultDescriptionModel.ConfusionMatrices.Add(new List<double>());
-                resultDescriptionModel.ConfusionMatrices[1].Add((double) classifyResult.fp);
-                resultDescriptionModel.ConfusionMatrices[1].Add((double) classifyResult.tn);
-
-                var xs = classifyResult.fpr;
-                var ys = classifyResult.tpr;
-                resultDescriptionModel.RocCurve = new List<Pt>();
-                resultDescriptionModel.RocCurve.Add(new Pt(0, 0));
-                var step = 1; //ys.Count() > 300 ? 50 : 1;  
-
-                if (xs != null && ys != null)
-                {
-                    for (int i = 0; i < xs.Count(); i += step)
-                    {
-                        resultDescriptionModel.RocCurve.Add(new Pt((double) xs[i], (double) ys[i]));
+                        List<FilterModel> filterModels = new List<FilterModel>();
+                        var brush = FilterModel.GetFilterModelsRecursive(brushQueryModel, new List<QueryModel>(), filterModels, false);
+                        brushes.Add(brush);
                     }
-                    resultDescriptionModel.RocCurve.Add(new Pt(1, 1));
+                    var label = brushes[0];
+
+                    ClassfierResultDescriptionModel resultDescriptionModel = new ClassfierResultDescriptionModel();
+                    resultDescriptionModel.Query = _query;
+                    JObject result = JObject.Parse(message);
+                    double progress = (double) result["progress"];
+
+                    var features = QueryModelClone.GetUsageInputOperationModel(InputUsage.Feature).ToList();
+                    foreach (var feature in features)
+                    {
+                        //['actual and predicted', 'not actual and predicted', 'not actual and not predicted', 'actual and not predicted']
+                        List<string> visBrushes = new List<string>() {"0", "1", "2", "3"};
+
+                        JObject token = (JObject) result["histograms"][feature.InputModel.Name];
+                        VisualizationResultDescriptionModel visResultDescriptionModel = new VisualizationResultDescriptionModel();
+                        List<ResultItemModel> resultItemModels = ProgressiveVisualizationJob.UpdateVisualizationResultDescriptionModel(visResultDescriptionModel, token, visBrushes,
+                            new List<InputOperationModel>()
+                            {
+                                new InputOperationModel(feature.InputModel)
+                                {
+                                    AggregateFunction = AggregateFunction.None
+                                },
+                                new InputOperationModel(feature.InputModel)
+                                {
+                                    AggregateFunction = AggregateFunction.Count
+                                }
+                            }, new List<AxisType>() {AxisType.Quantitative, AxisType.Quantitative}, new List<InputOperationModel>()
+                            {
+                                new InputOperationModel(feature.InputModel)
+                                {
+                                    AggregateFunction = AggregateFunction.Count
+                                }
+                            });
+                        resultDescriptionModel.VisualizationResultModel.Add(new ResultModel()
+                        {
+                            Progress = progress,
+                            ResultDescriptionModel = visResultDescriptionModel,
+                            ResultItemModels = new ObservableCollection<ResultItemModel>(resultItemModels)
+                        });
+                    }
+
+                    var classifyResult = JsonConvert.DeserializeObject<ClassifyResult>(result[label].ToString());
+
+
+                    resultDescriptionModel.ConfusionMatrices.Add(new List<double>());
+                    resultDescriptionModel.ConfusionMatrices[0].Add((double) classifyResult.tp);
+                    resultDescriptionModel.ConfusionMatrices[0].Add((double) classifyResult.fn);
+
+                    resultDescriptionModel.ConfusionMatrices.Add(new List<double>());
+                    resultDescriptionModel.ConfusionMatrices[1].Add((double) classifyResult.fp);
+                    resultDescriptionModel.ConfusionMatrices[1].Add((double) classifyResult.tn);
+
+                    var xs = classifyResult.fpr;
+                    var ys = classifyResult.tpr;
+                    resultDescriptionModel.RocCurve = new List<Pt>();
+                    resultDescriptionModel.RocCurve.Add(new Pt(0, 0));
+                    var step = 1; //ys.Count() > 300 ? 50 : 1;  
+
+                    if (xs != null && ys != null)
+                    {
+                        for (int i = 0; i < xs.Count(); i += step)
+                        {
+                            resultDescriptionModel.RocCurve.Add(new Pt((double) xs[i], (double) ys[i]));
+                        }
+                        resultDescriptionModel.RocCurve.Add(new Pt(1, 1));
+                    }
+
+                    resultDescriptionModel.Precision = classifyResult.precision;
+                    resultDescriptionModel.Recall = classifyResult.recall;
+                    resultDescriptionModel.AUC = classifyResult.auc;
+                    resultDescriptionModel.F1s = classifyResult.f1;
+                    resultDescriptionModel.Progresses = classifyResult.progress;
+
+
+                    await fireUpdated(new List<ResultItemModel>(), progress, resultDescriptionModel);
+
+                    if (progress > 1.0)
+                    {
+                        Stop();
+                        await fireCompleted();
+                    }
                 }
-
-                resultDescriptionModel.Precision = classifyResult.precision;
-                resultDescriptionModel.Recall = classifyResult.recall;
-                resultDescriptionModel.AUC = classifyResult.auc;
-                resultDescriptionModel.F1s = classifyResult.f1;
-                resultDescriptionModel.Progresses = classifyResult.progress;
-
-
-                   await fireUpdated(new List<ResultItemModel>(), progress, resultDescriptionModel);
-
-               if (progress > 1.0)
-               {
-                   Stop();
-                   await fireCompleted();
-               }
+            }
+            catch (Exception exc)
+            {
+                ErrorHandler.HandleError(exc.Message);
             }
         }
 
@@ -235,8 +251,15 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             if (_webSocket != null)
             {
-                _webSocket.Close(1000, "");
-                _webSocket = null;
+                try
+                {
+                    _webSocket.Close(1000, "");
+                    _webSocket = null;
+                }
+                catch (Exception exc)
+                {
+                    ErrorHandler.HandleError(exc.Message);
+                }
             }
         }
     }

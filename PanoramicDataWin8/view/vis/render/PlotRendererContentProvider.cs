@@ -721,7 +721,7 @@ namespace PanoramicDataWin8.view.vis.render
 
                         if (_filterModels.Contains(filterModel))
                         {
-                            canvasArgs.DrawingSession.DrawRoundedRectangle(rect, 4, 4, dark, 0.5f);
+                            canvasArgs.DrawingSession.DrawRoundedRectangle(rect, 4, 4, dark, 1f);
                         }
                     }
                 }

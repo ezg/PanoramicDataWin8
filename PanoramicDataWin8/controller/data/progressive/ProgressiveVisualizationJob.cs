@@ -98,7 +98,7 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             _stopWatch.Start();
             run();
-            // Task.Run(() => run());
+            //Task.Run(() => run());
         }
 
         private async void run()

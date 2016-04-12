@@ -84,7 +84,7 @@ class DataBinner():
                 brushDataFrame.apply(lambda x: self.__runAggregation(x, dfDTypes, toAggregateBrushes, currentBrushes, progress, brushDataFrame), axis=1).astype(object)
                 
         end = time.time()
-        print (end - start)
+        #print (end - start)
         
         self.binStructure.endBatchAggregation(self.dimensions, self.toAggregate, self.toAggregateFunctions, currentBrushes, df, progress)
     
