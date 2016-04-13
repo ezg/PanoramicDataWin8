@@ -206,7 +206,7 @@ class VisualizationExecutor(Executor):
         return df, progress
         
     def run(self):
-        dp = SequentialDataProvider(self.dataset, 'C:\\data', self.task['chunkSize'], self.task['chunkSize'])
+        dp = SequentialDataProvider(self.dataset, 'C:\\data', self.task['chunkSize'], 0)
         db = DataBinner(self.task['dimensions'], self.task['dimensionAggregateFunctions'], self.task['nrOfBins'], self.task['aggregateDimensions'], self.task['aggregateFunctions'], self.task['brushes'])
 
         while True:
@@ -365,6 +365,7 @@ if __name__ == "__main__":
     parser = OptionParser(usage="usage: %prog [options]", version="%prog 1.0")
     parser.add_option("-p", "--port", default=8888, type='int', action="store", dest="port", help="port (8000)")
     parser.add_option("-d", "--data", default='C:\\data', type='string', action="store", dest="data", help="folder where data is stored")
+    
     
     logging.getLogger().setLevel(logging.INFO)
         

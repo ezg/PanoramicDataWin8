@@ -24,7 +24,7 @@ job = {
     "brushes": [],
     "dimensionAggregateFunctions": [
       "None",
-      "Avg"
+      "Count"
     ],
     "dimensions": [
       "mpg",
@@ -69,20 +69,25 @@ while True:
         br0.getBins()
         
         br1 = db.binStructure.binRanges[1]
+        print ">>>>>>>>>>", br1.maxValue
         br1.getBins()
         
         
-        #for b0 in br0.getBins():
-        #    print '  ' + br0.getLabel(b0)
-        #    bkey = (br0.getIndex(b0),)
-        #
-        #    for b1 in br1.getBins():  
-        #        bkey = (br0.getIndex(b0), br1.getIndex(b1))
-        #        print '    ' + br1.getLabel(b1)
-        #        print '      ',
-        #        for k in [aggKey1, aggKey2, aggKey3, aggKey4]:
-        #            print str(db.binStructure.bins[bkey].values[k]) +',',
-        #        print
+        for b0 in br0.getBins():
+            print '  ' + br0.getLabel(b0)
+            bkey = (br0.getIndex(b0),)
+        
+            for b1 in br1.getBins():  
+                bkey = (br0.getIndex(b0), br1.getIndex(b1))
+                print '    ' + br1.getLabel(b1)
+                print '      ',
+                for k in [aggKey1, aggKey2, aggKey3, aggKey4]:
+                    print str(db.binStructure.bins[bkey].values[k]) +',',
+                print
+                print '      ',
+                for k in [aggKey1, aggKey2, aggKey3, aggKey4]:
+                    print str(db.binStructure.bins[bkey].counts[k]) +',',
+                print
 
         
         #print len(db.binStructure.bins)
