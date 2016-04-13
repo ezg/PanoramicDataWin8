@@ -267,7 +267,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
 
                 // y labels and grid lines
-                mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceHeight / (metricsY.Height + 0))) / yLabels.Count));
+                mod = (int)Math.Ceiling(1.0 / (Math.Floor((_deviceHeight / (metricsY.Height + 5))) / yLabels.Count));
                 count = 0;
                 foreach (var label in yLabels)
                 {
