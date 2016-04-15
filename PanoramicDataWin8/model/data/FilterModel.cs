@@ -11,6 +11,7 @@ namespace PanoramicDataWin8.model.data
     public class FilterModel
     {
         public double? Value { get; set; }
+        public double? Frequency { get; set; }
         public List<ValueComparison> ValueComparisons { get; set; }
         
         public FilterModel()

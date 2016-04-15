@@ -21,6 +21,8 @@ using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
 using System.Diagnostics;
 using Windows.UI.Xaml.Media.Animation;
+using Newtonsoft.Json.Linq;
+using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.view.inq;
@@ -125,11 +127,6 @@ namespace PanoramicDataWin8.view.common
 
         private void mainPointerManager_Added(object sender, PointerManagerEvent e)
         {
-            if (!(DataContext as InputFieldViewModel).IsDraggable)
-            {
-                return;
-            }
-
             if (e.NumActiveContacts == 1)
             {
                 GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
@@ -138,12 +135,11 @@ namespace PanoramicDataWin8.view.common
             }
         }
 
+        private static int _nextDragId = 0;
+        private int _dragId = 0;
         void mainPointerManager_Moved(object sender, PointerManagerEvent e)
         {
-            if (!(DataContext as InputFieldViewModel).IsDraggable)
-            {
-                return;
-            }
+
             if (e.NumActiveContacts == 1)
             {
                 GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
@@ -153,7 +149,16 @@ namespace PanoramicDataWin8.view.common
 
                 if (delta.Length > 10 && _shadow == null)
                 {
-                    createShadow(currentPoint);
+                    if ((DataContext as InputFieldViewModel).IsDraggable)
+                    {
+                        createShadow(currentPoint);
+
+                        _dragId = _nextDragId++;
+
+                        Logger.Instance?.Log("drag",
+                            new JProperty("dragId", _dragId),
+                            new JProperty("attribute", (DataContext as InputFieldViewModel).InputOperationModel.InputModel.Name));
+                    }
                 }
 
                 if (_shadow != null)
@@ -171,7 +176,7 @@ namespace PanoramicDataWin8.view.common
                         Rct bounds = _shadow.GetBounds(inkableScene);
                         (DataContext as InputFieldViewModel).FireMoved(bounds,
                             new InputOperationModel((DataContext as InputFieldViewModel).InputOperationModel.InputModel),
-                            InputFieldViewModelEventArgType.Default);
+                            InputFieldViewModelEventArgType.Default, _dragId);
                     }
                 }
 
@@ -181,10 +186,6 @@ namespace PanoramicDataWin8.view.common
 
         void mainPointerManager_Removed(object sender, PointerManagerEvent e)
         {
-            if (!(DataContext as InputFieldViewModel).IsDraggable)
-            {
-                return;
-            }
             if (_shadow == null &&
                 _manipulationStartTime + TimeSpan.FromSeconds(0.5).Ticks > DateTime.Now.Ticks)
             {
@@ -204,7 +205,7 @@ namespace PanoramicDataWin8.view.common
                     new InputOperationModel((DataContext as InputFieldViewModel).InputOperationModel.InputModel)
                     {
                         AggregateFunction = (DataContext as InputFieldViewModel).InputOperationModel.AggregateFunction
-                    });
+                    }, _dragId);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -247,7 +248,7 @@ namespace PanoramicDataWin8.view.common
                 Rct bounds = _shadow.GetBounds(inkableScene);
                 (DataContext as InputFieldViewModel).FireMoved(bounds,
                     new InputOperationModel((DataContext as InputFieldViewModel).InputOperationModel.InputModel),
-                    InputFieldViewModelEventArgType.Default);
+                    InputFieldViewModelEventArgType.Default, _dragId);
             }
         }
     }

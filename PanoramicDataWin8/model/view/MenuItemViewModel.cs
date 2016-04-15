@@ -203,6 +203,7 @@ namespace PanoramicDataWin8.model.view
         }
     }
 
+
     public class ToggleMenuItemComponentViewModel : MenuItemComponentViewModel
     {
         private bool _isChecked = false;
@@ -217,6 +218,8 @@ namespace PanoramicDataWin8.model.view
                 this.SetProperty(ref _isChecked, value);
             }
         }
+
+        public MenuViewModel MenuViewModel = null;
 
         private string _label = "";
         public string Label

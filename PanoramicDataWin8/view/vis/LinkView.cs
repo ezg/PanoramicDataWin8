@@ -13,6 +13,8 @@ using Windows.UI.Xaml.Media;
 using Windows.UI;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Text;
+using Newtonsoft.Json.Linq;
+using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.view;
@@ -539,6 +541,36 @@ namespace PanoramicDataWin8.view.vis
             {
                 FilteringOperation op = linkViewModel.ToVisualizationViewModel.QueryModel.FilteringOperation;
                 linkViewModel.ToVisualizationViewModel.QueryModel.FilteringOperation = op == FilteringOperation.AND ? FilteringOperation.OR : FilteringOperation.AND;
+
+                JArray fromArray = new JArray();
+                foreach (var fromVisualizationViewModel in linkViewModel.FromVisualizationViewModels)
+                {
+                    JObject o = new JObject(
+                        new JProperty("linkId", fromVisualizationViewModel.QueryModel.Id.ToString() + "_" + linkViewModel.ToVisualizationViewModel.QueryModel.Id.ToString()),
+                        new JProperty("negated", linkViewModel.LinkModels.First(v => v.FromQueryModel == fromVisualizationViewModel.QueryModel && v.ToQueryModel == linkViewModel.ToVisualizationViewModel.QueryModel).IsInverted),
+                        new JProperty("from_attribute_x_axis", fromVisualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name),
+                        new JProperty("from_attribute_y_axis", fromVisualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name),
+                        new JProperty("from_aggregation_x_axis", fromVisualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).First().AggregateFunction.ToString()),
+                        new JProperty("from_aggregation_y_axis", fromVisualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).First().AggregateFunction.ToString()),
+                        new JProperty("from_canvas_xpos", fromVisualizationViewModel.Bounds.Center.X),
+                        new JProperty("from_canvas_ypos", fromVisualizationViewModel.Bounds.Center.Y));
+                    fromArray.Add(o);
+                }
+
+                Logger.Instance?.Log("linkOperation",
+                    new JProperty("operation", linkViewModel.ToVisualizationViewModel.QueryModel.FilteringOperation.ToString()),
+
+                    new JProperty("froms", fromArray),
+
+                    new JProperty("to_attribute_x_axis", linkViewModel.ToVisualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name),
+                    new JProperty("to_attribute_y_axis", linkViewModel.ToVisualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name),
+                    new JProperty("to_aggregation_x_axis", linkViewModel.ToVisualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).First().AggregateFunction.ToString()),
+                    new JProperty("to_aggregation_y_axis", linkViewModel.ToVisualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).First().AggregateFunction.ToString()),
+                    new JProperty("to_canvas_xpos", linkViewModel.ToVisualizationViewModel.Bounds.Center.X),
+                    new JProperty("to_canvas_ypos", linkViewModel.ToVisualizationViewModel.Bounds.Center.Y));
+
+
+
                 e.Handled = true;
                 foreach (var linkModel in linkViewModel.LinkModels)
                 {
@@ -595,6 +627,25 @@ namespace PanoramicDataWin8.view.vis
                     var linkModel = (linkViewModel.LinkModels.First(lm => lm.FromQueryModel == model.QueryModel));
                     linkModel.IsInverted = !linkModel.IsInverted;
                     linkModel.ToQueryModel.FireQueryModelUpdated(QueryModelUpdatedEventType.Links);
+
+                    Logger.Instance?.Log("linkNegate",
+                        new JProperty("linkId", linkModel.FromQueryModel.Id.ToString() + "_" + linkModel.ToQueryModel.Id.ToString()),
+                        new JProperty("operation", linkModel.ToQueryModel.FilteringOperation.ToString()),
+                        new JProperty("negated", linkModel.IsInverted),
+
+                        new JProperty("from_attribute_x_axis", linkModel.FromQueryModel.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name),
+                        new JProperty("from_attribute_y_axis", linkModel.FromQueryModel.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name),
+                        new JProperty("from_aggregation_x_axis", linkModel.FromQueryModel.GetUsageInputOperationModel(InputUsage.X).First().AggregateFunction.ToString()),
+                        new JProperty("from_aggregation_y_axis", linkModel.FromQueryModel.GetUsageInputOperationModel(InputUsage.Y).First().AggregateFunction.ToString()),
+                        new JProperty("from_canvas_xpos", model.Bounds.Center.X),
+                        new JProperty("from_canvas_ypos", model.Bounds.Center.Y),
+
+                        new JProperty("to_attribute_x_axis", linkModel.ToQueryModel.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name),
+                        new JProperty("to_attribute_y_axis", linkModel.ToQueryModel.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name),
+                        new JProperty("to_aggregation_x_axis", linkModel.ToQueryModel.GetUsageInputOperationModel(InputUsage.X).First().AggregateFunction.ToString()),
+                        new JProperty("to_aggregation_y_axis", linkModel.ToQueryModel.GetUsageInputOperationModel(InputUsage.Y).First().AggregateFunction.ToString()),
+                        new JProperty("to_canvas_xpos", linkViewModel.ToVisualizationViewModel.Bounds.Center.X),
+                        new JProperty("to_canvas_ypos", linkViewModel.ToVisualizationViewModel.Bounds.Center.Y));
                 }
             }
             return true;

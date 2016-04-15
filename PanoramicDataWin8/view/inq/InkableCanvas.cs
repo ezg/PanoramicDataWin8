@@ -4,6 +4,7 @@ using Windows.Foundation;
 using Windows.System;
 using Windows.UI;
 using Windows.UI.Core;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
@@ -44,6 +45,14 @@ namespace PanoramicDataWin8.view.inq
             pts.Add(e.GetCurrentPoint(this).Position);
             _currentInkStroke = new InkStroke(pts);
             _currentInkStroke.IsErase = e.GetCurrentPoint(this).Properties.IsEraser;
+            if (e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+            {
+                var properties = e.GetCurrentPoint(this).Properties;
+                if (properties.PointerUpdateKind == PointerUpdateKind.RightButtonPressed)
+                {
+                    _currentInkStroke.IsErase = true;
+                }
+            }
             addDrawingInkStroke(_currentInkStroke);
         }
 

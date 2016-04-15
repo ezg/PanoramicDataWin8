@@ -65,7 +65,7 @@ namespace PanoramicDataWin8.view.vis
             var ancestors = (e.OriginalSource as FrameworkElement).GetAncestors();
             if (!ancestors.Contains(this) && _fingerDown)
             {
-                MainViewController.Instance.CopyVisualisationViewModel(this.DataContext as VisualizationViewModel, e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position);
+               // MainViewController.Instance.CopyVisualisationViewModel(this.DataContext as VisualizationViewModel, e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position);
             }
         }
 

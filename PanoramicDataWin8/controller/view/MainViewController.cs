@@ -5,6 +5,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using Windows.ApplicationModel;
 using GeoAPI.Geometries;
+using Newtonsoft.Json.Linq;
+using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.controller.data.sim;
 using PanoramicDataWin8.controller.data.tuppleware;
 using PanoramicDataWin8.controller.data.tuppleware.gateway;
@@ -196,7 +198,7 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        public void LoadData(DatasetConfiguration datasetConfiguration)
+        public async void LoadData(DatasetConfiguration datasetConfiguration)
         {
             if (datasetConfiguration.Backend.ToLower() == "mssql")
             {
@@ -222,6 +224,9 @@ namespace PanoramicDataWin8.controller.view
                 //TuppleWareGateway.GetCatalog((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
                 //((_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter as TuppleWareQueryExecuter).LoadFileDescription((_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel);
             }
+
+            await Logger.CreateInstance(MainViewController.Instance.MainModel);
+            Logger.Instance.Log("loadDataset");
         }
         public VisualizationViewModel CreateVisualizationViewModel(TaskModel taskModel, InputOperationModel inputOperationModel)
         {
@@ -351,6 +356,11 @@ namespace PanoramicDataWin8.controller.view
                 if (linkViewModel.LinkModels.Contains(linkModel))
                 {
                     linkViewModel.LinkModels.Remove(linkModel);
+
+
+
+                    Logger.Instance?.Log("dlink",
+                        new JProperty("linkId", linkModel.FromQueryModel.Id.ToString() + "_" + linkModel.ToQueryModel.Id.ToString()));
                 }
                 if (linkViewModel.LinkModels.Count == 0)
                 {
@@ -526,6 +536,18 @@ namespace PanoramicDataWin8.controller.view
                 visualizationViewModel.Size = size;
                 visualizationContainerView.DataContext = visualizationViewModel;
                 InkableScene.Add(visualizationContainerView);
+
+                Logger.Instance?.Log("plot",
+                    new JProperty("dragId", e.DragId),
+                    new JProperty("type", "new"),
+                    new JProperty("plotId", visualizationViewModel.QueryModel.Id),
+                    new JProperty("attribute_x_axis", visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name),
+                    new JProperty("attribute_y_axis", visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name),
+                    new JProperty("aggregation_x_axis", visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).First().AggregateFunction.ToString()),
+                    new JProperty("aggregation_y_axis", visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).First().AggregateFunction.ToString()),
+                    new JProperty("canvas_xpos", visualizationViewModel.Bounds.Center.X),
+                    new JProperty("canvas_ypos", visualizationViewModel.Bounds.Center.Y));
+
             }
         }
 
@@ -540,6 +562,15 @@ namespace PanoramicDataWin8.controller.view
                     {
                         RemoveLinkViewModel(link);
                     }
+
+                    Logger.Instance?.Log("dplot",
+                        new JProperty("plotId", (item as VisualizationViewModel).QueryModel.Id),
+                        new JProperty("attribute_x_axis", (item as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name),
+                        new JProperty("attribute_y_axis", (item as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name),
+                        new JProperty("aggregation_x_axis", (item as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.X).First().AggregateFunction.ToString()),
+                        new JProperty("aggregation_y_axis", (item as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.Y).First().AggregateFunction.ToString()),
+                        new JProperty("canvas_xpos", (item as VisualizationViewModel).Bounds.Center.X),
+                        new JProperty("canvas_ypos", (item as VisualizationViewModel).Bounds.Center.Y));
                 }
             }
             if (e.NewItems != null)
@@ -591,6 +622,25 @@ namespace PanoramicDataWin8.controller.view
                         {
                             linkModel.FromQueryModel.LinkModels.Add(linkModel);
                             linkModel.ToQueryModel.LinkModels.Add(linkModel);
+
+                            Logger.Instance?.Log("link",
+                                   new JProperty("linkId", linkModel.FromQueryModel.Id.ToString() + "_" + linkModel.ToQueryModel.Id.ToString()),
+                                   new JProperty("operation", linkModel.ToQueryModel.FilteringOperation.ToString()),
+                                   new JProperty("negated", false),
+
+                                   new JProperty("from_attribute_x_axis", linkModel.FromQueryModel.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name),
+                                   new JProperty("from_attribute_y_axis", linkModel.FromQueryModel.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name),
+                                   new JProperty("from_aggregation_x_axis", linkModel.FromQueryModel.GetUsageInputOperationModel(InputUsage.X).First().AggregateFunction.ToString()),
+                                   new JProperty("from_aggregation_y_axis", linkModel.FromQueryModel.GetUsageInputOperationModel(InputUsage.Y).First().AggregateFunction.ToString()),
+                                   new JProperty("from_canvas_xpos", VisualizationViewModels.First(v => v.QueryModel == linkModel.FromQueryModel).Bounds.Center.X),
+                                   new JProperty("from_canvas_ypos", VisualizationViewModels.First(v => v.QueryModel == linkModel.FromQueryModel).Bounds.Center.Y),
+
+                                   new JProperty("to_attribute_x_axis", linkModel.ToQueryModel.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name),
+                                   new JProperty("to_attribute_y_axis", linkModel.ToQueryModel.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name),
+                                   new JProperty("to_aggregation_x_axis", linkModel.ToQueryModel.GetUsageInputOperationModel(InputUsage.X).First().AggregateFunction.ToString()),
+                                   new JProperty("to_aggregation_y_axis", linkModel.ToQueryModel.GetUsageInputOperationModel(InputUsage.Y).First().AggregateFunction.ToString()),
+                                   new JProperty("to_canvas_xpos", VisualizationViewModels.First(v => v.QueryModel == linkModel.ToQueryModel).Bounds.Center.X),
+                                   new JProperty("to_canvas_ypos", VisualizationViewModels.First(v => v.QueryModel == linkModel.ToQueryModel).Bounds.Center.Y));
                         }
                     }
                     else

@@ -487,6 +487,7 @@ namespace PanoramicDataWin8.view.vis.render
                                             }
                                         }
                                     }
+                                    filterModel.Frequency = (double?) resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value;
                                     if (!HitTargets.ContainsKey(hitGeom))
                                     {
                                         HitTargets.Add(hitGeom, filterModel);
@@ -521,6 +522,7 @@ namespace PanoramicDataWin8.view.vis.render
                     {
                         BinIndex binIndex = new BinIndex(xi, yi);
                         double? unNormalizedvalue = null;
+                        double? frequency = null;
                         if (_binDictonary.ContainsKey(binIndex))
                         {
                             foreach (var resultItem in _binDictonary[binIndex])
@@ -532,6 +534,10 @@ namespace PanoramicDataWin8.view.vis.render
                                 else if (_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
                                 {
                                     unNormalizedvalue = (double?)resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value;
+                                }
+                                if (_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
+                                {
+                                    frequency = (double?) resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value;
                                 }
                             }
                         }
@@ -569,6 +575,7 @@ namespace PanoramicDataWin8.view.vis.render
                             filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.GREATER_THAN_EQUAL, yBins[yi]));
                             filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.LESS_THAN, yBins[yi + 1]));
                         }
+                        filterModel.Frequency = frequency;
                         HitTargets.Add(hitGeom, filterModel);
 
                         if (_filterModels.Contains(filterModel))

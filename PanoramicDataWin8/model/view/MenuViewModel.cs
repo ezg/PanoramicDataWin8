@@ -14,6 +14,8 @@ namespace PanoramicDataWin8.model.view
         {
         }
 
+        public int DragId = 0;
+
         private ObservableCollection<MenuItemViewModel> _menuItemViewModels = new ObservableCollection<MenuItemViewModel>();
         public ObservableCollection<MenuItemViewModel> MenuItemViewModels
         {

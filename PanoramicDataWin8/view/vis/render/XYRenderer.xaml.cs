@@ -14,6 +14,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using GeoAPI.Geometries;
+using Newtonsoft.Json.Linq;
+using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
@@ -141,6 +143,7 @@ namespace PanoramicDataWin8.view.vis.render
                     IsShadow = false,
                     BorderThicknes = new Thickness(0, 0, 0, 4),
                     Size = new Vec(visModel.Size.X - 54, 54),
+                    IsDraggable = false,
                     AttachmentOrientation = AttachmentOrientation.Top
                 };
             }
@@ -165,6 +168,7 @@ namespace PanoramicDataWin8.view.vis.render
                     IsShadow = false,
                     BorderThicknes = new Thickness(0, 0, 4, 0),
                     Size = new Vec(54, visModel.Size.Y - 54),
+                    IsDraggable = false,
                     TextAngle = 270,
                     AttachmentOrientation = AttachmentOrientation.Left
                 };
@@ -336,7 +340,8 @@ namespace PanoramicDataWin8.view.vis.render
                 }
             }
         }
-
+        private static int _nextDragId = 0;
+        private int _dragId = 0;
         void InputFieldViewInputFieldViewModelTapped(object sender, EventArgs e)
         {
             InputFieldViewModel model = (sender as InputFieldView).DataContext as InputFieldViewModel;
@@ -356,8 +361,33 @@ namespace PanoramicDataWin8.view.vis.render
 
                     if (createNew)
                     {
+                        var xInputFieldView = (InputFieldView)GetTemplateChild("xInputFieldView");
+                        var yInputFieldView = (InputFieldView)GetTemplateChild("yInputFieldView");
+                        var axis = "na";
+                        if (xInputFieldView == sender)
+                        {
+                            axis = "x";
+                        }
+                        else if (yInputFieldView == sender)
+                        {
+                            axis = "y";
+                        }
+
+                        Logger.Instance?.Log("agg_expand",
+                            new JProperty("menuId", _dragId),
+                            new JProperty("plotId", visModel.QueryModel.Id),
+                            new JProperty("axis", axis),
+                            new JProperty("attribute_x_axis", visModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name),
+                            new JProperty("attribute_y_axis", visModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name),
+                            new JProperty("aggregation_x_axis", visModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).First().AggregateFunction.ToString()),
+                            new JProperty("aggregation_y_axis", visModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).First().AggregateFunction.ToString()),
+                            new JProperty("canvas_xpos", (DataContext as VisualizationViewModel).Bounds.Center.X),
+                            new JProperty("canvas_ypos", (DataContext as VisualizationViewModel).Bounds.Center.Y));
+
                         InputFieldView inputFieldView = sender as InputFieldView;
                         var menuViewModel = model.CreateMenuViewModel(inputFieldView.GetBounds(MainViewController.Instance.InkableScene));
+
+                        menuViewModel.DragId = _nextDragId++;
                         if (menuViewModel.MenuItemViewModels.Count > 0)
                         {
                             _menuViewModel = menuViewModel;
@@ -401,6 +431,7 @@ namespace PanoramicDataWin8.view.vis.render
         
         void FilterModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            JArray predicates = new JArray();
 
             QueryModel queryModel = (DataContext as VisualizationViewModel).QueryModel;
             var tbSelection = ((TextBlock)GetTemplateChild("tbSelection"));
@@ -434,11 +465,23 @@ namespace PanoramicDataWin8.view.vis.render
                     tbSelection.Text += ", sum value: " + queryModel.FilterModels.Where(fm => fm.Value.HasValue).Sum(fm => fm.Value.Value).ToString("F1");
                 }
                 //tbSelection.Text = "" + queryModel.FilterModels.Count;
+
+                foreach (var filterModel in queryModel.FilterModels)
+                {
+                    JObject predicate = new JObject(
+                        new JProperty("predicate", filterModel.ToPythonString()),
+                        new JProperty("absoluteFrequency", filterModel.Frequency));
+                    predicates.Add(predicate);
+                }
             }
             else
             {
                 tbSelection.Text = "";
             }
+
+            Logger.Instance?.Log("select",
+                  new JProperty("plotId", queryModel.Id),
+                  new JProperty("predicates", predicates));
         }
 
         public GeoAPI.Geometries.IGeometry BoundsGeometry
@@ -525,6 +568,17 @@ namespace PanoramicDataWin8.view.vis.render
                     qModel.RemoveUsageInputOperationModel(InputUsage.X, qModel.GetUsageInputOperationModel(InputUsage.X).First());
                 }
                 qModel.AddUsageInputOperationModel(InputUsage.X, e.InputOperationModel);
+
+                Logger.Instance?.Log("plot",
+                    new JProperty("type", "existing"),
+                    new JProperty("dragId", e.DragId),
+                    new JProperty("plotId", qModel.Id),
+                    new JProperty("attribute_x_axis", qModel.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name),
+                    new JProperty("attribute_y_axis", qModel.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name),
+                    new JProperty("aggregation_x_axis", qModel.GetUsageInputOperationModel(InputUsage.X).First().AggregateFunction.ToString()),
+                    new JProperty("aggregation_y_axis", qModel.GetUsageInputOperationModel(InputUsage.Y).First().AggregateFunction.ToString()),
+                    new JProperty("canvas_xpos", (DataContext as VisualizationViewModel).Bounds.Center.X),
+                    new JProperty("canvas_ypos", (DataContext as VisualizationViewModel).Bounds.Center.Y));
             }
 
             var yBounds = yInputFieldView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
@@ -535,6 +589,18 @@ namespace PanoramicDataWin8.view.vis.render
                     qModel.RemoveUsageInputOperationModel(InputUsage.Y, qModel.GetUsageInputOperationModel(InputUsage.Y).First());
                 }
                 qModel.AddUsageInputOperationModel(InputUsage.Y, e.InputOperationModel);
+
+
+                Logger.Instance?.Log("plot",
+                   new JProperty("type", "existing"),
+                   new JProperty("dragId", e.DragId),
+                   new JProperty("plotId", qModel.Id),
+                   new JProperty("attribute_x_axis", qModel.GetUsageInputOperationModel(InputUsage.X).First().InputModel.Name),
+                   new JProperty("attribute_y_axis", qModel.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.Name),
+                   new JProperty("aggregation_x_axis", qModel.GetUsageInputOperationModel(InputUsage.X).First().AggregateFunction.ToString()),
+                   new JProperty("aggregation_y_axis", qModel.GetUsageInputOperationModel(InputUsage.Y).First().AggregateFunction.ToString()),
+                   new JProperty("canvas_xpos", (DataContext as VisualizationViewModel).Bounds.Center.X),
+                   new JProperty("canvas_ypos", (DataContext as VisualizationViewModel).Bounds.Center.Y));
             }
         }
     }

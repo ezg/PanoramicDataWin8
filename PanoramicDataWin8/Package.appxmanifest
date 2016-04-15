@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:mp="http://schemas.microsoft.com/appx/2014/phone/manifest" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap mp">
-  <Identity Name="cfd662e9-7f4f-43d9-a485-fb8015756a4f" Publisher="CN=ez" Version="1.0.0.0" />
+  <Identity Name="vizdom" Publisher="CN=ez" Version="1.0.0.0" />
   <mp:PhoneIdentity PhoneProductId="cfd662e9-7f4f-43d9-a485-fb8015756a4f" PhonePublisherId="00000000-0000-0000-0000-000000000000" />
   <Properties>
     <DisplayName>Vizdom</DisplayName>

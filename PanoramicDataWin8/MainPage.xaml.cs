@@ -31,6 +31,7 @@ using Windows.UI.Xaml.Documents;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.controller.data.tuppleware.gateway;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.controller.view;
@@ -53,6 +54,8 @@ namespace PanoramicDataWin8
         private Point _mainPointerManagerPreviousPoint = new Point();
         private DispatcherTimer _messageTimer = new DispatcherTimer();
 
+        private DispatcherTimer _flushTimer = new DispatcherTimer();
+
         private TileMenuItemView _inputMenu = null;
         private TileMenuItemView _visualizationMenu = null;
         private TileMenuItemView _jobMenu = null;
@@ -63,8 +66,15 @@ namespace PanoramicDataWin8
             this.Loaded += MainPage_Loaded;
             this.DataContextChanged += MainPage_DataContextChanged;
             this.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(MainPage_PointerPressed), true);
+            this.AddHandler(UIElement.PointerReleasedEvent, new PointerEventHandler(MainPage_PointerReleased), true);
+            this.AddHandler(UIElement.PointerMovedEvent, new PointerEventHandler(MainPage_PointerMoved), true);
             //this.KeyUp += MainPage_KeyUp;
             this.KeyDown += MainPage_KeyDown;
+
+
+            _flushTimer.Interval = TimeSpan.FromMilliseconds(500);
+            _flushTimer.Tick += _flushTimer_Tick;
+            _flushTimer.Start();
 
             _messageTimer.Interval = TimeSpan.FromMilliseconds(2000);
             _messageTimer.Tick += _messageTimer_Tick;
@@ -75,6 +85,14 @@ namespace PanoramicDataWin8
         {
             msgTextBlock.Opacity = 0;
             _messageTimer.Stop();
+        }
+
+        private void _flushTimer_Tick(object sender, object e)
+        {
+            if (Logger.Instance != null)
+            {
+                Logger.Instance.Flush();
+            }
         }
 
         void MainPage_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -208,16 +226,57 @@ namespace PanoramicDataWin8
                 }
             }
         }
+        private void MainPage_PointerMoved(object sender, PointerRoutedEventArgs e)
+        {
+            if (Logger.Instance != null)
+            {
+                var p = e.GetCurrentPoint(this);
+                Logger.Instance.LogMouse("Moved", p.Position.X, p.Position.Y, false, e.Pointer.PointerDeviceType.ToString());
+            }
+        }
+
+        private void MainPage_PointerReleased(object sender, PointerRoutedEventArgs e)
+        {
+            if (Logger.Instance != null)
+            {
+                bool isRight = false;
+                if (e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+                {
+                    var properties = e.GetCurrentPoint(this).Properties;
+                    if (properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
+                    {
+                        isRight = true;
+                    }
+                }
+                var p = e.GetCurrentPoint(this);
+                Logger.Instance.LogMouse("Released", p.Position.X, p.Position.Y, isRight, e.Pointer.PointerDeviceType.ToString());
+            }
+        }
 
         void MainPage_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+            if (Logger.Instance != null)
+            {
+                bool isRight = false;
+                if (e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+                {
+                    var properties = e.GetCurrentPoint(this).Properties;
+                    if (properties.PointerUpdateKind == PointerUpdateKind.RightButtonPressed)
+                    {
+                        isRight = true;
+                    }
+                }
+                var p = e.GetCurrentPoint(this);
+                Logger.Instance.LogMouse("Pressed", p.Position.X, p.Position.Y, isRight, e.Pointer.PointerDeviceType.ToString());
+            }
+
             Button button = (e.OriginalSource as FrameworkElement).GetFirstAncestorOfType<Button>();
             var ancestors = (e.OriginalSource as FrameworkElement).GetAncestors();
             if (!ancestors.Contains(addInputButton) && !ancestors.Contains(menuGrid))
             {
                 if (_inputMenu != null)
                 {
-                    ((TileMenuItemViewModel) _inputMenu.DataContext).AreChildrenExpanded = false;
+                    //((TileMenuItemViewModel) _inputMenu.DataContext).AreChildrenExpanded = false;
                 }
             }
             if (!ancestors.Contains(addVisualizationButton) && !ancestors.Contains(menuGrid))
@@ -252,7 +311,7 @@ namespace PanoramicDataWin8
             {
                 if (model.SchemaModel != null && model.SchemaModel is TuppleWareSchemaModel)
                 {
-                    addJobButton.Visibility = Visibility.Visible;
+                    //addJobButton.Visibility = Visibility.Visible;
                 }
                 else
                 {
@@ -391,6 +450,7 @@ namespace PanoramicDataWin8
             clearAndDisposeMenus();
             DatasetConfiguration ds = (sender as AppBarButton).DataContext as DatasetConfiguration;
             MainViewController.Instance.LoadData(ds);
+            addInputButton_Click(null, null);
         }
         
 
@@ -494,7 +554,7 @@ namespace PanoramicDataWin8
             MainModel mainModel = (DataContext as MainModel);
             if (_inputMenu != null && ((TileMenuItemViewModel) _inputMenu.DataContext).AreChildrenExpanded)
             {
-                ((TileMenuItemViewModel) _inputMenu.DataContext).AreChildrenExpanded = false;
+                //((TileMenuItemViewModel) _inputMenu.DataContext).AreChildrenExpanded = false;
             }
             else if (_inputMenu != null && !((TileMenuItemViewModel)_inputMenu.DataContext).AreChildrenExpanded)
             {
@@ -753,6 +813,12 @@ namespace PanoramicDataWin8
         {
             clearAndDisposeMenus();
             MainViewController.Instance.LoadConfigs();
+            //addInputButton_Click(null, null);
+        }
+
+        private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
+        {
+            Logger.Instance?.Log("bookmark");
         }
     }
 }

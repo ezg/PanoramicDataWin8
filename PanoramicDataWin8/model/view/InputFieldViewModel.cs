@@ -4,6 +4,8 @@ using System.Linq;
 using Windows.UI.Xaml;
 using GeoAPI.Geometries;
 using Microsoft.Practices.Prism.Mvvm;
+using Newtonsoft.Json.Linq;
+using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.utils;
 
@@ -22,19 +24,19 @@ namespace PanoramicDataWin8.model.view
             InputOperationModel = inputOperationModel;
         }
 
-        public void FireMoved(Rct bounds, InputOperationModel inputOperationModel, InputFieldViewModelEventArgType type)
+        public void FireMoved(Rct bounds, InputOperationModel inputOperationModel, InputFieldViewModelEventArgType type, int dragId)
         {
             if (InputFieldViewModelMoved != null)
             {
-                InputFieldViewModelMoved(this, new InputFieldViewModelEventArgs(inputOperationModel, bounds, type));
+                InputFieldViewModelMoved(this, new InputFieldViewModelEventArgs(inputOperationModel, bounds, type, dragId));
             }
         }
 
-        public void FireDropped(Rct bounds, InputFieldViewModelEventArgType type, InputOperationModel inputOperationModel)
+        public void FireDropped(Rct bounds, InputFieldViewModelEventArgType type, InputOperationModel inputOperationModel, int dragId)
         {
             if (InputFieldViewModelDropped != null)
             {
-                InputFieldViewModelDropped(this, new InputFieldViewModelEventArgs(inputOperationModel, bounds, type));
+                InputFieldViewModelDropped(this, new InputFieldViewModelEventArgs(inputOperationModel, bounds, type, dragId));
             }
         }
 
@@ -292,7 +294,7 @@ namespace PanoramicDataWin8.model.view
             MenuItemViewModel menuItem = null;
             menuViewModel.NrRows = 3;
             menuViewModel.NrColumns = 4;
-
+            /*
             // Sort None
             menuItem = new MenuItemViewModel()
             {
@@ -396,7 +398,7 @@ namespace PanoramicDataWin8.model.view
             toggle1.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle2, toggle3 });
             toggle2.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle1, toggle3 });
             toggle3.OtherToggles.AddRange(new ToggleMenuItemComponentViewModel[] { toggle1, toggle2 });
-
+            */
             if (((InputFieldModel)_inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.INT ||
                 ((InputFieldModel)_inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.FLOAT)
             {
@@ -404,7 +406,7 @@ namespace PanoramicDataWin8.model.view
                 List<MenuItemViewModel> items = new List<MenuItemViewModel>();
 
                 int count = 0;
-                foreach (var aggregationFunction in Enum.GetValues(typeof(AggregateFunction)).Cast<AggregateFunction>())
+                foreach (var aggregationFunction in Enum.GetValues(typeof(AggregateFunction)).Cast<AggregateFunction>().Where(ag => ag == AggregateFunction.Avg || ag == AggregateFunction.Count || ag == AggregateFunction.None || ag == AggregateFunction.Sum))
                 {
                     menuItem = new MenuItemViewModel()
                     {
@@ -419,7 +421,8 @@ namespace PanoramicDataWin8.model.view
                     ToggleMenuItemComponentViewModel toggle = new ToggleMenuItemComponentViewModel()
                     {
                         Label = aggregationFunction.ToString(),
-                        IsChecked = _inputOperationModel.AggregateFunction == aggregationFunction
+                        IsChecked = _inputOperationModel.AggregateFunction == aggregationFunction,
+                        MenuViewModel = menuViewModel
                     };
                     toggles.Add(toggle);
                     menuItem.MenuItemComponentViewModel = toggle;
@@ -435,6 +438,10 @@ namespace PanoramicDataWin8.model.view
                                 {
                                     tg.IsChecked = false;
                                 }
+
+                                Logger.Instance?.Log("agg_choose",
+                                    new JProperty("menuId", model.MenuViewModel.DragId),
+                                    new JProperty("aggregation", aggregationFunction.ToString()));
                             }
                         }
                     };
@@ -537,12 +544,14 @@ namespace PanoramicDataWin8.model.view
         public InputFieldViewModelEventArgType Type { get; set; }
         public bool UseDefaultSize { get; set; }
         public VisualizationViewModel CreateLinkFrom { get; set; }
+        public int DragId = 0;
 
-        public  InputFieldViewModelEventArgs(InputOperationModel inputOperationModel, Rct bounds, InputFieldViewModelEventArgType type)
+        public  InputFieldViewModelEventArgs(InputOperationModel inputOperationModel, Rct bounds, InputFieldViewModelEventArgType type, int dragId)
         {
             InputOperationModel = inputOperationModel;
             Bounds = bounds;
             Type = type;
+            DragId = dragId;
             UseDefaultSize = true;
         }
     }
