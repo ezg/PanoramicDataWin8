@@ -59,6 +59,7 @@ namespace PanoramicDataWin8.view.vis.render
         private int _yIndex = -1;
         private InputOperationModel _xAom = null;
         private InputOperationModel _yAom = null;
+        private double? _totalFrequency = null;
         private Dictionary<BinIndex, List<VisualizationItemResultModel>> _binDictonary = null;
         private Dictionary<BinIndex, BinPrimitive> _binPrimitives = new Dictionary<BinIndex, BinPrimitive>();
 
@@ -88,8 +89,12 @@ namespace PanoramicDataWin8.view.vis.render
 
             _visualizationDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
 
+            _totalFrequency = null;
             if (resultModel.ResultItemModels.Count > 0)
             {
+                //ResultItemModels
+                _totalFrequency = resultModel.ResultItemModels.Sum(ri => (ri as VisualizationItemResultModel).Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value as double?);
+
                 _xIndex = _visualizationDescriptionModel.Dimensions.IndexOf(xAom);
                 _yIndex = _visualizationDescriptionModel.Dimensions.IndexOf(yAom);
                 _isResultEmpty = false;
@@ -488,6 +493,7 @@ namespace PanoramicDataWin8.view.vis.render
                                         }
                                     }
                                     filterModel.Frequency = (double?) resultItem.Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value;
+                                    filterModel.TotalFrequency = _totalFrequency;
                                     if (!HitTargets.ContainsKey(hitGeom))
                                     {
                                         HitTargets.Add(hitGeom, filterModel);
@@ -576,6 +582,7 @@ namespace PanoramicDataWin8.view.vis.render
                             filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.LESS_THAN, yBins[yi + 1]));
                         }
                         filterModel.Frequency = frequency;
+                        filterModel.TotalFrequency = _totalFrequency;
                         HitTargets.Add(hitGeom, filterModel);
 
                         if (_filterModels.Contains(filterModel))

@@ -38,11 +38,11 @@ namespace PanoramicDataWin8.controller.data
             
 
             _instance = new Logger();
-            var fileName = "LOG_" + DateTime.Now.Ticks.ToString() + "#" + root.DatasetConfiguration.Name;
+            var fileName = mainModel.Participant + "_LOG_" + DateTime.Now.Ticks.ToString() + "#" + root.DatasetConfiguration.Name;
             StorageFile file = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             _instance._stream = await file.OpenStreamForWriteAsync();
 
-            fileName = "MOUSE_" + DateTime.Now.Ticks.ToString() + "#" + root.DatasetConfiguration.Name;
+            fileName = mainModel.Participant + "_MOUSE_" + DateTime.Now.Ticks.ToString() + "#" + root.DatasetConfiguration.Name;
             file = await Windows.Storage.ApplicationData.Current.LocalFolder.CreateFileAsync(fileName, CreationCollisionOption.ReplaceExisting);
             _instance._mouseStream = await file.OpenStreamForWriteAsync();
 

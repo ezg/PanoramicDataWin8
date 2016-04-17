@@ -142,7 +142,6 @@ namespace PanoramicDataWin8.controller.view
         public static void CreateInstance(InkableScene root, MainPage mainPage)
         {
             _instance = new MainViewController(root, mainPage);
-            _instance.LoadConfigs();
         }
         
         public static MainViewController Instance

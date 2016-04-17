@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Navigation;
 using Windows.Storage;
 using System.Diagnostics;
 using System.ComponentModel;
+using Windows.ApplicationModel.Core;
 using Windows.Devices.Input;
 using PanoramicDataWin8.view.vis;
 using Windows.UI.Input;
@@ -79,7 +80,7 @@ namespace PanoramicDataWin8
             _messageTimer.Interval = TimeSpan.FromMilliseconds(2000);
             _messageTimer.Tick += _messageTimer_Tick;
 
-      }
+        }
 
         void _messageTimer_Tick(object sender, object e)
         {
@@ -336,7 +337,7 @@ namespace PanoramicDataWin8
 
         }
 
-        void MainPage_Loaded(object sender, RoutedEventArgs e)
+        async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             MainViewController.CreateInstance(inkableScene, this);
             DataContext = MainViewController.Instance.MainModel;
@@ -349,7 +350,27 @@ namespace PanoramicDataWin8
             this.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
             this.AddHandler(UIElement.PointerReleasedEvent, new PointerEventHandler(InkableScene_PointerReleased), true);
             this.AddHandler(UIElement.PointerMovedEvent, new PointerEventHandler(InkableScene_PointerMoved), true);
-        
+
+            
+            ParticipantDialog dialog = new ParticipantDialog()
+            {
+                Participant = MainViewController.Instance.MainModel.Participant,
+                Content = "Participand ID"
+            };
+
+            ContentDialogResult result = await dialog.ShowAsync();
+
+            if (result == ContentDialogResult.Secondary)
+            {
+                CoreApplication.Exit();
+            }
+            else
+            {
+                MainViewController.Instance.MainModel.Participant = dialog.Participant;
+            }
+
+            MainViewController.Instance.LoadConfigs();
+
         }
         private Dictionary<uint, FrameworkElement> _deviceRenderings = new Dictionary<uint, FrameworkElement>();
 

@@ -470,7 +470,8 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     JObject predicate = new JObject(
                         new JProperty("predicate", filterModel.ToPythonString()),
-                        new JProperty("absoluteFrequency", filterModel.Frequency));
+                        new JProperty("absoluteFrequency", filterModel.Frequency),
+                        new JProperty("sumFrequency", filterModel.TotalFrequency));
                     predicates.Add(predicate);
                 }
             }

@@ -57,6 +57,20 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private string _participant = "";
+        public string Participant
+        {
+            get
+            {
+                return _participant;
+            }
+            set
+            {
+                this.SetProperty(ref _participant, value);
+            }
+        }
+
+
         private SchemaModel _schemaModel;
         public SchemaModel SchemaModel
         {
