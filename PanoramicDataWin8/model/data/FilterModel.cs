@@ -58,7 +58,7 @@ namespace PanoramicDataWin8.model.data
 
         public string ToPythonString()
         {
-            string ret = "(" + string.Join("and", ValueComparisons.Select(vc => vc.ToPythonString())) + ")";
+            string ret = "(" + string.Join(" and ", ValueComparisons.Select(vc => vc.ToPythonString())) + ")";
             return ret;
         }
 
@@ -83,14 +83,14 @@ namespace PanoramicDataWin8.model.data
                     {
                         if (linkModel.IsInverted)
                         {
-                            child = "not " + child;
+                            child = " not " + child;
                         }
                         children.Add(child);
                     }
                 }
             }
 
-            string childrenJoined = string.Join(queryModel.FilteringOperation.ToString().ToLower(), children);
+            string childrenJoined = string.Join(" " + queryModel.FilteringOperation.ToString().ToLower() + " ", children);
             if (children.Count > 0)
             {
                 if (ret != "")
