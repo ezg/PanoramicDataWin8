@@ -93,7 +93,9 @@ namespace PanoramicDataWin8.view.vis.render
             if (resultModel.ResultItemModels.Count > 0)
             {
                 //ResultItemModels
-                _totalFrequency = resultModel.ResultItemModels.Sum(ri => (ri as VisualizationItemResultModel).Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value as double?);
+                _totalFrequency = resultModel.ResultItemModels.
+                    Where(ri => (ri as VisualizationItemResultModel).Values.ContainsKey(_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First())).
+                    Sum(ri => (ri as VisualizationItemResultModel).Values[_queryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value as double?);
 
                 _xIndex = _visualizationDescriptionModel.Dimensions.IndexOf(xAom);
                 _yIndex = _visualizationDescriptionModel.Dimensions.IndexOf(yAom);
