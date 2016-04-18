@@ -327,24 +327,23 @@ namespace PanoramicDataWin8.controller.view
         {
             List<LinkModel> linkModels = linkModel.FromQueryModel.LinkModels.Where(lm => lm.FromQueryModel == linkModel.FromQueryModel).ToList();
             linkModels.Add(linkModel);
-            return !recursiveCheckForCiruclarLinking(linkModels, linkModel.FromQueryModel, new HashSet<QueryModel>());
+            HashSet<QueryModel> chain = new HashSet<QueryModel>();
+            recursiveCheckForCiruclarLinking(linkModels, chain);
+
+            if (chain.Contains(linkModel.FromQueryModel))
+            {
+                return false;
+            }
+            return true;
         } 
 
-        private bool recursiveCheckForCiruclarLinking(List<LinkModel> links, QueryModel current, HashSet<QueryModel> chain)
+        private void recursiveCheckForCiruclarLinking(List<LinkModel> links, HashSet<QueryModel> chain)
         {
-            if (!chain.Contains(current))
+            bool ret = false;
+            foreach (var link in links)
             {
-                chain.Add(current);
-                bool ret = false;
-                foreach (var link in links)
-                {
-                    ret = ret || recursiveCheckForCiruclarLinking(link.ToQueryModel.LinkModels.Where(lm => lm.FromQueryModel == link.ToQueryModel).ToList(), link.ToQueryModel, chain);
-                }
-                return ret;
-            }
-            else
-            {
-                return true;
+                chain.Add(link.ToQueryModel);
+                recursiveCheckForCiruclarLinking(link.ToQueryModel.LinkModels.Where(lm => lm.FromQueryModel == link.ToQueryModel).ToList(), chain);
             }
         }
 

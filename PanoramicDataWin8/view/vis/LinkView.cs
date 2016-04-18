@@ -304,12 +304,14 @@ namespace PanoramicDataWin8.view.vis
                     poly.Fill = _lightBrush;
                     c.Children.Add(poly);
 
-                    _visualizationViewModelCenterGeometries.Add(incomingModel,
-                        poly.Points.GetPolygon().Buffer(3));
-                    _visualizationViewModelGeometries.Add(incomingModel,
-                        new Point[] { incomingStart.GetCoord().GetPt(), (incomingStart + cutOff).GetCoord().GetPt() }
-                            .GetLineString());
-
+                    if (!_visualizationViewModelCenterGeometries.ContainsKey(incomingModel))
+                    {
+                        _visualizationViewModelCenterGeometries.Add(incomingModel,
+                            poly.Points.GetPolygon().Buffer(3));
+                        _visualizationViewModelGeometries.Add(incomingModel,
+                            new Point[] {incomingStart.GetCoord().GetPt(), (incomingStart + cutOff).GetCoord().GetPt()}
+                                .GetLineString());
+                    }
 
 
                     /*Vec iconPos = (distanceVec.Normalized() * (distanceVec.Length * 0.2)) + incomingStart;
