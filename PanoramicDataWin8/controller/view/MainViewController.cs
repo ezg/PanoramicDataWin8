@@ -354,9 +354,6 @@ namespace PanoramicDataWin8.controller.view
                 if (linkViewModel.LinkModels.Contains(linkModel))
                 {
                     linkViewModel.LinkModels.Remove(linkModel);
-
-
-
                     Logger.Instance?.Log("dlink",
                         new JProperty("linkId", linkModel.FromQueryModel.Id.ToString() + "_" + linkModel.ToQueryModel.Id.ToString()));
                 }
@@ -556,9 +553,12 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var item in e.OldItems)
                 {
                     (item as VisualizationViewModel).QueryModel.LinkModels.CollectionChanged -= LinkModels_CollectionChanged;
-                    foreach (var link in (item as VisualizationViewModel).QueryModel.LinkModels)
+                    foreach (var link in (item as VisualizationViewModel).QueryModel.LinkModels.ToArray())
                     {
                         RemoveLinkViewModel(link);
+
+                        link.FromQueryModel.LinkModels.Remove(link);
+                        link.ToQueryModel.LinkModels.Remove(link);
                     }
 
                     Logger.Instance?.Log("dplot",
