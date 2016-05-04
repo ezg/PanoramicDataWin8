@@ -156,6 +156,27 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(result)
 
+
+class WorkerDaemon(multiprocessing.Process): 
+    def __init__(self, workers):
+        multiprocessing.Process.__init__(self)
+        self.daemon = True
+        self.workers = workers  
+        
+        
+    def run(self):
+        while True:
+            for w in workers:
+                if w.isRunning():
+                    w.step()
+        
+class Worker():
+    def __init__(self, start):
+        self.current = 0
+        self.start = 0
+        
+    def
+
 class Executor(multiprocessing.Process): 
 
     def __init__(self, uuid):
