@@ -1,6 +1,7 @@
 from dataprovider import SequentialDataProvider
 from databinner import DataBinner
 import json
+import time
 import numpy as np
 
 
@@ -24,11 +25,11 @@ job = {
     "brushes": [],
     "dimensionAggregateFunctions": [
       "None",
-      "Count"
+      "None"
     ],
     "dimensions": [
       "mpg",
-      "mpg"
+      "year"
     ]
   }
 }
@@ -53,6 +54,8 @@ def default(o):
     raise TypeError
 
 while True:
+    start = time.time()
+
     c, df = dp.getDataFrame()
     if not task['filter'] == '':
         df = df.query(task['filter'])
@@ -60,17 +63,10 @@ while True:
     if not df is None:
         db.bin(df, c)
         
-        br0 = db.binStructure.binRanges[0]
-        
-        f = open('tst.txt', 'w')
-        f.write(str(db.binStructure.toJson()))
-        f.write(json.dumps(db.binStructure.toJson(), indent=2, default=default))
-        f.close()
-        br0.getBins()
-        
+        br0 = db.binStructure.binRanges[0]        
         br1 = db.binStructure.binRanges[1]
-        print ">>>>>>>>>>", br1.maxValue
-        br1.getBins()
+       
+       
         
         
         for b0 in br0.getBins():
@@ -96,4 +92,7 @@ while True:
     
     if df is None or c == 1.0:
         break    
+        
+    end = time.time()
+    print "time", (end - start)
     print

@@ -9,6 +9,7 @@ import math
 import multiprocessing
 import uuid
 import traceback
+import sklearn.metrics 
 
 from BaseHTTPServer import BaseHTTPRequestHandler
 from BaseHTTPServer import HTTPServer
@@ -22,7 +23,6 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import confusion_matrix
 from sklearn.utils import compute_class_weight
 from sklearn.metrics import auc
-import sklearn.metrics 
 from sklearn.metrics import classification_report
 from sklearn.metrics import roc_curve
 from sklearn.linear_model import SGDClassifier

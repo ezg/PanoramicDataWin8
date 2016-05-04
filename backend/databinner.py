@@ -73,7 +73,7 @@ class DataBinner():
         
         start = time.time()
         for brushIndex, brushDataFrame in enumerate(brushDataFrames):
-            print len(brushDataFrame)
+            #print len(brushDataFrame)
             toAggregateBrushes = [brushIndex, currentBrushes[-1]]
             dfDTypes = brushDataFrame.dtypes
             if len(brushDataFrame) > 0:
