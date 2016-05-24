@@ -57,7 +57,9 @@ namespace PanoramicDataWin8.view.vis.render
         private List<FilterModel> _filterModels = new List<FilterModel>();
         private Dictionary<FilterModel, Rect> _filterModelRects = new Dictionary<FilterModel, Rect>();
         private InputOperationModel _xAom = null;
+        private InputOperationModel _yAom = null;
         private Dictionary<string, Dictionary<BrushIndex, double>> _values = new Dictionary<string, Dictionary<BrushIndex, double>>();
+        private Dictionary<string, int> _index = new Dictionary<string, int>();
         private Dictionary<string, Dictionary<BrushIndex, double>> _countsInterpolated = new Dictionary<string, Dictionary<BrushIndex, double>>();
 
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
@@ -146,6 +148,7 @@ namespace PanoramicDataWin8.view.vis.render
             _queryModelClone = queryModelClone;
             _queryModel = queryModel;
             _xAom = xAom;
+            _yAom = yAom;
 
             _visualizationDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
 
@@ -156,6 +159,7 @@ namespace PanoramicDataWin8.view.vis.render
 
                 _values.Clear();
                 _countsInterpolated.Clear();
+                _index.Clear();
                 var labels = yBinRange.GetLabels();
                 foreach (var resultItem in _resultModel.ResultItemModels.Select(ri => ri as ProgressiveVisualizationResultItemModel))
                 {
@@ -163,6 +167,7 @@ namespace PanoramicDataWin8.view.vis.render
                     var yValues = resultItem.Values[yAom];
                     var label = (yBinRange as NominalBinRange).LabelsValue[(int)yValues[BrushIndex.ALL]];
 
+                    _index.Add(label, (int)yValues[BrushIndex.ALL]);
                     _values.Add(label, xValues);
                     _countsInterpolated.Add(label, resultItem.CountsInterpolated[xAom]);
                 }
@@ -279,8 +284,35 @@ namespace PanoramicDataWin8.view.vis.render
                     
                 }
             }
-            
+            HitTargets.Clear();
+            foreach (var key in _svgShapes.Keys)
+            {
+                foreach (var path in _svgShapes[key])
+                {
+                    var label = "F" + key;
+                    var index = _index[label];
 
+                    if (path.Count > 4)
+                    {
+                        IGeometry hitGeom = path.Select(v => new Pt((v.X - _minX)*_xScale + _leftOffset, (v.Y - _minY)*_yScale + _topOffset)).GetPolygon();
+                        var filterModel = new FilterModel();
+                        filterModel.Value = index;
+
+                        filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.EQUALS, label));
+                        if (!HitTargets.ContainsKey(hitGeom))
+                        {
+                            HitTargets.Add(hitGeom, filterModel);
+                        
+
+                            if (_filterModels.Contains(filterModel))
+                            {
+                                var geom = CanvasGeometry.CreatePolygon(canvas, path.Select(v => new Vector2(v.X - _minX, v.Y - _minY)).ToArray());
+                                canvasArgs.DrawingSession.DrawGeometry(geom, dark, 1f/_xScale);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void computeSizesAndRenderLabels(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, bool renderLines)
