@@ -12,10 +12,12 @@ namespace PanoramicDataWin8.model.data
     {
         public double? Value { get; set; }
         public List<ValueComparison> ValueComparisons { get; set; }
+        public string GroupAggregateComparisons { get; set; }
         
         public FilterModel()
         {
             ValueComparisons = new List<ValueComparison>();
+            GroupAggregateComparisons = "";
         }
 
         public override int GetHashCode()
@@ -67,7 +69,14 @@ namespace PanoramicDataWin8.model.data
             if (!isFirst && queryModel.FilterModels.Count(fm => fm.ValueComparisons.Count > 0) > 0)
             {
                 filterModels.AddRange(queryModel.FilterModels.Where(fm => fm.ValueComparisons.Count > 0));
-                ret = "(" + string.Join(" or ", queryModel.FilterModels.Select(fm => fm.ToPythonString())) + ")";
+                if (queryModel.FilterModels.Where(fm => fm.ValueComparisons.Count > 0).All(fm => fm.GroupAggregateComparisons == ""))
+                {
+                    ret = "(" + string.Join(" or ", queryModel.FilterModels.Select(fm => fm.ToPythonString())) + ")";
+                }
+                else
+                {
+                    ret = "(" + string.Join(",", queryModel.FilterModels.Select(fm => fm.ValueComparisons[0].)) + ")";
+                }
             }
 
 
