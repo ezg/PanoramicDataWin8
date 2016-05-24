@@ -292,6 +292,10 @@
     <Compile Include="view\vis\render\MapRenderer.xaml.cs">
       <DependentUpon>MapRenderer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\vis\render\SVGRendererContentProvider.cs" />
+    <Compile Include="view\vis\render\SVGRenderer.xaml.cs">
+      <DependentUpon>SVGRenderer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\render\PlotRenderer.xaml.cs">
       <DependentUpon>PlotRenderer.xaml</DependentUpon>
     </Compile>
@@ -302,6 +306,9 @@
     <Compile Include="view\vis\render\Renderer.cs" />
     <Compile Include="view\vis\render\TableRenderer.xaml.cs">
       <DependentUpon>TableRenderer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\render\XRenderer.xaml.cs">
+      <DependentUpon>XRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\XYRenderer.xaml.cs">
       <DependentUpon>XYRenderer.xaml</DependentUpon>
@@ -317,6 +324,9 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Assets\svg\county.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="project.json" />
     <Content Include="Assets\BadgeLogo.scale-400.png" />
@@ -502,6 +512,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="view\vis\render\SVGRenderer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="view\vis\render\PlotRenderer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -513,6 +527,10 @@
     <Page Include="view\vis\render\TableRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\XRenderer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\render\XYRenderer.xaml">
       <SubType>Designer</SubType>

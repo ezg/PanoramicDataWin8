@@ -27,7 +27,7 @@ using PanoramicDataWin8.view.vis.menu;
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public partial class XYRenderer : ContentControl, InputFieldViewModelEventHandler
+    public partial class XRenderer : ContentControl, InputFieldViewModelEventHandler
     {
         public delegate void EventHandler(bool sizeChanged = false);
         public event EventHandler Render;
@@ -39,7 +39,7 @@ namespace PanoramicDataWin8.view.vis.render
         private MenuView _menuView = null;
         private VisualizationViewModel _visualizationViewModel = null;
 
-        public XYRenderer()
+        public XRenderer()
         {
             this.InitializeComponent();
 
@@ -61,7 +61,6 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 _visualizationViewModel.PropertyChanged -= VisualizationViewModel_PropertyChanged;
                 _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged -= X_CollectionChanged;
-                _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged -= Y_CollectionChanged;
                 _visualizationViewModel.QueryModel.FilterModels.CollectionChanged -= FilterModels_CollectionChanged;
                 ResultModel resultModel = _visualizationViewModel.QueryModel.ResultModel;
                 resultModel.ResultModelUpdated -= resultModel_ResultModelUpdated;
@@ -82,7 +81,6 @@ namespace PanoramicDataWin8.view.vis.render
                 _visualizationViewModel = (VisualizationViewModel) DataContext;
                 _visualizationViewModel.PropertyChanged += VisualizationViewModel_PropertyChanged;
                 _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged += X_CollectionChanged;
-                _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged += Y_CollectionChanged;
                 _visualizationViewModel.QueryModel.FilterModels.CollectionChanged += FilterModels_CollectionChanged;
                 ResultModel resultModel = _visualizationViewModel.QueryModel.ResultModel;
                 resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
@@ -91,10 +89,6 @@ namespace PanoramicDataWin8.view.vis.render
         }
 
         void X_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            populateHeaders();
-        }
-        void Y_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             populateHeaders();
         }
@@ -112,11 +106,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 if (((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext != null)
                 {
-                    (((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext as InputFieldViewModel).Size = new Vec(model.Size.X - 54, 54);
-                }
-                if (((InputFieldView)GetTemplateChild("yInputFieldView")).DataContext != null)
-                {
-                    (((InputFieldView)GetTemplateChild("yInputFieldView")).DataContext as InputFieldViewModel).Size = new Vec(54, model.Size.Y - 54);
+                    (((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext as InputFieldViewModel).Size = new Vec(model.Size.X, 54);
                 }
 
                 render(true);
@@ -136,12 +126,13 @@ namespace PanoramicDataWin8.view.vis.render
             if (queryModel.GetUsageInputOperationModel(InputUsage.X).Any())
             {
                 var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
-                ((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), xAom) 
+                ((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), xAom)
                 {
                     IsShadow = false,
                     BorderThicknes = new Thickness(0, 0, 0, 4),
-                    Size = new Vec(visModel.Size.X - 54, 54),
-                    AttachmentOrientation = AttachmentOrientation.Top
+                    Size = new Vec(visModel.Size.X, 54),
+                    AttachmentOrientation = AttachmentOrientation.Top,
+                    HideAggregationFunction = true
                 };
             }
             else
@@ -152,34 +143,9 @@ namespace PanoramicDataWin8.view.vis.render
                     IsDraggable = false,
                     IsShadow = false,
                     BorderThicknes = new Thickness(0, 0, 0, 4),
-                    Size = new Vec(visModel.Size.X - 54, 54),
-                    AttachmentOrientation = AttachmentOrientation.Top
-                };
-            }
-
-            if (queryModel.GetUsageInputOperationModel(InputUsage.Y).Any())
-            {
-                var yAom = queryModel.GetUsageInputOperationModel(InputUsage.Y).First();
-                ((InputFieldView)GetTemplateChild("yInputFieldView")).DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), yAom)
-                {
-                    IsShadow = false,
-                    BorderThicknes = new Thickness(0, 0, 4, 0),
-                    Size = new Vec(54, visModel.Size.Y - 54),
-                    TextAngle = 270,
-                    AttachmentOrientation = AttachmentOrientation.Left
-                };
-            }
-            else
-            {
-                ((InputFieldView)GetTemplateChild("yInputFieldView")).DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), null)
-                {
-                    IsDraggableByPen = false,
-                    IsDraggable = false,
-                    IsShadow = false,
-                    BorderThicknes = new Thickness(0, 0, 4, 0),
-                    Size = new Vec(54, visModel.Size.Y - 54),
-                    TextAngle = 270,
-                    AttachmentOrientation = AttachmentOrientation.Left
+                    Size = new Vec(visModel.Size.X, 54),
+                    AttachmentOrientation = AttachmentOrientation.Top,
+                    HideAggregationFunction = true
                 };
             }
         }
@@ -434,36 +400,15 @@ namespace PanoramicDataWin8.view.vis.render
                     (xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
                 }
             }
-
-            var yBounds = yInputFieldView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
-            if (yBounds.Intersects(e.Bounds.GetPolygon()) && !xBounds.Intersects(e.Bounds.GetPolygon()))
-            {
-                if (yInputFieldView.DataContext != null && !(yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted)
-                {
-                    (yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = true;
-                }
-            }
-            else
-            {
-                if (yInputFieldView.DataContext != null && (yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted)
-                {
-                    (yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
-                }
-            }
         }
 
         public void InputFieldViewModelDropped(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
         {
             var xInputFieldView = (InputFieldView)GetTemplateChild("xInputFieldView");
-            var yInputFieldView = (InputFieldView)GetTemplateChild("yInputFieldView");
             // turn both off 
             if (xInputFieldView.DataContext != null)
             {
                 (xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
-            }
-            if (yInputFieldView.DataContext != null)
-            {
-                (yInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
             }
 
             if (!overElement)
@@ -489,17 +434,17 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     qModel.RemoveUsageInputOperationModel(InputUsage.X, qModel.GetUsageInputOperationModel(InputUsage.X).First());
                 }
-                qModel.AddUsageInputOperationModel(InputUsage.X, e.InputOperationModel);
-            }
-
-            var yBounds = yInputFieldView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
-            if (yBounds.Intersects(e.Bounds.GetPolygon()) && !xBounds.Intersects(e.Bounds.GetPolygon()))
-            {
-                if (qModel.GetUsageInputOperationModel(InputUsage.Y).Any())
+                InputOperationModel value = new InputOperationModel(e.InputOperationModel.InputModel);
+                if (((InputFieldModel) e.InputOperationModel.InputModel).InputDataType == InputDataTypeConstants.FLOAT ||
+                    ((InputFieldModel) e.InputOperationModel.InputModel).InputDataType == InputDataTypeConstants.INT)
                 {
-                    qModel.RemoveUsageInputOperationModel(InputUsage.Y, qModel.GetUsageInputOperationModel(InputUsage.Y).First());
+                    value.AggregateFunction = AggregateFunction.Avg;
                 }
-                qModel.AddUsageInputOperationModel(InputUsage.Y, e.InputOperationModel);
+                else
+                {
+                    value.AggregateFunction = AggregateFunction.Count;
+                }
+                qModel.AddUsageInputOperationModel(InputUsage.X, value);
             }
         }
     }

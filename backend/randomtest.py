@@ -7,17 +7,17 @@ import numpy as np
 
 job = {
   "type": "execute",
-  "dataset": "cars.csv_100000",
+  "dataset": "facts.csv_5000",
   "task": {
     "filter": "",
+    "aggregateFunctions": [
+      "Count"
+    ],
     "type": "visualization",
     "chunkSize": 10000,
     "aggregateDimensions": [
-      "mpg"
+      "obama"
     ],
-    "aggregateFunctions": [
-      "Count"
-    ],    
     "nrOfBins": [
       10.0,
       10.0
@@ -25,15 +25,14 @@ job = {
     "brushes": [],
     "dimensionAggregateFunctions": [
       "None",
-      "None"
+      "Count"
     ],
     "dimensions": [
-      "mpg",
-      "year"
+      "obama",
+      "obama"
     ]
   }
 }
-
 print json.dumps(job)
 
 task = job['task']

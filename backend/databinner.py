@@ -246,7 +246,7 @@ class BinStructure():
                     bin.countsInterpolated[aggregateKey] = bin.counts[aggregateKey] / progress
                     totalCountInterpolated = bin.countsInterpolated[aggregateKey]
                     
-                    if bin.counts[aggregateKey] > 1 and totalCountInterpolated > 0:
+                    if bin.counts[aggregateKey] > 1 and totalCountInterpolated > 1:
                         if aggregateFunction == 'Count':
                             toSqrt = (totalCountInterpolated - bin.counts[aggregateKey])/(totalCountInterpolated - 1)                        
                             fpc = math.sqrt(max(0, toSqrt))
@@ -362,12 +362,12 @@ class Bin():
     
     def containsBin(self, bin):
         for d, val in enumerate(self.spans):
-            if (not ((bin.spans[d].min >= self.spans[d].min or __aboutEqual(bin.spans[d].min, self.spans[d].min)) and
-                     (bin.spans[d].max <= self.spans[d].max or __aboutEqual(bin.spans[d].max, self.spans[d].max)))):
+            if (not ((bin.spans[d].min >= self.spans[d].min or self.__aboutEqual(bin.spans[d].min, self.spans[d].min)) and
+                     (bin.spans[d].max <= self.spans[d].max or self.__aboutEqual(bin.spans[d].max, self.spans[d].max)))):
                 return False
         return True
     
-    def __aboutEqual(x, y):
+    def __aboutEqual(self, x, y):
         epsilon = max(abs(x), abs(y)) * 1E-15;
         return abs(x - y) <= epsilon;
         

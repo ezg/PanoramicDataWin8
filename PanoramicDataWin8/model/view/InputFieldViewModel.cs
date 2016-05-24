@@ -65,6 +65,21 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private bool _hideAggregationFunction = false;
+        public bool HideAggregationFunction
+        {
+            get
+            {
+                return _hideAggregationFunction;
+            }
+            set
+            {
+                this.SetProperty(ref _hideAggregationFunction, value);
+                updateLabels();
+            }
+        }
+
+
         private bool _isShadow = false;
         public bool IsShadow
         {
@@ -460,14 +475,24 @@ namespace PanoramicDataWin8.model.view
 
         private void updateLabels()
         {
-            MainLabel = _inputOperationModel.InputModel.Name; //columnDescriptor.GetLabels(out mainLabel, out subLabel);
+            if (_inputOperationModel != null)
+            {
+                MainLabel = _inputOperationModel.InputModel.Name; //columnDescriptor.GetLabels(out mainLabel, out subLabel);
 
-            string mainLabel = _inputOperationModel.InputModel.Name;
-            string subLabel = "";
+                string mainLabel = _inputOperationModel.InputModel.Name;
+                string subLabel = "";
 
-            mainLabel = addDetailToLabel(mainLabel);
-            MainLabel = mainLabel.Replace("_", " ");
-            SubLabel = subLabel;
+                if (!HideAggregationFunction)
+                {
+                    mainLabel = addDetailToLabel(mainLabel);
+                    MainLabel = mainLabel.Replace("_", " ");
+                }
+                else
+                {
+                    mainLabel = mainLabel;
+                }
+                SubLabel = subLabel;
+            }
         }
 
         private string addDetailToLabel(string name)

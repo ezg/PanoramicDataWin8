@@ -5,6 +5,7 @@
     xmlns:model="clr-namespace:PanoramicData.model.view"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:view="using:PanoramicDataWin8.model.view"
     mc:Ignorable="d"
     d:DesignHeight="100"
     d:DesignWidth="100"
@@ -13,8 +14,8 @@
     FontFamily="{StaticResource abel}">
 
     <d:DesignProperties.DataContext>
-        <model:VisualizationTypeViewModel VisualizationType="Bar">
-        </model:VisualizationTypeViewModel>
+        <view:VisualizationTypeViewModel VisualizationType="Bar">
+        </view:VisualizationTypeViewModel>
     </d:DesignProperties.DataContext>
 
     <Grid Name="mainGrid" Background="{StaticResource lightBrush}">

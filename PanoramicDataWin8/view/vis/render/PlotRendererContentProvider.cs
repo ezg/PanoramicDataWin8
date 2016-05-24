@@ -245,17 +245,17 @@ namespace PanoramicDataWin8.view.vis.render
                         canvasArgs.DrawingSession.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xFrom, yTo), white, 0.5f);
                         if (lastLabel)
                         {
-                            canvasArgs.DrawingSession.DrawLine(new Vector2(xTo, yFrom), new Vector2(xTo, yTo), white, 0.5f);
+                           // canvasArgs.DrawingSession.DrawLine(new Vector2(xTo, yFrom), new Vector2(xTo, yTo), white, 0.5f);
                         }
                     }
                     if (count % mod == 0)
                     {
                         if (_visualizationDescriptionModel.AxisTypes[_xIndex] == AxisType.Quantitative)
                         {
-                            DrawString(canvasArgs, _textFormat, xFrom, yFrom + 5, double.Parse(label.Label).ToString("N0"), _textColor, true, true, false);
+                            DrawString(canvasArgs, _textFormat, xFrom, yFrom + 5, double.Parse(label.Label).ToString(), _textColor, true, true, false);
                             if (lastLabel)
                             {
-                                DrawString(canvasArgs, _textFormat, xTo, yFrom + 5, label.MaxValue.ToString("N0"), _textColor, true, true, false);
+                               // DrawString(canvasArgs, _textFormat, xTo, yFrom + 5, label.MaxValue.ToString(), _textColor, true, true, false);
                             }
                         }
                         else
@@ -282,17 +282,17 @@ namespace PanoramicDataWin8.view.vis.render
                         canvasArgs.DrawingSession.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xTo, yFrom), white, 0.5f);
                         if (lastLabel)
                         {
-                            canvasArgs.DrawingSession.DrawLine(new Vector2(xFrom, yTo), new Vector2(xTo, yTo), white, 0.5f);
+                            //canvasArgs.DrawingSession.DrawLine(new Vector2(xFrom, yTo), new Vector2(xTo, yTo), white, 0.5f);
                         }
                     }
                     if (count % mod == 0)
                     {
                         if (_visualizationDescriptionModel.AxisTypes[_yIndex] == AxisType.Quantitative)
                         {
-                            DrawString(canvasArgs, _textFormat, xFrom - 10, yFrom, double.Parse(label.Label).ToString("N0"), _textColor, false, false, true);
+                            DrawString(canvasArgs, _textFormat, xFrom - 10, yFrom, double.Parse(label.Label).ToString(), _textColor, false, false, true);
                             if (lastLabel)
                             {
-                                DrawString(canvasArgs, _textFormat, xFrom - 10, yTo, label.MaxValue.ToString("N0"), _textColor, false, false, true);
+                               // DrawString(canvasArgs, _textFormat, xFrom - 10, yTo, label.MaxValue.ToString(), _textColor, false, false, true);
                             }
                         }
                         else

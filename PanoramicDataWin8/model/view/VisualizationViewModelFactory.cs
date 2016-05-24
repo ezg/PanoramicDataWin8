@@ -22,6 +22,26 @@ namespace PanoramicDataWin8.model.view
             }
             visualizationViewModel.QueryModel.VisualizationType = visualizationType;
 
+            if (visualizationType == VisualizationType.county)
+            {
+                var county = schemaModel.OriginModels.First().InputModels.FirstOrDefault(im => im.Name == "county");
+                if (county != null)
+                {
+                    InputOperationModel x = new InputOperationModel(county);
+                    x.AggregateFunction = AggregateFunction.Count;
+
+                    InputOperationModel y = new InputOperationModel(county);
+                    y.AggregateFunction = AggregateFunction.None;
+
+                    InputOperationModel value = new InputOperationModel(county);
+                    value.AggregateFunction = AggregateFunction.Count;
+
+                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.X, x);
+                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.Y, y);
+                    visualizationViewModel.QueryModel.AddUsageInputOperationModel(InputUsage.DefaultValue, value);
+                }
+            }
+
             return visualizationViewModel;
         }
 

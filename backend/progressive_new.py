@@ -9,6 +9,7 @@ import math
 import multiprocessing
 import uuid
 import traceback
+import sklearn.metrics 
 
 from BaseHTTPServer import BaseHTTPRequestHandler
 from BaseHTTPServer import HTTPServer
@@ -22,7 +23,6 @@ from sklearn.metrics import roc_curve
 from sklearn.metrics import confusion_matrix
 from sklearn.utils import compute_class_weight
 from sklearn.metrics import auc
-import sklearn.metrics 
 from sklearn.metrics import classification_report
 from sklearn.metrics import roc_curve
 from sklearn.linear_model import SGDClassifier
@@ -155,6 +155,27 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type','application/json')
         self.end_headers()
         self.wfile.write(result)
+
+
+class WorkerDaemon(multiprocessing.Process): 
+    def __init__(self, workers):
+        multiprocessing.Process.__init__(self)
+        self.daemon = True
+        self.workers = workers  
+        
+        
+    def run(self):
+        while True:
+            for w in workers:
+                if w.isRunning():
+                    w.step()
+        
+class Worker():
+    def __init__(self, start):
+        self.current = 0
+        self.start = 0
+        
+    def
 
 class Executor(multiprocessing.Process): 
 

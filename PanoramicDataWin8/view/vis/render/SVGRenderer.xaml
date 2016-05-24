@@ -1,5 +1,5 @@
 ﻿<local:Renderer
-    x:Class="PanoramicDataWin8.view.vis.render.SVGRenderer"
+    x:Class="PanoramicDataWin8.view.vis.render.PlotRenderer"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:PanoramicDataWin8.view.vis.render"
@@ -10,6 +10,6 @@
     d:DesignHeight="300"
     d:DesignWidth="400"
     FontFamily="{StaticResource abel}">
-    <local:XRenderer x:Name="xRenderer">
-    </local:XRenderer>
+    <local:XYRenderer x:Name="xyRenderer">
+    </local:XYRenderer>
 </local:Renderer>

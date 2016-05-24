@@ -140,6 +140,11 @@ namespace PanoramicDataWin8.view.vis
                     _renderer = new MapRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
+                else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.county)
+                {
+                    _renderer = new SVGRenderer("county.json");
+                    contentGrid.Children.Add(_renderer);
+                }
                 /*else if (visualizationViewModel.QueryModel.VisualizationType == VisualizationType.line)
                 {
                     _renderer = new PlotRenderer();
@@ -150,8 +155,8 @@ namespace PanoramicDataWin8.view.vis
                     _renderer = new PlotRenderer();
                     contentGrid.Children.Add(_renderer);
                 }*/
-                
-                
+
+
             }
             else if (visualizationViewModel.QueryModel.TaskModel != null)
             {
