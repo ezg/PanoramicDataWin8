@@ -9,7 +9,8 @@ namespace PanoramicDataWin8.view.inq
     public class InkStrokeElement : Canvas
     {
         private static SolidColorBrush ERASE_COLOR = new SolidColorBrush(Helpers.GetColorFromString("#d57074"));
-        private static SolidColorBrush COLOR = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
+        //private static SolidColorBrush COLOR = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
+        private static SolidColorBrush COLOR = new SolidColorBrush(Helpers.GetColorFromString("#111111"));
 
         protected InkStroke _inkStroke;
         public InkStroke InkStroke { get { return _inkStroke; } }

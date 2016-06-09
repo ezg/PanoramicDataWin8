@@ -69,13 +69,17 @@ namespace PanoramicDataWin8.model.data
             if (!isFirst && queryModel.FilterModels.Count(fm => fm.ValueComparisons.Count > 0) > 0)
             {
                 filterModels.AddRange(queryModel.FilterModels.Where(fm => fm.ValueComparisons.Count > 0));
-                if (queryModel.FilterModels.Where(fm => fm.ValueComparisons.Count > 0).All(fm => fm.GroupAggregateComparisons == ""))
+                if (queryModel.FilterModels.Any(fm => fm.ValueComparisons.Count > 0))
                 {
-                    ret = "(" + string.Join(" or ", queryModel.FilterModels.Select(fm => fm.ToPythonString())) + ")";
-                }
-                else
-                {
-                    ret = "(" + string.Join(",", queryModel.FilterModels.Select(fm => fm.ValueComparisons[0].)) + ")";
+                    if (queryModel.FilterModels.Where(fm => fm.ValueComparisons.Count > 0).All(fm => fm.GroupAggregateComparisons == ""))
+                    {
+                        ret = "(" + string.Join(" or ", queryModel.FilterModels.Select(fm => fm.ToPythonString())) + ")";
+                    }
+                    else
+                    {
+                        ret = "(" + queryModel.FilterModels[0].ValueComparisons[0].InputOperationModel.InputModel.Name + " in [" + string.Join(",", queryModel.FilterModels.Select(fm => fm.ValueComparisons[0]).Select(vc => "'" + vc.Value.ToString() + "'")) + "])";
+                        //ret = "(" + string.Join(",", queryModel.FilterModels.Select(fm => fm.ValueComparisons[0].)) + ")";
+                    }
                 }
             }
 

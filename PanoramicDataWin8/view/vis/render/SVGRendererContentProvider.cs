@@ -41,10 +41,6 @@ namespace PanoramicDataWin8.view.vis.render
         private float _deviceHeight = 0;
         private float _xScale = 0;
         private float _yScale = 0;
-        private float _minX = 0;
-        private float _minY = 0;
-        private float _maxX = 0;
-        private float _maxY = 0;
 
         private Color _textColor;
         private CanvasTextFormat _textFormat;
@@ -70,6 +66,13 @@ namespace PanoramicDataWin8.view.vis.render
         public Dictionary<IGeometry, FilterModel> HitTargets { get; set; }
 
         private Dictionary<string, List<List<Vector2>>> _svgShapes = new Dictionary<string, List<List<Vector2>>>();
+        private Dictionary<string, List<CanvasCachedGeometry>> _cachedGeometriesFilled = null;
+        private Dictionary<string, Dictionary<float, List<CanvasCachedGeometry>>> _cachedGeometriesOutline = null;
+        private MinMax2D _minMax = new MinMax2D();
+        private List<float> _strokeScales = null;
+
+        private static Dictionary<string, Dictionary<string, List<List<Vector2>>>>  _svgShapesCache = new Dictionary<string, Dictionary<string, List<List<Vector2>>>>();
+        private static Dictionary<string, MinMax2D>  _minMaxCache = new Dictionary<string, MinMax2D>();
 
         public SVGRendererContentProvider(string svgFilePath)
         {
@@ -80,64 +83,68 @@ namespace PanoramicDataWin8.view.vis.render
 
         private async void loadSVGData()
         {
-            _minX = float.MaxValue;
-            _minY = float.MaxValue;
-            _maxX = float.MinValue;
-            _maxY = float.MinValue;
-
-            var installedLoc = Package.Current.InstalledLocation;
-            string content = await installedLoc.GetFileAsync(@"Assets\svg\" + _svgFilePath).AsTask().ContinueWith(t => Windows.Storage.FileIO.ReadTextAsync(t.Result)).Result;
-            JObject result = JObject.Parse(content);
-            foreach (var obj in result)
+            if (!_svgShapesCache.ContainsKey(_svgFilePath) || !_minMaxCache.ContainsKey(_svgFilePath))
             {
-                var key = obj.Key;
-                if (!_svgShapes.ContainsKey(key))
-                {
-                    _svgShapes.Add(key, new List<List<Vector2>>());
-                }
-                List<List<Vector2>> shapes = _svgShapes[key];
-                foreach (var shapeString in (JArray) obj.Value)
-                {
-                    var data = shapeString.ToString();
-                    var entries = data.Split(new string[] {" "}, StringSplitOptions.RemoveEmptyEntries);
+                var minMax = new MinMax2D();
+                var svgShapes = new Dictionary<string, List<List<Vector2>>>();
 
-                    List<Vector2> currentShape = null;
+                _minMaxCache.Add(_svgFilePath, minMax);
+                _svgShapesCache.Add(_svgFilePath, svgShapes);
 
-                    foreach (var entry in entries)
+                var installedLoc = Package.Current.InstalledLocation;
+                string content = await installedLoc.GetFileAsync(@"Assets\svg\" + _svgFilePath).AsTask().ContinueWith(t => Windows.Storage.FileIO.ReadTextAsync(t.Result)).Result;
+                JObject result = JObject.Parse(content);
+                foreach (var obj in result)
+                {
+                    var key = obj.Key;
+                    if (!svgShapes.ContainsKey(key))
                     {
-                        var ptString = entry.Split(new string[] {","}, StringSplitOptions.RemoveEmptyEntries);
-                        float x = 0;
-                        float y = 0;
+                        svgShapes.Add(key, new List<List<Vector2>>());
+                    }
+                    List<List<Vector2>> shapes = svgShapes[key];
+                    foreach (var shapeString in (JArray) obj.Value)
+                    {
+                        var data = shapeString.ToString();
+                        var entries = data.Split(new string[] {" "}, StringSplitOptions.RemoveEmptyEntries);
 
-                        if (entry == "M")
-                        {
-                            currentShape = new List<Vector2>();
-                            shapes.Add(currentShape);
-                        }
-                        else if (entry == "L")
-                        {
-                            
-                        }
-                        else if (float.TryParse(ptString[0], out x) && float.TryParse(ptString[1], out y))
-                        {
-                            var pt = new Vector2(x, y);
-                            currentShape.Add(pt);
-                            _minX = Math.Min(_minX, x);
-                            _minY = Math.Min(_minY, y);
+                        List<Vector2> currentShape = null;
 
-                            _maxX = Math.Max(_maxX, x);
-                            _maxY = Math.Max(_maxY, y);
-                        }
-                        else
+                        foreach (var entry in entries)
                         {
-                            
+                            var ptString = entry.Split(new string[] {","}, StringSplitOptions.RemoveEmptyEntries);
+                            float x = 0;
+                            float y = 0;
+
+                            if (entry == "M")
+                            {
+                                currentShape = new List<Vector2>();
+                                shapes.Add(currentShape);
+                            }
+                            else if (entry == "L")
+                            {
+
+                            }
+                            else if (float.TryParse(ptString[0], out x) && float.TryParse(ptString[1], out y))
+                            {
+                                var pt = new Vector2(x, y);
+                                currentShape.Add(pt);
+                                minMax.Update(x, y);
+                            }
+                            else
+                            {
+
+                            }
                         }
                     }
                 }
             }
+            _svgShapes = _svgShapesCache[_svgFilePath];
+            _minMax = _minMaxCache[_svgFilePath];
+
+           
         }
 
-        public void UpdateFilterModels(List<FilterModel> filterModels)
+        public  void UpdateFilterModels(List<FilterModel> filterModels)
         {
             _filterModels = filterModels;
         }
@@ -180,6 +187,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         public override void Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             var mat = Matrix3x2.CreateScale(new Vector2(CompositionScaleX, CompositionScaleY));
             canvasArgs.DrawingSession.Transform = mat;
 
@@ -200,6 +209,7 @@ namespace PanoramicDataWin8.view.vis.render
                 _deviceHeight = (float)(canvas.ActualHeight / CompositionScaleY - _topOffset - _bottomtOffset);
                 DrawString(canvasArgs, _textFormat, _deviceWidth / 2.0f + _leftOffset, _deviceHeight / 2.0f + _topOffset, "no datapoints", _textColor, true, true, false);
             }
+            Debug.WriteLine("time to render county map : " + sw.ElapsedMilliseconds);
         }
 
         private void renderSVG(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
@@ -208,6 +218,37 @@ namespace PanoramicDataWin8.view.vis.render
             if (_deviceHeight < 0 || _deviceWidth < 0)
             {
                 return;
+            }
+
+       
+            if (_cachedGeometriesFilled == null || _cachedGeometriesOutline == null)
+            {
+                _strokeScales = new List<float>();
+                _strokeScales.Add(1);
+                _strokeScales.Add(0.2f);
+
+                _cachedGeometriesFilled = new Dictionary<string, List<CanvasCachedGeometry>>();
+                _cachedGeometriesOutline = new Dictionary<string, Dictionary<float, List<CanvasCachedGeometry>>>();
+                foreach (var key in _svgShapes.Keys)
+                {
+                    _cachedGeometriesOutline.Add(key, new Dictionary<float, List<CanvasCachedGeometry>>());
+                    foreach (var strokeScale in _strokeScales)
+                    {
+                        _cachedGeometriesOutline[key].Add(strokeScale, new List<CanvasCachedGeometry>());
+                    }
+                    _cachedGeometriesFilled.Add(key, new List<CanvasCachedGeometry>());
+                    foreach (var path in _svgShapes[key])
+                    {
+                        var geom = CanvasGeometry.CreatePolygon(canvas, path.Select(v => new Vector2(v.X - _minMax.MinX, v.Y - _minMax.MinY)).ToArray());
+                        var fill = CanvasCachedGeometry.CreateFill(geom, CanvasGeometry.ComputeFlatteningTolerance(300, 5));
+                        foreach (var strokeScale in _strokeScales)
+                        {
+                            _cachedGeometriesOutline[key][strokeScale].Add(CanvasCachedGeometry.CreateStroke(geom, strokeScale, new CanvasStrokeStyle()));
+                        }
+                        _cachedGeometriesFilled[key].Add(fill);
+
+                    }
+                }
             }
 
             var currentMat = canvasArgs.DrawingSession.Transform;
@@ -219,11 +260,16 @@ namespace PanoramicDataWin8.view.vis.render
             var white = Color.FromArgb(255, 255, 255, 255);
             var dark = Color.FromArgb(255, 11, 11, 11);
 
+            //var x = _xScale;
+            //float scaleIndex = _strokeScales.Select((s, i) => new { v = s, d = Math.Abs(s - x), i = i }).OrderBy(e => e.d).First().v;
+            //int scaleIndex = _strokeScales.Select(s => s -  );
+
+
             foreach (var key in _svgShapes.Keys)
             {
-                foreach (var path in _svgShapes[key])
+                for (int i = 0; i < _svgShapes[key].Count; i++)
                 {
-                    var geom = CanvasGeometry.CreatePolygon(canvas, path.Select(v => new Vector2(v.X - _minX, v.Y - _minY)).ToArray());
+                    //var geom = CanvasGeometry.CreatePolygon(canvas, path.Select(v => new Vector2(v.X - _minMax.MinX, v.Y - _minMax.MinY)).ToArray());
                     if (_values.ContainsKey("F" + key))
                     {
                         var value = _values["F" + key][BrushIndex.ALL];
@@ -239,12 +285,12 @@ namespace PanoramicDataWin8.view.vis.render
                         {
                             value = (value - min)/(max - min);
                         }
-                        var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float) Math.Sqrt(value));
+                        float alpha = 0.15f;
+                        var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float) (alpha + Math.Pow(value, 1.0/3.0)*(1.0 - alpha)));
                         var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
+                        //var dataColor = Color.FromArgb((byte)((0.10 + (Math.Pow(value, 1.0 / 3.0)) * (1.0 - 0.10)) * 255), 40, 170, 213);
 
-                        canvasArgs.DrawingSession.FillGeometry(geom, dataColor);
-
-                         
+                        canvasArgs.DrawingSession.DrawCachedGeometry(_cachedGeometriesFilled[key][i], dataColor);
 
                         var brushCount = 0;
                         foreach (var brushIndex in _visualizationDescriptionModel.BrushIndices.Where(bi => bi != BrushIndex.ALL))
@@ -256,8 +302,9 @@ namespace PanoramicDataWin8.view.vis.render
                                 brushColor = _queryModelClone.BrushColors[brushCount];
                             }
 
-                            var brushLerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), brushColor, (float) Math.Sqrt(value));
+                            var brushLerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), brushColor, (float) (alpha + Math.Pow(value, 1.0/3.0)*(1.0 - alpha)));
                             var renderColor = Color.FromArgb(255, brushLerpColor.R, brushLerpColor.G, brushLerpColor.B);
+                            //var renderColor = Color.FromArgb((byte)((0.10 + (Math.Pow(value, 1.0 / 3.0)) * (1.0 - 0.10)) * 255), brushColor.R, brushColor.G, brushColor.B);
 
                             var allUnNormalizedValue = _countsInterpolated["F" + key][BrushIndex.ALL];
                             var brushUnNormalizedValue = _countsInterpolated["F" + key][brushIndex];
@@ -271,43 +318,52 @@ namespace PanoramicDataWin8.view.vis.render
                             canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, renderColor);*/
                             if (brushFactor > 0)
                             {
-                                canvasArgs.DrawingSession.FillGeometry(geom, renderColor);
+                                //canvasArgs.DrawingSession.FillGeometry(geom, renderColor);
+                                canvasArgs.DrawingSession.DrawCachedGeometry(_cachedGeometriesFilled[key][i], renderColor);
                             }
                             brushCount++;
                         }
-                        canvasArgs.DrawingSession.DrawGeometry(geom, white, 0.1f/_xScale);
+                        //canvasArgs.DrawingSession.DrawGeometry(geom, white, 0.1f/_xScale);
+                        canvasArgs.DrawingSession.DrawCachedGeometry(_cachedGeometriesOutline[key][0.2f][i], white);
                     }
                     else
                     {
-                        canvasArgs.DrawingSession.DrawGeometry(geom, white, 1f / _xScale);
+                        //canvasArgs.DrawingSession.DrawGeometry(geom, white, 1f / _xScale);
+                        canvasArgs.DrawingSession.DrawCachedGeometry(_cachedGeometriesOutline[key][0.2f][i], white);
                     }
-                    
+
                 }
             }
             HitTargets.Clear();
             foreach (var key in _svgShapes.Keys)
             {
-                foreach (var path in _svgShapes[key])
+                for (int i = 0; i < _svgShapes[key].Count; i++)
                 {
+                    var path = _svgShapes[key][i];
                     var label = "F" + key;
-                    var index = _index[label];
-
-                    if (path.Count > 4)
+                    if (_index.ContainsKey(label))
                     {
-                        IGeometry hitGeom = path.Select(v => new Pt((v.X - _minX)*_xScale + _leftOffset, (v.Y - _minY)*_yScale + _topOffset)).GetPolygon();
-                        var filterModel = new FilterModel();
-                        filterModel.Value = index;
+                        var index = _index[label];
 
-                        filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.EQUALS, label));
-                        if (!HitTargets.ContainsKey(hitGeom))
+                        if (path.Count > 4)
                         {
-                            HitTargets.Add(hitGeom, filterModel);
-                        
+                            IGeometry hitGeom = path.Select(v => new Pt((v.X - _minMax.MinX)*_xScale + _leftOffset, (v.Y - _minMax.MinY)*_yScale + _topOffset)).GetPolygon();
+                            var filterModel = new FilterModel();
+                            filterModel.Value = index;
+                            filterModel.GroupAggregateComparisons = "f";
 
-                            if (_filterModels.Contains(filterModel))
+                            filterModel.ValueComparisons.Add(new ValueComparison(_yAom, Predicate.EQUALS, label));
+                            if (!HitTargets.ContainsKey(hitGeom))
                             {
-                                var geom = CanvasGeometry.CreatePolygon(canvas, path.Select(v => new Vector2(v.X - _minX, v.Y - _minY)).ToArray());
-                                canvasArgs.DrawingSession.DrawGeometry(geom, dark, 1f/_xScale);
+                                HitTargets.Add(hitGeom, filterModel);
+
+
+                                if (_filterModels.Contains(filterModel))
+                                {
+                                    //var geom = CanvasGeometry.CreatePolygon(canvas, path.Select(v => new Vector2(v.X - _minMax.MinX, v.Y - _minMax.MinY)).ToArray());
+                                    //canvasArgs.DrawingSession.DrawGeometry(geom, dark, 1f/_xScale);
+                                    canvasArgs.DrawingSession.DrawCachedGeometry(_cachedGeometriesOutline[key][1][i], dark);
+                                }
                             }
                         }
                     }
@@ -320,16 +376,16 @@ namespace PanoramicDataWin8.view.vis.render
             _deviceWidth = (float)(canvas.ActualWidth / CompositionScaleX - 10 - 10);
             _deviceHeight = (float)(canvas.ActualHeight / CompositionScaleY - 10 - 10);
 
-            _xScale = _deviceWidth / (_maxX - _minX);
-            _yScale = _deviceHeight / (_maxY - _minY);
+            _xScale = _deviceWidth / (_minMax.MaxX - _minMax.MinX);
+            _yScale = _deviceHeight / (_minMax.MaxY - _minMax.MinY);
 
             _xScale = Math.Min(_xScale, _yScale);
             _yScale = Math.Min(_xScale, _yScale);
 
-            float xOff = _deviceWidth - ((_maxX - _minX)*_xScale);
+            float xOff = _deviceWidth - ((_minMax.MaxX - _minMax.MinX) *_xScale);
             _leftOffset = 10f + xOff/2.0f;
 
-            float yOff = _deviceHeight - ((_maxY - _minY) * _xScale);
+            float yOff = _deviceHeight - ((_minMax.MaxY - _minMax.MinY) * _xScale);
             _topOffset = 10f + yOff / 2.0f;
         }
 
@@ -341,6 +397,46 @@ namespace PanoramicDataWin8.view.vis.render
                 FontFamily = "/Assets/font/Abel-Regular.ttf#Abel"
             };
             _textColor = Color.FromArgb(255, 17, 17, 17);
+        }
+    }
+
+    public class MinMax2D
+    {
+        private float _minX = float.MaxValue;
+        public float MinX
+        {
+            get { return _minX; }
+            set { _minX = value; }
+        }
+
+        private float _minY = float.MaxValue;
+        public float MinY
+        {
+            get { return _minY; }
+            set { _minY = value; }
+        }
+
+        private float _maxX = float.MinValue;
+        public float MaxX
+        {
+            get { return _maxX; }
+            set { _maxX = value; }
+        }
+
+        private float _maxY = float.MinValue;
+        public float MaxY
+        {
+            get { return _maxY; }
+            set { _maxY = value; }
+        }
+
+        public void Update(float x, float y)
+        {
+            _minX = Math.Min(_minX, x);
+            _minY = Math.Min(_minY, y);
+
+            _maxX = Math.Max(_maxX, x);
+            _maxY = Math.Max(_maxY, y);
         }
     }
 }

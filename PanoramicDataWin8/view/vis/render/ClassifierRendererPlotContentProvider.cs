@@ -450,9 +450,10 @@ namespace PanoramicDataWin8.view.vis.render
                                 }
 
 
-                                float alpha = 0.1f * (float)Math.Log10(value) + 1f;
-                                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)Math.Sqrt(value));
+                                float alpha = 0.15f;
+                                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float)(alpha + Math.Pow(value, 1.0 / 3.0) * (1.0 - alpha)));
                                 var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
+                                //var dataColor = Color.FromArgb((byte)((0.10 + (Math.Pow(value, 1.0 / 3.0)) * (1.0 - 0.10)) * 255), 40, 170, 213);
 
                                 //var brushBaseColor = Windows.UI.Color.FromArgb(178, 77, 148, 125);
                                 //var brushBaseColor = Windows.UI.Color.FromArgb(255, 178, 77, 148);
