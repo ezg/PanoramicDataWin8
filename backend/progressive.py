@@ -9,7 +9,7 @@ import math
 import multiprocessing
 import uuid
 import traceback
-
+from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from BaseHTTPServer import BaseHTTPRequestHandler
 from BaseHTTPServer import HTTPServer
 from multiprocessing import Manager
@@ -279,6 +279,7 @@ class ClassificationExecutor(Executor):
         
         X_test = []
         y_test = []
+        scaler = None
         df_test = None
         while True:
             if not self.isRunningPerUUID[self.uuid]:
@@ -296,6 +297,8 @@ class ClassificationExecutor(Executor):
                  # retain first as test
                 if len(X_test) == 0:
                     X_test = df[self.task['features']]
+                    
+                    scaler = MinMaxScaler().fit(X_test)
                     y_test = df.eval(self.task['label'])
                     df_test = df
                     #X_test =  np.array(df[self.task['features']])
@@ -306,7 +309,7 @@ class ClassificationExecutor(Executor):
                     dfTrain = df[split:]
                 
                     y_train = dfTrain.eval(self.task['label'])
-                    X_train = dfTrain[self.task['features']]
+                    X_train = np.abs(scaler.transform(dfTrain[self.task['features']]))
                     
                     y_test_current = dfTest.eval(self.task['label'])
                     X_test_current = dfTest[self.task['features']]
@@ -317,10 +320,10 @@ class ClassificationExecutor(Executor):
                     y_pred = None
                     
                     if cls_name in ['sgd', 'perceptron', 'passive_aggressive']:
-                        y_pred = cls.predict(np.array(pd.concat([X_test, X_test_current])))
+                        y_pred = cls.predict(np.array(scaler.transform(pd.concat([X_test, X_test_current]))))
                         y_prob = np.array([[0,y] for y in y_pred])
                     else:
-                        y_prob = cls.predict_proba(np.array(pd.concat([X_test, X_test_current])))
+                        y_prob = cls.predict_proba(np.array(scaler.transform(pd.concat([X_test, X_test_current]))))
                         y_pred = [1 if t[0] >= 0.5 else 0 for t in y_prob]
                         
                     y_test_concat = np.array([1 if x else 0 for x in np.array(pd.concat([y_test, y_test_current]))])

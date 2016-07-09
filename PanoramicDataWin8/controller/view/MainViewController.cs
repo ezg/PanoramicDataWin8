@@ -195,7 +195,8 @@ namespace PanoramicDataWin8.controller.view
             TaskGroupModel parent = new TaskGroupModel();
             foreach (var child in jToken as JArray)
             {
-                recursiveCreateAttributeModels(child, parent);
+                if (child.ToString() != "")
+                    recursiveCreateAttributeModels(child, parent);
             }
             _mainModel.TaskModels = parent.TaskModels.ToList();
         }

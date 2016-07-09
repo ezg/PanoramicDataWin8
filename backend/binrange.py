@@ -61,7 +61,7 @@ class NominalBinRange(BinRange):
     def __init__(self):
         BinRange.__init__(self, 0, 0, 0)
         self.labelsValue = {} #string, index
-        self.ValuesLabel = {} #index, string
+        self.valuesLabel = {} #index, string
         self.type = 'NominalBinRange'
     
     @staticmethod
@@ -73,7 +73,7 @@ class NominalBinRange(BinRange):
             if not u in scale.labelsValue:
                 index = len(scale.labelsValue.keys())
                 scale.labelsValue[u] = index
-                scale.ValuesLabel[index] = u
+                scale.valuesLabel[index] = u
         return scale
     
     def getIndexFromValue(self, value):
@@ -86,7 +86,7 @@ class NominalBinRange(BinRange):
         return value
         
     def getLabel(self, value):
-       return self.ValuesLabel[value]      
+       return self.valuesLabel[value]      
         
     def getBins(self):
         scale = []
@@ -97,7 +97,7 @@ class NominalBinRange(BinRange):
     def getUpdatedBinRange(self, dataMin, dataMax, df, val):
         newRange = NominalBinRange()
         newRange.labelsValue = self.labelsValue
-        newRange.ValuesLabel = self.ValuesLabel
+        newRange.valuesLabel = self.valuesLabel
         
         uniqueValues = df[val].unique()
     
@@ -105,7 +105,7 @@ class NominalBinRange(BinRange):
             if not u in newRange.labelsValue:
                 index = len(newRange.labelsValue.keys())
                 newRange.labelsValue[u] = index
-                newRange.ValuesLabel[index] = u
+                newRange.valuesLabel[index] = u
         return newRange
         
 class QuantitativeBinRange(BinRange):        

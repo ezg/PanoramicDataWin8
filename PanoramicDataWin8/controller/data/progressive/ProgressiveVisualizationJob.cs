@@ -97,6 +97,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 
             _query = new JObject(
                 new JProperty("type", "execute"),
+                new JProperty("uuid", null),
                 new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Name),
                 new JProperty("task",
                     new JObject(
@@ -135,10 +136,12 @@ namespace PanoramicDataWin8.controller.data.progressive
                 {
                     JObject lookupData = new JObject(
                         new JProperty("type", "lookup"),
-                        new JProperty("uuid", _requestUuid));
+                        new JProperty("uuid", _requestUuid),
+                        new JProperty("dataset", null),
+                        new JProperty("task", null));
                     string message = await ProgressiveGateway.Request(lookupData);
 
-                    if (message != "None")
+                    if (message != "None" && message != "null" && message != "\"None\"")
                     {
                         JObject result = JObject.Parse(message);
 
@@ -233,7 +236,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 }
                 else if (binRange["type"].ToString() == "NominalBinRange")
                 {
-                    var valuesLabel = binRange["ValuesLabel"];
+                    var valuesLabel = binRange["valuesLabel"];
                     var nbr = new NominalBinRange();
                     resultDescriptionModel.BinRanges.Add(nbr);
                     var count = 0;
