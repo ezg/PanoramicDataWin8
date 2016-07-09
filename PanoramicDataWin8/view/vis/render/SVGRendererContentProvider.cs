@@ -83,17 +83,6 @@ namespace PanoramicDataWin8.view.vis.render
 
         private async void loadSVGData()
         {
-            Stopwatch sw = new Stopwatch();
-            sw.Start();
-            for (int i = 0; i < 1000000; i++)
-            {
-                if ("3" == i.ToString())
-                {
-                    
-                }
-            }
-            Debug.WriteLine("teee " + sw.ElapsedMilliseconds);
-
             if (!_svgShapesCache.ContainsKey(_svgFilePath) || !_minMaxCache.ContainsKey(_svgFilePath))
             {
                 var minMax = new MinMax2D();
