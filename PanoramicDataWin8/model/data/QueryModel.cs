@@ -435,6 +435,20 @@ namespace PanoramicDataWin8.model.data
             }
         }
 
+        private ObservableCollection<ComparisonViewModel> _comparisonViewModels = new ObservableCollection<ComparisonViewModel>();
+        [JsonIgnore]
+        public ObservableCollection<ComparisonViewModel> ComparisonViewModels
+        {
+            get
+            {
+                return _comparisonViewModels;
+            }
+            set
+            {
+                this.SetProperty(ref _comparisonViewModels, value);
+            }
+        }
+
         private ObservableCollection<FilterModel> _filterModels = new ObservableCollection<FilterModel>();
         public ObservableCollection<FilterModel> FilterModels
         {

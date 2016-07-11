@@ -750,7 +750,28 @@ namespace PanoramicDataWin8.controller.view
 
         private void ComparisonViews_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            throw new NotImplementedException();
+            if (e.OldItems != null)
+            {
+                foreach (var item in e.OldItems)
+                {
+                    var current = (((KeyValuePair<ComparisonViewModel, ComparisonView>)item).Key);
+                    foreach (var visualizationViewModel in current.VisualizationViewModels)
+                    {
+                        visualizationViewModel.QueryModel.ComparisonViewModels.Remove(current);
+                    }
+                }
+            }
+            if (e.NewItems != null)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    var current = (((KeyValuePair<ComparisonViewModel, ComparisonView>)item).Key);
+                    foreach (var visualizationViewModel in current.VisualizationViewModels)
+                    {
+                        visualizationViewModel.QueryModel.ComparisonViewModels.Add(current);
+                    }
+                }
+            }
         }
 
         private double boundHorizontalDistance(Rct b1, Rct b2)
@@ -759,37 +780,68 @@ namespace PanoramicDataWin8.controller.view
         }
 
         
+        private Dictionary<VisualizationViewModel, DateTime> _lastMoved = new Dictionary<VisualizationViewModel, DateTime>(); 
         private void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var current = sender as VisualizationViewModel;
             if (e.PropertyName == current.GetPropertyName(() => current.Position))
             {
+                // update last moved time
+                _lastMoved[current] = DateTime.Now;
+
                 // check if we need to create new inputvisualization views
                 foreach (var other in VisualizationViewModels.Where(c => c != null))
                 {
                     var diff = current.Position - other.Position;
-                    if (Math.Abs(diff.Y) < 300 &&
-                        boundHorizontalDistance(current.Bounds, other.Bounds) < 50)
-                    {
-                        if (!InputVisualizationViews.Keys.Any(sov => sov.VisualizationViewModels.Contains(current) && sov.VisualizationViewModels.Contains(other)))
-                        {
-                            bool areLinked = false;
-                            foreach (var linkModel in current.QueryModel.LinkModels)
-                            {
-                                if ((linkModel.FromQueryModel == current.QueryModel && linkModel.ToQueryModel == other.QueryModel) ||
-                                    (linkModel.FromQueryModel == other.QueryModel && linkModel.ToQueryModel == current.QueryModel))
-                                {
-                                    areLinked = true;
-                                }
-                            }
 
-                            if (!areLinked)
+                    bool areLinked = false;
+                    foreach (var linkModel in current.QueryModel.LinkModels)
+                    {
+                        if ((linkModel.FromQueryModel == current.QueryModel && linkModel.ToQueryModel == other.QueryModel) ||
+                            (linkModel.FromQueryModel == other.QueryModel && linkModel.ToQueryModel == current.QueryModel))
+                        {
+                            areLinked = true;
+                        }
+                    }
+                    if (!areLinked)
+                    {
+                        // check for comparision views
+                        if (Math.Abs(diff.Y) < 300 &&
+                            boundHorizontalDistance(current.Bounds, other.Bounds) < 200 &&
+                            _lastMoved.ContainsKey(other) &&
+                            other != current &&
+                            Math.Abs((_lastMoved[other] - _lastMoved[current]).TotalMilliseconds) < 400)
+                        {
+                            if (!ComparisonViews.Keys.Any(sov => sov.VisualizationViewModels.Contains(current) && sov.VisualizationViewModels.Contains(other)))
+                            {
+                                ComparisonViewModel comparisonViewModel = new ComparisonViewModel();
+                                comparisonViewModel.VisualizationViewModels.Add(other);
+                                comparisonViewModel.VisualizationViewModels.Add(current);
+                                comparisonViewModel.Position =
+                                    (((comparisonViewModel.VisualizationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec())) / 2.0) - comparisonViewModel.Size / 2.0).GetWindowsPoint();
+
+                                comparisonViewModel.ComparisonViewModelState = ComparisonViewModelState.Opening;
+                                comparisonViewModel.DwellStartPosition = current.Position;
+                                comparisonViewModel.TicksSinceDwellStart = DateTime.Now.Ticks;
+
+                                ComparisonView view = new ComparisonView();
+                                view.DataContext = comparisonViewModel;
+                                InkableScene.Children.Add(view);
+                                ComparisonViews.Add(comparisonViewModel, view);
+                            }
+                        }
+
+                        // check for inputvisualization views
+                        else if (Math.Abs(diff.Y) < 300 &&
+                            boundHorizontalDistance(current.Bounds, other.Bounds) < 50)
+                        {
+                            if (!InputVisualizationViews.Keys.Any(sov => sov.VisualizationViewModels.Contains(current) && sov.VisualizationViewModels.Contains(other)))
                             {
                                 List<InputVisualizationViewModel> inputCohorts = InputVisualizationViews.Keys.Where(icv => icv.To == other).ToList();
 
                                 var allColorIndex = Enumerable.Range(0, InputVisualizationViewModel.ColorScheme1.Count);
                                 allColorIndex = allColorIndex.Except(inputCohorts.Select(c => c.ColorIndex));
-                                var colorIndex = inputCohorts.Count % InputVisualizationViewModel.ColorScheme1.Count;
+                                var colorIndex = inputCohorts.Count%InputVisualizationViewModel.ColorScheme1.Count;
                                 if (allColorIndex.Any())
                                 {
                                     colorIndex = allColorIndex.First();
@@ -813,11 +865,11 @@ namespace PanoramicDataWin8.controller.view
                                 InkableScene.Children.Add(view);
                                 InputVisualizationViews.Add(inputVisualizationViewModel, view);
                             }
-                        }
-                        else
-                        {
-                            var inputModel = InputVisualizationViews.Keys.First(sov => sov.VisualizationViewModels.Contains(current) && sov.VisualizationViewModels.Contains(other));
-                            inputModel.From = current;
+                            else
+                            {
+                                var inputModel = InputVisualizationViews.Keys.First(sov => sov.VisualizationViewModels.Contains(current) && sov.VisualizationViewModels.Contains(other));
+                                inputModel.From = current;
+                            }
                         }
                     }
                 }
@@ -827,6 +879,57 @@ namespace PanoramicDataWin8.controller.view
         void _visualizationMovingTimer_Tick(object sender, object e)
         {
             checkOpenOrCloseInputVisualizationModels();
+            checkOpenOrCloseComparisionModels();
+        }
+
+        private void checkOpenOrCloseComparisionModels(bool dropped = false)
+        {
+            // views that need to be opened or closed
+            foreach (var comparisonViewModel in ComparisonViews.Keys.ToList())
+            {
+                var model = comparisonViewModel;
+
+                var diff = comparisonViewModel.VisualizationViewModels[0].Position - comparisonViewModel.VisualizationViewModels[1].Position;
+
+                // views to open
+                if (Math.Abs(diff.Y) < 300 &&
+                    boundHorizontalDistance(comparisonViewModel.VisualizationViewModels[0].Bounds, comparisonViewModel.VisualizationViewModels[1].Bounds) < 300 &&
+                    (dropped || DateTime.Now.Ticks > TimeSpan.TicksPerSecond*1 + model.TicksSinceDwellStart))
+                {
+                    comparisonViewModel.ComparisonViewModelState = ComparisonViewModelState.Opened;
+                }
+
+                bool areLinked = false;
+                foreach (var linkModel in comparisonViewModel.VisualizationViewModels.First().QueryModel.LinkModels)
+                {
+                    if ((linkModel.FromQueryModel == comparisonViewModel.VisualizationViewModels[0].QueryModel && linkModel.ToQueryModel == comparisonViewModel.VisualizationViewModels[1].QueryModel) ||
+                        (linkModel.FromQueryModel == comparisonViewModel.VisualizationViewModels[1].QueryModel && linkModel.ToQueryModel == comparisonViewModel.VisualizationViewModels[0].QueryModel))
+                    {
+                        areLinked = true;
+                    }
+                }
+
+
+                // Views to close
+                if (areLinked ||
+                    Math.Abs(diff.Y) >= 300 ||
+                    (comparisonViewModel.ComparisonViewModelState == ComparisonViewModelState.Opening && boundHorizontalDistance(comparisonViewModel.VisualizationViewModels[0].Bounds, comparisonViewModel.VisualizationViewModels[1].Bounds) >= 300) ||
+                    (comparisonViewModel.ComparisonViewModelState == ComparisonViewModelState.Opened && boundHorizontalDistance(comparisonViewModel.VisualizationViewModels[0].Bounds, comparisonViewModel.VisualizationViewModels[1].Bounds) >= 300) ||
+                    comparisonViewModel.VisualizationViewModels.Any(c => !VisualizationViewModels.Contains(c)))
+                {
+                    comparisonViewModel.ComparisonViewModelState = ComparisonViewModelState.Closing;
+                    var view = ComparisonViews[comparisonViewModel];
+                    ComparisonViews.Remove(comparisonViewModel);
+
+                    var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+                    dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                    {
+                        await Task.Delay(TimeSpan.FromMilliseconds(1000));
+                        InkableScene.Children.Remove(view);
+                    });
+
+                }
+            }
         }
 
         private void checkOpenOrCloseInputVisualizationModels(bool dropped = false)

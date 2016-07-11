@@ -185,9 +185,13 @@
     <Compile Include="controller\data\tuppleware\gateway\TuppleWareGateway.cs" />
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
+    <Compile Include="model\view\ComparisonViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="utils\ObservableDictionary.cs" />
     <Compile Include="view\inq\IInkable.cs" />
+    <Compile Include="view\vis\ComparisonView.xaml.cs">
+      <DependentUpon>ComparisonView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\InputVisualizationView.xaml.cs">
       <DependentUpon>InputVisualizationView.xaml</DependentUpon>
     </Compile>
@@ -430,6 +434,10 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="view\vis\ComparisonView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\vis\InputVisualizationView.xaml">
       <SubType>Designer</SubType>
