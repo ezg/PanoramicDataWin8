@@ -14,6 +14,8 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 
@@ -75,6 +77,7 @@ namespace PanoramicDataWin8.view.vis
                     vis.QueryModel.ResultModel.ResultModelUpdated += ResultModel_ResultModelUpdated;
                 }
                 updateRendering();
+                updateResult();
             }
         }
 
@@ -85,12 +88,20 @@ namespace PanoramicDataWin8.view.vis
 
         private void updateResult()
         {
-            var res1 = _model.VisualizationViewModels[0].QueryModel.ResultModel.ResultDescriptionModel;
-            var res2 = _model.VisualizationViewModels[0].QueryModel.ResultModel.ResultDescriptionModel;
+            var res1 = _model.VisualizationViewModels[0].QueryModel.ResultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
+            var res2 = _model.VisualizationViewModels[1].QueryModel.ResultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
 
             if (res1 != null && res2 != null)
             {
+                var dim = _model.VisualizationViewModels[0].QueryModel.GetUsageInputOperationModel(InputUsage.X).First();
+                var n1 = res1.OverallCount[dim.InputModel.Name];
+                var n2 = res2.OverallCount[dim.InputModel.Name];
+                var m1 = res1.OverallMeans[dim.InputModel.Name];
+                var m2 = res2.OverallMeans[dim.InputModel.Name];
+                var v1 = Math.Sqrt(res1.OverallSampleStandardDeviations[dim.InputModel.Name]);
+                var v2 = Math.Sqrt(res2.OverallSampleStandardDeviations[dim.InputModel.Name]);
 
+                var t = (m1 - m2)/Math.Sqrt((v1/n1) + (v2/n2));
             }
         }
 

@@ -19,7 +19,8 @@ namespace PanoramicDataWin8.model.data.result
         }
 
         public Dictionary<string, double> OverallMeans { get; set; } = new Dictionary<string, double>();
-        
+        public Dictionary<string, double> OverallCount { get; set; } = new Dictionary<string, double>();
+
         public Dictionary<string, double> OverallPowerSumAverage { get; set; } = new Dictionary<string, double>();
         
         public Dictionary<string, double> OverallSampleStandardDeviations { get; set; } = new Dictionary<string, double>();
