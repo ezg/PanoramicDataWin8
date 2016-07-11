@@ -198,6 +198,10 @@ namespace PanoramicDataWin8.controller.data.progressive
             double progress = (double)result["progress"];
             JObject binStruct = (JObject)result["binStructure"];
             double nullCount = (double)binStruct["nullCount"];
+            resultDescriptionModel.NullCount = nullCount;
+            resultDescriptionModel.OverallMeans = binStruct["overallMeans"].ToObject<Dictionary<string, double>>();
+            resultDescriptionModel.OverallPowerSumAverage = binStruct["overallPowerSumAverage"].ToObject<Dictionary<string, double>>();
+            resultDescriptionModel.OverallSampleStandardDeviations = binStruct["overallSampleStandardDeviations"].ToObject<Dictionary<string, double>>();
             JObject bins = (JObject)binStruct["bins"];
             JArray binRanges = (JArray)binStruct["binRanges"];
 

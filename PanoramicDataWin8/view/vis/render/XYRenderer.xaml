@@ -13,8 +13,8 @@
         <ControlTemplate TargetType="ContentControl">
             <Grid>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="54"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="54"/>
                 </Grid.RowDefinitions>
 
                 <Grid.ColumnDefinitions>
@@ -23,12 +23,12 @@
                 </Grid.ColumnDefinitions>
 
 
-                <common:InputFieldView x:Name="xInputFieldView" Grid.Column="1" Grid.Row="0"/>
-                <common:InputFieldView x:Name="yInputFieldView" Grid.Column="0" Grid.Row="1"/>
+                <common:InputFieldView x:Name="xInputFieldView" Grid.Column="1" Grid.Row="1"/>
+                <common:InputFieldView x:Name="yInputFieldView" Grid.Column="0" Grid.Row="0"/>
 
-                <Grid Grid.Column="1" Grid.Row="1" Background="{StaticResource lightBrush}">
+                <Grid Grid.Column="1" Grid.Row="0" Background="{StaticResource lightBrush}">
                     <Viewbox MaxWidth="150" CacheMode="BitmapCache">
-                        <TextBlock x:Name="mainLabel" Text="" Foreground="{StaticResource highlightBrush}"/>
+                        <TextBlock x:Name="mainLabel" Text="" Foreground="{StaticResource highlightBrush}" Opacity="0"/>
                     </Viewbox>
                     <Grid x:Name="contentGrid" Opacity="1">
                         <ContentPresenter x:Name="contentPresenter"/>

@@ -139,7 +139,7 @@ namespace PanoramicDataWin8.view.vis.render
                 ((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), xAom) 
                 {
                     IsShadow = false,
-                    BorderThicknes = new Thickness(0, 0, 0, 4),
+                    BorderThicknes = new Thickness(0, 4, 0, 0),
                     Size = new Vec(visModel.Size.X - 54, 54),
                     AttachmentOrientation = AttachmentOrientation.Top
                 };
@@ -151,7 +151,7 @@ namespace PanoramicDataWin8.view.vis.render
                     IsDraggableByPen = false,
                     IsDraggable = false,
                     IsShadow = false,
-                    BorderThicknes = new Thickness(0, 0, 0, 4),
+                    BorderThicknes = new Thickness(0, 4, 0, 0),
                     Size = new Vec(visModel.Size.X - 54, 54),
                     AttachmentOrientation = AttachmentOrientation.Top
                 };

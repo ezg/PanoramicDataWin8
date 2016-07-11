@@ -105,7 +105,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                             new JProperty("uuid", _requestUuid));
                         string message = await ProgressiveGateway.Request(lookupData);
 
-                        if (message != "None")
+                        if (message != "None" && message != "null" && message != "\"None\"")
                         {
                             List<string> brushes = new List<string>();
                             foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)

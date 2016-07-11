@@ -55,6 +55,7 @@ namespace PanoramicDataWin8.controller.view
             _root.InkCollectedEvent += root_InkCollectedEvent;
             VisualizationViewModels.CollectionChanged += VisualizationViewModels_CollectionChanged;
             InputVisualizationViews.CollectionChanged += InputVisualizationViews_CollectionChanged;
+            ComparisonViews.CollectionChanged += ComparisonViews_CollectionChanged;
 
             _gesturizer.AddGesture(new ConnectGesture(_root));
             _gesturizer.AddGesture(new EraseGesture(_root));
@@ -296,6 +297,11 @@ namespace PanoramicDataWin8.controller.view
                 return _root;
             }
         }
+
+        public ObservableDictionary<InputVisualizationViewModel, InputVisualizationView> InputVisualizationViews = new ObservableDictionary<InputVisualizationViewModel, InputVisualizationView>();
+
+        public ObservableDictionary<ComparisonViewModel, ComparisonView> ComparisonViews = new ObservableDictionary<ComparisonViewModel, ComparisonView>();
+
 
         private ObservableCollection<VisualizationViewModel> _visualizationViewModels = new ObservableCollection<VisualizationViewModel>();
         public ObservableCollection<VisualizationViewModel> VisualizationViewModels
@@ -740,19 +746,25 @@ namespace PanoramicDataWin8.controller.view
                 }
             }
         }
+        
+
+        private void ComparisonViews_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
 
         private double boundHorizontalDistance(Rct b1, Rct b2)
         {
             return Math.Min(Math.Abs(b1.Right - b2.Left), Math.Abs(b1.Left - b2.Right));
         }
 
-        public ObservableDictionary<InputVisualizationViewModel, InputVisualizationView> InputVisualizationViews = new ObservableDictionary<InputVisualizationViewModel, InputVisualizationView>();
+        
         private void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var current = sender as VisualizationViewModel;
             if (e.PropertyName == current.GetPropertyName(() => current.Position))
             {
-                // check if we need to create new setoperation views
+                // check if we need to create new inputvisualization views
                 foreach (var other in VisualizationViewModels.Where(c => c != null))
                 {
                     var diff = current.Position - other.Position;

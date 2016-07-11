@@ -87,7 +87,7 @@ namespace PanoramicDataWin8.view.vis.render
             _classfierResultDescriptionModel = _resultModel.ResultDescriptionModel as ClassfierResultDescriptionModel;
         }
 
-        private bool _testResult = false;
+        private bool? _testResult = null;
         public async void ProcessStroke(List<Windows.Foundation.Point> stroke, bool isErase)
         {
             if (stroke.Count > 5)
@@ -161,13 +161,13 @@ namespace PanoramicDataWin8.view.vis.render
                         new JProperty("type", "test"),
                         new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Name),
                         new JProperty("uuid", ""),
-                        new JProperty("features", f),
+                        new JProperty("features", f.ToString()),
                         new JProperty("feature_dimensions", _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(fi => fi.InputModel.Name).ToList()));
                     request["uuid"] = _classfierResultDescriptionModel.Uuid;
 
                     string message = await ProgressiveGateway.Request(request);
                     JToken jToken = JToken.Parse(message);
-                    if ((double)jToken["result"] == 0)
+                    if (jToken["result"] != null && (double)jToken["result"] == 0)
                     {
                         _testResult = false;
                     }
@@ -378,7 +378,7 @@ namespace PanoramicDataWin8.view.vis.render
                                 new Vector2(
                                     (float)last.X, (float) last.Y),
                                 new Vector2(
-                                    (float)pt.X, (float)pt.Y), _testResult ? brush : blue, 3f);
+                                    (float)pt.X, (float)pt.Y), !_testResult.HasValue ? _textColor : (_testResult.Value ? brush : blue), 3f);
                             last = pt;
                         }
                     }
