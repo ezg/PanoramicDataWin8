@@ -127,10 +127,10 @@ namespace PanoramicDataWin8.view.vis
                     {
                         tbPValue.Text = "p > 0.05";
                     }
-                    tbPValue.FontSize = 14;
+                    tbPValue.FontSize = 16;
 
                     tbDValue.Text = "d = " + Math.Abs(d).ToString("F2");
-                    tbDValue.FontSize = 14;
+                    tbDValue.FontSize = 16;
                 }
             }
         }
@@ -281,8 +281,8 @@ namespace PanoramicDataWin8.view.vis
             var lineFrom = (new Pt(left.Bounds.Right, left.Bounds.Center.Y) - _model.Position).GetWindowsPoint();
             var lineTo = (new Pt(right.Bounds.Left, right.Bounds.Center.Y) - _model.Position).GetWindowsPoint();
 
-            _model.Size = new Vec(80,80);
-            var size = 80;
+            _model.Size = new Vec(100,100);
+            var size = 100;
             brushRectangle.Width = size;
             brushRectangle.Height = size;
             brushRectangle.Fill = Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush;

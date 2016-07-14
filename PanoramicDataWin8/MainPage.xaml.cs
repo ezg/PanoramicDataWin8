@@ -52,6 +52,7 @@ namespace PanoramicDataWin8
     {
         private PointerManager _mainPointerManager = new PointerManager();
         private Point _mainPointerManagerPreviousPoint = new Point();
+        private double _length = 1;
         private DispatcherTimer _messageTimer = new DispatcherTimer();
 
         private TileMenuItemView _inputMenu = null;
@@ -408,6 +409,14 @@ namespace PanoramicDataWin8
                 GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(this);
                 _mainPointerManagerPreviousPoint = gt.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position);
             }
+            else if (e.NumActiveContacts == 2)
+            {
+                GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(this);
+                var p1 = gt.TransformPoint(e.CurrentContacts.Values.ToList()[0].Position);
+                var p2 = gt.TransformPoint(e.CurrentContacts.Values.ToList()[1].Position);
+                _mainPointerManagerPreviousPoint = ((p1.GetVec() + p2.GetVec()) /2.0).GetWindowsPoint();
+                _length = (p1.GetVec() - p2.GetVec()).Length;
+            }
         }
 
         void mainPointerManager_Moved(object sender, PointerManagerEvent e)
@@ -433,10 +442,43 @@ namespace PanoramicDataWin8
 
                 _mainPointerManagerPreviousPoint = currentPoint;
             }
+            else if (e.NumActiveContacts == 2)
+            {
+                GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(this);
+                var p1 = gt.TransformPoint(e.CurrentContacts.Values.ToList()[0].Position);
+                var p2 = gt.TransformPoint(e.CurrentContacts.Values.ToList()[1].Position);
+
+                var currentPoint = ((p1.GetVec() + p2.GetVec()) / 2.0).GetWindowsPoint();
+                var currentLength = (p1.GetVec() - p2.GetVec()).Length;
+
+                var s = currentLength / _length;
+
+                Vec delta = _mainPointerManagerPreviousPoint.GetVec() - currentPoint.GetVec();
+
+                MatrixTransform xform = MainViewController.Instance.InkableScene.RenderTransform as MatrixTransform;
+                Mat matrix = xform.Matrix;
+                matrix =
+                    Mat.Translate(currentPoint.X, currentPoint.Y) *
+                    Mat.Scale(s, s) *
+                    Mat.Translate(-currentPoint.X, -currentPoint.Y) *
+                    matrix;
+                MainViewController.Instance.InkableScene.RenderTransform = new MatrixTransform()
+                {
+                    Matrix = matrix
+                };
+
+                _mainPointerManagerPreviousPoint = currentPoint;
+                _length = currentLength;
+            }
         }
 
-        void mainPointerManager_Removed(object sender, PointerManagerEvent e)
+        private void mainPointerManager_Removed(object sender, PointerManagerEvent e)
         {
+            if (e.NumActiveContacts == 1)
+            {
+                GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(this);
+                _mainPointerManagerPreviousPoint = gt.TransformPoint(e.CurrentContacts.Values.ToList()[0].Position);
+            }
         }
 
         private void addJobButton_Click(object sender, RoutedEventArgs e)
