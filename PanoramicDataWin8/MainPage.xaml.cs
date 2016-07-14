@@ -156,6 +156,10 @@ namespace PanoramicDataWin8
                     msgTextBlock.Opacity = 1;
                     _messageTimer.Start();
                 }
+                else if (e.Key == Windows.System.VirtualKey.L)
+                {
+                    MainViewController.Instance.LoadCatalog();
+                }
                 if (e.Key == Windows.System.VirtualKey.Number1)
                 {
                     MainViewController.Instance.MainModel.GraphRenderOption = GraphRenderOptions.Grid;
@@ -323,6 +327,8 @@ namespace PanoramicDataWin8
                 fingerAndPenCanvas.Children.Remove(_deviceRenderings[e.Pointer.PointerId]);
                 _deviceRenderings.Remove(e.Pointer.PointerId);
             }
+
+            MainViewController.Instance.UpdateJobStatus();
         }
 
         private void InkableScene_PointerMoved(object sender, PointerRoutedEventArgs e)

@@ -79,6 +79,19 @@ namespace PanoramicDataWin8.controller.data.progressive
                 }));
         }
 
+        public override void HaltJob(QueryModel queryModel)
+        {
+            ActiveJobs[queryModel].Stop();
+            ActiveJobs[queryModel].JobUpdate -= job_JobUpdate;
+            ActiveJobs[queryModel].JobCompleted -= job_JobCompleted;
+            ActiveJobs.Remove(queryModel);
+        }
+
+        public override void ResumeJob(QueryModel queryModel)
+        {
+            ExecuteQuery(queryModel);
+        }
+
         public override void ExecuteQuery(QueryModel queryModel)
         {
             if (ExecuteQueryEvent != null)

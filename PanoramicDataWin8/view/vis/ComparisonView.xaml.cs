@@ -18,6 +18,7 @@ using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
+using WinRTXamlToolkit.Tools;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -94,15 +95,104 @@ namespace PanoramicDataWin8.view.vis
             if (res1 != null && res2 != null)
             {
                 var dim = _model.VisualizationViewModels[0].QueryModel.GetUsageInputOperationModel(InputUsage.X).First();
-                var n1 = res1.OverallCount[dim.InputModel.Name];
-                var n2 = res2.OverallCount[dim.InputModel.Name];
-                var m1 = res1.OverallMeans[dim.InputModel.Name];
-                var m2 = res2.OverallMeans[dim.InputModel.Name];
-                var v1 = Math.Sqrt(res1.OverallSampleStandardDeviations[dim.InputModel.Name]);
-                var v2 = Math.Sqrt(res2.OverallSampleStandardDeviations[dim.InputModel.Name]);
+                if (_model.VisualizationViewModels[1].QueryModel.GetUsageInputOperationModel(InputUsage.X).Any(i => i.InputModel == dim.InputModel))
+                {
+                    var n1 = res1.OverallCount[dim.InputModel.Name];
+                    var n2 = res2.OverallCount[dim.InputModel.Name];
+                    var m1 = res1.OverallMeans[dim.InputModel.Name];
+                    var m2 = res2.OverallMeans[dim.InputModel.Name];
+                    var v1 = Math.Sqrt(res1.OverallSampleStandardDeviations[dim.InputModel.Name]);
+                    var v2 = Math.Sqrt(res2.OverallSampleStandardDeviations[dim.InputModel.Name]);
 
-                var t = (m1 - m2)/Math.Sqrt((v1/n1) + (v2/n2));
+                    var df = Math.Min(n1, n2);
+                    var t = (m1 - m2)/Math.Sqrt((v1/n1) + (v2/n2));
+                    var p = tToP(t, df);
+
+                    var r = Math.Sqrt((t * t) / ((t * t) + (df * 1)));
+                    var d = (t * 2) / (Math.Sqrt(df));
+
+                    if (p < 0.001)
+                    {
+                        tbPValue.Text = "p < 0.001";
+                    }
+                    else if (p < 0.01)
+                    {
+                        tbPValue.Text = "p < 0.01";
+                    }
+                    else if (p < 0.05)
+                    {
+                        tbPValue.Text = "p < 0.05";
+                    }
+                    else if (p >= 0.05)
+                    {
+                        tbPValue.Text = "p > 0.05";
+                    }
+                    tbPValue.FontSize = 14;
+
+                    tbDValue.Text = "d = " + Math.Abs(d).ToString("F2");
+                    tbDValue.FontSize = 14;
+                }
             }
+        }
+
+        private double tToP(double t, double df)
+        {
+            var abst = Math.Abs(t);
+            var tsq = t*t;
+            var p = 0.0;
+            if (df == 1)
+            {
+                p = 1 - 2.0*Math.Atan(abst)/Math.PI;
+            }
+            else if (df == 2)
+                p = 1 - abst/Math.Sqrt(tsq + 2);
+            else if (df == 3)
+                p = 1 - 2*(Math.Atan(abst/Math.Sqrt(3)) + abst*Math.Sqrt(3)/(tsq + 3))/Math.PI;
+            else if (df == 4)
+                p = 1 - abst*(1 + 2/(tsq + 4))/Math.Sqrt(tsq + 4);
+            else
+            {
+                var z = tToZ(abst, df);
+                if (df > 4)
+                    p = normP(z);
+            }
+            return p;
+        }
+
+        private double tToZ(double t, double df)
+        {
+            var A9 = df - 0.5;
+            var B9 = 48*A9*A9;
+            var T9 = t*t/df;
+            var Z8 = 0.0;
+            var P7 = 0.0;
+            var B7 = 0.0;
+            var z = 0.0;
+
+            if (T9 >= 0.04)
+                Z8 = A9*Math.Log(1 + T9);
+            else
+            {
+                Z8 = A9*(((1 - T9*0.75)*T9/3 - 0.5)*T9 + 1)*T9;
+            }
+            P7 = ((0.4 * Z8 + 3.3) * Z8 + 24) * Z8 + 85.5;
+            B7 = 0.8 * Math.Pow(Z8, 2) + 100 + B9;
+            z = (1 + (-P7 / B7 + Z8 + 3) / B9) * Math.Sqrt(Z8);
+            return z;
+        }
+
+        private double normP(double z)
+        {
+            var absz = Math.Abs(z);
+            var a1 = 0.0000053830;
+            var a2 = 0.0000488906;
+            var a3 = 0.0000380036;
+            var a4 = 0.0032776263;
+            var a5 = 0.0211410061;
+            var a6 = 0.0498673470;
+            var p = (((((a1*absz + a2)*absz + a3)*absz + a4)*absz + a5)*absz + a6)*absz + 1;
+            p = Math.Pow(p, -16);
+            return p;
         }
 
         private void VisModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

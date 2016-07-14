@@ -141,7 +141,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                         new JProperty("task", null));
                     string message = await ProgressiveGateway.Request(lookupData);
 
-                    if (message != "None" && message != "null" && message != "\"None\"")
+                     if (message != "None" && message != "null" && message != "\"None\"")
                     {
                         JObject result = JObject.Parse(message);
 
@@ -201,7 +201,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             resultDescriptionModel.NullCount = nullCount;
             resultDescriptionModel.OverallMeans = binStruct["overallMeans"].ToObject<Dictionary<string, double>>();
             resultDescriptionModel.OverallCount = binStruct["overallCount"].ToObject<Dictionary<string, double>>();
-            resultDescriptionModel.OverallPowerSumAverage = binStruct["overallPowerSumAverage"].ToObject<Dictionary<string, double>>();
+            resultDescriptionModel.OverallSumOfSquares = binStruct["overallSumOfSquares"].ToObject<Dictionary<string, double>>();
             resultDescriptionModel.OverallSampleStandardDeviations = binStruct["overallSampleStandardDeviations"].ToObject<Dictionary<string, double>>();
             JObject bins = (JObject)binStruct["bins"];
             JArray binRanges = (JArray)binStruct["binRanges"];

@@ -174,10 +174,9 @@ namespace PanoramicDataWin8.controller.view
 
                     MainModel.Ip = ip;
 
-                    string message = await ProgressiveGateway.Request(new JObject(new JProperty("type", "catalog")));
-                    parsePgCatalogResponse(message);
-                    
-                    message = await ProgressiveGateway.Request(new JObject(new JProperty("type", "tasks")));
+                    LoadCatalog();
+
+                    string message = await ProgressiveGateway.Request(new JObject(new JProperty("type", "tasks")));
                     parsePgTaskResponse(message);
 
                 }
@@ -223,6 +222,12 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
+        public async void LoadCatalog()
+        {
+            string message = await ProgressiveGateway.Request(new JObject(new JProperty("type", "catalog")));
+            parsePgCatalogResponse(message);
+        }
+
         private async void parsePgCatalogResponse(string e)
         {
             var installedLoc = Package.Current.InstalledLocation;
@@ -242,7 +247,7 @@ namespace PanoramicDataWin8.controller.view
                 .First(l => l.ToLower().StartsWith("samplesize"))
                 .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
 
-            JToken jToken = JToken.Parse(e);
+            JToken jToken = JToken.Parse(e );
 
             List<DatasetConfiguration> dataSets = new List<DatasetConfiguration>();
             foreach (var child in jToken)
@@ -258,6 +263,7 @@ namespace PanoramicDataWin8.controller.view
                 };
                 dataSets.Add(dataSetConfig);
             }
+            _mainModel.DatasetConfigurations.Clear();
             foreach (var ds in dataSets)
             {
                 ds.ThrottleInMillis = throttle;
@@ -786,6 +792,7 @@ namespace PanoramicDataWin8.controller.view
             var current = sender as VisualizationViewModel;
             if (e.PropertyName == current.GetPropertyName(() => current.Position))
             {
+
                 // update last moved time
                 _lastMoved[current] = DateTime.Now;
 
@@ -1098,6 +1105,26 @@ namespace PanoramicDataWin8.controller.view
                 if (!consumed)
                 {
                     _root.Add(e.InkStroke);
+                }
+            }
+        }
+
+        public void UpdateJobStatus()
+        {
+            foreach (var current in VisualizationViewModels.ToArray())
+            {
+                // check if we need to halt or resume the job
+                var tg = InkableScene.TransformToVisual(MainPage);
+                var tt = tg.TransformBounds(current.Bounds);
+
+                if (!MainPage.GetBounds().IntersectsWith(tt) && _mainModel.SchemaModel.QueryExecuter.IsJobRunning(current.QueryModel))
+                {
+                    _mainModel.SchemaModel.QueryExecuter.HaltJob(current.QueryModel);
+                }
+                else if (MainPage.GetBounds().IntersectsWith(tt) &&
+                         !_mainModel.SchemaModel.QueryExecuter.IsJobRunning(current.QueryModel))
+                {
+                    _mainModel.SchemaModel.QueryExecuter.ResumeJob(current.QueryModel);
                 }
             }
         }
