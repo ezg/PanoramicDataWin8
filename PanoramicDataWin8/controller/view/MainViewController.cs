@@ -347,6 +347,11 @@ namespace PanoramicDataWin8.controller.view
 
         public void LoadData(DatasetConfiguration datasetConfiguration)
         {
+            if (_mainModel.SchemaModel != null && _mainModel.SchemaModel.QueryExecuter != null)
+            {
+                _mainModel.SchemaModel.QueryExecuter.HaltAllJobs();
+            }
+
             if (datasetConfiguration.Backend.ToLower() == "mssql")
             {
                 _mainModel.SchemaModel = null; //new MSSQLSchemaModel(datasetConfiguration);
