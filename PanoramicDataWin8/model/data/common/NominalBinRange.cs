@@ -8,6 +8,7 @@ namespace PanoramicDataWin8.model.data.common
     public class NominalBinRange : BinRange
     {
         List<string> days = new List<string>() {"Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"};
+        List<string> daysUpper = new List<string>() { "MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN" };
         List<string> months = new List<string>() { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
         private Dictionary<double, string> _labelsValue = new Dictionary<double, string>();
@@ -83,9 +84,15 @@ namespace PanoramicDataWin8.model.data.common
 
         private string getOrderingIndex(string v)
         {
+            //v = new String(v.Select((ch, index) => (index == 0) ? ch : Char.ToLower(ch)).ToArray());
+
             if (days.Contains(v))
             {
                 return days.IndexOf(v).ToString("D8");
+            }
+            if (daysUpper.Contains(v))
+            {
+                return daysUpper.IndexOf(v).ToString("D8");
             }
             if (months.Contains(v))
             {
@@ -113,7 +120,7 @@ namespace PanoramicDataWin8.model.data.common
 
         public override int GetDisplayIndex(double value)
         {
-            var ordered = _labelsValue.OrderBy(kvp => kvp.Value).Select(kvp => kvp.Key).ToList().IndexOf(value);
+            var ordered = _labelsValue.OrderBy(kvp => this.getOrderingIndex(kvp.Value)).Select(kvp => kvp.Key).ToList().IndexOf(value);
             var index = _labelsValue.Keys.ToList().IndexOf((int)Math.Floor((value - this.MinValue) / this.Step));
             if (ordered == -1)
             {
