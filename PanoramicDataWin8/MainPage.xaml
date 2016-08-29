@@ -101,10 +101,11 @@
         </Grid>
 
         <Canvas Name="fingerAndPenCanvas"></Canvas>
+        <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5"  Text="Build 1.005" Foreground="{StaticResource darkBrush}" FontSize="10"></TextBlock>
     </Grid>
 
     <Page.BottomAppBar >
-        <CommandBar Name="commandBar" IsSticky="False">
+        <CommandBar Name="commandBar" IsSticky="False" Background="White">
             <CommandBar.SecondaryCommands >
             </CommandBar.SecondaryCommands>
         </CommandBar>

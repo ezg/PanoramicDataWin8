@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GeoAPI.Geometries;
-using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 
-namespace PanoramicDataWin8.model.data.tuppleware
+namespace PanoramicDataWin8.model.data
 {
     public class TaskModel : ExtendedBindableBase
     {

@@ -15,7 +15,7 @@ namespace PanoramicDataWin8.controller.data.sim
         public override void ExecuteQuery(QueryModel queryModel)
         {
             queryModel.ResultModel.ResultItemModels = new ObservableCollection<ResultItemModel>();
-            queryModel.ResultModel.FireResultModelUpdated();
+            queryModel.ResultModel.FireResultModelUpdated(ResultType.Clear);
 
             if (ActiveJobs.ContainsKey(queryModel))
             {
@@ -44,6 +44,8 @@ namespace PanoramicDataWin8.controller.data.sim
 
         void simJob_JobCompleted(object sender, EventArgs e)
         {
+            DataJob dataJob = sender as DataJob;
+            dataJob.QueryModel.ResultModel.FireResultModelUpdated(ResultType.Complete);
         }
 
         void simJob_JobUpdate(object sender, JobEventArgs jobEventArgs)
@@ -118,7 +120,7 @@ namespace PanoramicDataWin8.controller.data.sim
 
             dataJob.QueryModel.ResultModel.Progress = jobEventArgs.Progress;
             dataJob.QueryModel.ResultModel.ResultDescriptionModel = jobEventArgs.ResultDescriptionModel;
-            dataJob.QueryModel.ResultModel.FireResultModelUpdated();
+            dataJob.QueryModel.ResultModel.FireResultModelUpdated(ResultType.Update);
         }
     }
 }

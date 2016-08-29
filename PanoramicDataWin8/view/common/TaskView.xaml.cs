@@ -21,6 +21,7 @@ using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
 using System.Diagnostics;
 using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.view.inq;
 

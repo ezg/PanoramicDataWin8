@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Practices.Prism.Mvvm;
-using PanoramicDataWin8.controller.input;
-using PanoramicDataWin8.utils;
-namespace PanoramicDataWin8.model.data.tuppleware
+﻿using System.Collections.ObjectModel;
+
+namespace PanoramicDataWin8.model.data
 {
     public class TaskGroupModel : TaskModel
     {

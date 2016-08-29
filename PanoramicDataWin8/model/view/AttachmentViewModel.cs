@@ -297,6 +297,7 @@ namespace PanoramicDataWin8.model.view
 
         void createLogregLeft()
         {
+            return;
             AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
             {
                 InputUsage = InputUsage.Label,
@@ -450,11 +451,11 @@ namespace PanoramicDataWin8.model.view
         {
             // value
             var intensityHeader = createValueAttachmentHeader();
-            AttachmentHeaderViewModels.Add(intensityHeader);
+            //AttachmentHeaderViewModels.Add(intensityHeader);
 
             // grouping
             var groupHeader = createGroupingAttachmentHeader();
-            AttachmentHeaderViewModels.Add(groupHeader);
+            //AttachmentHeaderViewModels.Add(groupHeader);
         }
 
         AttachmentHeaderViewModel createValueAttachmentHeader()

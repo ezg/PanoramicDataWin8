@@ -31,7 +31,12 @@ namespace PanoramicDataWin8.model.data.common
             }
         }
 
-        private QuantitativeBinRange(double dataMinValue, double dataMaxValue, double targetBinNumber, bool isIntegerRange)
+        public QuantitativeBinRange()
+        {
+            
+        }
+
+        public QuantitativeBinRange(double dataMinValue, double dataMaxValue, double targetBinNumber, bool isIntegerRange)
         {
             DataMinValue = dataMinValue;
             DataMaxValue = dataMaxValue;

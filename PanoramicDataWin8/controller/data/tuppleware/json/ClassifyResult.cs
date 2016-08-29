@@ -9,7 +9,8 @@ namespace PanoramicDataWin8.controller.data.tuppleware.json
     public class ClassifyResult
     {
         public double fp { get; set; }
-        public double f1 { get; set; }
+        public List<double> f1 { get; set; }
+        public List<double> progress { get; set; }
         public double auc { get; set; }
         public double recall { get; set; }
         public double precision { get; set; }

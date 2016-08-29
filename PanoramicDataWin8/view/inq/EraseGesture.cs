@@ -57,7 +57,7 @@ namespace PanoramicDataWin8.view.inq
                         p.StrokeThickness = 5;
                         _inkableScene.Add(p);*/
 
-                        if (inkStrokeLine.Intersects(geom))
+                        if (inkStrokeLine.Intersects(geom) && !geom.Contains(inkStrokeLine))
                         {
                             _hitScribbables.Add(existingScribbable);
                         }

@@ -1,0 +1,403 @@
+{'binRanges': [{'dataMaxValue': 46.600000000000001, 'maxValue': 50.0, 'minValue': 5.0, 'step': 5.0, 'dataMinValue': 9.0, 'targetBinNumber': 10.0, 'isIntegerRange': False, 'type': 'QuantitativeBinRange'}, {'dataMaxValue': 0.0, 'maxValue': 0, 'minValue': 0, 'dataMinValue': 0.0, 'targetBinNumber': 0.0, 'type': 'AggregatedBinRange'}], 'nullCount': 0, 'bins': {'[7, 0]': {'marginsAbsolute': {'mpg': {'Count': {0: 0, 1: 14.462489208271514}}}, 'counts': {'mpg': {'Count': {0: 0.0, 1: 10570.0}}}, 'values': {'mpg': {'Count': {0: 0.0, 1: 20326.923076923078}}}, 'countsInterpolated': {'mpg': {'Count': {0: 0.0, 1: 40653.846153846156}}}, 'margins': {'mpg': {'Count': {0: 0, 1: 0.00035574713284300787}}}}, '[3, 0]': {'marginsAbsolute': {'mpg': {'Count': {0: 0, 1: 414.21394854305896}}}, 'counts': {'mpg': {'Count': {0: 0.0, 1: 106032.0}}}, 'values': {'mpg': {'Count': {0: 0.0, 1: 203907.6923076923}}}, 'countsInterpolated': {'mpg': {'Count': {0: 0.0, 1: 407815.3846153846}}}, 'margins': {'mpg': {'Count': {0: 0, 1: 0.0010156898542062333}}}}, '[8, 0]': {'marginsAbsolute': {'mpg': {'Count': {0: 0, 1: 0.010358759274497321}}}, 'counts': {'mpg': {'Count': {0: 0.0, 1: 84.0}}}, 'values': {'mpg': {'Count': {0: 0.0, 1: 161.53846153846152}}}, 'countsInterpolated': {'mpg': {'Count': {0: 0.0, 1: 323.07692307692304}}}, 'margins': {'mpg': {'Count': {0: 0, 1: 3.2062826325825045e-05}}}}, '[6, 0]': {'marginsAbsolute': {'mpg': {'Count': {0: 0, 1: 102.44365776521408}}}, 'counts': {'mpg': {'Count': {0: 0.0, 1: 39760.0}}}, 'values': {'mpg': {'Count': {0: 0.0, 1: 76461.53846153845}}}, 'countsInterpolated': {'mpg': {'Count': {0: 0.0, 1: 152923.0769230769}}}, 'margins': {'mpg': {'Count': {0: 0, 1: 0.0006699031946417421}}}}, '[5, 0]': {'marginsAbsolute': {'mpg': {'Count': {0: 0, 1: 237.2337352157406}}}, 'counts': {'mpg': {'Count': {0: 0.0, 1: 71182.0}}}, 'values': {'mpg': {'Count': {0: 0.0, 1: 136888.46153846153}}}, 'countsInterpolated': {'mpg': {'Count': {0: 0.0, 1: 273776.92307692306}}}, 'margins': {'mpg': {'Count': {0: 0, 1: 0.0008665220302336625}}}}, '[2, 0]': {'marginsAbsolute': {'mpg': {'Count': {0: 0, 1: 391.88465100868285}}}, 'counts': {'mpg': {'Count': {0: 0.0, 1: 101844.0}}}, 'values': {'mpg': {'Count': {0: 0.0, 1: 195853.84615384616}}}, 'countsInterpolated': {'mpg': {'Count': {0: 0.0, 1: 391707.6923076923}}}, 'margins': {'mpg': {'Count': {0: 0, 1: 0.0010004517621289182}}}}, '[1, 0]': {'marginsAbsolute': {'mpg': {'Count': {0: 0, 1: 244.047708596731}}}, 'counts': {'mpg': {'Count': {0: 0.0, 1: 72616.0}}}, 'values': {'mpg': {'Count': {0: 0.0, 1: 139646.15384615384}}}, 'countsInterpolated': {'mpg': {'Count': {0: 0.0, 1: 279292.3076923077}}}, 'margins': {'mpg': {'Count': {0: 0, 1: 0.0008738074836833489}}}}, '[4, 0]': {'marginsAbsolute': {'mpg': {'Count': {0: 0, 1: 477.019185061521}}}, 'counts': {'mpg': {'Count': {0: 0.0, 1: 117602.0}}}, 'values': {'mpg': {'Count': {0: 0.0, 1: 226157.6923076923}}}, 'countsInterpolated': {'mpg': {'Count': {0: 0.0, 1: 452315.3846153846}}}, 'margins': {'mpg': {'Count': {0: 0, 1: 0.001054616317035386}}}}, '[0, 0]': {'marginsAbsolute': {'mpg': {'Count': {0: 0, 1: 0.07338232349111569}}}, 'counts': {'mpg': {'Count': {0: 0.0, 1: 310.0}}}, 'values': {'mpg': {'Count': {0: 0.0, 1: 596.1538461538462}}}, 'countsInterpolated': {'mpg': {'Count': {0: 0.0, 1: 1192.3076923076924}}}, 'margins': {'mpg': {'Count': {0: 0, 1: 6.154646486351638e-05}}}}}}{
+  "binRanges": [
+    {
+      "dataMaxValue": 46.600000000000001, 
+      "maxValue": 50.0, 
+      "minValue": 5.0, 
+      "step": 5.0, 
+      "dataMinValue": 9.0, 
+      "targetBinNumber": 10.0, 
+      "isIntegerRange": false, 
+      "type": "QuantitativeBinRange"
+    }, 
+    {
+      "dataMaxValue": 0.0, 
+      "maxValue": 0, 
+      "minValue": 0, 
+      "dataMinValue": 0.0, 
+      "targetBinNumber": 0.0, 
+      "type": "AggregatedBinRange"
+    }
+  ], 
+  "nullCount": 0, 
+  "bins": {
+    "[7, 0]": {
+      "marginsAbsolute": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 14.462489208271514
+          }
+        }
+      }, 
+      "counts": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 10570.0
+          }
+        }
+      }, 
+      "values": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 20326.923076923078
+          }
+        }
+      }, 
+      "countsInterpolated": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 40653.846153846156
+          }
+        }
+      }, 
+      "margins": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 0.00035574713284300787
+          }
+        }
+      }
+    }, 
+    "[3, 0]": {
+      "marginsAbsolute": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 414.21394854305896
+          }
+        }
+      }, 
+      "counts": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 106032.0
+          }
+        }
+      }, 
+      "values": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 203907.6923076923
+          }
+        }
+      }, 
+      "countsInterpolated": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 407815.3846153846
+          }
+        }
+      }, 
+      "margins": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 0.0010156898542062333
+          }
+        }
+      }
+    }, 
+    "[8, 0]": {
+      "marginsAbsolute": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 0.010358759274497321
+          }
+        }
+      }, 
+      "counts": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 84.0
+          }
+        }
+      }, 
+      "values": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 161.53846153846152
+          }
+        }
+      }, 
+      "countsInterpolated": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 323.07692307692304
+          }
+        }
+      }, 
+      "margins": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 3.2062826325825045e-05
+          }
+        }
+      }
+    }, 
+    "[6, 0]": {
+      "marginsAbsolute": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 102.44365776521408
+          }
+        }
+      }, 
+      "counts": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 39760.0
+          }
+        }
+      }, 
+      "values": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 76461.53846153845
+          }
+        }
+      }, 
+      "countsInterpolated": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 152923.0769230769
+          }
+        }
+      }, 
+      "margins": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 0.0006699031946417421
+          }
+        }
+      }
+    }, 
+    "[5, 0]": {
+      "marginsAbsolute": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 237.2337352157406
+          }
+        }
+      }, 
+      "counts": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 71182.0
+          }
+        }
+      }, 
+      "values": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 136888.46153846153
+          }
+        }
+      }, 
+      "countsInterpolated": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 273776.92307692306
+          }
+        }
+      }, 
+      "margins": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 0.0008665220302336625
+          }
+        }
+      }
+    }, 
+    "[2, 0]": {
+      "marginsAbsolute": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 391.88465100868285
+          }
+        }
+      }, 
+      "counts": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 101844.0
+          }
+        }
+      }, 
+      "values": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 195853.84615384616
+          }
+        }
+      }, 
+      "countsInterpolated": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 391707.6923076923
+          }
+        }
+      }, 
+      "margins": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 0.0010004517621289182
+          }
+        }
+      }
+    }, 
+    "[1, 0]": {
+      "marginsAbsolute": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 244.047708596731
+          }
+        }
+      }, 
+      "counts": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 72616.0
+          }
+        }
+      }, 
+      "values": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 139646.15384615384
+          }
+        }
+      }, 
+      "countsInterpolated": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 279292.3076923077
+          }
+        }
+      }, 
+      "margins": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 0.0008738074836833489
+          }
+        }
+      }
+    }, 
+    "[4, 0]": {
+      "marginsAbsolute": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 477.019185061521
+          }
+        }
+      }, 
+      "counts": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 117602.0
+          }
+        }
+      }, 
+      "values": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 226157.6923076923
+          }
+        }
+      }, 
+      "countsInterpolated": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 452315.3846153846
+          }
+        }
+      }, 
+      "margins": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 0.001054616317035386
+          }
+        }
+      }
+    }, 
+    "[0, 0]": {
+      "marginsAbsolute": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 0.07338232349111569
+          }
+        }
+      }, 
+      "counts": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 310.0
+          }
+        }
+      }, 
+      "values": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 596.1538461538462
+          }
+        }
+      }, 
+      "countsInterpolated": {
+        "mpg": {
+          "Count": {
+            "0": 0.0, 
+            "1": 1192.3076923076924
+          }
+        }
+      }, 
+      "margins": {
+        "mpg": {
+          "Count": {
+            "0": 0, 
+            "1": 6.154646486351638e-05
+          }
+        }
+      }
+    }
+  }
+}

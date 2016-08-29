@@ -24,16 +24,18 @@ using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
+using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.view.vis.menu;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public sealed partial class ClassifierRenderer : Renderer
+    public sealed partial class ClassifierRenderer : Renderer, IScribbable
     {
         private MenuViewModel _menuViewModel = null;
         private MenuView _menuView = null;
+        private int _currentViewIndex = 0;
 
         private ClassifierRendererContentProvider _classifierRendererContentProvider = new ClassifierRendererContentProvider();
 
@@ -73,11 +75,20 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 ((VisualizationViewModel) DataContext).PropertyChanged += VisualizationViewModel_PropertyChanged;
                 ((VisualizationViewModel) DataContext).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
+                ((VisualizationViewModel)DataContext).QueryModel.RequestRender += PlotRenderer_RequestRender;
                 ResultModel resultModel = ((VisualizationViewModel) DataContext).QueryModel.ResultModel;
                 resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
                 mainLabel.Text = ((VisualizationViewModel) DataContext).QueryModel.VisualizationType.ToString();
                 mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
                 tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
+            }
+        }
+
+        private void PlotRenderer_RequestRender(object sender, EventArgs e)
+        {
+            if (DataContext != null && (DataContext as VisualizationViewModel).QueryModel.ResultModel != null)
+            {
+                render();
             }
         }
 
@@ -224,7 +235,9 @@ namespace PanoramicDataWin8.view.vis.render
         {
             VisualizationViewModel model = ((VisualizationViewModel) DataContext);
             ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel) model.QueryModel.ResultModel.ResultDescriptionModel);
-            _classifierRendererContentProvider.UpdateData(resultModel, model.QueryModel.Clone(), descriptionModel.Labels.Count > 1 ? -1 : 0);
+            int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
+            _currentViewIndex = (_currentViewIndex) % max;
+            _classifierRendererContentProvider.UpdateData(resultModel, model.QueryModel, model.QueryModel.Clone(), _currentViewIndex);
 
             render(); render();
         }
@@ -330,22 +343,11 @@ namespace PanoramicDataWin8.view.vis.render
             if (model.QueryModel.ResultModel != null && model.QueryModel.ResultModel.ResultDescriptionModel != null)
             {
                 ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel) model.QueryModel.ResultModel.ResultDescriptionModel);
+                int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
+                
+                _currentViewIndex = (_currentViewIndex + 1) % max;
+                _classifierRendererContentProvider.ViewIndex = _currentViewIndex;
 
-                if (descriptionModel.Labels.Count > 1)
-                {
-                    if (_classifierRendererContentProvider.LabelIndex + 1 == descriptionModel.Labels.Count)
-                    {
-                        _classifierRendererContentProvider.LabelIndex = -1;
-                    }
-                    else
-                    {
-                        _classifierRendererContentProvider.LabelIndex += 1;
-                    }
-                }
-                else
-                {
-                    _classifierRendererContentProvider.LabelIndex = (_classifierRendererContentProvider.LabelIndex + 1) % descriptionModel.Labels.Count;
-                }
                 render();
             }
             
@@ -362,6 +364,81 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 return this.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             }
+        }
+        
+
+        public bool IsDeletable
+        {
+            get { return false; }
+        }
+
+        public IGeometry Geometry
+        {
+            get
+            {
+                VisualizationViewModel model = this.DataContext as VisualizationViewModel;
+
+                Rct bounds = new Rct(model.Position, model.Size);
+                return bounds.GetPolygon();
+            }
+        }
+
+        public List<IScribbable> Children
+        {
+            get { return new List<IScribbable>(); }
+        }
+
+        public bool Consume(InkStroke inkStroke)
+        {
+            VisualizationViewModel model = ((VisualizationViewModel)DataContext);
+            ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel)model.QueryModel.ResultModel.ResultDescriptionModel);
+            int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
+            if (_currentViewIndex == max - 1)
+            {
+                GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
+                List<Windows.Foundation.Point> selectionPoints = inkStroke.Points.Select(p => gt.TransformPoint(p)).ToList();
+                _classifierRendererContentProvider.ProcessStroke(selectionPoints, inkStroke.IsErase);
+                render();
+            }
+
+            /*GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
+            List<Windows.Foundation.Point> selectionPoints = inkStroke.Points.Select(p => gt.TransformPoint(p)).ToList();
+
+            IList<Vec> convexHull = Convexhull.convexhull(selectionPoints);
+            IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon();
+
+            List<FilterModel> hits = new List<FilterModel>();
+            foreach (var geom in _plotRendererContentProvider.HitTargets.Keys)
+            {
+                if (convexHullPoly.Intersects(geom))
+                {
+                    hits.Add(_plotRendererContentProvider.HitTargets[geom]);
+                }
+            }
+            if (hits.Count > 0)
+            {
+                foreach (var valueComparison in hits[0].ValueComparisons)
+                {
+                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.Name + " " +
+                                     valueComparison.Value));
+                }
+
+                QueryModel queryModel = (DataContext as VisualizationViewModel).QueryModel;
+                var vcs = hits.SelectMany(h => h.ValueComparisons).ToList();
+
+                var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
+                var yAom = queryModel.GetUsageInputOperationModel(InputUsage.Y).First();
+
+                if (hits.Any(h => queryModel.FilterModels.Contains(h)))
+                {
+                    queryModel.RemoveFilterModels(hits);
+                }
+                else
+                {
+                    queryModel.AddFilterModels(hits);
+                }
+            }*/
+            return true;
         }
     }
 }

@@ -72,12 +72,25 @@ namespace PanoramicDataWin8.view.vis.render
             if (args.NewValue != null)
             {
                 (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
+                (DataContext as VisualizationViewModel).QueryModel.RequestRender += PlotRenderer_RequestRender;
+            }
+        }
+
+        private void PlotRenderer_RequestRender(object sender, EventArgs e)
+        {
+            if (DataContext != null && (DataContext as VisualizationViewModel).QueryModel.ResultModel != null)
+            {
+                var resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+                if (resultModel.ResultItemModels.Count > 0 || resultModel.Progress == 1.0 || resultModel.ResultType == ResultType.Complete)
+                {
+                    render();
+                }
             }
         }
 
         void QueryModel_QueryModelUpdated(object sender, QueryModelUpdatedEventArgs e)
         {
-            if (e.QueryModelUpdatedEventType == QueryModelUpdatedEventType.FilterModels)
+            if (e.QueryModelUpdatedEventType == QueryModelUpdatedEventType.FilterModels || e.QueryModelUpdatedEventType == QueryModelUpdatedEventType.ClearFilterModels)
             {
                 _plotRendererContentProvider.UpdateFilterModels((sender as QueryModel).FilterModels.ToList());
                 render();
@@ -88,6 +101,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
             _plotRendererContentProvider.UpdateData(resultModel,
+                model.QueryModel,
                 model.QueryModel.Clone(),
                 model.QueryModel.GetUsageInputOperationModel(InputUsage.X).FirstOrDefault(),
                 model.QueryModel.GetUsageInputOperationModel(InputUsage.Y).FirstOrDefault());
@@ -141,7 +155,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
             }
         }
-        
+
 
         void render(bool sizeChanged = false)
         {

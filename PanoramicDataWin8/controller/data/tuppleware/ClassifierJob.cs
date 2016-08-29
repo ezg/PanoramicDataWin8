@@ -115,7 +115,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                 await Task.Delay(50);
 
                 ClassfierResultDescriptionModel resultDescriptionModel = new ClassfierResultDescriptionModel();
-                resultDescriptionModel.Labels = labels;
+                /* //resultDescriptionModel.Labels = labels;
                 foreach (var label in labels)
                 {
                     JObject classifyResultTocken = await lookupCommand.Lookup(_originModel, classifysUuid[label], -1, -1) as JObject;
@@ -128,7 +128,7 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
                     var classifyResult = JsonConvert.DeserializeObject<ClassifyResult>(classifyResultTocken.ToString());
 
-                    resultDescriptionModel.ConfusionMatrices.Add(label, new List<List<double>>());
+                   resultDescriptionModel.ConfusionMatrices.Add(label, new List<List<double>>());
                     resultDescriptionModel.ConfusionMatrices[label].Add(new List<double>());
                     resultDescriptionModel.ConfusionMatrices[label][0].Add((double) classifyResult.tp);
                     resultDescriptionModel.ConfusionMatrices[label][0].Add((double) classifyResult.fn);
@@ -139,17 +139,17 @@ namespace PanoramicDataWin8.controller.data.tuppleware
 
                     var xs = classifyResult.fpr;
                     var ys = classifyResult.tpr;
-                    resultDescriptionModel.RocCurves.Add(label, new List<Pt>());
-                    resultDescriptionModel.RocCurves[label].Add(new Pt(0, 0));
+                    resultDescriptionModel.RocCurve.Add(label, new List<Pt>());
+                    resultDescriptionModel.RocCurve[label].Add(new Pt(0, 0));
                     var step = 1;//ys.Count() > 300 ? 50 : 1;  
 
                     if (xs != null && ys != null)
                     {
                         for (int i = 0; i < xs.Count(); i += step)
                         {
-                            resultDescriptionModel.RocCurves[label].Add(new Pt((double) xs[i], (double) ys[i]));
+                            resultDescriptionModel.RocCurve[label].Add(new Pt((double) xs[i], (double) ys[i]));
                         }
-                        resultDescriptionModel.RocCurves[label].Add(new Pt(1, 1));
+                        resultDescriptionModel.RocCurve[label].Add(new Pt(1, 1));
                     }
 
                     resultDescriptionModel.AUCs.Add(label, classifyResult.auc);
@@ -157,15 +157,15 @@ namespace PanoramicDataWin8.controller.data.tuppleware
                     resultDescriptionModel.F1s.Add(label, classifyResult.f1);
                     resultDescriptionModel.AvgF1 += classifyResult.f1;
 
-                    resultDescriptionModel.Precisions.Add(label, classifyResult.precision);
+                    resultDescriptionModel.Precision.Add(label, classifyResult.precision);
                     resultDescriptionModel.AvgPrecision += classifyResult.precision;
 
-                    resultDescriptionModel.Recalls.Add(label, classifyResult.recall);
+                    resultDescriptionModel.Recall.Add(label, classifyResult.recall);
                     resultDescriptionModel.AvRecall += classifyResult.recall;
                 }
                 resultDescriptionModel.AvgF1 /= (double)labels.Count;
                 resultDescriptionModel.AvgPrecision /= (double)labels.Count;
-                resultDescriptionModel.AvRecall /= (double)labels.Count;
+                resultDescriptionModel.AvRecall /= (double)labels.Count;*/
 
                 await fireUpdated(new List<ResultItemModel>(), 1.0, resultDescriptionModel);
                 await fireCompleted();

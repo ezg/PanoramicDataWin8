@@ -136,10 +136,10 @@ namespace PanoramicDataWin8.view.vis.render
             if (queryModel.GetUsageInputOperationModel(InputUsage.X).Any())
             {
                 var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
-                ((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), xAom)
+                ((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), xAom) 
                 {
                     IsShadow = false,
-                    BorderThicknes = new Thickness(0, 0, 0, 4),
+                    BorderThicknes = new Thickness(0, 4, 0, 0),
                     Size = new Vec(visModel.Size.X - 54, 54),
                     AttachmentOrientation = AttachmentOrientation.Top
                 };
@@ -151,7 +151,7 @@ namespace PanoramicDataWin8.view.vis.render
                     IsDraggableByPen = false,
                     IsDraggable = false,
                     IsShadow = false,
-                    BorderThicknes = new Thickness(0, 0, 0, 4),
+                    BorderThicknes = new Thickness(0, 4, 0, 0),
                     Size = new Vec(visModel.Size.X - 54, 54),
                     AttachmentOrientation = AttachmentOrientation.Top
                 };
@@ -234,72 +234,37 @@ namespace PanoramicDataWin8.view.vis.render
         private void populateData()
         {
             ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
-            //if (resultModel.ResultItemModels.Count > 0)
+
+            var contentPresenter = (ContentPresenter)GetTemplateChild("contentPresenter");
+            var mainLabel = (TextBlock)GetTemplateChild("mainLabel");
+
+            contentPresenter.Opacity = 1;
+            mainLabel.Opacity = 0;
+
+            if (resultModel.ResultItemModels.Count > 0 || resultModel.Progress == 1.0 || resultModel.ResultType == ResultType.Complete)
             {
-                /*ExponentialEase easingFunction = new ExponentialEase();
-                easingFunction.EasingMode = EasingMode.EaseInOut;
-
-                DoubleAnimation animation = new DoubleAnimation();
-                animation.Duration = TimeSpan.FromMilliseconds(100);
-                animation.From = mainLabel.Opacity;
-                animation.To = 0;
-                animation.EasingFunction = easingFunction;
-                Storyboard storyboard = new Storyboard();
-                storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, mainLabel);
-                Storyboard.SetTargetProperty(animation, "Opacity");
-                storyboard.Begin();
-
-                animation = new DoubleAnimation();
-                animation.Duration = TimeSpan.FromMilliseconds(100);
-                animation.From = contentGrid.Opacity;
-                animation.To = 1;
-                animation.EasingFunction = easingFunction;
-                storyboard = new Storyboard();
-                storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, contentGrid);
-                Storyboard.SetTargetProperty(animation, "Opacity");
-                storyboard.Begin();*/
-
-                var contentGrid = (Grid)GetTemplateChild("contentGrid");
-                var mainLabel = (TextBlock)GetTemplateChild("mainLabel");
-                
-                contentGrid.Opacity = 1;
-                mainLabel.Opacity = 0;
-
                 loadResultItemModels(resultModel);
                 render();
             }
-            /*else
+
+            var animationGrid = (Grid)GetTemplateChild("animationGrid");
+            var progressGrid = (Grid)GetTemplateChild("progressGrid");
+            /*if (MainViewController.Instance.MainModel.Mode == Mode.batch &&
+                resultModel.ResultType == ResultType.Clear &&
+                ((VisualizationViewModel)DataContext).QueryModel.GetUsageInputOperationModel(InputUsage.X).Any() &&
+                ((VisualizationViewModel)DataContext).QueryModel.GetUsageInputOperationModel(InputUsage.Y).Any())
             {
-                // animate between render canvas and label
-                ExponentialEase easingFunction = new ExponentialEase();
-                easingFunction.EasingMode = EasingMode.EaseInOut;
 
-                DoubleAnimation animation = new DoubleAnimation();
-                animation.Duration = TimeSpan.FromMilliseconds(300);
-                animation.From = mainLabel.Opacity;
-                animation.To = 1;
-                animation.EasingFunction = easingFunction;
-                Storyboard storyboard = new Storyboard();
-                storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, mainLabel);
-                Storyboard.SetTargetProperty(animation, "Opacity");
-                storyboard.Begin();
-
-                animation = new DoubleAnimation();
-                animation.Duration = TimeSpan.FromMilliseconds(300);
-                animation.From = contentGrid.Opacity;
-                animation.To = 0;
-                animation.EasingFunction = easingFunction;
-                storyboard = new Storyboard();
-                storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, contentGrid);
-                Storyboard.SetTargetProperty(animation, "Opacity");
-                storyboard.Begin();
-                contentGrid.Opacity = 0;
-                mainLabel.Opacity = 1;
-            }*/
+                animationGrid.Opacity = 1.0;
+                contentPresenter.Opacity = 0.0;
+                progressGrid.Opacity = 0.0;
+            }
+            else*/
+            {
+                animationGrid.Opacity = 0.0;
+                contentPresenter.Opacity = 1.0;
+                progressGrid.Opacity = 1.0;
+            }
         }
 
         private void loadResultItemModels(ResultModel resultModel)

@@ -18,6 +18,13 @@ namespace PanoramicDataWin8.model.data.result
             }
         }
 
+        public Dictionary<string, double> OverallMeans { get; set; } = new Dictionary<string, double>();
+        public Dictionary<string, double> OverallCount { get; set; } = new Dictionary<string, double>();
+
+        public Dictionary<string, double> OverallSumOfSquares { get; set; } = new Dictionary<string, double>();
+        
+        public Dictionary<string, double> OverallSampleStandardDeviations { get; set; } = new Dictionary<string, double>();
+
         private List<AxisType> _axisTypes = new List<AxisType>();
         public List<AxisType> AxisTypes
         {
@@ -44,6 +51,20 @@ namespace PanoramicDataWin8.model.data.result
             }
         }
 
+
+        private List<BrushIndex> _brushIndices = null;
+        public List<BrushIndex> BrushIndices
+        {
+            get
+            {
+                return _brushIndices;
+            }
+            set
+            {
+                this.SetProperty(ref _brushIndices, value);
+            }
+        }
+
         private List<InputOperationModel> _dimensions = new List<InputOperationModel>();
         public List<InputOperationModel> Dimensions
         {
@@ -58,8 +79,8 @@ namespace PanoramicDataWin8.model.data.result
         }
 
 
-        private Dictionary<InputOperationModel, double> _maxValues = new Dictionary<InputOperationModel, double>();
-        public Dictionary<InputOperationModel, double> MaxValues
+        private Dictionary<InputOperationModel, Dictionary<BrushIndex, double>> _maxValues = new Dictionary<InputOperationModel, Dictionary<BrushIndex, double>>();
+        public Dictionary<InputOperationModel, Dictionary<BrushIndex, double>> MaxValues
         {
             get
             {
@@ -71,8 +92,8 @@ namespace PanoramicDataWin8.model.data.result
             }
         }
 
-        private Dictionary<InputOperationModel, double> _minValues = new Dictionary<InputOperationModel, double>();
-        public Dictionary<InputOperationModel, double> MinValues
+        private Dictionary<InputOperationModel, Dictionary<BrushIndex, double>> _minValues = new Dictionary<InputOperationModel, Dictionary<BrushIndex, double>>();
+        public Dictionary<InputOperationModel, Dictionary<BrushIndex, double>> MinValues
         {
             get
             {

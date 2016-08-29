@@ -102,6 +102,10 @@
     <Compile Include="controller\data\DataProvider.cs" />
     <Compile Include="controller\data\DataRow.cs" />
     <Compile Include="controller\data\Job.cs" />
+    <Compile Include="controller\data\progressive\ProgressiveClassifyJob.cs" />
+    <Compile Include="controller\data\progressive\ProgressiveGateway.cs" />
+    <Compile Include="controller\data\progressive\ProgressiveQueryExecuter.cs" />
+    <Compile Include="controller\data\progressive\ProgressiveVisualizationJob.cs" />
     <Compile Include="controller\data\tuppleware\ErrorHandler.cs" />
     <Compile Include="controller\data\tuppleware\FrequentItemsetJob.cs" />
     <Compile Include="controller\data\tuppleware\ClassifierJob.cs" />
@@ -155,8 +159,13 @@
     <Compile Include="model\data\LinkType.cs" />
     <Compile Include="model\data\NamedInputModel.cs" />
     <Compile Include="model\data\OriginModel.cs" />
+    <Compile Include="model\data\progressive\ProgressiveFieldInputModel.cs" />
+    <Compile Include="model\data\progressive\ProgressiveInputGroupModel.cs" />
+    <Compile Include="model\data\progressive\ProgressiveOriginModel.cs" />
+    <Compile Include="model\data\progressive\ProgressiveSchemaModel.cs" />
     <Compile Include="model\data\QueryModel.cs" />
     <Compile Include="model\data\result\ClassfierResultDescriptionModel.cs" />
+    <Compile Include="model\data\result\ProgressiveVisualizationResultItemModel.cs" />
     <Compile Include="model\data\result\VisualizationItemResultModel.cs" />
     <Compile Include="model\data\result\ResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultItemModel.cs" />
@@ -167,8 +176,8 @@
     <Compile Include="model\data\sim\SimInputFieldModel.cs" />
     <Compile Include="model\data\sim\SimOriginModel.cs" />
     <Compile Include="model\data\sim\SimSchemaModel.cs" />
-    <Compile Include="model\data\tuppleware\TaskGroupModel.cs" />
-    <Compile Include="model\data\tuppleware\TaskModel.cs" />
+    <Compile Include="model\data\TaskGroupModel.cs" />
+    <Compile Include="model\data\TaskModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareFieldInputModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareInputGroupModel.cs" />
     <Compile Include="model\data\tuppleware\TuppleWareOriginModel.cs" />
@@ -176,7 +185,17 @@
     <Compile Include="controller\data\tuppleware\gateway\TuppleWareGateway.cs" />
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
+    <Compile Include="model\view\ComparisonViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
+    <Compile Include="utils\ObservableDictionary.cs" />
+    <Compile Include="view\inq\IInkable.cs" />
+    <Compile Include="view\vis\ComparisonView.xaml.cs">
+      <DependentUpon>ComparisonView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\InputVisualizationView.xaml.cs">
+      <DependentUpon>InputVisualizationView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="model\view\InputVisualizationViewModel.cs" />
     <Compile Include="model\view\tilemenu\TileMenuItemView.cs" />
     <Compile Include="model\view\tilemenu\TileMenuContentViewModel.cs" />
     <Compile Include="model\view\VisualizationTypeViewModel.cs" />
@@ -270,11 +289,16 @@
       <DependentUpon>ToggleMenuItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\ClassifierRendererContentProvider.cs" />
+    <Compile Include="view\vis\render\ClassifierRendererPlotContentProvider.cs" />
     <Compile Include="view\vis\render\FrequentItemsetRenderer.xaml.cs">
       <DependentUpon>FrequentItemsetRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\MapRenderer.xaml.cs">
       <DependentUpon>MapRenderer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\render\SVGRendererContentProvider.cs" />
+    <Compile Include="view\vis\render\SVGRenderer.xaml.cs">
+      <DependentUpon>SVGRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\PlotRenderer.xaml.cs">
       <DependentUpon>PlotRenderer.xaml</DependentUpon>
@@ -286,6 +310,9 @@
     <Compile Include="view\vis\render\Renderer.cs" />
     <Compile Include="view\vis\render\TableRenderer.xaml.cs">
       <DependentUpon>TableRenderer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\render\XRenderer.xaml.cs">
+      <DependentUpon>XRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\XYRenderer.xaml.cs">
       <DependentUpon>XYRenderer.xaml</DependentUpon>
@@ -301,6 +328,9 @@
     <Content Include="ApplicationInsights.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
+    </Content>
+    <Content Include="Assets\svg\county.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="project.json" />
     <Content Include="Assets\BadgeLogo.scale-400.png" />
@@ -405,6 +435,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="view\vis\ComparisonView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\InputVisualizationView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="view\common\DXSurface.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -482,6 +520,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="view\vis\render\SVGRenderer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="view\vis\render\PlotRenderer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -493,6 +535,10 @@
     <Page Include="view\vis\render\TableRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\XRenderer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\render\XYRenderer.xaml">
       <SubType>Designer</SubType>
@@ -511,6 +557,7 @@
       <Name>Microsoft Visual C++ 2013 Runtime Package for Windows</Name>
     </SDKReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

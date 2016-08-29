@@ -131,7 +131,7 @@ namespace PanoramicDataWin8.controller.data
                             _aggregator.AggregateStep(_binner.BinStructure, QueryModelClone, _dataProvider.Progress());
                         }
 
-                        ResultDescriptionModel resultDescriptionModel = null;
+                        VisualizationResultDescriptionModel resultDescriptionModel = null;
                         if (_binner != null && _binner.BinStructure != null)
                         {
                             resultItemModels = convertBinsToResultItemModels(_binner.BinStructure);
@@ -140,11 +140,12 @@ namespace PanoramicDataWin8.controller.data
                                 BinRanges = _binner.BinStructure.BinRanges,
                                 NullCount = _binner.BinStructure.NullCount,
                                 Dimensions = _dimensions,
-                                AxisTypes = _axisTypes,
-                                MinValues = _binner.BinStructure.AggregatedMinValues.ToDictionary(entry => entry.Key, entry => entry.Value),
-                                MaxValues = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => entry.Value)
+                                AxisTypes = _axisTypes
                             };
 
+                            resultDescriptionModel.MinValues = _binner.BinStructure.AggregatedMinValues.ToDictionary(entry => entry.Key, entry => new Dictionary<BrushIndex, double>() { { BrushIndex.ALL, entry.Value } });
+                            resultDescriptionModel.MaxValues  = _binner.BinStructure.AggregatedMaxValues.ToDictionary(entry => entry.Key, entry => new Dictionary<BrushIndex, double>() { { BrushIndex.ALL, entry.Value } });
+                            
                             await fireUpdated(resultItemModels, _dataProvider.Progress(), resultDescriptionModel);
                         }
                     }

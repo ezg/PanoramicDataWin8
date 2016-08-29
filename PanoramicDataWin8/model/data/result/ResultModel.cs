@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.data.result
@@ -35,8 +37,9 @@ namespace PanoramicDataWin8.model.data.result
             }
         }
 
-        public void FireResultModelUpdated()
+        public void FireResultModelUpdated(ResultType resultType)
         {
+            _resultType = resultType;
             if (ResultModelUpdated != null)
             {
                 ResultModelUpdated(this, new EventArgs());
@@ -56,5 +59,21 @@ namespace PanoramicDataWin8.model.data.result
                 this.SetProperty(ref _progress, value);
             }
         }
+
+        private ResultType _resultType = ResultType.Clear;
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ResultType ResultType
+        {
+            get
+            {
+                return _resultType;
+            }
+            set
+            {
+                this.SetProperty(ref _resultType, value);
+            }
+        }
     }
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum ResultType { Clear, Update, Complete }
 }

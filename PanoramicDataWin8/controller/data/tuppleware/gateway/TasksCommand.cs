@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.input;
+using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.tuppleware;
 
 namespace PanoramicDataWin8.controller.data.tuppleware.gateway
