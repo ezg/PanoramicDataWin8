@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 
-namespace PanoramicDataWin8.controller.data.tuppleware
+namespace PanoramicDataWin8.model.data
 {
     public class ErrorHandler
     {

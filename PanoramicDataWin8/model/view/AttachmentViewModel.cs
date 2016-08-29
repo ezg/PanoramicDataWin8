@@ -361,7 +361,7 @@ namespace PanoramicDataWin8.model.view
                         header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                         {
                             InputOperationModel = item as InputOperationModel,
-                            SubLabel = iom != null ? iom.InputModel.Name.Replace("_", "") : " ",
+                            SubLabel = iom != null ? iom.InputModel.RawName.Replace("_", "") : " ",
                             MainLabel = "label",
                             AttachmentHeaderViewModel = header
                         });
@@ -437,7 +437,7 @@ namespace PanoramicDataWin8.model.view
                         header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                         {
                             InputOperationModel = item as InputOperationModel,
-                            SubLabel = iom != null ? iom.InputModel.Name.Replace("_", "") : " ",
+                            SubLabel = iom != null ? iom.InputModel.RawName.Replace("_", "") : " ",
                             MainLabel = "feature",
                             AttachmentHeaderViewModel = header
                         });
@@ -559,7 +559,7 @@ namespace PanoramicDataWin8.model.view
                         header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                         {
                             InputOperationModel = item as InputOperationModel,
-                            SubLabel = (item as InputOperationModel).InputModel.Name.Replace("_", " "),
+                            SubLabel = (item as InputOperationModel).InputModel.RawName.Replace("_", " "),
                             MainLabel = inputUsage.ToString().ToLower(),
                             AttachmentHeaderViewModel = header
                         });

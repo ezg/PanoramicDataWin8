@@ -223,7 +223,7 @@ namespace PanoramicDataWin8.view.vis
             sb.Append(" <StackPanel Orientation=\"Horizontal\">");
             sb.Append("     <local:DataGridResizer Margin=\"0,0,0,0\" Width=\"4\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/> ");
             sb.Append("     <Grid Width=\"{Binding Width}\">");
-            sb.Append("         <local:InputFieldView DataContext=\"{Binding InputFieldViewModel}\" Width=\"{Binding Width}\" Name=\"inputFieldView\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/>");
+            sb.Append("         <local:InputFieldView DataContext=\"{Binding InputFieldViewModel}\" Width=\"{Binding Width}\" RawName=\"inputFieldView\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/>");
             sb.Append("     </Grid>");
             sb.Append("     <local:DataGridResizer Width=\"4\" xmlns:local=\"using:PanoramicDataWin8.view.common\" IsResizer=\"True\"/> ");
             sb.Append(" </StackPanel>");

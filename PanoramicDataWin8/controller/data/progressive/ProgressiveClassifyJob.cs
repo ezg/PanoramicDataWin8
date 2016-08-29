@@ -13,8 +13,6 @@ using Windows.UI.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data;
-using PanoramicDataWin8.controller.data.tuppleware;
-using PanoramicDataWin8.controller.data.tuppleware.json;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.common;
@@ -46,7 +44,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             _throttle = throttle;
             var psm = (queryModelClone.SchemaModel as ProgressiveSchemaModel);
 
-            var features = QueryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(iom => iom.InputModel.Name).ToList();
+            var features = QueryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(iom => iom.InputModel.RawName).ToList();
 
             string filter = "";
             List<FilterModel> filterModels = new List<FilterModel>();
@@ -62,7 +60,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 
             _query = new JObject(
                 new JProperty("type", "execute"),
-                new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Name),
+                new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Schema.RawName),
                 new JProperty("task",
                     new JObject(
                         new JProperty("type", "classify"),
@@ -89,7 +87,7 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             try
             {
-                string response = await ProgressiveGateway.Request(_query);
+                string response = null;//await ProgressiveGateway.Request(_query);
                 JObject dict = JObject.Parse(response);
                 _requestUuid = dict["uuid"].ToString();
 
@@ -103,7 +101,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                         JObject lookupData = new JObject(
                             new JProperty("type", "lookup"),
                             new JProperty("uuid", _requestUuid));
-                        string message = await ProgressiveGateway.Request(lookupData);
+                        string message = null;;//await ProgressiveGateway.Request(lookupData);
 
                         if (message != "None" && message != "null" && message != "\"None\"")
                         {
@@ -127,7 +125,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 //['actual and predicted', 'not actual and predicted', 'not actual and not predicted', 'actual and not predicted']
                                 List<string> visBrushes = new List<string>() { "0", "1", "2", "3" };
 
-                                JObject token = (JObject)result["histograms"][feature.InputModel.Name];
+                                JObject token = (JObject)result["histograms"][feature.InputModel.RawName];
                                 VisualizationResultDescriptionModel visResultDescriptionModel = new VisualizationResultDescriptionModel();
                                 List<ResultItemModel> resultItemModels = ProgressiveVisualizationJob.UpdateVisualizationResultDescriptionModel(visResultDescriptionModel, token, visBrushes,
                                     new List<InputOperationModel>()
@@ -155,7 +153,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 });
                             }
 
-                            var classifyResult = JsonConvert.DeserializeObject<ClassifyResult>(result[label].ToString());
+                            /*var classifyResult = JsonConvert.DeserializeObject<ClassifyResult>(result[label].ToString());
 
 
                             resultDescriptionModel.ConfusionMatrices.Add(new List<double>());
@@ -188,7 +186,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                             resultDescriptionModel.Progresses = classifyResult.progress;
 
 
-                            await fireUpdated(new List<ResultItemModel>(), progress, resultDescriptionModel);
+                            await fireUpdated(new List<ResultItemModel>(), progress, resultDescriptionModel);*/
 
                             if (progress >= 1.0)
                             {
@@ -241,7 +239,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 JObject lookupData = new JObject(
                                new JProperty("type", "halt"),
                                new JProperty("uuid", _requestUuid));
-                ProgressiveGateway.Request(lookupData);
+                //ProgressiveGateway.Request(lookupData);
             }
         }
     }

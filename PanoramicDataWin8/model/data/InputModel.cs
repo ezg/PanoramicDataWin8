@@ -19,6 +19,7 @@ namespace PanoramicDataWin8.model.data
             set { this.SetProperty(ref _isDisplayed, value); }
         }
 
-        public abstract string Name { get; set; }
+        public abstract string RawName { get; set; }
+        public abstract string DisplayName { get; set; }
     }
 }

@@ -8,7 +8,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.model.data.result;
-using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 

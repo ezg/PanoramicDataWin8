@@ -13,21 +13,35 @@ namespace PanoramicDataWin8.model.data.progressive
 
         }
 
-        public ProgressiveInputGroupModel(string name)
+        public ProgressiveInputGroupModel(string rawName, string displayName)
         {
-            _name = name;
+            _rawName = rawName;
+            _displayName = displayName;
         }
 
-        private string _name = "";
-        public override string Name
+        private string _rawName = "";
+        public override string RawName
         {
             get
             {
-                return _name;
+                return _rawName;
             }
             set
             {
-                this.SetProperty(ref _name, value);
+                this.SetProperty(ref _rawName, value);
+            }
+        }
+
+        private string _displayName = "";
+        public override string DisplayName
+        {
+            get
+            {
+                return _displayName;
+            }
+            set
+            {
+                this.SetProperty(ref _displayName, value);
             }
         }
     }

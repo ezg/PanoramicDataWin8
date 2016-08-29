@@ -3,7 +3,6 @@ using System.Collections.ObjectModel;
 using Microsoft.Practices.Prism.Mvvm;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.model.data.tuppleware;
 
 namespace PanoramicDataWin8.model.view
 {

@@ -18,7 +18,7 @@ namespace PanoramicDataWin8.model.data
                 var am = obj as InputGroupModel;
                 return
                     am.OriginModel.Equals(this.OriginModel) &&
-                    am.Name.Equals(this.Name) &&
+                    am.RawName.Equals(this.RawName) &&
                     this.InputModels.SequenceEqual(am.InputModels);
             }
             return false;
@@ -28,7 +28,7 @@ namespace PanoramicDataWin8.model.data
         {
             int code = 0;
             code ^= this.OriginModel.GetHashCode();
-            code ^= this.Name.GetHashCode();
+            code ^= this.RawName.GetHashCode();
             return this.InputModels.Aggregate(code, (current, inputModel) => current ^ inputModel.GetHashCode());
         }
     }

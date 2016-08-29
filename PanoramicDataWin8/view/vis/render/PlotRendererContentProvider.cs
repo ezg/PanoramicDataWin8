@@ -1,5 +1,4 @@
 ﻿using NetTopologySuite.Geometries;
-using PanoramicDataWin8.controller.data.sim;
 using PanoramicDataWin8.view.common;
 using System;
 using System.Collections.Generic;

@@ -9,7 +9,6 @@ using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.progressive;
-using PanoramicDataWin8.controller.data.tuppleware;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;

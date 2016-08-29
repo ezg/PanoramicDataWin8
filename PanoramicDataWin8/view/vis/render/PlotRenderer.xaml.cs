@@ -18,7 +18,6 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
-using PanoramicDataWin8.controller.data.sim;
 using Windows.UI.Input;
 using System.Diagnostics;
 using GeoAPI.Geometries;
@@ -139,7 +138,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 foreach (var valueComparison in hits[0].ValueComparisons)
                 {
-                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.Name + " " +
+                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.RawName + " " +
                                      valueComparison.Value));
                 }
 
@@ -214,7 +213,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 foreach (var valueComparison in hits[0].ValueComparisons)
                 {
-                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.Name + " " +
+                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.RawName + " " +
                                      valueComparison.Value));
                 }
 

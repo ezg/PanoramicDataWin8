@@ -39,6 +39,19 @@ namespace PanoramicDataWin8.model.data
             }
         }
 
+        private Type _type;
+        public Type Type
+        {
+            get
+            {
+                return _type;
+            }
+            set
+            {
+                this.SetProperty(ref _type, value);
+            }
+        }
+
         private string _name;
         public string Name
         {

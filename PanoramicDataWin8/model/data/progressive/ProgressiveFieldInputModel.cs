@@ -10,23 +10,38 @@ namespace PanoramicDataWin8.model.data.progressive
     [JsonObject(MemberSerialization.OptOut)]
     public class ProgressiveFieldInputModel : InputFieldModel
     {
-        public ProgressiveFieldInputModel(string name, string inputDataType, string inputVisualizationType)
+        public ProgressiveFieldInputModel(string rawName, string displayName, string inputDataType, string inputVisualizationType)
         {
-            _name = name;
+            _rawName = rawName;
+            _displayName = displayName;
             _inputDataType = inputDataType;
             _inputVisualizationType = inputVisualizationType;
         }
 
-        private string _name = "";
-        public override string Name
+
+        private string _displayName = "";
+        public override string DisplayName
         {
             get
             {
-                return _name;
+                return _displayName;
             }
             set
             {
-                this.SetProperty(ref _name, value);
+                this.SetProperty(ref _displayName, value);
+            }
+        }
+
+        private string _rawName = "";
+        public override string RawName
+        {
+            get
+            {
+                return _rawName;
+            }
+            set
+            {
+                this.SetProperty(ref _rawName, value);
             }
         }
 

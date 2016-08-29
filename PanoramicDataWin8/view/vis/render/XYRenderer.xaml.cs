@@ -379,7 +379,7 @@ namespace PanoramicDataWin8.view.vis.render
 
                 if (queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Count(vc => Equals(vc.InputOperationModel, xAom)) > 0)
                 {
-                    tbSelection.Text = xAom.InputModel.Name + ": " +
+                    tbSelection.Text = xAom.InputModel.RawName + ": " +
                                        queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, xAom))
                                            .Min(vc => vc.Value).ToString();
                     tbSelection.Text += " - " + queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, xAom)).Max(vc => vc.Value);
@@ -387,7 +387,7 @@ namespace PanoramicDataWin8.view.vis.render
                 if (!xAom.Equals(yAom) &&
                     queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Count(vc => Equals(vc.InputOperationModel, yAom)) > 0)
                 {
-                    tbSelection.Text += ", " + yAom.InputModel.Name + ": " +
+                    tbSelection.Text += ", " + yAom.InputModel.RawName + ": " +
                                         queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, yAom))
                                             .Min(vc => vc.Value).ToString();
                     tbSelection.Text += " - " + queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, yAom)).Max(vc => vc.Value);

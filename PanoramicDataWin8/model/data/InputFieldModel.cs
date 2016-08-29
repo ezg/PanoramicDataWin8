@@ -21,7 +21,7 @@ namespace PanoramicDataWin8.model.data
                 var am = obj as InputFieldModel;
                 return
                     am.OriginModel.Equals(this.OriginModel) &&
-                    am.Name.Equals(this.Name) &&
+                    am.RawName.Equals(this.RawName) &&
                     am.InputVisualizationType.Equals(this.InputVisualizationType) &&
                     am.InputDataType.Equals(this.InputDataType);
             }
@@ -32,7 +32,7 @@ namespace PanoramicDataWin8.model.data
         {
             int code = 0;
             code ^= this.OriginModel.GetHashCode();
-            code ^= this.Name.GetHashCode();
+            code ^= this.RawName.GetHashCode();
             code ^= this.InputVisualizationType.GetHashCode();
             code ^= this.InputDataType.GetHashCode();
             return code;

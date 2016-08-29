@@ -11,6 +11,7 @@ using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.view.common;
@@ -19,7 +20,13 @@ namespace PanoramicDataWin8.controller.data.progressive
 {
     public class ProgressiveGateway
     {
-        public static async Task<string> Request(JObject data)
+        public static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
+        {
+            TypeNameHandling = TypeNameHandling.Objects,
+            Formatting = Formatting.Indented
+        };
+
+        public static async Task<string> Request(object data, string endpoint)
         {
             while (true)
             {
@@ -34,10 +41,18 @@ namespace PanoramicDataWin8.controller.data.progressive
                     var httpClient = new HttpClient();
                     httpClient.Timeout = TimeSpan.FromMinutes(5);
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                    var httpResponseMessage = await httpClient.PostAsync(MainViewController.Instance.MainModel.Ip, new StringContent(
-                        data.ToString(),
-                        Encoding.UTF8,
-                        "application/json"));
+                    HttpResponseMessage httpResponseMessage = null;
+                    if (data != null)
+                    {
+                        httpResponseMessage = await httpClient.PostAsync(MainViewController.Instance.MainModel.Ip + "/" + endpoint, new StringContent(
+                            data.ToString(),
+                            Encoding.UTF8,
+                            "application/json"));
+                    }
+                    else
+                    {
+                        httpResponseMessage = await httpClient.GetAsync(MainViewController.Instance.MainModel.Ip + "/" + endpoint);
+                    }
                     if (MainViewController.Instance.MainModel.Verbose)
                     {
                         Debug.WriteLine("TuppleWare Roundtrip Time: " + sw.ElapsedMilliseconds);

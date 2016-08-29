@@ -1,5 +1,4 @@
 ﻿using NetTopologySuite.Geometries;
-using PanoramicDataWin8.controller.data.sim;
 using PanoramicDataWin8.view.common;
 using System;
 using System.Collections.Generic;
@@ -153,19 +152,19 @@ namespace PanoramicDataWin8.view.vis.render
                     var c = 0;
                     foreach (var feature in _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature))
                     {
-                        f.Add(new JProperty(feature.InputModel.Name, new JArray(_recognizedText[c] is string ? 0 : _recognizedText[c])));
+                        f.Add(new JProperty(feature.InputModel.RawName, new JArray(_recognizedText[c] is string ? 0 : _recognizedText[c])));
                         c++;
                     }
 
                     JObject request = new JObject(
                         new JProperty("type", "test"),
-                        new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Name),
+                        new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Schema.RawName),
                         new JProperty("uuid", ""),
                         new JProperty("features", f.ToString()),
-                        new JProperty("feature_dimensions", _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(fi => fi.InputModel.Name).ToList()));
+                        new JProperty("feature_dimensions", _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(fi => fi.InputModel.RawName).ToList()));
                     request["uuid"] = _classfierResultDescriptionModel.Uuid;
 
-                    string message = await ProgressiveGateway.Request(request);
+                    string message = await ProgressiveGateway.Request(request, "test");
                     JToken jToken = JToken.Parse(message);
                     if (jToken["result"] != null && (double)jToken["result"] == 0)
                     {
@@ -289,7 +288,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 else if (_viewIndex == 1)
                 {
-                    string label = "details"; //_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].Name : "avg across labels";
+                    string label = "details"; //_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].RawName : "avg across labels";
                     DrawString(canvasArgs, _textFormatBig, centerX, _topOffset, label, _textColor, false, true, false);
 
                     var w = (_deviceWidth - 20)/3.0f;
@@ -357,7 +356,7 @@ namespace PanoramicDataWin8.view.vis.render
                         var oldTransform = canvasArgs.DrawingSession.Transform;
                         mat = Matrix3x2.CreateRotation((-90f*(float) Math.PI)/180.0f, new Vector2(x, y + (h/2.0f) + count * h));
                         canvasArgs.DrawingSession.Transform = mat*oldTransform;
-                        DrawString(canvasArgs, _textFormatBig, x, y + (h / 2.0f) + count * h, feature.InputModel.Name, _textColor, false, true, false);
+                        DrawString(canvasArgs, _textFormatBig, x, y + (h / 2.0f) + count * h, feature.InputModel.RawName, _textColor, false, true, false);
                         canvasArgs.DrawingSession.Transform = oldTransform;
 
                         if (_recognizedText.Count > count)
@@ -395,7 +394,7 @@ namespace PanoramicDataWin8.view.vis.render
                     int histogramIndex = _viewIndex - 2;
                     var feat = _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature)[histogramIndex];
 
-                    string label = feat.InputModel.Name.Replace("_", " "); //_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].Name : "avg across labels";
+                    string label = feat.InputModel.RawName.Replace("_", " "); //_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].RawName : "avg across labels";
                     DrawString(canvasArgs, _textFormatBig, centerX, _topOffset, label, _textColor, false, true, false);
 
                     var rr = new ClassifierRendererPlotContentProvider() {CompositionScaleX = CompositionScaleX, CompositionScaleY = CompositionScaleY};

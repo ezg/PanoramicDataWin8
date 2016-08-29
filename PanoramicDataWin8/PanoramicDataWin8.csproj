@@ -102,24 +102,11 @@
     <Compile Include="controller\data\DataProvider.cs" />
     <Compile Include="controller\data\DataRow.cs" />
     <Compile Include="controller\data\Job.cs" />
+    <Compile Include="controller\data\progressive\CatalogCommand.cs" />
     <Compile Include="controller\data\progressive\ProgressiveClassifyJob.cs" />
     <Compile Include="controller\data\progressive\ProgressiveGateway.cs" />
     <Compile Include="controller\data\progressive\ProgressiveQueryExecuter.cs" />
     <Compile Include="controller\data\progressive\ProgressiveVisualizationJob.cs" />
-    <Compile Include="controller\data\tuppleware\ErrorHandler.cs" />
-    <Compile Include="controller\data\tuppleware\FrequentItemsetJob.cs" />
-    <Compile Include="controller\data\tuppleware\ClassifierJob.cs" />
-    <Compile Include="controller\data\tuppleware\gateway\FrequentItemsetsCommand.cs" />
-    <Compile Include="controller\data\tuppleware\gateway\CodeGenCommand.cs" />
-    <Compile Include="controller\data\tuppleware\gateway\Lookup.cs" />
-    <Compile Include="controller\data\tuppleware\gateway\ProjectCommand.cs" />
-    <Compile Include="controller\data\tuppleware\gateway\CatalogCommand.cs" />
-    <Compile Include="controller\data\tuppleware\gateway\ClassifyCommand.cs" />
-    <Compile Include="controller\data\tuppleware\gateway\CorrelateCommand.cs" />
-    <Compile Include="controller\data\tuppleware\gateway\TasksCommand.cs" />
-    <Compile Include="controller\data\tuppleware\json\ClassifyResult.cs" />
-    <Compile Include="controller\data\tuppleware\gateway\SelectCommand.cs" />
-    <Compile Include="controller\data\tuppleware\TuppleWareDataProvider.cs" />
     <Compile Include="controller\data\virt\AsyncVirtualizedCollection.cs" />
     <Compile Include="controller\data\virt\DataPage.cs" />
     <Compile Include="controller\data\virt\DataWrapper.cs" />
@@ -134,15 +121,13 @@
     <Compile Include="model\data\common\QuantitativeBinRange.cs" />
     <Compile Include="model\data\common\BinRange.cs" />
     <Compile Include="model\data\common\GroupingObject.cs" />
-    <Compile Include="controller\data\sim\SimDataProvider.cs" />
     <Compile Include="controller\data\DataJob.cs" />
-    <Compile Include="controller\data\sim\SimQueryExecuter.cs" />
-    <Compile Include="controller\data\tuppleware\TuppleWareQueryExecuter.cs" />
     <Compile Include="controller\input\DatasetConfiguration.cs" />
     <Compile Include="controller\view\MainViewController.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="model\data\ErrorHandler.cs" />
     <Compile Include="model\data\InputDataTypeConstants.cs" />
     <Compile Include="model\data\InputGroupModel.cs" />
     <Compile Include="model\data\InputModel.cs" />
@@ -173,16 +158,8 @@
     <Compile Include="model\data\result\ResultModel.cs" />
     <Compile Include="model\data\result\VisualizationResultDescriptionModel.cs" />
     <Compile Include="model\data\SchemaModel.cs" />
-    <Compile Include="model\data\sim\SimInputFieldModel.cs" />
-    <Compile Include="model\data\sim\SimOriginModel.cs" />
-    <Compile Include="model\data\sim\SimSchemaModel.cs" />
     <Compile Include="model\data\TaskGroupModel.cs" />
     <Compile Include="model\data\TaskModel.cs" />
-    <Compile Include="model\data\tuppleware\TuppleWareFieldInputModel.cs" />
-    <Compile Include="model\data\tuppleware\TuppleWareInputGroupModel.cs" />
-    <Compile Include="model\data\tuppleware\TuppleWareOriginModel.cs" />
-    <Compile Include="model\data\tuppleware\TuppleWareSchemaModel.cs" />
-    <Compile Include="controller\data\tuppleware\gateway\TuppleWareGateway.cs" />
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
     <Compile Include="model\view\ComparisonViewModel.cs" />
@@ -557,7 +534,12 @@
       <Name>Microsoft Visual C++ 2013 Runtime Package for Windows</Name>
     </SDKReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\..\IDEA\IDEA-common\IDEA-common.csproj">
+      <Project>{f69e6bc5-99c2-4822-a27a-4fe3267f385e}</Project>
+      <Name>IDEA-common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

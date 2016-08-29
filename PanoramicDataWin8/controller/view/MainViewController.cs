@@ -9,16 +9,12 @@ using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using GeoAPI.Geometries;
+using IDEA_common.catalog;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.progressive;
-using PanoramicDataWin8.controller.data.sim;
-using PanoramicDataWin8.controller.data.tuppleware;
-using PanoramicDataWin8.controller.data.tuppleware.gateway;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.progressive;
-using PanoramicDataWin8.model.data.sim;
-using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.inq;
@@ -79,24 +75,7 @@ namespace PanoramicDataWin8.controller.view
                 .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
 
             _mainModel.DatasetConfigurations.Clear();
-            if (backend.ToLower() == "sim")
-            {
-                var configs = await configLoc.GetFilesAsync();
-                foreach (var file in configs)
-                {
-                    var content = await Windows.Storage.FileIO.ReadTextAsync(file);
-                    _mainModel.DatasetConfigurations.Add(DatasetConfiguration.FromContent(content, file.Name));
-                }
-                if (_mainModel.DatasetConfigurations.Any(ds => ds.Name.ToLower().Contains(startDataSet)))
-                {
-                    LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains(startDataSet)));
-                }
-                else
-                {
-                    LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains("nba")));
-                }
-            }
-            else if (backend.ToLower() == "tuppleware")
+            if (backend.ToLower() == "progressive")
             {
                 try
                 {
@@ -104,101 +83,21 @@ namespace PanoramicDataWin8.controller.view
                         .First(l => l.ToLower().StartsWith("ip"))
                         .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
 
-                    var throttle = double.Parse(mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
-                        .First(l => l.ToLower().StartsWith("throttle"))
-                        .Split(new string[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-                    var nrRecords = int.Parse(mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
-                        .First(l => l.ToLower().StartsWith("nrofrecords"))
-                        .Split(new string[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-                    var sampleSize = double.Parse(mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
-                        .First(l => l.ToLower().StartsWith("samplesize"))
-                        .Split(new string[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-
-                    var showCodeGen = bool.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                        .First(l => l.ToLower().StartsWith("showcodegen"))
-                        .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-
                     var renderShadingIn1DHistograms = bool.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
                         .First(l => l.ToLower().StartsWith("rendershadingin1dhistograms"))
                         .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-
-                    MainModel.ShowCodeGen = showCodeGen;
-                    MainModel.RenderShadingIn1DHistograms = renderShadingIn1DHistograms;
-
-                    MainModel.Ip = ip;
-                    CatalogCommand catalogCommand = new CatalogCommand();
-                    var loadedDatasetConfigs = await catalogCommand.GetCatalog(MainModel.Ip);
-                    foreach (var ds in loadedDatasetConfigs)
-                    {
-                        ds.ThrottleInMillis = throttle;
-                        ds.SampleSize = sampleSize;
-                        ds.NrOfRecords = nrRecords;
-                        _mainModel.DatasetConfigurations.Add(ds);
-                    }
-                    if (_mainModel.DatasetConfigurations.Any(ds => ds.Name.ToLower().Contains(startDataSet)))
-                    {
-                        LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains(startDataSet)));
-                    }
-                    else
-                    {
-                        LoadData(_mainModel.DatasetConfigurations.First());
-                    }
-
-                    TasksCommand tasksCommand = new TasksCommand();
-                    var loadedTasks = await tasksCommand.GetTasks(backend);
-                    _mainModel.TaskModels = loadedTasks;
-                }
-                catch (Exception exc)
-                {
-                    ErrorHandler.HandleError(exc.Message);
-                }
-            }
-            else if (backend.ToLower() == "progressive")
-            {
-                try
-                {
-                    var ip = mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                        .First(l => l.ToLower().StartsWith("ip"))
-                        .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
-
-                    var showCodeGen = bool.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                        .First(l => l.ToLower().StartsWith("showcodegen"))
-                        .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-
-                    var renderShadingIn1DHistograms = bool.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                        .First(l => l.ToLower().StartsWith("rendershadingin1dhistograms"))
-                        .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-
-                    MainModel.ShowCodeGen = showCodeGen;
+                    
                     MainModel.RenderShadingIn1DHistograms = renderShadingIn1DHistograms;
 
                     MainModel.Ip = ip;
 
                     LoadCatalog();
-
-                    string message = await ProgressiveGateway.Request(new JObject(new JProperty("type", "tasks")));
-                    parsePgTaskResponse(message);
-
                 }
                 catch (Exception exc)
                 {
                     ErrorHandler.HandleError(exc.Message);
                 }
             }
-        }
-
-        private void parsePgTaskResponse(string e)
-        {
-            JToken jToken = JToken.Parse(e);
-
-            List<TaskModel> tasks = new List<TaskModel>();
-            TaskGroupModel parent = new TaskGroupModel();
-            foreach (var child in jToken as JArray)
-            {
-                if (child.ToString() != "")
-                    recursiveCreateAttributeModels(child, parent);
-            }
-            _mainModel.TaskModels = parent.TaskModels.ToList();
         }
 
         private void recursiveCreateAttributeModels(JToken token, TaskGroupModel parent)
@@ -224,63 +123,54 @@ namespace PanoramicDataWin8.controller.view
 
         public async void LoadCatalog()
         {
-            string message = await ProgressiveGateway.Request(new JObject(new JProperty("type", "catalog")));
-            parsePgCatalogResponse(message);
-        }
-
-        private async void parsePgCatalogResponse(string e)
-        {
             var installedLoc = Package.Current.InstalledLocation;
             var configLoc = await installedLoc.GetFolderAsync(@"Assets\data\config");
             string mainConifgContent = await installedLoc.GetFileAsync(@"Assets\data\main.ini").AsTask().ContinueWith(t => Windows.Storage.FileIO.ReadTextAsync(t.Result)).Result;
-          
+
             var startDataSet = mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
                 .First(l => l.ToLower().StartsWith("startdataset"))
                 .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
             var throttle = double.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
                 .First(l => l.ToLower().StartsWith("throttle"))
                 .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-            var nrRecords = int.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                .First(l => l.ToLower().StartsWith("nrofrecords"))
-                .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
             var sampleSize = double.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
                 .First(l => l.ToLower().StartsWith("samplesize"))
                 .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
 
-            JToken jToken = JToken.Parse(e );
-
-            List<DatasetConfiguration> dataSets = new List<DatasetConfiguration>();
-            foreach (var child in jToken)
+            CatalogCommand catalogCommand = new CatalogCommand();
+            Catalog catalog = await catalogCommand.GetCatalog();
+            
+            _mainModel.DatasetConfigurations.Clear();
+            foreach (var schema in catalog.Schemas)
             {
-                var schemaName = ((JProperty)child).Name;
-                var schemaJson = ((JProperty)child).Value;
                 var dataSetConfig = new DatasetConfiguration
                 {
-                    Name = schemaName,
-                    SchemaJson = schemaJson,
+                    Schema = schema,
                     Backend = "progressive",
-                    BaseUUID = ((JProperty)child).Value["uuid"].Value<string>()
+                    ThrottleInMillis = throttle,
+                    SampleSize = sampleSize
                 };
-                dataSets.Add(dataSetConfig);
+                _mainModel.DatasetConfigurations.Add(dataSetConfig);
             }
-            _mainModel.DatasetConfigurations.Clear();
-            foreach (var ds in dataSets)
+
+            if (_mainModel.DatasetConfigurations.Any(ds => ds.Schema.DisplayName.ToLower().Contains(startDataSet)))
             {
-                ds.ThrottleInMillis = throttle;
-                ds.SampleSize = sampleSize;
-                ds.NrOfRecords = nrRecords;
-                _mainModel.DatasetConfigurations.Add(ds);
-            }
-            if (_mainModel.DatasetConfigurations.Any(ds => ds.Name.ToLower().Contains(startDataSet)))
-            {
-                LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Name.ToLower().Contains(startDataSet)));
+                LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Schema.DisplayName.ToLower().Contains(startDataSet)));
             }
             else
             {
                 LoadData(_mainModel.DatasetConfigurations.First());
             }
+            
+            /*TaskGroupModel parent = new TaskGroupModel();
+            foreach (var child in catalog.SupportedOperations)
+            {
+                if (child.ToString() != "")
+                    recursiveCreateAttributeModels(child, parent);
+            }
+            _mainModel.TaskModels = parent.TaskModels.ToList();*/
         }
-
+        
         public static void CreateInstance(InkableScene root, MainPage mainPage)
         {
             _instance = new MainViewController(root, mainPage);
@@ -352,29 +242,7 @@ namespace PanoramicDataWin8.controller.view
                 _mainModel.SchemaModel.QueryExecuter.HaltAllJobs();
             }
 
-            if (datasetConfiguration.Backend.ToLower() == "mssql")
-            {
-                _mainModel.SchemaModel = null; //new MSSQLSchemaModel(datasetConfiguration);
-            }
-            else if (datasetConfiguration.Backend.ToLower() == "sim")
-            {
-                _mainModel.SchemaModel = new SimSchemaModel();
-                _mainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
-                _mainModel.SampleSize = datasetConfiguration.SampleSize;
-                (_mainModel.SchemaModel as SimSchemaModel).QueryExecuter = new SimQueryExecuter();
-                (_mainModel.SchemaModel as SimSchemaModel).RootOriginModel = new SimOriginModel(datasetConfiguration);
-                (_mainModel.SchemaModel as SimSchemaModel).RootOriginModel.LoadInputFields();
-            }
-            else if (datasetConfiguration.Backend.ToLower() == "tuppleware")
-            {
-                _mainModel.SchemaModel = new TuppleWareSchemaModel();
-                _mainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
-                _mainModel.SampleSize = datasetConfiguration.SampleSize;
-                (_mainModel.SchemaModel as TuppleWareSchemaModel).QueryExecuter = new TuppleWareQueryExecuter();
-                (_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel = new TuppleWareOriginModel(datasetConfiguration);
-                (_mainModel.SchemaModel as TuppleWareSchemaModel).RootOriginModel.LoadInputFields();
-            }
-            else if (datasetConfiguration.Backend.ToLower() == "progressive")
+            if (datasetConfiguration.Backend.ToLower() == "progressive")
             {
                 _mainModel.SchemaModel = new ProgressiveSchemaModel();
                 _mainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;

@@ -419,7 +419,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 foreach (var valueComparison in hits[0].ValueComparisons)
                 {
-                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.Name + " " +
+                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.RawName + " " +
                                      valueComparison.Value));
                 }
 

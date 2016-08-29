@@ -77,7 +77,7 @@ namespace PanoramicDataWin8.model.data
                     }
                     else
                     {
-                        ret = "(" + queryModel.FilterModels[0].ValueComparisons[0].InputOperationModel.InputModel.Name + " in [" + string.Join(",", queryModel.FilterModels.Select(fm => fm.ValueComparisons[0]).Select(vc => "'" + vc.Value.ToString() + "'")) + "])";
+                        ret = "(" + queryModel.FilterModels[0].ValueComparisons[0].InputOperationModel.InputModel.RawName + " in [" + string.Join(",", queryModel.FilterModels.Select(fm => fm.ValueComparisons[0]).Select(vc => "'" + vc.Value.ToString() + "'")) + "])";
                         //ret = "(" + string.Join(",", queryModel.FilterModels.Select(fm => fm.ValueComparisons[0].)) + ")";
                     }
                 }
@@ -184,7 +184,7 @@ namespace PanoramicDataWin8.model.data
             {
                 val = "'" + val + "'";
             }
-            string ret = " " + InputOperationModel.InputModel.Name + " "  + op + " " + val + " ";
+            string ret = " " + InputOperationModel.InputModel.RawName + " "  + op + " " + val + " ";
             return ret;
         }
 

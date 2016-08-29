@@ -31,13 +31,11 @@ using Windows.UI.Xaml.Documents;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
-using PanoramicDataWin8.controller.data.tuppleware.gateway;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.progressive;
 using PanoramicDataWin8.model.data.result;
-using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.tilemenu;
 
@@ -256,7 +254,7 @@ namespace PanoramicDataWin8
             var model = DataContext as MainModel;
             if (model.SchemaModel != null)
             {
-                if (model.SchemaModel != null && (model.SchemaModel is TuppleWareSchemaModel || model.SchemaModel is ProgressiveSchemaModel))
+                if (model.SchemaModel != null && (model.SchemaModel is ProgressiveSchemaModel))
                 {
                     addJobButton.Visibility = Visibility.Visible;
                 }
@@ -274,7 +272,7 @@ namespace PanoramicDataWin8
             {
                 AppBarButton b = new AppBarButton();
                 b.Style =  Application.Current.Resources.MergedDictionaries[0]["AppBarButtonStyle1"] as Style;
-                b.Label = datasetConfiguration.Name;
+                b.Label = datasetConfiguration.Schema.DisplayName;
                 b.Icon = new SymbolIcon(Symbol.Library);
                 b.DataContext = datasetConfiguration;
                 b.Click += appBarButton_Click;
@@ -554,7 +552,7 @@ namespace PanoramicDataWin8
                 var buttonBounds = addInputButton.GetBounds(this);
                 var inputModels =
                     mainModel.SchemaModel.OriginModels.First()
-                        .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.Name)*/;
+                        .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
 
                 if (_inputMenu != null)
                 {
@@ -578,7 +576,7 @@ namespace PanoramicDataWin8
                     tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor((parentModel.Children.Count - 1)/8.0) - 1;
                     tileMenuItemViewModel.RowSpan = 1;
                     tileMenuItemViewModel.ColumnSpan = 1;
-                    Debug.WriteLine(inputModel.Name + " c: " + tileMenuItemViewModel.Column + " r : " + tileMenuItemViewModel.Row);
+                    Debug.WriteLine(inputModel.RawName + " c: " + tileMenuItemViewModel.Column + " r : " + tileMenuItemViewModel.Row);
                     count++;
                     if (count == 8.0)
                     {
@@ -606,7 +604,7 @@ namespace PanoramicDataWin8
                 InputGroupViewModel inputGroupViewModel = new InputGroupViewModel(null, inputGroupModel);
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new InputGroupViewTileMenuContentViewModel()
                 {
-                    Name = inputGroupModel.Name,
+                    Name = inputGroupModel.RawName,
                     InputGroupViewModel = inputGroupViewModel
                 };
 
@@ -616,7 +614,7 @@ namespace PanoramicDataWin8
                 currentTileMenuItemViewModel.AttachPosition = AttachPosition.Right;
 
                 int count = 0;
-                foreach (var childInputModel in inputGroupModel.InputModels/*.OrderBy(am => am.Name)*/)
+                foreach (var childInputModel in inputGroupModel.InputModels/*.OrderBy(am => am.RawName)*/)
                 {
                     var childTileMenu = recursiveCreateTileMenu(childInputModel, currentTileMenuItemViewModel);
                     childTileMenu.Row = count; // TileMenuItemViewModel.Children.Count;
@@ -637,7 +635,7 @@ namespace PanoramicDataWin8
                 InputFieldViewModel inputFieldViewModel = new InputFieldViewModel(null, new InputOperationModel(inputModel as InputFieldModel));
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new InputFieldViewTileMenuContentViewModel()
                 {
-                    Name = (inputModel as InputFieldModel).Name,
+                    Name = (inputModel as InputFieldModel).RawName,
                     InputFieldViewModel = inputFieldViewModel
                 };
             } 
@@ -657,7 +655,7 @@ namespace PanoramicDataWin8
                 currentTileMenuItemViewModel.AttachPosition = AttachPosition.Right;
 
                 int count = 0;
-                foreach (var childInputModel in taskGroupModel.TaskModels/*.OrderBy(am => am.Name)*/)
+                foreach (var childInputModel in taskGroupModel.TaskModels/*.OrderBy(am => am.RawName)*/)
                 {
                     var childTileMenu = recursiveCreateTileMenu(childInputModel, currentTileMenuItemViewModel);
                     childTileMenu.Row = count; // TileMenuItemViewModel.Children.Count;
@@ -755,18 +753,18 @@ namespace PanoramicDataWin8
 
         public async void FireCodeGeneration(VisualizationViewModel vis)
         {
-            codeGrid.Visibility = Visibility.Visible;
+            //codeGrid.Visibility = Visibility.Visible;
 
-            string text = "";
-            foreach (var generateCodeUuid in vis.QueryModel.GenerateCodeUuids)
-            {
-                CodeGenCommand cmd = new CodeGenCommand();
-                string response = await cmd.CodeGen((vis.QueryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel), generateCodeUuid);
-                JObject obj = JObject.Parse(response);
-                text += obj["code"] + "\n";
-            }
+            //string text = "";
+            //foreach (var generateCodeUuid in vis.QueryModel.GenerateCodeUuids)
+            //{
+            //    CodeGenCommand cmd = new CodeGenCommand();
+            //    string response = await cmd.CodeGen((vis.QueryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel), generateCodeUuid);
+            //    JObject obj = JObject.Parse(response);
+            //    text += obj["code"] + "\n";
+            //}
 
-            editBox.Document.SetText(TextSetOptions.ApplyRtfDocumentDefaults, text);
+            //editBox.Document.SetText(TextSetOptions.ApplyRtfDocumentDefaults, text);
         }
 
         private void clearAndDisposeMenus()

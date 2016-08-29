@@ -18,7 +18,6 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
-using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
@@ -171,11 +170,11 @@ namespace PanoramicDataWin8.view.vis.render
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
             List<InputOperationModel> inputOperationModels = new List<InputOperationModel>();
 
-            InputModel pattern = new TuppleWareFieldInputModel("pattern", InputDataTypeConstants.NVARCHAR, InputVisualizationTypeConstants.ENUM) { OriginModel = (model.QueryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel) };
-            InputModel minsupport = new TuppleWareFieldInputModel("support", InputDataTypeConstants.NVARCHAR, InputVisualizationTypeConstants.ENUM) { OriginModel = (model.QueryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel) };
+            //InputModel pattern = new TuppleWareFieldInputModel("pattern", InputDataTypeConstants.NVARCHAR, InputVisualizationTypeConstants.ENUM) { OriginModel = (model.QueryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel) };
+            //InputModel minsupport = new TuppleWareFieldInputModel("support", InputDataTypeConstants.NVARCHAR, InputVisualizationTypeConstants.ENUM) { OriginModel = (model.QueryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel) };
             
-            inputOperationModels.Add(new InputOperationModel(pattern));
-            inputOperationModels.Add(new InputOperationModel(minsupport));
+           // inputOperationModels.Add(new InputOperationModel(pattern));
+            //inputOperationModels.Add(new InputOperationModel(minsupport));
 
             List<HeaderObject> headerObjects = new List<HeaderObject>();
 
@@ -211,7 +210,7 @@ namespace PanoramicDataWin8.view.vis.render
             sb.Append(" <StackPanel Orientation=\"Horizontal\">");
             sb.Append("     <local:DataGridResizer Margin=\"0,0,0,0\" Width=\"4\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/> ");
             sb.Append("     <Grid Width=\"{Binding Width}\">");
-            sb.Append("         <local:InputFieldView DataContext=\"{Binding InputFieldViewModel}\" Width=\"{Binding Width}\" Name=\"inputFieldView\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/>");
+            sb.Append("         <local:InputFieldView DataContext=\"{Binding InputFieldViewModel}\" Width=\"{Binding Width}\" RawName=\"inputFieldView\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/>");
             sb.Append("     </Grid>");
             sb.Append("     <local:DataGridResizer Width=\"4\" xmlns:local=\"using:PanoramicDataWin8.view.common\" IsResizer=\"True\"/> ");
             sb.Append(" </StackPanel>");

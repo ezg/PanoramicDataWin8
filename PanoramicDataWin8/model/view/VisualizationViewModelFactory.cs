@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.model.data.tuppleware;
 
 namespace PanoramicDataWin8.model.view
 {
@@ -24,7 +23,7 @@ namespace PanoramicDataWin8.model.view
 
             if (visualizationType == VisualizationType.county)
             {
-                var county = schemaModel.OriginModels.First().InputModels.FirstOrDefault(im => im.Name == "county");
+                var county = schemaModel.OriginModels.First().InputModels.FirstOrDefault(im => im.RawName == "county");
                 if (county != null)
                 {
                     InputOperationModel x = new InputOperationModel(county);

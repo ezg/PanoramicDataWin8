@@ -22,7 +22,6 @@ using PanoramicDataWin8.view.vis.menu;
 using System.Diagnostics;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.view.inq;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236

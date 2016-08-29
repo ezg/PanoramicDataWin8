@@ -1,5 +1,4 @@
 ﻿using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.model.data.tuppleware;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view.tilemenu

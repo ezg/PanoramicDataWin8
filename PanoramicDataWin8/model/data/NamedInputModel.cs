@@ -6,7 +6,13 @@ namespace PanoramicDataWin8.model.data
     {
         public NamedInputModel() : base() { }
 
-        public override string Name
+        public override string RawName
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+
+        public override string DisplayName
         {
             get { throw new NotImplementedException(); }
             set { throw new NotImplementedException(); }

@@ -97,12 +97,12 @@ namespace PanoramicDataWin8.view.vis
                 var dim = _model.VisualizationViewModels[0].QueryModel.GetUsageInputOperationModel(InputUsage.X).First();
                 if (_model.VisualizationViewModels[1].QueryModel.GetUsageInputOperationModel(InputUsage.X).Any(i => i.InputModel == dim.InputModel))
                 {
-                    var n1 = res1.OverallCount[dim.InputModel.Name];
-                    var n2 = res2.OverallCount[dim.InputModel.Name];
-                    var m1 = res1.OverallMeans[dim.InputModel.Name];
-                    var m2 = res2.OverallMeans[dim.InputModel.Name];
-                    var v1 = Math.Sqrt(res1.OverallSampleStandardDeviations[dim.InputModel.Name]);
-                    var v2 = Math.Sqrt(res2.OverallSampleStandardDeviations[dim.InputModel.Name]);
+                    var n1 = res1.OverallCount[dim.InputModel.RawName];
+                    var n2 = res2.OverallCount[dim.InputModel.RawName];
+                    var m1 = res1.OverallMeans[dim.InputModel.RawName];
+                    var m2 = res2.OverallMeans[dim.InputModel.RawName];
+                    var v1 = Math.Sqrt(res1.OverallSampleStandardDeviations[dim.InputModel.RawName]);
+                    var v2 = Math.Sqrt(res2.OverallSampleStandardDeviations[dim.InputModel.RawName]);
 
                     var df = Math.Min(n1, n2);
                     var t = (m1 - m2)/Math.Sqrt((v1/n1) + (v2/n2));

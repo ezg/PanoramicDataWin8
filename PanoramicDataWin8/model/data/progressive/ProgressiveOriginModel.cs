@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using IDEA_common.catalog;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.input;
+using Attribute = IDEA_common.catalog.Attribute;
 
 namespace PanoramicDataWin8.model.data.progressive
 {
@@ -18,66 +20,54 @@ namespace PanoramicDataWin8.model.data.progressive
 
         }
 
-        private void recursiveCreateAttributeModels(JToken token, ProgressiveInputGroupModel parentGroupModel, ProgressiveOriginModel progressiveOriginModel)
+        private void recursiveCreateAttributeModels(AttributeGroup attributeGroup, ProgressiveInputGroupModel parentGroupModel)
         {
-            if (token is JArray)
+            ProgressiveInputGroupModel groupModel = new ProgressiveInputGroupModel(attributeGroup.Name.ToString(), attributeGroup.Name.ToString());
+            groupModel.OriginModel = this;
+            if (parentGroupModel != null)
             {
-                if (token[0] is JValue)
-                {
-                    if (token[1] is JValue)
-                    {
-                        var datatype = InputDataTypeConstants.NVARCHAR;
-                        if (token[1].ToString().ToLower() == "int64")
-                        {
-                            datatype = InputDataTypeConstants.INT;
-                        }
-                        else if (token[1].ToString().ToLower() == "float64")
-                        {
-                            datatype = InputDataTypeConstants.FLOAT;
-                        }
-                        if (!token[0].ToString().ToLower().StartsWith("unnamed"))
-                        {
-                            ProgressiveFieldInputModel fieldInputModel = new ProgressiveFieldInputModel(token[0].ToString(),
-                                datatype,
-                                token[1].ToString().ToLower() == "object" ? "enum" : "numeric");
-                            fieldInputModel.OriginModel = progressiveOriginModel;
+                parentGroupModel.InputModels.Add(groupModel);
+            }
+            else
+            {
+                this.InputModels.Add(groupModel);
+            }
+            foreach (var childGroup in attributeGroup.AttributeGroups)
+            {
+                recursiveCreateAttributeModels(childGroup, groupModel);
+            }
+            foreach (var childAttribute in attributeGroup.Attributes)
+            {
+                recursiveCreateAttributeModels(childAttribute, groupModel);
+            }
+        }
 
-                            if (parentGroupModel != null)
-                            {
-                                parentGroupModel.InputModels.Add(fieldInputModel);
-                            }
-                            else
-                            {
-                                progressiveOriginModel.InputModels.Add(fieldInputModel);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        ProgressiveInputGroupModel groupModel = new ProgressiveInputGroupModel(token[0].ToString());
-                        groupModel.OriginModel = progressiveOriginModel;
-                        if (parentGroupModel != null)
-                        {
-                            parentGroupModel.InputModels.Add(groupModel);
-                        }
-                        else
-                        {
-                            progressiveOriginModel.InputModels.Add(groupModel);
-                        }
-                        foreach (var child in token[1])
-                        {
-                            recursiveCreateAttributeModels(child, groupModel, progressiveOriginModel);
-                        }
-                    }
-                }
+        private void recursiveCreateAttributeModels(IDEA_common.catalog.Attribute attribute, ProgressiveInputGroupModel parentGroupModel)
+        {
+            ProgressiveFieldInputModel fieldInputModel = new ProgressiveFieldInputModel(attribute.RawName, attribute.DisplayName,
+                                InputDataTypeConstants.FromType(attribute.DataType),
+                                InputDataTypeConstants.FromType(attribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric");
+            fieldInputModel.OriginModel = this;
+
+            if (parentGroupModel != null)
+            {
+                parentGroupModel.InputModels.Add(fieldInputModel);
+            }
+            else
+            {
+                this.InputModels.Add(fieldInputModel);
             }
         }
 
         public void LoadInputFields()
         {
-            foreach (var child in DatasetConfiguration.SchemaJson["schema"])
+            foreach (AttributeGroup attributeGroup in DatasetConfiguration.Schema.RootAttributeGroup.AttributeGroups)
             {
-                recursiveCreateAttributeModels(child, null, this);
+                recursiveCreateAttributeModels(attributeGroup, null);
+            }
+            foreach (Attribute attribute in DatasetConfiguration.Schema.RootAttributeGroup.Attributes)
+            {
+                recursiveCreateAttributeModels(attribute, null);
             }
         }
 
@@ -98,7 +88,7 @@ namespace PanoramicDataWin8.model.data.progressive
         {
             get
             {
-                return _datasetConfiguration.Name;
+                return _datasetConfiguration.Schema.RawName;
             }
         }
 

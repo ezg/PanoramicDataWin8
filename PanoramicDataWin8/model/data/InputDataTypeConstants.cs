@@ -1,4 +1,6 @@
-﻿namespace PanoramicDataWin8.model.data
+﻿using System;
+
+namespace PanoramicDataWin8.model.data
 {
     public class InputDataTypeConstants
     {
@@ -10,5 +12,23 @@
         public static string INT = "int";
         public static string TIME = "time";
         public static string GUID = "uniqueidentifier";
+
+        public static string FromType(Type type)
+        {
+            if (type == typeof (float) ||
+                type == typeof(double))
+            {
+                return FLOAT;
+            }
+            if (type == typeof(DateTime))
+            {
+                return DATE;
+            }
+            if (type == typeof(int))
+            {
+                return INT;
+            }
+            return NVARCHAR;
+        }
     }
 }
