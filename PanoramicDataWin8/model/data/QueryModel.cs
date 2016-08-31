@@ -4,9 +4,11 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using Windows.UI;
+using IDEA_common.aggregates;
+using IDEA_common.operations;
+using IDEA_common.operations.histogram;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
@@ -25,11 +27,10 @@ namespace PanoramicDataWin8.model.data
         public delegate void RequestRenderHandler(object sender, EventArgs e);
         public event RequestRenderHandler RequestRender;
 
-        public QueryModel(SchemaModel schemaModel, ResultModel resultModel)
+        public QueryModel(SchemaModel schemaModel)
         {
             _id = _nextId++;
             _schemaModel = schemaModel;
-            _resultModel = resultModel;
 
             foreach (var inputUsage in Enum.GetValues(typeof(InputUsage)).Cast<InputUsage>())
             {
@@ -299,17 +300,17 @@ namespace PanoramicDataWin8.model.data
         }
 
         
-        private ResultModel _resultModel = null;
+        private IResult _result = null;
         [JsonIgnore]
-        public ResultModel ResultModel
+        public IResult Result
         {
             get
             {
-                return _resultModel;
+                return _result;
             }
             set
             {
-                this.SetProperty(ref _resultModel, value);
+                this.SetProperty(ref _result, value);
             }
         }
 
@@ -519,56 +520,6 @@ namespace PanoramicDataWin8.model.data
             }
         }
 
-        public AxisType GetAxisType(InputOperationModel inputOperationModel)
-        {
-            // determine axis type
-            // some aggregation
-            if (inputOperationModel.AggregateFunction != AggregateFunction.None)
-            {
-                if (inputOperationModel.AggregateFunction == AggregateFunction.Avg ||
-                    inputOperationModel.AggregateFunction == AggregateFunction.Sum ||
-                    inputOperationModel.AggregateFunction == AggregateFunction.Count)
-                {
-                    return AxisType.Quantitative;
-                }
-                else if (inputOperationModel.AggregateFunction == AggregateFunction.Max ||
-                         inputOperationModel.AggregateFunction == AggregateFunction.Min) 
-                {
-                    if (((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.FLOAT ||
-                        ((InputFieldModel)inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.INT)
-                    {
-                        return AxisType.Quantitative;
-                    }
-                }
-                else 
-                {
-                    return AxisType.Ordinal;
-                }
-            }
-            // no aggrgation
-            else
-            {
-                if (((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.FLOAT ||
-                    ((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.INT)
-                {
-                    if (((InputFieldModel) inputOperationModel.InputModel).InputVisualizationType == InputVisualizationTypeConstants.ENUM)
-                    {
-                        return AxisType.Nominal;
-                    }
-                    return AxisType.Quantitative;
-                }
-                else if (((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.TIME)
-                {
-                    return AxisType.Time;
-                }
-                else if (((InputFieldModel) inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.DATE)
-                {
-                    return AxisType.Date;
-                }
-            }
-            return AxisType.Nominal;
-        }
-
         private TaskModel taskModel;
         public TaskModel TaskModel
         {
@@ -646,4 +597,55 @@ namespace PanoramicDataWin8.model.data
     public enum QueryModelUpdatedEventType { Structure, Links, FilterModels, ClearFilterModels, Brush }
 
     public enum VisualizationType { table, plot, map, line, county }
+
+    public static class QueryModelHelper
+    {
+        public static AggregateParameters CreateAggregateParameters(InputOperationModel iom)
+        {
+            if (iom.AggregateFunction == AggregateFunction.Count)
+            {
+                return new CountAggregateParameters() { Dimension = iom.InputModel.RawName };
+            }
+            if (iom.AggregateFunction == AggregateFunction.Avg)
+            {
+                return new AverageAggregateParameters() { Dimension = iom.InputModel.RawName };
+            }
+            if (iom.AggregateFunction == AggregateFunction.Max)
+            {
+                return new MaxAggregateParameters() { Dimension = iom.InputModel.RawName };
+            }
+            if (iom.AggregateFunction == AggregateFunction.Min)
+            {
+                return new MinAggregateParameters() { Dimension = iom.InputModel.RawName };
+            }
+            if (iom.AggregateFunction == AggregateFunction.Sum)
+            {
+                return new SumAggregateParameters() { Dimension = iom.InputModel.RawName };
+            }
+            if (iom.AggregateFunction == AggregateFunction.Count)
+            {
+                return new CountAggregateParameters() { Dimension = iom.InputModel.RawName };
+            }
+            return null;
+        }
+
+        public static AggregateKey CreateAggregateKey(InputOperationModel iom, HistogramResult histogramResult, int brushIndex)
+        {
+            return new AggregateKey()
+            {
+                AggregateParameterIndex = histogramResult.GetAggregateParametersIndex(CreateAggregateParameters(iom)),
+                BrushIndex = brushIndex
+            };
+        }
+
+        public static AggregateKey CreateAggregateKey(InputOperationModel iom, SingleDimensionAggregateParameters aggParameters, HistogramResult histogramResult, int brushIndex)
+        {
+            aggParameters.Dimension = iom.InputModel.RawName;
+            return new AggregateKey()
+            {
+                AggregateParameterIndex = histogramResult.GetAggregateParametersIndex(aggParameters),
+                BrushIndex = brushIndex
+            };
+        }
+    }
 }

@@ -46,10 +46,7 @@ namespace PanoramicDataWin8.model.view
 
         public VisualizationViewModel(SchemaModel schemaModel)
         {
-            _queryModel = new QueryModel(schemaModel, new ResultModel()
-            {
-                ResultDescriptionModel = new VisualizationResultDescriptionModel()
-            });
+            _queryModel = new QueryModel(schemaModel);
             selectColor();
         }
 

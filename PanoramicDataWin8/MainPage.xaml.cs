@@ -188,8 +188,8 @@ namespace PanoramicDataWin8
                 }
                 if (e.Key == VirtualKey.T)
                 {
-                    QueryModel q1 = new QueryModel(MainViewController.Instance.MainModel.SchemaModel, new ResultModel());
-                    QueryModel q2 = new QueryModel(MainViewController.Instance.MainModel.SchemaModel, new ResultModel());
+                    QueryModel q1 = new QueryModel(MainViewController.Instance.MainModel.SchemaModel);
+                    QueryModel q2 = new QueryModel(MainViewController.Instance.MainModel.SchemaModel);
                     q1.FilterModels.Add(new FilterModel());
                     LinkModel lm = new LinkModel();
                     lm.FromQueryModel = q1;

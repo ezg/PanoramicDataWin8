@@ -32,10 +32,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                     await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         var queryModel = arg.EventArgs.QueryModel;
-                        queryModel.ResultModel.ResultItemModels = new ObservableCollection<ResultItemModel>();
-                        queryModel.ResultModel.Progress = 0.0;
-                        queryModel.ResultModel.ResultDescriptionModel = null;
-                        queryModel.ResultModel.FireResultModelUpdated(ResultType.Clear);
+                        queryModel.Result = null;
 
                         if (ActiveJobs.ContainsKey(queryModel))
                         {
@@ -110,7 +107,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             }
         }
 
-        private void job_JobCompleted(object sender, EventArgs e)
+        private void job_JobCompleted(object sender, JobEventArgs jobEventArgs)
         {
             QueryModel queryModel = null;
             if (sender is ProgressiveVisualizationJob)
@@ -123,8 +120,9 @@ namespace PanoramicDataWin8.controller.data.progressive
                 ProgressiveClassifyJob job = sender as ProgressiveClassifyJob;
                 queryModel = job.QueryModel;
             }
-            queryModel.ResultModel.Progress = 1.0;
-            queryModel.ResultModel.FireResultModelUpdated(ResultType.Complete);
+            queryModel.Result = jobEventArgs.Result;
+            //queryModel.Result.Progress = 1.0;
+            //queryModel.Result.FireResultModelUpdated(ResultType.Complete);
         }
 
         private void job_JobUpdate(object sender, JobEventArgs jobEventArgs)
@@ -140,17 +138,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 ProgressiveClassifyJob job = sender as ProgressiveClassifyJob;
                 queryModel = job.QueryModel;
             }
-            var oldItems = queryModel.ResultModel.ResultItemModels;
-            {
-                oldItems.Clear();
-                foreach (var sample in jobEventArgs.Samples)
-                {
-                    oldItems.Add(sample);
-                }
-            }
-            queryModel.ResultModel.Progress = jobEventArgs.Progress;
-            queryModel.ResultModel.ResultDescriptionModel = jobEventArgs.ResultDescriptionModel;
-            queryModel.ResultModel.FireResultModelUpdated(ResultType.Update);
+            queryModel.Result = jobEventArgs.Result;
         }
     }
 

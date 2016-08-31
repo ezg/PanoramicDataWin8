@@ -14,12 +14,13 @@ using Windows.Networking.Sockets;
 using Windows.UI;
 using PanoramicDataWin8.utils;
 using GeoAPI.Geometries;
+using IDEA_common.operations;
+using IDEA_common.operations.histogram;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 
@@ -44,8 +45,8 @@ namespace PanoramicDataWin8.view.vis.render
         private Color _textColor;
         private CanvasTextFormat _textFormat;
 
-        private ResultModel _resultModel = null;
-        private VisualizationResultDescriptionModel _visualizationDescriptionModel = null;
+        private IResult _result = null;
+        //private VisualizationResultDescriptionModel _visualizationDescriptionModel = null;
 
         private QueryModel _queryModelClone = null;
         private QueryModel _queryModel = null;
@@ -53,9 +54,9 @@ namespace PanoramicDataWin8.view.vis.render
         private Dictionary<FilterModel, Rect> _filterModelRects = new Dictionary<FilterModel, Rect>();
         private InputOperationModel _xAom = null;
         private InputOperationModel _yAom = null;
-        private Dictionary<string, Dictionary<BrushIndex, double>> _values = new Dictionary<string, Dictionary<BrushIndex, double>>();
+        private Dictionary<string, Dictionary<Brush, double>> _values = new Dictionary<string, Dictionary<Brush, double>>();
         private Dictionary<string, int> _index = new Dictionary<string, int>();
-        private Dictionary<string, Dictionary<BrushIndex, double>> _countsInterpolated = new Dictionary<string, Dictionary<BrushIndex, double>>();
+        private Dictionary<string, Dictionary<Brush, double>> _countsInterpolated = new Dictionary<string, Dictionary<Brush, double>>();
 
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
         private CanvasCachedGeometry _strokeRoundedRectGeom = null;
@@ -148,15 +149,15 @@ namespace PanoramicDataWin8.view.vis.render
             _filterModels = filterModels;
         }
 
-        public async void UpdateData(ResultModel resultModel, QueryModel queryModel, QueryModel queryModelClone, InputOperationModel xAom, InputOperationModel yAom)
+        public async void UpdateData(IResult result, QueryModel queryModel, QueryModel queryModelClone, InputOperationModel xAom, InputOperationModel yAom)
         {
-            _resultModel = resultModel;
+            _result = result;
             _queryModelClone = queryModelClone;
             _queryModel = queryModel;
             _xAom = xAom;
             _yAom = yAom;
 
-            _visualizationDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
+            /*_visualizationDescriptionModel = _result.ResultDescriptionModel as VisualizationResultDescriptionModel;
 
             if (resultModel.ResultItemModels.Count > 0)
             {
@@ -167,7 +168,7 @@ namespace PanoramicDataWin8.view.vis.render
                 _countsInterpolated.Clear();
                 _index.Clear();
                 var labels = yBinRange.GetLabels();
-                foreach (var resultItem in _resultModel.ResultItemModels.Select(ri => ri as ProgressiveVisualizationResultItemModel))
+                foreach (var resultItem in _result.ResultItemModels.Select(ri => ri as ProgressiveVisualizationResultItemModel))
                 {
                     var xValues = resultItem.Values[xAom];
                     var yValues = resultItem.Values[yAom];
@@ -180,8 +181,8 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else if (resultModel.ResultItemModels.Count == 0 && resultModel.Progress == 1.0)
             {
-                _isResultEmpty = _resultModel.ResultType != ResultType.Clear; ;
-            }
+                _isResultEmpty = _result.ResultType != ResultType.Clear; ;
+            }*/
         }
 
         public override void Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
@@ -191,7 +192,7 @@ namespace PanoramicDataWin8.view.vis.render
             var mat = Matrix3x2.CreateScale(new Vector2(CompositionScaleX, CompositionScaleY));
             canvasArgs.DrawingSession.Transform = mat;
 
-            if (_resultModel != null && _resultModel.ResultItemModels.Count > 0)
+            if (_result != null)
             {
                 if (MainViewController.Instance.MainModel.GraphRenderOption == GraphRenderOptions.Cell)
                 {
@@ -270,7 +271,7 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     //var geom = CanvasGeometry.CreatePolygon(canvas, path.Select(v => new Vector2(v.X - _minMax.MinX, v.Y - _minMax.MinY)).ToArray());
                     if (_values.ContainsKey("F" + key))
-                    {
+                    {/*
                         var value = _values["F" + key][BrushIndex.ALL];
 
                         double min = _visualizationDescriptionModel.MinValues[_xAom][BrushIndex.ALL];
@@ -309,12 +310,7 @@ namespace PanoramicDataWin8.view.vis.render
                             var brushUnNormalizedValue = _countsInterpolated["F" + key][brushIndex];
                             var brushFactor = (brushUnNormalizedValue/allUnNormalizedValue);
 
-                            /*var ratio = (rect.Width/rect.Height);
-                            var newHeight = Math.Sqrt((1.0/ratio)*((rect.Width*rect.Height)*brushFactor));
-                            var newWidth = newHeight*ratio;
-
-                            var brushRect = new Rect(rect.X + (rect.Width - newWidth)/2.0f, rect.Y + (rect.Height - newHeight)/2.0f, newWidth, newHeight);
-                            canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, renderColor);*/
+                          
                             if (brushFactor > 0)
                             {
                                 //canvasArgs.DrawingSession.FillGeometry(geom, renderColor);
@@ -323,7 +319,7 @@ namespace PanoramicDataWin8.view.vis.render
                             brushCount++;
                         }
                         //canvasArgs.DrawingSession.DrawGeometry(geom, white, 0.1f/_xScale);
-                        canvasArgs.DrawingSession.DrawCachedGeometry(_cachedGeometriesOutline[key][0.2f][i], white);
+                        canvasArgs.DrawingSession.DrawCachedGeometry(_cachedGeometriesOutline[key][0.2f][i], white);*/
                     }
                     else
                     {

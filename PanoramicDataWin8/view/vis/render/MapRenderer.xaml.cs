@@ -20,6 +20,8 @@ using Esri.ArcGISRuntime.Geometry;
 using Esri.ArcGISRuntime.Layers;
 using Esri.ArcGISRuntime.Symbology;
 using GeoAPI.Geometries;
+using IDEA_common.operations;
+using IDEA_common.operations.histogram;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
@@ -73,7 +75,7 @@ namespace PanoramicDataWin8.view.vis.render
             _mapInertiaHandler = new MapInertiaHandler(sender as MapView);
 
             xyRenderer.Render += render;
-            xyRenderer.LoadResultItemModels += loadResultItemModels;
+            xyRenderer.LoadResult += LoadResult;
         }
 
         void render(bool sizeChanged = false)
@@ -84,18 +86,14 @@ namespace PanoramicDataWin8.view.vis.render
                 var graphicsOverlay = _mapInertiaHandler.MapView.GraphicsOverlays["graphicsOverlay"];
                 List<Graphic> graphics = new List<Graphic>();
 
-                if (model.QueryModel.ResultModel != null && model.QueryModel.ResultModel.ResultItemModels.Any())
+                var histogramResult = model.QueryModel.Result as HistogramResult;
+                if (histogramResult != null)
                 {
-                    var resultDescriptionModel = model.QueryModel.ResultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
-
                     var xAom = model.QueryModel.GetUsageInputOperationModel(InputUsage.X).FirstOrDefault();
                     var yAom = model.QueryModel.GetUsageInputOperationModel(InputUsage.Y).FirstOrDefault();
 
-                    var xIndex = resultDescriptionModel.Dimensions.IndexOf(xAom);
-                    var yIndex = resultDescriptionModel.Dimensions.IndexOf(yAom);
-
-                    var xBinRange = resultDescriptionModel.BinRanges[xIndex];
-                    var yBinRange = resultDescriptionModel.BinRanges[yIndex];
+                    var xBinRange = histogramResult.BinRanges[0];
+                    var yBinRange = histogramResult.BinRanges[1];
 
                     var xBins = xBinRange.GetBins();
                     xBins.Add(xBinRange.AddStep(xBins.Max()));
@@ -104,7 +102,7 @@ namespace PanoramicDataWin8.view.vis.render
 
                     if (xAom != null && yAom != null)
                     {
-                        foreach (var resultItem in model.QueryModel.ResultModel.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
+                        /*foreach (var resultItem in model.QueryModel.Result.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
                         {
                             double? xValue = (double?) resultItem.Values[xAom].Value;
                             double? yValue = (double?) resultItem.Values[yAom].Value;
@@ -156,7 +154,7 @@ namespace PanoramicDataWin8.view.vis.render
                                     graphics.Add(new Graphic() {Geometry = polygon, Symbol = redSymbol});
                                 }
                             }
-                        }
+                        }*/
                     }
                     graphicsOverlay.GraphicsSource = graphics;
                 }
@@ -213,7 +211,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
         }
 
-        void loadResultItemModels(ResultModel resultModel)
+        void LoadResult(IResult result)
         {
             render();
         }

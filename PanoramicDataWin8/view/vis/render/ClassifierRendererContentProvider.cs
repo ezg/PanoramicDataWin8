@@ -12,7 +12,6 @@ using PanoramicDataWin8.utils;
 using GeoAPI.Geometries;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 using System.Numerics;
@@ -20,6 +19,7 @@ using Windows.Foundation;
 using Windows.UI;
 using Windows.UI.Input.Inking;
 using Windows.UI.Xaml.Media;
+using IDEA_common.operations;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using Newtonsoft.Json.Linq;
@@ -54,7 +54,7 @@ namespace PanoramicDataWin8.view.vis.render
         private List<List<Windows.Foundation.Point>> _strokes = new List<List<Point>>();
         private List<object> _recognizedText = new List<object>();
 
-        private ResultModel _resultModel = null;
+        private IResult _result = null;
         private ClassfierResultDescriptionModel _classfierResultDescriptionModel = null;
 
         private QueryModel _queryModelClone = null;
@@ -76,14 +76,14 @@ namespace PanoramicDataWin8.view.vis.render
         {
         }
         
-        public void UpdateData(ResultModel resultModel, QueryModel queryModel, QueryModel queryModelClone, int viewIndex )
+        public void UpdateData(IResult result, QueryModel queryModel, QueryModel queryModelClone, int viewIndex )
         {
-            _resultModel = resultModel;
+            _result = result;
             _queryModelClone = queryModelClone;
             _queryModel = queryModel;
             _viewIndex = viewIndex;
 
-            _classfierResultDescriptionModel = _resultModel.ResultDescriptionModel as ClassfierResultDescriptionModel;
+            //_classfierResultDescriptionModel = _result.ResultDescriptionModel as ClassfierResultDescriptionModel;
         }
 
         private bool? _testResult = null;
@@ -212,7 +212,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var mat = Matrix3x2.CreateScale(new Vector2(CompositionScaleX, CompositionScaleY));
             canvasArgs.DrawingSession.Transform = mat;
-            if (_resultModel != null && _classfierResultDescriptionModel != null)
+            if (_result != null && _classfierResultDescriptionModel != null)
             {
                 computeSizes(canvas, canvasArgs);
 

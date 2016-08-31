@@ -1,5 +1,6 @@
 ﻿using System;
 using Windows.UI.Xaml;
+using IDEA_common.operations;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
@@ -34,8 +35,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (DataContext != null)
             {
                 ((VisualizationViewModel)DataContext).QueryModel.QueryModelUpdated -= QueryModel_QueryModelUpdated;
-                ResultModel resultModel = ((VisualizationViewModel)DataContext).QueryModel.ResultModel;
-                resultModel.ResultModelUpdated -= resultModel_ResultModelUpdated;
+                ((VisualizationViewModel)DataContext).QueryModel.PropertyChanged -= QueryModel_PropertyChanged;
             }
         }
 
@@ -44,10 +44,19 @@ namespace PanoramicDataWin8.view.vis.render
             if (args.NewValue != null)
             {
                 ((VisualizationViewModel)DataContext).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
-                ResultModel resultModel = ((VisualizationViewModel)DataContext).QueryModel.ResultModel;
-                resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
+                ((VisualizationViewModel)DataContext).QueryModel.PropertyChanged += QueryModel_PropertyChanged;
                 //mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.VisualizationType.ToString();
                 //mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskType.Replace("_", " ").ToString();
+            }
+        }
+
+
+        private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            QueryModel model = (DataContext as VisualizationViewModel).QueryModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Result))
+            {
+                populateData();
             }
         }
 
@@ -55,15 +64,10 @@ namespace PanoramicDataWin8.view.vis.render
         {
         }
 
-        void resultModel_ResultModelUpdated(object sender, EventArgs e)
-        {
-            populateData();
-        }
-
         private void populateData()
         {
-            ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
-            if (resultModel.ResultItemModels.Count > 0)
+            IResult resultModel = (DataContext as VisualizationViewModel).QueryModel.Result;
+            if (resultModel != null)
             {
                 mainGrid.Opacity = 1;
                 mainLabel.Opacity = 0;

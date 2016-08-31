@@ -10,12 +10,12 @@ using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 using Windows.UI.Composition;
 using Windows.UI.Core;
+using IDEA_common.operations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.model.data.progressive;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.utils;
@@ -125,7 +125,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 //['actual and predicted', 'not actual and predicted', 'not actual and not predicted', 'actual and not predicted']
                                 List<string> visBrushes = new List<string>() { "0", "1", "2", "3" };
 
-                                JObject token = (JObject)result["histograms"][feature.InputModel.RawName];
+                                /*JObject token = (JObject)result["histograms"][feature.InputModel.RawName];
                                 VisualizationResultDescriptionModel visResultDescriptionModel = new VisualizationResultDescriptionModel();
                                 List<ResultItemModel> resultItemModels = ProgressiveVisualizationJob.UpdateVisualizationResultDescriptionModel(visResultDescriptionModel, token, visBrushes,
                                     new List<InputOperationModel>()
@@ -150,7 +150,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                                     Progress = progress,
                                     ResultDescriptionModel = visResultDescriptionModel,
                                     ResultItemModels = new ObservableCollection<ResultItemModel>(resultItemModels)
-                                });
+                                });*/
                             }
 
                             /*var classifyResult = JsonConvert.DeserializeObject<ClassifyResult>(result[label].ToString());
@@ -191,7 +191,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                             if (progress >= 1.0)
                             {
                                 Stop();
-                                await fireCompleted();
+                                //await fireCompleted();
                             }
                         }
 
@@ -206,26 +206,27 @@ namespace PanoramicDataWin8.controller.data.progressive
             }
         }
         
-        private async Task fireUpdated(List<ResultItemModel> samples, double progress, ResultDescriptionModel resultDescriptionModel)
+        private async Task fireUpdated(IResult result)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 FireJobUpdated(new JobEventArgs()
                 {
-                    Samples = samples,
-                    Progress = progress,
-                    ResultDescriptionModel = resultDescriptionModel
+                    Result = result
                 });
             });
         }
 
-        private async Task fireCompleted()
+        private async Task fireCompleted(IResult result)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                FireJobCompleted(new EventArgs());
+                FireJobCompleted(new JobEventArgs()
+                {
+                    Result = result
+                });
             });
         }
 

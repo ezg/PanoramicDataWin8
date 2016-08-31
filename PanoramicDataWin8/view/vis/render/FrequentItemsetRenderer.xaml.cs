@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Markup;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using IDEA_common.operations;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
@@ -50,8 +51,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 ((VisualizationViewModel)DataContext).PropertyChanged -= VisualizationViewModel_PropertyChanged;
                 ((VisualizationViewModel)DataContext).QueryModel.QueryModelUpdated -= QueryModel_QueryModelUpdated;
-                ResultModel resultModel = ((VisualizationViewModel)DataContext).QueryModel.ResultModel;
-                resultModel.ResultModelUpdated -= resultModel_ResultModelUpdated;
+                ((VisualizationViewModel)DataContext).QueryModel.PropertyChanged -= QueryModel_PropertyChanged;
             }
         }
 
@@ -76,16 +76,20 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 ((VisualizationViewModel)DataContext).PropertyChanged += VisualizationViewModel_PropertyChanged;
                 ((VisualizationViewModel)DataContext).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
-                ResultModel resultModel = ((VisualizationViewModel)DataContext).QueryModel.ResultModel;
-                resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
+                ((VisualizationViewModel) DataContext).QueryModel.PropertyChanged += QueryModel_PropertyChanged;
                 mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.VisualizationType.ToString();
                 mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
             }
         }
 
-        void resultModel_ResultModelUpdated(object sender, EventArgs e)
+
+        private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            populateData();
+            QueryModel model = (DataContext as VisualizationViewModel).QueryModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Result))
+            {
+                populateData();
+            }
         }
 
 
@@ -97,9 +101,9 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void populateData()
         {
-            ResultModel resultModel = ((VisualizationViewModel) DataContext).QueryModel.ResultModel;
+            IResult resultModel = ((VisualizationViewModel) DataContext).QueryModel.Result;
             
-            if (resultModel != null && resultModel.ResultItemModels.Count > 0)
+            if (resultModel != null)
             {
                 ExponentialEase easingFunction = new ExponentialEase();
                 easingFunction.EasingMode = EasingMode.EaseInOut;
@@ -129,7 +133,7 @@ namespace PanoramicDataWin8.view.vis.render
                 tableGrid.Opacity = 1;
                 mainGrid.Opacity = 0;
 
-               // loadResults(((VisualizationViewModel)DataContext).QueryModel.ResultModel);
+               // loadResults(((VisualizationViewModel)DataContext).QueryModel.result);
                render();
             }
             else
@@ -252,7 +256,7 @@ namespace PanoramicDataWin8.view.vis.render
             datatemplate = (DataTemplate)XamlReader.Load(sb.ToString());
             listView.ItemTemplate = datatemplate;
 
-            listView.ItemsSource = model.QueryModel.ResultModel.ResultItemModels;
+            //listView.ItemsSource = model.QueryModel.Result.ResultItemModels;
         }
 
         void headerObject_Resized(object sender, EventArgs e)

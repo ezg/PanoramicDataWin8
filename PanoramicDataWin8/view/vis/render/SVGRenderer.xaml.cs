@@ -21,6 +21,7 @@ using PanoramicDataWin8.view.vis.menu;
 using Windows.UI.Input;
 using System.Diagnostics;
 using GeoAPI.Geometries;
+using IDEA_common.operations;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
@@ -49,7 +50,7 @@ namespace PanoramicDataWin8.view.vis.render
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
             xRenderer.Render += render;
-            xRenderer.LoadResultItemModels += loadResultItemModels;
+            xRenderer.LoadResult += LoadResult;
             dxSurface = new DXSurface();
             _svgRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
             _svgRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
@@ -79,10 +80,10 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void PlotRenderer_RequestRender(object sender, EventArgs e)
         {
-            if (DataContext != null && (DataContext as VisualizationViewModel).QueryModel.ResultModel != null)
+            if (DataContext != null && (DataContext as VisualizationViewModel).QueryModel.Result != null)
             {
-                var resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
-                if (resultModel.ResultItemModels.Count > 0 || resultModel.Progress == 1.0 || resultModel.ResultType == ResultType.Complete)
+                var resultModel = (DataContext as VisualizationViewModel).QueryModel.Result;
+                if (resultModel != null)
                 {
                     render();
                 }
@@ -98,10 +99,10 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void loadResultItemModels(ResultModel resultModel)
+        void LoadResult(IResult result)
         {
             VisualizationViewModel model = (DataContext as VisualizationViewModel);
-            _svgRendererContentProvider.UpdateData(resultModel,
+            _svgRendererContentProvider.UpdateData(result,
                 model.QueryModel,
                 model.QueryModel.Clone(),
                 model.QueryModel.GetUsageInputOperationModel(InputUsage.X).FirstOrDefault(),

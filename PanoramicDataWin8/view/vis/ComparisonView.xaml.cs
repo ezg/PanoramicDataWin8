@@ -65,7 +65,7 @@ namespace PanoramicDataWin8.view.vis
                 foreach (var vis in _model.VisualizationViewModels)
                 {
                     vis.PropertyChanged -= VisModel_PropertyChanged;
-                    vis.QueryModel.ResultModel.ResultModelUpdated -= ResultModel_ResultModelUpdated;
+                    vis.QueryModel.PropertyChanged -= QueryModel_PropertyChanged;
                 }
             }
             if (args.NewValue != null)
@@ -75,22 +75,26 @@ namespace PanoramicDataWin8.view.vis
                 foreach (var vis in _model.VisualizationViewModels)
                 {
                     vis.PropertyChanged += VisModel_PropertyChanged;
-                    vis.QueryModel.ResultModel.ResultModelUpdated += ResultModel_ResultModelUpdated;
+                    vis.QueryModel.PropertyChanged += QueryModel_PropertyChanged;
                 }
                 updateRendering();
                 updateResult();
             }
         }
 
-        private void ResultModel_ResultModelUpdated(object sender, EventArgs e)
+        private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            updateResult();
+            QueryModel model = (DataContext as VisualizationViewModel).QueryModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Result))
+            {
+                updateResult();
+            }
         }
-
+        
         private void updateResult()
         {
-            var res1 = _model.VisualizationViewModels[0].QueryModel.ResultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
-            var res2 = _model.VisualizationViewModels[1].QueryModel.ResultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
+            /*var res1 = _model.VisualizationViewModels[0].QueryModel.Result.ResultDescriptionModel as VisualizationResultDescriptionModel;
+            var res2 = _model.VisualizationViewModels[1].QueryModel.Result.ResultDescriptionModel as VisualizationResultDescriptionModel;
 
             if (res1 != null && res2 != null)
             {
@@ -132,7 +136,7 @@ namespace PanoramicDataWin8.view.vis
                     tbDValue.Text = "d = " + Math.Abs(d).ToString("F2");
                     tbDValue.FontSize = 16;
                 }
-            }
+            }*/
         }
 
         private double tToP(double t, double df)

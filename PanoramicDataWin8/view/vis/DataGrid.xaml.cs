@@ -87,8 +87,7 @@ namespace PanoramicDataWin8.view.vis
             if (DataContext != null)
             {
                 (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
-                ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
-                resultModel.PropertyChanged -= ResultModel_PropertyChanged;
+                (DataContext as VisualizationViewModel).QueryModel.PropertyChanged -= QueryModel_PropertyChanged;
                 removeMenu();
             }
             InputFieldView.InputFieldViewModelTapped -= InputFieldViewInputFieldViewModelTapped;
@@ -117,14 +116,23 @@ namespace PanoramicDataWin8.view.vis
                     });
 
                 (DataContext as VisualizationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
-
-                ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
-                resultModel.PropertyChanged += ResultModel_PropertyChanged;
-                if (resultModel.ResultItemModels != null)
+                (DataContext as VisualizationViewModel).QueryModel.PropertyChanged += QueryModel_PropertyChanged;
+               
+                if ((DataContext as VisualizationViewModel).QueryModel != null)
                 {
                     populateData();
                 }
                 populateTableHeaders();
+            }
+        }
+
+        
+        private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            QueryModel model = (DataContext as VisualizationViewModel).QueryModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Result))
+            {
+                populateData();
             }
         }
 
@@ -169,20 +177,11 @@ namespace PanoramicDataWin8.view.vis
             }
             setMenuViewModelAnkerPosition();
         }
-
-        void ResultModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-             ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
-             if (e.PropertyName == resultModel.GetPropertyName(() => resultModel.ResultItemModels))
-             {
-                 populateData();
-             }
-        }
-
+        
         private void populateData()
         {
-            ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
-            listView.ItemsSource = resultModel.ResultItemModels;
+           // ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.Result;
+           // listView.ItemsSource = resultModel.ResultItemModels;
         }
 
         private void populateTableHeaders()

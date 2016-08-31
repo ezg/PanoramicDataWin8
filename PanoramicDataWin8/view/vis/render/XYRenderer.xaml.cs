@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using GeoAPI.Geometries;
+using IDEA_common.operations;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
@@ -32,8 +33,8 @@ namespace PanoramicDataWin8.view.vis.render
         public delegate void EventHandler(bool sizeChanged = false);
         public event EventHandler Render;
 
-        public delegate void LoadResultItemModelsHandler(ResultModel resultModel);
-        public event LoadResultItemModelsHandler LoadResultItemModels;
+        public delegate void LoadResultHandler(IResult result);
+        public event LoadResultHandler LoadResult;
 
         private MenuViewModel _menuViewModel = null;
         private MenuView _menuView = null;
@@ -63,8 +64,18 @@ namespace PanoramicDataWin8.view.vis.render
                 _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged -= X_CollectionChanged;
                 _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged -= Y_CollectionChanged;
                 _visualizationViewModel.QueryModel.FilterModels.CollectionChanged -= FilterModels_CollectionChanged;
-                ResultModel resultModel = _visualizationViewModel.QueryModel.ResultModel;
-                resultModel.ResultModelUpdated -= resultModel_ResultModelUpdated;
+                _visualizationViewModel.QueryModel.PropertyChanged -= QueryModel_PropertyChanged;
+            }
+        }
+
+
+        private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            QueryModel model = (DataContext as VisualizationViewModel).QueryModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Result) && model.Result != null)
+            {
+                populateData();
+                updateProgressAndNullVisualization();
             }
         }
 
@@ -84,8 +95,7 @@ namespace PanoramicDataWin8.view.vis.render
                 _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged += X_CollectionChanged;
                 _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Y).CollectionChanged += Y_CollectionChanged;
                 _visualizationViewModel.QueryModel.FilterModels.CollectionChanged += FilterModels_CollectionChanged;
-                ResultModel resultModel = _visualizationViewModel.QueryModel.ResultModel;
-                resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
+                _visualizationViewModel.QueryModel.PropertyChanged += QueryModel_PropertyChanged;
                 ApplyTemplate();
             }
         }
@@ -97,12 +107,6 @@ namespace PanoramicDataWin8.view.vis.render
         void Y_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             populateHeaders();
-        }
-
-        void resultModel_ResultModelUpdated(object sender, EventArgs e)
-        {
-            populateData();
-            updateProgressAndNullVisualization();
         }
 
         void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -186,7 +190,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void updateProgressAndNullVisualization()
         {
-            ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
+            IResult resultModel = (DataContext as VisualizationViewModel).QueryModel.Result;
 
             // progress
             double size = 14;
@@ -220,10 +224,10 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             // null labels
-            if (resultModel.ResultDescriptionModel != null && (resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount > 0)
+            if (resultModel != null)
             {
                 tbNull.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                tbNull.Text = "null values : " + (resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount;
+                //tbNull.Text = "null values : " + (resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount;
             }
             else
             {
@@ -233,15 +237,14 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void populateData()
         {
-            ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.ResultModel;
-
+            IResult resultModel = (DataContext as VisualizationViewModel).QueryModel.Result;
             var contentPresenter = (ContentPresenter)GetTemplateChild("contentPresenter");
             var mainLabel = (TextBlock)GetTemplateChild("mainLabel");
 
             contentPresenter.Opacity = 1;
             mainLabel.Opacity = 0;
 
-            if (resultModel.ResultItemModels.Count > 0 || resultModel.Progress == 1.0 || resultModel.ResultType == ResultType.Complete)
+            if (resultModel != null)
             {
                 loadResultItemModels(resultModel);
                 render();
@@ -250,7 +253,7 @@ namespace PanoramicDataWin8.view.vis.render
             var animationGrid = (Grid)GetTemplateChild("animationGrid");
             var progressGrid = (Grid)GetTemplateChild("progressGrid");
             /*if (MainViewController.Instance.MainModel.Mode == Mode.batch &&
-                resultModel.ResultType == ResultType.Clear &&
+                result.ResultType == ResultType.Clear &&
                 ((VisualizationViewModel)DataContext).QueryModel.GetUsageInputOperationModel(InputUsage.X).Any() &&
                 ((VisualizationViewModel)DataContext).QueryModel.GetUsageInputOperationModel(InputUsage.Y).Any())
             {
@@ -267,11 +270,11 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        private void loadResultItemModels(ResultModel resultModel)
+        private void loadResultItemModels(IResult resultModel)
         {
-            if (LoadResultItemModels != null)
+            if (LoadResult != null)
             {
-                LoadResultItemModels(resultModel);
+                LoadResult(resultModel);
             }
         }
 

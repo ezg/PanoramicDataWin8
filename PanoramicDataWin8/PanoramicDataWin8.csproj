@@ -99,7 +99,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="controller\data\DataProvider.cs" />
     <Compile Include="controller\data\DataRow.cs" />
     <Compile Include="controller\data\Job.cs" />
     <Compile Include="controller\data\progressive\CatalogCommand.cs" />
@@ -112,16 +111,6 @@
     <Compile Include="controller\data\virt\DataWrapper.cs" />
     <Compile Include="controller\data\virt\IItemsProvider.cs" />
     <Compile Include="controller\data\QueryExecuter.cs" />
-    <Compile Include="controller\data\DataAggregator.cs" />
-    <Compile Include="controller\data\DataBinner.cs" />
-    <Compile Include="model\data\common\AggregateBinRange.cs" />
-    <Compile Include="model\data\common\BinStructure.cs" />
-    <Compile Include="model\data\common\DateTimeBinRange.cs" />
-    <Compile Include="model\data\common\NominalBinRange.cs" />
-    <Compile Include="model\data\common\QuantitativeBinRange.cs" />
-    <Compile Include="model\data\common\BinRange.cs" />
-    <Compile Include="model\data\common\GroupingObject.cs" />
-    <Compile Include="controller\data\DataJob.cs" />
     <Compile Include="controller\input\DatasetConfiguration.cs" />
     <Compile Include="controller\view\MainViewController.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -134,9 +123,7 @@
     <Compile Include="model\data\InputUsage.cs" />
     <Compile Include="model\data\InputFieldModel.cs" />
     <Compile Include="model\data\InputOperationModel.cs" />
-    <Compile Include="model\data\common\Bin.cs" />
     <Compile Include="model\data\CalculatedInputModel.cs" />
-    <Compile Include="model\data\common\AxisType.cs" />
     <Compile Include="model\data\FilteringOperation.cs" />
     <Compile Include="model\data\FilterModel.cs" />
     <Compile Include="model\data\InputVisualizationTypeConstants.cs" />
@@ -150,13 +137,10 @@
     <Compile Include="model\data\progressive\ProgressiveSchemaModel.cs" />
     <Compile Include="model\data\QueryModel.cs" />
     <Compile Include="model\data\result\ClassfierResultDescriptionModel.cs" />
-    <Compile Include="model\data\result\ProgressiveVisualizationResultItemModel.cs" />
-    <Compile Include="model\data\result\VisualizationItemResultModel.cs" />
     <Compile Include="model\data\result\ResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultItemModel.cs" />
     <Compile Include="model\data\result\ResultItemValueModel.cs" />
     <Compile Include="model\data\result\ResultModel.cs" />
-    <Compile Include="model\data\result\VisualizationResultDescriptionModel.cs" />
     <Compile Include="model\data\SchemaModel.cs" />
     <Compile Include="model\data\TaskGroupModel.cs" />
     <Compile Include="model\data\TaskModel.cs" />

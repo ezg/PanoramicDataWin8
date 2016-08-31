@@ -16,6 +16,7 @@ using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using Windows.UI.Xaml.Shapes;
 using GeoAPI.Geometries;
+using IDEA_common.operations;
 using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.controller.data.virt;
 using PanoramicDataWin8.controller.view;
@@ -63,8 +64,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 ((VisualizationViewModel) DataContext).PropertyChanged -= VisualizationViewModel_PropertyChanged;
                 ((VisualizationViewModel) DataContext).QueryModel.QueryModelUpdated -= QueryModel_QueryModelUpdated;
-                ResultModel resultModel = ((VisualizationViewModel) DataContext).QueryModel.ResultModel;
-                resultModel.ResultModelUpdated -= resultModel_ResultModelUpdated;
+                ((VisualizationViewModel)DataContext).QueryModel.PropertyChanged -= QueryModel_PropertyChanged;
             }
             dxSurface.Dispose();
         }
@@ -76,8 +76,7 @@ namespace PanoramicDataWin8.view.vis.render
                 ((VisualizationViewModel) DataContext).PropertyChanged += VisualizationViewModel_PropertyChanged;
                 ((VisualizationViewModel) DataContext).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
                 ((VisualizationViewModel)DataContext).QueryModel.RequestRender += PlotRenderer_RequestRender;
-                ResultModel resultModel = ((VisualizationViewModel) DataContext).QueryModel.ResultModel;
-                resultModel.ResultModelUpdated += resultModel_ResultModelUpdated;
+                ((VisualizationViewModel)DataContext).QueryModel.PropertyChanged += QueryModel_PropertyChanged;
                 mainLabel.Text = ((VisualizationViewModel) DataContext).QueryModel.VisualizationType.ToString();
                 mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
                 tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
@@ -86,7 +85,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void PlotRenderer_RequestRender(object sender, EventArgs e)
         {
-            if (DataContext != null && (DataContext as VisualizationViewModel).QueryModel.ResultModel != null)
+            if (DataContext != null && (DataContext as VisualizationViewModel).QueryModel.Result != null)
             {
                 render();
             }
@@ -100,10 +99,14 @@ namespace PanoramicDataWin8.view.vis.render
             render();
         }
 
-        void resultModel_ResultModelUpdated(object sender, EventArgs e)
+        private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            populateData();
-            updateProgressAndNullVisualization();
+            QueryModel model = (DataContext as VisualizationViewModel).QueryModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Result))
+            {
+                populateData();
+                updateProgressAndNullVisualization();
+            }
         }
 
         void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -123,8 +126,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void updateProgressAndNullVisualization()
         {
-            ResultModel resultModel = ((VisualizationViewModel) DataContext).QueryModel.ResultModel;
-            ClassfierResultDescriptionModel descriptionModel = (resultModel.ResultDescriptionModel as ClassfierResultDescriptionModel);
+            IResult resultModel = ((VisualizationViewModel) DataContext).QueryModel.Result;
 
             /*if (descriptionModel != null)
             {
@@ -165,7 +167,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void populateData()
         {
-            ClassfierResultDescriptionModel resultModel = ((VisualizationViewModel)DataContext).QueryModel.ResultModel.ResultDescriptionModel as ClassfierResultDescriptionModel;
+            IResult resultModel = ((VisualizationViewModel)DataContext).QueryModel.Result;
             if (resultModel != null)
             {
                 ExponentialEase easingFunction = new ExponentialEase();
@@ -196,7 +198,7 @@ namespace PanoramicDataWin8.view.vis.render
                 dxSurfaceGrid.Opacity = 1;
                 mainLabel.Opacity = 0;
 
-                loadResults(((VisualizationViewModel)DataContext).QueryModel.ResultModel);
+                loadResults(resultModel);
                 render();
             }
             else
@@ -231,15 +233,14 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void loadResults(ResultModel resultModel)
+        void loadResults(IResult result)
         {
             VisualizationViewModel model = ((VisualizationViewModel) DataContext);
-            ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel) model.QueryModel.ResultModel.ResultDescriptionModel);
             int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
             _currentViewIndex = (_currentViewIndex) % max;
-            _classifierRendererContentProvider.UpdateData(resultModel, model.QueryModel, model.QueryModel.Clone(), _currentViewIndex);
+            _classifierRendererContentProvider.UpdateData(result, model.QueryModel, model.QueryModel.Clone(), _currentViewIndex);
 
-            render(); render();
+            render();
         }
 
         void removeMenu()
@@ -340,9 +341,8 @@ namespace PanoramicDataWin8.view.vis.render
             List<FilterModel> hits = new List<FilterModel>();
 
             VisualizationViewModel model = ((VisualizationViewModel) DataContext);
-            if (model.QueryModel.ResultModel != null && model.QueryModel.ResultModel.ResultDescriptionModel != null)
+            if (model.QueryModel.Result != null)
             {
-                ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel) model.QueryModel.ResultModel.ResultDescriptionModel);
                 int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
                 
                 _currentViewIndex = (_currentViewIndex + 1) % max;
@@ -391,7 +391,6 @@ namespace PanoramicDataWin8.view.vis.render
         public bool Consume(InkStroke inkStroke)
         {
             VisualizationViewModel model = ((VisualizationViewModel)DataContext);
-            ClassfierResultDescriptionModel descriptionModel = ((ClassfierResultDescriptionModel)model.QueryModel.ResultModel.ResultDescriptionModel);
             int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
             if (_currentViewIndex == max - 1)
             {
