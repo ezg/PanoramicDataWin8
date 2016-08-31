@@ -13,11 +13,12 @@ using Windows.Networking.Sockets;
 using Windows.UI;
 using PanoramicDataWin8.utils;
 using GeoAPI.Geometries;
+using IDEA_common.operations.histogram;
+using IDEA_common.range;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.model.data.common;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 
@@ -48,7 +49,7 @@ namespace PanoramicDataWin8.view.vis.render
         private CanvasTextFormat _textFormat;
 
         private ResultModel _resultModel = null;
-        private VisualizationResultDescriptionModel _visualizationDescriptionModel = null;
+        //private VisualizationResultDescriptionModel _visualizationDescriptionModel = null;
         
         private BinRange _xBinRange = null;
         private BinRange _yBinRange = null;
@@ -59,8 +60,8 @@ namespace PanoramicDataWin8.view.vis.render
         private InputOperationModel _xAom = null;
         private InputOperationModel _yAom = null;
         private InputOperationModel _vAom = null;
-        private Dictionary<BinIndex, List<ProgressiveVisualizationResultItemModel>> _binDictonary = null;
-        private Dictionary<BinIndex, BinPrimitive> _binPrimitives = new Dictionary<BinIndex, BinPrimitive>();
+        //private Dictionary<BinIndex, List<ProgressiveVisualizationResultItemModel>> _binDictonary = null;
+        //private Dictionary<BinIndex, BinPrimitive> _binPrimitives = new Dictionary<BinIndex, BinPrimitive>();
 
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
         private CanvasCachedGeometry _strokeRoundedRectGeom = null;
@@ -77,7 +78,7 @@ namespace PanoramicDataWin8.view.vis.render
             _yAom = yAom;
             _vAom = vAom;
 
-            _visualizationDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
+            /*_visualizationDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
 
             if (resultModel.ResultItemModels.Count > 0)
             {
@@ -155,7 +156,7 @@ namespace PanoramicDataWin8.view.vis.render
             else if (resultModel.ResultItemModels.Count == 0 && resultModel.Progress == 1.0)
             {
                 _isResultEmpty = _resultModel.ResultType != ResultType.Clear; ;
-            }
+            }*/
         }
 
         public void Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
@@ -255,7 +256,7 @@ namespace PanoramicDataWin8.view.vis.render
                     }
                     if (count % mod == 0)
                     {
-                        if (_visualizationDescriptionModel.AxisTypes[_xIndex] == AxisType.Quantitative)
+                        if (_xBinRange is QuantitativeBinRange)
                         {
                             DrawString(canvasArgs, _textFormat, xFrom, yFrom + 5, double.Parse(label.Label).ToString(), _textColor, true, true, false);
                             if (lastLabel)
@@ -330,7 +331,7 @@ namespace PanoramicDataWin8.view.vis.render
             yBins.Add(_yBinRange.AddStep(yBins.Max()));
 
             // draw data
-            var resultDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
+            /*var resultDescriptionModel = _resultModel.ResultDescriptionModel as VisualizationResultDescriptionModel;
             var rect = new Rect();
             float xFrom = 0;
             float yFrom = 0;
@@ -589,7 +590,7 @@ namespace PanoramicDataWin8.view.vis.render
                         canvasArgs.DrawingSession.Transform = currentMat;
                     }
                 }
-            }
+            }*/
         }
 
         public override void Load(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs canvasArgs)
