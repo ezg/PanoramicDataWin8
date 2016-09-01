@@ -214,7 +214,7 @@ namespace PanoramicDataWin8.view.vis.render
             var white = Color.FromArgb(255, 255, 255, 255);
             var dark = Color.FromArgb(255, 11, 11, 11);
 
-            List<BinPrimitive> allBinPrimitives = new List<BinPrimitive>();
+            List<BinPrimitiveCollection> allBinPrimitiveCollections = new List<BinPrimitiveCollection>();
             HitTargets.Clear();
             for (int xi = 0; xi < _histogramResult.BinRanges[0].GetBins().Count; xi++)
             {
@@ -225,29 +225,27 @@ namespace PanoramicDataWin8.view.vis.render
                     if (_histogramResult.Bins.ContainsKey(binIndex))
                     {
                         var bin = _histogramResult.Bins[binIndex];
-                        var binPrimitives = _helper.GetBinPrimitives(bin);
-                        allBinPrimitives.AddRange(binPrimitives);
+                        var binPrimitiveCollection = _helper.GetBinPrimitives(bin);
+                        allBinPrimitiveCollections.Add(binPrimitiveCollection);
 
-                        foreach (var binPrimitive in binPrimitives)
+                        foreach (var binPrimitive in binPrimitiveCollection.BinPrimitives.Where(bp => bp.Value != 0.0 && bp.BrushIndex != _histogramResult.AllBrushIndex()))
                         {
-                            if (binPrimitive.Value != 0.0)
-                            {
-                                canvasArgs.DrawingSession.FillRoundedRectangle(binPrimitive.Rect, 4, 4, binPrimitive.Color);   
-                            }
-                            if (binPrimitive.FilterModel != null)
-                            {
-                                HitTargets.Add(binPrimitive.HitGeom, binPrimitive.FilterModel);
-                            }
+                            canvasArgs.DrawingSession.FillRoundedRectangle(binPrimitive.Rect, 4, 4, binPrimitive.Color);
+                        }
+
+                        if (binPrimitiveCollection.FilterModel != null)
+                        {
+                            HitTargets.Add(binPrimitiveCollection.HitGeom, binPrimitiveCollection.FilterModel);
                         }
                     }
                 }
             }
 
-            foreach (var binPrimitive in allBinPrimitives)
+            foreach (var binPrimitiveCollection in allBinPrimitiveCollections)
             {
-                if (binPrimitive.FilterModel != null && _filterModels.Contains(binPrimitive.FilterModel))
+                if (binPrimitiveCollection.FilterModel != null && _filterModels.Contains(binPrimitiveCollection.FilterModel))
                 {
-                    canvasArgs.DrawingSession.DrawRoundedRectangle(binPrimitive.Rect, 4, 4, dark, 1.0f);
+                    canvasArgs.DrawingSession.DrawRoundedRectangle(binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex()).Rect, 4, 4, dark, 1.0f);
                 }
             }
         }
@@ -264,15 +262,19 @@ namespace PanoramicDataWin8.view.vis.render
         
     }
 
+    public class BinPrimitiveCollection
+    {
+        public List<BinPrimitive>  BinPrimitives { get; set; } = new List<BinPrimitive>();
+        public IGeometry HitGeom { get; set; }
+        public FilterModel FilterModel { get; set; }
+    }
+
     public class BinPrimitive
     {
         public float Value { get; set; }
         public Rect Rect { get; set; }
         public Color Color { get; set; }
         public int BrushIndex { get; set; }
-        public IGeometry HitGeom { get; set; }
-        public FilterModel FilterModel { get; set; }
-
     }
 
     public class PlotRendererContentProviderHelper
@@ -329,8 +331,18 @@ namespace PanoramicDataWin8.view.vis.render
                 _valueIom = _queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).First();
             }
 
-            _minValue = (float)_histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex())]).Result);
-            _maxValue = (float)_histogramResult.Bins.Values.Max(bin => ((DoubleValueAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex())]).Result);
+            var aggregateKey = QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
+            _minValue = float.MaxValue;
+            _maxValue = float.MinValue;
+            foreach (var brush in _histogramResult.Brushes)
+            {
+                aggregateKey.BrushIndex = brush.BrushIndex;
+                foreach (var bin in _histogramResult.Bins.Values)
+                {
+                    _minValue = (float)Math.Min(_minValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
+                    _maxValue = (float)Math.Max(_maxValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
+                }
+            }
             
             initializeChartType(_histogramResult.BinRanges);
 
@@ -401,31 +413,41 @@ namespace PanoramicDataWin8.view.vis.render
             else
             {
                 double factor = 0.0;
-                if (_histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result) -
-                    _histogramResult.Bins.Values.Max(bin => ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result) == 0)
+                
+                var minValue = float.MaxValue;
+                var maxValue = float.MinValue;
+                foreach (var brush in _histogramResult.Brushes)
+                {
+                    aggregateKey.BrushIndex = brush.BrushIndex;
+                    foreach (var bin in _histogramResult.Bins.Values)
+                    {
+                        minValue = (float)Math.Min(minValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
+                        maxValue = (float)Math.Max(maxValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
+                    }
+                }
+
+                if (minValue - maxValue == 0)
                 {
                     factor = 0.1;
-                    factor *= _histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result) < 0 ? -1f : 1f;
+                    factor *= minValue < 0 ? -1f : 1f;
                 }
-                visualBinRange = QuantitativeBinRange.Initialize(
-                    _histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result) * (1.0 - factor),
-                    _histogramResult.Bins.Values.Max(bin => ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result) * (1.0 + factor), 10, false);
+                visualBinRange = QuantitativeBinRange.Initialize(minValue*(1.0 - factor), maxValue*(1.0 + factor), 10, false);
+                if (_chartType == ChartType.HorizontalBar || _chartType == ChartType.VerticalBar)
+                {
+                    visualBinRange = QuantitativeBinRange.Initialize(Math.Min(0, minValue), visualBinRange.DataMaxValue, 10, false);
+                }
             }
-
-            if ((_chartType == ChartType.HorizontalBar || _chartType == ChartType.VerticalBar) &&
-                dataBinRange is AggregateBinRange)
-            {
-                visualBinRange = QuantitativeBinRange.Initialize(Math.Min(0,
-                    _histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result)), visualBinRange.DataMaxValue, 10, false);
-            }
+            
             return visualBinRange;
         }
 
-        public List<BinPrimitive> GetBinPrimitives(Bin bin)
+        public BinPrimitiveCollection GetBinPrimitives(Bin bin)
         {
-            List<BinPrimitive> binPrimitives = new List<BinPrimitive>();
+            BinPrimitiveCollection binPrimitiveCollection = new BinPrimitiveCollection();
             float alpha = 0.15f;
             var baseColor = Colors.White;
+
+            var valueAggregateKey = QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
 
             foreach (var brush in _histogramResult.Brushes)
             {
@@ -440,13 +462,14 @@ namespace PanoramicDataWin8.view.vis.render
                 float yMarginAbsolute = 0;
                 Color color = Colors.White;
 
-                float unNormalizedvalue = (float)((DoubleValueAggregateResult) bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, brush.BrushIndex)]).Result;
+                valueAggregateKey.BrushIndex = brush.BrushIndex;
+                float unNormalizedvalue = (float)((DoubleValueAggregateResult) bin.AggregateResults[valueAggregateKey]).Result;
                 if (unNormalizedvalue != 0)
                 {
                     value = (unNormalizedvalue - _minValue)/(Math.Abs((_maxValue - _minValue)) < TOLERANCE ? (unNormalizedvalue - _minValue) : (_maxValue - _minValue));
                 }
 
-                if (brush.BrushIndex == _histogramResult.AllBrushIndex())
+                if (brush.BrushIndex == _histogramResult.RestBrushIndex())
                 {
                     baseColor = Windows.UI.Color.FromArgb(255, 40, 170, 213);
                 }
@@ -454,11 +477,19 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     baseColor = Color.FromArgb(255, 17, 17, 17);
                 }
+                else if (brush.BrushIndex == _histogramResult.AllBrushIndex())
+                {
+                    baseColor = Windows.UI.Color.FromArgb(255, 255, 0, 0);
+                }
                 else
                 {
-                    //baseColor = _queryModelClone.BrushColors[brush.BrushIndex % _queryModelClone.BrushColors.Count];
+                    baseColor = _queryModelClone.BrushColors[brush.BrushIndex % _queryModelClone.BrushColors.Count];
                 }
-                
+
+                var xAggregateKey = QueryModelHelper.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);
+                var yAggregateKey = QueryModelHelper.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex);
+                var xMarginAggregateKey = QueryModelHelper.CreateAggregateKey(_xIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex);
+                var yMarginAggregateKey = QueryModelHelper.CreateAggregateKey(_yIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex);
 
                 // read out value depinding on chart type
                 if (_chartType == ChartType.HeatMap)
@@ -475,15 +506,15 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 else if (_chartType == ChartType.HorizontalBar)
                 {
-                    var xValue = ((DoubleValueAggregateResult) bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex)]).Result;
+                    var xValue = ((DoubleValueAggregateResult) bin.AggregateResults[xAggregateKey]).Result;
                     xFrom = DataToScreenX((float) Math.Min(0, xValue));
                     xTo = DataToScreenX((float) Math.Max(0, xValue));
 
                     yFrom = DataToScreenY((float) VisualBinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1]));
                     yTo = DataToScreenY((float) VisualBinRanges[1].AddStep(VisualBinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1])));
 
-                    xMargin = (float) ((MarginAggregateResult) bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_xIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex)]).Margin;
-                    xMarginAbsolute = (float) ((MarginAggregateResult) bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_xIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex)]).AbsolutMargin;
+                    xMargin = (float) ((MarginAggregateResult) bin.AggregateResults[xMarginAggregateKey]).Margin;
+                    xMarginAbsolute = (float) ((MarginAggregateResult) bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
 
                     var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), baseColor, (float)(alpha + Math.Pow(value, 1.0 / 3.0) * (1.0 - alpha)));
                     var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
@@ -492,15 +523,15 @@ namespace PanoramicDataWin8.view.vis.render
 
                 else if (_chartType == ChartType.VerticalBar)
                 {
-                    var yValue = ((DoubleValueAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex)]).Result;
+                    var yValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
                     yFrom = DataToScreenY((float)Math.Min(0, yValue));
                     yTo = DataToScreenY((float)Math.Max(0, yValue));
 
                     xFrom = DataToScreenX((float)VisualBinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
                     xTo = DataToScreenX((float)VisualBinRanges[0].AddStep(VisualBinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
 
-                    yMargin = (float)((MarginAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_yIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex)]).Margin;
-                    yMarginAbsolute = (float)((MarginAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_yIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex)]).AbsolutMargin;
+                    yMargin = (float)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
+                    yMarginAbsolute = (float)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
 
                     var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), baseColor, (float)(alpha + Math.Pow(value, 1.0 / 3.0) * (1.0 - alpha)));
                     var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
@@ -509,28 +540,29 @@ namespace PanoramicDataWin8.view.vis.render
 
                 else if (_chartType == ChartType.SinglePoint)
                 {
-                    var xValue = ((DoubleValueAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex)]).Result;
-                    xFrom = DataToScreenX((float)Math.Min(0, xValue));
-                    xTo = DataToScreenX((float)Math.Max(0, xValue));
+                    var xValue = ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result;
+                    xFrom = DataToScreenX((float) xValue) - 5;
+                    xTo = DataToScreenX((float) xValue) + 5;
 
-                    var yValue = ((DoubleValueAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex)]).Result;
-                    yFrom = DataToScreenY((float)Math.Min(0, yValue));
-                    yTo = DataToScreenY((float)Math.Max(0, yValue));
+                    var yValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
+                    yFrom = DataToScreenY((float)yValue) + 5;
+                    yTo = DataToScreenY((float)yValue);
 
-                    xMargin = (float)((MarginAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_xIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex)]).Margin;
-                    xMarginAbsolute = (float)((MarginAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_xIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex)]).AbsolutMargin;
+                    xMargin = (float)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).Margin;
+                    xMarginAbsolute = (float)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
                     
-                    yMargin = (float)((MarginAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_yIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex)]).Margin;
-                    yMarginAbsolute = (float)((MarginAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_yIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex)]).AbsolutMargin;
+                    yMargin = (float)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
+                    yMarginAbsolute = (float)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
 
                     color = baseColor;
                 }
 
 
-                IGeometry hitGeom = null;
-                FilterModel filterModel = null;
+                
                 if (brush.BrushIndex == _histogramResult.AllBrushIndex())
                 {
+                    IGeometry hitGeom = null;
+                    FilterModel filterModel = null;
                     InputOperationModel[] dimensions = new InputOperationModel[] {_xIom, _yIom};
                     //if (_chartType != ChartType.HeatMap)
                     {
@@ -557,6 +589,8 @@ namespace PanoramicDataWin8.view.vis.render
                             }
                         }
                     }
+                    binPrimitiveCollection.FilterModel = filterModel;
+                    binPrimitiveCollection.HitGeom = hitGeom;
                 }
 
                 BinPrimitive binPrimitive = new BinPrimitive()
@@ -569,13 +603,43 @@ namespace PanoramicDataWin8.view.vis.render
                     BrushIndex = brush.BrushIndex,
                     Color = color,
                     Value = unNormalizedvalue, 
-                    FilterModel = filterModel,
-                    HitGeom = hitGeom
                 };
-                binPrimitives.Add(binPrimitive);
-
+                binPrimitiveCollection.BinPrimitives.Add(binPrimitive);
             }
-            return binPrimitives;
+
+
+            // adjust brush rects (stacking or not)
+            BinPrimitive allBrushBinPrimitive = binPrimitiveCollection.BinPrimitives.FirstOrDefault(b => b.BrushIndex == _histogramResult.AllBrushIndex());
+            double sum = 0.0f;
+            foreach (var bp in binPrimitiveCollection.BinPrimitives.Where(b => b.BrushIndex != _histogramResult.AllBrushIndex()))
+            {
+                if (_chartType == ChartType.VerticalBar)
+                {
+                    if (_yIom.AggregateFunction == AggregateFunction.Count)
+                    {
+                        //var brushFactor = (bp.Value / allBrushBinPrimitive.Value);
+                        bp.Rect = new Rect(bp.Rect.X, bp.Rect.Y - sum, bp.Rect.Width, bp.Rect.Height);
+                        sum += bp.Rect.Height;
+                    }
+                }
+                else if (_chartType == ChartType.HorizontalBar)
+                {
+                    if (_xIom.AggregateFunction == AggregateFunction.Count)
+                    {
+                        //var brushFactor = (bp.Value / allBrushBinPrimitive.Value);
+                        bp.Rect = new Rect(bp.Rect.X + sum, bp.Rect.Y, bp.Rect.Width, bp.Rect.Height);
+                        sum += bp.Rect.Width;
+                    }
+                }
+                else if (_chartType == ChartType.HorizontalBar)
+                {
+                    //var brushFactor = (bp.Value / allBrushBinPrimitive.Value);
+                    bp.Rect = new Rect(bp.Rect.X + sum, bp.Rect.Y, bp.Rect.Width, bp.Rect.Height);
+                    sum += bp.Rect.Width;
+                }
+            }
+            binPrimitiveCollection.BinPrimitives.Reverse();
+            return binPrimitiveCollection;
         }
 
         public float DataToScreenX(float x)
