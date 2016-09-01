@@ -31,16 +31,6 @@ namespace PanoramicDataWin8.view.vis.render
     {
         private bool _isResultEmpty = false;
 
-        //private float _leftOffset = 40;
-        //private float _rightOffset = 20;
-        //private float _topOffset = 20;
-        //private float _bottomtOffset = 45;
-
-        //private float _deviceWidth = 0;
-        //private float _deviceHeight = 0;
-        //private float _xScale = 0;
-        //private float _yScale = 0;
-
         private PlotRendererContentProviderHelper _helper = null;
 
         private Color _textColor;
@@ -51,21 +41,6 @@ namespace PanoramicDataWin8.view.vis.render
         private QueryModel _queryModelClone = null;
         private QueryModel _queryModel = null;
         private List<FilterModel> _filterModels = new List<FilterModel>();
-        private Dictionary<FilterModel, Rect> _filterModelRects = new Dictionary<FilterModel, Rect>();
-        private BinRange _xBinRange = null;
-        private BinRange _yBinRange = null;
-        private bool _isXAxisAggregated = false;
-        private bool _isYAxisAggregated = false;
-        private int _xIndex = -1;
-        private int _yIndex = -1;
-        private InputOperationModel _xIom = null;
-        private InputOperationModel _yIom = null;
-        private InputOperationModel _valueIom = null;
-        private double _minValue = 0;
-        private double _maxValue = 0;
-        //private Dictionary<BinIndex, List<ProgressiveVisualizationResultItemModel>> _binDictonary = null;
-        //private Dictionary<BinIndex, BinPrimitive> _binPrimitives = new Dictionary<BinIndex, BinPrimitive>();
-
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
         private CanvasCachedGeometry _strokeRoundedRectGeom = null;
 
@@ -85,88 +60,17 @@ namespace PanoramicDataWin8.view.vis.render
 
         public void UpdateData(IResult result, QueryModel queryModel, QueryModel queryModelClone)
         {
-            _helper = new PlotRendererContentProviderHelper((HistogramResult)result, queryModel, queryModelClone, CompositionScaleX, CompositionScaleY);
+            
 
             _histogramResult = (HistogramResult)result;
             _queryModelClone = queryModelClone;
             _queryModel = queryModel;
-            _xIom = _queryModelClone.GetUsageInputOperationModel(InputUsage.X).FirstOrDefault();
-            _yIom = _queryModelClone.GetUsageInputOperationModel(InputUsage.Y).FirstOrDefault();
-
-            var xAggregateKey = QueryModelHelper.CreateAggregateKey(_xIom, _histogramResult, _histogramResult.AllBrushIndex());
-            var yAggregateKey = QueryModelHelper.CreateAggregateKey(_yIom, _histogramResult, _histogramResult.AllBrushIndex());
-
             
-            if (_queryModelClone.GetUsageInputOperationModel(InputUsage.Value).Any())
+            if (_histogramResult != null && _histogramResult.Bins != null)
             {
-                _valueIom = _queryModelClone.GetUsageInputOperationModel(InputUsage.Value).First();
-            }
-            else if (_queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).Any())
-            {
-                _valueIom = _queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).First();
-            }
-            _minValue = _histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult) bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex())]).Result);
-            _maxValue = _histogramResult.Bins.Values.Max(bin => ((DoubleValueAggregateResult)bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex())]).Result);
-
-            if (_histogramResult != null)
-            {
-                _xIndex = 0;
-                _yIndex = 1;
+                _helper = new PlotRendererContentProviderHelper((HistogramResult)result, queryModel, queryModelClone, CompositionScaleX, CompositionScaleY);
                 _isResultEmpty = false;
-
-                if (!(_histogramResult.BinRanges[_xIndex] is AggregateBinRange))
-                {
-                    _xBinRange = _histogramResult.BinRanges[_xIndex];
-                    _isXAxisAggregated = false;
-                }
-                else
-                {
-                    double factor = 0.0;
-                    if (_histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult) bin.AggregateResults[xAggregateKey]).Result) - 
-                        _histogramResult.Bins.Values.Max(bin => ((DoubleValueAggregateResult) bin.AggregateResults[xAggregateKey]).Result) == 0)
-                    {
-                        factor = 0.1;
-                        factor *= _histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result) < 0 ? -1f : 1f;
-                    }
-                    _isXAxisAggregated = true;
-                    _xBinRange = QuantitativeBinRange.Initialize(
-                        _histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result) * (1.0 - factor),
-                        _histogramResult.Bins.Values.Max(bin => ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result) * (1.0 + factor), 10, false);
-                }
-
-                if (!(_histogramResult.BinRanges[_yIndex] is AggregateBinRange))
-                {
-                    _yBinRange = _histogramResult.BinRanges[_yIndex];
-                    _isYAxisAggregated = false;
-                }
-                else
-                {
-                    double factor = 0.0;
-                    if (_histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result) -
-                        _histogramResult.Bins.Values.Max(bin => ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result) == 0)
-                    {
-                        factor = 0.1;
-                        factor *= _histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result) < 0 ? -1f : 1f;
-                    }
-                    _isYAxisAggregated = true;
-                    _yBinRange = QuantitativeBinRange.Initialize(
-                        _histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result) * (1.0 - factor),
-                        _histogramResult.Bins.Values.Max(bin => ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result) * (1.0 + factor), 10, false);
-                }
-
-                // scale axis to 0 if this is a bar chart
-                if (_isXAxisAggregated && !_isYAxisAggregated &&
-                    (_xIom.AggregateFunction == AggregateFunction.Count || _xIom.AggregateFunction == AggregateFunction.Sum || _xIom.AggregateFunction == AggregateFunction.Avg || _xIom.AggregateFunction == AggregateFunction.Min || _xIom.AggregateFunction == AggregateFunction.Max))
-                {
-                    _xBinRange = QuantitativeBinRange.Initialize(Math.Min(0,
-                        _histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result)), _xBinRange.DataMaxValue, 10, false);
-                }
-                if (!_isXAxisAggregated && _isYAxisAggregated &&
-                    (_yIom.AggregateFunction == AggregateFunction.Count || _yIom.AggregateFunction == AggregateFunction.Sum || _yIom.AggregateFunction == AggregateFunction.Avg || _yIom.AggregateFunction == AggregateFunction.Min || _yIom.AggregateFunction == AggregateFunction.Max))
-                {
-                    _yBinRange = QuantitativeBinRange.Initialize(Math.Min(0,
-                        _histogramResult.Bins.Values.Min(bin => ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result)), _yBinRange.DataMaxValue, 10, false);
-                }
+                
             }
             else
             {
@@ -179,7 +83,7 @@ namespace PanoramicDataWin8.view.vis.render
             var mat = Matrix3x2.CreateScale(new Vector2(CompositionScaleX, CompositionScaleY));
             canvasArgs.DrawingSession.Transform = mat;
 
-            if (_histogramResult != null && _histogramResult.Bins.Count > 0)
+            if (_histogramResult != null && _histogramResult.Bins != null)
             {
                 if (MainViewController.Instance.MainModel.GraphRenderOption == GraphRenderOptions.Cell)
                 {
@@ -188,10 +92,14 @@ namespace PanoramicDataWin8.view.vis.render
             }
             if (_isResultEmpty)
             {
-                /*_leftOffset = 10;
-                _deviceWidth = (float)(canvas.ActualWidth / CompositionScaleX - _leftOffset - _rightOffset);
-                _deviceHeight = (float)(canvas.ActualHeight / CompositionScaleY - _topOffset - _bottomtOffset);
-                DrawString(canvasArgs, _textFormat, _deviceWidth / 2.0f + _leftOffset, _deviceHeight / 2.0f + _topOffset, "no datapoints", _textColor, true, true, false);*/
+                var leftOffset = 10;
+                var rightOffset = 20;
+                var topOffset = 20;
+                var bottomtOffset = 45;
+
+                var deviceWidth = (float) (canvas.ActualWidth/CompositionScaleX - leftOffset - rightOffset);
+                var deviceHeight = (float)(canvas.ActualHeight / CompositionScaleY - topOffset - bottomtOffset);
+                DrawString(canvasArgs, _textFormat, deviceWidth / 2.0f + leftOffset, deviceHeight / 2.0f + topOffset, "no datapoints", _textColor, true, true, false);
             }
         }
 
@@ -230,7 +138,7 @@ namespace PanoramicDataWin8.view.vis.render
                     }
                     if (count % mod == 0)
                     {
-                        if (_xBinRange is QuantitativeBinRange)
+                        if (_helper.VisualBinRanges[0] is QuantitativeBinRange)
                         {
                             DrawString(canvasArgs, _textFormat, xFrom, yFrom + 5, double.Parse(label.Label).ToString(), _textColor, true, true, false);
                             if (lastLabel)
@@ -268,7 +176,7 @@ namespace PanoramicDataWin8.view.vis.render
                     }
                     if (count % mod == 0)
                     {
-                        if (_yBinRange is QuantitativeBinRange)
+                        if (_helper.VisualBinRanges[1] is QuantitativeBinRange)
                         {
                             DrawString(canvasArgs, _textFormat, xFrom - 10, yFrom, double.Parse(label.Label).ToString(), _textColor, false, false, true);
                             if (lastLabel)
@@ -286,8 +194,8 @@ namespace PanoramicDataWin8.view.vis.render
 
                 _fillRoundedRectGeom?.Dispose();
                 _strokeRoundedRectGeom?.Dispose();
-                var x = _helper.DataToScreenX((float)_xBinRange.AddStep(0)) - _helper.DataToScreenX(0);
-                var y = _helper.DataToScreenY((float)_yBinRange.AddStep(0), false) - _helper.DataToScreenY(0, false);
+                var x = _helper.DataToScreenX((float)_helper.VisualBinRanges[0].AddStep(0)) - _helper.DataToScreenX(0);
+                var y = _helper.DataToScreenY((float)_helper.VisualBinRanges[1].AddStep(0), false) - _helper.DataToScreenY(0, false);
 
                 _fillRoundedRectGeom = CanvasCachedGeometry.CreateFill(CanvasGeometry.CreateRoundedRectangle(canvas, new Rect(0, 0, x, y), 4, 4));
                 _strokeRoundedRectGeom = CanvasCachedGeometry.CreateStroke(CanvasGeometry.CreateRoundedRectangle(canvas, new Rect(0, 0, x, y), 4, 4), 0.5f);
@@ -308,9 +216,9 @@ namespace PanoramicDataWin8.view.vis.render
 
             List<BinPrimitive> allBinPrimitives = new List<BinPrimitive>();
             HitTargets.Clear();
-            for (int xi = 0; xi < _histogramResult.BinRanges[_xIndex].GetBins().Count; xi++)
+            for (int xi = 0; xi < _histogramResult.BinRanges[0].GetBins().Count; xi++)
             {
-                for (int yi = 0; yi < _histogramResult.BinRanges[_yIndex].GetBins().Count; yi++)
+                for (int yi = 0; yi < _histogramResult.BinRanges[1].GetBins().Count; yi++)
                 {
                     BinIndex binIndex = new BinIndex(xi, yi);
                     
@@ -340,416 +248,6 @@ namespace PanoramicDataWin8.view.vis.render
                 if (binPrimitive.FilterModel != null && _filterModels.Contains(binPrimitive.FilterModel))
                 {
                     canvasArgs.DrawingSession.DrawRoundedRectangle(binPrimitive.Rect, 4, 4, dark, 1.0f);
-                }
-            }
-
-            return;
-          
-
-            var xBins = _xBinRange.GetBins();
-            xBins.Add(_xBinRange.AddStep(xBins.Max()));
-            var yBins = _yBinRange.GetBins();
-            yBins.Add(_yBinRange.AddStep(yBins.Max()));
-
-            // draw data
-            
-            _filterModelRects.Clear();
-            var rect = new Rect();
-            float xFrom = 0;
-            float yFrom = 0;
-            float xTo = 0;
-            float yTo = 0;
-
-            float xFromMargin = 0;
-            float yFromMargin = 0;
-            float xToMargin = 0;
-            float yToMargin = 0;
-
-            for (int xi = 0; xi < _histogramResult.BinRanges[_xIndex].GetBins().Count; xi++)
-            {
-                for (int yi = 0; yi < _histogramResult.BinRanges[_yIndex].GetBins().Count; yi++)
-                {
-                    BinIndex binIndex = new BinIndex(xi, yi);
-                    if (_histogramResult.Bins.ContainsKey(binIndex))
-                    {
-                        var bin = _histogramResult.Bins[binIndex];
-
-                        //double xValue = resultItem.Values[_queryModelClone.GetUsageInputOperationModel(InputUsage.X).First()][BrushIndex.ALL];
-                        //double yValue = resultItem.Values[_queryModelClone.GetUsageInputOperationModel(InputUsage.Y).First()][BrushIndex.ALL];
-                        double value = 0;
-                        double unNormalizedvalue = 0;
-                        double xMargin = 0;
-                        double xMarginAbsolute = 0;
-                        double yMargin = 0;
-                        double yMarginAbsolute = 0;
-                        double valueMargin = 0;
-                        double valueMarginAbsolute = 0;
-
-                        unNormalizedvalue = (bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex())] as DoubleValueAggregateResult).Result;
-
-                        if (_minValue - _maxValue == 0.0)
-                        {
-                            value = 1.0;
-                        }
-                        else
-                        {
-                            value = (unNormalizedvalue - _minValue) / (_maxValue - _minValue);
-                        }
-                        valueMargin = (bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_valueIom, new MarginAggregateParameters(),  _histogramResult, _histogramResult.AllBrushIndex())] as MarginAggregateResult).Margin;
-                        valueMarginAbsolute = (bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_valueIom, new MarginAggregateParameters(), _histogramResult, _histogramResult.AllBrushIndex())] as MarginAggregateResult).AbsolutMargin;
-
-                        if (unNormalizedvalue != 0.0)
-                        {
-                            double xValue = 0;
-                            double yValue = 0;
-                            if (_isXAxisAggregated && !_isYAxisAggregated &&
-                                (_xIom.AggregateFunction == AggregateFunction.Count || _xIom.AggregateFunction == AggregateFunction.Sum || _xIom.AggregateFunction == AggregateFunction.Avg ||
-                                 _xIom.AggregateFunction == AggregateFunction.Min || _xIom.AggregateFunction == AggregateFunction.Max))
-                            {
-                                xValue = (bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_xIom, _histogramResult, _histogramResult.AllBrushIndex())] as DoubleValueAggregateResult).Result;
-                                xFrom = _helper.DataToScreenX((float) Math.Min(0, xValue));
-                                xMargin = (bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_xIom, new MarginAggregateParameters(), _histogramResult, _histogramResult.AllBrushIndex())] as MarginAggregateResult).Margin;
-                                xMarginAbsolute = (bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_xIom, new MarginAggregateParameters(), _histogramResult, _histogramResult.AllBrushIndex())] as MarginAggregateResult).AbsolutMargin;
-                            }
-                            else
-                            {
-                                xFrom = _helper.DataToScreenX((float) _xBinRange.GetValueFromIndex(bin.BinIndex.Indices[0]));
-                            }
-
-                            if (!_isXAxisAggregated && _isYAxisAggregated &&
-                                (_yIom.AggregateFunction == AggregateFunction.Count || _yIom.AggregateFunction == AggregateFunction.Sum || _yIom.AggregateFunction == AggregateFunction.Avg ||
-                                 _yIom.AggregateFunction == AggregateFunction.Min || _yIom.AggregateFunction == AggregateFunction.Max))
-                            {
-                                yValue = (bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_yIom, _histogramResult, _histogramResult.AllBrushIndex())] as DoubleValueAggregateResult).Result;
-                                yFrom = _helper.DataToScreenY((float) Math.Min(0, yValue));
-                                yMargin = (bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_yIom, new MarginAggregateParameters(), _histogramResult, _histogramResult.AllBrushIndex())] as MarginAggregateResult).Margin;
-                                yMarginAbsolute = (bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_yIom, new MarginAggregateParameters(), _histogramResult, _histogramResult.AllBrushIndex())] as MarginAggregateResult).AbsolutMargin;
-                            }
-                            else
-                            {
-                                yFrom = _helper.DataToScreenY((float)_yBinRange.GetValueFromIndex(bin.BinIndex.Indices[1]));
-                            }
-
-                            if (_xBinRange is NominalBinRange)
-                            {
-                                xTo = _helper.DataToScreenX((float)_xBinRange.GetValueFromIndex(bin.BinIndex.Indices[0] + 1));
-                            }
-                            else
-                            {
-                                if (_isXAxisAggregated)
-                                {
-                                    if (_isYAxisAggregated)
-                                    {
-                                        xValue = (bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_xIom, _histogramResult, _histogramResult.AllBrushIndex())] as DoubleValueAggregateResult).Result;
-                                        xTo = _helper.DataToScreenX((float)xValue);
-                                    }
-                                    else
-                                    {
-                                        xTo = _helper.DataToScreenX((float) xValue);
-                                        xFromMargin = _helper.DataToScreenX((float) (xValue - xMarginAbsolute));
-                                        xToMargin = _helper.DataToScreenX((float) (xValue + xMarginAbsolute));
-                                    }
-                                }
-                                else
-                                {
-                                    xTo = _helper.DataToScreenX((float)_xBinRange.AddStep(_xBinRange.GetValueFromIndex(bin.BinIndex.Indices[0])));
-                                }
-                            }
-
-                            if (_yBinRange is NominalBinRange)
-                            {
-                                yTo = _helper.DataToScreenY((float)_yBinRange.GetValueFromIndex(bin.BinIndex.Indices[1] + 1));
-                            }
-                            else
-                            {
-                                if (_isYAxisAggregated)
-                                {
-                                    if (_isXAxisAggregated)
-                                    {
-                                        yValue = (bin.AggregateResults[QueryModelHelper.CreateAggregateKey(_yIom, _histogramResult, _histogramResult.AllBrushIndex())] as DoubleValueAggregateResult).Result;
-                                        yTo = _helper.DataToScreenY((float) yValue);
-                                    }
-                                    else
-                                    {
-                                        yTo = _helper.DataToScreenY((float) yValue);
-                                        yFromMargin = _helper.DataToScreenY((float) (yValue - yMarginAbsolute));
-                                        yToMargin = _helper.DataToScreenY((float) (yValue + yMarginAbsolute));
-                                    }
-                                }
-                                else
-                                {
-                                    yTo = _helper.DataToScreenY((float)_yBinRange.AddStep(_yBinRange.GetValueFromIndex(bin.BinIndex.Indices[1])));
-                                }
-                            }
-
-
-                            float alpha = 0.15f;
-                            var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), Windows.UI.Color.FromArgb(255, 40, 170, 213), (float) (alpha + Math.Pow(value, 1.0/3.0)*(1.0 - alpha)));
-                            var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
-                            //var dataColor = Color.FromArgb((byte)((0.10 + (Math.Pow(value, 1.0/3.0)) * (1.0-0.10)) * 255), 40, 170, 213);
-
-                            //var brushBaseColor = Windows.UI.Color.FromArgb(178, 77, 148, 125);
-                            //var brushBaseColor = Windows.UI.Color.FromArgb(255, 178, 77, 148);
-                            //lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 240, 219, 232), brushBaseColor, (float)Math.Sqrt(value));
-                            //var brushColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
-
-                            rect = new Rect(
-                                xFrom,
-                                yTo,
-                                xTo - xFrom,
-                                yFrom - yTo);
-
-                            if (!_isXAxisAggregated && !_isYAxisAggregated)
-                            {
-                                // draw data rect
-                                var currentMat = canvasArgs.DrawingSession.Transform;
-                                var mat = Matrix3x2.CreateTranslation(new Vector2(xFrom, yTo));
-                                mat = mat*currentMat;
-                                canvasArgs.DrawingSession.Transform = mat;
-                                canvasArgs.DrawingSession.DrawCachedGeometry(_fillRoundedRectGeom, dataColor);
-                                canvasArgs.DrawingSession.Transform = currentMat;
-
-                                // draw brush rect
-                                if (_queryModel.BrushQueryModels.Count > 0)
-                                {
-                                    /*var allUnNormalizedValue = resultItem.CountsInterpolated[iom][BrushIndex.ALL];
-                                    var brushCount = 0;
-                                    foreach (var brushIndex in resultDescriptionModel.BrushIndices.Where(bi => bi != BrushIndex.ALL))
-                                    {
-
-                                        Color brushColor = Color.FromArgb(255, 17, 17, 17);
-                                        if (_queryModelClone.BrushColors.Count > brushCount)
-                                        {
-                                            brushColor = _queryModelClone.BrushColors[brushCount];
-                                        }
-
-                                        var brushLerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), brushColor, (float) (alpha + Math.Pow(value, 1.0/3.0)*(1.0 - alpha)));
-                                        var renderColor = Color.FromArgb(255, brushLerpColor.R, brushLerpColor.G, brushLerpColor.B);
-                                        //var renderColor = Color.FromArgb((byte)((0.10 + (Math.Pow(value, 1.0 / 3.0)) * (1.0 - 0.10)) * 255), brushColor.R, brushColor.G, brushColor.B);
-
-                                        var brushUnNormalizedValue = resultItem.CountsInterpolated[iom][brushIndex];
-                                        var brushFactor = (brushUnNormalizedValue/allUnNormalizedValue);
-
-                                        var ratio = (rect.Width/rect.Height);
-                                        var newHeight = Math.Sqrt((1.0/ratio)*((rect.Width*rect.Height)*brushFactor));
-                                        var newWidth = newHeight*ratio;
-
-                                        var brushRect = new Rect(rect.X + (rect.Width - newWidth)/2.0f, rect.Y + (rect.Height - newHeight)/2.0f, newWidth, newHeight);
-                                        canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, renderColor);
-                                        brushCount++;
-                                    }*/
-                                }
-                                if (valueMargin != 0.0 && _histogramResult.Progress < 1.0)
-                                {
-                                    //DrawString(canvasArgs, _textFormat,
-                                    //    (float)(rect.Left + rect.Width / 2.0f),
-                                    //    (float)(rect.Top + rect.Height / 2.0f), '\u00B1' + (valueMargin * 100).ToString("F2") + "%", new Color() { A = 80, R = _textColor.R, G = _textColor.G, B = _textColor.B }, false, true, true);
-                                }
-                            }
-                            else
-                            {
-                                // draw data rect
-                                canvasArgs.DrawingSession.FillRoundedRectangle(rect, 4, 4, Windows.UI.Color.FromArgb(255, 40, 170, 213));
-                                //DrawString(canvasArgs, _textFormat, (float) rect.X + _leftOffset, (float)rect.Y + _topOffset, yMargin.Value.ToString("F2"), _textColor, true, true, false);
-
-
-                                // draw brush rect
-                                if (_queryModel.BrushQueryModels.Count > 0)
-                                {
-                                    /*var allUnNormalizedValue = resultItem.CountsInterpolated[iom][BrushIndex.ALL];
-                                    var brushCount = 0;
-                                    double sumBrushFactor = 0.0d;
-                                    foreach (var brushIndex in resultDescriptionModel.BrushIndices.Where(bi => bi != BrushIndex.ALL))
-                                    {
-                                        var brushUnNormalizedValue = resultItem.CountsInterpolated[iom][brushIndex];
-                                        min = resultDescriptionModel.MinValues[iom][brushIndex];
-                                        max = resultDescriptionModel.MaxValues[iom][brushIndex];
-
-                                        var brushValueMargin = resultItem.Margins[iom][brushIndex];
-                                        var brushValueMarginAbsolute = resultItem.MarginsAbsolute[iom][brushIndex];
-
-                                        Color brushColor = Color.FromArgb(255, 17, 17, 17);
-                                        if (_queryModelClone.BrushColors.Count > brushCount)
-                                        {
-                                            brushColor = _queryModelClone.BrushColors[brushCount];
-                                        }
-
-                                        var brushFactor = (brushUnNormalizedValue/allUnNormalizedValue);
-                                        if (_isYAxisAggregated && _isXAxisAggregated)
-                                        {
-                                            var ratio = (rect.Width/rect.Height);
-                                            var newHeight = Math.Sqrt((1.0/ratio)*((rect.Width*rect.Height)*brushFactor));
-                                            var newWidth = newHeight*ratio;
-
-                                            var brushRect = new Rect(rect.X + (rect.Width - newWidth)/2.0f, rect.Y + (rect.Height - newHeight)/2.0f, newWidth, newHeight);
-                                            canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, brushColor);
-
-                                        }
-                                        else if (_isYAxisAggregated)
-                                        {
-                                            var brushRect = new Rect(rect.X, rect.Y + (rect.Height - rect.Height*brushFactor) - rect.Height*sumBrushFactor, rect.Width, rect.Height*brushFactor);
-                                            canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, brushColor);
-
-                                            double currentY = resultItem.Values[_queryModelClone.GetUsageInputOperationModel(InputUsage.Y).First()][brushIndex];
-                                            float pixel = _helper.DataToScreenY((float) (0)) - _helper.DataToScreenY((float) (brushValueMarginAbsolute));
-
-                                            canvasArgs.DrawingSession.DrawLine(
-                                                new Vector2((float) (brushRect.X + rect.Width/2.0f), (float) brushRect.Y - pixel),
-                                                new Vector2((float) (brushRect.X + rect.Width/2.0f), (float) brushRect.Y + pixel), dark, 1);
-                                        }
-                                        else if (_isXAxisAggregated)
-                                        {
-                                            var brushRect = new Rect(rect.X + rect.Width*sumBrushFactor, rect.Y, rect.Width*brushFactor, rect.Height);
-                                            canvasArgs.DrawingSession.FillRoundedRectangle(brushRect, 4, 4, brushColor);
-                                        }
-                                        sumBrushFactor += brushFactor;
-                                        brushCount++;
-                                    }*/
-                                }
-
-                                if (_isYAxisAggregated && !_isXAxisAggregated)
-                                {
-                                    canvasArgs.DrawingSession.DrawLine(
-                                        new Vector2((float) (rect.X + rect.Width/2.0f), (float) yFromMargin),
-                                        new Vector2((float) (rect.X + rect.Width/2.0f), (float) yToMargin), dark, 3);
-                                }
-                                if (_isXAxisAggregated && !_isYAxisAggregated)
-                                {
-                                    canvasArgs.DrawingSession.DrawLine(
-                                        new Vector2((float) xFromMargin, (float) (rect.Y + rect.Height/2.0f)),
-                                        new Vector2((float) xToMargin, (float) (rect.Y + rect.Height/2.0f)), dark, 3);
-                                }
-                            }
-
-                            if (_isXAxisAggregated || _isYAxisAggregated)
-                            {
-                                //canvasArgs.DrawingSession.DrawRoundedRectangle(rect, 4, 4, white, 0.5f);
-
-                                /*IGeometry hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
-                                var filterModel = new FilterModel();
-                                for (int i = 0; i < resultDescriptionModel.BinRanges.Count; i++)
-                                {
-                                    if (!(resultDescriptionModel.BinRanges[i] is AggregateBinRange))
-                                    {
-                                        double binRangeValue = resultItem.Values[resultDescriptionModel.Dimensions[i]][BrushIndex.ALL];
-
-                                        var bins = resultDescriptionModel.BinRanges[i].GetBins();
-                                        bins.Add(resultDescriptionModel.BinRanges[i].AddStep(bins.Max()));
-                                        var v = resultDescriptionModel.BinRanges[i].GetIndex(binRangeValue);
-                                        filterModel.Value = unNormalizedvalue;
-                                        if (resultDescriptionModel.BinRanges[i] is NominalBinRange)
-                                        {
-                                            filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.EQUALS,
-                                                resultDescriptionModel.BinRanges[i].GetLabel(v)));
-                                        }
-                                        else
-                                        {
-                                            filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.GREATER_THAN_EQUAL, bins[v]));
-                                            filterModel.ValueComparisons.Add(new ValueComparison(resultDescriptionModel.Dimensions[i], Predicate.LESS_THAN, bins[v + 1]));
-                                        }
-                                    }
-                                }
-                                if (!HitTargets.ContainsKey(hitGeom))
-                                {
-                                    HitTargets.Add(hitGeom, filterModel);
-                                    _filterModelRects.Add(filterModel, rect);
-                                }*/
-                            }
-                        }
-
-                    }
-                    xFrom = _helper.DataToScreenX((float)xBins[xi]);
-                    yFrom = _helper.DataToScreenY((float)yBins[yi]);
-                    xTo = _helper.DataToScreenX((float)xBins[xi + 1]);
-                    yTo = _helper.DataToScreenY((float)yBins[yi + 1]);
-                    if (!_isXAxisAggregated && !_isYAxisAggregated)
-                    {
-                        // d2dDeviceContext.DrawRoundedRectangle(roundedRect, white, 0.5f);
-                        var currentMat = canvasArgs.DrawingSession.Transform;
-                        var mat = Matrix3x2.CreateTranslation(new Vector2(xFrom, yTo));
-                        mat = mat * currentMat;
-                        canvasArgs.DrawingSession.Transform = mat;
-                        canvasArgs.DrawingSession.DrawCachedGeometry(_strokeRoundedRectGeom, white);
-                        canvasArgs.DrawingSession.Transform = currentMat;
-                    }
-                }
-            }
-
-            if (!_isXAxisAggregated && !_isYAxisAggregated)
-            {
-                /*for (int xi = 0; xi < resultDescriptionModel.BinRanges[_xIndex].GetBins().Count; xi++)
-                {
-                    for (int yi = 0; yi < resultDescriptionModel.BinRanges[_yIndex].GetBins().Count; yi++)
-                    {
-                        BinIndex binIndex = new BinIndex(xi, yi);
-                        double? unNormalizedvalue = null;
-                        if (_binDictonary.ContainsKey(binIndex))
-                        {
-                            foreach (var resultItem in _binDictonary[binIndex])
-                            {
-                                if (_queryModelClone.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(_queryModelClone.GetUsageInputOperationModel(InputUsage.Value).First()))
-                                {
-                                    unNormalizedvalue = (double?)resultItem.Values[_queryModelClone.GetUsageInputOperationModel(InputUsage.Value).First()][BrushIndex.ALL];
-                                }
-                                else if (_queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(_queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
-                                {
-                                    unNormalizedvalue = (double?)resultItem.Values[_queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).First()][BrushIndex.ALL];
-                                }
-                            }
-                        }
-
-                        xFrom = _helper.DataToScreenX((float)xBins[xi]);
-                        yFrom = _helper.DataToScreenY((float)yBins[yi]);
-                        xTo = _helper.DataToScreenX((float)xBins[xi + 1]);
-                        yTo = _helper.DataToScreenY((float)yBins[yi + 1]);
-                        rect = new Rect(
-                            xFrom,
-                            yTo,
-                            xTo - xFrom,
-                            yFrom - yTo);
-
-                        IGeometry hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
-                        var filterModel = new FilterModel();
-                        filterModel.Value = unNormalizedvalue;
-                        if (resultDescriptionModel.BinRanges[_xIndex] is NominalBinRange)
-                        {
-                            filterModel.ValueComparisons.Add(new ValueComparison(_xIom, Predicate.EQUALS,
-                                  resultDescriptionModel.BinRanges[_xIndex].GetLabels()[xi].Label));
-                        }
-                        else
-                        {
-                            filterModel.ValueComparisons.Add(new ValueComparison(_xIom, Predicate.GREATER_THAN_EQUAL, xBins[xi]));
-                            filterModel.ValueComparisons.Add(new ValueComparison(_xIom, Predicate.LESS_THAN, xBins[xi + 1]));
-                        }
-                        if (resultDescriptionModel.BinRanges[_yIndex] is NominalBinRange)
-                        {
-                            var gg = resultDescriptionModel.BinRanges[_yIndex].GetBins();
-
-                            filterModel.ValueComparisons.Add(new ValueComparison(_yIom, Predicate.EQUALS,
-                                  resultDescriptionModel.BinRanges[_yIndex].GetLabels()[yi].Label));
-                        }
-                        else
-                        {
-                            filterModel.ValueComparisons.Add(new ValueComparison(_yIom, Predicate.GREATER_THAN_EQUAL, yBins[yi]));
-                            filterModel.ValueComparisons.Add(new ValueComparison(_yIom, Predicate.LESS_THAN, yBins[yi + 1]));
-                        }
-                        HitTargets.Add(hitGeom, filterModel);
-
-                        if (_filterModels.Contains(filterModel))
-                        {
-                            canvasArgs.DrawingSession.DrawRoundedRectangle(rect, 4, 4, dark, 1f);
-                        }
-                    }
-                }*/
-            }
-            else
-            {
-                foreach (var filterModel in _filterModelRects.Keys)
-                {
-                    if (_filterModels.Contains(filterModel))
-                    {
-                        canvasArgs.DrawingSession.DrawRoundedRectangle(_filterModelRects[filterModel], 4, 4, dark, 1.0f);
-                    }
                 }
             }
         }
