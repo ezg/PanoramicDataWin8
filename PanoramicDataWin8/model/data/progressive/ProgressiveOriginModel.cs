@@ -44,9 +44,9 @@ namespace PanoramicDataWin8.model.data.progressive
 
         private void recursiveCreateAttributeModels(IDEA_common.catalog.Attribute attribute, ProgressiveInputGroupModel parentGroupModel)
         {
-            ProgressiveFieldInputModel fieldInputModel = new ProgressiveFieldInputModel(attribute.RawName, attribute.DisplayName,
-                                InputDataTypeConstants.FromType(attribute.DataType),
-                                InputDataTypeConstants.FromType(attribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric");
+            ProgressiveFieldInputModel fieldInputModel = new ProgressiveFieldInputModel(attribute.RawName, attribute.DisplayName, attribute.Index,
+                                InputDataTypeConstants.FromDataType(attribute.DataType),
+                                InputDataTypeConstants.FromDataType(attribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric");
             fieldInputModel.OriginModel = this;
 
             if (parentGroupModel != null)

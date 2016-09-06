@@ -1,4 +1,5 @@
 ﻿using System;
+using IDEA_common.catalog;
 
 namespace PanoramicDataWin8.model.data
 {
@@ -25,6 +26,24 @@ namespace PanoramicDataWin8.model.data
                 return DATE;
             }
             if (type == typeof(int))
+            {
+                return INT;
+            }
+            return NVARCHAR;
+        }
+
+        public static string FromDataType(DataType type)
+        {
+            if (type == DataType.Float ||
+                type == DataType.Double)
+            {
+                return FLOAT;
+            }
+            if (type == DataType.DateTime)
+            {
+                return DATE;
+            }
+            if (type == DataType.Int)
             {
                 return INT;
             }

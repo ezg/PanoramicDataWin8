@@ -18,6 +18,8 @@ namespace PanoramicDataWin8.model.data
             set { throw new NotImplementedException(); }
         }
 
+        public override int Index { get; set; }
+
         public override string InputVisualizationType
         {
             get { throw new NotImplementedException(); }

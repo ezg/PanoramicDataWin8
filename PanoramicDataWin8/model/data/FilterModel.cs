@@ -58,7 +58,7 @@ namespace PanoramicDataWin8.model.data
 
         public string ToPythonString()
         {
-            string ret = "(" + string.Join("and", ValueComparisons.Select(vc => vc.ToPythonString())) + ")";
+            string ret = "(" + string.Join("&&", ValueComparisons.Select(vc => vc.ToPythonString())) + ")";
             return ret;
         }
 
@@ -73,7 +73,7 @@ namespace PanoramicDataWin8.model.data
                 {
                     if (queryModel.FilterModels.Where(fm => fm.ValueComparisons.Count > 0).All(fm => fm.GroupAggregateComparisons == ""))
                     {
-                        ret = "(" + string.Join(" or ", queryModel.FilterModels.Select(fm => fm.ToPythonString())) + ")";
+                        ret = "(" + string.Join(" || ", queryModel.FilterModels.Select(fm => fm.ToPythonString())) + ")";
                     }
                     else
                     {
@@ -94,7 +94,7 @@ namespace PanoramicDataWin8.model.data
                     {
                         if (linkModel.IsInverted)
                         {
-                            child = "not " + child;
+                            child = "! " + child;
                         }
                         children.Add(child);
                     }
@@ -106,7 +106,7 @@ namespace PanoramicDataWin8.model.data
             {
                 if (ret != "")
                 {
-                    ret = "(" + ret + " and " + childrenJoined + ")";
+                    ret = "(" + ret + " && " + childrenJoined + ")";
                 }
                 else
                 {

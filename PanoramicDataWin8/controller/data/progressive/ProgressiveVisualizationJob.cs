@@ -103,24 +103,24 @@ namespace PanoramicDataWin8.controller.data.progressive
             BinningParameters xBinning = xIom.AggregateFunction == AggregateFunction.None
                 ? (BinningParameters) new EquiWidthBinningParameters()
                 {
-                    Dimension = xIom.InputModel.RawName,
+                    Dimension = xIom.InputModel.Index,
                     RequestedNrOfBins = MainViewController.Instance.MainModel.NrOfXBins,
                 }
                 : (BinningParameters) new SingleBinBinningParameters()
                 {
-                    Dimension = xIom.InputModel.RawName,
+                    Dimension = xIom.InputModel.Index,
                 };
 
 
             BinningParameters yBinning = yIom.AggregateFunction == AggregateFunction.None
                 ? (BinningParameters)new EquiWidthBinningParameters()
                 {
-                    Dimension = yIom.InputModel.RawName,
+                    Dimension = yIom.InputModel.Index,
                     RequestedNrOfBins = MainViewController.Instance.MainModel.NrOfYBins,
                 }
                 : (BinningParameters)new SingleBinBinningParameters()
                 {
-                    Dimension = yIom.InputModel.RawName,
+                    Dimension = yIom.InputModel.Index,
                 };
 
             var aggregateParameters = new List<AggregateParameters>();
@@ -130,20 +130,20 @@ namespace PanoramicDataWin8.controller.data.progressive
                 {
                     aggregateParameters.Add(new AverageAggregateParameters()
                     {
-                        Dimension = agg.InputModel.RawName
+                        Dimension = agg.InputModel.Index
                     });
                 }
                 else if (agg.AggregateFunction == AggregateFunction.Count)
                 {
                     aggregateParameters.Add(new CountAggregateParameters()
                     {
-                        Dimension = agg.InputModel.RawName
+                        Dimension = agg.InputModel.Index
                     });
                 }
 
                 aggregateParameters.Add(new MarginAggregateParameters()
                 {
-                    Dimension = agg.InputModel.RawName,
+                    Dimension = agg.InputModel.Index,
                     AggregateFunction = agg.AggregateFunction.ToString()
                 });
             }
@@ -173,7 +173,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             try
             {
                 string response = await ProgressiveGateway.Request(JsonConvert.SerializeObject(_query, ProgressiveGateway.JsonSerializerSettings), "operation");
-                _operationReference = JsonConvert.DeserializeObject<IOperationReference>(response, ProgressiveGateway.JsonSerializerSettings);
+                _operationReference = JsonConvert.DeserializeObject<OperationReference>(response, ProgressiveGateway.JsonSerializerSettings);
 
                 // starting looping for updates
                 while (_isRunning)
@@ -181,7 +181,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                     string message = await ProgressiveGateway.Request(JsonConvert.SerializeObject(_operationReference, ProgressiveGateway.JsonSerializerSettings), "result");
                     if (message != "null")
                     {
-                        HistogramResult result = (HistogramResult)JsonConvert.DeserializeObject<IResult>(message, ProgressiveGateway.JsonSerializerSettings);
+                        HistogramResult result = (HistogramResult)JsonConvert.DeserializeObject<HistogramResult>(message, ProgressiveGateway.JsonSerializerSettings);
 
                         await fireUpdated(result);
 

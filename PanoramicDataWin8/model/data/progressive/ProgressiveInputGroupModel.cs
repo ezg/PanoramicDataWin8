@@ -44,5 +44,7 @@ namespace PanoramicDataWin8.model.data.progressive
                 this.SetProperty(ref _displayName, value);
             }
         }
+
+        public override int Index { get; set; }
     }
 }

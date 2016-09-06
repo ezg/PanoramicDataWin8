@@ -519,10 +519,10 @@
     </SDKReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\IDEA\IDEA-common\IDEA-common.csproj">
-      <Project>{f69e6bc5-99c2-4822-a27a-4fe3267f385e}</Project>
-      <Name>IDEA-common</Name>
-    </ProjectReference>
+    <Reference Include="IDEA-common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\IDEA\src\IDEA-common\bin\Debug\netstandard1.1\IDEA-common.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

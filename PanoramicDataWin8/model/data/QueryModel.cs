@@ -604,27 +604,27 @@ namespace PanoramicDataWin8.model.data
         {
             if (iom.AggregateFunction == AggregateFunction.Count)
             {
-                return new CountAggregateParameters() { Dimension = iom.InputModel.RawName };
+                return new CountAggregateParameters() { Dimension = iom.InputModel.Index };
             }
             if (iom.AggregateFunction == AggregateFunction.Avg)
             {
-                return new AverageAggregateParameters() { Dimension = iom.InputModel.RawName };
+                return new AverageAggregateParameters() { Dimension = iom.InputModel.Index };
             }
             if (iom.AggregateFunction == AggregateFunction.Max)
             {
-                return new MaxAggregateParameters() { Dimension = iom.InputModel.RawName };
+                return new MaxAggregateParameters() { Dimension = iom.InputModel.Index };
             }
             if (iom.AggregateFunction == AggregateFunction.Min)
             {
-                return new MinAggregateParameters() { Dimension = iom.InputModel.RawName };
+                return new MinAggregateParameters() { Dimension = iom.InputModel.Index };
             }
             if (iom.AggregateFunction == AggregateFunction.Sum)
             {
-                return new SumAggregateParameters() { Dimension = iom.InputModel.RawName };
+                return new SumAggregateParameters() { Dimension = iom.InputModel.Index };
             }
             if (iom.AggregateFunction == AggregateFunction.Count)
             {
-                return new CountAggregateParameters() { Dimension = iom.InputModel.RawName };
+                return new CountAggregateParameters() { Dimension = iom.InputModel.Index };
             }
             return null;
         }
@@ -640,7 +640,7 @@ namespace PanoramicDataWin8.model.data
 
         public static AggregateKey CreateAggregateKey(InputOperationModel iom, SingleDimensionAggregateParameters aggParameters, HistogramResult histogramResult, int brushIndex)
         {
-            aggParameters.Dimension = iom.InputModel.RawName;
+            aggParameters.Dimension = iom.InputModel.Index;
             return new AggregateKey()
             {
                 AggregateParameterIndex = histogramResult.GetAggregateParametersIndex(aggParameters),

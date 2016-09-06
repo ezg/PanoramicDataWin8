@@ -21,5 +21,7 @@ namespace PanoramicDataWin8.model.data
 
         public abstract string RawName { get; set; }
         public abstract string DisplayName { get; set; }
+
+        public abstract int Index { get; set; }
     }
 }
