@@ -106,7 +106,7 @@ namespace PanoramicDataWin8.model.data
             {
                 if (ret != "")
                 {
-                    ret = "(" + ret + " && " + childrenJoined + ")";
+                    ret = "(" + ret + " &&  " + childrenJoined + ")";
                 }
                 else
                 {
@@ -182,7 +182,7 @@ namespace PanoramicDataWin8.model.data
             string val = Value.ToString();
             if (Value is string)
             {
-                val = "'" + val + "'";
+                val = "\"" + val + "\"";
             }
             string ret = " " + InputOperationModel.InputModel.RawName + " "  + op + " " + val + " ";
             return ret;

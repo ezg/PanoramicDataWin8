@@ -231,8 +231,8 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             lock (_lock)
             {
+                ProgressiveGateway.Request(JsonConvert.SerializeObject(_operationReference, ProgressiveGateway.JsonSerializerSettings), "pause");
                 _isRunning = false;
-
                 //JObject lookupData = new JObject(
                 //   new JProperty("type", "halt"),
                 //   new JProperty("uuid", _requestUuid));

@@ -130,12 +130,13 @@
     <Compile Include="model\data\LinkModel.cs" />
     <Compile Include="model\data\LinkType.cs" />
     <Compile Include="model\data\NamedInputModel.cs" />
+    <Compile Include="model\data\operation\OperationModel.cs" />
     <Compile Include="model\data\OriginModel.cs" />
     <Compile Include="model\data\progressive\ProgressiveFieldInputModel.cs" />
     <Compile Include="model\data\progressive\ProgressiveInputGroupModel.cs" />
     <Compile Include="model\data\progressive\ProgressiveOriginModel.cs" />
     <Compile Include="model\data\progressive\ProgressiveSchemaModel.cs" />
-    <Compile Include="model\data\QueryModel.cs" />
+    <Compile Include="model\data\operation\QueryModel.cs" />
     <Compile Include="model\data\result\ClassfierResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultItemModel.cs" />
@@ -524,6 +525,7 @@
       <HintPath>..\..\IDEA\src\IDEA-common\bin\Debug\netstandard1.1\IDEA-common.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
