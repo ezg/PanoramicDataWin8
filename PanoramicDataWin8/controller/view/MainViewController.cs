@@ -14,8 +14,10 @@ using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.progressive;
 using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.view.vis;
@@ -27,17 +29,19 @@ namespace PanoramicDataWin8.controller.view
     {
         private Gesturizer _gesturizer = new Gesturizer();
         private static MainViewController _instance;
-        private DispatcherTimer _visualizationMovingTimer = new DispatcherTimer();
+        private DispatcherTimer _operationMovingTimer = new DispatcherTimer();
 
-        private MainViewController(InkableScene root, MainPage mainPage)
+        private MainViewController(InkableScene inkableScene, MainPage mainPage)
         {
-            _root = root;
+            _inkableScene = inkableScene;
             _mainPage = mainPage;
+
+            BrushableViewController.CreateInstance(_operationViewModels);
 
             _mainModel = new MainModel();
             
-            InputFieldViewModel.InputFieldViewModelDropped += InputFieldViewModelDropped;
-            InputFieldViewModel.InputFieldViewModelMoved += InputFieldViewModelMoved;
+            AttributeTransformationViewModel.AttributeTransformationViewModelDropped += AttributeTransformationViewModelDropped;
+            AttributeTransformationViewModel.AttributeTransformationViewModelMoved += AttributeTransformationViewModelMoved;
 
             InputGroupViewModel.InputGroupViewModelDropped += InputGroupViewModelDropped;
             InputGroupViewModel.InputGroupViewModelMoved += InputGroupViewModelMoved;
@@ -45,27 +49,25 @@ namespace PanoramicDataWin8.controller.view
             TaskModel.JobTypeViewModelDropped += TaskModelDropped;
             TaskModel.JobTypeViewModelMoved += TaskModelMoved;
 
-            VisualizationTypeViewModel.VisualizationTypeViewModelDropped += VisualizationTypeViewModel_VisualizationTypeViewModelDropped;
-            VisualizationTypeViewModel.VisualizationTypeViewModelMoved += VisualizationTypeViewModel_VisualizationTypeViewModelMoved;
+            VisualizationTypeViewModel.VisualizationTypeViewModelDropped += VisualizationTypeViewModelDropped;
+            VisualizationTypeViewModel.VisualizationTypeViewModelMoved += VisualizationTypeViewModelMoved;
 
-            _root.InkCollectedEvent += root_InkCollectedEvent;
-            VisualizationViewModels.CollectionChanged += VisualizationViewModels_CollectionChanged;
-            InputVisualizationViews.CollectionChanged += InputVisualizationViews_CollectionChanged;
+            _inkableScene.InkCollectedEvent += InkableSceneInkCollectedEvent;
+            OperationViewModels.CollectionChanged += OperationViewViewModels_CollectionChanged;
             ComparisonViews.CollectionChanged += ComparisonViews_CollectionChanged;
 
-            _gesturizer.AddGesture(new ConnectGesture(_root));
-            _gesturizer.AddGesture(new EraseGesture(_root));
+            _gesturizer.AddGesture(new ConnectGesture(_inkableScene));
+            _gesturizer.AddGesture(new EraseGesture(_inkableScene));
             //_gesturizer.AddGesture(new ScribbleGesture(_root));
 
-            _visualizationMovingTimer.Interval = TimeSpan.FromMilliseconds(20);
-            _visualizationMovingTimer.Tick += _visualizationMovingTimer_Tick;
-            _visualizationMovingTimer.Start();
+            _operationMovingTimer.Interval = TimeSpan.FromMilliseconds(20);
+            _operationMovingTimer.Tick += OperationMovingTimerTick;
+            _operationMovingTimer.Start();
         }
 
-        public async void LoadConfigs()
+        public async void LoadConfig()
         {
             var installedLoc = Package.Current.InstalledLocation;
-            var configLoc = await installedLoc.GetFolderAsync(@"Assets\data\config");
             string mainConifgContent = await installedLoc.GetFileAsync(@"Assets\data\main.ini").AsTask().ContinueWith(t => Windows.Storage.FileIO.ReadTextAsync(t.Result)).Result;
             var backend = mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
                 .First(l => l.ToLower().StartsWith("backend"))
@@ -100,31 +102,10 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        private void recursiveCreateAttributeModels(JToken token, TaskGroupModel parent)
-        {
-            if (token is JArray)
-            {
-                if (token[0] is JValue)
-                {
-                    TaskGroupModel groupModel = new TaskGroupModel() { Name = token[0].ToString() };
-                    parent.TaskModels.Add(groupModel);
-                    foreach (var child in token[1])
-                    {
-                        recursiveCreateAttributeModels(child, groupModel);
-                    }
-                }
-            }
-            if (token is JValue)
-            {
-                TaskModel taskModel = new TaskModel() { Name = token.ToString() };
-                parent.TaskModels.Add(taskModel);
-            }
-        }
-
         public async void LoadCatalog()
         {
             var installedLoc = Package.Current.InstalledLocation;
-            var configLoc = await installedLoc.GetFolderAsync(@"Assets\data\config");
+            
             string mainConifgContent = await installedLoc.GetFileAsync(@"Assets\data\main.ini").AsTask().ContinueWith(t => Windows.Storage.FileIO.ReadTextAsync(t.Result)).Result;
 
             var startDataSet = mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
@@ -170,11 +151,30 @@ namespace PanoramicDataWin8.controller.view
             }
             _mainModel.TaskModels = parent.TaskModels.ToList();*/
         }
-        
+
+        public void LoadData(DatasetConfiguration datasetConfiguration)
+        {
+            if (_mainModel.SchemaModel != null && _mainModel.SchemaModel.QueryExecuter != null)
+            {
+                _mainModel.SchemaModel.QueryExecuter.HaltAllJobs();
+            }
+
+            if (datasetConfiguration.Backend.ToLower() == "progressive")
+            {
+                _mainModel.SchemaModel = new ProgressiveSchemaModel();
+                _mainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
+                _mainModel.SampleSize = datasetConfiguration.SampleSize;
+                (_mainModel.SchemaModel as ProgressiveSchemaModel).QueryExecuter = new ProgressiveQueryExecuter();
+                (_mainModel.SchemaModel as ProgressiveSchemaModel).RootOriginModel = new ProgressiveOriginModel(datasetConfiguration);
+                (_mainModel.SchemaModel as ProgressiveSchemaModel).RootOriginModel.LoadInputFields();
+            }
+        }
+
+
         public static void CreateInstance(InkableScene root, MainPage mainPage)
         {
             _instance = new MainViewController(root, mainPage);
-            _instance.LoadConfigs();
+            _instance.LoadConfig();
         }
         
         public static MainViewController Instance
@@ -185,35 +185,24 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        private InkableScene _root;
+        private InkableScene _inkableScene;
         public InkableScene InkableScene
         {
             get
             {
-                return _root;
+                return _inkableScene;
             }
         }
-
-        public ObservableDictionary<InputVisualizationViewModel, InputVisualizationView> InputVisualizationViews = new ObservableDictionary<InputVisualizationViewModel, InputVisualizationView>();
 
         public ObservableDictionary<ComparisonViewModel, ComparisonView> ComparisonViews = new ObservableDictionary<ComparisonViewModel, ComparisonView>();
 
 
-        private ObservableCollection<VisualizationViewModel> _visualizationViewModels = new ObservableCollection<VisualizationViewModel>();
-        public ObservableCollection<VisualizationViewModel> VisualizationViewModels
+        private ObservableCollection<OperationViewModel> _operationViewModels = new ObservableCollection<OperationViewModel>();
+        public ObservableCollection<OperationViewModel> OperationViewModels
         {
             get
             {
-                return _visualizationViewModels;
-            }
-        }
-
-        private ObservableCollection<LinkViewModel> _linkViewModels = new ObservableCollection<LinkViewModel>();
-        public ObservableCollection<LinkViewModel> LinkViewModels
-        {
-            get
-            {
-                return _linkViewModels;
+                return _operationViewModels;
             }
         }
 
@@ -235,67 +224,31 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        public void LoadData(DatasetConfiguration datasetConfiguration)
+        public HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(AttributeModel attributeModel )
         {
-            if (_mainModel.SchemaModel != null && _mainModel.SchemaModel.QueryExecuter != null)
-            {
-                _mainModel.SchemaModel.QueryExecuter.HaltAllJobs();
-            }
-
-            if (datasetConfiguration.Backend.ToLower() == "progressive")
-            {
-                _mainModel.SchemaModel = new ProgressiveSchemaModel();
-                _mainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
-                _mainModel.SampleSize = datasetConfiguration.SampleSize;
-                (_mainModel.SchemaModel as ProgressiveSchemaModel).QueryExecuter = new ProgressiveQueryExecuter();
-                (_mainModel.SchemaModel as ProgressiveSchemaModel).RootOriginModel = new ProgressiveOriginModel(datasetConfiguration);
-                (_mainModel.SchemaModel as ProgressiveSchemaModel).RootOriginModel.LoadInputFields();
-            }
-        }
-        public VisualizationViewModel CreateVisualizationViewModel(TaskModel taskModel, InputOperationModel inputOperationModel)
-        {
-            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, taskModel, inputOperationModel != null ? inputOperationModel.InputModel : null);
+            HistogramOperationViewModel visModel = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(_mainModel.SchemaModel, attributeModel);
             addAttachmentViews(visModel);
-            _visualizationViewModels.Add(visModel);
+            _operationViewModels.Add(visModel);
             return visModel;
         }
+        
 
-        public VisualizationViewModel CreateVisualizationViewModel(TaskModel taskModel, VisualizationType visualizationType)
+        public void CopyOperationViewModel(OperationViewModel operationViewModel, Pt centerPoint)
         {
-            VisualizationViewModel visModel = VisualizationViewModelFactory.CreateDefault(_mainModel.SchemaModel, taskModel, visualizationType);
-            addAttachmentViews(visModel);
-            _visualizationViewModels.Add(visModel);
-            return visModel;
+            OperationContainerView newOperationContainerView = new OperationContainerView();
+            OperationViewModel newOperationViewModel = OperationViewModelFactory.CopyOperationViewModel(operationViewModel);
+            addAttachmentViews(newOperationViewModel);
+            _operationViewModels.Add(newOperationViewModel);
+
+            newOperationViewModel.Position = centerPoint - (operationViewModel.Size / 2.0);
+
+            newOperationContainerView.DataContext = newOperationViewModel;
+            InkableScene.Add(newOperationContainerView);
+
+            //newOperationViewModel.OperationModel.FireOperationModelUpdated(HistogramModelUpdatedEventType.Structure);
         }
 
-        public void CopyVisualisationViewModel(VisualizationViewModel visualizationViewModel, Pt centerPoint)
-        {
-            VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-            VisualizationViewModel newVisualizationViewModel = CreateVisualizationViewModel(visualizationViewModel.QueryModel.TaskModel, null);
-            
-            newVisualizationViewModel.Position = centerPoint - (visualizationViewModel.Size / 2.0);
-            newVisualizationViewModel.Size = visualizationViewModel.Size;
-            foreach (var usage in visualizationViewModel.QueryModel.UsageInputOperationModels.Keys)
-            {
-                foreach (var inputOperationModel in visualizationViewModel.QueryModel.UsageInputOperationModels[usage])
-                {
-                    newVisualizationViewModel.QueryModel.AddUsageInputOperationModel(usage, 
-                        new InputOperationModel(inputOperationModel.InputModel)
-                        {
-                            AggregateFunction = inputOperationModel.AggregateFunction
-                        });
-                }
-            }
-            newVisualizationViewModel.Size = visualizationViewModel.Size;
-            newVisualizationViewModel.QueryModel.VisualizationType = visualizationViewModel.QueryModel.VisualizationType;
-
-            visualizationContainerView.DataContext = newVisualizationViewModel;
-            InkableScene.Add(visualizationContainerView);
-
-            newVisualizationViewModel.QueryModel.FireQueryModelUpdated(QueryModelUpdatedEventType.Structure);
-        }
-
-        private void addAttachmentViews(VisualizationViewModel visModel)
+        private void addAttachmentViews(OperationViewModel visModel)
         {
             foreach (var attachmentViewModel in visModel.AttachementViewModels)
             {
@@ -308,91 +261,27 @@ namespace PanoramicDataWin8.controller.view
         }
 
 
-        public void RemoveVisualizationViewModel(VisualizationContainerView visualizationContainerView)
+        public void RemoveOperationViewModel(OperationContainerView operationContainerView)
         {
-            _mainModel.SchemaModel.QueryExecuter.RemoveJob((visualizationContainerView.DataContext as VisualizationViewModel).QueryModel);
-            _visualizationViewModels.Remove(visualizationContainerView.DataContext as VisualizationViewModel);
-            //PhysicsController.Instance.RemovePhysicalObject(visualizationContainerView);
-            MainViewController.Instance.InkableScene.Remove(visualizationContainerView);
+            _mainModel.SchemaModel.QueryExecuter.RemoveJob((operationContainerView.DataContext as OperationViewModel).OperationModel);
+            _operationViewModels.Remove(operationContainerView.DataContext as HistogramOperationViewModel);
+            //PhysicsController.Instance.RemovePhysicalObject(operationContainerView);
+            MainViewController.Instance.InkableScene.Remove(operationContainerView);
 
-            visualizationContainerView.Dispose();
+            operationContainerView.Dispose();
             foreach (var attachmentView in MainViewController.Instance.InkableScene.Elements.Where(e => e is AttachmentView).ToList())
             {
-                if ((attachmentView.DataContext as AttachmentViewModel).VisualizationViewModel == visualizationContainerView.DataContext as VisualizationViewModel)
+                if ((attachmentView.DataContext as AttachmentViewModel).OperationViewModel == operationContainerView.DataContext as HistogramOperationViewModel)
                 {
                     (attachmentView as AttachmentView).Dispose();
                     MainViewController.Instance.InkableScene.Remove(attachmentView);
                 }
             }
-            var qm = (visualizationContainerView.DataContext as VisualizationViewModel).QueryModel;
+            var qm = (operationContainerView.DataContext as HistogramOperationViewModel).HistogramOperationModel;
             foreach (var model in qm.LinkModels.ToArray())
             {
-                model.FromQueryModel.LinkModels.Remove(model);
-                model.ToQueryModel.LinkModels.Remove(model);
-            }
-        }
-
-        public LinkViewModel CreateLinkViewModel(LinkModel linkModel)
-        {
-            LinkViewModel linkViewModel = LinkViewModels.FirstOrDefault(lvm => lvm.ToVisualizationViewModel == VisualizationViewModels.Where(vvm => vvm.QueryModel == linkModel.ToQueryModel).First());
-            if (linkViewModel == null)
-            {
-                linkViewModel = new LinkViewModel()
-                {
-                    ToVisualizationViewModel = VisualizationViewModels.Where(vvm => vvm.QueryModel == linkModel.ToQueryModel).First(),
-                };
-                _linkViewModels.Add(linkViewModel);
-                LinkView linkView = new LinkView();
-                linkView.DataContext = linkViewModel;
-                _root.AddToBack(linkView);
-            }
-            if (!linkViewModel.LinkModels.Contains(linkModel))
-            {
-                linkViewModel.LinkModels.Add(linkModel);
-                linkViewModel.FromVisualizationViewModels.Add(VisualizationViewModels.Where(vvm => vvm.QueryModel == linkModel.FromQueryModel).First());
-            }
-
-            return linkViewModel;
-        }
-
-        private bool isLinkAllowed(LinkModel linkModel)
-        {
-            List<LinkModel> linkModels = linkModel.FromQueryModel.LinkModels.Where(lm => lm.FromQueryModel == linkModel.FromQueryModel).ToList();
-            linkModels.Add(linkModel);
-            return !recursiveCheckForCiruclarLinking(linkModels, linkModel.FromQueryModel, new HashSet<QueryModel>());
-        } 
-
-        private bool recursiveCheckForCiruclarLinking(List<LinkModel> links, QueryModel current, HashSet<QueryModel> chain)
-        {
-            if (!chain.Contains(current))
-            {
-                chain.Add(current);
-                bool ret = false;
-                foreach (var link in links)
-                {
-                    ret = ret || recursiveCheckForCiruclarLinking(link.ToQueryModel.LinkModels.Where(lm => lm.FromQueryModel == link.ToQueryModel).ToList(), link.ToQueryModel, chain);
-                }
-                return ret;
-            }
-            else
-            {
-                return true;
-            }
-        }
-
-        public void RemoveLinkViewModel(LinkModel linkModel)
-        {
-            foreach (var linkViewModel in LinkViewModels.ToArray()) 
-            {
-                if (linkViewModel.LinkModels.Contains(linkModel))
-                {
-                    linkViewModel.LinkModels.Remove(linkModel);
-                }
-                if (linkViewModel.LinkModels.Count == 0)
-                {
-                    LinkViewModels.Remove(linkViewModel);
-                    _root.Remove(_root.Elements.First(e => e is LinkView && (e as LinkView).DataContext == linkViewModel));
-                }
+                ((IFilterConsumer) model.FromOperationModel).LinkModels.Remove(model);
+                ((IFilterConsumer)model.ToOperationModel).LinkModels.Remove(model);
             }
         }
 
@@ -403,14 +292,14 @@ namespace PanoramicDataWin8.controller.view
 
         void TaskModelDropped(object sender, TaskModelEventArgs e)
         {
-            double width = VisualizationViewModel.WIDTH;
-            double height = VisualizationViewModel.HEIGHT;
+            double width = HistogramOperationViewModel.WIDTH;
+            double height = HistogramOperationViewModel.HEIGHT;
             Vec size = new Vec(width, height);
             Pt position = (Pt)new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
 
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
-            List<VisualizationContainerView> hits = new List<VisualizationContainerView>();
-            foreach (var element in InkableScene.Elements.Where(ele => ele is VisualizationContainerView).Select(ele => ele as VisualizationContainerView))
+            List<OperationContainerView> hits = new List<OperationContainerView>();
+            foreach (var element in InkableScene.Elements.Where(ele => ele is OperationContainerView).Select(ele => ele as OperationContainerView))
             {
                 var geom = element.GetBounds(InkableScene).GetPolygon();
                 if (geom != null && mainPageBounds.Intersects(geom))
@@ -422,9 +311,9 @@ namespace PanoramicDataWin8.controller.view
             bool found = false;
             foreach (var element in hits)
             {
-                if ((element.DataContext as VisualizationViewModel).QueryModel.TaskModel != null)
+                if ((element.DataContext as ClassificationOperationViewModel).ClassificationOperationModel.TaskModel != null)
                 {
-                    (element.DataContext as VisualizationViewModel).QueryModel.TaskModel = (sender as TaskModel);
+                    (element.DataContext as ClassificationOperationViewModel).ClassificationOperationModel.TaskModel = (sender as TaskModel);
                     found = true;
                     break;
                 }
@@ -432,32 +321,34 @@ namespace PanoramicDataWin8.controller.view
 
             if (!found)
             {
-                VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-                VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel((sender as TaskModel), null);
-                visualizationViewModel.Position = position;
-                visualizationViewModel.Size = size;
-                visualizationContainerView.DataContext = visualizationViewModel;
-                InkableScene.Add(visualizationContainerView);
+                OperationContainerView operationContainerView = new OperationContainerView();
+                //TODO
+                /*HistogramOperationViewModel histogramOperationViewModel = CreateHistogramOperationViewModel((sender as TaskModel), null);
+                histogramOperationViewModel.Position = position;
+                histogramOperationViewModel.Size = size;
+                operationContainerView.DataContext = histogramOperationViewModel;
+                InkableScene.Add(operationContainerView);*/
             }
         }
 
-        void VisualizationTypeViewModel_VisualizationTypeViewModelMoved(object sender, VisualizationTypeViewModelEventArgs e)
+        void VisualizationTypeViewModelMoved(object sender, VisualizationTypeViewModelEventArgs e)
         {
         }
 
-        void VisualizationTypeViewModel_VisualizationTypeViewModelDropped(object sender, VisualizationTypeViewModelEventArgs e)
+        void VisualizationTypeViewModelDropped(object sender, VisualizationTypeViewModelEventArgs e)
         {
-            double width = VisualizationViewModel.WIDTH;
-            double height = VisualizationViewModel.HEIGHT;
+            double width = HistogramOperationViewModel.WIDTH;
+            double height = HistogramOperationViewModel.HEIGHT;
             Vec size = new Vec(width, height);
             Pt position = (Pt)new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
 
-            VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-            VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel(null, (sender as VisualizationTypeViewModel).VisualizationType);
-            visualizationViewModel.Position = position;
-            visualizationViewModel.Size = size;
-            visualizationContainerView.DataContext = visualizationViewModel;
-            InkableScene.Add(visualizationContainerView);
+            OperationContainerView operationContainerView = new OperationContainerView();
+            //TODO
+                /*HistogramOperationViewModel histogramOperationViewModel = CreateHistogramOperationViewModel(null, (sender as VisualizationTypeViewModel).VisualizationType);
+            histogramOperationViewModel.Position = position;
+            histogramOperationViewModel.Size = size;
+            operationContainerView.DataContext = histogramOperationViewModel;
+            InkableScene.Add(operationContainerView);*/
         }
 
         void InputGroupViewModelMoved(object sender, InputGroupViewModelEventArgs e)
@@ -505,11 +396,11 @@ namespace PanoramicDataWin8.controller.view
             }
         }
         
-        void InputFieldViewModelMoved(object sender, InputFieldViewModelEventArgs e)
+        void AttributeTransformationViewModelMoved(object sender, AttributeTransformationViewModelEventArgs e)
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
-            List<InputFieldViewModelEventHandler> hits = new List<InputFieldViewModelEventHandler>();
-            var tt = InkableScene.GetDescendants().OfType<InputFieldViewModelEventHandler>().ToList();
+            List<AttributeTransformationViewModelEventHandler> hits = new List<AttributeTransformationViewModelEventHandler>();
+            var tt = InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>().ToList();
             foreach (var element in tt)
             {
                 var geom = element.BoundsGeometry;
@@ -520,19 +411,19 @@ namespace PanoramicDataWin8.controller.view
             }
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
 
-            foreach (var element in InkableScene.GetDescendants().OfType<InputFieldViewModelEventHandler>())
+            foreach (var element in InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>())
             {
-                element.InputFieldViewModelMoved(
-                        sender as InputFieldViewModel, e,
+                element.AttributeTransformationViewModelMoved(
+                        sender as AttributeTransformationViewModel, e,
                         hits.Count() > 0 && orderderHits[0] == element);
             }
         }
 
-        void InputFieldViewModelDropped(object sender, InputFieldViewModelEventArgs e)
+        void AttributeTransformationViewModelDropped(object sender, AttributeTransformationViewModelEventArgs e)
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
-            List<InputFieldViewModelEventHandler> hits = new List<InputFieldViewModelEventHandler>();
-            foreach (var element in InkableScene.GetDescendants().OfType<InputFieldViewModelEventHandler>())
+            List<AttributeTransformationViewModelEventHandler> hits = new List<AttributeTransformationViewModelEventHandler>();
+            foreach (var element in InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>())
             {
                 var geom = element.BoundsGeometry;
                 if (geom != null && mainPageBounds.Intersects(geom))
@@ -541,41 +432,41 @@ namespace PanoramicDataWin8.controller.view
                 }
             }
 
-            double width = e.UseDefaultSize ? VisualizationViewModel.WIDTH : e.Bounds.Width;
-            double height = e.UseDefaultSize ? VisualizationViewModel.HEIGHT : e.Bounds.Height;
+            double width = OperationViewModel.WIDTH;
+            double height = OperationViewModel.HEIGHT;
             Vec size = new Vec(width, height);
             Pt position = (Pt) new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
 
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
-            foreach (var element in InkableScene.GetDescendants().OfType<InputFieldViewModelEventHandler>())
+            foreach (var element in InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>())
             {
-                element.InputFieldViewModelDropped(
-                        sender as InputFieldViewModel, e,
+                element.AttributeTransformationViewModelDropped(
+                        sender as AttributeTransformationViewModel, e,
                         hits.Count() > 0 && orderderHits[0] == element);
             }
 
             if (!hits.Any())
             {
-                VisualizationContainerView visualizationContainerView = new VisualizationContainerView();
-                VisualizationViewModel visualizationViewModel = CreateVisualizationViewModel(null, e.InputOperationModel);
-                visualizationViewModel.Position = position;
-                visualizationViewModel.Size = size;
-                visualizationContainerView.DataContext = visualizationViewModel;
-                InkableScene.Add(visualizationContainerView);
+                OperationContainerView operationContainerView = new OperationContainerView();
+                HistogramOperationViewModel histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(e.AttributeTransformationModel.AttributeModel);
+                histogramOperationViewModel.Position = position;
+                histogramOperationViewModel.Size = size;
+                operationContainerView.DataContext = histogramOperationViewModel;
+                InkableScene.Add(operationContainerView);
             }
         }
 
-        void VisualizationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        void OperationViewViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
             {
                 foreach (var item in e.OldItems)
                 {
-                    (item as VisualizationViewModel).QueryModel.LinkModels.CollectionChanged -= LinkModels_CollectionChanged;
-                    (item as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
-                    foreach (var link in (item as VisualizationViewModel).QueryModel.LinkModels)
+                    (item as HistogramOperationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
+                    (item as OperationViewModel).OperationModel.OperationModelUpdated -= OperationModel_OperationModelUpdated;
+                    foreach (var link in (item as HistogramOperationViewModel).HistogramOperationModel.LinkModels)
                     {
-                        RemoveLinkViewModel(link);
+                        FilterLinkViewController.Instance.RemoveFilterLinkViewModel(link);
                     }
                 }
             }
@@ -583,25 +474,45 @@ namespace PanoramicDataWin8.controller.view
             {
                 foreach (var item in e.NewItems)
                 {
-                    (item as VisualizationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
-                    (item as VisualizationViewModel).QueryModel.LinkModels.CollectionChanged += LinkModels_CollectionChanged;
+                    (item as HistogramOperationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
+                    (item as OperationViewModel).OperationModel.OperationModelUpdated += OperationModel_OperationModelUpdated;
                 }
             }
         }
 
-        public void VisualizationViewTapped(VisualizationViewModel visModel)
+        private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
-            foreach (var inputVisualizationView in InputVisualizationViews)
+            OperationModel model = sender as OperationModel;
+            if (e is FilterOperationModelUpdatedEventArgs && 
+                (e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.Links)
             {
-                if (visModel.QueryModel.TaskModel == null && inputVisualizationView.Key.VisualizationViewModels.Contains(visModel))
-                {
-                    inputVisualizationView.Key.From = visModel;
-                }
+                ((HistogramOperationModel) model).ClearFilterModels();
             }
+            /*FilterOperationModelUpdated?.Invoke(this, new FilterOperationModelUpdatedEventArgs(type));*/
+
+            if (!(e is FilterOperationModelUpdatedEventArgs) || (e is FilterOperationModelUpdatedEventArgs && 
+                (e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType != FilterOperationModelUpdatedEventType.FilterModels))
+            {
+                model.SchemaModel.QueryExecuter.ExecuteOperationModel(model);
+            }
+        }
+
+        public void OperationViewModelTapped(OperationViewModel operationViewModel)
+        {
+            // TODO
+            /*foreach (var inputVisualizationView in InputVisualizationViews)
+            {
+                if (operationViewModel.OperationModel is IBrushableOperationModel && inputVisualizationView.Key.VisualizationViewModels.Contains(operationViewModel))
+                {
+                    inputVisualizationView.Key.From = (HistogramOperationViewModel) operationViewModel;
+                }
+            }*/
         }
         
         private void InputVisualizationViews_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            //TODO
+            /*
             if (e.OldItems != null)
             {
                 foreach (var item in e.OldItems)
@@ -609,7 +520,7 @@ namespace PanoramicDataWin8.controller.view
                     var current = (((KeyValuePair<InputVisualizationViewModel, InputVisualizationView>)item).Key);
                     foreach (var visualizationViewModel in current.VisualizationViewModels)
                     {
-                        visualizationViewModel.QueryModel.InputVisualizationViewModels.Remove(current);
+                        visualizationViewModel.HistogramOperationModel.InputVisualizationViewModels.Remove(current);
                     }
                 }
             }
@@ -620,10 +531,10 @@ namespace PanoramicDataWin8.controller.view
                     var current = (((KeyValuePair< InputVisualizationViewModel, InputVisualizationView>)item).Key);
                     foreach (var visualizationViewModel in current.VisualizationViewModels)
                     {
-                        visualizationViewModel.QueryModel.InputVisualizationViewModels.Add(current);
+                        visualizationViewModel.HistogramOperationModel.InputVisualizationViewModels.Add(current);
                     }
                 }
-            }
+            }*/
         }
         
 
@@ -636,7 +547,7 @@ namespace PanoramicDataWin8.controller.view
                     var current = (((KeyValuePair<ComparisonViewModel, ComparisonView>)item).Key);
                     foreach (var visualizationViewModel in current.VisualizationViewModels)
                     {
-                        visualizationViewModel.QueryModel.ComparisonViewModels.Remove(current);
+                        visualizationViewModel.HistogramOperationModel.ComparisonViewModels.Remove(current);
                     }
                 }
             }
@@ -647,22 +558,16 @@ namespace PanoramicDataWin8.controller.view
                     var current = (((KeyValuePair<ComparisonViewModel, ComparisonView>)item).Key);
                     foreach (var visualizationViewModel in current.VisualizationViewModels)
                     {
-                        visualizationViewModel.QueryModel.ComparisonViewModels.Add(current);
+                        visualizationViewModel.HistogramOperationModel.ComparisonViewModels.Add(current);
                     }
                 }
             }
         }
-
-        private double boundHorizontalDistance(Rct b1, Rct b2)
-        {
-            return Math.Min(Math.Abs(b1.Right - b2.Left), Math.Abs(b1.Left - b2.Right));
-        }
-
         
-        private Dictionary<VisualizationViewModel, DateTime> _lastMoved = new Dictionary<VisualizationViewModel, DateTime>(); 
+        private Dictionary<HistogramOperationViewModel, DateTime> _lastMoved = new Dictionary<HistogramOperationViewModel, DateTime>(); 
         private void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var current = sender as VisualizationViewModel;
+            /*var current = sender as HistogramOperationViewModel;
             if (e.PropertyName == current.GetPropertyName(() => current.Position))
             {
 
@@ -670,15 +575,15 @@ namespace PanoramicDataWin8.controller.view
                 _lastMoved[current] = DateTime.Now;
 
                 // check if we need to create new inputvisualization views
-                foreach (var other in VisualizationViewModels.Where(c => c != null))
+                foreach (var other in OperationViewModels.Select(c => c as HistogramOperationViewModel).Where(c => c != null))
                 {
                     var diff = current.Position - other.Position;
 
                     bool areLinked = false;
-                    foreach (var linkModel in current.QueryModel.LinkModels)
+                    foreach (var linkModel in current.HistogramOperationModel.LinkModels)
                     {
-                        if ((linkModel.FromQueryModel == current.QueryModel && linkModel.ToQueryModel == other.QueryModel) ||
-                            (linkModel.FromQueryModel == other.QueryModel && linkModel.ToQueryModel == current.QueryModel))
+                        if ((linkModel.FromOperationModel == current.HistogramOperationModel && linkModel.ToOperationModel == other.HistogramOperationModel) ||
+                            (linkModel.FromOperationModel == other.HistogramOperationModel && linkModel.ToOperationModel == current.HistogramOperationModel))
                         {
                             areLinked = true;
                         }
@@ -717,33 +622,33 @@ namespace PanoramicDataWin8.controller.view
                         {
                             if (!InputVisualizationViews.Keys.Any(sov => sov.VisualizationViewModels.Contains(current) && sov.VisualizationViewModels.Contains(other)))
                             {
-                                List<InputVisualizationViewModel> inputCohorts = InputVisualizationViews.Keys.Where(icv => icv.To == other).ToList();
+                                List<BrushViewModel> inputCohorts = InputVisualizationViews.Keys.Where(icv => icv.To == other).ToList();
 
-                                var allColorIndex = Enumerable.Range(0, InputVisualizationViewModel.ColorScheme1.Count);
+                                var allColorIndex = Enumerable.Range(0, BrushViewModel.ColorScheme1.Count);
                                 allColorIndex = allColorIndex.Except(inputCohorts.Select(c => c.ColorIndex));
-                                var colorIndex = inputCohorts.Count%InputVisualizationViewModel.ColorScheme1.Count;
+                                var colorIndex = inputCohorts.Count%BrushViewModel.ColorScheme1.Count;
                                 if (allColorIndex.Any())
                                 {
                                     colorIndex = allColorIndex.First();
                                 }
 
-                                InputVisualizationViewModel inputVisualizationViewModel = new InputVisualizationViewModel();
-                                inputVisualizationViewModel.ColorIndex = colorIndex;
-                                inputVisualizationViewModel.Color = InputVisualizationViewModel.ColorScheme1[colorIndex];
-                                inputVisualizationViewModel.VisualizationViewModels.Add(other);
-                                inputVisualizationViewModel.VisualizationViewModels.Add(current);
-                                inputVisualizationViewModel.Position =
-                                    (((inputVisualizationViewModel.VisualizationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec()))/2.0) - inputVisualizationViewModel.Size/2.0).GetWindowsPoint();
+                                BrushViewModel brushViewModel = new BrushViewModel();
+                                brushViewModel.ColorIndex = colorIndex;
+                                brushViewModel.Color = BrushViewModel.ColorScheme1[colorIndex];
+                                brushViewModel.OperationViewModels.Add(other);
+                                brushViewModel.OperationViewModels.Add(current);
+                                brushViewModel.Position =
+                                    (((brushViewModel.OperationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec()))/2.0) - brushViewModel.Size/2.0).GetWindowsPoint();
 
-                                inputVisualizationViewModel.InputVisualizationViewModelState = InputVisualizationViewModelState.Opening;
-                                inputVisualizationViewModel.DwellStartPosition = current.Position;
-                                inputVisualizationViewModel.From = current;
-                                inputVisualizationViewModel.TicksSinceDwellStart = DateTime.Now.Ticks;
+                                brushViewModel.BrushableOperationViewModelState = BrushableOperationViewModelState.Opening;
+                                brushViewModel.DwellStartPosition = current.Position;
+                                brushViewModel.From = current;
+                                brushViewModel.TicksSinceDwellStart = DateTime.Now.Ticks;
 
-                                InputVisualizationView view = new InputVisualizationView();
-                                view.DataContext = inputVisualizationViewModel;
+                                BrushView view = new BrushView();
+                                view.DataContext = brushViewModel;
                                 InkableScene.Children.Add(view);
-                                InputVisualizationViews.Add(inputVisualizationViewModel, view);
+                                InputVisualizationViews.Add(brushViewModel, view);
                             }
                             else
                             {
@@ -753,18 +658,18 @@ namespace PanoramicDataWin8.controller.view
                         }
                     }
                 }
-            }
+            }*/
         }
 
-        void _visualizationMovingTimer_Tick(object sender, object e)
+        void OperationMovingTimerTick(object sender, object e)
         {
-            checkOpenOrCloseInputVisualizationModels();
+            //checkOpenOrCloseInputVisualizationModels();
             checkOpenOrCloseComparisionModels();
         }
 
         private void checkOpenOrCloseComparisionModels(bool dropped = false)
         {
-            // views that need to be opened or closed
+            /*// views that need to be opened or closed
             foreach (var comparisonViewModel in ComparisonViews.Keys.ToList())
             {
                 var model = comparisonViewModel;
@@ -780,10 +685,10 @@ namespace PanoramicDataWin8.controller.view
                 }
 
                 bool areLinked = false;
-                foreach (var linkModel in comparisonViewModel.VisualizationViewModels.First().QueryModel.LinkModels)
+                foreach (var linkModel in comparisonViewModel.VisualizationViewModels.First().HistogramOperationModel.LinkModels)
                 {
-                    if ((linkModel.FromQueryModel == comparisonViewModel.VisualizationViewModels[0].QueryModel && linkModel.ToQueryModel == comparisonViewModel.VisualizationViewModels[1].QueryModel) ||
-                        (linkModel.FromQueryModel == comparisonViewModel.VisualizationViewModels[1].QueryModel && linkModel.ToQueryModel == comparisonViewModel.VisualizationViewModels[0].QueryModel))
+                    if ((linkModel.FromOperationModel == comparisonViewModel.VisualizationViewModels[0].HistogramOperationModel && linkModel.ToOperationModel == comparisonViewModel.VisualizationViewModels[1].HistogramOperationModel) ||
+                        (linkModel.FromOperationModel == comparisonViewModel.VisualizationViewModels[1].HistogramOperationModel && linkModel.ToOperationModel == comparisonViewModel.VisualizationViewModels[0].HistogramOperationModel))
                     {
                         areLinked = true;
                     }
@@ -795,7 +700,7 @@ namespace PanoramicDataWin8.controller.view
                     Math.Abs(diff.Y) >= 300 ||
                     (comparisonViewModel.ComparisonViewModelState == ComparisonViewModelState.Opening && boundHorizontalDistance(comparisonViewModel.VisualizationViewModels[0].Bounds, comparisonViewModel.VisualizationViewModels[1].Bounds) >= 300) ||
                     (comparisonViewModel.ComparisonViewModelState == ComparisonViewModelState.Opened && boundHorizontalDistance(comparisonViewModel.VisualizationViewModels[0].Bounds, comparisonViewModel.VisualizationViewModels[1].Bounds) >= 300) ||
-                    comparisonViewModel.VisualizationViewModels.Any(c => !VisualizationViewModels.Contains(c)))
+                    comparisonViewModel.VisualizationViewModels.Any(c => !OperationViewModels.Contains(c)))
                 {
                     comparisonViewModel.ComparisonViewModelState = ComparisonViewModelState.Closing;
                     var view = ComparisonViews[comparisonViewModel];
@@ -809,78 +714,12 @@ namespace PanoramicDataWin8.controller.view
                     });
 
                 }
-            }
+            }*/
         }
 
-        private void checkOpenOrCloseInputVisualizationModels(bool dropped = false)
-        {
-            // views that need to be opened or closed
-            foreach (var inputVisualizationViewModel in InputVisualizationViews.Keys.ToList())
-            {
-                var model = inputVisualizationViewModel;
+        
 
-                var diff = inputVisualizationViewModel.VisualizationViewModels[0].Position - inputVisualizationViewModel.VisualizationViewModels[1].Position;
-
-                // views to open
-                if (Math.Abs(diff.Y) < 300 &&
-                    boundHorizontalDistance(inputVisualizationViewModel.VisualizationViewModels[0].Bounds, inputVisualizationViewModel.VisualizationViewModels[1].Bounds) < 50 &&
-                    (dropped || DateTime.Now.Ticks > TimeSpan.TicksPerSecond * 1 + model.TicksSinceDwellStart))
-                {
-                    inputVisualizationViewModel.InputVisualizationViewModelState = InputVisualizationViewModelState.Opened;
-                }
-
-                bool areLinked = false;
-                foreach (var linkModel in inputVisualizationViewModel.From.QueryModel.LinkModels)
-                {
-                    if ((linkModel.FromQueryModel == inputVisualizationViewModel.VisualizationViewModels[0].QueryModel && linkModel.ToQueryModel == inputVisualizationViewModel.VisualizationViewModels[1].QueryModel) ||
-                        (linkModel.FromQueryModel == inputVisualizationViewModel.VisualizationViewModels[1].QueryModel && linkModel.ToQueryModel == inputVisualizationViewModel.VisualizationViewModels[0].QueryModel))
-                    {
-                        areLinked = true;
-                    }
-                }
-
-
-                // Views to close
-                if (areLinked ||
-                    Math.Abs(diff.Y) >= 300 ||
-                    (inputVisualizationViewModel.InputVisualizationViewModelState == InputVisualizationViewModelState.Opening && boundHorizontalDistance(inputVisualizationViewModel.VisualizationViewModels[0].Bounds, inputVisualizationViewModel.VisualizationViewModels[1].Bounds) >= 50) ||
-                    (inputVisualizationViewModel.InputVisualizationViewModelState == InputVisualizationViewModelState.Opened && boundHorizontalDistance(inputVisualizationViewModel.VisualizationViewModels[0].Bounds, inputVisualizationViewModel.VisualizationViewModels[1].Bounds) >= 50) ||
-                    inputVisualizationViewModel.VisualizationViewModels.Any(c => !VisualizationViewModels.Contains(c)))
-                {
-                    inputVisualizationViewModel.InputVisualizationViewModelState = InputVisualizationViewModelState.Closing;
-                    var view = InputVisualizationViews[inputVisualizationViewModel];
-                    InputVisualizationViews.Remove(inputVisualizationViewModel);
-
-                    var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
-                    dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-                    {
-                        await Task.Delay(TimeSpan.FromMilliseconds(1000));
-                        InkableScene.Children.Remove(view);
-                    });
-
-                }
-            }
-        }
-
-        void LinkModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.OldItems != null)
-            {
-                foreach (var item in e.OldItems)
-                {
-                    RemoveLinkViewModel(item as LinkModel);
-                }
-            }
-            if (e.NewItems != null)
-            {
-                foreach (var item in e.NewItems)
-                {
-                    CreateLinkViewModel(item as LinkModel);
-                }
-            }
-        }
-
-        void root_InkCollectedEvent(object sender, InkCollectedEventArgs e)
+        void InkableSceneInkCollectedEvent(object sender, InkCollectedEventArgs e)
         {
             IList<IGesture> recognizedGestures = _gesturizer.Recognize(e.InkStroke.Clone());
 
@@ -889,25 +728,7 @@ namespace PanoramicDataWin8.controller.view
                 if (recognizedGesture is ConnectGesture)
                 {
                     ConnectGesture connect = recognizedGesture as ConnectGesture;
-
-                    LinkModel linkModel = new LinkModel()
-                    {
-                        FromQueryModel = connect.FromVisualizationViewModel.QueryModel,
-                        ToQueryModel = connect.ToVisualizationViewModel.QueryModel
-                    };
-                    if (isLinkAllowed(linkModel))
-                    {
-                        if (!linkModel.FromQueryModel.LinkModels.Contains(linkModel) &&
-                            !linkModel.ToQueryModel.LinkModels.Contains(linkModel))
-                        {
-                            linkModel.FromQueryModel.LinkModels.Add(linkModel);
-                            linkModel.ToQueryModel.LinkModels.Add(linkModel);
-                        }
-                    }
-                    else
-                    {
-                       ErrorHandler.HandleError("Link cycles are not supported."); 
-                    }
+                    FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FromOperationViewModel.OperationModel, connect.ToOperationViewModel.OperationModel);
                 }
                 else if (recognizedGesture is HitGesture)
                 {
@@ -916,19 +737,18 @@ namespace PanoramicDataWin8.controller.view
                     {
                         if (hitScribbable is InkStroke)
                         {
-                            _root.Remove(hitScribbable as InkStroke);
+                            _inkableScene.Remove(hitScribbable as InkStroke);
                         }
-                        else if (hitScribbable is VisualizationContainerView)
+                        else if (hitScribbable is OperationContainerView)
                         {
-                            RemoveVisualizationViewModel(hitScribbable as VisualizationContainerView);
+                            RemoveOperationViewModel(hitScribbable as OperationContainerView);
                         }
-                        else if (hitScribbable is LinkView)
+                        else if (hitScribbable is FilterLinkView)
                         {
-                            List<LinkModel> models = (hitScribbable as LinkView).GetLinkModelsToRemove(e.InkStroke.Geometry);
+                            List<FilterLinkModel> models = (hitScribbable as FilterLinkView).GetLinkModelsToRemove(e.InkStroke.Geometry);
                             foreach (var model in models)
                             {
-                                model.FromQueryModel.LinkModels.Remove(model);
-                                model.ToQueryModel.LinkModels.Remove(model);
+                                FilterLinkViewController.Instance.RemoveFilterLinkViewModel(model);
                             }
                         }
                         else if (hitScribbable is AttachmentItemView)
@@ -977,27 +797,27 @@ namespace PanoramicDataWin8.controller.view
 
                 if (!consumed)
                 {
-                    _root.Add(e.InkStroke);
+                    _inkableScene.Add(e.InkStroke);
                 }
             }
         }
 
         public void UpdateJobStatus()
         {
-            foreach (var current in VisualizationViewModels.ToArray())
+            foreach (var current in OperationViewModels.ToArray())
             {
                 // check if we need to halt or resume the job
                 var tg = InkableScene.TransformToVisual(MainPage);
                 var tt = tg.TransformBounds(current.Bounds);
 
-                if (!MainPage.GetBounds().IntersectsWith(tt) && _mainModel.SchemaModel.QueryExecuter.IsJobRunning(current.QueryModel))
+                if (!MainPage.GetBounds().IntersectsWith(tt) && _mainModel.SchemaModel.QueryExecuter.IsJobRunning(current.OperationModel))
                 {
-                    _mainModel.SchemaModel.QueryExecuter.HaltJob(current.QueryModel);
+                    _mainModel.SchemaModel.QueryExecuter.HaltJob(current.OperationModel);
                 }
                 else if (MainPage.GetBounds().IntersectsWith(tt) &&
-                         !_mainModel.SchemaModel.QueryExecuter.IsJobRunning(current.QueryModel))
+                         !_mainModel.SchemaModel.QueryExecuter.IsJobRunning(current.OperationModel))
                 {
-                    _mainModel.SchemaModel.QueryExecuter.ResumeJob(current.QueryModel);
+                    _mainModel.SchemaModel.QueryExecuter.ResumeJob(current.OperationModel);
                 }
             }
         }
