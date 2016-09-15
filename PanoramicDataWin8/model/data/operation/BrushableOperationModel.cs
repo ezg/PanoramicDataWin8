@@ -1,5 +1,7 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Windows.UI;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.data.operation
@@ -7,6 +9,11 @@ namespace PanoramicDataWin8.model.data.operation
     public interface IBrushableOperationModel
     {
         ObservableCollection<OperationModel> BrushOperationModels { get; set; }
+        List<Color> BrushColors { get; set; }
+    }
+
+    public interface IBrusherOperationModel
+    {
     }
 
     public class BrushableOperationModelImpl : ExtendedBindableBase, IBrushableOperationModel
@@ -25,6 +32,8 @@ namespace PanoramicDataWin8.model.data.operation
             get { return _brushOperationModels; }
             set { SetProperty(ref _brushOperationModels, value); }
         }
+
+        public List<Color> BrushColors { get; set; }
 
         private void BrushOperationModelsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {

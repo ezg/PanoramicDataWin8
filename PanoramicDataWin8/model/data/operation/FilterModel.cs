@@ -62,39 +62,41 @@ namespace PanoramicDataWin8.model.data
             string ret = "(" + string.Join("&&", ValueComparisons.Select(vc => vc.ToPythonString())) + ")";
             return ret;
         }
-
-        public static string GetFilterModelsRecursive(OperationModel operationModel, List<OperationModel> visitedOperationModels, List<FilterModel> filterModels, bool isFirst)
+        
+        public static string GetFilterModelsRecursive(object filterGraphNode, List<IFilterProvider> visitedFilterProviders, List<FilterModel> filterModels, bool isFirst)
         {
             string ret = "";
-            visitedOperationModels.Add(operationModel);
-            if (operationModel is IFilterableOperationModel)
+            if (filterGraphNode is IFilterProvider)
             {
-                var filterableOperationModel = (IFilterableOperationModel) operationModel;
-                if (!isFirst && filterableOperationModel.FilterModels.Count(fm => fm.ValueComparisons.Count > 0) > 0)
+                var filterProvider = ((IFilterProvider)filterGraphNode);
+                visitedFilterProviders.Add(filterProvider);
+                if (!isFirst && filterProvider.FilterModels.Count(fm => fm.ValueComparisons.Count > 0) > 0)
                 {
-                    filterModels.AddRange(filterableOperationModel.FilterModels.Where(fm => fm.ValueComparisons.Count > 0));
-                    if (filterableOperationModel.FilterModels.Any(fm => fm.ValueComparisons.Count > 0))
+                    filterModels.AddRange(filterProvider.FilterModels.Where(fm => fm.ValueComparisons.Count > 0));
+                    if (filterProvider.FilterModels.Any(fm => fm.ValueComparisons.Count > 0))
                     {
-                        if (filterableOperationModel.FilterModels.Where(fm => fm.ValueComparisons.Count > 0).All(fm => fm.GroupAggregateComparisons == ""))
+                        if (filterProvider.FilterModels.Where(fm => fm.ValueComparisons.Count > 0).All(fm => fm.GroupAggregateComparisons == ""))
                         {
-                            ret = "(" + string.Join(" || ", filterableOperationModel.FilterModels.Select(fm => fm.ToPythonString())) + ")";
+                            ret = "(" + string.Join(" || ", filterProvider.FilterModels.Select(fm => fm.ToPythonString())) + ")";
                         }
                         else
                         {
-                            ret = "(" + filterableOperationModel.FilterModels[0].ValueComparisons[0].AttributeTransformationModel.AttributeModel.RawName + 
-                                " in [" + string.Join(",", filterableOperationModel.FilterModels.Select(fm => fm.ValueComparisons[0]).Select(vc => "'" + vc.Value.ToString() + "'")) + "])";
+                            ret = "(" + filterProvider.FilterModels[0].ValueComparisons[0].AttributeTransformationModel.AttributeModel.RawName +
+                                  " in [" + string.Join(",", filterProvider.FilterModels.Select(fm => fm.ValueComparisons[0]).Select(vc => "'" + vc.Value.ToString() + "'")) + "])";
                             //ret = "(" + string.Join(",", operationModel.FilterModels.Select(fm => fm.ValueComparisons[0].)) + ")";
                         }
                     }
                 }
-
-
+            }
+            if (filterGraphNode is IFilterConsumer)
+            {
+                var filterConsumer = ((IFilterConsumer)filterGraphNode);
                 List<string> children = new List<string>();
-                foreach (var linkModel in filterableOperationModel.LinkModels)
+                foreach (var linkModel in filterConsumer.LinkModels)
                 {
-                    if (linkModel.FromOperationModel != null && !visitedOperationModels.Contains(linkModel.FromOperationModel))
+                    if (linkModel.FromOperationModel != null && !visitedFilterProviders.Contains(linkModel.FromOperationModel))
                     {
-                        var child = GetFilterModelsRecursive(linkModel.FromOperationModel, visitedOperationModels, filterModels, false);
+                        var child = GetFilterModelsRecursive(linkModel.FromOperationModel, visitedFilterProviders, filterModels, false);
                         if (child != "")
                         {
                             if (linkModel.IsInverted)
@@ -106,7 +108,7 @@ namespace PanoramicDataWin8.model.data
                     }
                 }
 
-                string childrenJoined = string.Join(filterableOperationModel.FilteringOperation == FilteringOperation.AND ? " && " : " || ", children);
+                string childrenJoined = string.Join(filterConsumer.FilteringOperation == FilteringOperation.AND ? " && " : " || ", children);
                 if (children.Count > 0)
                 {
                     if (ret != "")

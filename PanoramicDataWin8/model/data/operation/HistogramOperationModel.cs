@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using Windows.UI;
 using IDEA_common.aggregates;
 using IDEA_common.operations.histogram;
 using Newtonsoft.Json;
@@ -9,10 +10,11 @@ using PanoramicDataWin8.model.view;
 namespace PanoramicDataWin8.model.data
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class HistogramOperationModel : AttributeUsageOperationModel, IBrushableOperationModel, IFilterableOperationModel
+    public class HistogramOperationModel : AttributeUsageOperationModel, IBrushableOperationModel, IFilterConsumer, IFilterProvider
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
-        private readonly FilterableOperationModelImpl _filterableOperationModelImpl;
+        private readonly FilterProviderOperationModel _filterProviderOperationModel;
+        private readonly FilterConsumerOperationModel _filterConsumerOperationModel;
 
         private ObservableCollection<ComparisonViewModel> _comparisonViewModels = new ObservableCollection<ComparisonViewModel>();
 
@@ -20,7 +22,8 @@ namespace PanoramicDataWin8.model.data
 
         public HistogramOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
-            _filterableOperationModelImpl = new FilterableOperationModelImpl(this);
+            _filterProviderOperationModel = new FilterProviderOperationModel(this);
+            _filterConsumerOperationModel = new FilterConsumerOperationModel(this);
             _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
         }
 
@@ -43,46 +46,48 @@ namespace PanoramicDataWin8.model.data
             set { _brushableOperationModelImpl.BrushOperationModels = value; }
         }
 
+        public List<Color> BrushColors { get; set; } = new List<Color>();
+
         public FilteringOperation FilteringOperation
         {
-            get { return _filterableOperationModelImpl.FilteringOperation; }
-            set { _filterableOperationModelImpl.FilteringOperation = value; }
+            get { return _filterConsumerOperationModel.FilteringOperation; }
+            set { _filterConsumerOperationModel.FilteringOperation = value; }
         }
 
         public ObservableCollection<FilterLinkModel> LinkModels
         {
-            get { return _filterableOperationModelImpl.LinkModels; }
-            set { _filterableOperationModelImpl.LinkModels = value; }
+            get { return _filterConsumerOperationModel.LinkModels; }
+            set { _filterConsumerOperationModel.LinkModels = value; }
         }
 
         public ObservableCollection<FilterModel> FilterModels
         {
-            get { return _filterableOperationModelImpl.FilterModels; }
+            get { return _filterProviderOperationModel.FilterModels; }
         }
 
         public void ClearFilterModels()
         {
-            _filterableOperationModelImpl.ClearFilterModels();
+            _filterProviderOperationModel.ClearFilterModels();
         }
 
         public void AddFilterModels(List<FilterModel> filterModels)
         {
-            _filterableOperationModelImpl.AddFilterModels(filterModels);
+            _filterProviderOperationModel.AddFilterModels(filterModels);
         }
 
         public void AddFilterModel(FilterModel filterModel)
         {
-            _filterableOperationModelImpl.AddFilterModel(filterModel);
+            _filterProviderOperationModel.AddFilterModel(filterModel);
         }
 
         public void RemoveFilterModel(FilterModel filterModel)
         {
-            _filterableOperationModelImpl.RemoveFilterModel(filterModel);
+            _filterProviderOperationModel.RemoveFilterModel(filterModel);
         }
 
         public void RemoveFilterModels(List<FilterModel> filterModels)
         {
-            _filterableOperationModelImpl.RemoveFilterModels(filterModels);
+            _filterProviderOperationModel.RemoveFilterModels(filterModels);
         }
     }
 

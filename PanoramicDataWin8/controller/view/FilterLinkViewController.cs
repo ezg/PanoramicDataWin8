@@ -40,7 +40,7 @@ namespace PanoramicDataWin8.controller.view
         private FilterLinkModel createLinkModel(OperationModel from, OperationModel to)
         {
             FilterLinkModel filterLinkModel = null;
-            if (from is IFilterableOperationModel && to is IFilterableOperationModel)
+            if (from is IFilterConsumer && to is IFilterConsumer)
             {
                 filterLinkModel = new FilterLinkModel()
                 {
@@ -49,11 +49,11 @@ namespace PanoramicDataWin8.controller.view
                 };
                 if (isLinkAllowed(filterLinkModel))
                 {
-                    if (!((IFilterableOperationModel) filterLinkModel.FromOperationModel).LinkModels.Contains(filterLinkModel) &&
-                        !((IFilterableOperationModel) filterLinkModel.ToOperationModel).LinkModels.Contains(filterLinkModel))
+                    if (!((IFilterConsumer) filterLinkModel.FromOperationModel).LinkModels.Contains(filterLinkModel) &&
+                        !((IFilterConsumer) filterLinkModel.ToOperationModel).LinkModels.Contains(filterLinkModel))
                     {
-                        ((IFilterableOperationModel) filterLinkModel.FromOperationModel).LinkModels.Add(filterLinkModel);
-                        ((IFilterableOperationModel) filterLinkModel.ToOperationModel).LinkModels.Add(filterLinkModel);
+                        ((IFilterConsumer) filterLinkModel.FromOperationModel).LinkModels.Add(filterLinkModel);
+                        ((IFilterConsumer) filterLinkModel.ToOperationModel).LinkModels.Add(filterLinkModel);
                     }
                     return filterLinkModel;
                 }
@@ -68,9 +68,9 @@ namespace PanoramicDataWin8.controller.view
         public bool AreOperationViewModelsLinked(OperationViewModel current, OperationViewModel other)
         {
             bool areLinked = false;
-            if (current.OperationModel is IFilterableOperationModel && other.OperationModel is IFilterableOperationModel)
+            if (current.OperationModel is IFilterConsumer && other.OperationModel is IFilterConsumer)
             {
-                foreach (var linkModel in (current.OperationModel as IFilterableOperationModel).LinkModels)
+                foreach (var linkModel in (current.OperationModel as IFilterConsumer).LinkModels)
                 {
                     if ((linkModel.FromOperationModel == current.OperationModel && linkModel.ToOperationModel == other.OperationModel) ||
                         (linkModel.FromOperationModel == other.OperationModel && linkModel.ToOperationModel == current.OperationModel))
@@ -94,7 +94,7 @@ namespace PanoramicDataWin8.controller.view
                 {
                     filterLinkViewModel = new FilterLinkViewModel()
                     {
-                        ToOperationViewModel = MainViewController.Instance.OperationViewModels.Where(ovm => ovm.OperationModel is IFilterableOperationModel).First(vvm => vvm.OperationModel == filterLinkModel.ToOperationModel),
+                        ToOperationViewModel = MainViewController.Instance.OperationViewModels.Where(ovm => ovm.OperationModel is IFilterConsumer).First(vvm => vvm.OperationModel == filterLinkModel.ToOperationModel),
                     };
                     _filterLinkViewModels.Add(filterLinkViewModel);
                     FilterLinkView filterLinkView = new FilterLinkView
@@ -114,12 +114,12 @@ namespace PanoramicDataWin8.controller.view
 
         private bool isLinkAllowed(FilterLinkModel filterLinkModel)
         {
-            List<FilterLinkModel> linkModels = ((IFilterableOperationModel)filterLinkModel.FromOperationModel).LinkModels.Where(lm => lm.FromOperationModel == filterLinkModel.FromOperationModel).ToList();
+            List<FilterLinkModel> linkModels = ((IFilterConsumer)filterLinkModel.FromOperationModel).LinkModels.Where(lm => lm.FromOperationModel == filterLinkModel.FromOperationModel).ToList();
             linkModels.Add(filterLinkModel);
-            return !recursiveCheckForCiruclarLinking(linkModels, (IFilterableOperationModel)filterLinkModel.FromOperationModel, new HashSet<IFilterableOperationModel>());
+            return !recursiveCheckForCiruclarLinking(linkModels, (IFilterConsumer)filterLinkModel.FromOperationModel, new HashSet<IFilterConsumer>());
         }
 
-        private bool recursiveCheckForCiruclarLinking(List<FilterLinkModel> links, IFilterableOperationModel current, HashSet<IFilterableOperationModel> chain)
+        private bool recursiveCheckForCiruclarLinking(List<FilterLinkModel> links, IFilterConsumer current, HashSet<IFilterConsumer> chain)
         {
             if (!chain.Contains(current))
             {
@@ -127,8 +127,8 @@ namespace PanoramicDataWin8.controller.view
                 bool ret = false;
                 foreach (var link in links)
                 {
-                    ret = ret || recursiveCheckForCiruclarLinking(((IFilterableOperationModel)link.ToOperationModel).LinkModels.Where(lm => lm.FromOperationModel == link.ToOperationModel).ToList(),
-                        (IFilterableOperationModel)link.ToOperationModel, chain);
+                    ret = ret || recursiveCheckForCiruclarLinking(((IFilterConsumer)link.ToOperationModel).LinkModels.Where(lm => lm.FromOperationModel == link.ToOperationModel).ToList(),
+                        (IFilterConsumer)link.ToOperationModel, chain);
                 }
                 return ret;
             }
@@ -140,8 +140,8 @@ namespace PanoramicDataWin8.controller.view
 
         public void RemoveFilterLinkViewModel(FilterLinkModel filterLinkModel)
         {
-            (filterLinkModel.FromOperationModel as IFilterableOperationModel).LinkModels.Remove(filterLinkModel);
-            (filterLinkModel.ToOperationModel as IFilterableOperationModel).LinkModels.Remove(filterLinkModel);
+            (filterLinkModel.FromOperationModel as IFilterConsumer).LinkModels.Remove(filterLinkModel);
+            (filterLinkModel.ToOperationModel as IFilterConsumer).LinkModels.Remove(filterLinkModel);
             foreach (var linkViewModel in FilterLinkViewModels.ToArray())
             {
                 if (linkViewModel.FilterLinkModels.Contains(filterLinkModel))

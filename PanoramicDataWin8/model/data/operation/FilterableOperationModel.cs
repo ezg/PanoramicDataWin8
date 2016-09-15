@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
@@ -7,33 +6,33 @@ using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public interface IFilterableOperationModel
+    
+
+    public interface IFilterProvider
     {
-        FilteringOperation FilteringOperation { get; set; }
-        
-        ObservableCollection<FilterLinkModel> LinkModels { get; }
         ObservableCollection<FilterModel> FilterModels { get; }
-        void ClearFilterModels();
-
         void AddFilterModels(List<FilterModel> filterModels);
-
         void AddFilterModel(FilterModel filterModel);
-
         void RemoveFilterModel(FilterModel filterModel);
-
         void RemoveFilterModels(List<FilterModel> filterModels);
+        void ClearFilterModels();
     }
 
-    public class FilterableOperationModelImpl : ExtendedBindableBase, IFilterableOperationModel
+    public interface IFilterConsumer
+    {
+        FilteringOperation FilteringOperation { get; set; }
+        ObservableCollection<FilterLinkModel> LinkModels { get; }
+    }
+
+    public class FilterConsumerOperationModel : ExtendedBindableBase, IFilterConsumer
     {
         private FilteringOperation _filteringOperation = FilteringOperation.AND;
-        
-        private ObservableCollection<FilterLinkModel> _linkModels = new ObservableCollection<FilterLinkModel>();
         private OperationModel _host;
 
-        public FilterableOperationModelImpl(OperationModel host)
+        private ObservableCollection<FilterLinkModel> _linkModels = new ObservableCollection<FilterLinkModel>();
+
+        public FilterConsumerOperationModel(OperationModel host)
         {
-            _host = host;
             _linkModels.CollectionChanged += LinkModels_CollectionChanged;
         }
 
@@ -43,28 +42,66 @@ namespace PanoramicDataWin8.model.data.operation
             set { SetProperty(ref _filteringOperation, value); }
         }
 
-        public ObservableCollection<FilterModel> FilterModels { get; } = new ObservableCollection<FilterModel>();
-
         public ObservableCollection<FilterLinkModel> LinkModels
         {
             get { return _linkModels; }
             set { SetProperty(ref _linkModels, value); }
         }
-        
+
+
+        private void LinkModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            bool fire = false;
+            if (e.OldItems != null)
+            {
+                foreach (var item in e.OldItems)
+                {
+                    if (Equals(((FilterLinkModel) item).ToOperationModel, _host))
+                    {
+                        ((FilterLinkModel) item).FromOperationModel.OperationModelUpdated -= FromOperationModel_OperationModelUpdated;
+                        fire = true;
+                    }
+                }
+            }
+            if (e.NewItems != null)
+            {
+                foreach (var item in e.NewItems)
+                {
+                    if (Equals(((FilterLinkModel) item).ToOperationModel, _host))
+                    {
+                        ((FilterLinkModel) item).FromOperationModel.OperationModelUpdated += FromOperationModel_OperationModelUpdated;
+                        fire = true;
+                    }
+                }
+            }
+            if (fire)
+            {
+                fireFilterOperationModelUpdated(FilterOperationModelUpdatedEventType.Links);
+            }
+        }
+
+
+        private void FromOperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
+        {
+            fireFilterOperationModelUpdated(FilterOperationModelUpdatedEventType.Links);
+        }
+
         private void fireFilterOperationModelUpdated(FilterOperationModelUpdatedEventType type)
         {
-            /*if (type == FilterOperationModelUpdatedEventType.Links)
-            {
-                ClearFilterModels();
-            }
-            FilterOperationModelUpdated?.Invoke(this, new FilterOperationModelUpdatedEventArgs(type));
-
-            if (type != FilterOperationModelUpdatedEventType.FilterModels)
-            {
-                SchemaModel.QueryExecuter?.ExecuteOperationModel(this);
-            }*/
             _host.FireOperationModelUpdated(new FilterOperationModelUpdatedEventArgs(type));
         }
+    }
+
+    public class FilterProviderOperationModel : ExtendedBindableBase, IFilterProvider
+    {
+        private OperationModel _host;
+
+        public FilterProviderOperationModel(OperationModel host)
+        {
+            _host = host;
+        }
+
+        public ObservableCollection<FilterModel> FilterModels { get; } = new ObservableCollection<FilterModel>();
 
         public void ClearFilterModels()
         {
@@ -108,40 +145,9 @@ namespace PanoramicDataWin8.model.data.operation
             }
         }
 
-        private void LinkModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void fireFilterOperationModelUpdated(FilterOperationModelUpdatedEventType type)
         {
-            bool fire = false;
-            if (e.OldItems != null)
-            {
-                foreach (var item in e.OldItems)
-                {
-                    if (Equals(((FilterLinkModel) item).ToOperationModel, this._host))
-                    {
-                        ((FilterLinkModel) item).FromOperationModel.OperationModelUpdated -= FromOperationModel_OperationModelUpdated;
-                        fire = true;
-                    }
-                }
-            }
-            if (e.NewItems != null)
-            {
-                foreach (var item in e.NewItems)
-                {
-                    if (Equals(((FilterLinkModel) item).ToOperationModel, this._host))
-                    {
-                        ((FilterLinkModel)item).FromOperationModel.OperationModelUpdated += FromOperationModel_OperationModelUpdated;
-                        fire = true;
-                    }
-                }
-            }
-            if (fire)
-            {
-                fireFilterOperationModelUpdated(FilterOperationModelUpdatedEventType.Links);
-            }
-        }
-
-        private void FromOperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
-        {
-            fireFilterOperationModelUpdated(FilterOperationModelUpdatedEventType.Links);
+            _host.FireOperationModelUpdated(new FilterOperationModelUpdatedEventArgs(type));
         }
     }
 

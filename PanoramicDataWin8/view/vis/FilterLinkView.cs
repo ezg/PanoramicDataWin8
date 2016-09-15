@@ -429,11 +429,11 @@ namespace PanoramicDataWin8.view.vis
             if (sourceCount > 1)
             {
                 TextBlock label = new TextBlock();
-                if (((IFilterableOperationModel) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.AND)
+                if (((IFilterConsumer) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.AND)
                 {
                     label.Text = "AND";
                 }
-                else if (((IFilterableOperationModel)filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.OR)
+                else if (((IFilterConsumer)filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.OR)
                 {
                     label.Text = "OR";
                 }
@@ -539,8 +539,8 @@ namespace PanoramicDataWin8.view.vis
 
             if (_linkViewGeometry.Intersects(p))
             {
-                FilteringOperation op = ((IFilterableOperationModel) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation;
-                ((IFilterableOperationModel)filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation = op == FilteringOperation.AND ? FilteringOperation.OR : FilteringOperation.AND;
+                FilteringOperation op = ((IFilterConsumer) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation;
+                ((IFilterConsumer)filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation = op == FilteringOperation.AND ? FilteringOperation.OR : FilteringOperation.AND;
                 e.Handled = true;
                 foreach (var linkModel in filterLinkViewModel.FilterLinkModels)
                 {

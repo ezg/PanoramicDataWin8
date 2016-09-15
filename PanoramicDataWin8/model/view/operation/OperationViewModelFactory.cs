@@ -21,7 +21,7 @@ namespace PanoramicDataWin8.model.view
                 HistogramOperationModel newOperationModel = (HistogramOperationModel) oldOperationViewModel.OperationModel;
 
                 
-                foreach (var usage in oldOperationModel.UsageAttributeTransformationModels.Keys)
+                foreach (var usage in oldOperationModel.UsageAttributeTransformationModels.Keys.ToArray())
                 {
                     foreach (var atm in oldOperationModel.UsageAttributeTransformationModels[usage])
                     {

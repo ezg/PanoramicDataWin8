@@ -483,7 +483,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 else
                 {
-                    //baseColor = _histogramOperationModelClone.BrushColors[brush.BrushIndex % _histogramOperationModelClone.BrushColors.Count];
+                    baseColor = _histogramOperationModelClone.BrushColors[brush.BrushIndex % _histogramOperationModelClone.BrushColors.Count];
                 }
 
                 var xAggregateKey = QueryModelHelper.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);

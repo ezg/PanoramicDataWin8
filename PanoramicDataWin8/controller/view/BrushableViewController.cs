@@ -136,13 +136,29 @@ namespace PanoramicDataWin8.controller.view
                         if (Math.Abs(diff.Y) < 300 &&
                             boundHorizontalDistance(current.Bounds, other.Bounds) < 50)
                         {
-                            if (!BrushViews.Keys.Any(sov => sov.OperationViewModels.Contains(current) && sov.OperationViewModels.Contains(other)))
+                            if (BrushViews.Keys.Any(sov => sov.To == current && sov.From == other))
                             {
+                                var oldBrushView = BrushViews.Keys.First(sov => sov.To == current && sov.From == other);
+                                oldBrushView.BrushableOperationViewModelState = BrushableOperationViewModelState.Closing;
+                                var view = BrushViews[oldBrushView];
+                                BrushViews.Remove(oldBrushView);
+
+                                var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+                                dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                                {
+                                    await Task.Delay(TimeSpan.FromMilliseconds(1000));
+                                    MainViewController.Instance.InkableScene.Children.Remove(view);
+                                });
+                            }
+
+                            if (!BrushViews.Keys.Any(sov => sov.From == current && sov.To == other))
+                            {
+
                                 List<BrushViewModel> inputCohorts = BrushViews.Keys.Where(icv => icv.To == other).ToList();
 
                                 var allColorIndex = Enumerable.Range(0, BrushViewModel.ColorScheme1.Count);
                                 allColorIndex = allColorIndex.Except(inputCohorts.Select(c => c.ColorIndex));
-                                var colorIndex = inputCohorts.Count % BrushViewModel.ColorScheme1.Count;
+                                var colorIndex = inputCohorts.Count%BrushViewModel.ColorScheme1.Count;
                                 if (allColorIndex.Any())
                                 {
                                     colorIndex = allColorIndex.First();
@@ -154,7 +170,7 @@ namespace PanoramicDataWin8.controller.view
                                 brushViewModel.From = current;
                                 brushViewModel.To = other;
                                 brushViewModel.Position =
-                                    (((brushViewModel.OperationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec())) / 2.0) - brushViewModel.Size / 2.0).GetWindowsPoint();
+                                    (((brushViewModel.OperationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec()))/2.0) - brushViewModel.Size/2.0).GetWindowsPoint();
 
                                 brushViewModel.BrushableOperationViewModelState = BrushableOperationViewModelState.Opening;
                                 brushViewModel.DwellStartPosition = current.Position;
@@ -164,11 +180,6 @@ namespace PanoramicDataWin8.controller.view
                                 view.DataContext = brushViewModel;
                                 MainViewController.Instance.InkableScene.Children.Add(view);
                                 BrushViews.Add(brushViewModel, view);
-                            }
-                            else
-                            {
-                                var inputModel = BrushViews.Keys.First(sov => sov.OperationViewModels.Contains(current) && sov.OperationViewModels.Contains(other));
-                                inputModel.From = current;
                             }
                         }
                     }
@@ -191,7 +202,10 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var item in e.OldItems)
                 {
                     var current = ((KeyValuePair<BrushViewModel, BrushView>) item).Key;
-                    ((IBrushableOperationModel) current.To.OperationModel).BrushOperationModels.Remove(current.From.OperationModel);
+                    var toModel = (IBrushableOperationModel) current.To.OperationModel;
+                    var index = toModel.BrushOperationModels.IndexOf(current.From.OperationModel);
+                    toModel.BrushColors.RemoveAt(index);
+                    toModel.BrushOperationModels.RemoveAt(index);
                 }
             }
             if (e.NewItems != null)
@@ -199,7 +213,9 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var item in e.NewItems)
                 {
                     var current = ((KeyValuePair<BrushViewModel, BrushView>) item).Key;
-                    ((IBrushableOperationModel) current.To.OperationModel).BrushOperationModels.Add(current.From.OperationModel);
+                    var toModel = (IBrushableOperationModel)current.To.OperationModel;
+                    toModel.BrushColors.Add(current.Color);
+                    toModel.BrushOperationModels.Add(current.From.OperationModel);
                 }
             }
         }
