@@ -112,31 +112,35 @@
     <Compile Include="controller\data\virt\IItemsProvider.cs" />
     <Compile Include="controller\data\QueryExecuter.cs" />
     <Compile Include="controller\input\DatasetConfiguration.cs" />
+    <Compile Include="controller\view\BrushableViewController.cs" />
+    <Compile Include="controller\view\FilterLinkViewController.cs" />
     <Compile Include="controller\view\MainViewController.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="model\data\ErrorHandler.cs" />
+    <Compile Include="model\data\attribute\ErrorHandler.cs" />
     <Compile Include="model\data\InputDataTypeConstants.cs" />
-    <Compile Include="model\data\InputGroupModel.cs" />
-    <Compile Include="model\data\InputModel.cs" />
-    <Compile Include="model\data\InputUsage.cs" />
-    <Compile Include="model\data\InputFieldModel.cs" />
-    <Compile Include="model\data\InputOperationModel.cs" />
-    <Compile Include="model\data\CalculatedInputModel.cs" />
-    <Compile Include="model\data\FilteringOperation.cs" />
-    <Compile Include="model\data\FilterModel.cs" />
+    <Compile Include="model\data\attribute\AttributeGroupModel.cs" />
+    <Compile Include="model\data\attribute\AttributeModel.cs" />
+    <Compile Include="model\data\operation\AttributeUsageOperationModel.cs" />
+    <Compile Include="model\data\operation\InputUsage.cs" />
+    <Compile Include="model\data\attribute\AttributeFieldModel.cs" />
+    <Compile Include="model\data\attribute\AttributeTransformationModel.cs" />
+    <Compile Include="model\data\operation\FilteringOperation.cs" />
+    <Compile Include="model\data\operation\FilterModel.cs" />
     <Compile Include="model\data\InputVisualizationTypeConstants.cs" />
-    <Compile Include="model\data\LinkModel.cs" />
-    <Compile Include="model\data\LinkType.cs" />
-    <Compile Include="model\data\NamedInputModel.cs" />
+    <Compile Include="model\data\operation\FilterLinkModel.cs" />
+    <Compile Include="model\data\operation\LinkType.cs" />
+    <Compile Include="model\data\operation\BrushableOperationModel.cs" />
+    <Compile Include="model\data\operation\ClassificationOperationModel.cs" />
+    <Compile Include="model\data\operation\FilterableOperationModel.cs" />
     <Compile Include="model\data\operation\OperationModel.cs" />
     <Compile Include="model\data\OriginModel.cs" />
-    <Compile Include="model\data\progressive\ProgressiveFieldInputModel.cs" />
-    <Compile Include="model\data\progressive\ProgressiveInputGroupModel.cs" />
+    <Compile Include="model\data\progressive\ProgressiveFieldAttributeModel.cs" />
+    <Compile Include="model\data\progressive\ProgressiveAttributeGroupModel.cs" />
     <Compile Include="model\data\progressive\ProgressiveOriginModel.cs" />
     <Compile Include="model\data\progressive\ProgressiveSchemaModel.cs" />
-    <Compile Include="model\data\operation\QueryModel.cs" />
+    <Compile Include="model\data\operation\HistogramOperationModel.cs" />
     <Compile Include="model\data\result\ClassfierResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultItemModel.cs" />
@@ -149,15 +153,17 @@
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
     <Compile Include="model\view\ComparisonViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
+    <Compile Include="model\view\operation\ClassificationOperationViewModel.cs" />
+    <Compile Include="model\view\operation\OperationViewModel.cs" />
     <Compile Include="utils\ObservableDictionary.cs" />
     <Compile Include="view\inq\IInkable.cs" />
     <Compile Include="view\vis\ComparisonView.xaml.cs">
       <DependentUpon>ComparisonView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="view\vis\InputVisualizationView.xaml.cs">
-      <DependentUpon>InputVisualizationView.xaml</DependentUpon>
+    <Compile Include="view\vis\BrushView.xaml.cs">
+      <DependentUpon>BrushView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="model\view\InputVisualizationViewModel.cs" />
+    <Compile Include="model\view\BrushViewModel.cs" />
     <Compile Include="model\view\tilemenu\TileMenuItemView.cs" />
     <Compile Include="model\view\tilemenu\TileMenuContentViewModel.cs" />
     <Compile Include="model\view\VisualizationTypeViewModel.cs" />
@@ -165,12 +171,12 @@
     <Compile Include="model\view\MenuItemViewModel.cs" />
     <Compile Include="model\view\AttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentViewModel.cs" />
-    <Compile Include="model\view\InputFieldViewModel.cs" />
-    <Compile Include="model\view\LinkViewModel.cs" />
+    <Compile Include="model\view\AttributeTransformationViewModel.cs" />
+    <Compile Include="model\view\FilterLinkViewModel.cs" />
     <Compile Include="model\view\MainModel.cs" />
     <Compile Include="model\view\SchemaViewModel.cs" />
-    <Compile Include="model\view\VisualizationViewModel.cs" />
-    <Compile Include="model\view\VisualizationViewModelFactory.cs" />
+    <Compile Include="model\view\operation\HistogramOperationViewModel.cs" />
+    <Compile Include="model\view\operation\OperationViewModelFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="utils\CommonExtensions.cs" />
     <Compile Include="utils\Converters.cs" />
@@ -243,7 +249,7 @@
     <Compile Include="view\vis\DataGrid.xaml.cs">
       <DependentUpon>DataGrid.xaml</DependentUpon>
     </Compile>
-    <Compile Include="view\vis\LinkView.cs" />
+    <Compile Include="view\vis\FilterLinkView.cs" />
     <Compile Include="view\vis\menu\SliderMenuItemView.xaml.cs">
       <DependentUpon>SliderMenuItemView.xaml</DependentUpon>
     </Compile>
@@ -252,9 +258,6 @@
     </Compile>
     <Compile Include="view\vis\render\ClassifierRendererContentProvider.cs" />
     <Compile Include="view\vis\render\ClassifierRendererPlotContentProvider.cs" />
-    <Compile Include="view\vis\render\FrequentItemsetRenderer.xaml.cs">
-      <DependentUpon>FrequentItemsetRenderer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="view\vis\render\MapRenderer.xaml.cs">
       <DependentUpon>MapRenderer.xaml</DependentUpon>
     </Compile>
@@ -279,8 +282,8 @@
     <Compile Include="view\vis\render\XYRenderer.xaml.cs">
       <DependentUpon>XYRenderer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="view\vis\VisualizationContainerView.xaml.cs">
-      <DependentUpon>VisualizationContainerView.xaml</DependentUpon>
+    <Compile Include="view\vis\OperationContainerView.xaml.cs">
+      <DependentUpon>OperationContainerView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -296,27 +299,6 @@
     </Content>
     <None Include="project.json" />
     <Content Include="Assets\BadgeLogo.scale-400.png" />
-    <Content Include="Assets\data\config\test_large.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\config\test_small.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\config\titanic.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\config\titanic_csv.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\raw\TestDataLarge.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\raw\TestDataSmall.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\raw\Titanic.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="Assets\font\Lato-Light.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -331,33 +313,6 @@
     </Content>
     <Content Include="Assets\font\Abel-Regular.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\raw\census.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\config\census_csv.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\raw\nba.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\config\nba_csv.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\config\flightdata_csv.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\config\flightdata_small_csv.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\raw\nba_shuff.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\config\nba_shots.ini">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Assets\data\raw\nba_shots_shuff.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Assets\data\main.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -401,7 +356,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="view\vis\InputVisualizationView.xaml">
+    <Page Include="view\vis\BrushView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -474,10 +429,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="view\vis\render\FrequentItemsetRenderer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="view\vis\render\MapRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -506,7 +457,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="view\vis\VisualizationContainerView.xaml">
+    <Page Include="view\vis\OperationContainerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

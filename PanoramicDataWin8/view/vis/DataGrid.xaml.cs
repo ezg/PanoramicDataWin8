@@ -35,7 +35,7 @@ using PanoramicDataWin8.view.inq;
 
 namespace PanoramicDataWin8.view.vis
 {
-    public sealed partial class DataGrid : UserControl, InputFieldViewModelEventHandler
+    public sealed partial class DataGrid : UserControl, AttributeTransformationViewModelEventHandler
     {
         private IDisposable _observableDisposable = null;
 
@@ -67,7 +67,7 @@ namespace PanoramicDataWin8.view.vis
 
         void _activeTimer_Tick(object sender, object e)
         {
-            var model = (DataContext as VisualizationViewModel);
+            var model = (DataContext as HistogramOperationViewModel);
             if (model != null)
             {
                 if (model.ActiveStopwatch.Elapsed > TimeSpan.FromSeconds(5))
@@ -86,8 +86,8 @@ namespace PanoramicDataWin8.view.vis
             }
             if (DataContext != null)
             {
-                (DataContext as VisualizationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
-                (DataContext as VisualizationViewModel).QueryModel.PropertyChanged -= QueryModel_PropertyChanged;
+                (DataContext as HistogramOperationViewModel).PropertyChanged -= VisualizationViewModel_PropertyChanged;
+                (DataContext as HistogramOperationViewModel).HistogramOperationModel.PropertyChanged -= QueryModel_PropertyChanged;
                 removeMenu();
             }
             InputFieldView.InputFieldViewModelTapped -= InputFieldViewInputFieldViewModelTapped;
@@ -107,7 +107,7 @@ namespace PanoramicDataWin8.view.vis
                     _observableDisposable.Dispose();
                 }
                 _observableDisposable = Observable.FromEventPattern<NotifyCollectionChangedEventArgs>(
-                    (args.NewValue as VisualizationViewModel).QueryModel.GetUsageInputOperationModel(InputUsage.X), "CollectionChanged")
+                    (args.NewValue as HistogramOperationViewModel).HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X), "CollectionChanged")
                     .Throttle(TimeSpan.FromMilliseconds(50))
                     .ObserveOn(SynchronizationContext.Current)
                     .Subscribe((arg) =>
@@ -115,10 +115,10 @@ namespace PanoramicDataWin8.view.vis
                         populateTableHeaders();
                     });
 
-                (DataContext as VisualizationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
-                (DataContext as VisualizationViewModel).QueryModel.PropertyChanged += QueryModel_PropertyChanged;
+                (DataContext as HistogramOperationViewModel).PropertyChanged += VisualizationViewModel_PropertyChanged;
+                (DataContext as HistogramOperationViewModel).HistogramOperationModel.PropertyChanged += QueryModel_PropertyChanged;
                
-                if ((DataContext as VisualizationViewModel).QueryModel != null)
+                if ((DataContext as HistogramOperationViewModel).HistogramOperationModel != null)
                 {
                     populateData();
                 }
@@ -129,7 +129,7 @@ namespace PanoramicDataWin8.view.vis
         
         private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            QueryModel model = (DataContext as VisualizationViewModel).QueryModel;
+            HistogramOperationModel model = (DataContext as HistogramOperationViewModel).HistogramOperationModel;
             if (e.PropertyName == model.GetPropertyName(() => model.Result))
             {
                 populateData();
@@ -138,7 +138,7 @@ namespace PanoramicDataWin8.view.vis
 
         void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var model = DataContext as VisualizationViewModel;
+            var model = DataContext as HistogramOperationViewModel;
             if (e.PropertyName == model.GetPropertyName(() => model.Size))
             {
                 updateSize(null);
@@ -158,14 +158,14 @@ namespace PanoramicDataWin8.view.vis
         private void updateSize(HeaderObject exclude)
         {
             double totalHeaderWidth = HeaderObjects.Sum(ho => ho.Width);
-            double availableWidth = (DataContext as VisualizationViewModel).Size.X - (HeaderObjects.Count) * 8;
+            double availableWidth = (DataContext as HistogramOperationViewModel).Size.X - (HeaderObjects.Count) * 8;
 
             if (exclude != null)
             {
                 totalHeaderWidth -= exclude.Width;
                 availableWidth -= exclude.Width;
 
-                exclude.Width = Math.Min(exclude.Width, (DataContext as VisualizationViewModel).Size.X - (HeaderObjects.Count - 1) * 28);
+                exclude.Width = Math.Min(exclude.Width, (DataContext as HistogramOperationViewModel).Size.X - (HeaderObjects.Count - 1) * 28);
 
                 double ratio = availableWidth / totalHeaderWidth;
                 HeaderObjects.Where(ho => ho != exclude).ToList().ForEach(ho => ho.Value.Width *= ratio);
@@ -180,29 +180,29 @@ namespace PanoramicDataWin8.view.vis
         
         private void populateData()
         {
-           // ResultModel resultModel = (DataContext as VisualizationViewModel).QueryModel.Result;
+           // ResultModel resultModel = (DataContext as OperationViewModel).OperationModel.Result;
            // listView.ItemsSource = resultModel.ResultItemModels;
         }
 
         private void populateTableHeaders()
         {
             removeMenu();
-            VisualizationViewModel model = (DataContext as VisualizationViewModel);
-            List<InputOperationModel> inputOperationModels = model.QueryModel.GetUsageInputOperationModel(InputUsage.X).ToList();
+            HistogramOperationViewModel model = (DataContext as HistogramOperationViewModel);
+            List<AttributeTransformationModel> inputOperationModels = model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).ToList();
 
             List<HeaderObject> headerObjects = new List<HeaderObject>();
 
             foreach (var inputOperationModel in inputOperationModels)
             {
                 HeaderObject ho = new HeaderObject();
-                ho.InputFieldViewModel = new InputFieldViewModel(model, inputOperationModel)
+                ho.AttributeTransformationViewModel = new AttributeTransformationViewModel(model, inputOperationModel)
                 {
                     AttachmentOrientation = AttachmentOrientation.Top
                 };
                 ho.Width = 100;
-                if (HeaderObjects.Any(hoo => hoo.InputFieldViewModel != null && hoo.InputFieldViewModel.InputOperationModel == ho.InputFieldViewModel.InputOperationModel))
+                if (HeaderObjects.Any(hoo => hoo.AttributeTransformationViewModel != null && hoo.AttributeTransformationViewModel.AttributeTransformationModel == ho.AttributeTransformationViewModel.AttributeTransformationModel))
                 {
-                    var oldHo = HeaderObjects.First(hoo => hoo.InputFieldViewModel.InputOperationModel == ho.InputFieldViewModel.InputOperationModel);
+                    var oldHo = HeaderObjects.First(hoo => hoo.AttributeTransformationViewModel.AttributeTransformationModel == ho.AttributeTransformationViewModel.AttributeTransformationModel);
                     ho.Width = oldHo.Width;
                 }
                 headerObjects.Add(ho);
@@ -222,7 +222,7 @@ namespace PanoramicDataWin8.view.vis
             sb.Append(" <StackPanel Orientation=\"Horizontal\">");
             sb.Append("     <local:DataGridResizer Margin=\"0,0,0,0\" Width=\"4\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/> ");
             sb.Append("     <Grid Width=\"{Binding Width}\">");
-            sb.Append("         <local:InputFieldView DataContext=\"{Binding InputFieldViewModel}\" Width=\"{Binding Width}\" RawName=\"inputFieldView\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/>");
+            sb.Append("         <local:InputFieldView DataContext=\"{Binding AttributeTransformationViewModel}\" Width=\"{Binding Width}\" RawName=\"inputFieldView\" xmlns:local=\"using:PanoramicDataWin8.view.common\"/>");
             sb.Append("     </Grid>");
             sb.Append("     <local:DataGridResizer Width=\"4\" xmlns:local=\"using:PanoramicDataWin8.view.common\" IsResizer=\"True\"/> ");
             sb.Append(" </StackPanel>");
@@ -265,7 +265,7 @@ namespace PanoramicDataWin8.view.vis
             listView.ItemTemplate = datatemplate;
         }
 
-        public void InputFieldViewModelMoved(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
+        public void AttributeTransformationViewModelMoved(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement)
         {
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
@@ -321,17 +321,17 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
-        public void InputFieldViewModelDropped(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
+        public void AttributeTransformationViewModelDropped(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement)
         {
             // hide cloumn header reorder drop highlights 
             hideColumnReorderFeedbacks();
             if (overElement)
             {
 
-                VisualizationViewModel model = (DataContext as VisualizationViewModel);
-                if (model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Count == 0)
+                HistogramOperationViewModel model = (DataContext as HistogramOperationViewModel);
+                if (model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Count == 0)
                 {
-                    model.QueryModel.AddUsageInputOperationModel(InputUsage.X, sender.InputOperationModel);
+                    model.HistogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.X, sender.AttributeTransformationModel);
                     return;
                 }
 
@@ -342,26 +342,26 @@ namespace PanoramicDataWin8.view.vis
                 HeaderObject headerObject = closestDataGridResizer.DataContext as HeaderObject;
 
                 if ((CanReorder || CanDrag) &&
-                    model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Any(aom => object.ReferenceEquals(aom, sender.InputOperationModel)))
+                    model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Any(aom => object.ReferenceEquals(aom, sender.AttributeTransformationModel)))
                 {
-                    model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Remove(sender.InputOperationModel);
+                    model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Remove(sender.AttributeTransformationModel);
 
                 }
-                InputOperationModel clone = e.InputOperationModel;
-                if (headerObject.InputFieldViewModel == null)
+                AttributeTransformationModel clone = e.AttributeTransformationModel;
+                if (headerObject.AttributeTransformationViewModel == null)
                 {
-                    model.QueryModel.AddUsageInputOperationModel(InputUsage.X, clone);
+                    model.HistogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.X, clone);
                 }
                 else
                 {
                     int index = HeaderObjects.IndexOf(headerObject);
                     if (closestDataGridResizer.IsResizer)
                     {
-                        model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Insert(Math.Min(index + 1, model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Count), clone);
+                        model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Insert(Math.Min(index + 1, model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Count), clone);
                     }
                     else
                     {
-                        model.QueryModel.GetUsageInputOperationModel(InputUsage.X).Insert(index, clone);
+                        model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Insert(index, clone);
                     }
                 }
             }
@@ -380,7 +380,7 @@ namespace PanoramicDataWin8.view.vis
             
             if (_menuViewModel != null)
             {
-                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.InputFieldViewModel).FirstOrDefault();
+                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.AttributeTransformationViewModel).FirstOrDefault();
                 if (inputFieldView != null)
                 {
                     Rct bounds = inputFieldView.GetBounds(MainViewController.Instance.InkableScene);
@@ -396,16 +396,16 @@ namespace PanoramicDataWin8.view.vis
         
         void InputFieldViewInputFieldViewModelTapped(object sender, EventArgs e)
         {
-            var visModel = (DataContext as VisualizationViewModel);
+            var visModel = (DataContext as HistogramOperationViewModel);
             visModel.ActiveStopwatch.Restart();
 
-            InputFieldViewModel model = (sender as InputFieldView).DataContext as InputFieldViewModel;
-            if (HeaderObjects.Any(ho => ho.InputFieldViewModel == model))
+            AttributeTransformationViewModel model = (sender as InputFieldView).DataContext as AttributeTransformationViewModel;
+            if (HeaderObjects.Any(ho => ho.AttributeTransformationViewModel == model))
             {
                 bool createNew = true;
                 if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
                 {
-                    createNew = _menuViewModel.InputFieldViewModel != model;
+                    createNew = _menuViewModel.AttributeTransformationViewModel != model;
                     removeMenu();
                 }
 
@@ -432,7 +432,7 @@ namespace PanoramicDataWin8.view.vis
         {
             if (_menuViewModel != null)
             {
-                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.InputFieldViewModel).FirstOrDefault();
+                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.AttributeTransformationViewModel).FirstOrDefault();
 
                 if (inputFieldView != null)
                 {
@@ -459,7 +459,7 @@ namespace PanoramicDataWin8.view.vis
     {
         public event EventHandler<EventArgs> Resized;
 
-        public InputFieldViewModel InputFieldViewModel { get; set; }
+        public AttributeTransformationViewModel AttributeTransformationViewModel { get; set; }
 
         public void FireResized()
         {

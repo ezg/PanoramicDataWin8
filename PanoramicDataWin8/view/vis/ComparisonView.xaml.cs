@@ -65,7 +65,7 @@ namespace PanoramicDataWin8.view.vis
                 foreach (var vis in _model.VisualizationViewModels)
                 {
                     vis.PropertyChanged -= VisModel_PropertyChanged;
-                    vis.QueryModel.PropertyChanged -= QueryModel_PropertyChanged;
+                    vis.HistogramOperationModel.PropertyChanged -= QueryModel_PropertyChanged;
                 }
             }
             if (args.NewValue != null)
@@ -75,7 +75,7 @@ namespace PanoramicDataWin8.view.vis
                 foreach (var vis in _model.VisualizationViewModels)
                 {
                     vis.PropertyChanged += VisModel_PropertyChanged;
-                    vis.QueryModel.PropertyChanged += QueryModel_PropertyChanged;
+                    vis.HistogramOperationModel.PropertyChanged += QueryModel_PropertyChanged;
                 }
                 updateRendering();
                 updateResult();
@@ -84,7 +84,7 @@ namespace PanoramicDataWin8.view.vis
 
         private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            QueryModel model = (DataContext as VisualizationViewModel).QueryModel;
+            HistogramOperationModel model = (DataContext as HistogramOperationViewModel).HistogramOperationModel;
             if (e.PropertyName == model.GetPropertyName(() => model.Result))
             {
                 updateResult();
@@ -93,20 +93,20 @@ namespace PanoramicDataWin8.view.vis
         
         private void updateResult()
         {
-            /*var res1 = _model.VisualizationViewModels[0].QueryModel.Result.ResultDescriptionModel as VisualizationResultDescriptionModel;
-            var res2 = _model.VisualizationViewModels[1].QueryModel.Result.ResultDescriptionModel as VisualizationResultDescriptionModel;
+            /*var res1 = _model.OperationViewModels[0].OperationModel.Result.ResultDescriptionModel as VisualizationResultDescriptionModel;
+            var res2 = _model.OperationViewModels[1].OperationModel.Result.ResultDescriptionModel as VisualizationResultDescriptionModel;
 
             if (res1 != null && res2 != null)
             {
-                var dim = _model.VisualizationViewModels[0].QueryModel.GetUsageInputOperationModel(InputUsage.X).First();
-                if (_model.VisualizationViewModels[1].QueryModel.GetUsageInputOperationModel(InputUsage.X).Any(i => i.InputModel == dim.InputModel))
+                var dim = _model.OperationViewModels[0].OperationModel.GetUsageAttributeTransformationModel(InputUsage.X).First();
+                if (_model.OperationViewModels[1].OperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Any(i => i.AttributeModel == dim.AttributeModel))
                 {
-                    var n1 = res1.OverallCount[dim.InputModel.RawName];
-                    var n2 = res2.OverallCount[dim.InputModel.RawName];
-                    var m1 = res1.OverallMeans[dim.InputModel.RawName];
-                    var m2 = res2.OverallMeans[dim.InputModel.RawName];
-                    var v1 = Math.Sqrt(res1.OverallSampleStandardDeviations[dim.InputModel.RawName]);
-                    var v2 = Math.Sqrt(res2.OverallSampleStandardDeviations[dim.InputModel.RawName]);
+                    var n1 = res1.OverallCount[dim.AttributeModel.RawName];
+                    var n2 = res2.OverallCount[dim.AttributeModel.RawName];
+                    var m1 = res1.OverallMeans[dim.AttributeModel.RawName];
+                    var m2 = res2.OverallMeans[dim.AttributeModel.RawName];
+                    var v1 = Math.Sqrt(res1.OverallSampleStandardDeviations[dim.AttributeModel.RawName]);
+                    var v2 = Math.Sqrt(res2.OverallSampleStandardDeviations[dim.AttributeModel.RawName]);
 
                     var df = Math.Min(n1, n2);
                     var t = (m1 - m2)/Math.Sqrt((v1/n1) + (v2/n2));

@@ -33,28 +33,28 @@ namespace PanoramicDataWin8.controller.data.progressive
         private JObject _query = null;
 
         private TimeSpan _throttle = TimeSpan.FromMilliseconds(0);
-        public QueryModel QueryModel { get; set; }
-        public QueryModel QueryModelClone { get; set; }
+        public HistogramOperationModel HistogramOperationModel { get; set; }
+        public HistogramOperationModel HistogramOperationModelClone { get; set; }
 
-        public ProgressiveClassifyJob(QueryModel queryModel, QueryModel queryModelClone, TimeSpan throttle, int sampleSize)
+        public ProgressiveClassifyJob(HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone, TimeSpan throttle, int sampleSize)
         {
-            QueryModel = queryModel;
-            QueryModelClone = queryModelClone;
+           /* HistogramOperationModel = histogramOperationModel;
+            HistogramOperationModelClone = histogramOperationModelClone;
             _sampleSize = sampleSize;
             _throttle = throttle;
-            var psm = (queryModelClone.SchemaModel as ProgressiveSchemaModel);
+            var psm = (histogramOperationModelClone.SchemaModel as ProgressiveSchemaModel);
 
-            var features = QueryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(iom => iom.InputModel.RawName).ToList();
+            var features = HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature).Select(iom => iom.AttributeModel.RawName).ToList();
 
             string filter = "";
             List<FilterModel> filterModels = new List<FilterModel>();
-            filter = FilterModel.GetFilterModelsRecursive(QueryModelClone, new List<QueryModel>(), filterModels, true);
+            filter = FilterModel.GetFilterModelsRecursive(HistogramOperationModelClone, new List<HistogramOperationModel>(), filterModels, true);
 
             List<string> brushes = new List<string>();
-            foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)
+            foreach (var brushQueryModel in HistogramOperationModelClone.BrushQueryModels)
             {
                 filterModels = new List<FilterModel>();
-                var brush = FilterModel.GetFilterModelsRecursive(brushQueryModel, new List<QueryModel>(), filterModels, false);
+                var brush = FilterModel.GetFilterModelsRecursive(brushQueryModel, new List<HistogramOperationModel>(), filterModels, false);
                 brushes.Add(brush);
             }
 
@@ -66,11 +66,11 @@ namespace PanoramicDataWin8.controller.data.progressive
                         new JProperty("type", "classify"),
                         new JProperty("filter", filter),
                         new JProperty("chunkSize", sampleSize),
-                        new JProperty("classifier", QueryModelClone.TaskModel.Name),
+                        new JProperty("classifier", HistogramOperationModelClone.TaskModel.Name),
                         new JProperty("label", brushes[0]),
                         new JProperty("features", features)
                     ))
-                );
+                );*/
         }
         public override void Start()
         {
@@ -105,11 +105,11 @@ namespace PanoramicDataWin8.controller.data.progressive
 
                         if (message != "None" && message != "null" && message != "\"None\"")
                         {
-                            List<string> brushes = new List<string>();
-                            foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)
+                            /*List<string> brushes = new List<string>();
+                            foreach (var brushQueryModel in HistogramOperationModelClone.BrushQueryModels)
                             {
                                 List<FilterModel> filterModels = new List<FilterModel>();
-                                var brush = FilterModel.GetFilterModelsRecursive(brushQueryModel, new List<QueryModel>(), filterModels, false);
+                                var brush = FilterModel.GetFilterModelsRecursive(brushQueryModel, new List<HistogramOperationModel>(), filterModels, false);
                                 brushes.Add(brush);
                             }
                             var label = brushes[0];
@@ -118,29 +118,29 @@ namespace PanoramicDataWin8.controller.data.progressive
                             resultDescriptionModel.Uuid = _requestUuid;
                             JObject result = JObject.Parse(message);
                             double progress = (double)result["progress"];
-
-                            var features = QueryModelClone.GetUsageInputOperationModel(InputUsage.Feature).ToList();
+                            */
+                            var features = HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature).ToList();
                             foreach (var feature in features)
                             {
                                 //['actual and predicted', 'not actual and predicted', 'not actual and not predicted', 'actual and not predicted']
                                 List<string> visBrushes = new List<string>() { "0", "1", "2", "3" };
 
-                                /*JObject token = (JObject)result["histograms"][feature.InputModel.RawName];
+                                /*JObject token = (JObject)result["histograms"][feature.AttributeModel.RawName];
                                 VisualizationResultDescriptionModel visResultDescriptionModel = new VisualizationResultDescriptionModel();
                                 List<ResultItemModel> resultItemModels = ProgressiveVisualizationJob.UpdateVisualizationResultDescriptionModel(visResultDescriptionModel, token, visBrushes,
-                                    new List<InputOperationModel>()
+                                    new List<AttributeOperationModel>()
                                     {
-                                new InputOperationModel(feature.InputModel)
+                                new AttributeOperationModel(feature.AttributeModel)
                                 {
                                     AggregateFunction = AggregateFunction.None
                                 },
-                                new InputOperationModel(feature.InputModel)
+                                new AttributeOperationModel(feature.AttributeModel)
                                 {
                                     AggregateFunction = AggregateFunction.Count
                                 }
-                                    }, new List<AxisType>() { AxisType.Quantitative, AxisType.Quantitative }, new List<InputOperationModel>()
+                                    }, new List<AxisType>() { AxisType.Quantitative, AxisType.Quantitative }, new List<AttributeOperationModel>()
                                     {
-                                new InputOperationModel(feature.InputModel)
+                                new AttributeOperationModel(feature.AttributeModel)
                                 {
                                     AggregateFunction = AggregateFunction.Count
                                 }
@@ -188,7 +188,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 
                             await fireUpdated(new List<ResultItemModel>(), progress, resultDescriptionModel);*/
 
-                            if (progress >= 1.0)
+                           // if (progress >= 1.0)
                             {
                                 Stop();
                                 //await fireCompleted();

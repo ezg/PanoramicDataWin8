@@ -55,9 +55,9 @@ namespace PanoramicDataWin8.view.common
 
         void InputFieldView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (args.NewValue != null && args.NewValue is InputFieldViewModel)
+            if (args.NewValue != null && args.NewValue is AttributeTransformationViewModel)
             {
-                (args.NewValue as InputFieldViewModel).PropertyChanged += InputFieldView_PropertyChanged;
+                (args.NewValue as AttributeTransformationViewModel).PropertyChanged += InputFieldView_PropertyChanged;
                 updateRendering();
             }
         }
@@ -69,7 +69,7 @@ namespace PanoramicDataWin8.view.common
 
         void updateRendering()
         {
-            InputFieldViewModel model = DataContext as InputFieldViewModel;
+            AttributeTransformationViewModel model = DataContext as AttributeTransformationViewModel;
 
             if (model.IsShadow)
             {
@@ -125,7 +125,7 @@ namespace PanoramicDataWin8.view.common
 
         private void mainPointerManager_Added(object sender, PointerManagerEvent e)
         {
-            if (!(DataContext as InputFieldViewModel).IsDraggable)
+            if (!(DataContext as AttributeTransformationViewModel).IsDraggable)
             {
                 return;
             }
@@ -140,7 +140,7 @@ namespace PanoramicDataWin8.view.common
 
         void mainPointerManager_Moved(object sender, PointerManagerEvent e)
         {
-            if (!(DataContext as InputFieldViewModel).IsDraggable)
+            if (!(DataContext as AttributeTransformationViewModel).IsDraggable)
             {
                 return;
             }
@@ -169,9 +169,8 @@ namespace PanoramicDataWin8.view.common
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        (DataContext as InputFieldViewModel).FireMoved(bounds,
-                            new InputOperationModel((DataContext as InputFieldViewModel).InputOperationModel.InputModel),
-                            InputFieldViewModelEventArgType.Default);
+                        (DataContext as AttributeTransformationViewModel).FireMoved(bounds,
+                            new AttributeTransformationModel((DataContext as AttributeTransformationViewModel).AttributeTransformationModel.AttributeModel));
                     }
                 }
 
@@ -181,14 +180,14 @@ namespace PanoramicDataWin8.view.common
 
         void mainPointerManager_Removed(object sender, PointerManagerEvent e)
         {
-            if (!(DataContext as InputFieldViewModel).IsDraggable)
+            if (!(DataContext as AttributeTransformationViewModel).IsDraggable)
             {
                 return;
             }
             if (_shadow == null &&
                 _manipulationStartTime + TimeSpan.FromSeconds(0.5).Ticks > DateTime.Now.Ticks)
             {
-                if ((DataContext as InputFieldViewModel).IsMenuEnabled && InputFieldViewModelTapped != null)
+                if ((DataContext as AttributeTransformationViewModel).IsMenuEnabled && InputFieldViewModelTapped != null)
                 {
                     Debug.WriteLine("--TAPP");
                     InputFieldViewModelTapped(this, new EventArgs());
@@ -200,10 +199,10 @@ namespace PanoramicDataWin8.view.common
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as InputFieldViewModel).FireDropped(bounds, InputFieldViewModelEventArgType.Default,
-                    new InputOperationModel((DataContext as InputFieldViewModel).InputOperationModel.InputModel)
+                (DataContext as AttributeTransformationViewModel).FireDropped(bounds,
+                    new AttributeTransformationModel((DataContext as AttributeTransformationViewModel).AttributeTransformationModel.AttributeModel)
                     {
-                        AggregateFunction = (DataContext as InputFieldViewModel).InputOperationModel.AggregateFunction
+                        AggregateFunction = (DataContext as AttributeTransformationViewModel).AttributeTransformationModel.AggregateFunction
                     });
 
                 inkableScene.Remove(_shadow);
@@ -216,11 +215,11 @@ namespace PanoramicDataWin8.view.common
         public void createShadow(Point fromInkableScene)
         {
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
-            if (inkableScene != null && DataContext != null && (DataContext as InputFieldViewModel).InputOperationModel != null)
+            if (inkableScene != null && DataContext != null && (DataContext as AttributeTransformationViewModel).AttributeTransformationModel != null)
             {
                 _currentFromInkableScene = fromInkableScene;
                 _shadow = new InputFieldView();
-                _shadow.DataContext = new InputFieldViewModel(null, (DataContext as InputFieldViewModel).InputOperationModel)
+                _shadow.DataContext = new AttributeTransformationViewModel(null, (DataContext as AttributeTransformationViewModel).AttributeTransformationModel)
                 {
                     IsNoChrome = false,
                     IsMenuEnabled = true,
@@ -230,7 +229,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow.Measure(new Size(double.PositiveInfinity,
                                          double.PositiveInfinity));
 
-                double add = (DataContext as InputFieldViewModel).IsNoChrome ? 30 : 0;
+                double add = (DataContext as AttributeTransformationViewModel).IsNoChrome ? 30 : 0;
                 //_shadow.Width = this.ActualWidth + add;
                 //_shadow.Height = _shadow.DesiredSize.Height;
 
@@ -245,9 +244,8 @@ namespace PanoramicDataWin8.view.common
                 _shadow.SendToFront();
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as InputFieldViewModel).FireMoved(bounds,
-                    new InputOperationModel((DataContext as InputFieldViewModel).InputOperationModel.InputModel),
-                    InputFieldViewModelEventArgType.Default);
+                (DataContext as AttributeTransformationViewModel).FireMoved(bounds,
+                    new AttributeTransformationModel((DataContext as AttributeTransformationViewModel).AttributeTransformationModel.AttributeModel));
             }
         }
     }

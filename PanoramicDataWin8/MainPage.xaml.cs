@@ -188,12 +188,12 @@ namespace PanoramicDataWin8
                 }
                 if (e.Key == VirtualKey.T)
                 {
-                    QueryModel q1 = new QueryModel(MainViewController.Instance.MainModel.SchemaModel);
-                    QueryModel q2 = new QueryModel(MainViewController.Instance.MainModel.SchemaModel);
+                    HistogramOperationModel q1 = new HistogramOperationModel(MainViewController.Instance.MainModel.SchemaModel);
+                    HistogramOperationModel q2 = new HistogramOperationModel(MainViewController.Instance.MainModel.SchemaModel);
                     q1.FilterModels.Add(new FilterModel());
-                    LinkModel lm = new LinkModel();
-                    lm.FromQueryModel = q1;
-                    lm.ToQueryModel = q2;
+                    FilterLinkModel lm = new FilterLinkModel();
+                    lm.FromOperationModel = q1;
+                    lm.ToOperationModel = q2;
                     q1.LinkModels.Add(lm);
                     q2.LinkModels.Add(lm);
 
@@ -597,9 +597,9 @@ namespace PanoramicDataWin8
         private TileMenuItemViewModel recursiveCreateTileMenu(object inputModel, TileMenuItemViewModel parent)
         {
             TileMenuItemViewModel currentTileMenuItemViewModel = null;
-            if (inputModel is InputGroupModel)
+            if (inputModel is AttributeGroupModel)
             {
-                var inputGroupModel = inputModel as InputGroupModel;
+                var inputGroupModel = inputModel as AttributeGroupModel;
                 currentTileMenuItemViewModel = new TileMenuItemViewModel(parent);
                 InputGroupViewModel inputGroupViewModel = new InputGroupViewModel(null, inputGroupModel);
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new InputGroupViewTileMenuContentViewModel()
@@ -629,14 +629,14 @@ namespace PanoramicDataWin8
                     }
                 }
             }
-            else if (inputModel is InputFieldModel)
+            else if (inputModel is AttributeFieldModel)
             {
                 currentTileMenuItemViewModel = new TileMenuItemViewModel(parent);
-                InputFieldViewModel inputFieldViewModel = new InputFieldViewModel(null, new InputOperationModel(inputModel as InputFieldModel));
+                AttributeTransformationViewModel attributeTransformationViewModel = new AttributeTransformationViewModel(null, new AttributeTransformationModel(inputModel as AttributeFieldModel));
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new InputFieldViewTileMenuContentViewModel()
                 {
-                    Name = (inputModel as InputFieldModel).RawName,
-                    InputFieldViewModel = inputFieldViewModel
+                    Name = (inputModel as AttributeFieldModel).RawName,
+                    AttributeTransformationViewModel = attributeTransformationViewModel
                 };
             } 
             else if (inputModel is TaskGroupModel)
@@ -750,23 +750,7 @@ namespace PanoramicDataWin8
         {
             codeGrid.Visibility = Visibility.Collapsed;
         }
-
-        public async void FireCodeGeneration(VisualizationViewModel vis)
-        {
-            //codeGrid.Visibility = Visibility.Visible;
-
-            //string text = "";
-            //foreach (var generateCodeUuid in vis.QueryModel.GenerateCodeUuids)
-            //{
-            //    CodeGenCommand cmd = new CodeGenCommand();
-            //    string response = await cmd.CodeGen((vis.QueryModel.SchemaModel.OriginModels[0] as TuppleWareOriginModel), generateCodeUuid);
-            //    JObject obj = JObject.Parse(response);
-            //    text += obj["code"] + "\n";
-            //}
-
-            //editBox.Document.SetText(TextSetOptions.ApplyRtfDocumentDefaults, text);
-        }
-
+        
         private void clearAndDisposeMenus()
         {
             if (_jobMenu != null)
@@ -799,7 +783,7 @@ namespace PanoramicDataWin8
         private void Refresh_OnClick(object sender, RoutedEventArgs e)
         {
             clearAndDisposeMenus();
-            MainViewController.Instance.LoadConfigs();
+            MainViewController.Instance.LoadConfig();
         }
     }
 }

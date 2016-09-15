@@ -52,8 +52,6 @@ namespace PanoramicDataWin8.view.vis.render
         public MapRenderer()
         {
             this.InitializeComponent();
-
-            this.DataContextChanged += PlotRenderer_DataContextChanged;
         }
 
         void MapView_Loaded(object sender, RoutedEventArgs args)
@@ -82,15 +80,15 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (!sizeChanged)
             {
-                VisualizationViewModel model = (DataContext as VisualizationViewModel);
+                HistogramOperationViewModel model = (DataContext as HistogramOperationViewModel);
                 var graphicsOverlay = _mapInertiaHandler.MapView.GraphicsOverlays["graphicsOverlay"];
                 List<Graphic> graphics = new List<Graphic>();
 
-                var histogramResult = model.QueryModel.Result as HistogramResult;
+                var histogramResult = model.HistogramOperationModel.Result as HistogramResult;
                 if (histogramResult != null)
                 {
-                    var xAom = model.QueryModel.GetUsageInputOperationModel(InputUsage.X).FirstOrDefault();
-                    var yAom = model.QueryModel.GetUsageInputOperationModel(InputUsage.Y).FirstOrDefault();
+                    var xAom = model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).FirstOrDefault();
+                    var yAom = model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).FirstOrDefault();
 
                     var xBinRange = histogramResult.BinRanges[0];
                     var yBinRange = histogramResult.BinRanges[1];
@@ -102,7 +100,7 @@ namespace PanoramicDataWin8.view.vis.render
 
                     if (xAom != null && yAom != null)
                     {
-                        /*foreach (var resultItem in model.QueryModel.Result.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
+                        /*foreach (var resultItem in model.OperationModel.Result.ResultItemModels.Select(ri => ri as VisualizationItemResultModel))
                         {
                             double? xValue = (double?) resultItem.Values[xAom].Value;
                             double? yValue = (double?) resultItem.Values[yAom].Value;
@@ -117,15 +115,15 @@ namespace PanoramicDataWin8.view.vis.render
 
                                 double? value = null;
                                 double? unNormalizedvalue = null;
-                                if (model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()))
+                                if (model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.Value).First()))
                                 {
-                                    unNormalizedvalue = (double?) resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()].Value;
-                                    value = (double?) resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.Value).First()].NoramlizedValue;
+                                    unNormalizedvalue = (double?) resultItem.Values[model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.Value).First()].Value;
+                                    value = (double?) resultItem.Values[model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.Value).First()].NoramlizedValue;
                                 }
-                                else if (model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()))
+                                else if (model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).First()))
                                 {
-                                    unNormalizedvalue = (double?) resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].Value;
-                                    value = (double?) resultItem.Values[model.QueryModel.GetUsageInputOperationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
+                                    unNormalizedvalue = (double?) resultItem.Values[model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).First()].Value;
+                                    value = (double?) resultItem.Values[model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
                                 }
 
                                 if (value != null)
@@ -199,18 +197,6 @@ namespace PanoramicDataWin8.view.vis.render
             return new Point(mercatorX_lon, mercatorY_lat);
         }
         
-        void PlotRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-        {
-            if (args.NewValue != null)
-            {
-                (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
-            }
-        }
-
-        void QueryModel_QueryModelUpdated(object sender, QueryModelUpdatedEventArgs e)
-        {
-        }
-
         void LoadResult(IResult result)
         {
             render();

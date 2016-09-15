@@ -9,7 +9,7 @@ using PanoramicDataWin8.model.view;
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public sealed partial class TableRenderer : Renderer, InputFieldViewModelEventHandler
+    public sealed partial class TableRenderer : Renderer, AttributeTransformationViewModelEventHandler
     {
         private DataGrid _dataGrid = new DataGrid();
         public TableRenderer()
@@ -34,60 +34,54 @@ namespace PanoramicDataWin8.view.vis.render
             _dataGrid.Dispose();
             if (DataContext != null)
             {
-                ((VisualizationViewModel)DataContext).QueryModel.QueryModelUpdated -= QueryModel_QueryModelUpdated;
-                ((VisualizationViewModel)DataContext).QueryModel.PropertyChanged -= QueryModel_PropertyChanged;
+                ((HistogramOperationViewModel)DataContext).HistogramOperationModel.PropertyChanged -= QueryModel_PropertyChanged;
             }
         }
-
         void TableRenderer2_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (args.NewValue != null)
             {
-                ((VisualizationViewModel)DataContext).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
-                ((VisualizationViewModel)DataContext).QueryModel.PropertyChanged += QueryModel_PropertyChanged;
-                //mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.VisualizationType.ToString();
-                //mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskType.Replace("_", " ").ToString();
+                ((HistogramOperationViewModel)DataContext).HistogramOperationModel.PropertyChanged += QueryModel_PropertyChanged;
+                //mainLabel.Text = ((OperationViewModel)DataContext).OperationModel.VisualizationType.ToString();
+                //mainLabel.Text = ((OperationViewModel)DataContext).OperationModel.TaskType.Replace("_", " ").ToString();
             }
         }
 
 
         private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            QueryModel model = (DataContext as VisualizationViewModel).QueryModel;
+            HistogramOperationModel model = (DataContext as HistogramOperationViewModel).HistogramOperationModel;
             if (e.PropertyName == model.GetPropertyName(() => model.Result))
             {
                 populateData();
             }
         }
-
-        void QueryModel_QueryModelUpdated(object sender, QueryModelUpdatedEventArgs e)
-        {
-        }
+        
 
         private void populateData()
         {
-            IResult resultModel = (DataContext as VisualizationViewModel).QueryModel.Result;
+            IResult resultModel = (DataContext as HistogramOperationViewModel).HistogramOperationModel.Result;
             if (resultModel != null)
             {
                 mainGrid.Opacity = 1;
                 mainLabel.Opacity = 0;
             }
         }
-        public void InputFieldViewModelMoved(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
+        public void AttributeTransformationViewModelMoved(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement)
         {
-            InputFieldViewModelEventHandler inputModelEventHandler = _dataGrid as InputFieldViewModelEventHandler;
+            AttributeTransformationViewModelEventHandler inputModelEventHandler = _dataGrid as AttributeTransformationViewModelEventHandler;
             if (inputModelEventHandler != null)
             {
-                inputModelEventHandler.InputFieldViewModelMoved(sender, e, overElement);
+                inputModelEventHandler.AttributeTransformationViewModelMoved(sender, e, overElement);
             }
         }
 
-        public void InputFieldViewModelDropped(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
+        public void AttributeTransformationViewModelDropped(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement)
         {
-            InputFieldViewModelEventHandler inputModelEventHandler = _dataGrid as InputFieldViewModelEventHandler;
+            AttributeTransformationViewModelEventHandler inputModelEventHandler = _dataGrid as AttributeTransformationViewModelEventHandler;
             if (inputModelEventHandler != null)
             {
-                inputModelEventHandler.InputFieldViewModelDropped(sender, e, overElement);
+                inputModelEventHandler.AttributeTransformationViewModelDropped(sender, e, overElement);
             }
         }
 
@@ -95,7 +89,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             get
             {
-                InputFieldViewModelEventHandler inputModelEventHandler = _dataGrid as InputFieldViewModelEventHandler;
+                AttributeTransformationViewModelEventHandler inputModelEventHandler = _dataGrid as AttributeTransformationViewModelEventHandler;
                 if (inputModelEventHandler != null)
                 {
                     return inputModelEventHandler.BoundsGeometry;

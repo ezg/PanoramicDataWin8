@@ -48,12 +48,12 @@ namespace PanoramicDataWin8.view.vis.render
         private IResult _result = null;
         //private VisualizationResultDescriptionModel _visualizationDescriptionModel = null;
 
-        private QueryModel _queryModelClone = null;
-        private QueryModel _queryModel = null;
+        private HistogramOperationModel _histogramOperationModelClone = null;
+        private HistogramOperationModel _histogramOperationModel = null;
         private List<FilterModel> _filterModels = new List<FilterModel>();
         private Dictionary<FilterModel, Rect> _filterModelRects = new Dictionary<FilterModel, Rect>();
-        private InputOperationModel _xAom = null;
-        private InputOperationModel _yAom = null;
+        private AttributeTransformationModel _xAom = null;
+        private AttributeTransformationModel _yAom = null;
         private Dictionary<string, Dictionary<Brush, double>> _values = new Dictionary<string, Dictionary<Brush, double>>();
         private Dictionary<string, int> _index = new Dictionary<string, int>();
         private Dictionary<string, Dictionary<Brush, double>> _countsInterpolated = new Dictionary<string, Dictionary<Brush, double>>();
@@ -149,11 +149,11 @@ namespace PanoramicDataWin8.view.vis.render
             _filterModels = filterModels;
         }
 
-        public async void UpdateData(IResult result, QueryModel queryModel, QueryModel queryModelClone, InputOperationModel xAom, InputOperationModel yAom)
+        public async void UpdateData(IResult result, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone, AttributeTransformationModel xAom, AttributeTransformationModel yAom)
         {
             _result = result;
-            _queryModelClone = queryModelClone;
-            _queryModel = queryModel;
+            _histogramOperationModelClone = histogramOperationModelClone;
+            _histogramOperationModel = histogramOperationModel;
             _xAom = xAom;
             _yAom = yAom;
 
@@ -297,9 +297,9 @@ namespace PanoramicDataWin8.view.vis.render
                         {
 
                             Color brushColor = Color.FromArgb(255, 17, 17, 17);
-                            if (_queryModelClone.BrushColors.Count > brushCount)
+                            if (_histogramOperationModelClone.BrushColors.Count > brushCount)
                             {
-                                brushColor = _queryModelClone.BrushColors[brushCount];
+                                brushColor = _histogramOperationModelClone.BrushColors[brushCount];
                             }
 
                             var brushLerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), brushColor, (float) (alpha + Math.Pow(value, 1.0/3.0)*(1.0 - alpha)));

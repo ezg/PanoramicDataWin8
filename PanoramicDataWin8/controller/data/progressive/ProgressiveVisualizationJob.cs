@@ -34,19 +34,19 @@ namespace PanoramicDataWin8.controller.data.progressive
         private IOperationReference _operationReference = null;
 
         private TimeSpan _throttle = TimeSpan.FromMilliseconds(0);
-        public QueryModel QueryModel { get; set; }
-        public QueryModel QueryModelClone { get; set; }
+        public HistogramOperationModel HistogramOperationModel { get; set; }
+        public HistogramOperationModel HistogramOperationModelClone { get; set; }
 
-        public ProgressiveVisualizationJob(QueryModel queryModel, QueryModel queryModelClone, TimeSpan throttle, int sampleSize)
+        public ProgressiveVisualizationJob(HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone, TimeSpan throttle, int sampleSize)
         {
-            QueryModel = queryModel;
-            QueryModelClone = queryModelClone;
+            HistogramOperationModel = histogramOperationModel;
+            HistogramOperationModelClone = histogramOperationModelClone;
             _sampleSize = sampleSize;
             _throttle = throttle;
-            var psm = (queryModelClone.SchemaModel as ProgressiveSchemaModel);
+            var psm = (histogramOperationModelClone.SchemaModel as ProgressiveSchemaModel);
             string filter = "";
             List<FilterModel> filterModels = new List<FilterModel>();
-            filter = FilterModel.GetFilterModelsRecursive(QueryModelClone, new List<QueryModel>(), filterModels, true);
+            filter = FilterModel.GetFilterModelsRecursive(HistogramOperationModelClone, new List<OperationModel>(), filterModels, true);
             
             List<string> aggregateFunctions = new List<string>();
             List<string> aggregateDimensions = new List<string>();
@@ -55,72 +55,72 @@ namespace PanoramicDataWin8.controller.data.progressive
             List<string> brushes = new List<string>();
 
 
-            foreach (var brushQueryModel in QueryModelClone.BrushQueryModels)
+            foreach (var brushOperationModel in HistogramOperationModelClone.BrushOperationModels)
             {
                 filterModels = new List<FilterModel>();
-                var brush = FilterModel.GetFilterModelsRecursive(brushQueryModel, new List<QueryModel>(), filterModels, false);
+                var brush = FilterModel.GetFilterModelsRecursive(brushOperationModel, new List<OperationModel>(), filterModels, false);
                 brushes.Add(brush);
             }
 
             List<double> nrOfBins = new List<double>();
 
             nrOfBins = new double[] {MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins}.Concat(
-                QueryModel.GetUsageInputOperationModel(InputUsage.Group).Select(qom => MainViewController.Instance.MainModel.NrOfGroupBins)).ToList();
+                HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Group).Select(qom => MainViewController.Instance.MainModel.NrOfGroupBins)).ToList();
 
 
-            dimensionAggregateFunctions = QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Select(iom => iom.AggregateFunction.ToString()).Concat(
-                     QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).Select(iom => iom.AggregateFunction.ToString())).Concat(
-                     QueryModelClone.GetUsageInputOperationModel(InputUsage.Group).Select(iom => iom.AggregateFunction.ToString())).ToList();
+            dimensionAggregateFunctions = HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.X).Select(iom => iom.AggregateFunction.ToString()).Concat(
+                     HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Y).Select(iom => iom.AggregateFunction.ToString())).Concat(
+                     HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Group).Select(iom => iom.AggregateFunction.ToString())).ToList();
 
 
-            if (QueryModelClone.GetUsageInputOperationModel(InputUsage.X).First().InputModel.RawName == "long" ||
-                QueryModelClone.GetUsageInputOperationModel(InputUsage.X).First().InputModel.RawName == "lat")
+            if (HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.X).First().AttributeModel.RawName == "long" ||
+                HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.X).First().AttributeModel.RawName == "lat")
             {
                 nrOfBins[0] = 20;
             }
 
-            if (QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.RawName == "long" ||
-               QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).First().InputModel.RawName == "lat")
+            if (HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Y).First().AttributeModel.RawName == "long" ||
+               HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Y).First().AttributeModel.RawName == "lat")
             {
                 nrOfBins[0] = 20;
             }
 
-            dimensions = QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Select(iom => iom.InputModel.RawName).Concat(
-                                 QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).Select(iom => iom.InputModel.RawName)).Concat(
-                                 QueryModelClone.GetUsageInputOperationModel(InputUsage.Group).Select(iom => iom.InputModel.RawName)).ToList();
+            dimensions = HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.X).Select(iom => iom.AttributeModel.RawName).Concat(
+                                 HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Y).Select(iom => iom.AttributeModel.RawName)).Concat(
+                                 HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Group).Select(iom => iom.AttributeModel.RawName)).ToList();
 
-            var aggregates = QueryModelClone.GetUsageInputOperationModel(InputUsage.Value).Concat(
-                 QueryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue)).Concat(
-                 QueryModelClone.GetUsageInputOperationModel(InputUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
-                 QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
+            var aggregates = HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Value).Concat(
+                 HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.DefaultValue)).Concat(
+                 HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
+                 HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
 
-            aggregateDimensions = aggregates.Select(iom => iom.InputModel.RawName).ToList();
+            aggregateDimensions = aggregates.Select(iom => iom.AttributeModel.RawName).ToList();
             aggregateFunctions = aggregates.Select(iom => iom.AggregateFunction.ToString()).ToList();
 
-            var xIom = QueryModelClone.GetUsageInputOperationModel(InputUsage.X).FirstOrDefault();
-            var yIom = QueryModelClone.GetUsageInputOperationModel(InputUsage.Y).FirstOrDefault();
+            var xIom = HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.X).FirstOrDefault();
+            var yIom = HistogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Y).FirstOrDefault();
 
             BinningParameters xBinning = xIom.AggregateFunction == AggregateFunction.None
                 ? (BinningParameters) new EquiWidthBinningParameters()
                 {
-                    Dimension = xIom.InputModel.Index,
+                    Dimension = xIom.AttributeModel.Index,
                     RequestedNrOfBins = MainViewController.Instance.MainModel.NrOfXBins,
                 }
                 : (BinningParameters) new SingleBinBinningParameters()
                 {
-                    Dimension = xIom.InputModel.Index,
+                    Dimension = xIom.AttributeModel.Index,
                 };
 
 
             BinningParameters yBinning = yIom.AggregateFunction == AggregateFunction.None
                 ? (BinningParameters)new EquiWidthBinningParameters()
                 {
-                    Dimension = yIom.InputModel.Index,
+                    Dimension = yIom.AttributeModel.Index,
                     RequestedNrOfBins = MainViewController.Instance.MainModel.NrOfYBins,
                 }
                 : (BinningParameters)new SingleBinBinningParameters()
                 {
-                    Dimension = yIom.InputModel.Index,
+                    Dimension = yIom.AttributeModel.Index,
                 };
 
             var aggregateParameters = new List<AggregateParameters>();
@@ -130,20 +130,20 @@ namespace PanoramicDataWin8.controller.data.progressive
                 {
                     aggregateParameters.Add(new AverageAggregateParameters()
                     {
-                        Dimension = agg.InputModel.Index
+                        Dimension = agg.AttributeModel.Index
                     });
                 }
                 else if (agg.AggregateFunction == AggregateFunction.Count)
                 {
                     aggregateParameters.Add(new CountAggregateParameters()
                     {
-                        Dimension = agg.InputModel.Index
+                        Dimension = agg.AttributeModel.Index
                     });
                 }
 
                 aggregateParameters.Add(new MarginAggregateParameters()
                 {
-                    Dimension = agg.InputModel.Index,
+                    Dimension = agg.AttributeModel.Index,
                     AggregateFunction = agg.AggregateFunction.ToString()
                 });
             }

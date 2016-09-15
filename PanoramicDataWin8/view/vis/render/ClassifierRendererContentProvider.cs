@@ -24,6 +24,7 @@ using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.progressive;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.progressive;
 using PanoramicDataWin8.view.inq;
 using Point = Windows.Foundation.Point;
@@ -57,8 +58,8 @@ namespace PanoramicDataWin8.view.vis.render
         private IResult _result = null;
         private ClassfierResultDescriptionModel _classfierResultDescriptionModel = null;
 
-        private QueryModel _queryModelClone = null;
-        private QueryModel _queryModel = null;
+        private ClassificationOperationModel _classificationOperationModelClone = null;
+        private ClassificationOperationModel _classificationOperationModel = null;
 
         private int _viewIndex = 0;
 
@@ -76,11 +77,11 @@ namespace PanoramicDataWin8.view.vis.render
         {
         }
         
-        public void UpdateData(IResult result, QueryModel queryModel, QueryModel queryModelClone, int viewIndex )
+        public void UpdateData(IResult result, ClassificationOperationModel classificationOperationModel, ClassificationOperationModel classificationOperationModelClone, int viewIndex )
         {
             _result = result;
-            _queryModelClone = queryModelClone;
-            _queryModel = queryModel;
+            _classificationOperationModelClone = classificationOperationModelClone;
+            _classificationOperationModel = classificationOperationModel;
             _viewIndex = viewIndex;
 
             //_classfierResultDescriptionModel = _result.ResultDescriptionModel as ClassfierResultDescriptionModel;
@@ -108,16 +109,16 @@ namespace PanoramicDataWin8.view.vis.render
                     _strokes.Add(stroke);
                 }
 
-                var psm = (_queryModelClone.SchemaModel as ProgressiveSchemaModel);
+                var psm = (_classificationOperationModelClone.SchemaModel as ProgressiveSchemaModel);
 
                 // get text for each feature
                 _recognizedText.Clear();
-                var h = _deviceHeight/(float) _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Count;
+                var h = _deviceHeight/(float)_classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
                 var x = _leftOffset + 20;
                 var y = _topOffset;
 
                 float count = 0;
-                foreach (var feature in _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature))
+                foreach (var feature in _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature))
                 {
                     var rect = new Rect(x, y + h*count, _deviceWidth, h);
                     var geom = rect.GetPolygon();
@@ -150,9 +151,9 @@ namespace PanoramicDataWin8.view.vis.render
 
                     //_classfierResultDescriptionModel.Query
                     var c = 0;
-                    foreach (var feature in _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature))
+                    foreach (var feature in _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature))
                     {
-                        f.Add(new JProperty(feature.InputModel.RawName, new JArray(_recognizedText[c] is string ? 0 : _recognizedText[c])));
+                        f.Add(new JProperty(feature.AttributeModel.RawName, new JArray(_recognizedText[c] is string ? 0 : _recognizedText[c])));
                         c++;
                     }
 
@@ -161,7 +162,7 @@ namespace PanoramicDataWin8.view.vis.render
                         new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Schema.RawName),
                         new JProperty("uuid", ""),
                         new JProperty("features", f.ToString()),
-                        new JProperty("feature_dimensions", _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Select(fi => fi.InputModel.RawName).ToList()));
+                        new JProperty("feature_dimensions", _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature).Select(fi => fi.AttributeModel.RawName).ToList()));
                     request["uuid"] = _classfierResultDescriptionModel.Uuid;
 
                     string message = await ProgressiveGateway.Request(request, "test");
@@ -174,12 +175,12 @@ namespace PanoramicDataWin8.view.vis.render
                     {
                         _testResult = true;
                     }
-                    _queryModel.FireRequestRender();
+                    //_histogramOperationModel.FireRequestRender();
                 }
                 else
                 {
                     _testResult = false;
-                    _queryModel.FireRequestRender();
+                    //_histogramOperationModel.FireRequestRender();
                 }
             }
         }
@@ -223,7 +224,7 @@ namespace PanoramicDataWin8.view.vis.render
                 var centerX =  _deviceWidth/2.0f + _leftOffset;
                 var centerY =  _deviceHeight/2.0f + _topOffset;
 
-                int maxIndex = 3 + _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Count;
+                int maxIndex = 3 + _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
 
                 if (_viewIndex == 0)
                 {
@@ -346,17 +347,17 @@ namespace PanoramicDataWin8.view.vis.render
 
                     var blue = Color.FromArgb(255, 41, 170, 213);
                     var brush = Color.FromArgb(255, 178, 77, 148);
-                    var h = _deviceHeight / (float)_queryModelClone.GetUsageInputOperationModel(InputUsage.Feature).Count;
+                    var h = _deviceHeight / (float)_classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
                     var x = _leftOffset + 20;
                     var y = _topOffset;
 
                     float count = 0;
-                    foreach (var feature in _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature))
+                    foreach (var feature in _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature))
                     {
                         var oldTransform = canvasArgs.DrawingSession.Transform;
                         mat = Matrix3x2.CreateRotation((-90f*(float) Math.PI)/180.0f, new Vector2(x, y + (h/2.0f) + count * h));
                         canvasArgs.DrawingSession.Transform = mat*oldTransform;
-                        DrawString(canvasArgs, _textFormatBig, x, y + (h / 2.0f) + count * h, feature.InputModel.RawName, _textColor, false, true, false);
+                        DrawString(canvasArgs, _textFormatBig, x, y + (h / 2.0f) + count * h, feature.AttributeModel.RawName, _textColor, false, true, false);
                         canvasArgs.DrawingSession.Transform = oldTransform;
 
                         if (_recognizedText.Count > count)
@@ -392,15 +393,15 @@ namespace PanoramicDataWin8.view.vis.render
                 else if (_viewIndex < maxIndex - 1)
                 {
                     int histogramIndex = _viewIndex - 2;
-                    var feat = _queryModelClone.GetUsageInputOperationModel(InputUsage.Feature)[histogramIndex];
+                    var feat = _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature)[histogramIndex];
 
-                    string label = feat.InputModel.RawName.Replace("_", " "); //_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].RawName : "avg across labels";
+                    string label = feat.AttributeModel.RawName.Replace("_", " "); //_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].RawName : "avg across labels";
                     DrawString(canvasArgs, _textFormatBig, centerX, _topOffset, label, _textColor, false, true, false);
 
                     var rr = new ClassifierRendererPlotContentProvider() {CompositionScaleX = CompositionScaleX, CompositionScaleY = CompositionScaleY};
-                    var xIom = new InputOperationModel(feat.InputModel) {AggregateFunction = AggregateFunction.None};
-                    var yIom = new InputOperationModel(feat.InputModel) { AggregateFunction = AggregateFunction.Count };
-                    var vIom = new InputOperationModel(feat.InputModel) { AggregateFunction = AggregateFunction.Count };
+                    var xIom = new AttributeTransformationModel(feat.AttributeModel) {AggregateFunction = AggregateFunction.None};
+                    var yIom = new AttributeTransformationModel(feat.AttributeModel) { AggregateFunction = AggregateFunction.Count };
+                    var vIom = new AttributeTransformationModel(feat.AttributeModel) { AggregateFunction = AggregateFunction.Count };
                     rr.UpdateData(_classfierResultDescriptionModel.VisualizationResultModel[histogramIndex], xIom, yIom, vIom);
                     rr.render(canvas, canvasArgs, 40, 20, 40, 45, _deviceWidth, _deviceHeight);
                 }

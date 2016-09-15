@@ -21,7 +21,7 @@ using Windows.Devices.Input;
 
 namespace PanoramicDataWin8.view.vis
 {
-    public class AttachmentView : UserControl, InputFieldViewModelEventHandler, InputGroupViewModelEventHandler, IScribbable
+    public class AttachmentView : UserControl, AttributeTransformationViewModelEventHandler, InputGroupViewModelEventHandler, IScribbable
     {
         public static double GAP = 4;
 
@@ -198,7 +198,7 @@ namespace PanoramicDataWin8.view.vis
 
                 var model = (e.NewValue as AttachmentViewModel);
                 model.AttachmentHeaderViewModels.CollectionChanged += AttachmentHeaderViewModels_CollectionChanged;
-                model.VisualizationViewModel.PropertyChanged += VisualizationViewModel_PropertyChanged;
+                model.OperationViewModel.PropertyChanged += VisualizationViewModel_PropertyChanged;
                 model.PropertyChanged += AttachmentViewModel_PropertyChanged;
 
                 foreach (var header in model.AttachmentHeaderViewModels)
@@ -255,16 +255,8 @@ namespace PanoramicDataWin8.view.vis
                 if (sender is AddAttachmentItemView)
                 {
                     var model = (sender as AddAttachmentItemView).DataContext as AddAttachmentItemViewModel;
-                    if (model.Label == "codegen")
-                    {
-                        var vis = (this.DataContext as AttachmentViewModel).VisualizationViewModel;
-                        MainViewController.Instance.MainPage.FireCodeGeneration(vis);
-                    }
-                    else
-                    {
-                        displayMenu(model);
-                    }
-                }                
+                    displayMenu(model);
+                }
             }
         }
 
@@ -346,7 +338,7 @@ namespace PanoramicDataWin8.view.vis
                     }
 
                     views.Add(attachmentView);
-                    model.Position = (DataContext as AttachmentViewModel).VisualizationViewModel.Position;
+                    model.Position = (DataContext as AttachmentViewModel).OperationViewModel.Position;
                     _contentCanvas.Children.Insert(0, attachmentView);
                     updateRendering();
                 }
@@ -355,7 +347,7 @@ namespace PanoramicDataWin8.view.vis
 
         void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var visModel = (DataContext as AttachmentViewModel).VisualizationViewModel;
+            var visModel = (DataContext as AttachmentViewModel).OperationViewModel;
             if (e.PropertyName == visModel.GetPropertyName(() => visModel.Size) ||
                 e.PropertyName == visModel.GetPropertyName(() => visModel.Position))
             {
@@ -371,8 +363,8 @@ namespace PanoramicDataWin8.view.vis
 
             if (model.AttachmentOrientation == AttachmentOrientation.Left)
             {
-                var availableHeight = model.VisualizationViewModel.Size.Y;
-                var currentY = model.VisualizationViewModel.Position.Y;
+                var availableHeight = model.OperationViewModel.Size.Y;
+                var currentY = model.OperationViewModel.Position.Y;
                 if (availableHeight > calculateMinPreferedSizeY(model.AttachmentHeaderViewModels))
                 {
                     var remainingHeaders = model.AttachmentHeaderViewModels.ToList();
@@ -383,7 +375,7 @@ namespace PanoramicDataWin8.view.vis
                         int nrRows = (availableHeight - calculateMinPreferedSizeY(remainingHeaders)) + GAP > 2 * header.PreferedItemSize.Y + GAP ? 2 : 1;
                         int upperNrElemPerRow = (int) Math.Ceiling((double)header.AttachmentItemViewModels.Count / (double)nrRows);
                         int lowerNrElemPerRow = (int) Math.Floor((double)header.AttachmentItemViewModels.Count / (double)nrRows);
-                        double currentX = model.VisualizationViewModel.Position.X - (upperNrElemPerRow * header.PreferedItemSize.Y + (upperNrElemPerRow) * GAP);
+                        double currentX = model.OperationViewModel.Position.X - (upperNrElemPerRow * header.PreferedItemSize.Y + (upperNrElemPerRow) * GAP);
 
                         if (header.AddAttachmentItemViewModel != null)
                         {
@@ -405,7 +397,7 @@ namespace PanoramicDataWin8.view.vis
                             {
                                 currentRow++;
                                 currentY += header.PreferedItemSize.X + GAP;
-                                currentX = model.VisualizationViewModel.Position.X - (lowerNrElemPerRow * header.PreferedItemSize.X + (lowerNrElemPerRow) * GAP);
+                                currentX = model.OperationViewModel.Position.X - (lowerNrElemPerRow * header.PreferedItemSize.X + (lowerNrElemPerRow) * GAP);
                             }
                         }
                         availableHeight -= headerHeight;
@@ -414,8 +406,8 @@ namespace PanoramicDataWin8.view.vis
             }
             else if (model.AttachmentOrientation == AttachmentOrientation.Right)
             {
-                var availableHeight = model.VisualizationViewModel.Size.Y;
-                var currentY = model.VisualizationViewModel.Position.Y;
+                var availableHeight = model.OperationViewModel.Size.Y;
+                var currentY = model.OperationViewModel.Position.Y;
                 if (availableHeight > calculateMinPreferedSizeY(model.AttachmentHeaderViewModels))
                 {
                     var remainingHeaders = model.AttachmentHeaderViewModels.ToList();
@@ -426,7 +418,7 @@ namespace PanoramicDataWin8.view.vis
                         int nrRows = (availableHeight - calculateMinPreferedSizeY(remainingHeaders)) + GAP > 2 * header.PreferedItemSize.Y + GAP ? 2 : 1;
                         int upperNrElemPerRow = (int)Math.Ceiling((double)header.AttachmentItemViewModels.Count / (double)nrRows);
                         int lowerNrElemPerRow = (int)Math.Floor((double)header.AttachmentItemViewModels.Count / (double)nrRows);
-                        double currentX = model.VisualizationViewModel.Position.X  + model.VisualizationViewModel.Size.X + (upperNrElemPerRow * header.PreferedItemSize.Y + (upperNrElemPerRow) * GAP);
+                        double currentX = model.OperationViewModel.Position.X  + model.OperationViewModel.Size.X + (upperNrElemPerRow * header.PreferedItemSize.Y + (upperNrElemPerRow) * GAP);
                         //currentY -= header.PreferedItemSize.Y;
                         if (header.AddAttachmentItemViewModel != null)
                         {
@@ -448,7 +440,7 @@ namespace PanoramicDataWin8.view.vis
                             {
                                 currentRow++;
                                 currentY += header.PreferedItemSize.X + GAP;
-                                currentX = model.VisualizationViewModel.Position.X + (lowerNrElemPerRow * header.PreferedItemSize.X + (lowerNrElemPerRow) * GAP);
+                                currentX = model.OperationViewModel.Position.X + (lowerNrElemPerRow * header.PreferedItemSize.X + (lowerNrElemPerRow) * GAP);
                             }
                         }
                         availableHeight -= headerHeight;
@@ -457,7 +449,7 @@ namespace PanoramicDataWin8.view.vis
             }
             else if (model.AttachmentOrientation == AttachmentOrientation.Bottom)
             {
-                var availableWidth = model.VisualizationViewModel.Size.X;
+                var availableWidth = model.OperationViewModel.Size.X;
                 var tt = this.Opacity;
                 if (availableWidth > calculateMinPreferedSizeX(model.AttachmentHeaderViewModels))
                 {
@@ -465,15 +457,15 @@ namespace PanoramicDataWin8.view.vis
                     var maxX = 0d;
                     foreach (var header in model.AttachmentHeaderViewModels)
                     {
-                        var startX = model.VisualizationViewModel.Position.X;
-                        var offsetX =  (model.VisualizationViewModel.QueryModel.VisualizationType != VisualizationType.table ? 50 + GAP : 0);
+                        var startX = model.OperationViewModel.Position.X;
+                        var offsetX = 50 + GAP;//(model.OperationViewModel.HistogramOperationModel.VisualizationType != VisualizationType.table ? 50 + GAP : 0);
                         var currentX = startX;
                         remainingHeaders.Remove(header);
                         double headerWidth = header.PreferedItemSize.X;
                         int nrCols = (availableWidth - calculateMinPreferedSizeX(remainingHeaders)) + GAP > 2 * header.PreferedItemSize.X + GAP ? 2 : 1;
                         int leftNrElemPerCol = (int)Math.Ceiling((double)header.AttachmentItemViewModels.Count / (double)nrCols);
                         int rightNrElemPercol = (int)Math.Floor((double)header.AttachmentItemViewModels.Count / (double)nrCols);
-                        double currentY = (model.VisualizationViewModel.Position.Y + model.VisualizationViewModel.Size.Y) + GAP;// -(upperNrElemPerCol * header.PreferedItemSize.Y + (upperNrElemPerCol) * GAP);
+                        double currentY = (model.OperationViewModel.Position.Y + model.OperationViewModel.Size.Y) + GAP;// -(upperNrElemPerCol * header.PreferedItemSize.Y + (upperNrElemPerCol) * GAP);
 
                         int currentCol = 0;
                         int count = 0;
@@ -486,7 +478,7 @@ namespace PanoramicDataWin8.view.vis
                             if (count == leftNrElemPerCol)
                             {
                                 currentCol++;
-                                currentY = (model.VisualizationViewModel.Position.Y + model.VisualizationViewModel.Size.Y) + GAP;
+                                currentY = (model.OperationViewModel.Position.Y + model.OperationViewModel.Size.Y) + GAP;
                                 currentX = startX + header.PreferedItemSize.Y + GAP;
                             }
                         }
@@ -494,7 +486,7 @@ namespace PanoramicDataWin8.view.vis
                         {
                             header.AddAttachmentItemViewModel.TargetPosition = new Pt(
                                 maxX + startX + offsetX, 
-                                (model.VisualizationViewModel.Position.Y + model.VisualizationViewModel.Size.Y) + GAP + 
+                                (model.OperationViewModel.Position.Y + model.OperationViewModel.Size.Y) + GAP + 
                                 leftNrElemPerCol * header.PreferedItemSize.Y + leftNrElemPerCol * GAP);
                             // header.AddAttachmentItemViewModel.Size = new Vec(300, 300);
 
@@ -503,7 +495,7 @@ namespace PanoramicDataWin8.view.vis
 
                         if (header.AttachmentItemViewModels.Count > 0)
                         {
-                            maxX = header.AttachmentItemViewModels.Max(item => item.TargetPosition.X) + header.PreferedItemSize.X - model.VisualizationViewModel.Position.X + GAP - offsetX;
+                            maxX = header.AttachmentItemViewModels.Max(item => item.TargetPosition.X) + header.PreferedItemSize.X - model.OperationViewModel.Position.X + GAP - offsetX;
                         }
                         else
                         {
@@ -516,7 +508,7 @@ namespace PanoramicDataWin8.view.vis
             }
             else if (model.AttachmentOrientation == AttachmentOrientation.Top)
             {
-                var availableWidth = model.VisualizationViewModel.Size.X;
+                var availableWidth = model.OperationViewModel.Size.X;
                 var tt = this.Opacity;
                 if (availableWidth > calculateMinPreferedSizeX(model.AttachmentHeaderViewModels))
                 {
@@ -524,15 +516,15 @@ namespace PanoramicDataWin8.view.vis
                     var maxX = 0d;
                     foreach (var header in model.AttachmentHeaderViewModels)
                     {
-                        var startX = model.VisualizationViewModel.Position.X;
-                        var offsetX = (model.VisualizationViewModel.QueryModel.VisualizationType != VisualizationType.table ? 50 + GAP : 0);
+                        var startX = model.OperationViewModel.Position.X;
+                        var offsetX = 50 + GAP;//(model.OperationViewModel.HistogramOperationModel.VisualizationType != VisualizationType.table ? 50 + GAP : 0);
                         var currentX = startX;
                         remainingHeaders.Remove(header);
                         double headerWidth = header.PreferedItemSize.X;
                         int nrCols = (availableWidth - calculateMinPreferedSizeX(remainingHeaders)) + GAP > 2 * header.PreferedItemSize.X + GAP ? 2 : 1;
                         int leftNrElemPerCol = (int)Math.Ceiling((double)header.AttachmentItemViewModels.Count / (double)nrCols);
                         int rightNrElemPercol = (int)Math.Floor((double)header.AttachmentItemViewModels.Count / (double)nrCols);
-                        double currentY = (model.VisualizationViewModel.Position.Y ) - GAP;// -(upperNrElemPerCol * header.PreferedItemSize.Y + (upperNrElemPerCol) * GAP);
+                        double currentY = (model.OperationViewModel.Position.Y ) - GAP;// -(upperNrElemPerCol * header.PreferedItemSize.Y + (upperNrElemPerCol) * GAP);
 
                         int currentCol = 0;
                         int count = 0;
@@ -545,7 +537,7 @@ namespace PanoramicDataWin8.view.vis
                             if (count == leftNrElemPerCol)
                             {
                                 currentCol++;
-                                currentY = (model.VisualizationViewModel.Position.Y + model.VisualizationViewModel.Size.Y) + GAP;
+                                currentY = (model.OperationViewModel.Position.Y + model.OperationViewModel.Size.Y) + GAP;
                                 currentX = startX + header.PreferedItemSize.Y + GAP;
                             }
                         }
@@ -553,7 +545,7 @@ namespace PanoramicDataWin8.view.vis
                         {
                             header.AddAttachmentItemViewModel.TargetPosition = new Pt(
                                 maxX + startX + offsetX,
-                                (model.VisualizationViewModel.Position.Y) - GAP - header.PreferedItemSize.Y -
+                                (model.OperationViewModel.Position.Y) - GAP - header.PreferedItemSize.Y -
                                 leftNrElemPerCol * header.PreferedItemSize.Y - leftNrElemPerCol * GAP);
                             // header.AddAttachmentItemViewModel.Size = new Vec(300, 300);
 
@@ -562,7 +554,7 @@ namespace PanoramicDataWin8.view.vis
 
                         if (header.AttachmentItemViewModels.Count > 0)
                         {
-                            maxX = header.AttachmentItemViewModels.Max(item => item.TargetPosition.X) + header.PreferedItemSize.X - model.VisualizationViewModel.Position.X + GAP - offsetX;
+                            maxX = header.AttachmentItemViewModels.Max(item => item.TargetPosition.X) + header.PreferedItemSize.X - model.OperationViewModel.Position.X + GAP - offsetX;
                         }
                         else
                         {
@@ -733,11 +725,11 @@ namespace PanoramicDataWin8.view.vis
             if (closestModel != null && closestModel is AddAttachmentItemViewModel && (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AcceptsInputGroupModels &&
                 (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AddedTriggered != null)
             {
-                (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AddedTriggered(new InputOperationModel(e.InputGroupModel));
+                (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AddedTriggered(new AttributeTransformationModel(e.AttributeGroupModel));
             }
         }
 
-        public void InputFieldViewModelMoved(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
+        public void AttributeTransformationViewModelMoved(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement)
         {
             AttachmentViewModel model = (DataContext as AttachmentViewModel);
             model.IsDisplayed = true;
@@ -758,7 +750,7 @@ namespace PanoramicDataWin8.view.vis
             }
         }
         
-        public void InputFieldViewModelDropped(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
+        public void AttributeTransformationViewModelDropped(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement)
         {
             AttachmentViewModel model = (DataContext as AttachmentViewModel);
             model.IsDisplayed = false;
@@ -773,7 +765,7 @@ namespace PanoramicDataWin8.view.vis
             var closestModel = overElement ? getClosestModel(e.Bounds) : null;
             if (closestModel != null && closestModel is AddAttachmentItemViewModel && (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AddedTriggered != null)
             {
-                (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AddedTriggered(e.InputOperationModel);
+                (closestModel as AddAttachmentItemViewModel).AttachmentHeaderViewModel.AddedTriggered(e.AttributeTransformationModel);
             }
         }
 

@@ -19,10 +19,10 @@ namespace PanoramicDataWin8.model.view
         {
         }
 
-        public InputGroupViewModel(VisualizationViewModel visualizationViewModel, InputGroupModel inputGroupModel)
+        public InputGroupViewModel(HistogramOperationViewModel histogramOperationViewModel, AttributeGroupModel attributeGroupModel)
         {
-            VisualizationViewModel = visualizationViewModel;
-            InputOperationModel = inputGroupModel;
+            HistogramOperationViewModel = histogramOperationViewModel;
+            AttributeOperationModel = attributeGroupModel;
         }
 
         private string _mainLabel = null;
@@ -38,21 +38,21 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private VisualizationViewModel _visualizationViewModel = null;
-        public VisualizationViewModel VisualizationViewModel
+        private HistogramOperationViewModel _histogramOperationViewModel = null;
+        public HistogramOperationViewModel HistogramOperationViewModel
         {
             get
             {
-                return _visualizationViewModel;
+                return _histogramOperationViewModel;
             }
             set
             {
-                this.SetProperty(ref _visualizationViewModel, value);
+                this.SetProperty(ref _histogramOperationViewModel, value);
             }
         }
 
-        private InputGroupModel _inpuGroupModel = null;
-        public InputGroupModel InputOperationModel
+        private AttributeGroupModel _inpuGroupModel = null;
+        public AttributeGroupModel AttributeOperationModel
         {
             get
             {
@@ -95,19 +95,19 @@ namespace PanoramicDataWin8.model.view
         }
 
 
-        public void FireMoved(Rct bounds, InputGroupModel inputGroupModel)
+        public void FireMoved(Rct bounds, AttributeGroupModel attributeGroupModel)
         {
             if (InputGroupViewModelMoved != null)
             {
-                InputGroupViewModelMoved(this, new InputGroupViewModelEventArgs(bounds, inputGroupModel));
+                InputGroupViewModelMoved(this, new InputGroupViewModelEventArgs(bounds, attributeGroupModel));
             }
         }
 
-        public void FireDropped(Rct bounds, InputGroupModel inputGroupModel)
+        public void FireDropped(Rct bounds, AttributeGroupModel attributeGroupModel)
         {
             if (InputGroupViewModelDropped != null)
             {
-                InputGroupViewModelDropped(this, new InputGroupViewModelEventArgs(bounds, inputGroupModel));
+                InputGroupViewModelDropped(this, new InputGroupViewModelEventArgs(bounds, attributeGroupModel));
             }
         }
 
@@ -129,12 +129,12 @@ namespace PanoramicDataWin8.model.view
 
     public class InputGroupViewModelEventArgs : EventArgs
     {
-        public InputGroupModel InputGroupModel { get; set; }
+        public AttributeGroupModel AttributeGroupModel { get; set; }
         public Rct Bounds { get; set; }
-        public InputGroupViewModelEventArgs(Rct bounds, InputGroupModel inputGroupModel)
+        public InputGroupViewModelEventArgs(Rct bounds, AttributeGroupModel attributeGroupModel)
         {
             Bounds = bounds;
-            InputGroupModel = inputGroupModel;
+            AttributeGroupModel = attributeGroupModel;
         }
     }
 }

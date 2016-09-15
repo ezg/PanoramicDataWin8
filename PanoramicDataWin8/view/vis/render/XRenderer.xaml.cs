@@ -28,7 +28,7 @@ using PanoramicDataWin8.view.vis.menu;
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public partial class XRenderer : ContentControl, InputFieldViewModelEventHandler
+    public partial class XRenderer : ContentControl, AttributeTransformationViewModelEventHandler
     {
         public delegate void EventHandler(bool sizeChanged = false);
         public event EventHandler Render;
@@ -38,7 +38,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         private MenuViewModel _menuViewModel = null;
         private MenuView _menuView = null;
-        private VisualizationViewModel _visualizationViewModel = null;
+        private HistogramOperationViewModel _histogramOperationViewModel = null;
+        private HistogramOperationModel _histogramOperationModel = null;
 
         public XRenderer()
         {
@@ -58,18 +59,18 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void removeEventHandlers()
         {
-            if (_visualizationViewModel != null)
+            if (_histogramOperationViewModel != null)
             {
-                _visualizationViewModel.PropertyChanged -= VisualizationViewModel_PropertyChanged;
-                _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged -= X_CollectionChanged;
-                _visualizationViewModel.QueryModel.FilterModels.CollectionChanged -= FilterModels_CollectionChanged;
-                _visualizationViewModel.QueryModel.PropertyChanged -= QueryModel_PropertyChanged;
+                _histogramOperationViewModel.PropertyChanged -= HistogramOperationViewModelPropertyChanged;
+                _histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).CollectionChanged -= X_CollectionChanged;
+                _histogramOperationModel.FilterModels.CollectionChanged -= FilterModels_CollectionChanged;
+                _histogramOperationModel.PropertyChanged -= QueryModel_PropertyChanged;
             }
         }
 
         protected override void OnApplyTemplate()
         {
-            ((TextBlock)GetTemplateChild("mainLabel")).Text = (DataContext as VisualizationViewModel).QueryModel.VisualizationType.ToString();
+            ((TextBlock)GetTemplateChild("mainLabel")).Text = ((HistogramOperationModel) ((HistogramOperationViewModel) DataContext).OperationModel).VisualizationType.ToString();
             populateHeaders();
         }
 
@@ -78,11 +79,13 @@ namespace PanoramicDataWin8.view.vis.render
             removeEventHandlers();
             if (args.NewValue != null)
             {
-                _visualizationViewModel = (VisualizationViewModel) DataContext;
-                _visualizationViewModel.PropertyChanged += VisualizationViewModel_PropertyChanged;
-                _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.X).CollectionChanged += X_CollectionChanged;
-                _visualizationViewModel.QueryModel.FilterModels.CollectionChanged += FilterModels_CollectionChanged;
-                _visualizationViewModel.QueryModel.PropertyChanged += QueryModel_PropertyChanged;
+                _histogramOperationViewModel = (HistogramOperationViewModel) DataContext;
+                _histogramOperationViewModel.PropertyChanged += HistogramOperationViewModelPropertyChanged;
+
+                _histogramOperationModel = (HistogramOperationModel)_histogramOperationViewModel.OperationModel;
+                _histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).CollectionChanged += X_CollectionChanged;
+                _histogramOperationModel.FilterModels.CollectionChanged += FilterModels_CollectionChanged;
+                _histogramOperationModel.PropertyChanged += QueryModel_PropertyChanged;
                 ApplyTemplate();
             }
         }
@@ -94,7 +97,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            QueryModel model = (DataContext as VisualizationViewModel).QueryModel;
+            HistogramOperationModel model = (HistogramOperationModel) ((HistogramOperationViewModel) DataContext).OperationModel;
             if (e.PropertyName == model.GetPropertyName(() => model.Result))
             {
                 populateData();
@@ -102,14 +105,14 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void HistogramOperationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            VisualizationViewModel model = (DataContext as VisualizationViewModel);
+            HistogramOperationViewModel model = (DataContext as HistogramOperationViewModel);
             if (e.PropertyName == model.GetPropertyName(() => model.Size))
             {
                 if (((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext != null)
                 {
-                    (((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext as InputFieldViewModel).Size = new Vec(model.Size.X, 54);
+                    (((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext as AttributeTransformationViewModel).Size = new Vec(model.Size.X, 54);
                 }
 
                 render(true);
@@ -124,12 +127,12 @@ namespace PanoramicDataWin8.view.vis.render
         private void populateHeaders()
         {
             removeMenu();
-            VisualizationViewModel visModel = (DataContext as VisualizationViewModel);
-            QueryModel queryModel = visModel.QueryModel;
-            if (queryModel.GetUsageInputOperationModel(InputUsage.X).Any())
+            HistogramOperationViewModel visModel = ((HistogramOperationViewModel) DataContext);
+            HistogramOperationModel histogramOperationModel = (HistogramOperationModel) visModel.OperationModel;
+            if (histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Any())
             {
-                var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
-                ((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), xAom)
+                var xAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).First();
+                ((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext = new AttributeTransformationViewModel((DataContext as HistogramOperationViewModel), xAom)
                 {
                     IsShadow = false,
                     BorderThicknes = new Thickness(0, 4, 0, 0),
@@ -140,7 +143,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else
             {
-                ((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext = new InputFieldViewModel((DataContext as VisualizationViewModel), null)
+                ((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext = new AttributeTransformationViewModel((DataContext as HistogramOperationViewModel), null)
                 {
                     IsDraggableByPen = false,
                     IsDraggable = false,
@@ -155,7 +158,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void updateProgressAndNullVisualization()
         {
-            IResult resultModel = (DataContext as VisualizationViewModel).QueryModel.Result;
+            IResult resultModel = ((HistogramOperationViewModel) DataContext).OperationModel.Result;
 
             // progress
             double size = 14;
@@ -202,7 +205,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void populateData()
         {
-            IResult resultModel = (DataContext as VisualizationViewModel).QueryModel.Result;
+            IResult resultModel = (DataContext as HistogramOperationViewModel).OperationModel.Result;
 
             var contentPresenter = (ContentPresenter)GetTemplateChild("contentPresenter");
             var mainLabel = (TextBlock)GetTemplateChild("mainLabel");
@@ -220,8 +223,8 @@ namespace PanoramicDataWin8.view.vis.render
             var progressGrid = (Grid)GetTemplateChild("progressGrid");
             /*if (MainViewController.Instance.MainModel.Mode == Mode.batch &&
                 result.ResultType == ResultType.Clear &&
-                ((VisualizationViewModel)DataContext).QueryModel.GetUsageInputOperationModel(InputUsage.X).Any() &&
-                ((VisualizationViewModel)DataContext).QueryModel.GetUsageInputOperationModel(InputUsage.Y).Any())
+                ((OperationViewModel)DataContext).OperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Any() &&
+                ((OperationViewModel)DataContext).OperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).Any())
             {
 
                 animationGrid.Opacity = 1.0;
@@ -257,7 +260,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (_menuViewModel != null)
             {
-                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.InputFieldViewModel).FirstOrDefault();
+                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.AttributeTransformationViewModel).FirstOrDefault();
                 if (inputFieldView != null)
                 {
                     Rct bounds = inputFieldView.GetBounds(MainViewController.Instance.InkableScene);
@@ -273,18 +276,18 @@ namespace PanoramicDataWin8.view.vis.render
 
         void InputFieldViewInputFieldViewModelTapped(object sender, EventArgs e)
         {
-            InputFieldViewModel model = (sender as InputFieldView).DataContext as InputFieldViewModel;
-            var visModel = model.VisualizationViewModel;
+            AttributeTransformationViewModel model = (sender as InputFieldView).DataContext as AttributeTransformationViewModel;
+            var visModel = model.HistogramOperationViewModel;
             if (DataContext == visModel)
             {
                 visModel.ActiveStopwatch.Restart();
 
-                //if (HeaderObjects.Any(ho => ho.InputFieldViewModel == model))
+                //if (HeaderObjects.Any(ho => ho.AttributeTransformationViewModel == model))
                 {
                     bool createNew = true;
                     if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
                     {
-                        createNew = _menuViewModel.InputFieldViewModel != model;
+                        createNew = _menuViewModel.AttributeTransformationViewModel != model;
                         removeMenu();
                     }
 
@@ -312,7 +315,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (_menuViewModel != null)
             {
-                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.InputFieldViewModel).FirstOrDefault();
+                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.AttributeTransformationViewModel).FirstOrDefault();
 
                 if (inputFieldView != null)
                 {
@@ -336,38 +339,38 @@ namespace PanoramicDataWin8.view.vis.render
         void FilterModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
 
-            QueryModel queryModel = (DataContext as VisualizationViewModel).QueryModel;
+            HistogramOperationModel histogramOperationModel = (HistogramOperationModel) ((HistogramOperationViewModel) DataContext).OperationModel;
             var tbSelection = ((TextBlock)GetTemplateChild("tbSelection"));
-            if (queryModel.FilterModels.Count > 0 &&
-                queryModel.GetUsageInputOperationModel(InputUsage.X).Count > 0 &&
-                queryModel.GetUsageInputOperationModel(InputUsage.Y).Count > 0)
+            if (histogramOperationModel.FilterModels.Count > 0 &&
+                histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Count > 0 &&
+                histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).Count > 0)
             {
-                var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
-                var yAom = queryModel.GetUsageInputOperationModel(InputUsage.Y).First();
+                var xAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).First();
+                var yAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).First();
 
 
-                if (queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Count(vc => Equals(vc.InputOperationModel, xAom)) > 0)
+                if (histogramOperationModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Count(vc => Equals(vc.AttributeTransformationModel, xAom)) > 0)
                 {
-                    tbSelection.Text = xAom.InputModel.RawName + ": " +
-                                       queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, xAom))
+                    tbSelection.Text = xAom.AttributeModel.RawName + ": " +
+                                       histogramOperationModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.AttributeTransformationModel, xAom))
                                            .Min(vc => vc.Value).ToString();
-                    tbSelection.Text += " - " + queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, xAom)).Max(vc => vc.Value);
+                    tbSelection.Text += " - " + histogramOperationModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.AttributeTransformationModel, xAom)).Max(vc => vc.Value);
                 }
                 if (!xAom.Equals(yAom) &&
-                    queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Count(vc => Equals(vc.InputOperationModel, yAom)) > 0)
+                    histogramOperationModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Count(vc => Equals(vc.AttributeTransformationModel, yAom)) > 0)
                 {
-                    tbSelection.Text += ", " + yAom.InputModel.RawName + ": " +
-                                        queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, yAom))
+                    tbSelection.Text += ", " + yAom.AttributeModel.RawName + ": " +
+                                        histogramOperationModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.AttributeTransformationModel, yAom))
                                             .Min(vc => vc.Value).ToString();
-                    tbSelection.Text += " - " + queryModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.InputOperationModel, yAom)).Max(vc => vc.Value);
+                    tbSelection.Text += " - " + histogramOperationModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Where(vc => Equals(vc.AttributeTransformationModel, yAom)).Max(vc => vc.Value);
                 }
 
-                if (queryModel.FilterModels.Any(fm => fm.Value.HasValue))
+                if (histogramOperationModel.FilterModels.Any(fm => fm.Value.HasValue))
                 {
-                    tbSelection.Text += ", avg value: " + queryModel.FilterModels.Where(fm => fm.Value.HasValue).Average(fm => fm.Value.Value).ToString("F1");
-                    tbSelection.Text += ", sum value: " + queryModel.FilterModels.Where(fm => fm.Value.HasValue).Sum(fm => fm.Value.Value).ToString("F1");
+                    tbSelection.Text += ", avg value: " + histogramOperationModel.FilterModels.Where(fm => fm.Value.HasValue).Average(fm => fm.Value.Value).ToString("F1");
+                    tbSelection.Text += ", sum value: " + histogramOperationModel.FilterModels.Where(fm => fm.Value.HasValue).Sum(fm => fm.Value.Value).ToString("F1");
                 }
-                //tbSelection.Text = "" + queryModel.FilterModels.Count;
+                //tbSelection.Text = "" + histogramOperationModel.FilterModels.Count;
             }
             else
             {
@@ -383,7 +386,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        public void InputFieldViewModelMoved(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
+        public void AttributeTransformationViewModelMoved(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement)
         {
             var xInputFieldView = (InputFieldView) GetTemplateChild("xInputFieldView");
             var yInputFieldView = (InputFieldView) GetTemplateChild("yInputFieldView");
@@ -391,27 +394,27 @@ namespace PanoramicDataWin8.view.vis.render
             var xBounds = xInputFieldView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             if (xBounds.Intersects(e.Bounds.GetPolygon()))
             {
-                if (xInputFieldView.DataContext != null && !(xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted)
+                if (xInputFieldView.DataContext != null && !(xInputFieldView.DataContext as AttributeTransformationViewModel).IsHighlighted)
                 {
-                    (xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = true;
+                    (xInputFieldView.DataContext as AttributeTransformationViewModel).IsHighlighted = true;
                 }
             }
             else
             {
-                if (xInputFieldView.DataContext != null && (xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted)
+                if (xInputFieldView.DataContext != null && (xInputFieldView.DataContext as AttributeTransformationViewModel).IsHighlighted)
                 {
-                    (xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
+                    (xInputFieldView.DataContext as AttributeTransformationViewModel).IsHighlighted = false;
                 }
             }
         }
 
-        public void InputFieldViewModelDropped(InputFieldViewModel sender, InputFieldViewModelEventArgs e, bool overElement)
+        public void AttributeTransformationViewModelDropped(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement)
         {
             var xInputFieldView = (InputFieldView)GetTemplateChild("xInputFieldView");
             // turn both off 
             if (xInputFieldView.DataContext != null)
             {
-                (xInputFieldView.DataContext as InputFieldViewModel).IsHighlighted = false;
+                (xInputFieldView.DataContext as AttributeTransformationViewModel).IsHighlighted = false;
             }
 
             if (!overElement)
@@ -419,27 +422,27 @@ namespace PanoramicDataWin8.view.vis.render
                 return;
             }
 
-            QueryModel qModel = (DataContext as VisualizationViewModel).QueryModel;
+            HistogramOperationModel qModel = (HistogramOperationModel) ((HistogramOperationViewModel) DataContext).OperationModel;
 
             // if both are empty before hand add default value
-            if (!qModel.GetUsageInputOperationModel(InputUsage.X).Any() && !qModel.GetUsageInputOperationModel(InputUsage.Y).Any())
+            if (!qModel.GetUsageAttributeTransformationModel(InputUsage.X).Any() && !qModel.GetUsageAttributeTransformationModel(InputUsage.Y).Any())
             {
-                InputOperationModel value = new InputOperationModel(e.InputOperationModel.InputModel);
+                AttributeTransformationModel value = new AttributeTransformationModel(e.AttributeTransformationModel.AttributeModel);
                 value.AggregateFunction = AggregateFunction.Count;
 
-                qModel.AddUsageInputOperationModel(InputUsage.DefaultValue, value);
+                qModel.AddUsageAttributeTransformationModel(InputUsage.DefaultValue, value);
             }
 
             var xBounds = xInputFieldView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             if (xBounds.Intersects(e.Bounds.GetPolygon()))
             {
-                if (qModel.GetUsageInputOperationModel(InputUsage.X).Any())
+                if (qModel.GetUsageAttributeTransformationModel(InputUsage.X).Any())
                 {
-                    qModel.RemoveUsageInputOperationModel(InputUsage.X, qModel.GetUsageInputOperationModel(InputUsage.X).First());
+                    qModel.RemoveUsageAttributeTransformationModel(InputUsage.X, qModel.GetUsageAttributeTransformationModel(InputUsage.X).First());
                 }
-                InputOperationModel value = new InputOperationModel(e.InputOperationModel.InputModel);
-                if (((InputFieldModel) e.InputOperationModel.InputModel).InputDataType == InputDataTypeConstants.FLOAT ||
-                    ((InputFieldModel) e.InputOperationModel.InputModel).InputDataType == InputDataTypeConstants.INT)
+                AttributeTransformationModel value = new AttributeTransformationModel(e.AttributeTransformationModel.AttributeModel);
+                if (((AttributeFieldModel) e.AttributeTransformationModel.AttributeModel).InputDataType == InputDataTypeConstants.FLOAT ||
+                    ((AttributeFieldModel) e.AttributeTransformationModel.AttributeModel).InputDataType == InputDataTypeConstants.INT)
                 {
                     value.AggregateFunction = AggregateFunction.Avg;
                 }
@@ -447,7 +450,7 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     value.AggregateFunction = AggregateFunction.Count;
                 }
-                qModel.AddUsageInputOperationModel(InputUsage.X, value);
+                qModel.AddUsageAttributeTransformationModel(InputUsage.X, value);
             }
         }
     }

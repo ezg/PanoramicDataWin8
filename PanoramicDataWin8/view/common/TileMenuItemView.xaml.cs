@@ -118,7 +118,7 @@ namespace PanoramicDataWin8.view.common
                     mainGrid.Children.Add(new InputFieldView()
                     {
                         DataContext =
-                            ((InputFieldViewTileMenuContentViewModel) model.TileMenuContentViewModel).InputFieldViewModel
+                            ((InputFieldViewTileMenuContentViewModel) model.TileMenuContentViewModel).AttributeTransformationViewModel
                     });
                 }
                 else if (model.TileMenuContentViewModel is VisualizationTypeViewTileMenuContentViewModel)

@@ -18,40 +18,42 @@ namespace PanoramicDataWin8.controller.data.progressive
 {
     public class ProgressiveQueryExecuter : QueryExecuter
     {
-        public delegate void ExecuteQueryHandler(object sender, ExecuteQueryEventArgs e);
+        public delegate void ExecuteQueryHandler(object sender, ExecuteOperationModelEventArgs e);
         public event ExecuteQueryHandler ExecuteQueryEvent;
 
         public ProgressiveQueryExecuter()
         {
-            var stream = Observable.FromEventPattern<ExecuteQueryEventArgs>(this, "ExecuteQueryEvent");
-            stream.GroupByUntil(k => k.EventArgs.QueryModel, g => Observable.Timer(TimeSpan.FromMilliseconds(50)))
+            var stream = Observable.FromEventPattern<ExecuteOperationModelEventArgs>(this, "ExecuteQueryEvent");
+            stream.GroupByUntil(k => k.EventArgs.OperationModel, g => Observable.Timer(TimeSpan.FromMilliseconds(50)))
                 .SelectMany(y => y.FirstAsync())
                 .Subscribe((async (arg) =>
                 {
                     var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
                     await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        var queryModel = arg.EventArgs.QueryModel;
-                        queryModel.Result = null;
+                        var operationModel = arg.EventArgs.OperationModel;
+                        operationModel.Result = null;
 
-                        if (ActiveJobs.ContainsKey(queryModel))
+                        if (ActiveJobs.ContainsKey(operationModel))
                         {
-                            ActiveJobs[queryModel].Stop();
-                            ActiveJobs[queryModel].JobUpdate -= job_JobUpdate;
-                            ActiveJobs[queryModel].JobCompleted -= job_JobCompleted;
-                            ActiveJobs.Remove(queryModel);
+                            ActiveJobs[operationModel].Stop();
+                            ActiveJobs[operationModel].JobUpdate -= job_JobUpdate;
+                            ActiveJobs[operationModel].JobCompleted -= job_JobCompleted;
+                            ActiveJobs.Remove(operationModel);
                         }
                         // determine if new job is even needed (i.e., are all relevant inputfieldmodels set)
-                        if (queryModel.TaskModel == null)
+                        if (operationModel is HistogramOperationModel)
                         {
-                            if ((queryModel.VisualizationType == VisualizationType.table && queryModel.InputOperationModels.Count > 0) ||
-                                (queryModel.VisualizationType != VisualizationType.table && queryModel.GetUsageInputOperationModel(InputUsage.X).Any() && queryModel.GetUsageInputOperationModel(InputUsage.Y).Any()))
+                            var histogramOperationModel = (HistogramOperationModel) operationModel;
+                            if ((histogramOperationModel.VisualizationType == VisualizationType.table && histogramOperationModel.AttributeTransformationModels.Count > 0) ||
+                                (histogramOperationModel.VisualizationType != VisualizationType.table && histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Any() &&
+                                histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).Any()))
                             {
-                                var queryModelClone = queryModel.Clone();
+                                var queryModelClone = operationModel.Clone();
                                 ProgressiveVisualizationJob progressiveVisualizationJob = new ProgressiveVisualizationJob(
-                                    queryModel, queryModelClone, TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
+                                    histogramOperationModel, (HistogramOperationModel)queryModelClone, TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
 
-                                ActiveJobs.Add(queryModel, progressiveVisualizationJob);
+                                ActiveJobs.Add(operationModel, progressiveVisualizationJob);
                                 progressiveVisualizationJob.JobUpdate += job_JobUpdate;
                                 progressiveVisualizationJob.JobCompleted += job_JobCompleted;
                                 progressiveVisualizationJob.Start();
@@ -59,97 +61,97 @@ namespace PanoramicDataWin8.controller.data.progressive
                         }
                         else
                         {
-                            if (queryModel.GetUsageInputOperationModel(InputUsage.Feature).Any() && queryModel.BrushQueryModels.Any())
+                         /*   if (operationModel.GetUsageAttributeTransformationModel(InputUsage.Feature).Any() && operationModel.BrushQueryModels.Any())
                             {
-                                var queryModelClone = queryModel.Clone();
+                                var queryModelClone = operationModel.Clone();
                                 ProgressiveClassifyJob progressiveClassifyJob = new ProgressiveClassifyJob(
-                                    queryModel, queryModelClone, TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
+                                    operationModel, queryModelClone, TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
 
-                                ActiveJobs.Add(queryModel, progressiveClassifyJob);
+                                ActiveJobs.Add(operationModel, progressiveClassifyJob);
                                 progressiveClassifyJob.JobUpdate += job_JobUpdate;
                                 progressiveClassifyJob.JobCompleted += job_JobCompleted;
                                 progressiveClassifyJob.Start();
-                            }
+                            }*/
                         }
                     });
                 }));
         }
 
-        public override void HaltJob(QueryModel queryModel)
+        public override void HaltJob(OperationModel operationModel)
         {
-            ActiveJobs[queryModel].Stop();
-            ActiveJobs[queryModel].JobUpdate -= job_JobUpdate;
-            ActiveJobs[queryModel].JobCompleted -= job_JobCompleted;
-            ActiveJobs.Remove(queryModel);
+            ActiveJobs[operationModel].Stop();
+            ActiveJobs[operationModel].JobUpdate -= job_JobUpdate;
+            ActiveJobs[operationModel].JobCompleted -= job_JobCompleted;
+            ActiveJobs.Remove(operationModel);
         }
 
-        public override void ResumeJob(QueryModel queryModel)
+        public override void ResumeJob(OperationModel operationModel)
         {
-            ExecuteQuery(queryModel);
+            ExecuteOperationModel(operationModel);
         }
 
-        public override void ExecuteQuery(QueryModel queryModel)
+        public override void ExecuteOperationModel(OperationModel operationModel)
         {
             if (ExecuteQueryEvent != null)
             {
-                ExecuteQueryEvent(this, new ExecuteQueryEventArgs(queryModel));
+                ExecuteQueryEvent(this, new ExecuteOperationModelEventArgs(operationModel));
             }
         }
 
-        public override void RemoveJob(QueryModel queryModel)
+        public override void RemoveJob(OperationModel histogramOperationModel)
         {
-            if (ActiveJobs.ContainsKey(queryModel))
+            if (ActiveJobs.ContainsKey(histogramOperationModel))
             {
-                ActiveJobs[queryModel].Stop();
-                ActiveJobs[queryModel].JobUpdate -= job_JobUpdate;
-                ActiveJobs[queryModel].JobCompleted -= job_JobCompleted;
-                ActiveJobs.Remove(queryModel);
+                ActiveJobs[histogramOperationModel].Stop();
+                ActiveJobs[histogramOperationModel].JobUpdate -= job_JobUpdate;
+                ActiveJobs[histogramOperationModel].JobCompleted -= job_JobCompleted;
+                ActiveJobs.Remove(histogramOperationModel);
             }
         }
 
         private void job_JobCompleted(object sender, JobEventArgs jobEventArgs)
         {
-            QueryModel queryModel = null;
+            HistogramOperationModel histogramOperationModel = null;
             if (sender is ProgressiveVisualizationJob)
             {
                 ProgressiveVisualizationJob job = sender as ProgressiveVisualizationJob;
-                queryModel = job.QueryModel;
+                histogramOperationModel = job.HistogramOperationModel;
             }
             else if (sender is ProgressiveClassifyJob)
             {
                 ProgressiveClassifyJob job = sender as ProgressiveClassifyJob;
-                queryModel = job.QueryModel;
+                histogramOperationModel = job.HistogramOperationModel;
             }
-            queryModel.Result = jobEventArgs.Result;
-            //queryModel.Result.Progress = 1.0;
-            //queryModel.Result.FireResultModelUpdated(ResultType.Complete);
+            histogramOperationModel.Result = jobEventArgs.Result;
+            //operationModel.Result.Progress = 1.0;
+            //operationModel.Result.FireResultModelUpdated(ResultType.Complete);
         }
 
         private void job_JobUpdate(object sender, JobEventArgs jobEventArgs)
         {
-            QueryModel queryModel = null;
+            HistogramOperationModel histogramOperationModel = null;
             if (sender is ProgressiveVisualizationJob)
             {
                 ProgressiveVisualizationJob job = sender as ProgressiveVisualizationJob;
-                queryModel = job.QueryModel;
+                histogramOperationModel = job.HistogramOperationModel;
             }
             else if (sender is ProgressiveClassifyJob)
             {
                 ProgressiveClassifyJob job = sender as ProgressiveClassifyJob;
-                queryModel = job.QueryModel;
+                histogramOperationModel = job.HistogramOperationModel;
             }
-            queryModel.Result = jobEventArgs.Result;
+            histogramOperationModel.Result = jobEventArgs.Result;
         }
     }
 
-    public class ExecuteQueryEventArgs : EventArgs
+    public class ExecuteOperationModelEventArgs : EventArgs
     {
-        public QueryModel QueryModel { get; set; }
+        public OperationModel OperationModel { get; set; }
 
-        public ExecuteQueryEventArgs(QueryModel queryModel)
+        public ExecuteOperationModelEventArgs(OperationModel operationModel)
             : base()
         {
-            this.QueryModel = queryModel;
+            this.OperationModel = operationModel;
         }
     }
 }

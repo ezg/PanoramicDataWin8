@@ -15,16 +15,16 @@
     FontFamily="{StaticResource abel}">
 
     <d:DesignProperties.DataContext>
-        <view:InputFieldViewModel>
-            <view:InputFieldViewModel.IsNoChrome>False</view:InputFieldViewModel.IsNoChrome>
-            <view:InputFieldViewModel.MainLabel>Count(blood)</view:InputFieldViewModel.MainLabel>
-            <view:InputFieldViewModel.SubLabel>Test dsafdsa</view:InputFieldViewModel.SubLabel>
-            <view:InputFieldViewModel.IsShadow>False</view:InputFieldViewModel.IsShadow>
-            <view:InputFieldViewModel.TextAngle>270</view:InputFieldViewModel.TextAngle>
-            <view:InputFieldViewModel.Size>
+        <view:AttributeTransformationViewModel>
+            <view:AttributeTransformationViewModel.IsNoChrome>False</view:AttributeTransformationViewModel.IsNoChrome>
+            <view:AttributeTransformationViewModel.MainLabel>Count(blood)</view:AttributeTransformationViewModel.MainLabel>
+            <view:AttributeTransformationViewModel.SubLabel>Test dsafdsa</view:AttributeTransformationViewModel.SubLabel>
+            <view:AttributeTransformationViewModel.IsShadow>False</view:AttributeTransformationViewModel.IsShadow>
+            <view:AttributeTransformationViewModel.TextAngle>270</view:AttributeTransformationViewModel.TextAngle>
+            <view:AttributeTransformationViewModel.Size>
                 <utils:Vec X="54" Y="200"/>
-            </view:InputFieldViewModel.Size>
-        </view:InputFieldViewModel>
+            </view:AttributeTransformationViewModel.Size>
+        </view:AttributeTransformationViewModel>
     </d:DesignProperties.DataContext>
 
     <Grid Name="mainGrid" Background="{StaticResource lightBrush}">
@@ -49,3 +49,130 @@
         </Border>
     </Grid>
 </UserControl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

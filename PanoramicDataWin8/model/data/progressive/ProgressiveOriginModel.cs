@@ -20,9 +20,9 @@ namespace PanoramicDataWin8.model.data.progressive
 
         }
 
-        private void recursiveCreateAttributeModels(AttributeGroup attributeGroup, ProgressiveInputGroupModel parentGroupModel)
+        private void recursiveCreateAttributeModels(AttributeGroup attributeGroup, ProgressiveAttributeGroupModel parentGroupModel)
         {
-            ProgressiveInputGroupModel groupModel = new ProgressiveInputGroupModel(attributeGroup.Name.ToString(), attributeGroup.Name.ToString());
+            ProgressiveAttributeGroupModel groupModel = new ProgressiveAttributeGroupModel(attributeGroup.Name.ToString(), attributeGroup.Name.ToString());
             groupModel.OriginModel = this;
             if (parentGroupModel != null)
             {
@@ -42,20 +42,20 @@ namespace PanoramicDataWin8.model.data.progressive
             }
         }
 
-        private void recursiveCreateAttributeModels(IDEA_common.catalog.Attribute attribute, ProgressiveInputGroupModel parentGroupModel)
+        private void recursiveCreateAttributeModels(IDEA_common.catalog.Attribute attribute, ProgressiveAttributeGroupModel parentGroupModel)
         {
-            ProgressiveFieldInputModel fieldInputModel = new ProgressiveFieldInputModel(attribute.RawName, attribute.DisplayName, attribute.Index,
+            ProgressiveFieldAttributeModel fieldAttributeModel = new ProgressiveFieldAttributeModel(attribute.RawName, attribute.DisplayName, attribute.Index,
                                 InputDataTypeConstants.FromDataType(attribute.DataType),
                                 InputDataTypeConstants.FromDataType(attribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric");
-            fieldInputModel.OriginModel = this;
+            fieldAttributeModel.OriginModel = this;
 
             if (parentGroupModel != null)
             {
-                parentGroupModel.InputModels.Add(fieldInputModel);
+                parentGroupModel.InputModels.Add(fieldAttributeModel);
             }
             else
             {
-                this.InputModels.Add(fieldInputModel);
+                this.InputModels.Add(fieldAttributeModel);
             }
         }
 
@@ -94,8 +94,8 @@ namespace PanoramicDataWin8.model.data.progressive
 
         public long FileId { get; set; }
 
-        private List<InputModel> _inputModels = new List<InputModel>();
-        public override List<InputModel> InputModels
+        private List<AttributeModel> _inputModels = new List<AttributeModel>();
+        public override List<AttributeModel> InputModels
         {
             get
             {

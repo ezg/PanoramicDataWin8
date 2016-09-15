@@ -7,30 +7,31 @@ using System.Text;
 using System.Threading.Tasks;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
 {
     public class AttachmentViewModel : ExtendedBindableBase
     {
-        private VisualizationViewModel _visualizationViewModel;
-        public VisualizationViewModel VisualizationViewModel
+        private OperationViewModel _operationViewModel;
+        public OperationViewModel OperationViewModel
         {
             get
             {
-                return _visualizationViewModel;
+                return _operationViewModel;
             }
             set
             {
-                if (_visualizationViewModel != null)
+                if (_operationViewModel != null)
                 {
-                    _visualizationViewModel.PropertyChanged -= _visualizationViewModel_PropertyChanged;
+                    _operationViewModel.PropertyChanged -= OperationViewModelPropertyChanged;
                 }
-                this.SetProperty(ref _visualizationViewModel, value);
-                if (_visualizationViewModel != null)
+                this.SetProperty(ref _operationViewModel, value);
+                if (_operationViewModel != null)
                 {
-                    _visualizationViewModel.PropertyChanged += _visualizationViewModel_PropertyChanged;
-                    _visualizationViewModel.QueryModel.PropertyChanged += QueryModel_PropertyChanged;    
+                    _operationViewModel.PropertyChanged += OperationViewModelPropertyChanged;
+                    _operationViewModel.OperationModel.PropertyChanged += QueryModel_PropertyChanged;    
                     initialize();
                 }
             }
@@ -97,15 +98,15 @@ namespace PanoramicDataWin8.model.view
                 AttachmentOrientation = this.AttachmentOrientation
             };
 
-            // is value InputOperationModel
+            /*// is value AttributeOperationModel
             if (attachedTo is AttachmentItemViewModel)
             {
                 var attachmentItemViewModel = attachedTo as AttachmentItemViewModel;
-                if (_visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Value).Contains(attachmentItemViewModel.InputOperationModel))
+                if (_operationViewModel.OperationModel.GetUsageInputOperationModel(InputUsage.Value).Contains(attachmentItemViewModel.AttributeTransformationModel))
                 {
-                    var aom = attachmentItemViewModel.InputOperationModel;
-                    if (((InputFieldModel) aom.InputModel).InputDataType == InputDataTypeConstants.INT ||
-                        ((InputFieldModel) aom.InputModel).InputDataType == InputDataTypeConstants.FLOAT)
+                    var aom = attachmentItemViewModel.AttributeTransformationModel;
+                    if (((AttributeFieldModel) aom.AttributeModel).InputDataType == InputDataTypeConstants.INT ||
+                        ((AttributeFieldModel) aom.AttributeModel).InputDataType == InputDataTypeConstants.FLOAT)
                     {
                         menuViewModel.NrRows = 3;
                         menuViewModel.NrColumns = 4;
@@ -129,7 +130,7 @@ namespace PanoramicDataWin8.model.view
                             ToggleMenuItemComponentViewModel toggle = new ToggleMenuItemComponentViewModel()
                             {
                                 Label = aggregationFunction.ToString(),
-                                IsChecked = attachmentItemViewModel.InputOperationModel.AggregateFunction == aggregationFunction
+                                IsChecked = attachmentItemViewModel.AttributeTransformationModel.AggregateFunction == aggregationFunction
                             };
                             toggles.Add(toggle);
                             menuItem.MenuItemComponentViewModel = toggle;
@@ -140,7 +141,7 @@ namespace PanoramicDataWin8.model.view
                                 {
                                     if (model.IsChecked)
                                     {
-                                        attachmentItemViewModel.InputOperationModel.AggregateFunction = aggregationFunction;
+                                        attachmentItemViewModel.AttributeTransformationModel.AggregateFunction = aggregationFunction;
                                         foreach (var tg in model.OtherToggles)
                                         {
                                             tg.IsChecked = false;
@@ -181,7 +182,7 @@ namespace PanoramicDataWin8.model.view
                     SliderMenuItemComponentViewModel slider = new SliderMenuItemComponentViewModel()
                     {
                         Label = "percentage",
-                        Value = _visualizationViewModel.QueryModel.MinimumSupport * 100.0,
+                        Value = _operationViewModel.HistogramOperationModel.MinimumSupport * 100.0,
                         MaxValue = 100,
                         MinValue = 0
                     };
@@ -191,45 +192,45 @@ namespace PanoramicDataWin8.model.view
                         var model = (sender as SliderMenuItemComponentViewModel);
                         if (args.PropertyName == model.GetPropertyName(() => model.FinalValue))
                         {
-                            _visualizationViewModel.QueryModel.MinimumSupport = model.FinalValue / 100.0;
+                            _operationViewModel.HistogramOperationModel.MinimumSupport = model.FinalValue / 100.0;
                         }
                     };
                     menuViewModel.MenuItemViewModels.Add(menuItem);
                 }
             }
-
+            */
             return menuViewModel;
         }
 
-        void _visualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void OperationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
         }
 
 
         void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == _visualizationViewModel.QueryModel.GetPropertyName(() => _visualizationViewModel.QueryModel.TaskModel) |
-                e.PropertyName == _visualizationViewModel.QueryModel.GetPropertyName(() => _visualizationViewModel.QueryModel.VisualizationType))
+            /*if (e.PropertyName == _operationViewModel.HistogramOperationModel.GetPropertyName(() => _operationViewModel.HistogramOperationModel.TaskModel) |
+                e.PropertyName == _operationViewModel.HistogramOperationModel.GetPropertyName(() => _operationViewModel.HistogramOperationModel.VisualizationType))
             {
                 initialize();
-            }
+            }*/
         }
 
         void initialize()
         {
-            if (AttachmentHeaderViewModels.Count == 0)
+            /*if (AttachmentHeaderViewModels.Count == 0)
             {
                 AttachmentHeaderViewModels.Clear();
-                if (_visualizationViewModel.QueryModel.TaskModel == null && _visualizationViewModel.QueryModel.VisualizationType != VisualizationType.table)
+                if (_operationViewModel.HistogramOperationModel.TaskModel == null && _operationViewModel.HistogramOperationModel.VisualizationType != VisualizationType.table)
                 {
                     if (_attachmentOrientation == AttachmentOrientation.Bottom)
                     {
                         createDbBottom();
                     }
                 }
-                else if (_visualizationViewModel.QueryModel.TaskModel != null)
+                else if (_operationViewModel.HistogramOperationModel.TaskModel != null)
                 {
-                    if (_visualizationViewModel.QueryModel.TaskModel.Name != "frequent_itemsets")
+                    if (_operationViewModel.HistogramOperationModel.TaskModel.Name != "frequent_itemsets")
                     {
                         if (_attachmentOrientation == AttachmentOrientation.Bottom)
                         {
@@ -253,7 +254,7 @@ namespace PanoramicDataWin8.model.view
                 {
                     createLogregTop();
                 }
-            }
+            }*/
         }
 
         void createFrequentItemsetBottom()
@@ -295,96 +296,20 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        void createLogregLeft()
-        {
-            return;
-            AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
-            {
-                InputUsage = InputUsage.Label,
-                AcceptsInputGroupModels = true
-            };
-            // initialize items
-            foreach (var item in _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Label))
-            {
-                header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
-                {
-                    InputOperationModel = item,
-                    AttachmentHeaderViewModel = header
-                });
-            }
-
-            // handle added
-            header.AddedTriggered = (inputOperationModel) =>
-            {
-                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (!queryModel.GetUsageInputOperationModel(InputUsage.Label).Contains(inputOperationModel))
-                {
-                    queryModel.AddUsageInputOperationModel(InputUsage.Label, inputOperationModel);
-                }
-            };
-            // handle removed
-            header.RemovedTriggered = (attachmentItemViewModel) =>
-            {
-                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (queryModel.GetUsageInputOperationModel(InputUsage.Label).Contains(attachmentItemViewModel.InputOperationModel))
-                {
-                    queryModel.RemoveUsageInputOperationModel(InputUsage.Label, attachmentItemViewModel.InputOperationModel);
-                }
-            };
-
-            header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
-            {
-                AttachmentHeaderViewModel = header,
-                //Size = new Vec(25,25),
-                //TargetSize = new Vec(25, 25),
-                Label = "label"
-            };
-
-            // handle updates
-            _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Label).CollectionChanged += (sender, args) =>
-            {
-                if (args.OldItems != null)
-                {
-                    foreach (var item in args.OldItems)
-                    {
-                        if (header.AttachmentItemViewModels.Any(aiv => aiv.InputOperationModel == item))
-                        {
-                            header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.InputOperationModel == item));
-                        }
-                    }
-                }
-                if (args.NewItems != null)
-                {
-                    foreach (var item in args.NewItems)
-                    {
-                        var iom = (item as InputOperationModel);
-                        header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
-                        {
-                            InputOperationModel = item as InputOperationModel,
-                            SubLabel = iom != null ? iom.InputModel.RawName.Replace("_", "") : " ",
-                            MainLabel = "label",
-                            AttachmentHeaderViewModel = header
-                        });
-                    }
-                }
-            };
-            AttachmentHeaderViewModels.Add(header);
-        }
-
 
         void createLogregBottom()
         {
-            AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
+            /*AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
             {
                 InputUsage = InputUsage.Feature,
                 AcceptsInputGroupModels = true
             };
             // initialize items
-            foreach (var item in _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Feature))
+            foreach (var item in _operationViewModel.HistogramOperationModel.GetUsageInputOperationModel(InputUsage.Feature))
             {
                 header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                 {
-                    InputOperationModel = item,
+                    AttributeTransformationModel = item,
                     AttachmentHeaderViewModel = header
                 });
             }
@@ -392,19 +317,19 @@ namespace PanoramicDataWin8.model.view
             // handle added
             header.AddedTriggered = (inputOperationModel) =>
             {
-                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (!queryModel.GetUsageInputOperationModel(InputUsage.Feature).Contains(inputOperationModel))
+                HistogramOperationModel histogramOperationModel = this.OperationViewModel.HistogramOperationModel;
+                if (!histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Feature).Contains(inputOperationModel))
                 {
-                    queryModel.AddUsageInputOperationModel(InputUsage.Feature, inputOperationModel);
+                    histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.Feature, inputOperationModel);
                 }
             };
             // handle removed
             header.RemovedTriggered = (attachmentItemViewModel) =>
             {
-                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (queryModel.GetUsageInputOperationModel(InputUsage.Feature).Contains(attachmentItemViewModel.InputOperationModel))
+                HistogramOperationModel histogramOperationModel = this.OperationViewModel.HistogramOperationModel;
+                if (histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Feature).Contains(attachmentItemViewModel.AttributeTransformationModel))
                 {
-                    queryModel.RemoveUsageInputOperationModel(InputUsage.Feature, attachmentItemViewModel.InputOperationModel);
+                    histogramOperationModel.RemoveUsageAttributeTransformationModel(InputUsage.Feature, attachmentItemViewModel.AttributeTransformationModel);
                 }
             };
 
@@ -417,15 +342,15 @@ namespace PanoramicDataWin8.model.view
             };
 
             // handle updates
-            _visualizationViewModel.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).CollectionChanged += (sender, args) =>
+            _operationViewModel.HistogramOperationModel.GetUsageInputOperationModel(InputUsage.Feature).CollectionChanged += (sender, args) =>
             {
                 if (args.OldItems != null)
                 {
                     foreach (var item in args.OldItems)
                     {
-                        if (header.AttachmentItemViewModels.Any(aiv => aiv.InputOperationModel == item))
+                        if (header.AttachmentItemViewModels.Any(aiv => aiv.AttributeTransformationModel == item))
                         {
-                            header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.InputOperationModel == item));
+                            header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.AttributeTransformationModel == item));
                         }
                     }
                 }
@@ -433,18 +358,18 @@ namespace PanoramicDataWin8.model.view
                 {
                     foreach (var item in args.NewItems)
                     {
-                        var iom = (item as InputOperationModel);
+                        var iom = (item as AttributeTransformationModel);
                         header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                         {
-                            InputOperationModel = item as InputOperationModel,
-                            SubLabel = iom != null ? iom.InputModel.RawName.Replace("_", "") : " ",
+                            AttributeTransformationModel = item as AttributeTransformationModel,
+                            SubLabel = iom != null ? iom.AttributeModel.RawName.Replace("_", "") : " ",
                             MainLabel = "feature",
                             AttachmentHeaderViewModel = header
                         });
                     }
                 }
             };
-            AttachmentHeaderViewModels.Add(header);
+            AttachmentHeaderViewModels.Add(header);*/
         }
 
         void createDbBottom()
@@ -461,13 +386,13 @@ namespace PanoramicDataWin8.model.view
         AttachmentHeaderViewModel createValueAttachmentHeader()
         {
             var groupHeader = createInputFieldUsageAttachmentHeader(InputUsage.Value);
-
+            /*
             // handle added
             groupHeader.AddedTriggered = (inputOperationModel) =>
             {
-                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (((InputFieldModel)inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.INT ||
-                    ((InputFieldModel)inputOperationModel.InputModel).InputDataType == InputDataTypeConstants.FLOAT)
+                HistogramOperationModel histogramOperationModel = this.OperationViewModel.HistogramOperationModel;
+                if (((AttributeFieldModel)inputOperationModel.AttributeModel).InputDataType == InputDataTypeConstants.INT ||
+                    ((AttributeFieldModel)inputOperationModel.AttributeModel).InputDataType == InputDataTypeConstants.FLOAT)
                 {
                     inputOperationModel.AggregateFunction = AggregateFunction.Avg;
                 }
@@ -475,20 +400,20 @@ namespace PanoramicDataWin8.model.view
                 {
                     inputOperationModel.AggregateFunction = AggregateFunction.Count;
                 }
-                if (!queryModel.GetUsageInputOperationModel(InputUsage.Value).Contains(inputOperationModel))
+                if (!histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Value).Contains(inputOperationModel))
                 {
-                    queryModel.AddUsageInputOperationModel(InputUsage.Value, inputOperationModel);
+                    histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.Value, inputOperationModel);
                 }
             };
             // handle removed
             groupHeader.RemovedTriggered = (attachmentItemViewModel) =>
             {
-                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (queryModel.GetUsageInputOperationModel(InputUsage.Value).Contains(attachmentItemViewModel.InputOperationModel))
+                HistogramOperationModel histogramOperationModel = this.OperationViewModel.HistogramOperationModel;
+                if (histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Value).Contains(attachmentItemViewModel.AttributeTransformationModel))
                 {
-                    queryModel.RemoveUsageInputOperationModel(InputUsage.Value, attachmentItemViewModel.InputOperationModel);
+                    histogramOperationModel.RemoveUsageAttributeTransformationModel(InputUsage.Value, attachmentItemViewModel.AttributeTransformationModel);
                 }
-            };
+            };*/
             return groupHeader;
         }
 
@@ -496,24 +421,24 @@ namespace PanoramicDataWin8.model.view
         {
              var groupHeader = createInputFieldUsageAttachmentHeader(InputUsage.Group);
 
-            // handle added
+            /*// handle added
             groupHeader.AddedTriggered = (inputOperationModel) =>
             {
-                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (!queryModel.GetUsageInputOperationModel(InputUsage.Group).Contains(inputOperationModel))
+                HistogramOperationModel histogramOperationModel = this.OperationViewModel.HistogramOperationModel;
+                if (!histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Group).Contains(inputOperationModel))
                 {
-                    queryModel.AddUsageInputOperationModel(InputUsage.Group, inputOperationModel);
+                    histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.Group, inputOperationModel);
                 }
             };
             // handle removed
             groupHeader.RemovedTriggered = (attachmentItemViewModel) =>
             {
-                QueryModel queryModel = this.VisualizationViewModel.QueryModel;
-                if (queryModel.GetUsageInputOperationModel(InputUsage.Group).Contains(attachmentItemViewModel.InputOperationModel))
+                HistogramOperationModel histogramOperationModel = this.OperationViewModel.HistogramOperationModel;
+                if (histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Group).Contains(attachmentItemViewModel.AttributeTransformationModel))
                 {
-                    queryModel.RemoveUsageInputOperationModel(InputUsage.Group, attachmentItemViewModel.InputOperationModel);
+                    histogramOperationModel.RemoveUsageAttributeTransformationModel(InputUsage.Group, attachmentItemViewModel.AttributeTransformationModel);
                 }
-            };
+            };*/
             return groupHeader;
         }
 
@@ -523,12 +448,12 @@ namespace PanoramicDataWin8.model.view
             {
                 InputUsage = inputUsage
             };
-            // initialize items
-            foreach (var item in _visualizationViewModel.QueryModel.GetUsageInputOperationModel(inputUsage))
+            /*// initialize items
+            foreach (var item in _operationViewModel.HistogramOperationModel.GetUsageInputOperationModel(inputUsage))
             {
                 header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                 {
-                    InputOperationModel = item,
+                    AttributeTransformationModel = item,
                     AttachmentHeaderViewModel = header
                 });
             }
@@ -540,15 +465,15 @@ namespace PanoramicDataWin8.model.view
             };
 
             // handle updates
-            _visualizationViewModel.QueryModel.GetUsageInputOperationModel(inputUsage).CollectionChanged += (sender, args) =>
+            _operationViewModel.HistogramOperationModel.GetUsageInputOperationModel(inputUsage).CollectionChanged += (sender, args) =>
             {
                 if (args.OldItems != null)
                 {
                     foreach (var item in args.OldItems)
                     {
-                        if (header.AttachmentItemViewModels.Any(aiv => aiv.InputOperationModel == item))
+                        if (header.AttachmentItemViewModels.Any(aiv => aiv.AttributeTransformationModel == item))
                         {
-                            header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.InputOperationModel == item));
+                            header.AttachmentItemViewModels.Remove(header.AttachmentItemViewModels.First(aiv => aiv.AttributeTransformationModel == item));
                         }
                     }
                 }
@@ -558,14 +483,14 @@ namespace PanoramicDataWin8.model.view
                     {
                         header.AttachmentItemViewModels.Add(new AttachmentItemViewModel()
                         {
-                            InputOperationModel = item as InputOperationModel,
-                            SubLabel = (item as InputOperationModel).InputModel.RawName.Replace("_", " "),
+                            AttributeTransformationModel = item as AttributeTransformationModel,
+                            SubLabel = (item as AttributeTransformationModel).AttributeModel.RawName.Replace("_", " "),
                             MainLabel = inputUsage.ToString().ToLower(),
                             AttachmentHeaderViewModel = header
                         });
                     }
                 }
-            };
+            };*/
             return header;
         }
     }

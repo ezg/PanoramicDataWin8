@@ -21,6 +21,7 @@ using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.controller.data.virt;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
@@ -62,9 +63,9 @@ namespace PanoramicDataWin8.view.vis.render
             InputFieldView.InputFieldViewModelTapped -= InputFieldViewInputFieldViewModelTapped;
             if (DataContext != null)
             {
-                ((VisualizationViewModel) DataContext).PropertyChanged -= VisualizationViewModel_PropertyChanged;
-                ((VisualizationViewModel) DataContext).QueryModel.QueryModelUpdated -= QueryModel_QueryModelUpdated;
-                ((VisualizationViewModel)DataContext).QueryModel.PropertyChanged -= QueryModel_PropertyChanged;
+                ((ClassificationOperationViewModel) DataContext).PropertyChanged -= VisualizationViewModel_PropertyChanged;
+                ((ClassificationOperationViewModel) DataContext).ClassificationOperationModel.OperationModelUpdated -= ClassificationOperationModel_OperationModelUpdated;
+                ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.PropertyChanged -= QueryModel_PropertyChanged;
             }
             dxSurface.Dispose();
         }
@@ -73,35 +74,35 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (args.NewValue != null)
             {
-                ((VisualizationViewModel) DataContext).PropertyChanged += VisualizationViewModel_PropertyChanged;
-                ((VisualizationViewModel) DataContext).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
-                ((VisualizationViewModel)DataContext).QueryModel.RequestRender += PlotRenderer_RequestRender;
-                ((VisualizationViewModel)DataContext).QueryModel.PropertyChanged += QueryModel_PropertyChanged;
-                mainLabel.Text = ((VisualizationViewModel) DataContext).QueryModel.VisualizationType.ToString();
-                mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
-                tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
+                ((ClassificationOperationViewModel) DataContext).PropertyChanged += VisualizationViewModel_PropertyChanged;
+                ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.OperationModelUpdated += ClassificationOperationModel_OperationModelUpdated;
+                //((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.RequestRender += PlotRenderer_RequestRender;
+                ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.PropertyChanged += QueryModel_PropertyChanged;
+                //mainLabel.Text = ((ClassificationOperationViewModel) DataContext).ClassificationOperationModel.VisualizationType.ToString();
+                mainLabel.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.TaskModel.Name.Replace("_", " ").ToString();
+                tbType.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.TaskModel.Name.Replace("_", " ").ToString();
             }
         }
 
         private void PlotRenderer_RequestRender(object sender, EventArgs e)
         {
-            if (DataContext != null && (DataContext as VisualizationViewModel).QueryModel.Result != null)
+            if (DataContext != null && (DataContext as ClassificationOperationViewModel).ClassificationOperationModel.Result != null)
             {
                 render();
             }
         }
 
-        void QueryModel_QueryModelUpdated(object sender, QueryModelUpdatedEventArgs e)
+        private void ClassificationOperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
-            QueryModel queryModel = ((VisualizationViewModel) DataContext).QueryModel;
-            mainLabel.Text = queryModel.TaskModel.Name.Replace("_", " ").ToString();
-            tbType.Text = queryModel.TaskModel.Name.Replace("_", " ").ToString();
+            ClassificationOperationModel classificationOperationModel = ((ClassificationOperationViewModel) DataContext).ClassificationOperationModel;
+            mainLabel.Text = classificationOperationModel.TaskModel.Name.Replace("_", " ").ToString();
+            tbType.Text = classificationOperationModel.TaskModel.Name.Replace("_", " ").ToString();
             render();
         }
 
         private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            QueryModel model = (DataContext as VisualizationViewModel).QueryModel;
+            ClassificationOperationModel model = (DataContext as ClassificationOperationViewModel).ClassificationOperationModel;
             if (e.PropertyName == model.GetPropertyName(() => model.Result))
             {
                 populateData();
@@ -111,7 +112,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         void VisualizationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            VisualizationViewModel model = ((VisualizationViewModel) DataContext);
+            ClassificationOperationViewModel model = ((ClassificationOperationViewModel) DataContext);
             if (e.PropertyName == model.GetPropertyName(() => model.Size))
             {
                 render();
@@ -121,20 +122,20 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 setMenuViewModelAnkerPosition();
             }
-            mainLabel.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.ToString();
+            mainLabel.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.TaskModel.Name.ToString();
         }
 
         private void updateProgressAndNullVisualization()
         {
-            IResult resultModel = ((VisualizationViewModel) DataContext).QueryModel.Result;
+            IResult resultModel = ((ClassificationOperationViewModel) DataContext).ClassificationOperationModel.Result;
 
             /*if (descriptionModel != null)
             {
-                tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskType.ToString() + " : " + (descriptionModel.F1s[descriptionModel.Labels[0]] * 100.0).ToString("F1") + "%";
+                tbType.Text = ((OperationViewModel)DataContext).OperationModel.TaskType.ToString() + " : " + (descriptionModel.F1s[descriptionModel.Labels[0]] * 100.0).ToString("F1") + "%";
             }
             else*/
             {
-                tbType.Text = ((VisualizationViewModel)DataContext).QueryModel.TaskModel.Name.Replace("_", " ").ToString();
+                tbType.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.TaskModel.Name.Replace("_", " ").ToString();
             }
 
             // progress
@@ -167,7 +168,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void populateData()
         {
-            IResult resultModel = ((VisualizationViewModel)DataContext).QueryModel.Result;
+            IResult resultModel = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.Result;
             if (resultModel != null)
             {
                 ExponentialEase easingFunction = new ExponentialEase();
@@ -235,10 +236,10 @@ namespace PanoramicDataWin8.view.vis.render
 
         void loadResults(IResult result)
         {
-            VisualizationViewModel model = ((VisualizationViewModel) DataContext);
-            int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
+            ClassificationOperationViewModel model = ((ClassificationOperationViewModel) DataContext);
+            int max = 3 + model.ClassificationOperationModel.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
             _currentViewIndex = (_currentViewIndex) % max;
-            _classifierRendererContentProvider.UpdateData(result, model.QueryModel, model.QueryModel.Clone(), _currentViewIndex);
+            _classifierRendererContentProvider.UpdateData(result, model.ClassificationOperationModel, (ClassificationOperationModel) model.ClassificationOperationModel.Clone(), _currentViewIndex);
 
             render();
         }
@@ -247,7 +248,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (_menuViewModel != null)
             {
-                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.InputFieldViewModel).FirstOrDefault();
+                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.AttributeTransformationViewModel).FirstOrDefault();
                 if (inputFieldView != null)
                 {
                     Rct bounds = inputFieldView.GetBounds(MainViewController.Instance.InkableScene);
@@ -263,16 +264,16 @@ namespace PanoramicDataWin8.view.vis.render
 
         void InputFieldViewInputFieldViewModelTapped(object sender, EventArgs e)
         {
-            var visModel = ((VisualizationViewModel) DataContext);
+            var visModel = ((ClassificationOperationViewModel) DataContext);
             visModel.ActiveStopwatch.Restart();
 
-            InputFieldViewModel model = (sender as InputFieldView).DataContext as InputFieldViewModel;
-            //if (HeaderObjects.Any(ho => ho.InputFieldViewModel == model))
+            AttributeTransformationViewModel model = (sender as InputFieldView).DataContext as AttributeTransformationViewModel;
+            //if (HeaderObjects.Any(ho => ho.AttributeTransformationViewModel == model))
             {
                 bool createNew = true;
                 if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
                 {
-                    createNew = _menuViewModel.InputFieldViewModel != model;
+                    createNew = _menuViewModel.AttributeTransformationViewModel != model;
                     removeMenu();
                 }
 
@@ -299,7 +300,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (_menuViewModel != null)
             {
-                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.InputFieldViewModel).FirstOrDefault();
+                InputFieldView inputFieldView = this.GetDescendantsOfType<InputFieldView>().Where(av => av.DataContext == _menuViewModel.AttributeTransformationViewModel).FirstOrDefault();
 
                 if (inputFieldView != null)
                 {
@@ -340,10 +341,10 @@ namespace PanoramicDataWin8.view.vis.render
 
             List<FilterModel> hits = new List<FilterModel>();
 
-            VisualizationViewModel model = ((VisualizationViewModel) DataContext);
-            if (model.QueryModel.Result != null)
+            ClassificationOperationViewModel model = ((ClassificationOperationViewModel) DataContext);
+            if (model.ClassificationOperationModel.Result != null)
             {
-                int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
+                int max = 3 + model.ClassificationOperationModel.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
                 
                 _currentViewIndex = (_currentViewIndex + 1) % max;
                 _classifierRendererContentProvider.ViewIndex = _currentViewIndex;
@@ -376,7 +377,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             get
             {
-                VisualizationViewModel model = this.DataContext as VisualizationViewModel;
+                ClassificationOperationViewModel model = this.DataContext as ClassificationOperationViewModel;
 
                 Rct bounds = new Rct(model.Position, model.Size);
                 return bounds.GetPolygon();
@@ -390,8 +391,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         public bool Consume(InkStroke inkStroke)
         {
-            VisualizationViewModel model = ((VisualizationViewModel)DataContext);
-            int max = 3 + model.QueryModel.GetUsageInputOperationModel(InputUsage.Feature).Count;
+            ClassificationOperationViewModel model = ((ClassificationOperationViewModel)DataContext);
+            int max = 3 + model.ClassificationOperationModel.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
             if (_currentViewIndex == max - 1)
             {
                 GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
@@ -418,23 +419,23 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 foreach (var valueComparison in hits[0].ValueComparisons)
                 {
-                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.RawName + " " +
+                    Debug.WriteLine((valueComparison.AttributeOperationModel.AttributeModel.RawName + " " +
                                      valueComparison.Value));
                 }
 
-                QueryModel queryModel = (DataContext as VisualizationViewModel).QueryModel;
+                OperationModel histogramOperationModel = (DataContext as OperationViewModel).OperationModel;
                 var vcs = hits.SelectMany(h => h.ValueComparisons).ToList();
 
-                var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
-                var yAom = queryModel.GetUsageInputOperationModel(InputUsage.Y).First();
+                var xAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).First();
+                var yAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).First();
 
-                if (hits.Any(h => queryModel.FilterModels.Contains(h)))
+                if (hits.Any(h => histogramOperationModel.FilterModels.Contains(h)))
                 {
-                    queryModel.RemoveFilterModels(hits);
+                    histogramOperationModel.RemoveFilterModels(hits);
                 }
                 else
                 {
-                    queryModel.AddFilterModels(hits);
+                    histogramOperationModel.AddFilterModels(hits);
                 }
             }*/
             return true;

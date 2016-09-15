@@ -12,16 +12,6 @@ namespace PanoramicDataWin8.model.data
             get;
         }
 
-        public abstract Dictionary<CalculatedInputModel, string> CalculatedInputFieldModels
-        {
-            get;
-        }
-
-        public abstract Dictionary<NamedInputModel, string> NamedInputFieldModels
-        {
-            get;
-        }
-
         public abstract QueryExecuter QueryExecuter
         {
             get;

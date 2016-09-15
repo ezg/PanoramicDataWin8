@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.vis;
 
@@ -14,39 +15,39 @@ namespace PanoramicDataWin8.view.inq
             this._inkableScene = inkableScene;
         }
 
-        private VisualizationViewModel _fromVisualizationViewModel = null;
-        public VisualizationViewModel FromVisualizationViewModel
+        private OperationViewModel _fromOperationViewModel = null;
+        public OperationViewModel FromOperationViewModel
         {
-            get { return _fromVisualizationViewModel; }
+            get { return _fromOperationViewModel; }
         }
 
-        private VisualizationViewModel _toVisualizationViewModel = null;
-        public VisualizationViewModel ToVisualizationViewModel
+        private OperationViewModel _toOperationViewModel = null;
+        public OperationViewModel ToOperationViewModel
         {
-            get { return _toVisualizationViewModel; }
+            get { return _toOperationViewModel; }
         }
 
         public bool Recognize(InkStroke inkStroke)
         {
             if (!inkStroke.IsErase)
             {
-                _fromVisualizationViewModel = null;
-                _toVisualizationViewModel = null;
+                _fromOperationViewModel = null;
+                _toOperationViewModel = null;
 
-                foreach (VisualizationContainerView view in _inkableScene.Elements.Where(e => e is VisualizationContainerView))
+                foreach (OperationContainerView view in _inkableScene.Elements.Where(e => e is OperationContainerView))
                 {
                     if (view.Geometry.Contains(inkStroke.Points[0].GetPoint()))
                     {
-                        _fromVisualizationViewModel = view.DataContext as VisualizationViewModel;
+                        _fromOperationViewModel = view.DataContext as HistogramOperationViewModel;
                     }
                     if (view.Geometry.Contains(inkStroke.Points[inkStroke.Points.Count - 1].GetPoint()) &&
-                        _fromVisualizationViewModel != view.DataContext as VisualizationViewModel)
+                        _fromOperationViewModel != view.DataContext as HistogramOperationViewModel)
                     {
-                        _toVisualizationViewModel = view.DataContext as VisualizationViewModel;
+                        _toOperationViewModel = view.DataContext as HistogramOperationViewModel;
                     }
                 }
 
-                if (_fromVisualizationViewModel != null && _toVisualizationViewModel != null)
+                if (_fromOperationViewModel != null && _toOperationViewModel != null)
                 {
                     return true;
                 }

@@ -38,8 +38,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         private HistogramResult _histogramResult = null;
 
-        private QueryModel _queryModelClone = null;
-        private QueryModel _queryModel = null;
+        private HistogramOperationModel _histogramOperationModelClone = null;
+        private HistogramOperationModel _histogramOperationModel = null;
         private List<FilterModel> _filterModels = new List<FilterModel>();
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
         private CanvasCachedGeometry _strokeRoundedRectGeom = null;
@@ -58,17 +58,17 @@ namespace PanoramicDataWin8.view.vis.render
             _filterModels = filterModels;
         }
 
-        public void UpdateData(IResult result, QueryModel queryModel, QueryModel queryModelClone)
+        public void UpdateData(IResult result, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone)
         {
             
 
             _histogramResult = (HistogramResult)result;
-            _queryModelClone = queryModelClone;
-            _queryModel = queryModel;
+            _histogramOperationModelClone = histogramOperationModelClone;
+            _histogramOperationModel = histogramOperationModel;
             
             if (_histogramResult != null && _histogramResult.Bins != null)
             {
-                _helper = new PlotRendererContentProviderHelper((HistogramResult)result, queryModel, queryModelClone, CompositionScaleX, CompositionScaleY);
+                _helper = new PlotRendererContentProviderHelper((HistogramResult)result, histogramOperationModel, histogramOperationModelClone, CompositionScaleX, CompositionScaleY);
                 _isResultEmpty = false;
                 
             }
@@ -283,11 +283,11 @@ namespace PanoramicDataWin8.view.vis.render
         private float _compositionScaleY = 1;
 
         private HistogramResult _histogramResult = null;
-        private QueryModel _queryModelClone = null;
-        private QueryModel _queryModel = null;
-        private InputOperationModel _xIom = null;
-        private InputOperationModel _yIom = null;
-        private InputOperationModel _valueIom = null;
+        private HistogramOperationModel _histogramOperationModelClone = null;
+        private HistogramOperationModel _histogramOperationModel = null;
+        private AttributeTransformationModel _xIom = null;
+        private AttributeTransformationModel _yIom = null;
+        private AttributeTransformationModel _valueIom = null;
         private ChartType _chartType = ChartType.HeatMap;
         public List<BinRange> VisualBinRanges { get; set; } = new List<BinRange>();
 
@@ -312,23 +312,23 @@ namespace PanoramicDataWin8.view.vis.render
 
         private static float TOLERANCE = 0.0001f;
 
-        public PlotRendererContentProviderHelper(HistogramResult histogramResult, QueryModel queryModel, QueryModel queryModelClone, float compositionScaleX, float compositionScaleY)
+        public PlotRendererContentProviderHelper(HistogramResult histogramResult, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone, float compositionScaleX, float compositionScaleY)
         {
             _compositionScaleX = compositionScaleX;
             _compositionScaleY = compositionScaleY;
             _histogramResult = histogramResult;
-            _queryModelClone = queryModelClone;
-            _queryModel = queryModel;
-            _xIom = _queryModelClone.GetUsageInputOperationModel(InputUsage.X).FirstOrDefault();
-            _yIom = _queryModelClone.GetUsageInputOperationModel(InputUsage.Y).FirstOrDefault();
+            _histogramOperationModelClone = histogramOperationModelClone;
+            _histogramOperationModel = histogramOperationModel;
+            _xIom = _histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.X).FirstOrDefault();
+            _yIom = _histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Y).FirstOrDefault();
 
-            if (_queryModelClone.GetUsageInputOperationModel(InputUsage.Value).Any())
+            if (_histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Value).Any())
             {
-                _valueIom = _queryModelClone.GetUsageInputOperationModel(InputUsage.Value).First();
+                _valueIom = _histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Value).First();
             }
-            else if (_queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).Any())
+            else if (_histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).Any())
             {
-                _valueIom = _queryModelClone.GetUsageInputOperationModel(InputUsage.DefaultValue).First();
+                _valueIom = _histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).First();
             }
 
             var aggregateKey = QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
@@ -483,7 +483,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 else
                 {
-                    baseColor = _queryModelClone.BrushColors[brush.BrushIndex % _queryModelClone.BrushColors.Count];
+                    //baseColor = _histogramOperationModelClone.BrushColors[brush.BrushIndex % _histogramOperationModelClone.BrushColors.Count];
                 }
 
                 var xAggregateKey = QueryModelHelper.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);
@@ -563,7 +563,7 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     IGeometry hitGeom = null;
                     FilterModel filterModel = null;
-                    InputOperationModel[] dimensions = new InputOperationModel[] {_xIom, _yIom};
+                    AttributeTransformationModel[] dimensions = new AttributeTransformationModel[] {_xIom, _yIom};
                     //if (_chartType != ChartType.HeatMap)
                     {
                         hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();

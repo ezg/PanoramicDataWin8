@@ -24,6 +24,7 @@ using GeoAPI.Geometries;
 using IDEA_common.operations;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.view.inq;
 
@@ -60,7 +61,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             base.Dispose();
             xyRenderer.Dispose();
-            (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated -= QueryModel_QueryModelUpdated;
+            (DataContext as HistogramOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
             if (dxSurface != null)
             {
                 dxSurface.Dispose();
@@ -71,16 +72,16 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (args.NewValue != null)
             {
-                (DataContext as VisualizationViewModel).QueryModel.QueryModelUpdated += QueryModel_QueryModelUpdated;
-                (DataContext as VisualizationViewModel).QueryModel.RequestRender += PlotRenderer_RequestRender;
+                (DataContext as HistogramOperationViewModel).OperationModel.OperationModelUpdated += OperationModelUpdated;
+                //(DataContext as OperationViewModel).OperationModel.RequestRender += PlotRenderer_RequestRender;
             }
         }
 
         private void PlotRenderer_RequestRender(object sender, EventArgs e)
         {
-            if (DataContext != null && (DataContext as VisualizationViewModel).QueryModel.Result != null)
+            if (DataContext != null && (DataContext as HistogramOperationViewModel).OperationModel.Result != null)
             {
-                var result = (DataContext as VisualizationViewModel).QueryModel.Result;
+                var result = (DataContext as HistogramOperationViewModel).OperationModel.Result;
                 if (result != null)
                 {
                     render();
@@ -88,21 +89,23 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void QueryModel_QueryModelUpdated(object sender, QueryModelUpdatedEventArgs e)
+        void OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
-            if (e.QueryModelUpdatedEventType == QueryModelUpdatedEventType.FilterModels || e.QueryModelUpdatedEventType == QueryModelUpdatedEventType.ClearFilterModels)
+            if (e is FilterOperationModelUpdatedEventArgs && 
+                (((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.FilterModels ||
+                ((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.ClearFilterModels))
             {
-                _plotRendererContentProvider.UpdateFilterModels((sender as QueryModel).FilterModels.ToList());
+                _plotRendererContentProvider.UpdateFilterModels((sender as HistogramOperationModel).FilterModels.ToList());
                 render();
             }
         }
 
         void LoadResult(IResult result)
         {
-            VisualizationViewModel model = (DataContext as VisualizationViewModel);
+            HistogramOperationViewModel model = (DataContext as HistogramOperationViewModel);
             _plotRendererContentProvider.UpdateData(result,
-                model.QueryModel,
-                model.QueryModel.Clone());
+                (HistogramOperationModel) model.OperationModel,
+                (HistogramOperationModel) model.OperationModel.Clone());
             render();
         }
 
@@ -137,19 +140,19 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 foreach (var valueComparison in hits[0].ValueComparisons)
                 {
-                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.RawName + " " +
+                    Debug.WriteLine((valueComparison.AttributeTransformationModel.AttributeModel.RawName + " " +
                                      valueComparison.Value));
                 }
 
-                QueryModel queryModel = (DataContext as VisualizationViewModel).QueryModel;
+                HistogramOperationModel histogramOperationModel = (HistogramOperationModel) ((HistogramOperationViewModel) DataContext).OperationModel;
 
-                if (hits.Any(h => queryModel.FilterModels.Contains(h)))
+                if (hits.Any(h => histogramOperationModel.FilterModels.Contains(h)))
                 {
-                    queryModel.RemoveFilterModels(hits);
+                    histogramOperationModel.RemoveFilterModels(hits);
                 }
                 else
                 {
-                    queryModel.AddFilterModels(hits);
+                    histogramOperationModel.AddFilterModels(hits);
                 }
             }
         }
@@ -157,10 +160,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         void render(bool sizeChanged = false)
         {
-            if (dxSurface != null)
-            {
-                dxSurface.Redraw();
-            }
+            dxSurface?.Redraw();
         }
 
         public GeoAPI.Geometries.IGeometry BoundsGeometry
@@ -180,7 +180,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             get
             {
-                VisualizationViewModel model = this.DataContext as VisualizationViewModel;
+                HistogramOperationViewModel model = this.DataContext as HistogramOperationViewModel;
 
                 Rct bounds = new Rct(model.Position, model.Size);
                 return bounds.GetPolygon();
@@ -212,23 +212,23 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 foreach (var valueComparison in hits[0].ValueComparisons)
                 {
-                    Debug.WriteLine((valueComparison.InputOperationModel.InputModel.RawName + " " +
+                    Debug.WriteLine((valueComparison.AttributeTransformationModel.AttributeModel.RawName + " " +
                                      valueComparison.Value));
                 }
 
-                QueryModel queryModel = (DataContext as VisualizationViewModel).QueryModel;
+                HistogramOperationModel histogramOperationModel = (HistogramOperationModel) ((HistogramOperationViewModel) DataContext).OperationModel;
                 var vcs = hits.SelectMany(h => h.ValueComparisons).ToList();
 
-                var xAom = queryModel.GetUsageInputOperationModel(InputUsage.X).First();
-                var yAom = queryModel.GetUsageInputOperationModel(InputUsage.Y).First();
+                var xAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).First();
+                var yAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).First();
 
-                if (hits.Any(h => queryModel.FilterModels.Contains(h)))
+                if (hits.Any(h => histogramOperationModel.FilterModels.Contains(h)))
                 {
-                    queryModel.RemoveFilterModels(hits);
+                    histogramOperationModel.RemoveFilterModels(hits);
                 }
                 else
                 {
-                    queryModel.AddFilterModels(hits);
+                    histogramOperationModel.AddFilterModels(hits);
                 }
             }
             return true;

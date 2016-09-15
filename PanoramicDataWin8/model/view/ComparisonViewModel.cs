@@ -46,8 +46,8 @@ namespace PanoramicDataWin8.model.view
             get { return new Rct(Position, Size); }
         }
 
-        private List<VisualizationViewModel> _visualizationViewModels = new List<VisualizationViewModel>();
-        public List<VisualizationViewModel> VisualizationViewModels
+        private List<HistogramOperationViewModel> _visualizationViewModels = new List<HistogramOperationViewModel>();
+        public List<HistogramOperationViewModel> VisualizationViewModels
         {
             get
             {

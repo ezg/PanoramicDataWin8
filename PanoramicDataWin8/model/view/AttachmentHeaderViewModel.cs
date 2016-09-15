@@ -11,7 +11,7 @@ namespace PanoramicDataWin8.model.view
 {
     public class AttachmentHeaderViewModel : ExtendedBindableBase
     {
-        public Action<InputOperationModel> AddedTriggered { get; set; }
+        public Action<AttributeTransformationModel> AddedTriggered { get; set; }
         public Action<AttachmentItemViewModel> RemovedTriggered { get; set; }
 
         private Vec _preferedItemSize = new Vec(50, 50);

@@ -51,21 +51,5 @@ namespace PanoramicDataWin8.model.data.progressive
                 return originModels;
             }
         }
-
-        public override Dictionary<CalculatedInputModel, string> CalculatedInputFieldModels
-        {
-            get
-            {
-                return new Dictionary<CalculatedInputModel, string>();
-            }
-        }
-
-        public override Dictionary<NamedInputModel, string> NamedInputFieldModels
-        {
-            get
-            {
-                return new Dictionary<NamedInputModel, string>();
-            }
-        }
     }
 }

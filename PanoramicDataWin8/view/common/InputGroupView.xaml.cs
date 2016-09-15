@@ -110,7 +110,7 @@ namespace PanoramicDataWin8.view.common
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        (DataContext as InputGroupViewModel).FireMoved(bounds, (DataContext as InputGroupViewModel).InputOperationModel);
+                        (DataContext as InputGroupViewModel).FireMoved(bounds, (DataContext as InputGroupViewModel).AttributeOperationModel);
                     }
                 }
 
@@ -132,7 +132,7 @@ namespace PanoramicDataWin8.view.common
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as InputGroupViewModel).FireDropped(bounds, (DataContext as InputGroupViewModel).InputOperationModel);
+                (DataContext as InputGroupViewModel).FireDropped(bounds, (DataContext as InputGroupViewModel).AttributeOperationModel);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -150,7 +150,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow = new InputGroupView();
                 _shadow.DataContext = new InputGroupViewModel()
                 {
-                    InputOperationModel = (DataContext as InputGroupViewModel).InputOperationModel,
+                    AttributeOperationModel = (DataContext as InputGroupViewModel).AttributeOperationModel,
                     IsShadow = true
                 };
 
@@ -172,7 +172,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow.SendToFront();
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as InputGroupViewModel).FireMoved(bounds, (DataContext as InputGroupViewModel).InputOperationModel);
+                (DataContext as InputGroupViewModel).FireMoved(bounds, (DataContext as InputGroupViewModel).AttributeOperationModel);
             }
         }
     }

@@ -57,9 +57,9 @@ namespace PanoramicDataWin8.view.vis.render
         private bool _isYAxisAggregated = false;
         private int _xIndex = -1;
         private int _yIndex = -1;
-        private InputOperationModel _xAom = null;
-        private InputOperationModel _yAom = null;
-        private InputOperationModel _vAom = null;
+        private AttributeTransformationModel _xAom = null;
+        private AttributeTransformationModel _yAom = null;
+        private AttributeTransformationModel _vAom = null;
         //private Dictionary<BinIndex, List<ProgressiveVisualizationResultItemModel>> _binDictonary = null;
         //private Dictionary<BinIndex, BinPrimitive> _binPrimitives = new Dictionary<BinIndex, BinPrimitive>();
 
@@ -71,7 +71,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
         }
 
-        public void UpdateData(ResultModel resultModel, InputOperationModel xAom, InputOperationModel yAom, InputOperationModel vAom)
+        public void UpdateData(ResultModel resultModel, AttributeTransformationModel xAom, AttributeTransformationModel yAom, AttributeTransformationModel vAom)
         {
             _resultModel = resultModel;
             _xAom = xAom;
@@ -363,7 +363,7 @@ namespace PanoramicDataWin8.view.vis.render
                             double valueMargin = 0;
                             double valueMarginAbsolute = 0;
 
-                            InputOperationModel iom = _vAom;
+                            AttributeOperationModel iom = _vAom;
                             unNormalizedvalue = resultItem.Values[iom][BrushIndex.ALL];
                             double min = resultDescriptionModel.MinValues[iom][BrushIndex.ALL];
                             double max = resultDescriptionModel.MaxValues[iom][BrushIndex.ALL];
