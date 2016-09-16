@@ -29,7 +29,6 @@ namespace PanoramicDataWin8.controller.view
     {
         private Gesturizer _gesturizer = new Gesturizer();
         private static MainViewController _instance;
-        private DispatcherTimer _operationMovingTimer = new DispatcherTimer();
 
         private MainViewController(InkableScene inkableScene, MainPage mainPage)
         {
@@ -59,10 +58,6 @@ namespace PanoramicDataWin8.controller.view
             _gesturizer.AddGesture(new ConnectGesture(_inkableScene));
             _gesturizer.AddGesture(new EraseGesture(_inkableScene));
             //_gesturizer.AddGesture(new ScribbleGesture(_root));
-
-            _operationMovingTimer.Interval = TimeSpan.FromMilliseconds(20);
-            _operationMovingTimer.Tick += OperationMovingTimerTick;
-            _operationMovingTimer.Start();
         }
 
         public async void LoadConfig()
@@ -488,7 +483,6 @@ namespace PanoramicDataWin8.controller.view
             {
                 ((HistogramOperationModel) model).ClearFilterModels();
             }
-            /*FilterOperationModelUpdated?.Invoke(this, new FilterOperationModelUpdatedEventArgs(type));*/
 
             if (!(e is FilterOperationModelUpdatedEventArgs) || (e is FilterOperationModelUpdatedEventArgs && 
                 (e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType != FilterOperationModelUpdatedEventType.FilterModels))
@@ -496,47 +490,6 @@ namespace PanoramicDataWin8.controller.view
                 model.SchemaModel.QueryExecuter.ExecuteOperationModel(model);
             }
         }
-
-        public void OperationViewModelTapped(OperationViewModel operationViewModel)
-        {
-            // TODO
-            /*foreach (var inputVisualizationView in InputVisualizationViews)
-            {
-                if (operationViewModel.OperationModel is IBrushableOperationModel && inputVisualizationView.Key.VisualizationViewModels.Contains(operationViewModel))
-                {
-                    inputVisualizationView.Key.From = (HistogramOperationViewModel) operationViewModel;
-                }
-            }*/
-        }
-        
-        private void InputVisualizationViews_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            //TODO
-            /*
-            if (e.OldItems != null)
-            {
-                foreach (var item in e.OldItems)
-                {
-                    var current = (((KeyValuePair<InputVisualizationViewModel, InputVisualizationView>)item).Key);
-                    foreach (var visualizationViewModel in current.VisualizationViewModels)
-                    {
-                        visualizationViewModel.HistogramOperationModel.InputVisualizationViewModels.Remove(current);
-                    }
-                }
-            }
-            if (e.NewItems != null)
-            {
-                foreach (var item in e.NewItems)
-                {
-                    var current = (((KeyValuePair< InputVisualizationViewModel, InputVisualizationView>)item).Key);
-                    foreach (var visualizationViewModel in current.VisualizationViewModels)
-                    {
-                        visualizationViewModel.HistogramOperationModel.InputVisualizationViewModels.Add(current);
-                    }
-                }
-            }*/
-        }
-        
 
         private void ComparisonViews_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -660,13 +613,7 @@ namespace PanoramicDataWin8.controller.view
                 }
             }*/
         }
-
-        void OperationMovingTimerTick(object sender, object e)
-        {
-            //checkOpenOrCloseInputVisualizationModels();
-            checkOpenOrCloseComparisionModels();
-        }
-
+        
         private void checkOpenOrCloseComparisionModels(bool dropped = false)
         {
             /*// views that need to be opened or closed

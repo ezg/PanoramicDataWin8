@@ -93,6 +93,7 @@ namespace PanoramicDataWin8.controller.view
                     if (opViewModel.OperationModel is IBrushableOperationModel)
                     {
                         opViewModel.PropertyChanged -= OperationViewModel_PropertyChanged;
+                        opViewModel.OperationViewModelTapped -= OpViewModel_OperationViewModelTapped;
                     }
                 }
             }
@@ -103,9 +104,15 @@ namespace PanoramicDataWin8.controller.view
                     if (opViewModel.OperationModel is IBrushableOperationModel)
                     {
                         opViewModel.PropertyChanged += OperationViewModel_PropertyChanged;
+                        opViewModel.OperationViewModelTapped += OpViewModel_OperationViewModelTapped;
                     }
                 }
             }
+        }
+
+        private void OpViewModel_OperationViewModelTapped(object sender, EventArgs e)
+        {
+            operationViewModelUpdated((OperationViewModel) sender);
         }
 
         private double boundHorizontalDistance(Rct b1, Rct b2)
@@ -113,12 +120,10 @@ namespace PanoramicDataWin8.controller.view
             return Math.Min(Math.Abs(b1.Right - b2.Left), Math.Abs(b1.Left - b2.Right));
         }
 
-        
-        private Dictionary<OperationViewModel, DateTime> _lastMoved = new Dictionary<OperationViewModel, DateTime>();
-        private void OperationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+
+        private void operationViewModelUpdated(OperationViewModel current)
         {
-            var current = sender as OperationViewModel;
-            if (current.OperationModel is IBrusherOperationModel &&  e.PropertyName == current.GetPropertyName(() => current.Position))
+            if (current.OperationModel is IBrusherOperationModel)
             {
                 // update last moved time
                 _lastMoved[current] = DateTime.Now;
@@ -183,6 +188,16 @@ namespace PanoramicDataWin8.controller.view
                         }
                     }
                 }
+            }
+        }
+
+        private Dictionary<OperationViewModel, DateTime> _lastMoved = new Dictionary<OperationViewModel, DateTime>();
+        private void OperationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var current = sender as OperationViewModel;
+            if (e.PropertyName == current.GetPropertyName(() => current.Position))
+            {
+                operationViewModelUpdated(current);
             }
         }
 

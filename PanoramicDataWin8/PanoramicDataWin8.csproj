@@ -113,6 +113,7 @@
     <Compile Include="controller\data\QueryExecuter.cs" />
     <Compile Include="controller\input\DatasetConfiguration.cs" />
     <Compile Include="controller\view\BrushableViewController.cs" />
+    <Compile Include="controller\view\ComparisonViewController.cs" />
     <Compile Include="controller\view\FilterLinkViewController.cs" />
     <Compile Include="controller\view\MainViewController.cs" />
     <Compile Include="MainPage.xaml.cs">

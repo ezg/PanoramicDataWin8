@@ -255,7 +255,7 @@ namespace PanoramicDataWin8.view.vis
                 avm.IsDisplayed = true;
             }
 
-            MainViewController.Instance.OperationViewModelTapped((DataContext as OperationViewModel));
+            ((OperationViewModel) DataContext).FireOperationViewModelTapped();
         }
 
         async void VisualizationContainerView_PointerMoved(object sender, PointerRoutedEventArgs e)

@@ -14,6 +14,8 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class OperationViewModel : ExtendedBindableBase
     {
+        public event EventHandler OperationViewModelTapped;
+
         public static double WIDTH = 300;
         public static double HEIGHT = 300;
 
@@ -47,6 +49,11 @@ namespace PanoramicDataWin8.model.view.operation
         {
             _operationModel = operationModel;
             selectColor();
+        }
+
+        public void FireOperationViewModelTapped()
+        {
+            OperationViewModelTapped?.Invoke(this, new EventArgs());
         }
 
         private Stopwatch _activeStopwatch = new Stopwatch();
