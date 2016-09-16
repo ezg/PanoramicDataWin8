@@ -62,8 +62,8 @@ namespace PanoramicDataWin8.model.view.operation
             }
         }
 
-        private OperationModel _operationModel = null;
-        public OperationModel OperationModel
+        private IOperationModel _operationModel = null;
+        public IOperationModel OperationModel
         {
             get
             {

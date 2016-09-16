@@ -77,7 +77,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 }));
         }
 
-        public override void HaltJob(OperationModel operationModel)
+        public override void HaltJob(IOperationModel operationModel)
         {
             ActiveJobs[operationModel].Stop();
             ActiveJobs[operationModel].JobUpdate -= job_JobUpdate;
@@ -85,12 +85,12 @@ namespace PanoramicDataWin8.controller.data.progressive
             ActiveJobs.Remove(operationModel);
         }
 
-        public override void ResumeJob(OperationModel operationModel)
+        public override void ResumeJob(IOperationModel operationModel)
         {
             ExecuteOperationModel(operationModel);
         }
 
-        public override void ExecuteOperationModel(OperationModel operationModel)
+        public override void ExecuteOperationModel(IOperationModel operationModel)
         {
             if (ExecuteQueryEvent != null)
             {
@@ -98,7 +98,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             }
         }
 
-        public override void RemoveJob(OperationModel histogramOperationModel)
+        public override void RemoveJob(IOperationModel histogramOperationModel)
         {
             if (ActiveJobs.ContainsKey(histogramOperationModel))
             {
@@ -146,9 +146,9 @@ namespace PanoramicDataWin8.controller.data.progressive
 
     public class ExecuteOperationModelEventArgs : EventArgs
     {
-        public OperationModel OperationModel { get; set; }
+        public IOperationModel OperationModel { get; set; }
 
-        public ExecuteOperationModelEventArgs(OperationModel operationModel)
+        public ExecuteOperationModelEventArgs(IOperationModel operationModel)
             : base()
         {
             this.OperationModel = operationModel;

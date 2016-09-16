@@ -6,23 +6,23 @@ namespace PanoramicDataWin8.controller.data
 {
     public abstract class QueryExecuter
     {
-        private Dictionary<OperationModel, Job> _activeJobs = new Dictionary<OperationModel, Job>();
+        private Dictionary<IOperationModel, Job> _activeJobs = new Dictionary<IOperationModel, Job>();
 
-        public Dictionary<OperationModel, Job> ActiveJobs
+        public Dictionary<IOperationModel, Job> ActiveJobs
         {
             get { return _activeJobs; }
             set { _activeJobs = value; }
         }
 
-        public virtual void RemoveJob(OperationModel operationModel)
+        public virtual void RemoveJob(IOperationModel operationModel)
         {
         }
 
-        public virtual void HaltJob(OperationModel operationModel)
+        public virtual void HaltJob(IOperationModel operationModel)
         {
         }
 
-        public virtual void ResumeJob(OperationModel operationModel)
+        public virtual void ResumeJob(IOperationModel operationModel)
         {
         }
 
@@ -34,7 +34,7 @@ namespace PanoramicDataWin8.controller.data
             }
         }
 
-        public virtual bool IsJobRunning(OperationModel operationModel)
+        public virtual bool IsJobRunning(IOperationModel operationModel)
         {
             if (ActiveJobs.ContainsKey(operationModel))
             {
@@ -46,6 +46,6 @@ namespace PanoramicDataWin8.controller.data
             }
         }
 
-        public abstract void ExecuteOperationModel(OperationModel operationModel);
+        public abstract void ExecuteOperationModel(IOperationModel operationModel);
     }
 }

@@ -2,13 +2,12 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using IDEA_common.operations;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    
-
-    public interface IFilterProvider
+    public interface IFilterProvider : IOperationModel
     {
         ObservableCollection<FilterModel> FilterModels { get; }
         void AddFilterModels(List<FilterModel> filterModels);
@@ -18,7 +17,7 @@ namespace PanoramicDataWin8.model.data.operation
         void ClearFilterModels();
     }
 
-    public interface IFilterConsumer
+    public interface IFilterConsumer : IOperationModel
     {
         FilteringOperation FilteringOperation { get; set; }
         ObservableCollection<FilterLinkModel> LinkModels { get; }
@@ -27,13 +26,14 @@ namespace PanoramicDataWin8.model.data.operation
     public class FilterConsumerOperationModel : ExtendedBindableBase, IFilterConsumer
     {
         private FilteringOperation _filteringOperation = FilteringOperation.AND;
-        private OperationModel _host;
+        private IOperationModel _host;
 
         private ObservableCollection<FilterLinkModel> _linkModels = new ObservableCollection<FilterLinkModel>();
 
-        public FilterConsumerOperationModel(OperationModel host)
+        public FilterConsumerOperationModel(IOperationModel host)
         {
             _linkModels.CollectionChanged += LinkModels_CollectionChanged;
+            _host = host;
         }
 
         public FilteringOperation FilteringOperation
@@ -48,6 +48,19 @@ namespace PanoramicDataWin8.model.data.operation
             set { SetProperty(ref _linkModels, value); }
         }
 
+        public event OperationModel.OperationModelUpdatedHandler OperationModelUpdated;
+
+        public void FireOperationModelUpdated(OperationModelUpdatedEventArgs args)
+        {
+            _host.FireOperationModelUpdated(args);
+        }
+
+        public IResult Result { get; set; }
+        public SchemaModel SchemaModel { get; set; }
+        public OperationModel Clone()
+        {
+            throw new System.NotImplementedException();
+        }
 
         private void LinkModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -94,9 +107,9 @@ namespace PanoramicDataWin8.model.data.operation
 
     public class FilterProviderOperationModel : ExtendedBindableBase, IFilterProvider
     {
-        private OperationModel _host;
+        private IOperationModel _host;
 
-        public FilterProviderOperationModel(OperationModel host)
+        public FilterProviderOperationModel(IOperationModel host)
         {
             _host = host;
         }
@@ -143,6 +156,20 @@ namespace PanoramicDataWin8.model.data.operation
             {
                 fireFilterOperationModelUpdated(FilterOperationModelUpdatedEventType.FilterModels);
             }
+        }
+
+        public event OperationModel.OperationModelUpdatedHandler OperationModelUpdated;
+
+        public void FireOperationModelUpdated(OperationModelUpdatedEventArgs args)
+        {
+            _host.FireOperationModelUpdated(args);
+        }
+
+        public IResult Result { get; set; }
+        public SchemaModel SchemaModel { get; set; }
+        public OperationModel Clone()
+        {
+            throw new System.NotImplementedException();
         }
 
         private void fireFilterOperationModelUpdated(FilterOperationModelUpdatedEventType type)

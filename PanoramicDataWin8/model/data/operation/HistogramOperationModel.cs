@@ -10,7 +10,7 @@ using PanoramicDataWin8.model.view;
 namespace PanoramicDataWin8.model.data
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class HistogramOperationModel : AttributeUsageOperationModel, IBrushableOperationModel, IFilterConsumer, IFilterProvider
+    public class HistogramOperationModel : AttributeUsageOperationModel, IBrushableOperationModel, IBrusherOperationModel, IFilterConsumer, IFilterProvider
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
         private readonly FilterProviderOperationModel _filterProviderOperationModel;
@@ -40,7 +40,7 @@ namespace PanoramicDataWin8.model.data
             set { SetProperty(ref _comparisonViewModels, value); }
         }
 
-        public ObservableCollection<OperationModel> BrushOperationModels
+        public ObservableCollection<IBrushableOperationModel> BrushOperationModels
         {
             get { return _brushableOperationModelImpl.BrushOperationModels; }
             set { _brushableOperationModelImpl.BrushOperationModels = value; }

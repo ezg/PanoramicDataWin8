@@ -118,9 +118,8 @@ namespace PanoramicDataWin8.controller.view
         private void OperationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var current = sender as OperationViewModel;
-            if (e.PropertyName == current.GetPropertyName(() => current.Position))
+            if (current.OperationModel is IBrusherOperationModel &&  e.PropertyName == current.GetPropertyName(() => current.Position))
             {
-
                 // update last moved time
                 _lastMoved[current] = DateTime.Now;
 
@@ -203,7 +202,7 @@ namespace PanoramicDataWin8.controller.view
                 {
                     var current = ((KeyValuePair<BrushViewModel, BrushView>) item).Key;
                     var toModel = (IBrushableOperationModel) current.To.OperationModel;
-                    var index = toModel.BrushOperationModels.IndexOf(current.From.OperationModel);
+                    var index = toModel.BrushOperationModels.IndexOf(current.From.OperationModel as IBrushableOperationModel);
                     toModel.BrushColors.RemoveAt(index);
                     toModel.BrushOperationModels.RemoveAt(index);
                 }
@@ -215,7 +214,7 @@ namespace PanoramicDataWin8.controller.view
                     var current = ((KeyValuePair<BrushViewModel, BrushView>) item).Key;
                     var toModel = (IBrushableOperationModel)current.To.OperationModel;
                     toModel.BrushColors.Add(current.Color);
-                    toModel.BrushOperationModels.Add(current.From.OperationModel);
+                    toModel.BrushOperationModels.Add(current.From.OperationModel as IBrushableOperationModel);
                 }
             }
         }

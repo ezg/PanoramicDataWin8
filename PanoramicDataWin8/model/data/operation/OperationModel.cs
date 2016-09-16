@@ -1,12 +1,26 @@
 ﻿using System;
+using System.ComponentModel;
 using IDEA_common.operations;
 using Newtonsoft.Json;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.data
 {
+    public interface IOperationModel : INotifyPropertyChanged
+    {
+        event OperationModel.OperationModelUpdatedHandler OperationModelUpdated;
+        void FireOperationModelUpdated(OperationModelUpdatedEventArgs args);
+
+        IResult Result { get; set; }
+
+        SchemaModel SchemaModel { get; set; }
+
+        OperationModel Clone();
+    }
+
+
     [JsonObject(MemberSerialization.OptOut)]
-    public class OperationModel : ExtendedBindableBase
+    public class OperationModel : ExtendedBindableBase, IOperationModel
     {
         public delegate void OperationModelUpdatedHandler(object sender, OperationModelUpdatedEventArgs e);
 
@@ -28,12 +42,7 @@ namespace PanoramicDataWin8.model.data
 
         public bool IsClone { get; set; }
 
-        [JsonIgnore]
-        public IResult Result
-        {
-            get { return _result; }
-            set { SetProperty(ref _result, value); }
-        }
+
 
         public SchemaModel SchemaModel
         {
@@ -47,7 +56,7 @@ namespace PanoramicDataWin8.model.data
             set { SetProperty(ref _id, value); }
         }
 
-        public OperationModel Clone()
+        public  OperationModel Clone()
         {
             string serializedQueryModel = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
             {
@@ -63,8 +72,6 @@ namespace PanoramicDataWin8.model.data
             });
             return deserializeObject;
         }
-
-        public event OperationModelUpdatedHandler OperationModelUpdated;
 
         public override bool Equals(object obj)
         {
@@ -88,6 +95,15 @@ namespace PanoramicDataWin8.model.data
         {
             OperationModelUpdated?.Invoke(this, args);
         }
+
+        [JsonIgnore]
+        public IResult Result
+        {
+            get { return _result; }
+            set { SetProperty(ref _result, value); }
+        }
+
+        public event OperationModelUpdatedHandler OperationModelUpdated;
     }
 
     public class OperationModelUpdatedEventArgs : EventArgs

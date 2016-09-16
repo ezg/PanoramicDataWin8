@@ -2,32 +2,33 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using Windows.UI;
+using IDEA_common.operations;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public interface IBrushableOperationModel
+    public interface IBrushableOperationModel : IOperationModel
     {
-        ObservableCollection<OperationModel> BrushOperationModels { get; set; }
+        ObservableCollection<IBrushableOperationModel> BrushOperationModels { get; set; }
         List<Color> BrushColors { get; set; }
     }
 
-    public interface IBrusherOperationModel
+    public interface IBrusherOperationModel : IFilterProvider
     {
     }
 
     public class BrushableOperationModelImpl : ExtendedBindableBase, IBrushableOperationModel
     {
-        private ObservableCollection<OperationModel> _brushOperationModels = new ObservableCollection<OperationModel>();
-        private OperationModel _host;
+        private ObservableCollection<IBrushableOperationModel> _brushOperationModels = new ObservableCollection<IBrushableOperationModel>();
+        private IOperationModel _host;
 
-        public BrushableOperationModelImpl(OperationModel host)
+        public BrushableOperationModelImpl(IOperationModel host)
         {
             _host = host;
             _brushOperationModels.CollectionChanged += BrushOperationModelsCollectionChanged;
         }
 
-        public ObservableCollection<OperationModel> BrushOperationModels
+        public ObservableCollection<IBrushableOperationModel> BrushOperationModels
         {
             get { return _brushOperationModels; }
             set { SetProperty(ref _brushOperationModels, value); }
@@ -59,6 +60,19 @@ namespace PanoramicDataWin8.model.data.operation
         private void Current_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
             _host.FireOperationModelUpdated(new BrushOperationModelUpdatedEventArgs());
+        }
+
+        public event OperationModel.OperationModelUpdatedHandler OperationModelUpdated;
+        public void FireOperationModelUpdated(OperationModelUpdatedEventArgs args)
+        {
+            _host.FireOperationModelUpdated(args);
+        }
+
+        public IResult Result { get; set; }
+        public SchemaModel SchemaModel { get; set; }
+        public OperationModel Clone()
+        {
+            throw new System.NotImplementedException();
         }
     }
 

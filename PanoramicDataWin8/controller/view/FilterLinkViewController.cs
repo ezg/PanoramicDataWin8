@@ -37,15 +37,15 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        private FilterLinkModel createLinkModel(OperationModel from, OperationModel to)
+        private FilterLinkModel createLinkModel(IOperationModel from, IOperationModel to)
         {
             FilterLinkModel filterLinkModel = null;
-            if (from is IFilterConsumer && to is IFilterConsumer)
+            if (from is IFilterProvider && to is IFilterConsumer)
             {
                 filterLinkModel = new FilterLinkModel()
                 {
-                    FromOperationModel = from,
-                    ToOperationModel = to
+                    FromOperationModel = (IFilterProvider) @from,
+                    ToOperationModel = (IFilterConsumer) to
                 };
                 if (isLinkAllowed(filterLinkModel))
                 {
@@ -83,7 +83,7 @@ namespace PanoramicDataWin8.controller.view
         }
 
 
-        public FilterLinkViewModel CreateFilterLinkViewModel(OperationModel from, OperationModel to)
+        public FilterLinkViewModel CreateFilterLinkViewModel(IOperationModel from, IOperationModel to)
         {
             FilterLinkModel filterLinkModel = createLinkModel(from, to);
             FilterLinkViewModel filterLinkViewModel = null;

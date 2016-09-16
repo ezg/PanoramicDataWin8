@@ -17,6 +17,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.progressive;
 using PanoramicDataWin8.model.data.result;
 
@@ -46,7 +47,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             var psm = (histogramOperationModelClone.SchemaModel as ProgressiveSchemaModel);
             string filter = "";
             List<FilterModel> filterModels = new List<FilterModel>();
-            filter = FilterModel.GetFilterModelsRecursive(HistogramOperationModelClone, new List<OperationModel>(), filterModels, true);
+            filter = FilterModel.GetFilterModelsRecursive(HistogramOperationModelClone, new List<IFilterProvider>(), filterModels, true);
             
             List<string> aggregateFunctions = new List<string>();
             List<string> aggregateDimensions = new List<string>();
@@ -58,7 +59,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             foreach (var brushOperationModel in HistogramOperationModelClone.BrushOperationModels)
             {
                 filterModels = new List<FilterModel>();
-                var brush = FilterModel.GetFilterModelsRecursive(brushOperationModel, new List<OperationModel>(), filterModels, false);
+                var brush = FilterModel.GetFilterModelsRecursive(brushOperationModel, new List<IFilterProvider>(), filterModels, false);
                 brushes.Add(brush);
             }
 
