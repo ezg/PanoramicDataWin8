@@ -5,30 +5,23 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
-using Windows.Devices.AllJoyn;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
-using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.view.vis;
 
 namespace PanoramicDataWin8.controller.view
 {
     public class BrushableViewController
     {
-        private static BrushableViewController _instance;
+        private Dictionary<OperationViewModel, DateTime> _lastMoved = new Dictionary<OperationViewModel, DateTime>();
 
         private DispatcherTimer _operationViewMovingTimer = new DispatcherTimer();
 
         public ObservableDictionary<BrushViewModel, BrushView> BrushViews = new ObservableDictionary<BrushViewModel, BrushView>();
-
-        public static void CreateInstance(ObservableCollection<OperationViewModel> operationViewModel)
-        {
-            _instance = new BrushableViewController(operationViewModel);
-        }
 
         private BrushableViewController(ObservableCollection<OperationViewModel> operationViewModel)
         {
@@ -40,10 +33,18 @@ namespace PanoramicDataWin8.controller.view
             _operationViewMovingTimer.Start();
         }
 
+        public static BrushableViewController Instance { get; private set; }
+
+        public static void CreateInstance(ObservableCollection<OperationViewModel> operationViewModel)
+        {
+            Instance = new BrushableViewController(operationViewModel);
+        }
+
         private void operationViewMovingTimer_Tick(object sender, object e)
         {
             checkOpenOrCloseInputVisualizationModels();
         }
+
         private void checkOpenOrCloseInputVisualizationModels(bool dropped = false)
         {
             // views that need to be opened or closed
@@ -52,9 +53,9 @@ namespace PanoramicDataWin8.controller.view
                 var diff = brushViewModel.OperationViewModels[0].Position - brushViewModel.OperationViewModels[1].Position;
 
                 // views to open
-                if (Math.Abs(diff.Y) < 300 &&
-                    boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) < 50 &&
-                    (dropped || DateTime.Now.Ticks > TimeSpan.TicksPerSecond * 1 + brushViewModel.TicksSinceDwellStart))
+                if ((Math.Abs(diff.Y) < 300) &&
+                    (boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) < 50) &&
+                    (dropped || (DateTime.Now.Ticks > TimeSpan.TicksPerSecond*1 + brushViewModel.TicksSinceDwellStart)))
                 {
                     brushViewModel.BrushableOperationViewModelState = BrushableOperationViewModelState.Opened;
                 }
@@ -64,10 +65,10 @@ namespace PanoramicDataWin8.controller.view
 
                 // Views to close
                 if (areLinked ||
-                    Math.Abs(diff.Y) >= 300 ||
-                    (brushViewModel.BrushableOperationViewModelState == BrushableOperationViewModelState.Opening && boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) >= 50) ||
-                    (brushViewModel.BrushableOperationViewModelState == BrushableOperationViewModelState.Opened && boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) >= 50) //||
-                    )//brushViewModel.OperationViewModels.Any(c => !BrushViews.Contains(c as Brush)))
+                    (Math.Abs(diff.Y) >= 300) ||
+                    ((brushViewModel.BrushableOperationViewModelState == BrushableOperationViewModelState.Opening) && (boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) >= 50)) ||
+                    ((brushViewModel.BrushableOperationViewModelState == BrushableOperationViewModelState.Opened) && (boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) >= 50)) //||
+                ) //brushViewModel.OperationViewModels.Any(c => !BrushViews.Contains(c as Brush)))
                 {
                     brushViewModel.BrushableOperationViewModelState = BrushableOperationViewModelState.Closing;
                     var view = BrushViews[brushViewModel];
@@ -79,7 +80,6 @@ namespace PanoramicDataWin8.controller.view
                         await Task.Delay(TimeSpan.FromMilliseconds(1000));
                         MainViewController.Instance.InkableScene.Children.Remove(view);
                     });
-
                 }
             }
         }
@@ -137,12 +137,12 @@ namespace PanoramicDataWin8.controller.view
                     bool areLinked = FilterLinkViewController.Instance.AreOperationViewModelsLinked(current, other);
                     if (!areLinked)
                     {
-                        if (Math.Abs(diff.Y) < 300 &&
-                            boundHorizontalDistance(current.Bounds, other.Bounds) < 50)
+                        if ((Math.Abs(diff.Y) < 300) &&
+                            (boundHorizontalDistance(current.Bounds, other.Bounds) < 50))
                         {
-                            if (BrushViews.Keys.Any(sov => sov.To == current && sov.From == other))
+                            if (BrushViews.Keys.Any(sov => (sov.To == current) && (sov.From == other)))
                             {
-                                var oldBrushView = BrushViews.Keys.First(sov => sov.To == current && sov.From == other);
+                                var oldBrushView = BrushViews.Keys.First(sov => (sov.To == current) && (sov.From == other));
                                 oldBrushView.BrushableOperationViewModelState = BrushableOperationViewModelState.Closing;
                                 var view = BrushViews[oldBrushView];
                                 BrushViews.Remove(oldBrushView);
@@ -155,9 +155,8 @@ namespace PanoramicDataWin8.controller.view
                                 });
                             }
 
-                            if (!BrushViews.Keys.Any(sov => sov.From == current && sov.To == other))
+                            if (!BrushViews.Keys.Any(sov => (sov.From == current) && (sov.To == other)))
                             {
-
                                 List<BrushViewModel> inputCohorts = BrushViews.Keys.Where(icv => icv.To == other).ToList();
 
                                 var allColorIndex = Enumerable.Range(0, BrushViewModel.ColorScheme1.Count);
@@ -174,7 +173,7 @@ namespace PanoramicDataWin8.controller.view
                                 brushViewModel.From = current;
                                 brushViewModel.To = other;
                                 brushViewModel.Position =
-                                    (((brushViewModel.OperationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec()))/2.0) - brushViewModel.Size/2.0).GetWindowsPoint();
+                                    (brushViewModel.OperationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec())/2.0 - brushViewModel.Size/2.0).GetWindowsPoint();
 
                                 brushViewModel.BrushableOperationViewModelState = BrushableOperationViewModelState.Opening;
                                 brushViewModel.DwellStartPosition = current.Position;
@@ -191,21 +190,12 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        private Dictionary<OperationViewModel, DateTime> _lastMoved = new Dictionary<OperationViewModel, DateTime>();
         private void OperationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var current = sender as OperationViewModel;
             if (e.PropertyName == current.GetPropertyName(() => current.Position))
             {
                 operationViewModelUpdated(current);
-            }
-        }
-
-        public static BrushableViewController Instance
-        {
-            get
-            {
-                return _instance;
             }
         }
 
@@ -227,7 +217,7 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var item in e.NewItems)
                 {
                     var current = ((KeyValuePair<BrushViewModel, BrushView>) item).Key;
-                    var toModel = (IBrushableOperationModel)current.To.OperationModel;
+                    var toModel = (IBrushableOperationModel) current.To.OperationModel;
                     toModel.BrushColors.Add(current.Color);
                     toModel.BrushOperationModels.Add(current.From.OperationModel as IBrushableOperationModel);
                 }

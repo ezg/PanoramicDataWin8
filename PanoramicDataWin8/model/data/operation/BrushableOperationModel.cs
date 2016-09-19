@@ -13,7 +13,7 @@ namespace PanoramicDataWin8.model.data.operation
         List<Color> BrushColors { get; set; }
     }
 
-    public interface IBrusherOperationModel : IFilterProvider
+    public interface IBrusherOperationModel : IFilterProviderOperationModel
     {
     }
 

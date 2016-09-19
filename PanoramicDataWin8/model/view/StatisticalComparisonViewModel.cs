@@ -7,7 +7,7 @@ using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
 {
-    public class ComparisonViewModel : ExtendedBindableBase
+    public class StatisticalComparisonViewModel : ExtendedBindableBase
     {
         public Pt DwellStartPosition { get; set; }
         public long TicksSinceDwellStart { get; set; }

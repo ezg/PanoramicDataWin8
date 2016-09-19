@@ -10,20 +10,21 @@ using PanoramicDataWin8.model.view;
 namespace PanoramicDataWin8.model.data
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class HistogramOperationModel : AttributeUsageOperationModel, IBrushableOperationModel, IBrusherOperationModel, IFilterConsumer, IFilterProvider
+    public class HistogramOperationModel : AttributeUsageOperationModel, IBrushableOperationModel, IBrusherOperationModel, IFilterConsumerOperationModel,
+        IStatisticalComparableOperationModel
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
-        private readonly FilterProviderOperationModel _filterProviderOperationModel;
-        private readonly FilterConsumerOperationModel _filterConsumerOperationModel;
+        private readonly FilterProviderOperationModelOperationModel _filterProviderOperationModelOperationModel;
+        private readonly FilterConsumerOperationModelOperationModel _filterConsumerOperationModelOperationModel;
 
-        private ObservableCollection<ComparisonViewModel> _comparisonViewModels = new ObservableCollection<ComparisonViewModel>();
+        private ObservableCollection<StatisticalComparisonViewModel> _comparisonViewModels = new ObservableCollection<StatisticalComparisonViewModel>();
 
         private VisualizationType _visualizationType;
 
         public HistogramOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
-            _filterProviderOperationModel = new FilterProviderOperationModel(this);
-            _filterConsumerOperationModel = new FilterConsumerOperationModel(this);
+            _filterProviderOperationModelOperationModel = new FilterProviderOperationModelOperationModel(this);
+            _filterConsumerOperationModelOperationModel = new FilterConsumerOperationModelOperationModel(this);
             _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
         }
 
@@ -34,7 +35,7 @@ namespace PanoramicDataWin8.model.data
         }
 
         [JsonIgnore]
-        public ObservableCollection<ComparisonViewModel> ComparisonViewModels
+        public ObservableCollection<StatisticalComparisonViewModel> ComparisonViewModels
         {
             get { return _comparisonViewModels; }
             set { SetProperty(ref _comparisonViewModels, value); }
@@ -50,44 +51,44 @@ namespace PanoramicDataWin8.model.data
 
         public FilteringOperation FilteringOperation
         {
-            get { return _filterConsumerOperationModel.FilteringOperation; }
-            set { _filterConsumerOperationModel.FilteringOperation = value; }
+            get { return _filterConsumerOperationModelOperationModel.FilteringOperation; }
+            set { _filterConsumerOperationModelOperationModel.FilteringOperation = value; }
         }
 
         public ObservableCollection<FilterLinkModel> LinkModels
         {
-            get { return _filterConsumerOperationModel.LinkModels; }
-            set { _filterConsumerOperationModel.LinkModels = value; }
+            get { return _filterConsumerOperationModelOperationModel.LinkModels; }
+            set { _filterConsumerOperationModelOperationModel.LinkModels = value; }
         }
 
         public ObservableCollection<FilterModel> FilterModels
         {
-            get { return _filterProviderOperationModel.FilterModels; }
+            get { return _filterProviderOperationModelOperationModel.FilterModels; }
         }
 
         public void ClearFilterModels()
         {
-            _filterProviderOperationModel.ClearFilterModels();
+            _filterProviderOperationModelOperationModel.ClearFilterModels();
         }
 
         public void AddFilterModels(List<FilterModel> filterModels)
         {
-            _filterProviderOperationModel.AddFilterModels(filterModels);
+            _filterProviderOperationModelOperationModel.AddFilterModels(filterModels);
         }
 
         public void AddFilterModel(FilterModel filterModel)
         {
-            _filterProviderOperationModel.AddFilterModel(filterModel);
+            _filterProviderOperationModelOperationModel.AddFilterModel(filterModel);
         }
 
         public void RemoveFilterModel(FilterModel filterModel)
         {
-            _filterProviderOperationModel.RemoveFilterModel(filterModel);
+            _filterProviderOperationModelOperationModel.RemoveFilterModel(filterModel);
         }
 
         public void RemoveFilterModels(List<FilterModel> filterModels)
         {
-            _filterProviderOperationModel.RemoveFilterModels(filterModels);
+            _filterProviderOperationModelOperationModel.RemoveFilterModels(filterModels);
         }
     }
 

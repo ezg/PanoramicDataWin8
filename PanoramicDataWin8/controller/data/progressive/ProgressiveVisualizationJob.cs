@@ -47,7 +47,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             var psm = (histogramOperationModelClone.SchemaModel as ProgressiveSchemaModel);
             string filter = "";
             List<FilterModel> filterModels = new List<FilterModel>();
-            filter = FilterModel.GetFilterModelsRecursive(HistogramOperationModelClone, new List<IFilterProvider>(), filterModels, true);
+            filter = FilterModel.GetFilterModelsRecursive(HistogramOperationModelClone, new List<IFilterProviderOperationModel>(), filterModels, true);
             
             List<string> aggregateFunctions = new List<string>();
             List<string> aggregateDimensions = new List<string>();
@@ -59,7 +59,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             foreach (var brushOperationModel in HistogramOperationModelClone.BrushOperationModels)
             {
                 filterModels = new List<FilterModel>();
-                var brush = FilterModel.GetFilterModelsRecursive(brushOperationModel, new List<IFilterProvider>(), filterModels, false);
+                var brush = FilterModel.GetFilterModelsRecursive(brushOperationModel, new List<IFilterProviderOperationModel>(), filterModels, false);
                 brushes.Add(brush);
             }
 

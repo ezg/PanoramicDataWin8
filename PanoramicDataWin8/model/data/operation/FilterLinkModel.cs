@@ -5,8 +5,8 @@ namespace PanoramicDataWin8.model.data
 {
     public class FilterLinkModel : ExtendedBindableBase
     {
-        private IFilterProvider _fromOperationModel = null;
-        public IFilterProvider FromOperationModel
+        private IFilterProviderOperationModel _fromOperationModel = null;
+        public IFilterProviderOperationModel FromOperationModel
         {
             get
             {
@@ -18,8 +18,8 @@ namespace PanoramicDataWin8.model.data
             }
         }
 
-        private IFilterConsumer _toOperationModel = null;
-        public IFilterConsumer ToOperationModel
+        private IFilterConsumerOperationModel _toOperationModel = null;
+        public IFilterConsumerOperationModel ToOperationModel
         {
             get
             {

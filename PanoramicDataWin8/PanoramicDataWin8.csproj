@@ -136,6 +136,7 @@
     <Compile Include="model\data\operation\ClassificationOperationModel.cs" />
     <Compile Include="model\data\operation\FilterableOperationModel.cs" />
     <Compile Include="model\data\operation\OperationModel.cs" />
+    <Compile Include="model\data\operation\StatisticalComparableOperationModel.cs" />
     <Compile Include="model\data\OriginModel.cs" />
     <Compile Include="model\data\progressive\ProgressiveFieldAttributeModel.cs" />
     <Compile Include="model\data\progressive\ProgressiveAttributeGroupModel.cs" />
@@ -152,7 +153,7 @@
     <Compile Include="model\data\TaskModel.cs" />
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
-    <Compile Include="model\view\ComparisonViewModel.cs" />
+    <Compile Include="model\view\StatisticalComparisonViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="model\view\operation\ClassificationOperationViewModel.cs" />
     <Compile Include="model\view\operation\OperationViewModel.cs" />

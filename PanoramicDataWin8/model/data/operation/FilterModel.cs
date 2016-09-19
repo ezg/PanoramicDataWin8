@@ -63,12 +63,12 @@ namespace PanoramicDataWin8.model.data
             return ret;
         }
         
-        public static string GetFilterModelsRecursive(object filterGraphNode, List<IFilterProvider> visitedFilterProviders, List<FilterModel> filterModels, bool isFirst)
+        public static string GetFilterModelsRecursive(object filterGraphNode, List<IFilterProviderOperationModel> visitedFilterProviders, List<FilterModel> filterModels, bool isFirst)
         {
             string ret = "";
-            if (filterGraphNode is IFilterProvider)
+            if (filterGraphNode is IFilterProviderOperationModel)
             {
-                var filterProvider = ((IFilterProvider)filterGraphNode);
+                var filterProvider = ((IFilterProviderOperationModel)filterGraphNode);
                 visitedFilterProviders.Add(filterProvider);
                 if (!isFirst && filterProvider.FilterModels.Count(fm => fm.ValueComparisons.Count > 0) > 0)
                 {
@@ -88,9 +88,9 @@ namespace PanoramicDataWin8.model.data
                     }
                 }
             }
-            if (filterGraphNode is IFilterConsumer)
+            if (filterGraphNode is IFilterConsumerOperationModel)
             {
-                var filterConsumer = ((IFilterConsumer)filterGraphNode);
+                var filterConsumer = ((IFilterConsumerOperationModel)filterGraphNode);
                 List<string> children = new List<string>();
                 foreach (var linkModel in filterConsumer.LinkModels)
                 {

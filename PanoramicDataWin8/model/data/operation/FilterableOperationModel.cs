@@ -7,7 +7,7 @@ using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public interface IFilterProvider : IOperationModel
+    public interface IFilterProviderOperationModel : IOperationModel
     {
         ObservableCollection<FilterModel> FilterModels { get; }
         void AddFilterModels(List<FilterModel> filterModels);
@@ -17,20 +17,20 @@ namespace PanoramicDataWin8.model.data.operation
         void ClearFilterModels();
     }
 
-    public interface IFilterConsumer : IOperationModel
+    public interface IFilterConsumerOperationModel : IOperationModel
     {
         FilteringOperation FilteringOperation { get; set; }
         ObservableCollection<FilterLinkModel> LinkModels { get; }
     }
 
-    public class FilterConsumerOperationModel : ExtendedBindableBase, IFilterConsumer
+    public class FilterConsumerOperationModelOperationModel : ExtendedBindableBase, IFilterConsumerOperationModel
     {
         private FilteringOperation _filteringOperation = FilteringOperation.AND;
         private IOperationModel _host;
 
         private ObservableCollection<FilterLinkModel> _linkModels = new ObservableCollection<FilterLinkModel>();
 
-        public FilterConsumerOperationModel(IOperationModel host)
+        public FilterConsumerOperationModelOperationModel(IOperationModel host)
         {
             _linkModels.CollectionChanged += LinkModels_CollectionChanged;
             _host = host;
@@ -105,11 +105,11 @@ namespace PanoramicDataWin8.model.data.operation
         }
     }
 
-    public class FilterProviderOperationModel : ExtendedBindableBase, IFilterProvider
+    public class FilterProviderOperationModelOperationModel : ExtendedBindableBase, IFilterProviderOperationModel
     {
         private IOperationModel _host;
 
-        public FilterProviderOperationModel(IOperationModel host)
+        public FilterProviderOperationModelOperationModel(IOperationModel host)
         {
             _host = host;
         }

@@ -26,7 +26,7 @@ namespace PanoramicDataWin8.view.vis
 {
     public sealed partial class ComparisonView : UserControl
     {
-        private ComparisonViewModel _model = null;
+        private StatisticalComparisonViewModel _model = null;
         private Storyboard _pulsingOpeningStoryboard = null;
         private Storyboard _closingStoryboard = null;
 
@@ -62,7 +62,7 @@ namespace PanoramicDataWin8.view.vis
             if (_model != null)
             {
                 _model.PropertyChanged -= _model_PropertyChanged;
-                foreach (var vis in _model.VisualizationViewModels)
+                foreach (var vis in _model.OperationViewModels)
                 {
                     vis.PropertyChanged -= VisModel_PropertyChanged;
                     vis.HistogramOperationModel.PropertyChanged -= QueryModel_PropertyChanged;
@@ -70,9 +70,9 @@ namespace PanoramicDataWin8.view.vis
             }
             if (args.NewValue != null)
             {
-                _model = (ComparisonViewModel)args.NewValue;
+                _model = (StatisticalComparisonViewModel)args.NewValue;
                 _model.PropertyChanged += _model_PropertyChanged;
-                foreach (var vis in _model.VisualizationViewModels)
+                foreach (var vis in _model.OperationViewModels)
                 {
                     vis.PropertyChanged += VisModel_PropertyChanged;
                     vis.HistogramOperationModel.PropertyChanged += QueryModel_PropertyChanged;
@@ -272,8 +272,8 @@ namespace PanoramicDataWin8.view.vis
         {
             this.SendToFront();
 
-            var left = _model.VisualizationViewModels[0];
-            var right = _model.VisualizationViewModels[1];
+            var left = _model.OperationViewModels[0];
+            var right = _model.OperationViewModels[1];
 
             if (left.Bounds.Left > right.Bounds.Left)
             {

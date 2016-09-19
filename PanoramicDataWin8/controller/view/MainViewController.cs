@@ -189,7 +189,7 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        public ObservableDictionary<ComparisonViewModel, ComparisonView> ComparisonViews = new ObservableDictionary<ComparisonViewModel, ComparisonView>();
+        public ObservableDictionary<StatisticalComparisonViewModel, ComparisonView> ComparisonViews = new ObservableDictionary<StatisticalComparisonViewModel, ComparisonView>();
 
 
         private ObservableCollection<OperationViewModel> _operationViewModels = new ObservableCollection<OperationViewModel>();
@@ -275,8 +275,8 @@ namespace PanoramicDataWin8.controller.view
             var qm = (operationContainerView.DataContext as HistogramOperationViewModel).HistogramOperationModel;
             foreach (var model in qm.LinkModels.ToArray())
             {
-                ((IFilterConsumer) model.FromOperationModel).LinkModels.Remove(model);
-                ((IFilterConsumer)model.ToOperationModel).LinkModels.Remove(model);
+                ((IFilterConsumerOperationModel) model.FromOperationModel).LinkModels.Remove(model);
+                ((IFilterConsumerOperationModel)model.ToOperationModel).LinkModels.Remove(model);
             }
         }
 
@@ -497,8 +497,8 @@ namespace PanoramicDataWin8.controller.view
             {
                 foreach (var item in e.OldItems)
                 {
-                    var current = (((KeyValuePair<ComparisonViewModel, ComparisonView>)item).Key);
-                    foreach (var visualizationViewModel in current.VisualizationViewModels)
+                    var current = (((KeyValuePair<StatisticalComparisonViewModel, ComparisonView>)item).Key);
+                    foreach (var visualizationViewModel in current.OperationViewModels)
                     {
                         visualizationViewModel.HistogramOperationModel.ComparisonViewModels.Remove(current);
                     }
@@ -508,8 +508,8 @@ namespace PanoramicDataWin8.controller.view
             {
                 foreach (var item in e.NewItems)
                 {
-                    var current = (((KeyValuePair<ComparisonViewModel, ComparisonView>)item).Key);
-                    foreach (var visualizationViewModel in current.VisualizationViewModels)
+                    var current = (((KeyValuePair<StatisticalComparisonViewModel, ComparisonView>)item).Key);
+                    foreach (var visualizationViewModel in current.OperationViewModels)
                     {
                         visualizationViewModel.HistogramOperationModel.ComparisonViewModels.Add(current);
                     }

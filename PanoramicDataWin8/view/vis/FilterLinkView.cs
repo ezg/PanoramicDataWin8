@@ -152,8 +152,8 @@ namespace PanoramicDataWin8.view.vis
 
             List<Pt> midPoints = new List<Pt>();
             int sourceCount = 0;
-            foreach (var from in filterLinkViewModel.FromOperationViewModels.Where(vvm => vvm.OperationModel is IFilterProvider).Where(
-                vvm => filterLinkViewModel.FilterLinkModels.Where(lvm => lvm.LinkType == linkType).Select(lvm => lvm.FromOperationModel).Contains(vvm.OperationModel as IFilterProvider)))
+            foreach (var from in filterLinkViewModel.FromOperationViewModels.Where(vvm => vvm.OperationModel is IFilterProviderOperationModel).Where(
+                vvm => filterLinkViewModel.FilterLinkModels.Where(lvm => lvm.LinkType == linkType).Select(lvm => lvm.FromOperationModel).Contains(vvm.OperationModel as IFilterProviderOperationModel)))
             {
                 sourceCount++;
                 var fromCenterToCenter = new Point[] { 
@@ -249,8 +249,8 @@ namespace PanoramicDataWin8.view.vis
         private void drawLinesFromModelsToAttachmentCenter(LinkType linkType, Vec attachmentCenter, Canvas c)
         {
             FilterLinkViewModel filterLinkViewModel = (DataContext as FilterLinkViewModel);
-            foreach (var incomingModel in filterLinkViewModel.FromOperationViewModels.Where(vvm => vvm.OperationModel is IFilterProvider).Where(
-                vvm => filterLinkViewModel.FilterLinkModels.Where(lvm => lvm.LinkType == linkType).Select(lvm => lvm.FromOperationModel).Contains(vvm.OperationModel as IFilterProvider)))
+            foreach (var incomingModel in filterLinkViewModel.FromOperationViewModels.Where(vvm => vvm.OperationModel is IFilterProviderOperationModel).Where(
+                vvm => filterLinkViewModel.FilterLinkModels.Where(lvm => lvm.LinkType == linkType).Select(lvm => lvm.FromOperationModel).Contains(vvm.OperationModel as IFilterProviderOperationModel)))
             {
                 Vec incomingCenter = new Vec(
                     (incomingModel.Position + incomingModel.Size / 2.0).X,
@@ -283,7 +283,7 @@ namespace PanoramicDataWin8.view.vis
                     l1.Y1 = incomingStart.Y;
                     l1.X2 = incomingStart.X + cutOff.X;
                     l1.Y2 = incomingStart.Y + cutOff.Y;
-                    if (filterLinkViewModel.FilterLinkModels.Where(lm => lm.IsInverted).Select(lm => lm.FromOperationModel).Contains(incomingModel.OperationModel as IFilterProvider))
+                    if (filterLinkViewModel.FilterLinkModels.Where(lm => lm.IsInverted).Select(lm => lm.FromOperationModel).Contains(incomingModel.OperationModel as IFilterProviderOperationModel))
                     {
                         l1.StrokeDashArray = new DoubleCollection() { 2 };
                     }
@@ -429,11 +429,11 @@ namespace PanoramicDataWin8.view.vis
             if (sourceCount > 1)
             {
                 TextBlock label = new TextBlock();
-                if (((IFilterConsumer) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.AND)
+                if (((IFilterConsumerOperationModel) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.AND)
                 {
                     label.Text = "AND";
                 }
-                else if (((IFilterConsumer)filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.OR)
+                else if (((IFilterConsumerOperationModel)filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.OR)
                 {
                     label.Text = "OR";
                 }
@@ -539,8 +539,8 @@ namespace PanoramicDataWin8.view.vis
 
             if (_linkViewGeometry.Intersects(p))
             {
-                FilteringOperation op = ((IFilterConsumer) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation;
-                ((IFilterConsumer)filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation = op == FilteringOperation.AND ? FilteringOperation.OR : FilteringOperation.AND;
+                FilteringOperation op = ((IFilterConsumerOperationModel) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation;
+                ((IFilterConsumerOperationModel)filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation = op == FilteringOperation.AND ? FilteringOperation.OR : FilteringOperation.AND;
                 e.Handled = true;
                 foreach (var linkModel in filterLinkViewModel.FilterLinkModels)
                 {
