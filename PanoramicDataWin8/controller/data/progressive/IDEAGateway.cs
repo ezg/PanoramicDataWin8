@@ -18,7 +18,7 @@ using PanoramicDataWin8.view.common;
 
 namespace PanoramicDataWin8.controller.data.progressive
 {
-    public class ProgressiveGateway
+    public class IDEAGateway
     {
         public static JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings()
         {

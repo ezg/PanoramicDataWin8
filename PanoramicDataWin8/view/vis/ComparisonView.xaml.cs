@@ -26,7 +26,7 @@ namespace PanoramicDataWin8.view.vis
 {
     public sealed partial class ComparisonView : UserControl
     {
-        private StatisticalComparisonViewModel _model = null;
+        private StatisticalComparisonOperationViewModel _model = null;
         private Storyboard _pulsingOpeningStoryboard = null;
         private Storyboard _closingStoryboard = null;
 
@@ -65,17 +65,17 @@ namespace PanoramicDataWin8.view.vis
                 foreach (var vis in _model.OperationViewModels)
                 {
                     vis.PropertyChanged -= VisModel_PropertyChanged;
-                    vis.HistogramOperationModel.PropertyChanged -= QueryModel_PropertyChanged;
+                    vis.OperationModel.PropertyChanged -= QueryModel_PropertyChanged;
                 }
             }
             if (args.NewValue != null)
             {
-                _model = (StatisticalComparisonViewModel)args.NewValue;
+                _model = (StatisticalComparisonOperationViewModel)args.NewValue;
                 _model.PropertyChanged += _model_PropertyChanged;
                 foreach (var vis in _model.OperationViewModels)
                 {
                     vis.PropertyChanged += VisModel_PropertyChanged;
-                    vis.HistogramOperationModel.PropertyChanged += QueryModel_PropertyChanged;
+                    vis.OperationModel.PropertyChanged += QueryModel_PropertyChanged;
                 }
                 updateRendering();
                 updateResult();
@@ -84,7 +84,7 @@ namespace PanoramicDataWin8.view.vis
 
         private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            HistogramOperationModel model = (DataContext as HistogramOperationViewModel).HistogramOperationModel;
+            HistogramOperationModel model = (sender as HistogramOperationModel);
             if (e.PropertyName == model.GetPropertyName(() => model.Result))
             {
                 updateResult();

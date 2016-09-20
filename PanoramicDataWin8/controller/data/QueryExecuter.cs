@@ -6,9 +6,9 @@ namespace PanoramicDataWin8.controller.data
 {
     public abstract class QueryExecuter
     {
-        private Dictionary<IOperationModel, Job> _activeJobs = new Dictionary<IOperationModel, Job>();
+        private Dictionary<IOperationModel, OperationJob> _activeJobs = new Dictionary<IOperationModel, OperationJob>();
 
-        public Dictionary<IOperationModel, Job> ActiveJobs
+        public Dictionary<IOperationModel, OperationJob> ActiveJobs
         {
             get { return _activeJobs; }
             set { _activeJobs = value; }

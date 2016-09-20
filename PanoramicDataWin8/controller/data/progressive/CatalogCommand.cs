@@ -14,8 +14,8 @@ namespace PanoramicDataWin8.controller.data.progressive
     {
         public async Task<Catalog> GetCatalog()
         {
-            string response = await ProgressiveGateway.Request(null, "catalog");
-            Catalog catalog = JsonConvert.DeserializeObject<Catalog>(response, ProgressiveGateway.JsonSerializerSettings);
+            string response = await IDEAGateway.Request(null, "catalog");
+            Catalog catalog = JsonConvert.DeserializeObject<Catalog>(response, IDEAGateway.JsonSerializerSettings);
             return catalog;
         }
     }

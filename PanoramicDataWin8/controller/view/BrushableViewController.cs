@@ -135,7 +135,8 @@ namespace PanoramicDataWin8.controller.view
                     var diff = current.Position - other.Position;
 
                     bool areLinked = FilterLinkViewController.Instance.AreOperationViewModelsLinked(current, other);
-                    if (!areLinked)
+                    if (!areLinked &&
+                        (!_lastMoved.ContainsKey(other) || (DateTime.Now - _lastMoved[other] > TimeSpan.FromSeconds(0.5))))
                     {
                         if ((Math.Abs(diff.Y) < 300) &&
                             (boundHorizontalDistance(current.Bounds, other.Bounds) < 50))

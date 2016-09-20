@@ -165,7 +165,7 @@ namespace PanoramicDataWin8.view.vis.render
                         new JProperty("feature_dimensions", _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature).Select(fi => fi.AttributeModel.RawName).ToList()));
                     request["uuid"] = _classfierResultDescriptionModel.Uuid;
 
-                    string message = await ProgressiveGateway.Request(request, "test");
+                    string message = await IDEAGateway.Request(request, "test");
                     JToken jToken = JToken.Parse(message);
                     if (jToken["result"] != null && (double)jToken["result"] == 0)
                     {

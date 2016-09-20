@@ -1,13 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.ObjectModel;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public interface IStatisticalComparableOperationModel : IOperationModel
+    public interface IStatisticallyComparableOperationModel : IOperationModel
     {
-    } 
+    }
+
+    public class StatisticalComparisonOperationModel : OperationModel
+    {
+        private ObservableCollection<IStatisticallyComparableOperationModel> _statisticallyComparableOperationModels =
+            new ObservableCollection<IStatisticallyComparableOperationModel>();
+
+        public StatisticalComparisonOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        {
+        }
+
+        public ObservableCollection<IStatisticallyComparableOperationModel> StatisticallyComparableOperationModels
+        {
+            get { return _statisticallyComparableOperationModels; }
+            set { SetProperty(ref _statisticallyComparableOperationModels, value); }
+        }
+    }
 }

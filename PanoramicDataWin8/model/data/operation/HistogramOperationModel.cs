@@ -11,13 +11,11 @@ namespace PanoramicDataWin8.model.data
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class HistogramOperationModel : AttributeUsageOperationModel, IBrushableOperationModel, IBrusherOperationModel, IFilterConsumerOperationModel,
-        IStatisticalComparableOperationModel
+        IStatisticallyComparableOperationModel
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
         private readonly FilterProviderOperationModelOperationModel _filterProviderOperationModelOperationModel;
         private readonly FilterConsumerOperationModelOperationModel _filterConsumerOperationModelOperationModel;
-
-        private ObservableCollection<StatisticalComparisonViewModel> _comparisonViewModels = new ObservableCollection<StatisticalComparisonViewModel>();
 
         private VisualizationType _visualizationType;
 
@@ -32,13 +30,6 @@ namespace PanoramicDataWin8.model.data
         {
             get { return _visualizationType; }
             set { SetProperty(ref _visualizationType, value); }
-        }
-
-        [JsonIgnore]
-        public ObservableCollection<StatisticalComparisonViewModel> ComparisonViewModels
-        {
-            get { return _comparisonViewModels; }
-            set { SetProperty(ref _comparisonViewModels, value); }
         }
 
         public ObservableCollection<IBrushableOperationModel> BrushOperationModels

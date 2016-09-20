@@ -100,12 +100,11 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="controller\data\DataRow.cs" />
-    <Compile Include="controller\data\Job.cs" />
+    <Compile Include="controller\data\OperationJob.cs" />
     <Compile Include="controller\data\progressive\CatalogCommand.cs" />
-    <Compile Include="controller\data\progressive\ProgressiveClassifyJob.cs" />
-    <Compile Include="controller\data\progressive\ProgressiveGateway.cs" />
-    <Compile Include="controller\data\progressive\ProgressiveQueryExecuter.cs" />
-    <Compile Include="controller\data\progressive\ProgressiveVisualizationJob.cs" />
+    <Compile Include="controller\data\progressive\IDEAGateway.cs" />
+    <Compile Include="controller\data\progressive\IDEAQueryExecuter.cs" />
+    <Compile Include="controller\data\progressive\HistogramOperationJob.cs" />
     <Compile Include="controller\data\virt\AsyncVirtualizedCollection.cs" />
     <Compile Include="controller\data\virt\DataPage.cs" />
     <Compile Include="controller\data\virt\DataWrapper.cs" />
@@ -153,7 +152,7 @@
     <Compile Include="model\data\TaskModel.cs" />
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
-    <Compile Include="model\view\StatisticalComparisonViewModel.cs" />
+    <Compile Include="model\view\operation\StatisticalComparisonOperationViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="model\view\operation\ClassificationOperationViewModel.cs" />
     <Compile Include="model\view\operation\OperationViewModel.cs" />

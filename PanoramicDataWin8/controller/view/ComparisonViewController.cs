@@ -5,11 +5,15 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
 using Windows.UI.Xaml;
+using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
+using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.view.vis;
 
 namespace PanoramicDataWin8.controller.view
@@ -21,7 +25,7 @@ namespace PanoramicDataWin8.controller.view
 
         private DispatcherTimer _operationViewMovingTimer = new DispatcherTimer();
 
-        public ObservableDictionary<StatisticalComparisonViewModel, ComparisonView> StatisticalComparisonViews = new ObservableDictionary<StatisticalComparisonViewModel, ComparisonView>();
+        public ObservableDictionary<StatisticalComparisonOperationViewModel, ComparisonView> StatisticalComparisonViews = new ObservableDictionary<StatisticalComparisonOperationViewModel, ComparisonView>();
 
         public static void CreateInstance(ObservableCollection<OperationViewModel> operationViewModel)
         {
@@ -58,25 +62,18 @@ namespace PanoramicDataWin8.controller.view
 
         private void operationViewModelUpdated(OperationViewModel current)
         {
-            if (current.OperationModel is IBrusherOperationModel)
+            if (current.OperationModel is IStatisticallyComparableOperationModel)
             {
                 // update last moved time
                 _lastMoved[current] = DateTime.Now;
 
+                var allComparableOperationViewModels = MainViewController.Instance.OperationViewModels.Where(c => c.OperationModel is IStatisticallyComparableOperationModel);
                 // check if we need to create new inputvisualization views
-                foreach (var other in OperationViewModels.Select(c => c as HistogramOperationViewModel).Where(c => c != null))
+                foreach (var other in allComparableOperationViewModels)
                 {
                     var diff = current.Position - other.Position;
 
-                    bool areLinked = false;
-                    foreach (var linkModel in current.HistogramOperationModel.LinkModels)
-                    {
-                        if ((linkModel.FromOperationModel == current.HistogramOperationModel && linkModel.ToOperationModel == other.HistogramOperationModel) ||
-                            (linkModel.FromOperationModel == other.HistogramOperationModel && linkModel.ToOperationModel == current.HistogramOperationModel))
-                        {
-                            areLinked = true;
-                        }
-                    }
+                    bool areLinked = FilterLinkViewController.Instance.AreOperationViewModelsLinked(current, other);
                     if (!areLinked)
                     {
                         // check for comparision views
@@ -86,63 +83,23 @@ namespace PanoramicDataWin8.controller.view
                             other != current &&
                             Math.Abs((_lastMoved[other] - _lastMoved[current]).TotalMilliseconds) < 400)
                         {
-                            if (!ComparisonViews.Keys.Any(sov => sov.VisualizationViewModels.Contains(current) && sov.VisualizationViewModels.Contains(other)))
+                            if (!StatisticalComparisonViews.Keys.Any(sov => sov.OperationViewModels.Contains(current) && sov.OperationViewModels.Contains(other)))
                             {
-                                ComparisonViewModel comparisonViewModel = new ComparisonViewModel();
-                                comparisonViewModel.VisualizationViewModels.Add(other);
-                                comparisonViewModel.VisualizationViewModels.Add(current);
-                                comparisonViewModel.Position =
-                                    (((comparisonViewModel.VisualizationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec()))/2.0) - comparisonViewModel.Size/2.0).GetWindowsPoint();
+                                StatisticalComparisonOperationViewModel comparisonOperationViewModel = new StatisticalComparisonOperationViewModel(
+                                    new StatisticalComparisonOperationModel(current.OperationModel.SchemaModel));
+                                comparisonOperationViewModel.OperationViewModels.Add(other);
+                                comparisonOperationViewModel.OperationViewModels.Add(current);
+                                comparisonOperationViewModel.Position =
+                                    (((comparisonOperationViewModel.OperationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec()))/2.0) - comparisonOperationViewModel.Size/2.0).GetWindowsPoint();
 
-                                comparisonViewModel.ComparisonViewModelState = ComparisonViewModelState.Opening;
-                                comparisonViewModel.DwellStartPosition = current.Position;
-                                comparisonViewModel.TicksSinceDwellStart = DateTime.Now.Ticks;
+                                comparisonOperationViewModel.ComparisonViewModelState = ComparisonViewModelState.Opening;
+                                comparisonOperationViewModel.DwellStartPosition = current.Position;
+                                comparisonOperationViewModel.TicksSinceDwellStart = DateTime.Now.Ticks;
 
                                 ComparisonView view = new ComparisonView();
-                                view.DataContext = comparisonViewModel;
-                                InkableScene.Children.Add(view);
-                                ComparisonViews.Add(comparisonViewModel, view);
-                            }
-                        }
-
-                        // check for inputvisualization views
-                        else if (Math.Abs(diff.Y) < 300 &&
-                                 boundHorizontalDistance(current.Bounds, other.Bounds) < 50)
-                        {
-                            if (!InputVisualizationViews.Keys.Any(sov => sov.VisualizationViewModels.Contains(current) && sov.VisualizationViewModels.Contains(other)))
-                            {
-                                List<BrushViewModel> inputCohorts = InputVisualizationViews.Keys.Where(icv => icv.To == other).ToList();
-
-                                var allColorIndex = Enumerable.Range(0, BrushViewModel.ColorScheme1.Count);
-                                allColorIndex = allColorIndex.Except(inputCohorts.Select(c => c.ColorIndex));
-                                var colorIndex = inputCohorts.Count%BrushViewModel.ColorScheme1.Count;
-                                if (allColorIndex.Any())
-                                {
-                                    colorIndex = allColorIndex.First();
-                                }
-
-                                BrushViewModel brushViewModel = new BrushViewModel();
-                                brushViewModel.ColorIndex = colorIndex;
-                                brushViewModel.Color = BrushViewModel.ColorScheme1[colorIndex];
-                                brushViewModel.OperationViewModels.Add(other);
-                                brushViewModel.OperationViewModels.Add(current);
-                                brushViewModel.Position =
-                                    (((brushViewModel.OperationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec()))/2.0) - brushViewModel.Size/2.0).GetWindowsPoint();
-
-                                brushViewModel.BrushableOperationViewModelState = BrushableOperationViewModelState.Opening;
-                                brushViewModel.DwellStartPosition = current.Position;
-                                brushViewModel.From = current;
-                                brushViewModel.TicksSinceDwellStart = DateTime.Now.Ticks;
-
-                                BrushView view = new BrushView();
-                                view.DataContext = brushViewModel;
-                                InkableScene.Children.Add(view);
-                                InputVisualizationViews.Add(brushViewModel, view);
-                            }
-                            else
-                            {
-                                var inputModel = InputVisualizationViews.Keys.First(sov => sov.VisualizationViewModels.Contains(current) && sov.VisualizationViewModels.Contains(other));
-                                inputModel.From = current;
+                                view.DataContext = comparisonOperationViewModel;
+                                MainViewController.Instance.InkableScene.Children.Add(view);
+                                StatisticalComparisonViews.Add(comparisonOperationViewModel, view);
                             }
                         }
                     }
@@ -152,52 +109,43 @@ namespace PanoramicDataWin8.controller.view
 
         private void checkOpenOrCloseComparisionModels(bool dropped = false)
         {
-            /*// views that need to be opened or closed
-            foreach (var comparisonViewModel in ComparisonViews.Keys.ToList())
+            // views that need to be opened or closed
+            foreach (var comparisonViewModel in StatisticalComparisonViews.Keys.ToList())
             {
                 var model = comparisonViewModel;
 
-                var diff = comparisonViewModel.VisualizationViewModels[0].Position - comparisonViewModel.VisualizationViewModels[1].Position;
+                var diff = comparisonViewModel.OperationViewModels[0].Position - comparisonViewModel.OperationViewModels[1].Position;
 
                 // views to open
                 if (Math.Abs(diff.Y) < 300 &&
-                    boundHorizontalDistance(comparisonViewModel.VisualizationViewModels[0].Bounds, comparisonViewModel.VisualizationViewModels[1].Bounds) < 300 &&
+                    boundHorizontalDistance(comparisonViewModel.OperationViewModels[0].Bounds, comparisonViewModel.OperationViewModels[1].Bounds) < 300 &&
                     (dropped || DateTime.Now.Ticks > TimeSpan.TicksPerSecond*1 + model.TicksSinceDwellStart))
                 {
                     comparisonViewModel.ComparisonViewModelState = ComparisonViewModelState.Opened;
                 }
 
-                bool areLinked = false;
-                foreach (var linkModel in comparisonViewModel.VisualizationViewModels.First().HistogramOperationModel.LinkModels)
-                {
-                    if ((linkModel.FromOperationModel == comparisonViewModel.VisualizationViewModels[0].HistogramOperationModel && linkModel.ToOperationModel == comparisonViewModel.VisualizationViewModels[1].HistogramOperationModel) ||
-                        (linkModel.FromOperationModel == comparisonViewModel.VisualizationViewModels[1].HistogramOperationModel && linkModel.ToOperationModel == comparisonViewModel.VisualizationViewModels[0].HistogramOperationModel))
-                    {
-                        areLinked = true;
-                    }
-                }
+                bool areLinked = FilterLinkViewController.Instance.AreOperationViewModelsLinked(comparisonViewModel.OperationViewModels[0], comparisonViewModel.OperationViewModels[1]);
 
 
                 // Views to close
                 if (areLinked ||
                     Math.Abs(diff.Y) >= 300 ||
-                    (comparisonViewModel.ComparisonViewModelState == ComparisonViewModelState.Opening && boundHorizontalDistance(comparisonViewModel.VisualizationViewModels[0].Bounds, comparisonViewModel.VisualizationViewModels[1].Bounds) >= 300) ||
-                    (comparisonViewModel.ComparisonViewModelState == ComparisonViewModelState.Opened && boundHorizontalDistance(comparisonViewModel.VisualizationViewModels[0].Bounds, comparisonViewModel.VisualizationViewModels[1].Bounds) >= 300) ||
-                    comparisonViewModel.VisualizationViewModels.Any(c => !OperationViewModels.Contains(c)))
+                    (comparisonViewModel.ComparisonViewModelState == ComparisonViewModelState.Opening && boundHorizontalDistance(comparisonViewModel.OperationViewModels[0].Bounds, comparisonViewModel.OperationViewModels[1].Bounds) >= 300) ||
+                    (comparisonViewModel.ComparisonViewModelState == ComparisonViewModelState.Opened && boundHorizontalDistance(comparisonViewModel.OperationViewModels[0].Bounds, comparisonViewModel.OperationViewModels[1].Bounds) >= 300))
                 {
                     comparisonViewModel.ComparisonViewModelState = ComparisonViewModelState.Closing;
-                    var view = ComparisonViews[comparisonViewModel];
-                    ComparisonViews.Remove(comparisonViewModel);
+                    var view = StatisticalComparisonViews[comparisonViewModel];
+                    StatisticalComparisonViews.Remove(comparisonViewModel);
 
                     var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
                     dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                     {
                         await Task.Delay(TimeSpan.FromMilliseconds(1000));
-                        InkableScene.Children.Remove(view);
+                        MainViewController.Instance.InkableScene.Children.Remove(view);
                     });
 
                 }
-            }*/
+            }
         }
 
 
@@ -232,6 +180,10 @@ namespace PanoramicDataWin8.controller.view
         {
             checkOpenOrCloseComparisionModels();
         }
+        private double boundHorizontalDistance(Rct b1, Rct b2)
+        {
+            return Math.Min(Math.Abs(b1.Right - b2.Left), Math.Abs(b1.Left - b2.Right));
+        }
 
         private void StatisticalComparisonViewsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
@@ -239,23 +191,28 @@ namespace PanoramicDataWin8.controller.view
             {
                 foreach (var item in e.OldItems)
                 {
-                    var current = ((KeyValuePair<StatisticalComparisonViewModel, ComparisonView>)item).Key;
-                    var toModel = (IBrushableOperationModel)current.To.OperationModel;
-                    var index = toModel.BrushOperationModels.IndexOf(current.From.OperationModel as IBrushableOperationModel);
-                    toModel.BrushColors.RemoveAt(index);
-                    toModel.BrushOperationModels.RemoveAt(index);
+                    var current = ((KeyValuePair<StatisticalComparisonOperationViewModel, ComparisonView>)item).Key;
+                    current.StatisticalComparisonOperationModel.OperationModelUpdated -= OperationModel_OperationModelUpdated;
+                    current.StatisticalComparisonOperationModel.StatisticallyComparableOperationModels.Clear();
                 }
             }
             if (e.NewItems != null)
             {
                 foreach (var item in e.NewItems)
                 {
-                    var current = ((KeyValuePair<BrushViewModel, BrushView>)item).Key;
-                    var toModel = (IBrushableOperationModel)current.To.OperationModel;
-                    toModel.BrushColors.Add(current.Color);
-                    toModel.BrushOperationModels.Add(current.From.OperationModel as IBrushableOperationModel);
+                    var current = ((KeyValuePair<StatisticalComparisonOperationViewModel, ComparisonView>)item).Key;
+                    current.StatisticalComparisonOperationModel.StatisticallyComparableOperationModels.Add((IStatisticallyComparableOperationModel)current.OperationViewModels[0].OperationModel);
+                    current.StatisticalComparisonOperationModel.StatisticallyComparableOperationModels.Add((IStatisticallyComparableOperationModel)current.OperationViewModels[1].OperationModel);
+                    current.StatisticalComparisonOperationModel.OperationModelUpdated += OperationModel_OperationModelUpdated;
+                    current.StatisticalComparisonOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                 }
             }
+        }
+
+        private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
+        {
+            OperationModel model = (OperationModel) sender;
+            model.SchemaModel.QueryExecuter.ExecuteOperationModel(model);
         }
     }
 }

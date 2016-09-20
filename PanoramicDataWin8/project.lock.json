@@ -17023,15 +17023,14 @@
   "libraries": {
     "Esri.ArcGISRuntime/10.2.7.1234": {
       "sha512": "AfTY8sRMgtFebWyfmOkGfObQcfPNbdX2i5ai8HoQgr0yo4rXbv8vf491Je4YObkymdj8BgNOLs+JE+nQ9VSWCA==",
-      "type": "Package",
+      "type": "package",
+      "path": "Esri.ArcGISRuntime/10.2.7.1234",
       "files": [
+        "Esri.ArcGISRuntime.10.2.7.1234.nupkg.sha512",
         "Esri.ArcGISRuntime.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "build/net45/Esri.ArcGISRuntime.targets",
         "build/win81/Esri.ArcGISRuntime.targets",
         "build/wpa81/Esri.ArcGISRuntime.targets",
-        "package/services/metadata/core-properties/a54c02c6befe467e9c25d4523d2acd41.psmdcp",
         "sdk/net45/Design/Esri.ArcGISRuntime.Design.dll",
         "sdk/net45/Esri.ArcGISRuntime.dll",
         "sdk/net45/Esri.ArcGISRuntime.xml",
@@ -18051,15 +18050,14 @@
     },
     "Esri.ArcGISRuntime.Toolkit/10.2.7.1234": {
       "sha512": "aVccsotjnyLq+31NU0zJv+4rfbQueSzcQ5ab89CrSXzmNQcEDp0ocQG2nTfJsbQiTObj9fKg635jc+irMGcsrQ==",
-      "type": "Package",
+      "type": "package",
+      "path": "Esri.ArcGISRuntime.Toolkit/10.2.7.1234",
       "files": [
+        "Esri.ArcGISRuntime.Toolkit.10.2.7.1234.nupkg.sha512",
         "Esri.ArcGISRuntime.Toolkit.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "build/net45/Esri.ArcGISRuntime.Toolkit.targets",
         "build/win81/Esri.ArcGISRuntime.Toolkit.targets",
         "build/wpa81/Esri.ArcGISRuntime.Toolkit.targets",
-        "package/services/metadata/core-properties/dd832668aac547dda8ee4cdb692534a5.psmdcp",
         "sdk/net45/Esri.ArcGISRuntime.Toolkit.dll",
         "sdk/net45/Esri.ArcGISRuntime.Toolkit.xml",
         "sdk/win81/ARM/Esri.ArcGISRuntime.Toolkit.WindowsStore.dll",
@@ -18098,11 +18096,11 @@
     },
     "GeoAPI/1.7.4": {
       "sha512": "joDULkwmUsXSZPsqQ6H62QmQOi54t3TWyhiKDb48PVUfIox1nSy1RRuEIDQ51h/jBmgb+ZeCsUmMoETVddKJ1A==",
-      "type": "Package",
+      "type": "package",
+      "path": "GeoAPI/1.7.4",
       "files": [
+        "GeoAPI.1.7.4.nupkg.sha512",
         "GeoAPI.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/net20/GeoAPI.dll",
         "lib/net20/GeoAPI.xml",
         "lib/net35-client/GeoAPI.dll",
@@ -18114,17 +18112,16 @@
         "lib/net45/GeoAPI.dll",
         "lib/net45/GeoAPI.xml",
         "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.dll",
-        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.xml",
-        "package/services/metadata/core-properties/73d27ef44fba499e9a54255075e791ef.psmdcp"
+        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/GeoAPI.xml"
       ]
     },
     "MathNet.Numerics/3.11.0": {
       "sha512": "/6p3quR3E9gg8UL5/uiYJgpn+D5Bc2j3LEfRs3yz9jCLjN297ir9Dn+NiHivQmMzHHkD844PjmP2Bo9Xd3N4kw==",
-      "type": "Package",
+      "type": "package",
+      "path": "MathNet.Numerics/3.11.0",
       "files": [
+        "MathNet.Numerics.3.11.0.nupkg.sha512",
         "MathNet.Numerics.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/net35/MathNet.Numerics.dll",
         "lib/net35/MathNet.Numerics.xml",
         "lib/net40/MathNet.Numerics.dll",
@@ -18140,17 +18137,16 @@
         "lib/portable-net45+sl5+netcore45+MonoAndroid1+MonoTouch1/MathNet.Numerics.XML",
         "lib/portable-net45+sl5+netcore45+MonoAndroid1+MonoTouch1/MathNet.Numerics.dll",
         "license.txt",
-        "package/services/metadata/core-properties/c973e5f9e3664419b7ac087ea65740bb.psmdcp",
         "readme.txt"
       ]
     },
     "Microsoft.ApplicationInsights/1.2.3": {
       "sha512": "a34atobxpucCTTX9VCD7aIu6Ydzry+Va7TxK2tTQcfaMvefGW4kUKtg9GHKIn19IaXe+A4oZt/GBqsOt5vQrBA==",
-      "type": "Package",
+      "type": "package",
+      "path": "Microsoft.ApplicationInsights/1.2.3",
       "files": [
+        "Microsoft.ApplicationInsights.1.2.3.nupkg.sha512",
         "Microsoft.ApplicationInsights.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/net40/Microsoft.ApplicationInsights.XML",
         "lib/net40/Microsoft.ApplicationInsights.dll",
         "lib/net45/Microsoft.ApplicationInsights.XML",
@@ -18158,17 +18154,16 @@
         "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.XML",
         "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.dll",
         "lib/wp8/Microsoft.ApplicationInsights.XML",
-        "lib/wp8/Microsoft.ApplicationInsights.dll",
-        "package/services/metadata/core-properties/3b36eef276524f5d883c618d5fd8c500.psmdcp"
+        "lib/wp8/Microsoft.ApplicationInsights.dll"
       ]
     },
     "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3": {
       "sha512": "5MGcvPQVaGlGyAVh9adg4sSkIVSYDKn+H3+YnZa9hi1gH/g6UsRt4HLc8vp/IxjlbmXbJyAB7dYJV/NHmAGAgA==",
-      "type": "Package",
+      "type": "package",
+      "path": "Microsoft.ApplicationInsights.PersistenceChannel/1.2.3",
       "files": [
+        "Microsoft.ApplicationInsights.PersistenceChannel.1.2.3.nupkg.sha512",
         "Microsoft.ApplicationInsights.PersistenceChannel.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/net40/Microsoft.ApplicationInsights.PersistenceChannel.XML",
         "lib/net40/Microsoft.ApplicationInsights.PersistenceChannel.dll",
         "lib/net45/Microsoft.ApplicationInsights.PersistenceChannel.XML",
@@ -18176,24 +18171,22 @@
         "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.XML",
         "lib/portable-win81+wpa81/Microsoft.ApplicationInsights.PersistenceChannel.dll",
         "lib/wp8/Microsoft.ApplicationInsights.PersistenceChannel.XML",
-        "lib/wp8/Microsoft.ApplicationInsights.PersistenceChannel.dll",
-        "package/services/metadata/core-properties/f973733421c14c3594986b3f2c22213a.psmdcp"
+        "lib/wp8/Microsoft.ApplicationInsights.PersistenceChannel.dll"
       ]
     },
     "Microsoft.ApplicationInsights.WindowsApps/1.1.1": {
       "sha512": "Orj0UQrjQ2z0aWZZoexl734Ge7Q4oVev3VFSsk6t8l2kImrfJ1eygkJWtQ1d7u0kF6MLLrvUvsMSxo+0rgPiMQ==",
-      "type": "Package",
+      "type": "package",
+      "path": "Microsoft.ApplicationInsights.WindowsApps/1.1.1",
       "files": [
+        "Microsoft.ApplicationInsights.WindowsApps.1.1.1.nupkg.sha512",
         "Microsoft.ApplicationInsights.WindowsApps.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/win81/Microsoft.ApplicationInsights.Extensibility.Windows.XML",
         "lib/win81/Microsoft.ApplicationInsights.Extensibility.Windows.dll",
         "lib/wp8/Microsoft.ApplicationInsights.Extensibility.Windows.XML",
         "lib/wp8/Microsoft.ApplicationInsights.Extensibility.Windows.dll",
         "lib/wpa81/Microsoft.ApplicationInsights.Extensibility.Windows.XML",
-        "lib/wpa81/Microsoft.ApplicationInsights.Extensibility.Windows.dll",
-        "package/services/metadata/core-properties/8265b8c93c244c80b4e8bce27f31849d.psmdcp"
+        "lib/wpa81/Microsoft.ApplicationInsights.Extensibility.Windows.dll"
       ]
     },
     "Microsoft.CSharp/4.0.1": {
@@ -18500,11 +18493,11 @@
     },
     "NetTopologySuite/1.14.0": {
       "sha512": "WZxN1WPRELed8vrTFZXc1lxRuLB29hJMx7W6FiisgZc27XGV+1Q9tdwb9ESAimc1i1sFfG7jQqVW9v090wtchQ==",
-      "type": "Package",
+      "type": "package",
+      "path": "NetTopologySuite/1.14.0",
       "files": [
+        "NetTopologySuite.1.14.0.nupkg.sha512",
         "NetTopologySuite.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/net20/NetTopologySuite.dll",
         "lib/net20/NetTopologySuite.xml",
         "lib/net20/PowerCollections.dll",
@@ -18530,8 +18523,7 @@
         "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/NetTopologySuite.dll",
         "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/NetTopologySuite.xml",
         "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/PowerCollections.dll",
-        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/PowerCollections.xml",
-        "package/services/metadata/core-properties/9644b49024494e6588746f3182f29707.psmdcp"
+        "lib/portable-net403+sl5+netcore45+wpa81+wp8+MonoAndroid10+XamariniOS10+MonoTouch10/PowerCollections.xml"
       ]
     },
     "Newtonsoft.Json/9.0.1": {
@@ -18560,13 +18552,12 @@
     },
     "Prism.Mvvm/1.1.1": {
       "sha512": "vaV/EBX3GS39vAcUN/tpOK+1B85lh16Sb6Ip+VdzUsTaN9IYdzz8EUha6Nm70YDjrdDz74oJahJomrftza0ySw==",
-      "type": "Package",
+      "type": "package",
+      "path": "Prism.Mvvm/1.1.1",
       "files": [
         "%5BContent_Types%5D.xml",
+        "Prism.Mvvm.1.1.1.nupkg.sha512",
         "Prism.Mvvm.nuspec",
-        "[Content_Types].xml",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/net45/Microsoft.Practices.Prism.Mvvm.Desktop.dll",
         "lib/net45/Microsoft.Practices.Prism.Mvvm.dll",
         "lib/net45/Microsoft.Practices.Prism.Mvvm.xml",
@@ -18585,10 +18576,7 @@
         "lib/wpa81/Microsoft.Practices.Prism.Mvvm.dll",
         "lib/wpa81/Microsoft.Practices.Prism.Mvvm.xml",
         "lib/wpa81/Microsoft.Practices.Prism.SharedInterfaces.dll",
-        "lib/wpa81/Microsoft.Practices.Prism.SharedInterfaces.xml",
-        "package/services/metadata/core-properties/1951281b8f2d45c1bf74ce41987210ab.psmdcp",
-        "package/services/metadata/core-properties/460a1cdd31ba4955a3be6b66ed9e0e9b.psmdcp",
-        "package/services/metadata/core-properties/9e2fc39d86cd4a85bedd66f4d7cd9dce.psmdcp"
+        "lib/wpa81/Microsoft.Practices.Prism.SharedInterfaces.xml"
       ]
     },
     "runtime.any.System.Collections/4.0.11": {
@@ -19554,11 +19542,11 @@
     },
     "Rx-Core/2.2.5": {
       "sha512": "DfWVTfW6tvRkkqpnRHKxPIvaRZyDJGADuqrE6J2nwejOQbLRWi0rNUwXkViDWz++25BGDy3iRE5OE6Dv8mJxYQ==",
-      "type": "Package",
+      "type": "package",
+      "path": "Rx-Core/2.2.5",
       "files": [
+        "Rx-Core.2.2.5.nupkg.sha512",
         "Rx-Core.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/net40/System.Reactive.Core.XML",
         "lib/net40/System.Reactive.Core.dll",
         "lib/net45/System.Reactive.Core.XML",
@@ -19578,17 +19566,16 @@
         "lib/windowsphone71/System.Reactive.Core.XML",
         "lib/windowsphone71/System.Reactive.Core.dll",
         "lib/windowsphone8/System.Reactive.Core.XML",
-        "lib/windowsphone8/System.Reactive.Core.dll",
-        "package/services/metadata/core-properties/acd70acf6eca4cb38c21c68005176d93.psmdcp"
+        "lib/windowsphone8/System.Reactive.Core.dll"
       ]
     },
     "Rx-Interfaces/2.2.5": {
       "sha512": "FKtG2QfMIeUcfB7r3a89VoAiszX3DTvYETkpC6U0FzWpxRK/mcHyzYOsniDfag+NsDG0P1k1c8yNSefXKp3t2A==",
-      "type": "Package",
+      "type": "package",
+      "path": "Rx-Interfaces/2.2.5",
       "files": [
+        "Rx-Interfaces.2.2.5.nupkg.sha512",
         "Rx-Interfaces.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/net40/System.Reactive.Interfaces.XML",
         "lib/net40/System.Reactive.Interfaces.dll",
         "lib/net45/System.Reactive.Interfaces.XML",
@@ -19608,17 +19595,16 @@
         "lib/windowsphone71/System.Reactive.Interfaces.XML",
         "lib/windowsphone71/System.Reactive.Interfaces.dll",
         "lib/windowsphone8/System.Reactive.Interfaces.XML",
-        "lib/windowsphone8/System.Reactive.Interfaces.dll",
-        "package/services/metadata/core-properties/c34c0935638f4b7ea6c51ca968fd1a88.psmdcp"
+        "lib/windowsphone8/System.Reactive.Interfaces.dll"
       ]
     },
     "Rx-Linq/2.2.5": {
       "sha512": "UTeCIu3cWPExxmTzdiVq7SalqTBhUaomBTaAC9LpYPoAopjlFwA3hjVWXoLkGlDc/44wqJemJuEwFP00KphiFg==",
-      "type": "Package",
+      "type": "package",
+      "path": "Rx-Linq/2.2.5",
       "files": [
+        "Rx-Linq.2.2.5.nupkg.sha512",
         "Rx-Linq.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/net40/System.Reactive.Linq.XML",
         "lib/net40/System.Reactive.Linq.dll",
         "lib/net45/System.Reactive.Linq.XML",
@@ -19638,27 +19624,25 @@
         "lib/windowsphone71/System.Reactive.Linq.XML",
         "lib/windowsphone71/System.Reactive.Linq.dll",
         "lib/windowsphone8/System.Reactive.Linq.XML",
-        "lib/windowsphone8/System.Reactive.Linq.dll",
-        "package/services/metadata/core-properties/0b05bef9a8e34a3da5e4d5d41f320ee4.psmdcp"
+        "lib/windowsphone8/System.Reactive.Linq.dll"
       ]
     },
     "Rx-Main/2.2.5": {
       "sha512": "qdQ6qENEiLsp/LRdzZlLlodihWN8VDjwNfWa8c2ELjEHZgTdKzt1V4i61gkHVtFKZXe8Px6KupbMP3pZ+1tusQ==",
-      "type": "Package",
+      "type": "package",
+      "path": "Rx-Main/2.2.5",
       "files": [
-        "Rx-Main.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
-        "package/services/metadata/core-properties/42be7976390b4c6f82065a7d2c011282.psmdcp"
+        "Rx-Main.2.2.5.nupkg.sha512",
+        "Rx-Main.nuspec"
       ]
     },
     "Rx-PlatformServices/2.2.5": {
       "sha512": "pMnNEvJVjT+wuDib+W/bi5hhIYcre7dW5yxvKrJxnR4iKJ1VLA/dY2FTtjDriHGx7OeGn12lQewXlH2oHiWFPA==",
-      "type": "Package",
+      "type": "package",
+      "path": "Rx-PlatformServices/2.2.5",
       "files": [
+        "Rx-PlatformServices.2.2.5.nupkg.sha512",
         "Rx-PlatformServices.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/net40/System.Reactive.PlatformServices.XML",
         "lib/net40/System.Reactive.PlatformServices.dll",
         "lib/net45/System.Reactive.PlatformServices.XML",
@@ -19678,8 +19662,7 @@
         "lib/windowsphone71/System.Reactive.PlatformServices.XML",
         "lib/windowsphone71/System.Reactive.PlatformServices.dll",
         "lib/windowsphone8/System.Reactive.PlatformServices.XML",
-        "lib/windowsphone8/System.Reactive.PlatformServices.dll",
-        "package/services/metadata/core-properties/5087526007294f7d8e78a6a4a61c494a.psmdcp"
+        "lib/windowsphone8/System.Reactive.PlatformServices.dll"
       ]
     },
     "System.AppContext/4.1.0": {
@@ -24586,18 +24569,17 @@
     },
     "Win2D.uwp/1.16.0": {
       "sha512": "95rW7qF76gzF5QiEiG/eauFGJ0J31M4AnqV+sq0vDSGZrie5PHSgSZVewB4A1fEdc3xn2ltyN3/M4PusBPPS7A==",
-      "type": "Package",
+      "type": "package",
+      "path": "Win2D.uwp/1.16.0",
       "files": [
+        "Win2D.uwp.1.16.0.nupkg.sha512",
         "Win2D.uwp.nuspec",
         "Win2d.githash.txt",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "build/native/Win2D.uwp.targets",
         "include/Microsoft.Graphics.Canvas.h",
         "include/Microsoft.Graphics.Canvas.native.h",
         "lib/uap10.0/Microsoft.Graphics.Canvas.winmd",
         "lib/uap10.0/Microsoft.Graphics.Canvas.xml",
-        "package/services/metadata/core-properties/a485f2599c6f467eb43545ecc40c57a4.psmdcp",
         "runtimes/win10-arm/native/Microsoft.Graphics.Canvas.dll",
         "runtimes/win10-x64/native/Microsoft.Graphics.Canvas.dll",
         "runtimes/win10-x86/native/Microsoft.Graphics.Canvas.dll"
@@ -24605,11 +24587,11 @@
     },
     "WinRTXamlToolkit.UWP/1.9.4": {
       "sha512": "CnX7Cpg+AzxUMBsSuAdwi5Bjh1Jp8Cy0PyCJnFVBmYxHujDoFAu5getRXvgLl4cIFw3BGUndFnrx7ws6GFoLWA==",
-      "type": "Package",
+      "type": "package",
+      "path": "WinRTXamlToolkit.UWP/1.9.4",
       "files": [
+        "WinRTXamlToolkit.UWP.1.9.4.nupkg.sha512",
         "WinRTXamlToolkit.UWP.nuspec",
-        "[Content_Types].xml",
-        "_rels/.rels",
         "lib/uap10.0/WinRTXamlToolkit.dll",
         "lib/uap10.0/WinRTXamlToolkit.pri",
         "lib/uap10.0/WinRTXamlToolkit/Async/_._",
@@ -24854,8 +24836,7 @@
         "lib/uap10.0/WinRTXamlToolkit/obj/x86/Debug/WinRTXamlToolkit/Controls/WatermarkTextBox/_._",
         "lib/uap10.0/WinRTXamlToolkit/obj/x86/Debug/WinRTXamlToolkit/Controls/WebBrowser/_._",
         "lib/uap10.0/WinRTXamlToolkit/obj/x86/Debug/WinRTXamlToolkit/Themes/_._",
-        "lib/uap10.0/WinRTXamlToolkit/obj/x86/Debug/intermediatexaml/_._",
-        "package/services/metadata/core-properties/deced4abe78a4a6e8c4a83fae1aa2cb0.psmdcp"
+        "lib/uap10.0/WinRTXamlToolkit/obj/x86/Debug/intermediatexaml/_._"
       ]
     }
   },

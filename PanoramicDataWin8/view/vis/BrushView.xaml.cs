@@ -82,7 +82,10 @@ namespace PanoramicDataWin8.view.vis
                     {
                         _closingStoryboard.Stop();
                     }
-                    _pulsingOpeningStoryboard.Stop();
+                    if (_pulsingOpeningStoryboard != null)
+                    {
+                        _pulsingOpeningStoryboard.Stop();
+                    }
 
                     CubicEase easingFunction = new CubicEase();
                     easingFunction.EasingMode = EasingMode.EaseInOut;

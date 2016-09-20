@@ -16,12 +16,12 @@ using PanoramicDataWin8.model.data.progressive;
 
 namespace PanoramicDataWin8.controller.data.progressive
 {
-    public class ProgressiveQueryExecuter : QueryExecuter
+    public class IDEAQueryExecuter : QueryExecuter
     {
         public delegate void ExecuteQueryHandler(object sender, ExecuteOperationModelEventArgs e);
         public event ExecuteQueryHandler ExecuteQueryEvent;
 
-        public ProgressiveQueryExecuter()
+        public IDEAQueryExecuter()
         {
             var stream = Observable.FromEventPattern<ExecuteOperationModelEventArgs>(this, "ExecuteQueryEvent");
             stream.GroupByUntil(k => k.EventArgs.OperationModel, g => Observable.Timer(TimeSpan.FromMilliseconds(50)))
@@ -50,13 +50,14 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).Any()))
                             {
                                 var queryModelClone = operationModel.Clone();
-                                ProgressiveVisualizationJob progressiveVisualizationJob = new ProgressiveVisualizationJob(
-                                    histogramOperationModel, (HistogramOperationModel)queryModelClone, TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
+                                HistogramOperationJob histogramOperationJob = new HistogramOperationJob(
+                                    histogramOperationModel, (HistogramOperationModel)queryModelClone, 
+                                    TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
 
-                                ActiveJobs.Add(operationModel, progressiveVisualizationJob);
-                                progressiveVisualizationJob.JobUpdate += job_JobUpdate;
-                                progressiveVisualizationJob.JobCompleted += job_JobCompleted;
-                                progressiveVisualizationJob.Start();
+                                ActiveJobs.Add(operationModel, histogramOperationJob);
+                                histogramOperationJob.JobUpdate += job_JobUpdate;
+                                histogramOperationJob.JobCompleted += job_JobCompleted;
+                                histogramOperationJob.Start();
                             }
                         }
                         else
@@ -111,36 +112,16 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         private void job_JobCompleted(object sender, JobEventArgs jobEventArgs)
         {
-            HistogramOperationModel histogramOperationModel = null;
-            if (sender is ProgressiveVisualizationJob)
-            {
-                ProgressiveVisualizationJob job = sender as ProgressiveVisualizationJob;
-                histogramOperationModel = job.HistogramOperationModel;
-            }
-            else if (sender is ProgressiveClassifyJob)
-            {
-                ProgressiveClassifyJob job = sender as ProgressiveClassifyJob;
-                histogramOperationModel = job.HistogramOperationModel;
-            }
-            histogramOperationModel.Result = jobEventArgs.Result;
-            //operationModel.Result.Progress = 1.0;
-            //operationModel.Result.FireResultModelUpdated(ResultType.Complete);
+            OperationJob operationJob = (OperationJob) sender;
+            OperationModel operationModel = operationJob.OperationModel;
+            operationModel.Result = jobEventArgs.Result;
         }
 
         private void job_JobUpdate(object sender, JobEventArgs jobEventArgs)
         {
-            HistogramOperationModel histogramOperationModel = null;
-            if (sender is ProgressiveVisualizationJob)
-            {
-                ProgressiveVisualizationJob job = sender as ProgressiveVisualizationJob;
-                histogramOperationModel = job.HistogramOperationModel;
-            }
-            else if (sender is ProgressiveClassifyJob)
-            {
-                ProgressiveClassifyJob job = sender as ProgressiveClassifyJob;
-                histogramOperationModel = job.HistogramOperationModel;
-            }
-            histogramOperationModel.Result = jobEventArgs.Result;
+            OperationJob operationJob = (OperationJob) sender;
+            OperationModel operationModel = operationJob.OperationModel;
+            operationModel.Result = jobEventArgs.Result;
         }
     }
 
