@@ -109,4 +109,8 @@ namespace PanoramicDataWin8.model.data
     public class OperationModelUpdatedEventArgs : EventArgs
     {
     }
+
+    public class VisualOperationModelUpdatedEventArgs : OperationModelUpdatedEventArgs
+    {
+    }
 }

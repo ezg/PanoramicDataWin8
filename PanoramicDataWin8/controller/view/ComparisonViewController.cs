@@ -193,7 +193,12 @@ namespace PanoramicDataWin8.controller.view
                 {
                     var current = ((KeyValuePair<StatisticalComparisonOperationViewModel, ComparisonView>)item).Key;
                     current.StatisticalComparisonOperationModel.OperationModelUpdated -= OperationModel_OperationModelUpdated;
-                    current.StatisticalComparisonOperationModel.StatisticallyComparableOperationModels.Clear();
+                    foreach (
+                        var m in
+                        current.StatisticalComparisonOperationModel.StatisticallyComparableOperationModels.ToArray())
+                    {
+                        current.StatisticalComparisonOperationModel.RemoveStatisticallyComparableOperationModel(m);
+                    }
                 }
             }
             if (e.NewItems != null)
@@ -201,8 +206,8 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var item in e.NewItems)
                 {
                     var current = ((KeyValuePair<StatisticalComparisonOperationViewModel, ComparisonView>)item).Key;
-                    current.StatisticalComparisonOperationModel.StatisticallyComparableOperationModels.Add((IStatisticallyComparableOperationModel)current.OperationViewModels[0].OperationModel);
-                    current.StatisticalComparisonOperationModel.StatisticallyComparableOperationModels.Add((IStatisticallyComparableOperationModel)current.OperationViewModels[1].OperationModel);
+                    current.StatisticalComparisonOperationModel.AddStatisticallyComparableOperationModel((IStatisticallyComparableOperationModel)current.OperationViewModels[0].OperationModel);
+                    current.StatisticalComparisonOperationModel.AddStatisticallyComparableOperationModel((IStatisticallyComparableOperationModel)current.OperationViewModels[1].OperationModel);
                     current.StatisticalComparisonOperationModel.OperationModelUpdated += OperationModel_OperationModelUpdated;
                     current.StatisticalComparisonOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                 }

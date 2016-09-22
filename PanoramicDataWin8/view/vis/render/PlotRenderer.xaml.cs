@@ -72,6 +72,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (args.NewValue != null)
             {
+                (DataContext as HistogramOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
                 (DataContext as HistogramOperationViewModel).OperationModel.OperationModelUpdated += OperationModelUpdated;
                 //(DataContext as OperationViewModel).OperationModel.RequestRender += PlotRenderer_RequestRender;
             }
@@ -96,6 +97,10 @@ namespace PanoramicDataWin8.view.vis.render
                 ((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.ClearFilterModels))
             {
                 _plotRendererContentProvider.UpdateFilterModels((sender as HistogramOperationModel).FilterModels.ToList());
+                render();
+            }
+            if (e is VisualOperationModelUpdatedEventArgs)
+            {
                 render();
             }
         }

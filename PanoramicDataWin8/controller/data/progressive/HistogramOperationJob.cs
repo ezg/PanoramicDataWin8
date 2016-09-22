@@ -116,6 +116,21 @@ namespace PanoramicDataWin8.controller.data.progressive
                 });
             }
 
+            var kdeDatatypes = new string[] {InputDataTypeConstants.INT, InputDataTypeConstants.FLOAT}.ToList();
+            var globalAggregates = new List<AggregateParameters>();
+            foreach (var index in aggregates.Where(a => kdeDatatypes.Contains((a.AttributeModel as AttributeFieldModel).InputDataType)).Select(a => a.AttributeModel.Index).Distinct())
+            {
+                globalAggregates.Add(new KDEAggregateParameters()
+                {
+                    Dimension = index,
+                    NrOfSamples = 50
+                });
+                globalAggregates.Add(new CountAggregateParameters()
+                {
+                    Dimension = index
+                });
+            }
+
             OperationParameters = new HistogramOperationParameters()
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
@@ -123,7 +138,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                 Brushes = brushes,
                 BinningParameters = IDEA_common.util.Extensions.Yield(xBinning, yBinning).ToList(),
                 SampleStreamBlockSize = sampleSize,
-                PerBinAggregateParameters = aggregateParameters
+                PerBinAggregateParameters = aggregateParameters,
+                GlobalAggregateParameters = globalAggregates
             };
         }
        

@@ -27,6 +27,7 @@ using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.style;
+using Point = Windows.Foundation.Point;
 using PointCollection = Esri.ArcGISRuntime.Geometry.PointCollection;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236

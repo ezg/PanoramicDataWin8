@@ -60,8 +60,6 @@ namespace PanoramicDataWin8.view.vis.render
 
         public void UpdateData(IResult result, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone)
         {
-            
-
             _histogramResult = (HistogramResult)result;
             _histogramOperationModelClone = histogramOperationModelClone;
             _histogramOperationModel = histogramOperationModel;
@@ -241,11 +239,38 @@ namespace PanoramicDataWin8.view.vis.render
                 }
             }
 
+            // highlight selected bars
             foreach (var binPrimitiveCollection in allBinPrimitiveCollections)
             {
                 if (binPrimitiveCollection.FilterModel != null && _filterModels.Contains(binPrimitiveCollection.FilterModel))
                 {
                     canvasArgs.DrawingSession.DrawRoundedRectangle(binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex()).Rect, 4, 4, dark, 1.0f);
+                }
+            }
+
+            // render distributions if needed
+            List<List<Vector2>> paths = _helper.GetDistribution();
+            foreach (var path in paths)
+            {
+                if (path.Count > 1)
+                {
+                    var pathBuilder = new CanvasPathBuilder(canvas);
+                    pathBuilder.BeginFigure(path[0]);
+                    foreach (var point in path.Skip(1))
+                    {
+                        pathBuilder.AddLine(point);
+                    }
+                    pathBuilder.EndFigure(CanvasFigureLoop.Open);
+                    var strokeStyle = new CanvasStrokeStyle
+                    {
+                        DashStyle = CanvasDashStyle.Solid,
+                        DashCap = CanvasCapStyle.Round,
+                        StartCap = CanvasCapStyle.Round,
+                        EndCap = CanvasCapStyle.Round,
+                        LineJoin = CanvasLineJoin.Bevel,
+                    };
+                    var geometry = CanvasGeometry.CreatePath(pathBuilder);
+                    canvasArgs.DrawingSession.DrawGeometry(geometry, dark, 2, strokeStyle);
                 }
             }
         }
@@ -439,6 +464,63 @@ namespace PanoramicDataWin8.view.vis.render
             }
             
             return visualBinRange;
+        }
+
+        public List<List<Vector2>> GetDistribution()
+        {
+            List<List<Vector2>> returnList = new List<List<Vector2>>();
+            if (_histogramOperationModel.IncludeDistribution && 
+                (_chartType == ChartType.HorizontalBar || _chartType == ChartType.VerticalBar))
+            {
+                foreach (var brush in _histogramResult.Brushes)
+                {
+                    var xKdeAggregateKey = new AggregateKey
+                    {
+                        AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
+                            a => a is KDEAggregateParameters && (a as KDEAggregateParameters).Dimension == _xIom.AttributeModel.Index)),
+                        BrushIndex = brush.BrushIndex
+                    };
+                    var xCountAggregateKey = new AggregateKey
+                    {
+                        AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
+                            a => a is CountAggregateParameters && (a as CountAggregateParameters).Dimension == _xIom.AttributeModel.Index)),
+                        BrushIndex = brush.BrushIndex
+                    };
+                    var yKdeAggregateKey = new AggregateKey
+                    {
+                        AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
+                            a => a is KDEAggregateParameters && (a as KDEAggregateParameters).Dimension == _yIom.AttributeModel.Index)),
+                        BrushIndex = brush.BrushIndex
+                    };
+                    var yCountAggregateKey = new AggregateKey
+                    {
+                        AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
+                             a => a is CountAggregateParameters && (a as CountAggregateParameters).Dimension == _yIom.AttributeModel.Index)),
+                        BrushIndex = brush.BrushIndex
+                    };
+
+                    if (_chartType == ChartType.HorizontalBar)
+                    {
+                        PointsAggregateResult points = (PointsAggregateResult) _histogramResult.AggregateResults[yKdeAggregateKey];
+                       
+                    }
+
+                    else if (_chartType == ChartType.VerticalBar)
+                    {
+                        List<Vector2> dist = new List<Vector2>();
+                        var count = (DoubleValueAggregateResult)_histogramResult.AggregateResults[xCountAggregateKey];
+                        PointsAggregateResult points = (PointsAggregateResult)_histogramResult.AggregateResults[xKdeAggregateKey];
+                        dist =
+                            points.Points.Select(
+                                p =>
+                                    new Vector2(
+                                        DataToScreenX((float)p.X),
+                                        DataToScreenY((float)p.Y * (float) (count.Result * VisualBinRanges[0].AddStep(0))))).ToList();
+                        returnList.Add(dist);
+                    }
+                }
+            }
+            return returnList;
         }
 
         public BinPrimitiveCollection GetBinPrimitives(Bin bin)

@@ -23,14 +23,14 @@ namespace PanoramicDataWin8.model.data.operation
         ObservableCollection<FilterLinkModel> LinkModels { get; }
     }
 
-    public class FilterConsumerOperationModelOperationModel : ExtendedBindableBase, IFilterConsumerOperationModel
+    public class FilterConsumerOperationModelImpl : ExtendedBindableBase, IFilterConsumerOperationModel
     {
         private FilteringOperation _filteringOperation = FilteringOperation.AND;
         private IOperationModel _host;
 
         private ObservableCollection<FilterLinkModel> _linkModels = new ObservableCollection<FilterLinkModel>();
 
-        public FilterConsumerOperationModelOperationModel(IOperationModel host)
+        public FilterConsumerOperationModelImpl(IOperationModel host)
         {
             _linkModels.CollectionChanged += LinkModels_CollectionChanged;
             _host = host;
@@ -105,11 +105,11 @@ namespace PanoramicDataWin8.model.data.operation
         }
     }
 
-    public class FilterProviderOperationModelOperationModel : ExtendedBindableBase, IFilterProviderOperationModel
+    public class FilterProviderOperationModelImpl : ExtendedBindableBase, IFilterProviderOperationModel
     {
         private IOperationModel _host;
 
-        public FilterProviderOperationModelOperationModel(IOperationModel host)
+        public FilterProviderOperationModelImpl(IOperationModel host)
         {
             _host = host;
         }
