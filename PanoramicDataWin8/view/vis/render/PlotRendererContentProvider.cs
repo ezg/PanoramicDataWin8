@@ -249,28 +249,35 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             // render distributions if needed
-            List<List<Vector2>> paths = _helper.GetDistribution();
-            foreach (var path in paths)
+            if (_histogramOperationModel.IncludeDistribution)
             {
-                if (path.Count > 1)
+                //canvasArgs.DrawingSession.FillRectangle(new Rect(0, 0, canvas.ActualWidth, canvas.ActualHeight),
+                    //Color.FromArgb(150, 230, 230, 230));
+
+                List<List<Vector2>> paths = _helper.GetDistribution();
+                foreach (var path in paths)
                 {
-                    var pathBuilder = new CanvasPathBuilder(canvas);
-                    pathBuilder.BeginFigure(path[0]);
-                    foreach (var point in path.Skip(1))
+                    if (path.Count > 1)
                     {
-                        pathBuilder.AddLine(point);
+                        var pathBuilder = new CanvasPathBuilder(canvas);
+                        pathBuilder.BeginFigure(path[0]);
+                        foreach (var point in path.Skip(1))
+                        {
+                            pathBuilder.AddLine(point);
+                        }
+                        pathBuilder.EndFigure(CanvasFigureLoop.Open);
+                        var strokeStyle = new CanvasStrokeStyle
+                        {
+                            DashStyle = CanvasDashStyle.Solid,
+                            DashCap = CanvasCapStyle.Round,
+                            StartCap = CanvasCapStyle.Round,
+                            EndCap = CanvasCapStyle.Round,
+                            LineJoin = CanvasLineJoin.Bevel,
+                        };
+                        var geometry = CanvasGeometry.CreatePath(pathBuilder);
+                        canvasArgs.DrawingSession.DrawGeometry(geometry, Color.FromArgb(150, 230, 230, 230), 4, strokeStyle);
+                        canvasArgs.DrawingSession.DrawGeometry(geometry, dark, 1, strokeStyle);
                     }
-                    pathBuilder.EndFigure(CanvasFigureLoop.Open);
-                    var strokeStyle = new CanvasStrokeStyle
-                    {
-                        DashStyle = CanvasDashStyle.Solid,
-                        DashCap = CanvasCapStyle.Round,
-                        StartCap = CanvasCapStyle.Round,
-                        EndCap = CanvasCapStyle.Round,
-                        LineJoin = CanvasLineJoin.Bevel,
-                    };
-                    var geometry = CanvasGeometry.CreatePath(pathBuilder);
-                    canvasArgs.DrawingSession.DrawGeometry(geometry, dark, 2, strokeStyle);
                 }
             }
         }
@@ -323,6 +330,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         public float DeviceWidth { get; set; } = 0;
         public float DeviceHeight { get; set; } = 0;
+        
         private float _xScale = 0;
         private float _yScale = 0;
         private float _minValue = 0;
