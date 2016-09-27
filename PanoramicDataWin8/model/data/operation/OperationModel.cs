@@ -13,6 +13,8 @@ namespace PanoramicDataWin8.model.data
 
         IResult Result { get; set; }
 
+        IOperationModel ResultCauserClone { get; set; }
+
         SchemaModel SchemaModel { get; set; }
 
         OperationModel Clone();
@@ -29,7 +31,7 @@ namespace PanoramicDataWin8.model.data
         private long _id;
 
         private IResult _result;
-
+        private IOperationModel _resultCauserClone;
 
         private SchemaModel _schemaModel;
 
@@ -101,6 +103,13 @@ namespace PanoramicDataWin8.model.data
         {
             get { return _result; }
             set { SetProperty(ref _result, value); }
+        }
+
+        [JsonIgnore]
+        public IOperationModel ResultCauserClone
+        {
+            get { return _resultCauserClone; }
+            set { _resultCauserClone = value; }
         }
 
         public event OperationModelUpdatedHandler OperationModelUpdated;

@@ -379,10 +379,8 @@ namespace PanoramicDataWin8.view.vis.render
             
             initializeChartType(_histogramResult.BinRanges);
 
-            var xAggregateKey = QueryModelHelper.CreateAggregateKey(_xIom, _histogramResult, _histogramResult.AllBrushIndex());
-            var yAggregateKey = QueryModelHelper.CreateAggregateKey(_yIom, _histogramResult, _histogramResult.AllBrushIndex());
-            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[0], xAggregateKey));
-            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[1], yAggregateKey));
+            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[0], _xIom, histogramOperationModel.IncludeDistribution));
+            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[1], _yIom, histogramOperationModel.IncludeDistribution));
         }
 
         public void ComputeSizes(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, CanvasTextFormat textFormat)
@@ -436,15 +434,52 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        private BinRange createVisualBinRange(BinRange dataBinRange, AggregateKey aggregateKey)
+        private BinRange createVisualBinRange(BinRange dataBinRange, AttributeTransformationModel atm, bool includeDistribution)
         {
             BinRange visualBinRange = null;
             if (!(dataBinRange is AggregateBinRange))
             {
-                visualBinRange = dataBinRange;
+                if (dataBinRange is QuantitativeBinRange && includeDistribution)
+                {
+                    var maxDistX = (double) dataBinRange.DataMaxValue;
+                    var minDistX = (double) dataBinRange.DataMinValue;
+                    foreach (var brush in _histogramResult.Brushes)
+                    {
+                        var kdeAggregateKey = new AggregateKey
+                        {
+                            AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
+                                a => a is KDEAggregateParameters && (a as KDEAggregateParameters).Dimension == atm.AttributeModel.Index)),
+                            BrushIndex = brush.BrushIndex
+                        };
+                        var countAggregateKey = new AggregateKey
+                        {
+                            AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
+                                a => a is CountAggregateParameters && (a as CountAggregateParameters).Dimension == atm.AttributeModel.Index)),
+                            BrushIndex = brush.BrushIndex
+                        };
+                        if (_histogramResult.AggregateResults.ContainsKey(countAggregateKey) &&
+                            _histogramResult.AggregateResults.ContainsKey(kdeAggregateKey))
+                        {
+                            var count = (DoubleValueAggregateResult) _histogramResult.AggregateResults[countAggregateKey];
+                            PointsAggregateResult points = (PointsAggregateResult) _histogramResult.AggregateResults[kdeAggregateKey];
+                            if (points.Points.Any())
+                            {
+                                maxDistX = Math.Max(maxDistX, (double) points.Points.Max(p => p.X));
+                                minDistX = Math.Min(minDistX, (double) points.Points.Min(p => p.X));
+                            }
+                        }
+                    }
+
+                    visualBinRange = dataBinRange.GetUpdatedBinRange(minDistX, maxDistX, new List<object>());
+                }
+                else
+                {
+                    visualBinRange = dataBinRange;
+                }
             }
             else
             {
+                var aggregateKey = QueryModelHelper.CreateAggregateKey(atm, _histogramResult, _histogramResult.AllBrushIndex());
                 double factor = 0.0;
                 
                 var minValue = float.MaxValue;
@@ -509,8 +544,17 @@ namespace PanoramicDataWin8.view.vis.render
 
                     if (_chartType == ChartType.HorizontalBar)
                     {
-                        PointsAggregateResult points = (PointsAggregateResult) _histogramResult.AggregateResults[yKdeAggregateKey];
-                       
+                        List<Vector2> dist = new List<Vector2>();
+                        var count = (DoubleValueAggregateResult)_histogramResult.AggregateResults[yCountAggregateKey];
+                        PointsAggregateResult points = (PointsAggregateResult)_histogramResult.AggregateResults[yKdeAggregateKey];
+                        dist =
+                            points.Points.Select(
+                                p =>
+                                    new Vector2(
+                                        DataToScreenX((float)p.Y * (float)(count.Result * VisualBinRanges[1].AddStep(0))),
+                                        DataToScreenY((float)p.X))).ToList();
+                        returnList.Add(dist);
+
                     }
 
                     else if (_chartType == ChartType.VerticalBar)
@@ -539,6 +583,7 @@ namespace PanoramicDataWin8.view.vis.render
 
             var valueAggregateKey = QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
 
+            var brushFactorSum = 0.0f;
             foreach (var brush in _histogramResult.Brushes)
             {
                 float xFrom = 0;
@@ -584,12 +629,31 @@ namespace PanoramicDataWin8.view.vis.render
                 // read out value depinding on chart type
                 if (_chartType == ChartType.HeatMap)
                 {
-                    xFrom = DataToScreenX((float)VisualBinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
-                    xTo = DataToScreenX((float)VisualBinRanges[0].AddStep(VisualBinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
+                    valueAggregateKey.BrushIndex = _histogramResult.AllBrushIndex();
+                    var allUnNormalizedValue = (float)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
+                    var brushFactor = (unNormalizedvalue / allUnNormalizedValue);
+                    
 
-                    yFrom = DataToScreenY((float)VisualBinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1]));
-                    yTo = DataToScreenY((float)VisualBinRanges[1].AddStep(VisualBinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1])));
+                    xFrom = DataToScreenX((float)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
+                    xTo = DataToScreenX((float)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
 
+                    yFrom = DataToScreenY((float)_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1]));
+                    yTo = DataToScreenY((float)_histogramResult.BinRanges[1].AddStep(_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1])));
+                    if (allUnNormalizedValue > 0 && unNormalizedvalue > 0)
+                    {
+                        brushFactorSum += brushFactor;
+                        brushFactorSum = (float) Math.Min(brushFactorSum, 1.0);
+                        var tempRect = new Rect(xFrom, yTo, xTo - xFrom, yFrom - yTo);
+                        var ratio = (tempRect.Width/tempRect.Height);
+                        var newHeight = Math.Sqrt((1.0/ratio)*((tempRect.Width*tempRect.Height)* brushFactorSum));
+                        var newWidth = newHeight*ratio;
+                        xFrom = (float) (tempRect.X + (tempRect.Width - newWidth)/2.0f);
+                        yTo = (float) (tempRect.Y + (tempRect.Height - newHeight)/2.0f);
+                        xTo = (float) (xFrom + newWidth);
+                        yFrom = (float) (yTo + newHeight);
+                        var brushRect = new Rect(tempRect.X + (tempRect.Width - newWidth)/2.0f,
+                            tempRect.Y + (tempRect.Height - newHeight)/2.0f, newWidth, newHeight);
+                    }
                     var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), baseColor, (float)(alpha + Math.Pow(value, 1.0 / 3.0) * (1.0 - alpha)));
                     var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
                     color = dataColor;
@@ -600,8 +664,8 @@ namespace PanoramicDataWin8.view.vis.render
                     xFrom = DataToScreenX((float) Math.Min(0, xValue));
                     xTo = DataToScreenX((float) Math.Max(0, xValue));
 
-                    yFrom = DataToScreenY((float) VisualBinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1]));
-                    yTo = DataToScreenY((float) VisualBinRanges[1].AddStep(VisualBinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1])));
+                    yFrom = DataToScreenY((float)_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1]));
+                    yTo = DataToScreenY((float)_histogramResult.BinRanges[1].AddStep(_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1])));
 
                     xMargin = (float) ((MarginAggregateResult) bin.AggregateResults[xMarginAggregateKey]).Margin;
                     xMarginAbsolute = (float) ((MarginAggregateResult) bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
@@ -617,8 +681,8 @@ namespace PanoramicDataWin8.view.vis.render
                     yFrom = DataToScreenY((float)Math.Min(0, yValue));
                     yTo = DataToScreenY((float)Math.Max(0, yValue));
 
-                    xFrom = DataToScreenX((float)VisualBinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
-                    xTo = DataToScreenX((float)VisualBinRanges[0].AddStep(VisualBinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
+                    xFrom = DataToScreenX((float)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
+                    xTo = DataToScreenX((float)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
 
                     yMargin = (float)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
                     yMarginAbsolute = (float)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;

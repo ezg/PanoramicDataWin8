@@ -61,7 +61,6 @@ namespace PanoramicDataWin8.model.data.operation
             }
         }
 
-        [JsonIgnore]
         public List<AttributeTransformationModel> AttributeTransformationModels
         {
             get

@@ -69,6 +69,7 @@ namespace PanoramicDataWin8.model.data.operation
         }
 
         public IResult Result { get; set; }
+        public IOperationModel ResultCauserClone { get; set; }
         public SchemaModel SchemaModel { get; set; }
         public OperationModel Clone()
         {

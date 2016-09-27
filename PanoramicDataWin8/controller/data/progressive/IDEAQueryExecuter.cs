@@ -32,6 +32,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                     await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         var operationModel = arg.EventArgs.OperationModel;
+                        operationModel.ResultCauserClone = operationModel.Clone();
                         operationModel.Result = null;
 
                         if (ActiveJobs.ContainsKey(operationModel))
@@ -49,9 +50,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 (histogramOperationModel.VisualizationType != VisualizationType.table && histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Any() &&
                                 histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).Any()))
                             {
-                                var queryModelClone = operationModel.Clone();
                                 HistogramOperationJob histogramOperationJob = new HistogramOperationJob(
-                                    histogramOperationModel, (HistogramOperationModel)queryModelClone, 
+                                    histogramOperationModel,  
                                     TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
 
                                 ActiveJobs.Add(operationModel, histogramOperationJob);

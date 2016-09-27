@@ -458,7 +458,7 @@ namespace PanoramicDataWin8.controller.view
                     ((OperationViewModel) item).OperationModel.OperationModelUpdated -= OperationModel_OperationModelUpdated;
                     if (((OperationViewModel) item).OperationModel is IFilterConsumerOperationModel)
                     {
-                        foreach (var link in ((IFilterConsumerOperationModel) ((OperationViewModel) item).OperationModel).LinkModels)
+                        foreach (var link in ((IFilterConsumerOperationModel) ((OperationViewModel) item).OperationModel).LinkModels.ToArray())
                         {
                             FilterLinkViewController.Instance.RemoveFilterLinkViewModel(link);
                         }

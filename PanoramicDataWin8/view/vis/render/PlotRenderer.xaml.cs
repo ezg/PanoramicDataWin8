@@ -110,7 +110,7 @@ namespace PanoramicDataWin8.view.vis.render
             HistogramOperationViewModel model = (DataContext as HistogramOperationViewModel);
             _plotRendererContentProvider.UpdateData(result,
                 (HistogramOperationModel) model.OperationModel,
-                (HistogramOperationModel) model.OperationModel.Clone());
+                (HistogramOperationModel) model.OperationModel.ResultCauserClone);
             render();
         }
 

@@ -25,10 +25,11 @@ namespace PanoramicDataWin8.controller.data.progressive
 {
     public class HistogramOperationJob : OperationJob
     {
-        public HistogramOperationJob(OperationModel operationModel, 
-            HistogramOperationModel histogramOperationModelClone, 
+        public HistogramOperationJob(OperationModel operationModel,  
             TimeSpan throttle, int sampleSize) : base(operationModel, throttle)
         {
+            operationModel.ResultCauserClone = ((HistogramOperationModel) operationModel).Clone();
+            var histogramOperationModelClone = (HistogramOperationModel) operationModel.ResultCauserClone;
             var psm = (histogramOperationModelClone.SchemaModel as ProgressiveSchemaModel);
             string filter = "";
             List<FilterModel> filterModels = new List<FilterModel>();
@@ -118,7 +119,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 
             var kdeDatatypes = new string[] {InputDataTypeConstants.INT, InputDataTypeConstants.FLOAT}.ToList();
             var globalAggregates = new List<AggregateParameters>();
-            foreach (var index in aggregates.Where(a => kdeDatatypes.Contains((a.AttributeModel as AttributeFieldModel).InputDataType)).Select(a => a.AttributeModel.Index).Distinct())
+            foreach (var index in new AttributeTransformationModel[] { xIom, yIom}.Where(a => kdeDatatypes.Contains((a.AttributeModel as AttributeFieldModel).InputDataType)).Select(a => a.AttributeModel.Index).Distinct())
             {
                 globalAggregates.Add(new KDEAggregateParameters()
                 {
