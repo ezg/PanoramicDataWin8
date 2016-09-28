@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.data.progressive;
 
@@ -59,6 +60,18 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 histogramOperationJob.JobCompleted += job_JobCompleted;
                                 histogramOperationJob.Start();
                             }
+                        }
+                        else if (operationModel is StatisticalComparisonOperationModel)
+                        {
+                            var statisticalComparisonOperationModel = (StatisticalComparisonOperationModel)operationModel;
+                            StatisticalComparisonOperationJob statisticalComparisonOperationJob = new StatisticalComparisonOperationJob(
+                                   statisticalComparisonOperationModel,
+                                   TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
+
+                            ActiveJobs.Add(operationModel, statisticalComparisonOperationJob);
+                            statisticalComparisonOperationJob.JobUpdate += job_JobUpdate;
+                            statisticalComparisonOperationJob.JobCompleted += job_JobCompleted;
+                            statisticalComparisonOperationJob.Start();
                         }
                         else
                         {

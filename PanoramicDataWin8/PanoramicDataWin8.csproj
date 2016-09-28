@@ -103,8 +103,10 @@
     <Compile Include="controller\data\OperationJob.cs" />
     <Compile Include="controller\data\progressive\CatalogCommand.cs" />
     <Compile Include="controller\data\progressive\IDEAGateway.cs" />
+    <Compile Include="controller\data\progressive\IDEAHelpers.cs" />
     <Compile Include="controller\data\progressive\IDEAQueryExecuter.cs" />
     <Compile Include="controller\data\progressive\HistogramOperationJob.cs" />
+    <Compile Include="controller\data\progressive\StatisticalComparisonOperationJob.cs" />
     <Compile Include="controller\data\virt\AsyncVirtualizedCollection.cs" />
     <Compile Include="controller\data\virt\DataPage.cs" />
     <Compile Include="controller\data\virt\DataWrapper.cs" />

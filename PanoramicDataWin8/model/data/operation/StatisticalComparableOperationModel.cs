@@ -53,7 +53,7 @@ namespace PanoramicDataWin8.model.data.operation
     {
         private ObservableCollection<IStatisticallyComparableOperationModel> _statisticallyComparableOperationModels =
             new ObservableCollection<IStatisticallyComparableOperationModel>();
-        private StatistalComparisonType _statistalComparisonType = StatistalComparisonType.distribution;
+        private StatistalComparisonType _statistalComparisonType = StatistalComparisonType.histogram;
 
 
         public StatisticalComparisonOperationModel(SchemaModel schemaModel) : base(schemaModel)
