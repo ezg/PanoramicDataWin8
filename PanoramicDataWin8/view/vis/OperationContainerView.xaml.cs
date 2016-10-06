@@ -219,13 +219,6 @@ namespace PanoramicDataWin8.view.vis
             _initialPoint = _previousPoint;
             _movingStarted = false;
             _fingerDown = true;
-
-            //this.SendToFront();
-            OperationViewModel model = (DataContext as OperationViewModel);
-            foreach (var avm in model.AttachementViewModels)
-            {
-                avm.ActiveStopwatch.Restart();
-            }
         }
 
         public void TwoFingerMoved()
@@ -261,7 +254,16 @@ namespace PanoramicDataWin8.view.vis
                 if (e.CurrentContacts.ContainsKey(e.TriggeringPointer.PointerId))
                 {
                     _renderer.StartSelection(trans.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position));
-                    _renderer.EndSelection();
+                    var used = _renderer.EndSelection();
+
+                    OperationViewModel model = (DataContext as OperationViewModel);
+                    if (!used)
+                    {
+                        foreach (var avm in model.AttachementViewModels)
+                        {
+                            avm.ActiveStopwatch.Restart();
+                        }
+                    }
                 }
             }
             _fingerDown = false;
@@ -289,14 +291,7 @@ namespace PanoramicDataWin8.view.vis
             this.PointerMoved += VisualizationContainerView_PointerMoved;
             this.PointerReleased += VisualizationContainerView_PointerReleased;
             _fingerDown = true;
-
-            //this.SendToFront();
-            OperationViewModel model = (DataContext as OperationViewModel);
-            foreach (var avm in model.AttachementViewModels)
-            {
-                avm.ActiveStopwatch.Restart();
-            }
-
+            
             ((OperationViewModel) DataContext).FireOperationViewModelTapped();
         }
 
@@ -317,6 +312,7 @@ namespace PanoramicDataWin8.view.vis
 
         void VisualizationContainerView_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
+            OperationViewModel model = (DataContext as OperationViewModel);
             if (_movingStarted)
             {
                 _movingStarted = false;
@@ -324,7 +320,15 @@ namespace PanoramicDataWin8.view.vis
             else if (_tapStart.ElapsedMilliseconds < 300)
             {
                 _renderer.StartSelection(e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position);
-                _renderer.EndSelection();
+                var used = _renderer.EndSelection();
+
+                if (!used)
+                {
+                    foreach (var avm in model.AttachementViewModels)
+                    {
+                        avm.ActiveStopwatch.Restart();
+                    }
+                }
             }
             _fingerDown = false;
             this.ReleasePointerCapture(e.Pointer);
@@ -332,7 +336,6 @@ namespace PanoramicDataWin8.view.vis
             this.PointerReleased -= VisualizationContainerView_PointerReleased;
 
 
-            OperationViewModel model = (DataContext as OperationViewModel);
             foreach (var avm in model.AttachementViewModels)
             {
                 //avm.IsDisplayed = false;

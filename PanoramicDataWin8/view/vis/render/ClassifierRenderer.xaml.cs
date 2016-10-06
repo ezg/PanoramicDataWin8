@@ -334,7 +334,7 @@ namespace PanoramicDataWin8.view.vis.render
             _selectionPoints.Add(gt.TransformPoint(point));
         }
 
-        public override void EndSelection()
+        public override bool EndSelection()
         {
             IList<Vec> convexHull = Convexhull.convexhull(_selectionPoints);
             IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon();
@@ -351,7 +351,7 @@ namespace PanoramicDataWin8.view.vis.render
 
                 render();
             }
-            
+            return false;
         }
 
         void render()

@@ -13,6 +13,9 @@ namespace PanoramicDataWin8.view.vis.render
         public virtual void Dispose() { }
         public virtual void StartSelection(Point point) { }
         public virtual void MoveSelection(Point point) { }
-        public virtual void EndSelection() { }
+        public virtual bool EndSelection()
+        {
+            return false;
+        }
     }
 }

@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.view.operation;
@@ -14,73 +9,59 @@ namespace PanoramicDataWin8.model.view
 {
     public class AttachmentViewModel : ExtendedBindableBase
     {
+        private Stopwatch _activeStopwatch = new Stopwatch();
+
+        private AttachmentOrientation _attachmentOrientation;
+
+        private MenuViewModel _menuViewModel;
+
         private OperationViewModel _operationViewModel;
+
+        public AttachmentViewModel()
+        {
+            ActiveStopwatch.Start();
+        }
+
         public OperationViewModel OperationViewModel
         {
-            get
-            {
-                return _operationViewModel;
-            }
+            get { return _operationViewModel; }
             set
             {
                 if (_operationViewModel != null)
-                {
                     _operationViewModel.PropertyChanged -= OperationViewModelPropertyChanged;
-                }
-                this.SetProperty(ref _operationViewModel, value);
+                SetProperty(ref _operationViewModel, value);
                 if (_operationViewModel != null)
                 {
                     _operationViewModel.PropertyChanged += OperationViewModelPropertyChanged;
-                    _operationViewModel.OperationModel.PropertyChanged += QueryModel_PropertyChanged;    
+                    _operationViewModel.OperationModel.PropertyChanged += QueryModel_PropertyChanged;
                 }
             }
         }
 
-        private AttachmentOrientation _attachmentOrientation;
         public AttachmentOrientation AttachmentOrientation
         {
-            get
-            {
-                return _attachmentOrientation;
-            }
-            set
-            {
-                this.SetProperty(ref _attachmentOrientation, value);
-            }
-        }
-        
-        private Stopwatch _activeStopwatch = new Stopwatch();
-        public Stopwatch ActiveStopwatch
-        {
-            get
-            {
-                return _activeStopwatch;
-            }
-            set
-            {
-                this.SetProperty(ref _activeStopwatch, value);
-            }
+            get { return _attachmentOrientation; }
+            set { SetProperty(ref _attachmentOrientation, value); }
         }
 
-        private MenuViewModel _menuViewModel = null;
+        public Stopwatch ActiveStopwatch
+        {
+            get { return _activeStopwatch; }
+            set { SetProperty(ref _activeStopwatch, value); }
+        }
+
         public MenuViewModel MenuViewModel
         {
-            get
-            {
-                return _menuViewModel;
-            }
-            set
-            {
-                this.SetProperty(ref _menuViewModel, value);
-            }
+            get { return _menuViewModel; }
+            set { SetProperty(ref _menuViewModel, value); }
         }
 
         public MenuViewModel CreateMenuViewModel(AttachedTo attachedTo)
         {
-            MenuViewModel menuViewModel = new MenuViewModel()
+            var menuViewModel = new MenuViewModel
             {
                 AttachmentViewModel = this,
-                AttachmentOrientation = this.AttachmentOrientation
+                AttachmentOrientation = AttachmentOrientation
             };
 
             /*// is value AttributeOperationModel
@@ -187,12 +168,12 @@ namespace PanoramicDataWin8.model.view
             return menuViewModel;
         }
 
-        void OperationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void OperationViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
         }
 
 
-        void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void QueryModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             /*if (e.PropertyName == _operationViewModel.HistogramOperationModel.GetPropertyName(() => _operationViewModel.HistogramOperationModel.TaskModel) |
                 e.PropertyName == _operationViewModel.HistogramOperationModel.GetPropertyName(() => _operationViewModel.HistogramOperationModel.VisualizationType))
@@ -201,7 +182,7 @@ namespace PanoramicDataWin8.model.view
             }*/
         }
 
-        void initialize()
+        private void initialize()
         {
             /*if (AttachmentHeaderViewModels.Count == 0)
             {
@@ -241,16 +222,16 @@ namespace PanoramicDataWin8.model.view
                 }
             }*/
         }
-        
-        void createFrequentItemsetBottom()
+
+        private void createFrequentItemsetBottom()
         {
-            AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
+            var header = new AttachmentHeaderViewModel
             {
                 InputUsage = InputUsage.Label,
                 AcceptsInputGroupModels = false,
                 AcceptsInputModels = false
             };
-            header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
+            header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel
             {
                 AttachmentHeaderViewModel = header,
                 //Size = new Vec(25,25),
@@ -260,17 +241,17 @@ namespace PanoramicDataWin8.model.view
             //AttachmentHeaderViewModels.Add(header);
         }
 
-        void createLogregTop()
+        private void createLogregTop()
         {
             if (MainViewController.Instance.MainModel.ShowCodeGen)
             {
-                AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
+                var header = new AttachmentHeaderViewModel
                 {
                     InputUsage = InputUsage.Label,
                     AcceptsInputGroupModels = false,
                     AcceptsInputModels = false
                 };
-                header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel()
+                header.AddAttachmentItemViewModel = new AddAttachmentItemViewModel
                 {
                     AttachmentHeaderViewModel = header,
                     //Size = new Vec(25,25),
@@ -282,7 +263,7 @@ namespace PanoramicDataWin8.model.view
         }
 
 
-        void createLogregBottom()
+        private void createLogregBottom()
         {
             /*AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
             {
@@ -357,7 +338,7 @@ namespace PanoramicDataWin8.model.view
             AttachmentHeaderViewModels.Add(header);*/
         }
 
-        void createDbBottom()
+        private void createDbBottom()
         {
             // value
             var intensityHeader = createValueAttachmentHeader();
@@ -368,7 +349,7 @@ namespace PanoramicDataWin8.model.view
             //AttachmentHeaderViewModels.Add(groupHeader);
         }
 
-        AttachmentHeaderViewModel createValueAttachmentHeader()
+        private AttachmentHeaderViewModel createValueAttachmentHeader()
         {
             var groupHeader = createInputFieldUsageAttachmentHeader(InputUsage.Value);
             /*
@@ -402,9 +383,9 @@ namespace PanoramicDataWin8.model.view
             return groupHeader;
         }
 
-        AttachmentHeaderViewModel createGroupingAttachmentHeader()
+        private AttachmentHeaderViewModel createGroupingAttachmentHeader()
         {
-             var groupHeader = createInputFieldUsageAttachmentHeader(InputUsage.Group);
+            var groupHeader = createInputFieldUsageAttachmentHeader(InputUsage.Group);
 
             /*// handle added
             groupHeader.AddedTriggered = (inputOperationModel) =>
@@ -427,9 +408,9 @@ namespace PanoramicDataWin8.model.view
             return groupHeader;
         }
 
-        AttachmentHeaderViewModel createInputFieldUsageAttachmentHeader(InputUsage inputUsage)
+        private AttachmentHeaderViewModel createInputFieldUsageAttachmentHeader(InputUsage inputUsage)
         {
-            AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
+            var header = new AttachmentHeaderViewModel
             {
                 InputUsage = inputUsage
             };
@@ -480,5 +461,11 @@ namespace PanoramicDataWin8.model.view
         }
     }
 
-    public enum AttachmentOrientation { Left, Top, Bottom, Right }
+    public enum AttachmentOrientation
+    {
+        Left,
+        Top,
+        Bottom,
+        Right
+    }
 }

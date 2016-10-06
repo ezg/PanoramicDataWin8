@@ -24,6 +24,12 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             this.InitializeComponent();
             DataContextChanged += MenuItemView_DataContextChanged;
+            this.PointerPressed += MenuItemView_PointerPressed;
+        }
+
+        private void MenuItemView_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            
         }
 
         void MenuItemView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
