@@ -256,6 +256,9 @@
     <Compile Include="view\vis\menu\SliderMenuItemView.xaml.cs">
       <DependentUpon>SliderMenuItemView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\vis\menu\AttributeTransformationMenuItemView.xaml.cs">
+      <DependentUpon>AttributeTransformationMenuItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\menu\ToggleMenuItemView.xaml.cs">
       <DependentUpon>ToggleMenuItemView.xaml</DependentUpon>
     </Compile>
@@ -425,6 +428,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\vis\menu\SliderMenuItemView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="view\vis\menu\AttributeTransformationMenuItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

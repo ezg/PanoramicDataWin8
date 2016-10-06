@@ -10,6 +10,6 @@
     d:DesignHeight="300"
     d:DesignWidth="400"
     FontFamily="{StaticResource abel}">
-    <local:XYRenderer x:Name="xyRenderer">
-    </local:XYRenderer>
+    <common:DXSurface x:Name="dxSurface">
+    </common:DXSurface>
 </local:Renderer>

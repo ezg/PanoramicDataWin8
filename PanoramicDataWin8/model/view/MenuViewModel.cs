@@ -117,20 +117,7 @@ namespace PanoramicDataWin8.model.view
                 this.SetProperty(ref _attachmentViewModel, value);
             }
         }
-
-
-        private AttachedTo _attachedTo = null;
-        public AttachedTo AttachedTo
-        {
-            get
-            {
-                return _attachedTo;
-            }
-            set
-            {
-                this.SetProperty(ref _attachedTo, value);
-            }
-        }
+        
 
         private AttachmentOrientation _attachmentOrientation;
         public AttachmentOrientation AttachmentOrientation

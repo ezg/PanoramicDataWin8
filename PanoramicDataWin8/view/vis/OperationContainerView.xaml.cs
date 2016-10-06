@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Core;
 using Windows.System;
 using Windows.UI.Input;
+using IDEA_common.operations;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
@@ -97,18 +98,65 @@ namespace PanoramicDataWin8.view.vis
             if (args.NewValue != null)
             {
                 OperationViewModel model = ((OperationViewModel) args.NewValue);
-                model.OperationModel.PropertyChanged += QueryModel_PropertyChanged;
+                model.OperationModel.PropertyChanged += OperationModel_PropertyChanged;
                 visualizationTypeUpdated();
             }
         }
 
-        void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void OperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             HistogramOperationModel operationModel = (HistogramOperationModel) ((OperationViewModel) DataContext).OperationModel;
             if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.VisualizationType))
             {
                 visualizationTypeUpdated();
             }
+            else if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.Result))
+            {
+                updateProgressAndNullVisualization();
+            }
+        }
+
+        private void updateProgressAndNullVisualization()
+        {
+            IResult resultModel = ((OperationViewModel)DataContext).OperationModel.Result;
+
+            // progress
+            double size = 14;
+            double thickness = 2;
+
+            double progress = resultModel?.Progress ?? 0;
+            
+            tbPercentage1.Text = (progress * 100).ToString("F1") + "%";
+            double percentage = Math.Min(progress, 0.999999);
+            if (percentage > 0.5)
+            {
+                arcSegement1.IsLargeArc = true;
+            }
+            else
+            {
+                arcSegement1.IsLargeArc = false;
+            }
+            double angle = 2 * Math.PI * percentage - Math.PI / 2.0;
+            double x = size / 2.0;
+            double y = size / 2.0;
+
+            Windows.Foundation.Point p = new Windows.Foundation.Point(Math.Cos(angle) * (size / 2.0 - thickness / 2.0) + x, Math.Sin(angle) * (size / 2.0 - thickness / 2.0) + y);
+            arcSegement1.Point = p;
+            if ((size / 2.0 - thickness / 2.0) > 0.0)
+            {
+                arcSegement1.Size = new Size((size / 2.0 - thickness / 2.0), (size / 2.0 - thickness / 2.0));
+            }
+
+            // null labels
+            /*if (result.ResultDescriptionModel != null && (result.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount > 0)
+            {
+                tbNull.Visibility = Windows.UI.Xaml.Visibility.Visible;
+                tbNull.Text = "null values : " + (result.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount;
+            }
+            else
+            {
+                tbNull.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
+            }*/
         }
 
         void visualizationTypeUpdated()
@@ -172,11 +220,11 @@ namespace PanoramicDataWin8.view.vis
             _movingStarted = false;
             _fingerDown = true;
 
-            this.SendToFront();
+            //this.SendToFront();
             OperationViewModel model = (DataContext as OperationViewModel);
             foreach (var avm in model.AttachementViewModels)
             {
-                avm.IsDisplayed = true;
+                avm.ActiveStopwatch.Restart();
             }
         }
 
@@ -218,12 +266,6 @@ namespace PanoramicDataWin8.view.vis
             }
             _fingerDown = false;
 
-            OperationViewModel model = (DataContext as OperationViewModel);
-            foreach (var avm in model.AttachementViewModels)
-            {
-                avm.IsDisplayed = false;
-            }
-
             if (isRightMouse)
             {
                 MainViewController.Instance.RemoveOperationViewModel(this);
@@ -248,11 +290,11 @@ namespace PanoramicDataWin8.view.vis
             this.PointerReleased += VisualizationContainerView_PointerReleased;
             _fingerDown = true;
 
-            this.SendToFront();
+            //this.SendToFront();
             OperationViewModel model = (DataContext as OperationViewModel);
             foreach (var avm in model.AttachementViewModels)
             {
-                avm.IsDisplayed = true;
+                avm.ActiveStopwatch.Restart();
             }
 
             ((OperationViewModel) DataContext).FireOperationViewModelTapped();
@@ -293,7 +335,7 @@ namespace PanoramicDataWin8.view.vis
             OperationViewModel model = (DataContext as OperationViewModel);
             foreach (var avm in model.AttachementViewModels)
             {
-                avm.IsDisplayed = false;
+                //avm.IsDisplayed = false;
             }
 
             if (e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)

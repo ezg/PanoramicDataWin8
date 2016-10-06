@@ -13,7 +13,87 @@
 
     <Border Name="border" BorderBrush="{StaticResource backgroundBrush}" BorderThickness="0">
         <Grid>
-            <Grid Name="contentGrid"/>
+            <Grid Opacity="1">
+                <Grid Name="contentGrid"/>
+                <Grid Opacity="1">
+                    <ContentPresenter x:Name="contentPresenter"/>
+                    <Grid x:Name="animationGrid" RenderTransformOrigin="0.5, 0.5" Opacity="0" Width="14" Height="14">
+                        <Ellipse Width="14" Height="14" Stroke="{StaticResource backgroundBrush}" StrokeThickness="2"/>
+                        <Path Stroke="{StaticResource highlightBrush}" StrokeThickness="2">
+                            <Path.Data>
+                                <PathGeometry>
+                                    <PathGeometry.Figures>
+                                        <PathFigureCollection>
+                                            <PathFigure StartPoint="7,1">
+                                                <PathFigure.Segments>
+                                                    <PathSegmentCollection>
+                                                        <ArcSegment Size="6,6" RotationAngle="0" IsLargeArc="False" SweepDirection="Clockwise" Point="10.526711463928223,2.1458981037139893" />
+                                                    </PathSegmentCollection>
+                                                </PathFigure.Segments>
+                                            </PathFigure>
+                                        </PathFigureCollection>
+                                    </PathGeometry.Figures>
+                                </PathGeometry>
+                            </Path.Data>
+                        </Path>
+                        <Grid.RenderTransform>
+                            <CompositeTransform ScaleX="4" ScaleY="4"></CompositeTransform>
+                        </Grid.RenderTransform>
+                        <Grid.Triggers>
+                            <EventTrigger RoutedEvent="Grid.Loaded">
+                                <BeginStoryboard>
+                                    <Storyboard TargetName="animationGrid">
+                                        <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(CompositeTransform.Rotation)" To="-360" Duration="0:0:1" RepeatBehavior="Forever"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </EventTrigger>
+                        </Grid.Triggers>
+                    </Grid>
+                    <StackPanel Orientation="Horizontal"  HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4">
+                        <StackPanel>
+                            <Grid>
+                                <Grid x:Name="progressGrid" Width="14" Height="14" Opacity="1">
+                                    <Grid>
+                                        <Ellipse Width="14" Height="14" Stroke="{StaticResource backgroundBrush}" StrokeThickness="2"/>
+                                        <Path x:Name="path1" Stroke="{StaticResource highlightBrush}" StrokeThickness="2">
+                                            <Path.Data>
+                                                <PathGeometry>
+                                                    <PathGeometry.Figures>
+                                                        <PathFigureCollection>
+                                                            <PathFigure x:Name="pathFigure1" StartPoint="7,1">
+                                                                <PathFigure.Segments>
+                                                                    <PathSegmentCollection>
+                                                                        <ArcSegment x:Name="arcSegement1" Size="6,6" RotationAngle="0" IsLargeArc="False" SweepDirection="Clockwise" Point="13,6" />
+                                                                    </PathSegmentCollection>
+                                                                </PathFigure.Segments>
+                                                            </PathFigure>
+                                                        </PathFigureCollection>
+                                                    </PathGeometry.Figures>
+                                                </PathGeometry>
+                                            </Path.Data>
+                                        </Path>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                            <TextBlock x:Name="tbPercentage1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
+                                   FontSize="11"
+                                   Foreground="{StaticResource darkBrush}"
+                                   Text="25.9%"
+                                   Visibility="Collapsed"/>
+                        </StackPanel>
+                        <TextBlock x:Name="tbNull" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
+                                   FontSize="11"
+                                       Opacity="0"
+                                   Foreground="{StaticResource darkBrush}"
+                                   Text="25.9%"/>
+                        <TextBlock x:Name="tbSelection" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5,0,0,0"
+                                   FontSize="11"
+                                       Opacity="0"
+                                   Foreground="{StaticResource darkBrush}"
+                                   Text=""/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
             <Polygon 
                 Name="resizeGrid" 
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"

@@ -26,6 +26,7 @@ using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
+using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.view.inq;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
@@ -35,8 +36,7 @@ namespace PanoramicDataWin8.view.vis.render
     public sealed partial class PlotRenderer : Renderer, IScribbable
     {
         private PlotRendererContentProvider _plotRendererContentProvider = new PlotRendererContentProvider();
-
-        private DXSurface dxSurface = null;
+        
 
         public PlotRenderer()
         {
@@ -48,20 +48,17 @@ namespace PanoramicDataWin8.view.vis.render
 
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
-            xyRenderer.Render += render;
-            xyRenderer.LoadResult += LoadResult;
-            dxSurface = new DXSurface();
+         
             _plotRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
             _plotRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
             dxSurface.ContentProvider = _plotRendererContentProvider;
-            xyRenderer.Content = dxSurface;
         }
 
         public override void Dispose()
         {
             base.Dispose();
-            xyRenderer.Dispose();
             (DataContext as HistogramOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
+            (DataContext as HistogramOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
             if (dxSurface != null)
             {
                 dxSurface.Dispose();
@@ -74,22 +71,31 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 (DataContext as HistogramOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
                 (DataContext as HistogramOperationViewModel).OperationModel.OperationModelUpdated += OperationModelUpdated;
-                //(DataContext as OperationViewModel).OperationModel.RequestRender += PlotRenderer_RequestRender;
-            }
-        }
+                (DataContext as HistogramOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
+                (DataContext as HistogramOperationViewModel).OperationModel.PropertyChanged += OperationModel_PropertyChanged;
 
-        private void PlotRenderer_RequestRender(object sender, EventArgs e)
-        {
-            if (DataContext != null && (DataContext as HistogramOperationViewModel).OperationModel.Result != null)
-            {
                 var result = (DataContext as HistogramOperationViewModel).OperationModel.Result;
                 if (result != null)
                 {
+                    loadResult(result);
                     render();
                 }
             }
         }
-
+        void OperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            HistogramOperationModel operationModel = (HistogramOperationModel)((OperationViewModel)DataContext).OperationModel;
+            if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.Result))
+            {
+                var result = (DataContext as HistogramOperationViewModel).OperationModel.Result;
+                if (result != null)
+                {
+                    loadResult(result);
+                    render();
+                }
+            }
+        }
+        
         void OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
             if (e is FilterOperationModelUpdatedEventArgs && 
@@ -105,13 +111,12 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void LoadResult(IResult result)
+        void loadResult(IResult result)
         {
             HistogramOperationViewModel model = (DataContext as HistogramOperationViewModel);
             _plotRendererContentProvider.UpdateData(result,
                 (HistogramOperationModel) model.OperationModel,
                 (HistogramOperationModel) model.OperationModel.ResultCauserClone);
-            render();
         }
 
 

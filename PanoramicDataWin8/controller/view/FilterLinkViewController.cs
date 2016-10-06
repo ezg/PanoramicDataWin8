@@ -101,7 +101,7 @@ namespace PanoramicDataWin8.controller.view
                     {
                         DataContext = filterLinkViewModel
                     };
-                    MainViewController.Instance.InkableScene.AddToBack(filterLinkView);
+                    MainViewController.Instance.InkableScene.Add(filterLinkView);
                 }
                 if (!filterLinkViewModel.FilterLinkModels.Contains(filterLinkModel))
                 {

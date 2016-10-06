@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
@@ -95,7 +96,7 @@ namespace PanoramicDataWin8.model.view
         }
 
         private int _columnSpan = 1;
-        public int _ColumnSpan
+        public int ColumnSpan
         {
             get
             {
@@ -104,20 +105,6 @@ namespace PanoramicDataWin8.model.view
             set
             {
                 this.SetProperty(ref _columnSpan, value);
-            }
-        }
-
-
-        private Vec _preferedSize = new Vec(50, 50);
-        public Vec PreferedSize
-        {
-            get
-            {
-                return _preferedSize;
-            }
-            set
-            {
-                this.SetProperty(ref _preferedSize, value);
             }
         }
 
@@ -147,6 +134,32 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private bool _isWidthBoundToParent = false;
+        public bool IsWidthBoundToParent
+        {
+            get
+            {
+                return _isWidthBoundToParent;
+            }
+            set
+            {
+                this.SetProperty(ref _isWidthBoundToParent, value);
+            }
+        }
+
+        private bool _isHeightBoundToParent = false;
+        public bool IsHeightBoundToParent
+        {
+            get
+            {
+                return _isHeightBoundToParent;
+            }
+            set
+            {
+                this.SetProperty(ref _isHeightBoundToParent, value);
+            }
+        }
+
         private Vec _size = new Vec(50, 50);
         public Vec Size
         {
@@ -173,6 +186,19 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private bool _isAlwaysDisplayed = false;
+        public bool IsAlwaysDisplayed
+        {
+            get
+            {
+                return _isAlwaysDisplayed;
+            }
+            set
+            {
+                this.SetProperty(ref _isAlwaysDisplayed, value);
+            }
+        }
+
         private MenuItemComponentViewModel _menuItemComponentViewModel = null;
         public MenuItemComponentViewModel MenuItemComponentViewModel
         {
@@ -187,7 +213,7 @@ namespace PanoramicDataWin8.model.view
         }
     }
 
-    public class MenuItemComponentViewModel : ExtendedBindableBase
+    public abstract class MenuItemComponentViewModel : ExtendedBindableBase
     {
         private bool _isEnabled = false;
         public bool IsEnabled
@@ -199,6 +225,50 @@ namespace PanoramicDataWin8.model.view
             set
             {
                 this.SetProperty(ref _isEnabled, value);
+            }
+        }
+    }
+
+    public class AttributeTransformationMenuItemViewModel : MenuItemComponentViewModel
+    {
+        public Action<AttributeTransformationModel> DroppedTriggered { get; set; }
+
+        private string _label = "";
+        public string Label
+        {
+            get
+            {
+                return _label;
+            }
+            set
+            {
+                this.SetProperty(ref _label, value);
+            }
+        }
+
+        private AttributeTransformationViewModel _attributeTransformationViewModel = null;
+        public AttributeTransformationViewModel AttributeTransformationViewModel
+        {
+            get
+            {
+                return _attributeTransformationViewModel;
+            }
+            set
+            {
+                this.SetProperty(ref _attributeTransformationViewModel, value);
+            }
+        }
+
+        private double _textAngle = 0;
+        public double TextAngle
+        {
+            get
+            {
+                return _textAngle;
+            }
+            set
+            {
+                this.SetProperty(ref _textAngle, value);
             }
         }
     }

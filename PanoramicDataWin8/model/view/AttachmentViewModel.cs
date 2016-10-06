@@ -32,22 +32,7 @@ namespace PanoramicDataWin8.model.view
                 {
                     _operationViewModel.PropertyChanged += OperationViewModelPropertyChanged;
                     _operationViewModel.OperationModel.PropertyChanged += QueryModel_PropertyChanged;    
-                    initialize();
                 }
-            }
-        }
-
-
-        private ObservableCollection<AttachmentHeaderViewModel> _attachmentHeaderViewModels = new ObservableCollection<AttachmentHeaderViewModel>();
-        public ObservableCollection<AttachmentHeaderViewModel> AttachmentHeaderViewModels
-        {
-            get
-            {
-                return _attachmentHeaderViewModels;
-            }
-            set
-            {
-                this.SetProperty(ref _attachmentHeaderViewModels, value);
             }
         }
 
@@ -63,19 +48,7 @@ namespace PanoramicDataWin8.model.view
                 this.SetProperty(ref _attachmentOrientation, value);
             }
         }
-
-        private bool _isDisplayed;
-        public bool IsDisplayed
-        {
-            get
-            {
-                return _isDisplayed;
-            }
-            set
-            {
-                this.SetProperty(ref _isDisplayed, value);
-            }
-        }
+        
         private Stopwatch _activeStopwatch = new Stopwatch();
         public Stopwatch ActiveStopwatch
         {
@@ -89,12 +62,24 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
+        private MenuViewModel _menuViewModel = null;
+        public MenuViewModel MenuViewModel
+        {
+            get
+            {
+                return _menuViewModel;
+            }
+            set
+            {
+                this.SetProperty(ref _menuViewModel, value);
+            }
+        }
+
         public MenuViewModel CreateMenuViewModel(AttachedTo attachedTo)
         {
             MenuViewModel menuViewModel = new MenuViewModel()
             {
                 AttachmentViewModel = this,
-                AttachedTo = attachedTo,
                 AttachmentOrientation = this.AttachmentOrientation
             };
 
@@ -256,7 +241,7 @@ namespace PanoramicDataWin8.model.view
                 }
             }*/
         }
-
+        
         void createFrequentItemsetBottom()
         {
             AttachmentHeaderViewModel header = new AttachmentHeaderViewModel()
@@ -272,7 +257,7 @@ namespace PanoramicDataWin8.model.view
                 //TargetSize = new Vec(25, 25),
                 Label = "minimum support"
             };
-            AttachmentHeaderViewModels.Add(header);
+            //AttachmentHeaderViewModels.Add(header);
         }
 
         void createLogregTop()
@@ -292,7 +277,7 @@ namespace PanoramicDataWin8.model.view
                     //TargetSize = new Vec(25, 25),
                     Label = "codegen"
                 };
-                AttachmentHeaderViewModels.Add(header);
+                //AttachmentHeaderViewModels.Add(header);
             }
         }
 

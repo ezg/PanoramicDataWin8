@@ -22,13 +22,13 @@ namespace PanoramicDataWin8.view.vis.menu
         private DispatcherTimer _activeTimer = new DispatcherTimer();
         private Canvas _contentCanvas = new Canvas();
 
-        private List<MenuItemView> _menuViewItems = new List<MenuItemView>();
+        private Dictionary<MenuItemViewModel, MenuItemView> _menuViewItems = new Dictionary<MenuItemViewModel, MenuItemView>();
 
         public MenuView()
         {
             this.DataContextChanged += MenuView_DataContextChanged;
             this.Content = _contentCanvas;
-            this.Opacity = 0;
+            this.Opacity = 1;
 
 
             _activeTimer.Interval = TimeSpan.FromMilliseconds(10);
@@ -38,7 +38,6 @@ namespace PanoramicDataWin8.view.vis.menu
 
         void _activeTimer_Tick(object sender, object e)
         {
-
             // animate all elements to target size, position
             var model = (DataContext as MenuViewModel);
             if (model != null)
@@ -48,7 +47,7 @@ namespace PanoramicDataWin8.view.vis.menu
                     // position
                     if (item.Position.X == 0 && item.Position.Y == 0)
                     {
-                        item.Position = item.TargetPosition;
+                            item.Position = item.TargetPosition;
                     }
                     else
                     {
@@ -74,48 +73,53 @@ namespace PanoramicDataWin8.view.vis.menu
             }
         }
 
-        void toggleActive()
+        void toggleDisplayed()
         {
             var model = (DataContext as MenuViewModel);
 
             // fade out
             if (!model.IsDisplayed)
             {
-                ExponentialEase easingFunction = new ExponentialEase();
-                easingFunction.EasingMode = EasingMode.EaseInOut;
-
-                DoubleAnimation animation = new DoubleAnimation();
-                animation.From = this.Opacity;
-                animation.To = 0;
-                animation.EasingFunction = easingFunction;
-                Storyboard storyboard = new Storyboard();
-                storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, this);
-                Storyboard.SetTargetProperty(animation, "Opacity");
-                storyboard.Begin();
-                storyboard.Completed += (s, e) =>
+                foreach (var kvp in _menuViewItems)
                 {
-                    if (model.IsToBeRemoved) 
+                    if (!kvp.Key.IsAlwaysDisplayed)
                     {
-                        MainViewController.Instance.InkableScene.Remove(this);
+                        ExponentialEase easingFunction = new ExponentialEase();
+                        easingFunction.EasingMode = EasingMode.EaseInOut;
+
+                        DoubleAnimation animation = new DoubleAnimation();
+                        animation.From = kvp.Value.Opacity;
+                        animation.To = 0;
+                        animation.EasingFunction = easingFunction;
+                        Storyboard storyboard = new Storyboard();
+                        storyboard.Children.Add(animation);
+                        Storyboard.SetTarget(animation, kvp.Value);
+                        Storyboard.SetTargetProperty(animation, "Opacity");
+                        storyboard.Begin();
                     }
-                };
+                }
             }
             // fade in
             else
             {
-                ExponentialEase easingFunction = new ExponentialEase();
-                easingFunction.EasingMode = EasingMode.EaseInOut;
+                foreach (var kvp in _menuViewItems)
+                {
+                    if (!kvp.Key.IsAlwaysDisplayed)
+                    {
+                        ExponentialEase easingFunction = new ExponentialEase();
+                        easingFunction.EasingMode = EasingMode.EaseInOut;
 
-                DoubleAnimation animation = new DoubleAnimation();
-                animation.From = this.Opacity;
-                animation.To = 1;
-                animation.EasingFunction = easingFunction;
-                Storyboard storyboard = new Storyboard();
-                storyboard.Children.Add(animation);
-                Storyboard.SetTarget(animation, this);
-                Storyboard.SetTargetProperty(animation, "Opacity");
-                storyboard.Begin();
+                        DoubleAnimation animation = new DoubleAnimation();
+                        animation.From = kvp.Value.Opacity;
+                        animation.To = 1;
+                        animation.EasingFunction = easingFunction;
+                        Storyboard storyboard = new Storyboard();
+                        storyboard.Children.Add(animation);
+                        Storyboard.SetTarget(animation, kvp.Value);
+                        Storyboard.SetTargetProperty(animation, "Opacity");
+                        storyboard.Begin();
+                    }
+                }
             }
         }
 
@@ -127,7 +131,9 @@ namespace PanoramicDataWin8.view.vis.menu
                 _contentCanvas.Children.Clear();
 
                 var model = (e.NewValue as MenuViewModel);
+                model.PropertyChanged -= MenuViewModel_PropertyChanged;
                 model.PropertyChanged += MenuViewModel_PropertyChanged;
+                model.MenuItemViewModels.CollectionChanged -= MenuItemViewModels_CollectionChanged;
                 model.MenuItemViewModels.CollectionChanged += MenuItemViewModels_CollectionChanged;
 
                 foreach (var item in model.MenuItemViewModels)
@@ -136,7 +142,7 @@ namespace PanoramicDataWin8.view.vis.menu
                     {
                         DataContext = item
                     };
-                    _menuViewItems.Add(menuItemView);
+                    _menuViewItems.Add(item, menuItemView);
                     _contentCanvas.Children.Add(menuItemView);
                 }
 
@@ -149,7 +155,7 @@ namespace PanoramicDataWin8.view.vis.menu
             var model = (DataContext as MenuViewModel);
             if (e.PropertyName == model.GetPropertyName(() => model.IsDisplayed))
             {
-                toggleActive();
+                toggleDisplayed();
             }
             else if (e.PropertyName == model.GetPropertyName(() => model.AnkerPosition))
             {
@@ -164,9 +170,9 @@ namespace PanoramicDataWin8.view.vis.menu
                 foreach (var item in e.OldItems)
                 {
                     var model = (item as MenuItemViewModel);
-                    var view = _menuViewItems.FirstOrDefault(v => v.DataContext == model);
-                    _contentCanvas.Children.Remove(view);
-                    _menuViewItems.Remove(view);
+                    var view = _menuViewItems.FirstOrDefault(v => v.Key == model);
+                    _contentCanvas.Children.Remove(view.Value);
+                    _menuViewItems.Remove(view.Key);
                     updateRendering();
                 }
             }
@@ -180,7 +186,7 @@ namespace PanoramicDataWin8.view.vis.menu
                     };
                     var model = (item as MenuItemViewModel);
                     var views = new List<AttachmentItemView>();
-                    _menuViewItems.Add(menuItemView);
+                    _menuViewItems.Add(model, menuItemView);
                     _contentCanvas.Children.Insert(0, menuItemView);
                     updateRendering();
                 }
@@ -216,9 +222,9 @@ namespace PanoramicDataWin8.view.vis.menu
                 {
                     for (int col = 0; col < model.NrColumns; col++)
                     {
-                        for (int row = model.NrRows - 1; row >= 0; row--)
+                        for (int row = 0; row < model.NrRows; row++)
                         {
-                            var itemsInSameCol = model.MenuItemViewModels.Where(mi => mi.Row > row && mi.Column == col).ToList();
+                            var itemsInSameCol = model.MenuItemViewModels.Where(mi => mi.Row < row && (mi.Column == col || (mi.Column < col && mi.Column + mi.ColumnSpan - 1 >= col))).ToList();
                             var itemsInSameRow = model.MenuItemViewModels.Where(mi => mi.Column < col && mi.Row == row).ToList();
 
                             double currentY = model.AnkerPosition.Y + itemsInSameCol.Sum(mi => mi.Size.Y) + itemsInSameCol.Count * GAP + GAP;

@@ -130,6 +130,62 @@ namespace PanoramicDataWin8.model.data
             }
         }
 
+        public string GetLabel()
+        {
+            var mainLabel = addDetailToLabel(AttributeModel.RawName);
+            mainLabel = mainLabel.Replace("_", " ");
+            return mainLabel;
+        }
+
+        private string addDetailToLabel(string name)
+        {
+            if (AggregateFunction == AggregateFunction.Avg)
+            {
+                name = "avg(" + name + ")";
+            }
+            else if (AggregateFunction == AggregateFunction.Count)
+            {
+                name = "count";
+            }
+            else if (AggregateFunction == AggregateFunction.Max)
+            {
+                name = "max(" + name + ")";
+            }
+            else if (AggregateFunction == AggregateFunction.Min)
+            {
+                name = "min(" + name + ")";
+            }
+            else if (AggregateFunction == AggregateFunction.Sum)
+            {
+                name = "sum(" + name + ")";
+            }
+            /*else if (AttributeTransformationViewModel.AggregateFunction == AggregateFunction.Bin)
+            {
+                name = "Bin Range(" + name + ")";
+            }*/
+
+            if (ScaleFunction != ScaleFunction.None)
+            {
+                if (ScaleFunction == ScaleFunction.Log)
+                {
+                    name += " [Log]";
+                }
+                else if (ScaleFunction == ScaleFunction.Normalize)
+                {
+                    name += " [Normalize]";
+                }
+                else if (ScaleFunction == ScaleFunction.RunningTotal)
+                {
+                    name += " [RT]";
+                }
+                else if (ScaleFunction == ScaleFunction.RunningTotalNormalized)
+                {
+                    name += " [RT Norm]";
+                }
+            }
+            return name;
+        }
+
         public override bool Equals(object obj)
         {
             if (obj is AttributeTransformationModel)
