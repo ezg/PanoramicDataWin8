@@ -96,6 +96,10 @@ namespace PanoramicDataWin8.view.vis.menu
                         Storyboard.SetTarget(animation, kvp.Value);
                         Storyboard.SetTargetProperty(animation, "Opacity");
                         storyboard.Begin();
+                        storyboard.Completed += (sender, o) =>
+                        {
+                            kvp.Value.IsHitTestVisible = false;
+                        };
                     }
                 }
             }
@@ -106,6 +110,8 @@ namespace PanoramicDataWin8.view.vis.menu
                 {
                     if (!kvp.Key.IsAlwaysDisplayed)
                     {
+                        kvp.Value.IsHitTestVisible = true;
+
                         ExponentialEase easingFunction = new ExponentialEase();
                         easingFunction.EasingMode = EasingMode.EaseInOut;
 

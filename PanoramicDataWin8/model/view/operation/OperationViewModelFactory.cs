@@ -140,6 +140,10 @@ namespace PanoramicDataWin8.model.view
                     }
                 }
             };
+            attr1.TappedTriggered = () =>
+            {
+                attachmentViewModel.ActiveStopwatch.Restart();
+            };
             attr1.DroppedTriggered = (attributeTransformationModel) =>
             {
                 if (histogramOperationViewModel.HistogramOperationModel.GetUsageAttributeTransformationModel(axis).Any())

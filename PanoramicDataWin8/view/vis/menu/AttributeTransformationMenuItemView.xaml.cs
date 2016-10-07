@@ -152,7 +152,13 @@ namespace PanoramicDataWin8.view.vis.menu
             if (_shadow == null &&
                 _manipulationStartTime + TimeSpan.FromSeconds(0.5).Ticks > DateTime.Now.Ticks)
             {
-                Debug.WriteLine("--TAPP");
+                var attrModel =
+                ((AttributeTransformationMenuItemViewModel)
+                    ((MenuItemViewModel) DataContext).MenuItemComponentViewModel);
+                if (attrModel != null && attrModel.TappedTriggered != null)
+                {
+                    attrModel.TappedTriggered();
+                }
             }
 
             if (_shadow != null)

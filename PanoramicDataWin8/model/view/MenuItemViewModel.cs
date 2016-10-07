@@ -232,6 +232,7 @@ namespace PanoramicDataWin8.model.view
     public class AttributeTransformationMenuItemViewModel : MenuItemComponentViewModel
     {
         public Action<AttributeTransformationModel> DroppedTriggered { get; set; }
+        public Action TappedTriggered { get; set; }
 
         private string _label = "";
         public string Label
