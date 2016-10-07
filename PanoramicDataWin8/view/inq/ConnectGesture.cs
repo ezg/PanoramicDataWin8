@@ -15,6 +15,7 @@ namespace PanoramicDataWin8.view.inq
             this._inkableScene = inkableScene;
         }
 
+
         private OperationViewModel _fromOperationViewModel = null;
         public OperationViewModel FromOperationViewModel
         {

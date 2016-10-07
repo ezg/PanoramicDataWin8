@@ -44,7 +44,7 @@ namespace PanoramicDataWin8.controller.view
             {
                 filterLinkModel = new FilterLinkModel()
                 {
-                    FromOperationModel = (IFilterProviderOperationModel) @from,
+                    FromOperationModel = (IFilterProviderOperationModel) from,
                     ToOperationModel = (IFilterConsumerOperationModel) to
                 };
                 if (isLinkAllowed(filterLinkModel))
@@ -116,27 +116,25 @@ namespace PanoramicDataWin8.controller.view
         {
             List<FilterLinkModel> linkModels = ((IFilterConsumerOperationModel)filterLinkModel.FromOperationModel).LinkModels.Where(lm => lm.FromOperationModel == filterLinkModel.FromOperationModel).ToList();
             linkModels.Add(filterLinkModel);
-            return !recursiveCheckForCiruclarLinking(linkModels, (IFilterConsumerOperationModel)filterLinkModel.FromOperationModel, new HashSet<IFilterConsumerOperationModel>());
-        }
+            HashSet<IFilterConsumerOperationModel> chain = new HashSet<IFilterConsumerOperationModel>();
+            recursiveCheckForCiruclarLinking(linkModels, chain);
 
-        private bool recursiveCheckForCiruclarLinking(List<FilterLinkModel> links, IFilterConsumerOperationModel current, HashSet<IFilterConsumerOperationModel> chain)
-        {
-            if (!chain.Contains(current))
+            if (chain.Contains(filterLinkModel.FromOperationModel as IFilterConsumerOperationModel))
             {
-                chain.Add(current);
-                bool ret = false;
-                foreach (var link in links)
-                {
-                    ret = ret || recursiveCheckForCiruclarLinking(((IFilterConsumerOperationModel)link.ToOperationModel).LinkModels.Where(lm => lm.FromOperationModel == link.ToOperationModel).ToList(),
-                        (IFilterConsumerOperationModel)link.ToOperationModel, chain);
-                }
-                return ret;
+                return false;
             }
-            else
+            return true;
+        }
+        private void recursiveCheckForCiruclarLinking(List<FilterLinkModel> links, HashSet<IFilterConsumerOperationModel> chain)
+        {
+            bool ret = false;
+            foreach (var link in links)
             {
-                return true;
+                chain.Add(link.ToOperationModel);
+                recursiveCheckForCiruclarLinking(link.ToOperationModel.LinkModels.Where(lm => lm.FromOperationModel == link.ToOperationModel).ToList(), chain);
             }
         }
+        
 
         public void RemoveFilterLinkViewModel(FilterLinkModel filterLinkModel)
         {
