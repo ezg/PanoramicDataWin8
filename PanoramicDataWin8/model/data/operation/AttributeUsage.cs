@@ -1,13 +1,11 @@
 ﻿namespace PanoramicDataWin8.model.data
 {
-    public enum InputUsage
+    public enum AttributeUsage
     {
         DefaultValue,
         Value,
         Group,
         X,
-        Y,
-        Label,
-        Feature
+        Y
     }
 }

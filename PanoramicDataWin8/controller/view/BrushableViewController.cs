@@ -54,7 +54,7 @@ namespace PanoramicDataWin8.controller.view
 
                 // views to open
                 if ((Math.Abs(diff.Y) < 300) &&
-                    (boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) < 50) &&
+                    (boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) < 100) &&
                     (dropped || (DateTime.Now.Ticks > TimeSpan.TicksPerSecond*1 + brushViewModel.TicksSinceDwellStart)))
                 {
                     brushViewModel.BrushableOperationViewModelState = BrushableOperationViewModelState.Opened;
@@ -66,8 +66,8 @@ namespace PanoramicDataWin8.controller.view
                 // Views to close
                 if (areLinked ||
                     (Math.Abs(diff.Y) >= 300) ||
-                    ((brushViewModel.BrushableOperationViewModelState == BrushableOperationViewModelState.Opening) && (boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) >= 50)) ||
-                    ((brushViewModel.BrushableOperationViewModelState == BrushableOperationViewModelState.Opened) && (boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) >= 50)) //||
+                    ((brushViewModel.BrushableOperationViewModelState == BrushableOperationViewModelState.Opening) && (boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) >= 100)) ||
+                    ((brushViewModel.BrushableOperationViewModelState == BrushableOperationViewModelState.Opened) && (boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) >= 100)) //||
                 ) //brushViewModel.OperationViewModels.Any(c => !BrushViews.Contains(c as Brush)))
                 {
                     brushViewModel.BrushableOperationViewModelState = BrushableOperationViewModelState.Closing;
@@ -139,7 +139,7 @@ namespace PanoramicDataWin8.controller.view
                         (!_lastMoved.ContainsKey(other) || (DateTime.Now - _lastMoved[other] > TimeSpan.FromSeconds(0.5))))
                     {
                         if ((Math.Abs(diff.Y) < 300) &&
-                            (boundHorizontalDistance(current.Bounds, other.Bounds) < 50))
+                            (boundHorizontalDistance(current.Bounds, other.Bounds) < 100))
                         {
                             if (BrushViews.Keys.Any(sov => (sov.To == current) && (sov.From == other)))
                             {

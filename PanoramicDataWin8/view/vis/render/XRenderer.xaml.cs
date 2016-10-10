@@ -62,7 +62,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (_histogramOperationViewModel != null)
             {
                 _histogramOperationViewModel.PropertyChanged -= HistogramOperationViewModelPropertyChanged;
-                _histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).CollectionChanged -= X_CollectionChanged;
+                _histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).CollectionChanged -= X_CollectionChanged;
                 _histogramOperationModel.FilterModels.CollectionChanged -= FilterModels_CollectionChanged;
                 _histogramOperationModel.PropertyChanged -= QueryModel_PropertyChanged;
             }
@@ -83,7 +83,7 @@ namespace PanoramicDataWin8.view.vis.render
                 _histogramOperationViewModel.PropertyChanged += HistogramOperationViewModelPropertyChanged;
 
                 _histogramOperationModel = (HistogramOperationModel)_histogramOperationViewModel.OperationModel;
-                _histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).CollectionChanged += X_CollectionChanged;
+                _histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).CollectionChanged += X_CollectionChanged;
                 _histogramOperationModel.FilterModels.CollectionChanged += FilterModels_CollectionChanged;
                 _histogramOperationModel.PropertyChanged += QueryModel_PropertyChanged;
                 ApplyTemplate();
@@ -129,9 +129,9 @@ namespace PanoramicDataWin8.view.vis.render
             removeMenu();
             HistogramOperationViewModel visModel = ((HistogramOperationViewModel) DataContext);
             HistogramOperationModel histogramOperationModel = (HistogramOperationModel) visModel.OperationModel;
-            if (histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Any())
+            if (histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any())
             {
-                var xAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).First();
+                var xAom = histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).First();
                 ((InputFieldView)GetTemplateChild("xInputFieldView")).DataContext = new AttributeTransformationViewModel((DataContext as HistogramOperationViewModel), xAom)
                 {
                     IsShadow = false,
@@ -223,8 +223,8 @@ namespace PanoramicDataWin8.view.vis.render
             var progressGrid = (Grid)GetTemplateChild("progressGrid");
             /*if (MainViewController.Instance.MainModel.Mode == Mode.batch &&
                 result.ResultType == ResultType.Clear &&
-                ((OperationViewModel)DataContext).OperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Any() &&
-                ((OperationViewModel)DataContext).OperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).Any())
+                ((OperationViewModel)DataContext).OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any() &&
+                ((OperationViewModel)DataContext).OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).Any())
             {
 
                 animationGrid.Opacity = 1.0;
@@ -342,11 +342,11 @@ namespace PanoramicDataWin8.view.vis.render
             HistogramOperationModel histogramOperationModel = (HistogramOperationModel) ((HistogramOperationViewModel) DataContext).OperationModel;
             var tbSelection = ((TextBlock)GetTemplateChild("tbSelection"));
             if (histogramOperationModel.FilterModels.Count > 0 &&
-                histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Count > 0 &&
-                histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).Count > 0)
+                histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Count > 0 &&
+                histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).Count > 0)
             {
-                var xAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).First();
-                var yAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).First();
+                var xAom = histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).First();
+                var yAom = histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).First();
 
 
                 if (histogramOperationModel.FilterModels.SelectMany(fm => fm.ValueComparisons).Count(vc => Equals(vc.AttributeTransformationModel, xAom)) > 0)
@@ -425,20 +425,20 @@ namespace PanoramicDataWin8.view.vis.render
             HistogramOperationModel qModel = (HistogramOperationModel) ((HistogramOperationViewModel) DataContext).OperationModel;
 
             // if both are empty before hand add default value
-            if (!qModel.GetUsageAttributeTransformationModel(InputUsage.X).Any() && !qModel.GetUsageAttributeTransformationModel(InputUsage.Y).Any())
+            if (!qModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any() && !qModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).Any())
             {
                 AttributeTransformationModel value = new AttributeTransformationModel(e.AttributeTransformationModel.AttributeModel);
                 value.AggregateFunction = AggregateFunction.Count;
 
-                qModel.AddUsageAttributeTransformationModel(InputUsage.DefaultValue, value);
+                qModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
             }
 
             var xBounds = xInputFieldView.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
             if (xBounds.Intersects(e.Bounds.GetPolygon()))
             {
-                if (qModel.GetUsageAttributeTransformationModel(InputUsage.X).Any())
+                if (qModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any())
                 {
-                    qModel.RemoveUsageAttributeTransformationModel(InputUsage.X, qModel.GetUsageAttributeTransformationModel(InputUsage.X).First());
+                    qModel.RemoveAttributeUsageTransformationModel(AttributeUsage.X, qModel.GetAttributeUsageTransformationModel(AttributeUsage.X).First());
                 }
                 AttributeTransformationModel value = new AttributeTransformationModel(e.AttributeTransformationModel.AttributeModel);
                 if (((AttributeFieldModel) e.AttributeTransformationModel.AttributeModel).InputDataType == InputDataTypeConstants.FLOAT ||
@@ -450,7 +450,7 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     value.AggregateFunction = AggregateFunction.Count;
                 }
-                qModel.AddUsageAttributeTransformationModel(InputUsage.X, value);
+                qModel.AddAttributeUsageTransformationModel(AttributeUsage.X, value);
             }
         }
     }

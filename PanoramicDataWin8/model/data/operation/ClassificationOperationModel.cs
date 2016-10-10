@@ -1,19 +1,19 @@
 ﻿namespace PanoramicDataWin8.model.data.operation
 {
-    public class ClassificationOperationModel : AttributeUsageOperationModel
+    public class ClassificationOperationModel : OperationModel
     {
         private double _minimumSupport = 0.1;
 
-        private TaskModel taskModel;
+        private OperationTypeModel _operationTypeModel;
 
         public ClassificationOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
         }
 
-        public TaskModel TaskModel
+        public OperationTypeModel OperationTypeModel
         {
-            get { return taskModel; }
-            set { SetProperty(ref taskModel, value); }
+            get { return _operationTypeModel; }
+            set { SetProperty(ref _operationTypeModel, value); }
         }
 
         public double MinimumSupport

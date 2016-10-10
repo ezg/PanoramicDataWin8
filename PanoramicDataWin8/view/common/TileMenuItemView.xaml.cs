@@ -121,31 +121,22 @@ namespace PanoramicDataWin8.view.common
                             ((InputFieldViewTileMenuContentViewModel) model.TileMenuContentViewModel).AttributeTransformationViewModel
                     });
                 }
-                else if (model.TileMenuContentViewModel is VisualizationTypeViewTileMenuContentViewModel)
+                else if (model.TileMenuContentViewModel is OperationTypeTileMenuContentViewModel)
                 {
                     mainGrid.Children.Clear();
-                    mainGrid.Children.Add(new VisualizationTypeView()
+                    mainGrid.Children.Add(new OperationTypeView()
                     {
                         DataContext =
-                            ((VisualizationTypeViewTileMenuContentViewModel)model.TileMenuContentViewModel).VisualizationTypeViewModel
+                            ((OperationTypeTileMenuContentViewModel)model.TileMenuContentViewModel).OperationTypeModel
                     });
                 }
-                else if (model.TileMenuContentViewModel is TaskViewTileMenuContentViewModel)
+                else if (model.TileMenuContentViewModel is OperationTypeGroupTileMenuContentViewModel)
                 {
                     mainGrid.Children.Clear();
-                    mainGrid.Children.Add(new TaskView()
+                    mainGrid.Children.Add(new OperationTypeView()
                     {
                         DataContext =
-                            ((TaskViewTileMenuContentViewModel)model.TileMenuContentViewModel).TaskModel
-                    });
-                }
-                else if (model.TileMenuContentViewModel is TaskGroupViewTileMenuContentViewModel)
-                {
-                    mainGrid.Children.Clear();
-                    mainGrid.Children.Add(new TaskView()
-                    {
-                        DataContext =
-                            ((TaskGroupViewTileMenuContentViewModel)model.TileMenuContentViewModel).TaskGroupModel
+                            ((OperationTypeGroupTileMenuContentViewModel)model.TileMenuContentViewModel).OperationTypeGroupModel
                     });
                 }
                 else if (model.TileMenuContentViewModel is InputGroupViewTileMenuContentViewModel)

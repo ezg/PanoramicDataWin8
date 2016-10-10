@@ -24,11 +24,11 @@ namespace PanoramicDataWin8.model.view
                 HistogramOperationModel newOperationModel = (HistogramOperationModel)newHistogramOperationViewModel.OperationModel;
                 newOperationModel.VisualizationType = VisualizationType.plot;
 
-                foreach (var usage in oldOperationModel.UsageAttributeTransformationModels.Keys.ToArray())
+                foreach (var usage in oldOperationModel.AttributeUsageTransformationModels.Keys.ToArray())
                 {
-                    foreach (var atm in oldOperationModel.UsageAttributeTransformationModels[usage].ToArray())
+                    foreach (var atm in oldOperationModel.AttributeUsageTransformationModels[usage].ToArray())
                     {
-                        newOperationModel.AddUsageAttributeTransformationModel(usage,
+                        newOperationModel.AddAttributeUsageTransformationModel(usage,
                             new AttributeTransformationModel(atm.AttributeModel)
                             {
                                 AggregateFunction = atm.AggregateFunction
@@ -43,7 +43,7 @@ namespace PanoramicDataWin8.model.view
 
 
         private static void createAxisMenu(HistogramOperationViewModel histogramOperationViewModel, AttachmentOrientation attachmentOrientation, 
-            InputUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
+            AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {
             var attachmentViewModel =
                 histogramOperationViewModel.AttachementViewModels.First(
@@ -74,7 +74,7 @@ namespace PanoramicDataWin8.model.view
             {
                 TextAngle = textAngle
             };
-            histogramOperationViewModel.HistogramOperationModel.GetUsageAttributeTransformationModel(axis).CollectionChanged += (sender, args) =>
+            histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).CollectionChanged += (sender, args) =>
             {
                 var coll = sender as ObservableCollection<AttributeTransformationModel>;
                 attr1.Label = coll.FirstOrDefault() == null ? "" : coll.FirstOrDefault().GetLabel();
@@ -146,12 +146,19 @@ namespace PanoramicDataWin8.model.view
             };
             attr1.DroppedTriggered = (attributeTransformationModel) =>
             {
-                if (histogramOperationViewModel.HistogramOperationModel.GetUsageAttributeTransformationModel(axis).Any())
+                if (histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).Any())
                 {
-                    histogramOperationViewModel.HistogramOperationModel.RemoveUsageAttributeTransformationModel(axis, 
-                        histogramOperationViewModel.HistogramOperationModel.GetUsageAttributeTransformationModel(axis).First());
+                    histogramOperationViewModel.HistogramOperationModel.RemoveAttributeUsageTransformationModel(axis, 
+                        histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).First());
                 }
-                histogramOperationViewModel.HistogramOperationModel.AddUsageAttributeTransformationModel(axis, attributeTransformationModel);
+                if (!histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
+                {
+                    AttributeTransformationModel value = new AttributeTransformationModel(attributeTransformationModel.AttributeModel);
+                    value.AggregateFunction = AggregateFunction.Count;
+                    histogramOperationViewModel.HistogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
+                }
+                histogramOperationViewModel.HistogramOperationModel.AddAttributeUsageTransformationModel(axis, attributeTransformationModel);
+                attachmentViewModel.ActiveStopwatch.Restart();
             };
 
             menuItem.MenuItemComponentViewModel = attr1;
@@ -174,28 +181,9 @@ namespace PanoramicDataWin8.model.view
             }
 
             // axis attachment view models
-            createAxisMenu(histogramOperationViewModel, AttachmentOrientation.Bottom, InputUsage.X, new Vec(200, 50), 0, true, false);
-            createAxisMenu(histogramOperationViewModel, AttachmentOrientation.Left, InputUsage.Y, new Vec(50, 200), 270, false, true);
-            
-            //histogramOperationModel.VisualizationType = visualizationType;
+            createAxisMenu(histogramOperationViewModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
+            createAxisMenu(histogramOperationViewModel, AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
 
-
-            /*var county = schemaModel.OriginModels.First().InputModels.FirstOrDefault(im => im.RawName == "county");
-            if (county != null)
-            {
-                AttributeTransformationModel x = new AttributeTransformationModel(county);
-                x.AggregateFunction = AggregateFunction.Count;
-
-                AttributeTransformationModel y = new AttributeTransformationModel(county);
-                y.AggregateFunction = AggregateFunction.None;
-
-                AttributeTransformationModel value = new AttributeTransformationModel(county);
-                value.AggregateFunction = AggregateFunction.Count;
-
-                histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.X, x);
-                histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.Y, y);
-                histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.DefaultValue, value);
-            }*/
 
             if (attributeModel != null && attributeModel is AttributeFieldModel)
             {
@@ -213,9 +201,9 @@ namespace PanoramicDataWin8.model.view
                     AttributeTransformationModel y = new AttributeTransformationModel(inputFieldModel);
                     y.AggregateFunction = AggregateFunction.Count;
 
-                    histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.X, x);
-                    histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.Y, y);
-                    histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.DefaultValue, value);
+                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
+                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.Y, y);
+                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
                 }
                 else if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
                 {
@@ -230,9 +218,9 @@ namespace PanoramicDataWin8.model.view
                     AttributeTransformationModel y = new AttributeTransformationModel(inputFieldModel);
                     y.AggregateFunction = AggregateFunction.Count;
 
-                    histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.X, x);
-                    histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.Y, y);
-                    histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.DefaultValue, value);
+                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
+                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.Y, y);
+                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
                 }
                 else if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.GEOGRAPHY)
                 {
@@ -241,10 +229,13 @@ namespace PanoramicDataWin8.model.view
                 {
                     histogramOperationModel.VisualizationType = VisualizationType.table;
                     AttributeTransformationModel x = new AttributeTransformationModel(inputFieldModel);
-                    histogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.X, x);
+                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
                 }
             }
-
+            else
+            {
+                histogramOperationModel.VisualizationType = VisualizationType.plot;
+            }
 
             return histogramOperationViewModel;
         }

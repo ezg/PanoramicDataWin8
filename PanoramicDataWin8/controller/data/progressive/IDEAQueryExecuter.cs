@@ -48,8 +48,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                         {
                             var histogramOperationModel = (HistogramOperationModel) operationModel;
                             if ((histogramOperationModel.VisualizationType == VisualizationType.table && histogramOperationModel.AttributeTransformationModels.Count > 0) ||
-                                (histogramOperationModel.VisualizationType != VisualizationType.table && histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Any() &&
-                                histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).Any()))
+                                (histogramOperationModel.VisualizationType != VisualizationType.table && histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any() &&
+                                histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).Any()))
                             {
                                 HistogramOperationJob histogramOperationJob = new HistogramOperationJob(
                                     histogramOperationModel,  
@@ -75,7 +75,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                         }
                         else
                         {
-                         /*   if (operationModel.GetUsageAttributeTransformationModel(InputUsage.Feature).Any() && operationModel.BrushQueryModels.Any())
+                         /*   if (operationModel.GetAttributeUsageTransformationModel(AttributeUsage.Feature).Any() && operationModel.BrushQueryModels.Any())
                             {
                                 var queryModelClone = operationModel.Clone();
                                 ProgressiveClassifyJob progressiveClassifyJob = new ProgressiveClassifyJob(

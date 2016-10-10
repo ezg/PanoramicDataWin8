@@ -12,10 +12,10 @@ namespace PanoramicDataWin8.controller.data
 {
     public abstract class OperationJob
     {
-        private bool _isRunning;
         private readonly object _lock = new object();
         private readonly Stopwatch _stopWatch = new Stopwatch();
         private readonly TimeSpan _throttle;
+        private bool _isRunning;
 
         protected OperationJob(OperationModel operationModel, TimeSpan throttle)
         {
@@ -44,27 +44,17 @@ namespace PanoramicDataWin8.controller.data
         {
             try
             {
-                var response =
-                    await
-                        IDEAGateway.Request(
-                            JsonConvert.SerializeObject(OperationParameters, IDEAGateway.JsonSerializerSettings),
-                            "operation");
-                OperationReference = JsonConvert.DeserializeObject<OperationReference>(response,
-                    IDEAGateway.JsonSerializerSettings);
+                var response = await IDEAGateway.Request(JsonConvert.SerializeObject(OperationParameters, IDEAGateway.JsonSerializerSettings), "operation");
+                OperationReference = JsonConvert.DeserializeObject<OperationReference>(response, IDEAGateway.JsonSerializerSettings);
+
+                var resultCommand = new ResultCommand();
 
                 // starting looping for updates
                 while (_isRunning)
                 {
-                    var message =
-                        await
-                            IDEAGateway.Request(
-                                JsonConvert.SerializeObject(OperationReference,
-                                    IDEAGateway.JsonSerializerSettings), "result");
-                    if (message != "null")
+                    var result = await resultCommand.GetResult(OperationReference);
+                    if (result != null)
                     {
-                        var result = JsonConvert.DeserializeObject<Result>(message,
-                            IDEAGateway.JsonSerializerSettings);
-
                         FireJobUpdated(new JobEventArgs {Result = result});
 
                         if (result.Progress >= 1.0)
@@ -86,8 +76,7 @@ namespace PanoramicDataWin8.controller.data
         {
             lock (_lock)
             {
-                IDEAGateway.Request(
-                    JsonConvert.SerializeObject(OperationReference, IDEAGateway.JsonSerializerSettings), "pause");
+                IDEAGateway.Request(JsonConvert.SerializeObject(OperationReference, IDEAGateway.JsonSerializerSettings), "pause");
                 _isRunning = false;
             }
         }
@@ -101,8 +90,7 @@ namespace PanoramicDataWin8.controller.data
         protected async void FireJobCompleted(JobEventArgs jobEventArgs)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
-            await
-                dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { JobCompleted?.Invoke(this, jobEventArgs); });
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { JobCompleted?.Invoke(this, jobEventArgs); });
         }
     }
 

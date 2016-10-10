@@ -101,6 +101,7 @@
     </Compile>
     <Compile Include="controller\data\DataRow.cs" />
     <Compile Include="controller\data\OperationJob.cs" />
+    <Compile Include="controller\data\progressive\ResultCommand.cs" />
     <Compile Include="controller\data\progressive\CatalogCommand.cs" />
     <Compile Include="controller\data\progressive\IDEAGateway.cs" />
     <Compile Include="controller\data\progressive\IDEAHelpers.cs" />
@@ -124,10 +125,10 @@
     <Compile Include="model\data\InputDataTypeConstants.cs" />
     <Compile Include="model\data\attribute\AttributeGroupModel.cs" />
     <Compile Include="model\data\attribute\AttributeModel.cs" />
-    <Compile Include="model\data\operation\AttributeUsageOperationModel.cs" />
-    <Compile Include="model\data\operation\InputUsage.cs" />
+    <Compile Include="model\data\operation\AttributeUsage.cs" />
     <Compile Include="model\data\attribute\AttributeFieldModel.cs" />
     <Compile Include="model\data\attribute\AttributeTransformationModel.cs" />
+    <Compile Include="model\data\operation\ExampleOperationModel.cs" />
     <Compile Include="model\data\operation\FilteringOperation.cs" />
     <Compile Include="model\data\operation\FilterModel.cs" />
     <Compile Include="model\data\InputVisualizationTypeConstants.cs" />
@@ -150,8 +151,8 @@
     <Compile Include="model\data\result\ResultItemValueModel.cs" />
     <Compile Include="model\data\result\ResultModel.cs" />
     <Compile Include="model\data\SchemaModel.cs" />
-    <Compile Include="model\data\TaskGroupModel.cs" />
-    <Compile Include="model\data\TaskModel.cs" />
+    <Compile Include="model\data\OperationTypeGroupModel.cs" />
+    <Compile Include="model\data\OperationTypeModel.cs" />
     <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
     <Compile Include="model\view\operation\StatisticalComparisonOperationViewModel.cs" />
@@ -169,7 +170,6 @@
     <Compile Include="model\view\BrushViewModel.cs" />
     <Compile Include="model\view\tilemenu\TileMenuItemView.cs" />
     <Compile Include="model\view\tilemenu\TileMenuContentViewModel.cs" />
-    <Compile Include="model\view\VisualizationTypeViewModel.cs" />
     <Compile Include="model\view\MenuViewModel.cs" />
     <Compile Include="model\view\MenuItemViewModel.cs" />
     <Compile Include="model\view\AttachmentItemViewModel.cs" />
@@ -204,14 +204,11 @@
     <Compile Include="view\common\InputGroupView.xaml.cs">
       <DependentUpon>InputGroupView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="view\common\TaskView.xaml.cs">
-      <DependentUpon>TaskView.xaml</DependentUpon>
+    <Compile Include="view\common\OperationTypeView.xaml.cs">
+      <DependentUpon>OperationTypeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\common\TileMenuItemView.xaml.cs">
       <DependentUpon>TileMenuItemView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="view\common\VisualizationTypeView.xaml.cs">
-      <DependentUpon>VisualizationTypeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\common\DataGridCell.xaml.cs">
       <DependentUpon>DataGridCell.xaml</DependentUpon>
@@ -378,17 +375,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="view\common\TaskView.xaml">
+    <Page Include="view\common\OperationTypeView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\common\TileMenuItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="view\common\VisualizationTypeView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="view\common\DataGridCell.xaml">
       <SubType>Designer</SubType>

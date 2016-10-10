@@ -33,7 +33,7 @@
             </Canvas>
         </Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10,0,0,0" >
-            <Button Name="addInputButton" Click="addInputButton_Click" Margin="0,0,0,4">
+            <Button Name="addAttributeButton" Click="addAttributeButton_Click" Margin="0,0,0,4">
                 <Button.Template>
                     <ControlTemplate>
                         <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
@@ -50,7 +50,7 @@
                 </Button.Template>
             </Button>
             
-            <Button Name="addVisualizationButton" Click="addVisualizationButton_Click" Margin="0,0,0,4" Visibility="Visible">
+            <Button Name="addOperationButton" Click="addOperationButton_Click" Margin="0,0,0,4" Visibility="Visible">
                 <Button.Template>
                     <ControlTemplate>
                         <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
@@ -61,24 +61,7 @@
                                     HorizontalAlignment="Center"
                                     TextAlignment="Center"
                                     MaxWidth="50"
-                                    Text="v" FontSize="30" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
-                        </Grid>
-                    </ControlTemplate>
-                </Button.Template>
-            </Button>
-            
-            <Button Name="addJobButton" Click="addJobButton_Click" Visibility="Collapsed">
-                <Button.Template>
-                    <ControlTemplate>
-                        <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
-                            <TextBlock 
-                                    CacheMode="BitmapCache"
-                                    RenderTransformOrigin="0.5, 0.5"
-                                    VerticalAlignment="Center"
-                                    HorizontalAlignment="Center"
-                                    TextAlignment="Center"
-                                    MaxWidth="50"
-                                    Text="t" FontSize="30" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
+                                    Text="o" FontSize="30" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
                         </Grid>
                     </ControlTemplate>
                 </Button.Template>

@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
@@ -47,11 +48,8 @@ namespace PanoramicDataWin8.controller.view
             InputGroupViewModel.InputGroupViewModelDropped += InputGroupViewModelDropped;
             InputGroupViewModel.InputGroupViewModelMoved += InputGroupViewModelMoved;
 
-            TaskModel.JobTypeViewModelDropped += TaskModelDropped;
-            TaskModel.JobTypeViewModelMoved += TaskModelMoved;
-
-            VisualizationTypeViewModel.VisualizationTypeViewModelDropped += VisualizationTypeViewModelDropped;
-            VisualizationTypeViewModel.VisualizationTypeViewModelMoved += VisualizationTypeViewModelMoved;
+            OperationTypeModel.OperationTypeModelDropped += OperationTypeModelDropped;
+            OperationTypeModel.OperationTypeModelMoved += OperationTypeModelMoved;
 
             _inkableScene.InkCollectedEvent += InkableSceneInkCollectedEvent;
             OperationViewModels.CollectionChanged += OperationViewViewModels_CollectionChanged;
@@ -60,34 +58,36 @@ namespace PanoramicDataWin8.controller.view
             _gesturizer.AddGesture(new EraseGesture(_inkableScene));
             //_gesturizer.AddGesture(new ScribbleGesture(_root));
         }
-
+        
         public async void LoadConfig()
         {
             var installedLoc = Package.Current.InstalledLocation;
             string mainConifgContent = await installedLoc.GetFileAsync(@"Assets\data\main.ini").AsTask().ContinueWith(t => Windows.Storage.FileIO.ReadTextAsync(t.Result)).Result;
-            var backend = mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
+            MainModel.Backend = mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
                 .First(l => l.ToLower().StartsWith("backend"))
                 .Split(new string[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
-            var startDataSet = mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
+            MainModel.StartDataset = mainConifgContent.Split(new string[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
                 .First(l => l.ToLower().StartsWith("startdataset"))
                 .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
+            MainModel.ThrottleInMillis = double.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
+               .First(l => l.ToLower().StartsWith("throttle"))
+               .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
+            MainModel.SampleSize = double.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                .First(l => l.ToLower().StartsWith("samplesize"))
+                .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
 
-            _mainModel.DatasetConfigurations.Clear();
-            if (backend.ToLower() == "progressive")
+            MainModel.DatasetConfigurations.Clear();
+            if (MainModel.Backend.ToLower() == "progressive")
             {
                 try
                 {
-                    var ip = mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                    MainModel.Ip = mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
                         .First(l => l.ToLower().StartsWith("ip"))
                         .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
 
-                    var renderShadingIn1DHistograms = bool.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
+                    MainModel.RenderShadingIn1DHistograms = bool.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
                         .First(l => l.ToLower().StartsWith("rendershadingin1dhistograms"))
                         .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-                    
-                    MainModel.RenderShadingIn1DHistograms = renderShadingIn1DHistograms;
-
-                    MainModel.Ip = ip;
 
                     LoadCatalog();
                 }
@@ -99,70 +99,64 @@ namespace PanoramicDataWin8.controller.view
         }
 
         public async void LoadCatalog()
-        {
-            var installedLoc = Package.Current.InstalledLocation;
-            
-            string mainConifgContent = await installedLoc.GetFileAsync(@"Assets\data\main.ini").AsTask().ContinueWith(t => Windows.Storage.FileIO.ReadTextAsync(t.Result)).Result;
-
-            var startDataSet = mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                .First(l => l.ToLower().StartsWith("startdataset"))
-                .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
-            var throttle = double.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                .First(l => l.ToLower().StartsWith("throttle"))
-                .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-            var sampleSize = double.Parse(mainConifgContent.Split(new string[] { "\n" }, StringSplitOptions.RemoveEmptyEntries)
-                .First(l => l.ToLower().StartsWith("samplesize"))
-                .Split(new string[] { "=" }, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-
+        { 
             CatalogCommand catalogCommand = new CatalogCommand();
             Catalog catalog = await catalogCommand.GetCatalog();
-            
-            _mainModel.DatasetConfigurations.Clear();
+
+            MainModel.DatasetConfigurations.Clear();
             foreach (var schema in catalog.Schemas)
             {
                 var dataSetConfig = new DatasetConfiguration
                 {
                     Schema = schema,
                     Backend = "progressive",
-                    ThrottleInMillis = throttle,
-                    SampleSize = sampleSize
+                    ThrottleInMillis = MainModel.ThrottleInMillis,
+                    SampleSize = MainModel.SampleSize
                 };
                 _mainModel.DatasetConfigurations.Add(dataSetConfig);
             }
 
-            if (_mainModel.DatasetConfigurations.Any(ds => ds.Schema.DisplayName.ToLower().Contains(startDataSet)))
+            if (_mainModel.DatasetConfigurations.Any(ds => ds.Schema.DisplayName.ToLower().Contains(MainModel.StartDataset)))
             {
-                LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Schema.DisplayName.ToLower().Contains(startDataSet)));
+                LoadData(_mainModel.DatasetConfigurations.First(ds => ds.Schema.DisplayName.ToLower().Contains(MainModel.StartDataset)));
             }
             else
             {
                 LoadData(_mainModel.DatasetConfigurations.First());
             }
-            
-            /*TaskGroupModel parent = new TaskGroupModel();
-            foreach (var child in catalog.SupportedOperations)
-            {
-                if (child.ToString() != "")
-                    recursiveCreateAttributeModels(child, parent);
-            }
-            _mainModel.TaskModels = parent.TaskModels.ToList();*/
+
+            setupOperationTypeModels();
+        }
+
+        private void setupOperationTypeModels()
+        {
+            OperationTypeGroupModel parent = new OperationTypeGroupModel();
+            OperationTypeGroupModel vis = new OperationTypeGroupModel() {Name = "vis", OperationType = OperationType.Group };
+            parent.OperationTypeModels.Add(vis);
+            vis.OperationTypeModels.Add(new OperationTypeModel() {Name = "hist", OperationType = OperationType.Histogram});
+
+            OperationTypeGroupModel other = new OperationTypeGroupModel() { Name = "other", OperationType = OperationType.Group };
+            parent.OperationTypeModels.Add(other);
+            other.OperationTypeModels.Add(new OperationTypeModel() { Name = "example", OperationType = OperationType.Example });
+
+            _mainModel.OperationTypeModels = parent.OperationTypeModels.ToList();
         }
 
         public void LoadData(DatasetConfiguration datasetConfiguration)
         {
-            if (_mainModel.SchemaModel != null && _mainModel.SchemaModel.QueryExecuter != null)
+            if (MainModel.SchemaModel != null && MainModel.SchemaModel.QueryExecuter != null)
             {
-                _mainModel.SchemaModel.QueryExecuter.HaltAllJobs();
+                MainModel.SchemaModel.QueryExecuter.HaltAllJobs();
             }
 
             if (datasetConfiguration.Backend.ToLower() == "progressive")
             {
-                _mainModel.SchemaModel = new ProgressiveSchemaModel();
-                _mainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
-                _mainModel.SampleSize = datasetConfiguration.SampleSize;
-                (_mainModel.SchemaModel as ProgressiveSchemaModel).QueryExecuter = new IDEAQueryExecuter();
-                (_mainModel.SchemaModel as ProgressiveSchemaModel).RootOriginModel = new ProgressiveOriginModel(datasetConfiguration);
-                (_mainModel.SchemaModel as ProgressiveSchemaModel).RootOriginModel.LoadInputFields();
+                MainModel.SchemaModel = new ProgressiveSchemaModel();
+                MainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
+                MainModel.SampleSize = datasetConfiguration.SampleSize;
+                ((ProgressiveSchemaModel) MainModel.SchemaModel).QueryExecuter = new IDEAQueryExecuter();
+                ((ProgressiveSchemaModel) MainModel.SchemaModel).RootOriginModel = new ProgressiveOriginModel(datasetConfiguration);
+                ((ProgressiveSchemaModel) MainModel.SchemaModel).RootOriginModel.LoadInputFields();
             }
         }
 
@@ -217,9 +211,9 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        public HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(AttributeModel attributeModel )
+        public HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(AttributeModel attributeModel)
         {
-            HistogramOperationViewModel visModel = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(_mainModel.SchemaModel, attributeModel);
+            HistogramOperationViewModel visModel = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(MainModel.SchemaModel, attributeModel);
             addAttachmentViews(visModel);
             _operationViewModels.Add(visModel);
             return visModel;
@@ -237,8 +231,6 @@ namespace PanoramicDataWin8.controller.view
 
             newOperationContainerView.DataContext = newOperationViewModel;
             InkableScene.Add(newOperationContainerView);
-
-            //newOperationViewModel.OperationModel.FireOperationModelUpdated(HistogramModelUpdatedEventType.Structure);
         }
 
         private void addAttachmentViews(OperationViewModel visModel)
@@ -256,97 +248,58 @@ namespace PanoramicDataWin8.controller.view
 
         public void RemoveOperationViewModel(OperationContainerView operationContainerView)
         {
-            _mainModel.SchemaModel.QueryExecuter.RemoveJob((operationContainerView.DataContext as OperationViewModel).OperationModel);
-            _operationViewModels.Remove(operationContainerView.DataContext as HistogramOperationViewModel);
-            //PhysicsController.Instance.RemovePhysicalObject(operationContainerView);
+            var operationViewModel = (OperationViewModel) operationContainerView.DataContext;
+            MainModel.SchemaModel.QueryExecuter.RemoveJob((operationViewModel).OperationModel);
+            _operationViewModels.Remove(operationViewModel);
             MainViewController.Instance.InkableScene.Remove(operationContainerView);
 
             operationContainerView.Dispose();
             foreach (var attachmentView in MainViewController.Instance.InkableScene.Elements.Where(e => e is AttachmentView).ToList())
             {
-                if ((attachmentView.DataContext as AttachmentViewModel).OperationViewModel == operationContainerView.DataContext as HistogramOperationViewModel)
+                if (((AttachmentViewModel) attachmentView.DataContext).OperationViewModel == operationViewModel)
                 {
-                    (attachmentView as AttachmentView).Dispose();
+                    ((AttachmentView) attachmentView).Dispose();
                     MainViewController.Instance.InkableScene.Remove(attachmentView);
                 }
             }
-            var qm = (operationContainerView.DataContext as HistogramOperationViewModel).HistogramOperationModel;
-            foreach (var model in qm.LinkModels.ToArray())
+            if (operationViewModel.OperationModel is IFilterConsumerOperationModel)
             {
-                ((IFilterConsumerOperationModel) model.FromOperationModel).LinkModels.Remove(model);
-                ((IFilterConsumerOperationModel)model.ToOperationModel).LinkModels.Remove(model);
+                foreach (var model in ((IFilterConsumerOperationModel) operationViewModel.OperationModel).LinkModels.ToArray())
+                {
+                    ((IFilterConsumerOperationModel) model.FromOperationModel).LinkModels.Remove(model);
+                    ((IFilterConsumerOperationModel) model.ToOperationModel).LinkModels.Remove(model);
+                }
             }
         }
 
-        void TaskModelMoved(object sender, TaskModelEventArgs e)
+        void OperationTypeModelMoved(object sender, OperationTypeModelEventArgs e)
         {
             
         }
 
-        void TaskModelDropped(object sender, TaskModelEventArgs e)
+        void OperationTypeModelDropped(object sender, OperationTypeModelEventArgs e)
         {
-            double width = HistogramOperationViewModel.WIDTH;
-            double height = HistogramOperationViewModel.HEIGHT;
+            double width = OperationViewModel.WIDTH;
+            double height = OperationViewModel.HEIGHT;
             Vec size = new Vec(width, height);
             Pt position = (Pt)new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
 
-            IGeometry mainPageBounds = e.Bounds.GetPolygon();
-            List<OperationContainerView> hits = new List<OperationContainerView>();
-            foreach (var element in InkableScene.Elements.Where(ele => ele is OperationContainerView).Select(ele => ele as OperationContainerView))
-            {
-                var geom = element.GetBounds(InkableScene).GetPolygon();
-                if (geom != null && mainPageBounds.Intersects(geom))
-                {
-                    hits.Add(element);
-                }
-            }
+            var operationTypeModel = sender as OperationTypeModel;
 
-            bool found = false;
-            foreach (var element in hits)
+            if (operationTypeModel.OperationType == OperationType.Histogram)
             {
-                if ((element.DataContext as ClassificationOperationViewModel).ClassificationOperationModel.TaskModel != null)
-                {
-                    (element.DataContext as ClassificationOperationViewModel).ClassificationOperationModel.TaskModel = (sender as TaskModel);
-                    found = true;
-                    break;
-                }
-            }
-
-            if (!found)
-            {
-                OperationContainerView operationContainerView = new OperationContainerView();
-                //TODO
-                /*HistogramOperationViewModel histogramOperationViewModel = CreateHistogramOperationViewModel((sender as TaskModel), null);
+                OperationContainerView operationContainerView = new OperationContainerView(); 
+                HistogramOperationViewModel histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(null);
                 histogramOperationViewModel.Position = position;
                 histogramOperationViewModel.Size = size;
                 operationContainerView.DataContext = histogramOperationViewModel;
-                InkableScene.Add(operationContainerView);*/
+                InkableScene.Add(operationContainerView);
             }
+
         }
-
-        void VisualizationTypeViewModelMoved(object sender, VisualizationTypeViewModelEventArgs e)
-        {
-        }
-
-        void VisualizationTypeViewModelDropped(object sender, VisualizationTypeViewModelEventArgs e)
-        {
-            double width = HistogramOperationViewModel.WIDTH;
-            double height = HistogramOperationViewModel.HEIGHT;
-            Vec size = new Vec(width, height);
-            Pt position = (Pt)new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size / 2.0;
-
-            OperationContainerView operationContainerView = new OperationContainerView();
-            //TODO
-                /*HistogramOperationViewModel histogramOperationViewModel = CreateHistogramOperationViewModel(null, (sender as VisualizationTypeViewModel).VisualizationType);
-            histogramOperationViewModel.Position = position;
-            histogramOperationViewModel.Size = size;
-            operationContainerView.DataContext = histogramOperationViewModel;
-            InkableScene.Add(operationContainerView);*/
-        }
-
         void InputGroupViewModelMoved(object sender, InputGroupViewModelEventArgs e)
         {
-            IGeometry mainPageBounds = e.Bounds.GetPolygon();
+            /*IGeometry mainPageBounds = e.Bounds.GetPolygon();
             List<InputGroupViewModelEventHandler> hits = new List<InputGroupViewModelEventHandler>();
             foreach (var element in InkableScene.GetDescendants().Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
             {
@@ -363,13 +316,13 @@ namespace PanoramicDataWin8.controller.view
                 element.InputGroupViewModelMoved(
                         sender as InputGroupViewModel, e,
                         hits.Count() > 0 ? orderderHits[0] == element : false);
-            }
+            }*/
         }
 
 
         void InputGroupViewModelDropped(object sender, InputGroupViewModelEventArgs e)
         {
-            IGeometry mainPageBounds = e.Bounds.GetPolygon();
+           /*IGeometry mainPageBounds = e.Bounds.GetPolygon();
             List<InputGroupViewModelEventHandler> hits = new List<InputGroupViewModelEventHandler>();
             foreach (var element in InkableScene.GetDescendants().OfType<InputGroupViewModelEventHandler>())
             {
@@ -386,7 +339,7 @@ namespace PanoramicDataWin8.controller.view
                 element.InputGroupViewModelDropped(
                         sender as InputGroupViewModel, e,
                         hits.Count() > 0 && orderderHits[0] == element);
-            }
+            }*/
         }
         
         void AttributeTransformationViewModelMoved(object sender, AttributeTransformationViewModelEventArgs e)
@@ -477,11 +430,11 @@ namespace PanoramicDataWin8.controller.view
 
         private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
-            OperationModel model = sender as OperationModel;
+            OperationModel model = (OperationModel) sender;
             if (e is FilterOperationModelUpdatedEventArgs && 
                 (e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.Links)
             {
-                ((HistogramOperationModel) model).ClearFilterModels();
+                ((IFilterProviderOperationModel) model).ClearFilterModels();
             }
 
             if (!(e is FilterOperationModelUpdatedEventArgs) || (e is FilterOperationModelUpdatedEventArgs && 

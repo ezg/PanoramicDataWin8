@@ -49,8 +49,8 @@ namespace PanoramicDataWin8.view.vis
         {
             this.InitializeComponent();
 
-            this.Loaded += VisualizationContainerView_Loaded;
-            this.DataContextChanged += visualizationContainerView_DataContextChanged;
+            this.Loaded += OperationContainerView_Loaded;
+            this.DataContextChanged += operationContainerView_DataContextChanged;
             MainViewController.Instance.InkableScene.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
         }
 
@@ -83,9 +83,9 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
-        void VisualizationContainerView_Loaded(object sender, RoutedEventArgs e)
+        void OperationContainerView_Loaded(object sender, RoutedEventArgs e)
         {
-            this.PointerPressed += VisualizationContainerView_PointerPressed;
+            this.PointerPressed += OperationContainerView_PointerPressed;
 
             _resizePointerManager.Added += resizePointerManager_Added;
             _resizePointerManager.Moved += resizePointerManager_Moved;
@@ -93,24 +93,29 @@ namespace PanoramicDataWin8.view.vis
             _resizePointerManager.Attach(resizeGrid);
         }
 
-        void visualizationContainerView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        void operationContainerView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (args.NewValue != null)
             {
                 OperationViewModel model = ((OperationViewModel) args.NewValue);
                 model.OperationModel.PropertyChanged += OperationModel_PropertyChanged;
-                visualizationTypeUpdated();
+                operationTypeUpdated();
             }
+            updateProgressAndNullVisualization();
         }
 
         void OperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            HistogramOperationModel operationModel = (HistogramOperationModel) ((OperationViewModel) DataContext).OperationModel;
-            if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.VisualizationType))
+            OperationModel operationModel = ((OperationViewModel) DataContext).OperationModel;
+            if (operationModel is HistogramOperationModel)
             {
-                visualizationTypeUpdated();
+                var histogramOpertionModel = (HistogramOperationModel) operationModel;
+                if (e.PropertyName == histogramOpertionModel.GetPropertyName(() => histogramOpertionModel.VisualizationType))
+                {
+                    operationTypeUpdated();
+                }
             }
-            else if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.Result))
+            if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.Result))
             {
                 updateProgressAndNullVisualization();
             }
@@ -159,7 +164,7 @@ namespace PanoramicDataWin8.view.vis
             }*/
         }
 
-        void visualizationTypeUpdated()
+        void operationTypeUpdated()
         {
             OperationViewModel operationViewModel = (DataContext as OperationViewModel);
             if (contentGrid.Children.Count == 1)
@@ -198,12 +203,12 @@ namespace PanoramicDataWin8.view.vis
             else if (operationViewModel.OperationModel is ClassificationOperationModel)
             {
                 var classificationOperationModel = (ClassificationOperationModel)operationViewModel.OperationModel;
-                if (classificationOperationModel.TaskModel.Name != "frequent_itemsets")
+                if (classificationOperationModel.OperationTypeModel.Name != "frequent_itemsets")
                 {
                     _renderer = new ClassifierRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
-               /* else if (classificationOperationModel.TaskModel.Name == "frequent_itemsets")
+               /* else if (classificationOperationModel.OperationTypeModel.Name == "frequent_itemsets")
                 {
                     _renderer = new FrequentItemsetRenderer();
                     contentGrid.Children.Add(_renderer);
@@ -274,7 +279,7 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
-        void VisualizationContainerView_PointerPressed(object sender, PointerRoutedEventArgs e)
+        void OperationContainerView_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
             if (e.Pointer.PointerDeviceType == PointerDeviceType.Pen ||

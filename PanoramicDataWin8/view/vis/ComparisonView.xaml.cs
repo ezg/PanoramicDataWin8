@@ -98,8 +98,8 @@ namespace PanoramicDataWin8.view.vis
 
             if (res1 != null && res2 != null)
             {
-                var dim = _model.OperationViewModels[0].OperationModel.GetUsageAttributeTransformationModel(InputUsage.X).First();
-                if (_model.OperationViewModels[1].OperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Any(i => i.AttributeModel == dim.AttributeModel))
+                var dim = _model.OperationViewModels[0].OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).First();
+                if (_model.OperationViewModels[1].OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any(i => i.AttributeModel == dim.AttributeModel))
                 {
                     var n1 = res1.OverallCount[dim.AttributeModel.RawName];
                     var n2 = res2.OverallCount[dim.AttributeModel.RawName];

@@ -79,16 +79,16 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private InputUsage? _inputUsage = null;
-        public InputUsage? InputUsage
+        private AttributeUsage? _attributeUsage = null;
+        public AttributeUsage? AttributeUsage
         {
             get
             {
-                return _inputUsage;
+                return _attributeUsage;
             }
             set
             {
-                this.SetProperty(ref _inputUsage, value);
+                this.SetProperty(ref _attributeUsage, value);
             }
         }
     }

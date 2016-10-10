@@ -88,8 +88,8 @@ namespace PanoramicDataWin8.view.vis.render
                 var histogramResult = model.HistogramOperationModel.Result as HistogramResult;
                 if (histogramResult != null)
                 {
-                    var xAom = model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).FirstOrDefault();
-                    var yAom = model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).FirstOrDefault();
+                    var xAom = model.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+                    var yAom = model.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
 
                     var xBinRange = histogramResult.BinRanges[0];
                     var yBinRange = histogramResult.BinRanges[1];
@@ -116,15 +116,15 @@ namespace PanoramicDataWin8.view.vis.render
 
                                 double? value = null;
                                 double? unNormalizedvalue = null;
-                                if (model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.Value).Any() && resultItem.Values.ContainsKey(model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.Value).First()))
+                                if (model.OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any() && resultItem.Values.ContainsKey(model.OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Value).First()))
                                 {
-                                    unNormalizedvalue = (double?) resultItem.Values[model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.Value).First()].Value;
-                                    value = (double?) resultItem.Values[model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.Value).First()].NoramlizedValue;
+                                    unNormalizedvalue = (double?) resultItem.Values[model.OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Value).First()].Value;
+                                    value = (double?) resultItem.Values[model.OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Value).First()].NoramlizedValue;
                                 }
-                                else if (model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).First()))
+                                else if (model.OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any() && resultItem.Values.ContainsKey(model.OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First()))
                                 {
-                                    unNormalizedvalue = (double?) resultItem.Values[model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).First()].Value;
-                                    value = (double?) resultItem.Values[model.OperationModel.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).First()].NoramlizedValue;
+                                    unNormalizedvalue = (double?) resultItem.Values[model.OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First()].Value;
+                                    value = (double?) resultItem.Values[model.OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First()].NoramlizedValue;
                                 }
 
                                 if (value != null)

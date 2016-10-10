@@ -79,8 +79,8 @@ namespace PanoramicDataWin8.view.vis.render
                 //((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.RequestRender += PlotRenderer_RequestRender;
                 ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.PropertyChanged += QueryModel_PropertyChanged;
                 //mainLabel.Text = ((ClassificationOperationViewModel) DataContext).ClassificationOperationModel.VisualizationType.ToString();
-                mainLabel.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.TaskModel.Name.Replace("_", " ").ToString();
-                tbType.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.TaskModel.Name.Replace("_", " ").ToString();
+                mainLabel.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.OperationTypeModel.Name.Replace("_", " ").ToString();
+                tbType.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.OperationTypeModel.Name.Replace("_", " ").ToString();
             }
         }
 
@@ -95,8 +95,8 @@ namespace PanoramicDataWin8.view.vis.render
         private void ClassificationOperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
             ClassificationOperationModel classificationOperationModel = ((ClassificationOperationViewModel) DataContext).ClassificationOperationModel;
-            mainLabel.Text = classificationOperationModel.TaskModel.Name.Replace("_", " ").ToString();
-            tbType.Text = classificationOperationModel.TaskModel.Name.Replace("_", " ").ToString();
+            mainLabel.Text = classificationOperationModel.OperationTypeModel.Name.Replace("_", " ").ToString();
+            tbType.Text = classificationOperationModel.OperationTypeModel.Name.Replace("_", " ").ToString();
             render();
         }
 
@@ -122,7 +122,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 setMenuViewModelAnkerPosition();
             }
-            mainLabel.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.TaskModel.Name.ToString();
+            mainLabel.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.OperationTypeModel.Name.ToString();
         }
 
         private void updateProgressAndNullVisualization()
@@ -135,7 +135,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else*/
             {
-                tbType.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.TaskModel.Name.Replace("_", " ").ToString();
+                tbType.Text = ((ClassificationOperationViewModel)DataContext).ClassificationOperationModel.OperationTypeModel.Name.Replace("_", " ").ToString();
             }
 
             // progress
@@ -236,12 +236,12 @@ namespace PanoramicDataWin8.view.vis.render
 
         void loadResults(IResult result)
         {
-            ClassificationOperationViewModel model = ((ClassificationOperationViewModel) DataContext);
-            int max = 3 + model.ClassificationOperationModel.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
+            /*ClassificationOperationViewModel model = ((ClassificationOperationViewModel) DataContext);
+            int max = 3 + model.ClassificationOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Feature).Count;
             _currentViewIndex = (_currentViewIndex) % max;
             _classifierRendererContentProvider.UpdateData(result, model.ClassificationOperationModel, (ClassificationOperationModel) model.ClassificationOperationModel.Clone(), _currentViewIndex);
 
-            render();
+            render();*/
         }
 
         void removeMenu()
@@ -336,7 +336,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         public override bool EndSelection()
         {
-            IList<Vec> convexHull = Convexhull.convexhull(_selectionPoints);
+            /*IList<Vec> convexHull = Convexhull.convexhull(_selectionPoints);
             IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon();
 
             List<FilterModel> hits = new List<FilterModel>();
@@ -344,13 +344,13 @@ namespace PanoramicDataWin8.view.vis.render
             ClassificationOperationViewModel model = ((ClassificationOperationViewModel) DataContext);
             if (model.ClassificationOperationModel.Result != null)
             {
-                int max = 3 + model.ClassificationOperationModel.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
+                int max = 3 + model.ClassificationOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Feature).Count;
                 
                 _currentViewIndex = (_currentViewIndex + 1) % max;
                 _classifierRendererContentProvider.ViewIndex = _currentViewIndex;
 
                 render();
-            }
+            }*/
             return false;
         }
 
@@ -391,15 +391,15 @@ namespace PanoramicDataWin8.view.vis.render
 
         public bool Consume(InkStroke inkStroke)
         {
-            ClassificationOperationViewModel model = ((ClassificationOperationViewModel)DataContext);
-            int max = 3 + model.ClassificationOperationModel.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
+            /*ClassificationOperationViewModel model = ((ClassificationOperationViewModel)DataContext);
+            int max = 3 + model.ClassificationOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Feature).Count;
             if (_currentViewIndex == max - 1)
             {
                 GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
                 List<Windows.Foundation.Point> selectionPoints = inkStroke.Points.Select(p => gt.TransformPoint(p)).ToList();
                 _classifierRendererContentProvider.ProcessStroke(selectionPoints, inkStroke.IsErase);
                 render();
-            }
+            }*/
 
             /*GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
             List<Windows.Foundation.Point> selectionPoints = inkStroke.Points.Select(p => gt.TransformPoint(p)).ToList();
@@ -426,8 +426,8 @@ namespace PanoramicDataWin8.view.vis.render
                 OperationModel histogramOperationModel = (DataContext as OperationViewModel).OperationModel;
                 var vcs = hits.SelectMany(h => h.ValueComparisons).ToList();
 
-                var xAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).First();
-                var yAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).First();
+                var xAom = histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).First();
+                var yAom = histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).First();
 
                 if (hits.Any(h => histogramOperationModel.FilterModels.Contains(h)))
                 {

@@ -162,17 +162,17 @@ namespace PanoramicDataWin8.view.vis
             line.Visibility = Visibility.Collapsed;
 
             var gapTop = 0;//54;
-            var gapBottom = 54;
+            var gapBottom = 0;//54;
             if (left == _model.From)
             {
-                brushRectangle.Width = 10;
+                brushRectangle.Width = 4;
                 brushRectangle.Fill = new SolidColorBrush(_model.Color);
                 brushRectangle.Height = (left.Bounds.Bottom - left.Bounds.Top - gapTop - gapBottom);
                 brushRectangle.RenderTransform = new TranslateTransform() { X = left.Bounds.Right - _model.Position.X, Y = left.Bounds.Top - _model.Position.Y + gapTop };
             }
             else if (right == _model.From)
             {
-                brushRectangle.Width = 10;
+                brushRectangle.Width = 4;
                 brushRectangle.Fill = new SolidColorBrush(_model.Color);
                 brushRectangle.Height = (right.Bounds.Bottom - right.Bounds.Top - gapTop - gapBottom);
                 brushRectangle.RenderTransform = new TranslateTransform() { X = right.Bounds.Left - brushRectangle.Width - _model.Position.X, Y = right.Bounds.Top - _model.Position.Y + gapTop };

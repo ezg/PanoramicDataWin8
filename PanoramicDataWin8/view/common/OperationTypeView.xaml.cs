@@ -28,9 +28,9 @@ using PanoramicDataWin8.view.inq;
 
 namespace PanoramicDataWin8.view.common
 {
-    public sealed partial class TaskView : UserControl
+    public sealed partial class OperationTypeView : UserControl
     {
-        private TaskView _shadow = null;
+        private OperationTypeView _shadow = null;
         private long _manipulationStartTime = 0;
         private Pt _startDrag = new Point(0, 0);
         private Pt _currentFromInkableScene = new Point(0, 0);
@@ -38,7 +38,7 @@ namespace PanoramicDataWin8.view.common
         private PointerManager _mainPointerManager = new PointerManager();
         private Point _mainPointerManagerPreviousPoint = new Point();
 
-        public TaskView()
+        public OperationTypeView()
         {
             this.InitializeComponent();
             this.DataContextChanged += JobTypeView_DataContextChanged;
@@ -51,21 +51,21 @@ namespace PanoramicDataWin8.view.common
 
         void JobTypeView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (args.NewValue != null && args.NewValue is TaskModel)
+            if (args.NewValue != null && args.NewValue is OperationTypeModel)
             {
-                (args.NewValue as TaskModel).PropertyChanged += TaskModel_PropertyChanged;
+                (args.NewValue as OperationTypeModel).PropertyChanged += OperationTypeModel_PropertyChanged;
                 updateRendering();
             }
         }
 
-        void TaskModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void OperationTypeModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             updateRendering();
         }
 
         void updateRendering()
         {
-            TaskModel model = DataContext as TaskModel;
+            OperationTypeModel model = DataContext as OperationTypeModel;
 
             if (model.IsShadow)
             {
@@ -78,7 +78,7 @@ namespace PanoramicDataWin8.view.common
                 border.BorderThickness = new Thickness(0);
             }
 
-            if (model is TaskGroupModel)
+            if (model is OperationTypeGroupModel)
             {
                 tbLabel.Foreground = Application.Current.Resources.MergedDictionaries[0]["darkBrush"] as SolidColorBrush;
             }
@@ -127,7 +127,7 @@ namespace PanoramicDataWin8.view.common
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        (DataContext as TaskModel).FireMoved(bounds);
+                        (DataContext as OperationTypeModel).FireMoved(bounds);
                     }
                 }
 
@@ -149,7 +149,7 @@ namespace PanoramicDataWin8.view.common
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as TaskModel).FireDropped(bounds);
+                (DataContext as OperationTypeModel).FireDropped(bounds);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -161,13 +161,13 @@ namespace PanoramicDataWin8.view.common
         public void createShadow(Point fromInkableScene)
         {
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
-            if (inkableScene != null && DataContext != null && !((DataContext as TaskModel) is TaskGroupModel))
+            if (inkableScene != null && DataContext != null && !((DataContext as OperationTypeModel) is OperationTypeGroupModel))
             {
                 _currentFromInkableScene = fromInkableScene;
-                _shadow = new TaskView();
-                _shadow.DataContext = new TaskModel()
+                _shadow = new OperationTypeView();
+                _shadow.DataContext = new OperationTypeModel()
                 {
-                    Name = (DataContext as TaskModel).Name,
+                    Name = (DataContext as OperationTypeModel).Name,
                     IsShadow = true
                 };
 
@@ -189,7 +189,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow.SendToFront();
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as TaskModel).FireMoved(bounds);
+                (DataContext as OperationTypeModel).FireMoved(bounds);
             }
         }
     }

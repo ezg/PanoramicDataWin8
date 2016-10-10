@@ -107,7 +107,7 @@ namespace PanoramicDataWin8.view.vis
                     _observableDisposable.Dispose();
                 }
                 _observableDisposable = Observable.FromEventPattern<NotifyCollectionChangedEventArgs>(
-                    (args.NewValue as HistogramOperationViewModel).HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X), "CollectionChanged")
+                    (args.NewValue as HistogramOperationViewModel).HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X), "CollectionChanged")
                     .Throttle(TimeSpan.FromMilliseconds(50))
                     .ObserveOn(SynchronizationContext.Current)
                     .Subscribe((arg) =>
@@ -188,7 +188,7 @@ namespace PanoramicDataWin8.view.vis
         {
             removeMenu();
             HistogramOperationViewModel model = (DataContext as HistogramOperationViewModel);
-            List<AttributeTransformationModel> inputOperationModels = model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).ToList();
+            List<AttributeTransformationModel> inputOperationModels = model.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).ToList();
 
             List<HeaderObject> headerObjects = new List<HeaderObject>();
 
@@ -329,9 +329,9 @@ namespace PanoramicDataWin8.view.vis
             {
 
                 HistogramOperationViewModel model = (DataContext as HistogramOperationViewModel);
-                if (model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Count == 0)
+                if (model.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Count == 0)
                 {
-                    model.HistogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.X, sender.AttributeTransformationModel);
+                    model.HistogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, sender.AttributeTransformationModel);
                     return;
                 }
 
@@ -342,26 +342,26 @@ namespace PanoramicDataWin8.view.vis
                 HeaderObject headerObject = closestDataGridResizer.DataContext as HeaderObject;
 
                 if ((CanReorder || CanDrag) &&
-                    model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Any(aom => object.ReferenceEquals(aom, sender.AttributeTransformationModel)))
+                    model.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any(aom => object.ReferenceEquals(aom, sender.AttributeTransformationModel)))
                 {
-                    model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Remove(sender.AttributeTransformationModel);
+                    model.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Remove(sender.AttributeTransformationModel);
 
                 }
                 AttributeTransformationModel clone = e.AttributeTransformationModel;
                 if (headerObject.AttributeTransformationViewModel == null)
                 {
-                    model.HistogramOperationModel.AddUsageAttributeTransformationModel(InputUsage.X, clone);
+                    model.HistogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, clone);
                 }
                 else
                 {
                     int index = HeaderObjects.IndexOf(headerObject);
                     if (closestDataGridResizer.IsResizer)
                     {
-                        model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Insert(Math.Min(index + 1, model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Count), clone);
+                        model.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Insert(Math.Min(index + 1, model.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Count), clone);
                     }
                     else
                     {
-                        model.HistogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).Insert(index, clone);
+                        model.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Insert(index, clone);
                     }
                 }
             }

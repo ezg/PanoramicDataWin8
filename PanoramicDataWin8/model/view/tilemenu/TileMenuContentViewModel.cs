@@ -51,53 +51,35 @@ namespace PanoramicDataWin8.model.view.tilemenu
         }
     }
 
-    public class TaskGroupViewTileMenuContentViewModel : TileMenuContentViewModel
+    public class OperationTypeGroupTileMenuContentViewModel : TileMenuContentViewModel
     {
-        private TaskGroupModel _taskGroupModel = null;
-        public TaskGroupModel TaskGroupModel
+        private OperationTypeGroupModel _operationTypeGroupModel = null;
+        public OperationTypeGroupModel OperationTypeGroupModel
         {
             get
             {
-                return _taskGroupModel;
+                return _operationTypeGroupModel;
             }
             set
             {
-                this.SetProperty(ref _taskGroupModel, value);
+                this.SetProperty(ref _operationTypeGroupModel, value);
             }
         }
     }
 
 
-    public class TaskViewTileMenuContentViewModel : TileMenuContentViewModel
+    public class OperationTypeTileMenuContentViewModel : TileMenuContentViewModel
     {
-        private TaskModel _taskModel = null;
-        public TaskModel TaskModel
+        private OperationTypeModel _operationTypeModel = null;
+        public OperationTypeModel OperationTypeModel
         {
             get
             {
-                return _taskModel;
+                return _operationTypeModel;
             }
             set
             {
-                this.SetProperty(ref _taskModel, value);
-            }
-        }
-    }
-
-
-
-    public class VisualizationTypeViewTileMenuContentViewModel : TileMenuContentViewModel
-    {
-        private VisualizationTypeViewModel _visualizationTypeViewModel = null;
-        public VisualizationTypeViewModel VisualizationTypeViewModel
-        {
-            get
-            {
-                return _visualizationTypeViewModel;
-            }
-            set
-            {
-                this.SetProperty(ref _visualizationTypeViewModel, value);
+                this.SetProperty(ref _operationTypeModel, value);
             }
         }
     }

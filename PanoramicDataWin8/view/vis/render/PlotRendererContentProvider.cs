@@ -20,6 +20,7 @@ using IDEA_common.range;
 using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using NetTopologySuite.Algorithm;
+using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.result;
@@ -352,19 +353,19 @@ namespace PanoramicDataWin8.view.vis.render
             _histogramResult = histogramResult;
             _histogramOperationModelClone = histogramOperationModelClone;
             _histogramOperationModel = histogramOperationModel;
-            _xIom = _histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.X).FirstOrDefault();
-            _yIom = _histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Y).FirstOrDefault();
+            _xIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+            _yIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
 
-            if (_histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Value).Any())
+            if (_histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
             {
-                _valueIom = _histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Value).First();
+                _valueIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Value).First();
             }
-            else if (_histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).Any())
+            else if (_histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
             {
-                _valueIom = _histogramOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.DefaultValue).First();
+                _valueIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
             }
 
-            var aggregateKey = QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
+            var aggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
             _minValue = float.MaxValue;
             _maxValue = float.MinValue;
             foreach (var brush in _histogramResult.Brushes)
@@ -479,7 +480,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else
             {
-                var aggregateKey = QueryModelHelper.CreateAggregateKey(atm, _histogramResult, _histogramResult.AllBrushIndex());
+                var aggregateKey = IDEAHelpers.CreateAggregateKey(atm, _histogramResult, _histogramResult.AllBrushIndex());
                 double factor = 0.0;
                 
                 var minValue = float.MaxValue;
@@ -581,7 +582,7 @@ namespace PanoramicDataWin8.view.vis.render
             float alpha = 0.15f;
             var baseColor = Colors.White;
 
-            var valueAggregateKey = QueryModelHelper.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
+            var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
 
             var brushFactorSum = 0.0f;
             foreach (var brush in _histogramResult.Brushes)
@@ -621,10 +622,10 @@ namespace PanoramicDataWin8.view.vis.render
                     baseColor = _histogramOperationModelClone.BrushColors[brush.BrushIndex % _histogramOperationModelClone.BrushColors.Count];
                 }
 
-                var xAggregateKey = QueryModelHelper.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);
-                var yAggregateKey = QueryModelHelper.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex);
-                var xMarginAggregateKey = QueryModelHelper.CreateAggregateKey(_xIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex);
-                var yMarginAggregateKey = QueryModelHelper.CreateAggregateKey(_yIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex);
+                var xAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);
+                var yAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex);
+                var xMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex);
+                var yMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, new MarginAggregateParameters(), _histogramResult, brush.BrushIndex);
 
                 // read out value depinding on chart type
                 if (_chartType == ChartType.HeatMap)

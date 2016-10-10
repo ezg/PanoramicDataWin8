@@ -50,27 +50,27 @@ namespace PanoramicDataWin8.controller.data.progressive
             List<double> nrOfBins = new List<double>();
 
             nrOfBins = new double[] { MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins }.Concat(
-                model.GetUsageAttributeTransformationModel(InputUsage.Group).Select(qom => MainViewController.Instance.MainModel.NrOfGroupBins)).ToList();
+                model.GetAttributeUsageTransformationModel(AttributeUsage.Group).Select(qom => MainViewController.Instance.MainModel.NrOfGroupBins)).ToList();
 
-            if (model.GetUsageAttributeTransformationModel(InputUsage.X).First().AttributeModel.RawName == "long" ||
-                model.GetUsageAttributeTransformationModel(InputUsage.X).First().AttributeModel.RawName == "lat")
+            if (model.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel.RawName == "long" ||
+                model.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel.RawName == "lat")
             {
                 nrOfBins[0] = 20;
             }
 
-            if (model.GetUsageAttributeTransformationModel(InputUsage.Y).First().AttributeModel.RawName == "long" ||
-               model.GetUsageAttributeTransformationModel(InputUsage.Y).First().AttributeModel.RawName == "lat")
+            if (model.GetAttributeUsageTransformationModel(AttributeUsage.Y).First().AttributeModel.RawName == "long" ||
+               model.GetAttributeUsageTransformationModel(AttributeUsage.Y).First().AttributeModel.RawName == "lat")
             {
                 nrOfBins[0] = 20;
             }
 
-            var aggregates = model.GetUsageAttributeTransformationModel(InputUsage.Value).Concat(
-                 model.GetUsageAttributeTransformationModel(InputUsage.DefaultValue)).Concat(
-                 model.GetUsageAttributeTransformationModel(InputUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
-                 model.GetUsageAttributeTransformationModel(InputUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
+            var aggregates = model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(
+                 model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).Concat(
+                 model.GetAttributeUsageTransformationModel(AttributeUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
+                 model.GetAttributeUsageTransformationModel(AttributeUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
 
-            var xIom = model.GetUsageAttributeTransformationModel(InputUsage.X).FirstOrDefault();
-            var yIom = model.GetUsageAttributeTransformationModel(InputUsage.Y).FirstOrDefault();
+            var xIom = model.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+            var yIom = model.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
 
             BinningParameters xBinning = xIom.AggregateFunction == AggregateFunction.None
                 ? (BinningParameters)new EquiWidthBinningParameters()
@@ -146,6 +146,44 @@ namespace PanoramicDataWin8.controller.data.progressive
                 GlobalAggregateParameters = globalAggregates
             };
             return parameters;
+        }
+
+        public static AggregateParameters CreateAggregateParameters(AttributeTransformationModel iom)
+        {
+            if (iom.AggregateFunction == AggregateFunction.Count)
+                return new CountAggregateParameters { Dimension = iom.AttributeModel.Index };
+            if (iom.AggregateFunction == AggregateFunction.Avg)
+                return new AverageAggregateParameters { Dimension = iom.AttributeModel.Index };
+            if (iom.AggregateFunction == AggregateFunction.Max)
+                return new MaxAggregateParameters { Dimension = iom.AttributeModel.Index };
+            if (iom.AggregateFunction == AggregateFunction.Min)
+                return new MinAggregateParameters { Dimension = iom.AttributeModel.Index };
+            if (iom.AggregateFunction == AggregateFunction.Sum)
+                return new SumAggregateParameters { Dimension = iom.AttributeModel.Index };
+            if (iom.AggregateFunction == AggregateFunction.Count)
+                return new CountAggregateParameters { Dimension = iom.AttributeModel.Index };
+            return null;
+        }
+
+        public static AggregateKey CreateAggregateKey(AttributeTransformationModel iom, HistogramResult histogramResult,
+            int brushIndex)
+        {
+            return new AggregateKey
+            {
+                AggregateParameterIndex = histogramResult.GetAggregateParametersIndex(CreateAggregateParameters(iom)),
+                BrushIndex = brushIndex
+            };
+        }
+
+        public static AggregateKey CreateAggregateKey(AttributeTransformationModel iom,
+            SingleDimensionAggregateParameters aggParameters, HistogramResult histogramResult, int brushIndex)
+        {
+            aggParameters.Dimension = iom.AttributeModel.Index;
+            return new AggregateKey
+            {
+                AggregateParameterIndex = histogramResult.GetAggregateParametersIndex(aggParameters),
+                BrushIndex = brushIndex
+            };
         }
     }
 }

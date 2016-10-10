@@ -17,16 +17,16 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private List<TaskModel> _taskModels = null;
-        public List<TaskModel> TaskModels
+        private List<OperationTypeModel> _operationTypeModels = null;
+        public List<OperationTypeModel> OperationTypeModels
         {
             get
             {
-                return _taskModels;
+                return _operationTypeModels;
             }
             set
             {
-                this.SetProperty(ref _taskModels, value);
+                this.SetProperty(ref _operationTypeModels, value);
             }
         }
 
@@ -131,6 +131,33 @@ namespace PanoramicDataWin8.model.view
             set
             {
                 this.SetProperty(ref _throttleInMillis, value);
+            }
+        }
+
+
+        private string _startDataset = "";
+        public string StartDataset
+        {
+            get
+            {
+                return _startDataset;
+            }
+            set
+            {
+                this.SetProperty(ref _startDataset, value);
+            }
+        }
+
+        private string _backend = "";
+        public string Backend
+        {
+            get
+            {
+                return _backend;
+            }
+            set
+            {
+                this.SetProperty(ref _backend, value);
             }
         }
 

@@ -112,8 +112,8 @@ namespace PanoramicDataWin8.view.vis.render
             _svgRendererContentProvider.UpdateData(result,
                 opModel,
                  (HistogramOperationModel) opModel.Clone(),
-                opModel.GetUsageAttributeTransformationModel(InputUsage.X).FirstOrDefault(),
-                opModel.GetUsageAttributeTransformationModel(InputUsage.Y).FirstOrDefault());
+                opModel.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault(),
+                opModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault());
             render();
         }
 
@@ -232,8 +232,8 @@ namespace PanoramicDataWin8.view.vis.render
                 HistogramOperationModel histogramOperationModel = (HistogramOperationModel) ((HistogramOperationViewModel) DataContext).OperationModel;
                 var vcs = hits.SelectMany(h => h.ValueComparisons).ToList();
 
-                var xAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.X).First();
-                var yAom = histogramOperationModel.GetUsageAttributeTransformationModel(InputUsage.Y).First();
+                var xAom = histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).First();
+                var yAom = histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).First();
 
                 if (hits.Any(h => histogramOperationModel.FilterModels.Contains(h)))
                 {

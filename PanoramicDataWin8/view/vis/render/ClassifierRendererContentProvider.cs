@@ -90,7 +90,7 @@ namespace PanoramicDataWin8.view.vis.render
         private bool? _testResult = null;
         public async void ProcessStroke(List<Windows.Foundation.Point> stroke, bool isErase)
         {
-            if (stroke.Count > 5)
+            /*if (stroke.Count > 5)
             {
                 if (isErase)
                 {
@@ -113,12 +113,12 @@ namespace PanoramicDataWin8.view.vis.render
 
                 // get text for each feature
                 _recognizedText.Clear();
-                var h = _deviceHeight/(float)_classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
+                var h = _deviceHeight/(float)_classificationOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Feature).Count;
                 var x = _leftOffset + 20;
                 var y = _topOffset;
 
                 float count = 0;
-                foreach (var feature in _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature))
+                foreach (var feature in _classificationOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Feature))
                 {
                     var rect = new Rect(x, y + h*count, _deviceWidth, h);
                     var geom = rect.GetPolygon();
@@ -151,7 +151,7 @@ namespace PanoramicDataWin8.view.vis.render
 
                     //_classfierResultDescriptionModel.Query
                     var c = 0;
-                    foreach (var feature in _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature))
+                    foreach (var feature in _classificationOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Feature))
                     {
                         f.Add(new JProperty(feature.AttributeModel.RawName, new JArray(_recognizedText[c] is string ? 0 : _recognizedText[c])));
                         c++;
@@ -162,7 +162,7 @@ namespace PanoramicDataWin8.view.vis.render
                         new JProperty("dataset", psm.RootOriginModel.DatasetConfiguration.Schema.RawName),
                         new JProperty("uuid", ""),
                         new JProperty("features", f.ToString()),
-                        new JProperty("feature_dimensions", _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature).Select(fi => fi.AttributeModel.RawName).ToList()));
+                        new JProperty("feature_dimensions", _classificationOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Feature).Select(fi => fi.AttributeModel.RawName).ToList()));
                     request["uuid"] = _classfierResultDescriptionModel.Uuid;
 
                     string message = await IDEAGateway.Request(request, "test");
@@ -182,7 +182,7 @@ namespace PanoramicDataWin8.view.vis.render
                     _testResult = false;
                     //_histogramOperationModel.FireRequestRender();
                 }
-            }
+            }*/
         }
 
         private async Task<List<string>> inkToText(IEnumerable<List<Windows.Foundation.Point>> strokes)
@@ -211,7 +211,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         public override void Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
         {
-            var mat = Matrix3x2.CreateScale(new Vector2(CompositionScaleX, CompositionScaleY));
+           /* var mat = Matrix3x2.CreateScale(new Vector2(CompositionScaleX, CompositionScaleY));
             canvasArgs.DrawingSession.Transform = mat;
             if (_result != null && _classfierResultDescriptionModel != null)
             {
@@ -224,7 +224,7 @@ namespace PanoramicDataWin8.view.vis.render
                 var centerX =  _deviceWidth/2.0f + _leftOffset;
                 var centerY =  _deviceHeight/2.0f + _topOffset;
 
-                int maxIndex = 3 + _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
+                int maxIndex = 3 + _classificationOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Feature).Count;
 
                 if (_viewIndex == 0)
                 {
@@ -335,7 +335,7 @@ namespace PanoramicDataWin8.view.vis.render
                     }
                 }
                 else if (_viewIndex == maxIndex - 1)
-                {
+                {*/
                     /*string label = "query panel";
                     var layoutL = new CanvasTextLayout(canvas, label, _textFormatLarge, 1000f, 1000f);
                     var metrics = layoutL.DrawBounds;
@@ -344,15 +344,15 @@ namespace PanoramicDataWin8.view.vis.render
                                         
                     var white = Color.FromArgb(255, 255, 255, 255);
                     DrawString(canvasArgs, _textFormatLarge, centerX - (float) totalX/2.0f, _topOffset, label, blue, true, false, false);*/
-
+                    /*
                     var blue = Color.FromArgb(255, 41, 170, 213);
                     var brush = Color.FromArgb(255, 178, 77, 148);
-                    var h = _deviceHeight / (float)_classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature).Count;
+                    var h = _deviceHeight / (float)_classificationOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Feature).Count;
                     var x = _leftOffset + 20;
                     var y = _topOffset;
 
                     float count = 0;
-                    foreach (var feature in _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature))
+                    foreach (var feature in _classificationOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Feature))
                     {
                         var oldTransform = canvasArgs.DrawingSession.Transform;
                         mat = Matrix3x2.CreateRotation((-90f*(float) Math.PI)/180.0f, new Vector2(x, y + (h/2.0f) + count * h));
@@ -381,7 +381,7 @@ namespace PanoramicDataWin8.view.vis.render
                                     (float)pt.X, (float)pt.Y), !_testResult.HasValue ? _textColor : (_testResult.Value ? brush : blue), 3f);
                             last = pt;
                         }
-                    }
+                    }*/
 
                     /*
                     InkRecognizerContainer container = new InkRecognizerContainer();
@@ -389,11 +389,11 @@ namespace PanoramicDataWin8.view.vis.render
                     container..
                     var result = await container.RecognizeAsync(ink.InkPresenter.StrokeContainer, InkRecognitionTarget.);
                     string s = result[0].GetTextCandidates()[0];*/
-                }
+               /* }
                 else if (_viewIndex < maxIndex - 1)
                 {
                     int histogramIndex = _viewIndex - 2;
-                    var feat = _classificationOperationModelClone.GetUsageAttributeTransformationModel(InputUsage.Feature)[histogramIndex];
+                    var feat = _classificationOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Feature)[histogramIndex];
 
                     string label = feat.AttributeModel.RawName.Replace("_", " "); //_viewIndex != -1 ? _classfierResultDescriptionModel.Labels[_viewIndex].RawName : "avg across labels";
                     DrawString(canvasArgs, _textFormatBig, centerX, _topOffset, label, _textColor, false, true, false);
@@ -405,7 +405,7 @@ namespace PanoramicDataWin8.view.vis.render
                     rr.UpdateData(_classfierResultDescriptionModel.VisualizationResultModel[histogramIndex], xIom, yIom, vIom);
                     rr.render(canvas, canvasArgs, 40, 20, 40, 45, _deviceWidth, _deviceHeight);
                 }
-            };
+            };*/
         }
 
         private void renderGauge(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs,
