@@ -218,7 +218,16 @@ namespace PanoramicDataWin8.controller.view
             _operationViewModels.Add(visModel);
             return visModel;
         }
-        
+
+        public ExampleOperationViewModel CreateDefaultExampleOperationViewModel()
+        {
+            ExampleOperationViewModel visModel = OperationViewModelFactory.CreateDefaultExampleOperationViewModel(MainModel.SchemaModel);
+            addAttachmentViews(visModel);
+            _operationViewModels.Add(visModel);
+            return visModel;
+        }
+
+
 
         public void CopyOperationViewModel(OperationViewModel operationViewModel, Pt centerPoint)
         {
@@ -286,16 +295,24 @@ namespace PanoramicDataWin8.controller.view
 
             var operationTypeModel = sender as OperationTypeModel;
 
+            OperationViewModel operationViewModel = null; 
             if (operationTypeModel.OperationType == OperationType.Histogram)
             {
-                OperationContainerView operationContainerView = new OperationContainerView(); 
-                HistogramOperationViewModel histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(null);
-                histogramOperationViewModel.Position = position;
-                histogramOperationViewModel.Size = size;
-                operationContainerView.DataContext = histogramOperationViewModel;
-                InkableScene.Add(operationContainerView);
+                operationViewModel = CreateDefaultHistogramOperationViewModel(null);
+            }
+            else if (operationTypeModel.OperationType == OperationType.Example)
+            {
+                operationViewModel = CreateDefaultExampleOperationViewModel();
             }
 
+            if (operationViewModel != null)
+            {
+                OperationContainerView operationContainerView = new OperationContainerView();
+                operationViewModel.Size = size;
+                operationViewModel.Position = position;
+                operationContainerView.DataContext = operationViewModel;
+                InkableScene.Add(operationContainerView);
+            }
         }
         void InputGroupViewModelMoved(object sender, InputGroupViewModelEventArgs e)
         {

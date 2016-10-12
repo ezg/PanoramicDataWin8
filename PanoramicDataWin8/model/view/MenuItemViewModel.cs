@@ -229,6 +229,25 @@ namespace PanoramicDataWin8.model.view
         }
     }
 
+    public class AttributeTransformationDropTargetMenuItemViewModel : MenuItemComponentViewModel
+    {
+        public Action<AttributeTransformationModel> DroppedTriggered { get; set; }
+        public Action TappedTriggered { get; set; }
+
+        private string _label = "";
+        public string Label
+        {
+            get
+            {
+                return _label;
+            }
+            set
+            {
+                this.SetProperty(ref _label, value);
+            }
+        }
+    }
+
     public class AttributeTransformationMenuItemViewModel : MenuItemComponentViewModel
     {
         public Action<AttributeTransformationModel> DroppedTriggered { get; set; }

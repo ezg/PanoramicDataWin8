@@ -264,6 +264,10 @@
     <Compile Include="view\vis\render\MapRenderer.xaml.cs">
       <DependentUpon>MapRenderer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\vis\render\ExampleRenderer.xaml.cs">
+      <DependentUpon>ExampleRenderer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\render\ExampleRendererContentProvider.cs" />
     <Compile Include="view\vis\render\SVGRendererContentProvider.cs" />
     <Compile Include="view\vis\render\SVGRenderer.xaml.cs">
       <DependentUpon>SVGRenderer.xaml</DependentUpon>
@@ -435,6 +439,10 @@
     <Page Include="view\vis\render\MapRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\ExampleRenderer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\render\SVGRenderer.xaml">
       <Generator>MSBuild:Compile</Generator>

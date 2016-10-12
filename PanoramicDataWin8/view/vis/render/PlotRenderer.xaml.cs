@@ -80,6 +80,15 @@ namespace PanoramicDataWin8.view.vis.render
                     loadResult(result);
                     render();
                 }
+                else
+                {
+                    HistogramOperationModel operationModel = (HistogramOperationModel)((OperationViewModel)DataContext).OperationModel;
+                    if (!operationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any() &&
+                        !operationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).Any())
+                    {
+                        viewBox.Visibility = Visibility.Visible;
+                    }
+                }
             }
         }
         void OperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -172,6 +181,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         void render(bool sizeChanged = false)
         {
+            viewBox.Visibility = Visibility.Collapsed;
             dxSurface?.Redraw();
         }
 

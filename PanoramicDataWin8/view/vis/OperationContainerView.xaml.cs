@@ -197,22 +197,25 @@ namespace PanoramicDataWin8.view.vis
                     _renderer = new SVGRenderer("county.json");
                     contentGrid.Children.Add(_renderer);
                 }
-
-
+            }
+            else if (operationViewModel.OperationModel is ExampleOperationModel)
+            {
+                _renderer = new ExampleRenderer();
+                contentGrid.Children.Add(_renderer);
             }
             else if (operationViewModel.OperationModel is ClassificationOperationModel)
             {
-                var classificationOperationModel = (ClassificationOperationModel)operationViewModel.OperationModel;
+                var classificationOperationModel = (ClassificationOperationModel) operationViewModel.OperationModel;
                 if (classificationOperationModel.OperationTypeModel.Name != "frequent_itemsets")
                 {
                     _renderer = new ClassifierRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
-               /* else if (classificationOperationModel.OperationTypeModel.Name == "frequent_itemsets")
-                {
-                    _renderer = new FrequentItemsetRenderer();
-                    contentGrid.Children.Add(_renderer);
-                }*/
+                /* else if (classificationOperationModel.OperationTypeModel.Name == "frequent_itemsets")
+                 {
+                     _renderer = new FrequentItemsetRenderer();
+                     contentGrid.Children.Add(_renderer);
+                 }*/
             }
         }
 

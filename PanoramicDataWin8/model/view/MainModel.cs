@@ -17,7 +17,7 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private List<OperationTypeModel> _operationTypeModels = null;
+        private List<OperationTypeModel> _operationTypeModels = new List<OperationTypeModel>();
         public List<OperationTypeModel> OperationTypeModels
         {
             get
