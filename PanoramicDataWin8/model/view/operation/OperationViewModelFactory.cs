@@ -22,7 +22,7 @@ namespace PanoramicDataWin8.model.view
                 HistogramOperationModel oldOperationModel = (HistogramOperationModel) oldOperationViewModel.OperationModel;
 
                 HistogramOperationViewModel newHistogramOperationViewModel = CreateDefaultHistogramOperationViewModel(operationViewModel.OperationModel.SchemaModel, 
-                    null);
+                    null, operationViewModel.Position);
                 HistogramOperationModel newOperationModel = (HistogramOperationModel)newHistogramOperationViewModel.OperationModel;
                 newOperationModel.VisualizationType = VisualizationType.plot;
 
@@ -67,6 +67,7 @@ namespace PanoramicDataWin8.model.view
                 RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 3,
                 Column = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
                 Size = size,
+                Position = histogramOperationViewModel.Position,
                 TargetSize = size,
                 IsAlwaysDisplayed = true,
                 IsWidthBoundToParent = isWidthBoundToParent,
@@ -105,6 +106,7 @@ namespace PanoramicDataWin8.model.view
                             MenuViewModel = menuViewModel,
                             Row = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : count,
                             RowSpan = 0,
+                            Position = histogramOperationViewModel.Position,
                             Column = attachmentOrientation == AttachmentOrientation.Bottom ? count : 0,
                             Size = new Vec(32, 50),
                             TargetSize = new Vec(32, 50)
@@ -181,10 +183,11 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        public static HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(SchemaModel schemaModel, AttributeModel attributeModel)
+        public static HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(SchemaModel schemaModel, AttributeModel attributeModel, Pt position)
         {
             HistogramOperationModel histogramOperationModel = new HistogramOperationModel(schemaModel);
             HistogramOperationViewModel histogramOperationViewModel = new HistogramOperationViewModel(histogramOperationModel);
+            histogramOperationViewModel.Position = position;
             addAttachmentViewModels(histogramOperationViewModel);
 
             // axis attachment view models
@@ -268,6 +271,7 @@ namespace PanoramicDataWin8.model.view
                 ColumnSpan = 1,
                 RowSpan = 1,
                 Column = 0,
+                Position = exampleOperationViewModel.Position,
                 Size = new Vec(100, 50),
                 TargetSize = new Vec(100, 50),
                 IsAlwaysDisplayed = false,
@@ -324,7 +328,8 @@ namespace PanoramicDataWin8.model.view
                 TargetSize = new Vec(25, 25),
                 IsAlwaysDisplayed = false,
                 IsWidthBoundToParent = false,
-                IsHeightBoundToParent = false
+                IsHeightBoundToParent = false,
+                Position = exampleOperationViewModel.Position
             };
             AttributeTransformationMenuItemViewModel attr1 = new AttributeTransformationMenuItemViewModel()
             {
@@ -435,6 +440,7 @@ namespace PanoramicDataWin8.model.view
                     Row = count,
                     RowSpan = 0,
                     Column = 0,
+                    Position = exampleOperationViewModel.Position,
                     Size = new Vec(50, 32),
                     TargetSize = new Vec(50, 32)
                 };
@@ -473,10 +479,11 @@ namespace PanoramicDataWin8.model.view
             }
         }
         
-        public static ExampleOperationViewModel CreateDefaultExampleOperationViewModel(SchemaModel schemaModel)
+        public static ExampleOperationViewModel CreateDefaultExampleOperationViewModel(SchemaModel schemaModel, Pt position)
         {
             ExampleOperationModel exampleOperationModel = new ExampleOperationModel(schemaModel);
             ExampleOperationViewModel exampleOperationViewModel = new ExampleOperationViewModel(exampleOperationModel);
+            exampleOperationViewModel.Position = position;
             addAttachmentViewModels(exampleOperationViewModel);
             createBottomExampleMenu(exampleOperationViewModel);
             createRightExampleMenu(exampleOperationViewModel);

@@ -5,8 +5,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using Windows.UI;
-using IDEA_common.aggregates;
-using IDEA_common.operations.histogram;
 using Newtonsoft.Json;
 using PanoramicDataWin8.model.data.operation;
 

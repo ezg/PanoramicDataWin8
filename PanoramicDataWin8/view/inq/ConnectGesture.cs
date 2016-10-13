@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
@@ -16,39 +17,41 @@ namespace PanoramicDataWin8.view.inq
         }
 
 
-        private OperationViewModel _fromOperationViewModel = null;
-        public OperationViewModel FromOperationViewModel
+        private IFilterProviderOperationModel _filterProviderOperationViewModel = null;
+        public IFilterProviderOperationModel FilterProviderOperationViewModel
         {
-            get { return _fromOperationViewModel; }
+            get { return _filterProviderOperationViewModel; }
         }
 
-        private OperationViewModel _toOperationViewModel = null;
-        public OperationViewModel ToOperationViewModel
+        private IFilterConsumerOperationModel _filterConsumerOperationViewModel = null;
+        public IFilterConsumerOperationModel FilterConsumerOperationViewModel
         {
-            get { return _toOperationViewModel; }
+            get { return _filterConsumerOperationViewModel; }
         }
 
         public bool Recognize(InkStroke inkStroke)
         {
             if (!inkStroke.IsErase)
             {
-                _fromOperationViewModel = null;
-                _toOperationViewModel = null;
+                _filterProviderOperationViewModel = null;
+                _filterConsumerOperationViewModel = null;
 
                 foreach (OperationContainerView view in _inkableScene.Elements.Where(e => e is OperationContainerView))
                 {
-                    if (view.Geometry.Contains(inkStroke.Points[0].GetPoint()))
+                    var operationModel = ((OperationViewModel) view.DataContext).OperationModel;
+
+                    if (view.Geometry.Contains(inkStroke.Points[0].GetPoint()) && operationModel is IFilterProviderOperationModel)
                     {
-                        _fromOperationViewModel = view.DataContext as HistogramOperationViewModel;
+                        _filterProviderOperationViewModel = operationModel as IFilterProviderOperationModel;
                     }
                     if (view.Geometry.Contains(inkStroke.Points[inkStroke.Points.Count - 1].GetPoint()) &&
-                        _fromOperationViewModel != view.DataContext as HistogramOperationViewModel)
+                        _filterProviderOperationViewModel != operationModel && operationModel is IFilterConsumerOperationModel)  
                     {
-                        _toOperationViewModel = view.DataContext as HistogramOperationViewModel;
+                        _filterConsumerOperationViewModel = operationModel as IFilterConsumerOperationModel;
                     }
                 }
 
-                if (_fromOperationViewModel != null && _toOperationViewModel != null)
+                if (_filterProviderOperationViewModel != null && _filterConsumerOperationViewModel != null)
                 {
                     return true;
                 }

@@ -20,14 +20,22 @@ namespace PanoramicDataWin8.model.data.operation
         public double DummyValue
         {
             get { return _dummyValue; }
-            set { SetProperty(ref _dummyValue, value); }
+            set
+            {
+                SetProperty(ref _dummyValue, value);
+                FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+            }
         }
 
         private ExampleOperationType _exampleOperationType = ExampleOperationType.A;
         public ExampleOperationType ExampleOperationType
         {
             get { return _exampleOperationType; }
-            set { SetProperty(ref _exampleOperationType, value); }
+            set
+            {
+                SetProperty(ref _exampleOperationType, value);
+                FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+            }
         }
 
         public FilteringOperation FilteringOperation

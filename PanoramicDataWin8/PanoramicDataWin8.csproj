@@ -101,6 +101,7 @@
     </Compile>
     <Compile Include="controller\data\DataRow.cs" />
     <Compile Include="controller\data\OperationJob.cs" />
+    <Compile Include="controller\data\progressive\ExampleOperationJob.cs" />
     <Compile Include="controller\data\progressive\ResultCommand.cs" />
     <Compile Include="controller\data\progressive\CatalogCommand.cs" />
     <Compile Include="controller\data\progressive\IDEAGateway.cs" />

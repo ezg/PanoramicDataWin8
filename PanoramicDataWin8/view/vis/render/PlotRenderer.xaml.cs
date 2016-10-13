@@ -220,7 +220,7 @@ namespace PanoramicDataWin8.view.vis.render
             List<Windows.Foundation.Point> selectionPoints = inkStroke.Points.Select(p => gt.TransformPoint(p)).ToList();
 
             IList<Vec> convexHull = Convexhull.convexhull(selectionPoints);
-            IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon();
+            IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon().Buffer(1);
 
             List<FilterModel> hits = new List<FilterModel>();
             foreach (var geom in _plotRendererContentProvider.HitTargets.Keys)
@@ -252,6 +252,10 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     histogramOperationModel.AddFilterModels(hits);
                 }
+            }
+            else
+            {
+                
             }
             return true;
         }

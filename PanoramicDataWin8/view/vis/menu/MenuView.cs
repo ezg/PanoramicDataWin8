@@ -75,6 +75,8 @@ namespace PanoramicDataWin8.view.vis.menu
             }
         }
 
+
+        private Dictionary<MenuItemViewModel, Storyboard> _storyboards = new Dictionary<MenuItemViewModel, Storyboard>();
         void toggleDisplayed()
         {
             var model = (DataContext as MenuViewModel);
@@ -86,6 +88,10 @@ namespace PanoramicDataWin8.view.vis.menu
                 {
                     if (!kvp.Key.IsAlwaysDisplayed)
                     {
+                        if (_storyboards.ContainsKey(kvp.Key))
+                        {
+                            //_storyboards[kvp.Key].Stop();
+                        }
                         ExponentialEase easingFunction = new ExponentialEase();
                         easingFunction.EasingMode = EasingMode.EaseInOut;
 
@@ -102,6 +108,7 @@ namespace PanoramicDataWin8.view.vis.menu
                         {
                             kvp.Value.IsHitTestVisible = false;
                         };
+                        _storyboards[kvp.Key] = storyboard;
                     }
                 }
             }
@@ -112,6 +119,10 @@ namespace PanoramicDataWin8.view.vis.menu
                 {
                     if (!kvp.Key.IsAlwaysDisplayed)
                     {
+                        if (_storyboards.ContainsKey(kvp.Key))
+                        {
+                           // _storyboards[kvp.Key].Stop();
+                        }
                         kvp.Value.IsHitTestVisible = true;
 
                         ExponentialEase easingFunction = new ExponentialEase();
@@ -126,6 +137,11 @@ namespace PanoramicDataWin8.view.vis.menu
                         Storyboard.SetTarget(animation, kvp.Value);
                         Storyboard.SetTargetProperty(animation, "Opacity");
                         storyboard.Begin();
+                        storyboard.Completed += (sender, o) =>
+                        {
+                            kvp.Value.IsHitTestVisible = true;
+                        };
+                        _storyboards[kvp.Key] = storyboard;
                     }
                 }
             }

@@ -212,17 +212,19 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        public HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(AttributeModel attributeModel)
+        public HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(AttributeModel attributeModel, Pt position)
         {
-            HistogramOperationViewModel visModel = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(MainModel.SchemaModel, attributeModel);
+            HistogramOperationViewModel visModel = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(MainModel.SchemaModel, attributeModel, position);
+            visModel.Position = position;
             addAttachmentViews(visModel);
             _operationViewModels.Add(visModel);
             return visModel;
         }
 
-        public ExampleOperationViewModel CreateDefaultExampleOperationViewModel()
+        public ExampleOperationViewModel CreateDefaultExampleOperationViewModel(Pt position)
         {
-            ExampleOperationViewModel visModel = OperationViewModelFactory.CreateDefaultExampleOperationViewModel(MainModel.SchemaModel);
+            ExampleOperationViewModel visModel = OperationViewModelFactory.CreateDefaultExampleOperationViewModel(MainModel.SchemaModel, position);
+            visModel.Position = position;
             addAttachmentViews(visModel);
             _operationViewModels.Add(visModel);
             return visModel;
@@ -299,18 +301,17 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModel operationViewModel = null; 
             if (operationTypeModel.OperationType == OperationType.Histogram)
             {
-                operationViewModel = CreateDefaultHistogramOperationViewModel(null);
+                operationViewModel = CreateDefaultHistogramOperationViewModel(null, position);
             }
             else if (operationTypeModel.OperationType == OperationType.Example)
             {
-                operationViewModel = CreateDefaultExampleOperationViewModel();
+                operationViewModel = CreateDefaultExampleOperationViewModel(position);
             }
 
             if (operationViewModel != null)
             {
                 OperationContainerView operationContainerView = new OperationContainerView();
                 operationViewModel.Size = size;
-                operationViewModel.Position = position;
                 operationContainerView.DataContext = operationViewModel;
                 InkableScene.Add(operationContainerView);
             }
@@ -429,8 +430,7 @@ namespace PanoramicDataWin8.controller.view
             if (!hits.Any())
             {
                 OperationContainerView operationContainerView = new OperationContainerView();
-                HistogramOperationViewModel histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(e.AttributeTransformationModel.AttributeModel);
-                histogramOperationViewModel.Position = position;
+                HistogramOperationViewModel histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(e.AttributeTransformationModel.AttributeModel, position);
                 histogramOperationViewModel.Size = size;
                 operationContainerView.DataContext = histogramOperationViewModel;
                 InkableScene.Add(operationContainerView);
@@ -466,7 +466,8 @@ namespace PanoramicDataWin8.controller.view
         private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
             OperationModel model = (OperationModel) sender;
-            if (e is FilterOperationModelUpdatedEventArgs && 
+            if (model is IFilterProviderOperationModel && 
+                e is FilterOperationModelUpdatedEventArgs && 
                 (e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.Links)
             {
                 ((IFilterProviderOperationModel) model).ClearFilterModels();
@@ -489,7 +490,7 @@ namespace PanoramicDataWin8.controller.view
                 if (recognizedGesture is ConnectGesture)
                 {
                     ConnectGesture connect = recognizedGesture as ConnectGesture;
-                    FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FromOperationViewModel.OperationModel, connect.ToOperationViewModel.OperationModel);
+                    FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, connect.FilterConsumerOperationViewModel);
                 }
                 else if (recognizedGesture is HitGesture)
                 {
@@ -531,7 +532,33 @@ namespace PanoramicDataWin8.controller.view
 
 
             if (!e.InkStroke.IsErase && !recognizedGestures.Any())
-                _inkableScene.Add(e.InkStroke);
+            {
+                List<IScribbable> allScribbables = new List<IScribbable>();
+                IScribbleHelpers.GetScribbablesRecursive(allScribbables, InkableScene.Elements.OfType<IScribbable>().ToList());
+                var inkStroke = e.InkStroke.GetResampled(20);
+                ILineString inkStrokeLine = inkStroke.GetLineString();
+
+                bool consumed = false;
+                foreach (IScribbable existingScribbable in allScribbables)
+                {
+                    IGeometry geom = existingScribbable.Geometry;
+                    if (geom != null)
+                    {
+                        if (inkStrokeLine.Intersects(geom))
+                        {
+                            consumed = existingScribbable.Consume(e.InkStroke);
+                            if (consumed)
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (!consumed)
+                {
+                    _inkableScene.Add(e.InkStroke);
+                }
+            }
         }
 
         public void UpdateJobStatus()

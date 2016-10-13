@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using IDEA_common.aggregates;
 using IDEA_common.binning;
 using IDEA_common.operations;
+using IDEA_common.operations.example;
 using IDEA_common.operations.histogram;
 using IDEA_common.operations.risk;
 using PanoramicDataWin8.controller.view;
@@ -29,6 +30,25 @@ namespace PanoramicDataWin8.controller.data.progressive
             };
             return parameters;
 
+        }
+
+        public static ExampleOperationParameters GetExampleOperationParameters(ExampleOperationModel model, int sampleSize)
+        {
+            var psm = (model.SchemaModel as ProgressiveSchemaModel);
+            string filter = "";
+            List<FilterModel> filterModels = new List<FilterModel>();
+            filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
+
+            var parameters = new ExampleOperationParameters()
+            {
+                AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
+                Filter = filter,
+                Dimensions = model.AttributeUsageTransformationModels.Select(atm => atm.AttributeModel.Index).ToList(),
+                DummyValue = model.DummyValue,
+                ExampleType = model.ExampleOperationType.ToString(),
+                SampleStreamBlockSize = sampleSize
+            };
+            return parameters;
         }
 
         public static HistogramOperationParameters GetHistogramOperationParameters(HistogramOperationModel model, int sampleSize)

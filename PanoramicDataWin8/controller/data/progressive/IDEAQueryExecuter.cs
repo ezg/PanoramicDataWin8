@@ -73,6 +73,18 @@ namespace PanoramicDataWin8.controller.data.progressive
                             statisticalComparisonOperationJob.JobCompleted += job_JobCompleted;
                             statisticalComparisonOperationJob.Start();
                         }
+                        else if (operationModel is ExampleOperationModel)
+                        {
+                            var exampleOperationModel = (ExampleOperationModel)operationModel;
+                            ExampleOperationJob exampleOperationJob = new ExampleOperationJob(
+                                   exampleOperationModel,
+                                   TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
+
+                            ActiveJobs.Add(operationModel, exampleOperationJob);
+                            exampleOperationJob.JobUpdate += job_JobUpdate;
+                            exampleOperationJob.JobCompleted += job_JobCompleted;
+                            exampleOperationJob.Start();
+                        }
                         else
                         {
                          /*   if (operationModel.GetAttributeUsageTransformationModel(AttributeUsage.Feature).Any() && operationModel.BrushQueryModels.Any())
