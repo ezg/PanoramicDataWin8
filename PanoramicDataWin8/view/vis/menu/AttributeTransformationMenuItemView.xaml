@@ -7,17 +7,18 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:WinRTXamlToolkit.Controls"
+    xmlns:view="using:PanoramicDataWin8.model.view"
     mc:Ignorable="d"
     d:DesignHeight="100"
     d:DesignWidth="100"
     FontFamily="{StaticResource abel}">
 
     <d:DesignProperties.DataContext>
-        <model:MenuItemViewModel>
-            <model:MenuItemViewModel.MenuItemComponentViewModel>
-                <model:AttributeTransformationMenuItemViewModel Label="Test" />
-            </model:MenuItemViewModel.MenuItemComponentViewModel>
-        </model:MenuItemViewModel>
+        <view:MenuItemViewModel>
+            <view:MenuItemViewModel.MenuItemComponentViewModel>
+                <view:AttributeTransformationMenuItemViewModel Label="Test" />
+            </view:MenuItemViewModel.MenuItemComponentViewModel>
+        </view:MenuItemViewModel>
     </d:DesignProperties.DataContext>
 
 
@@ -37,7 +38,7 @@
                         HorizontalAlignment="Stretch"
                         TextAlignment="Center"
                         MaxWidth="{Binding Size.X}"
-                        Text="{Binding MenuItemComponentViewModel.Label}" FontSize="11" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
+                        Text="{Binding MenuItemComponentViewModel.Label}" FontSize="11" Foreground="{Binding MenuItemComponentViewModel.TextBrush}" TextWrapping="Wrap"/>
                 </controls:LayoutTransformControl>
             </Viewbox>
         </Border>

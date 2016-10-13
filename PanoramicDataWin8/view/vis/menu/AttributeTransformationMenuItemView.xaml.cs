@@ -61,6 +61,8 @@ namespace PanoramicDataWin8.view.vis.menu
         private bool _isHighlighted = false;
         void toggleHighlighted(bool isHighlighted)
         {
+            var model = ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
+
             ExponentialEase easingFunction = new ExponentialEase();
             easingFunction.EasingMode = EasingMode.EaseInOut;
 
@@ -77,9 +79,9 @@ namespace PanoramicDataWin8.view.vis.menu
             else
             {
                 backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush).Color;
-                txtBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush);
+                txtBlock.Foreground = model.TextBrush;
             }
-            
+
             Storyboard storyboard = new Storyboard();
             storyboard.Children.Add(backgroundAnimation);
             Storyboard.SetTarget(backgroundAnimation, mainGrid);
@@ -92,8 +94,8 @@ namespace PanoramicDataWin8.view.vis.menu
 
         private void mainPointerManager_Added(object sender, PointerManagerEvent e)
         {
-            var model = ((AttributeTransformationMenuItemViewModel) ((MenuItemViewModel) DataContext).MenuItemComponentViewModel).AttributeTransformationViewModel;
-            if (!model.IsDraggable)
+            var model = ((AttributeTransformationMenuItemViewModel) ((MenuItemViewModel) DataContext).MenuItemComponentViewModel);
+            if (!model.CanDrag)
             {
                 return;
             }
@@ -108,7 +110,9 @@ namespace PanoramicDataWin8.view.vis.menu
 
         void mainPointerManager_Moved(object sender, PointerManagerEvent e)
         {
-            if (e.NumActiveContacts == 1)
+            var model = ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
+
+            if (e.NumActiveContacts == 1 && model.CanDrag)
             {
                 GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
                 Point currentPoint = gt.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position);
@@ -132,9 +136,8 @@ namespace PanoramicDataWin8.view.vis.menu
                     {
                         inkableScene.Add(_shadow);
 
-                        var model = ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel).AttributeTransformationViewModel;
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        model.FireMoved(bounds, model.AttributeTransformationModel);
+                        model.AttributeTransformationViewModel.FireMoved(bounds, model.AttributeTransformationViewModel.AttributeTransformationModel);
                     }
                 }
 
@@ -144,8 +147,8 @@ namespace PanoramicDataWin8.view.vis.menu
 
         void mainPointerManager_Removed(object sender, PointerManagerEvent e)
         {
-            var model = ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel).AttributeTransformationViewModel;
-            if (!model.IsDraggable)
+            var model = ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
+            if (!model.CanDrag)
             {
                 return;
             }
@@ -167,10 +170,10 @@ namespace PanoramicDataWin8.view.vis.menu
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
                 
-                model.FireDropped(bounds,
-                    new AttributeTransformationModel(model.AttributeTransformationModel.AttributeModel)
+                model.AttributeTransformationViewModel.FireDropped(bounds,
+                    new AttributeTransformationModel(model.AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel)
                     {
-                        AggregateFunction = model.AttributeTransformationModel.AggregateFunction
+                        AggregateFunction = model.AttributeTransformationViewModel.AttributeTransformationModel.AggregateFunction
                     });
 
                 inkableScene.Remove(_shadow);
@@ -229,34 +232,42 @@ namespace PanoramicDataWin8.view.vis.menu
         public void AttributeTransformationViewModelMoved(AttributeTransformationViewModel sender,
             AttributeTransformationViewModelEventArgs e, bool overElement)
         {
-            if (overElement && !_isHighlighted)
-            {
-                toggleHighlighted(true);
-                _isHighlighted = true;
+            var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
 
-            }
-            else if (!overElement && _isHighlighted)
+            if (model.CanDrop)
             {
-                toggleHighlighted(false);
-                _isHighlighted = false;
+                if (overElement && !_isHighlighted)
+                {
+                    toggleHighlighted(true);
+                    _isHighlighted = true;
+
+                }
+                else if (!overElement && _isHighlighted)
+                {
+                    toggleHighlighted(false);
+                    _isHighlighted = false;
+                }
             }
         }
 
         public void AttributeTransformationViewModelDropped(AttributeTransformationViewModel sender,
             AttributeTransformationViewModelEventArgs e, bool overElement)
         {
-            if (_isHighlighted)
-            {
-                toggleHighlighted(false);
-                _isHighlighted = false;
-            }
+            var model = (AttributeTransformationMenuItemViewModel) ((MenuItemViewModel) DataContext).MenuItemComponentViewModel;
 
-            if (overElement)
-            {
-                var model = (AttributeTransformationMenuItemViewModel) ((MenuItemViewModel) DataContext).MenuItemComponentViewModel;
-                if (model != null && model.DroppedTriggered != null)
+            if (model.CanDrop) { 
+                if (_isHighlighted)
                 {
-                    model.DroppedTriggered(new AttributeTransformationModel(e.AttributeTransformationModel.AttributeModel));
+                    toggleHighlighted(false);
+                    _isHighlighted = false;
+                }
+
+                if (overElement)
+                {
+                    if (model != null && model.DroppedTriggered != null)
+                    {
+                        model.DroppedTriggered(new AttributeTransformationModel(e.AttributeTransformationModel.AttributeModel));
+                    }
                 }
             }
         }

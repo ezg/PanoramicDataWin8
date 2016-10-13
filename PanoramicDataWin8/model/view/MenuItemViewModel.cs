@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI;
+using Windows.UI.Xaml.Media;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.utils;
 
@@ -229,29 +231,49 @@ namespace PanoramicDataWin8.model.view
         }
     }
 
-    public class AttributeTransformationDropTargetMenuItemViewModel : MenuItemComponentViewModel
-    {
-        public Action<AttributeTransformationModel> DroppedTriggered { get; set; }
-        public Action TappedTriggered { get; set; }
-
-        private string _label = "";
-        public string Label
-        {
-            get
-            {
-                return _label;
-            }
-            set
-            {
-                this.SetProperty(ref _label, value);
-            }
-        }
-    }
-
     public class AttributeTransformationMenuItemViewModel : MenuItemComponentViewModel
     {
         public Action<AttributeTransformationModel> DroppedTriggered { get; set; }
         public Action TappedTriggered { get; set; }
+        
+        private bool _canDrag = true;
+        public bool CanDrag
+        {
+            get
+            {
+                return _canDrag;
+            }
+            set
+            {
+                this.SetProperty(ref _canDrag, value);
+            }
+        }
+
+        private bool _canDrop = true;
+        public bool CanDrop
+        {
+            get
+            {
+                return _canDrop;
+            }
+            set
+            {
+                this.SetProperty(ref _canDrop, value);
+            }
+        }
+
+        private Brush _textBrush = new SolidColorBrush(Colors.Black);
+        public Brush TextBrush
+        {
+            get
+            {
+                return _textBrush;
+            }
+            set
+            {
+                this.SetProperty(ref _textBrush, value);
+            }
+        }
 
         private string _label = "";
         public string Label
