@@ -252,6 +252,7 @@ namespace PanoramicDataWin8.model.view
             var attachmentViewModel =
                 exampleOperationViewModel.AttachementViewModels.First(
                     avm => avm.AttachmentOrientation == AttachmentOrientation.Bottom);
+            attachmentViewModel.ShowOnAttributeMove = true;
 
             MenuViewModel menuViewModel = new MenuViewModel()
             {
@@ -268,9 +269,9 @@ namespace PanoramicDataWin8.model.view
                 ColumnSpan = 1,
                 RowSpan = 1,
                 Column = 0,
-                Size = new Vec(50, 50),
-                TargetSize = new Vec(50, 50),
-                IsAlwaysDisplayed = true,
+                Size = new Vec(25, 25),
+                TargetSize = new Vec(25, 25),
+                IsAlwaysDisplayed = false,
                 IsWidthBoundToParent = false,
                 IsHeightBoundToParent = false
             };

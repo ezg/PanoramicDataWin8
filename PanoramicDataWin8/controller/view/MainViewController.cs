@@ -372,6 +372,23 @@ namespace PanoramicDataWin8.controller.view
                     hits.Add(element);
                 }
             }
+
+            var ops = InkableScene.GetDescendants().OfType<OperationContainerView>().ToList();
+            foreach (var element in ops)
+            {
+                var geom = element.Geometry;
+                if (geom != null && mainPageBounds.Distance(geom) < 100)
+                {
+                    foreach (var a in (element.DataContext as OperationViewModel).AttachementViewModels)
+                    {
+                        if (a.ShowOnAttributeMove)
+                        {
+                            a.ActiveStopwatch.Restart();
+                        }
+                    }
+                }
+            }
+
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
 
             foreach (var element in InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>())

@@ -10,12 +10,10 @@ namespace PanoramicDataWin8.model.view
     public class AttachmentViewModel : ExtendedBindableBase
     {
         private Stopwatch _activeStopwatch = new Stopwatch();
-
         private AttachmentOrientation _attachmentOrientation;
-
         private MenuViewModel _menuViewModel;
-
         private OperationViewModel _operationViewModel;
+        private bool _showOnAttributeMove;
 
         public AttachmentViewModel()
         {
@@ -54,6 +52,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _menuViewModel; }
             set { SetProperty(ref _menuViewModel, value); }
+        }
+
+        public bool ShowOnAttributeMove
+        {
+            get { return _showOnAttributeMove; }
+            set { SetProperty(ref _showOnAttributeMove, value); }
         }
 
         public MenuViewModel CreateMenuViewModel(AttachedTo attachedTo)
@@ -172,7 +176,6 @@ namespace PanoramicDataWin8.model.view
         {
         }
 
-
         private void QueryModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             /*if (e.PropertyName == _operationViewModel.HistogramOperationModel.GetPropertyName(() => _operationViewModel.HistogramOperationModel.OperationTypeModel) |
@@ -261,7 +264,6 @@ namespace PanoramicDataWin8.model.view
                 //AttachmentHeaderViewModels.Add(header);
             }
         }
-
 
         private void createLogregBottom()
         {
