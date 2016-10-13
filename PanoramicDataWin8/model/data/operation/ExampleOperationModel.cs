@@ -7,6 +7,8 @@ namespace PanoramicDataWin8.model.data.operation
     {
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
+        private double _dummyValue = 50;
+
         public ExampleOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
@@ -14,6 +16,19 @@ namespace PanoramicDataWin8.model.data.operation
         }
 
         public ObservableCollection<AttributeTransformationModel> AttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
+
+        public double DummyValue
+        {
+            get { return _dummyValue; }
+            set { SetProperty(ref _dummyValue, value); }
+        }
+
+        private ExampleOperationType _exampleOperationType = ExampleOperationType.A;
+        public ExampleOperationType ExampleOperationType
+        {
+            get { return _exampleOperationType; }
+            set { SetProperty(ref _exampleOperationType, value); }
+        }
 
         public FilteringOperation FilteringOperation
         {
@@ -31,5 +46,10 @@ namespace PanoramicDataWin8.model.data.operation
         {
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
+    }
+
+    public enum ExampleOperationType
+    {
+        A, B, C
     }
 }

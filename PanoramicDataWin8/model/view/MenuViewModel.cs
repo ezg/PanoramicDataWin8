@@ -1,178 +1,115 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
 {
     public class MenuViewModel : ExtendedBindableBase
     {
-        public MenuViewModel()
-        {
-        }
+        private Pt _ankerPosition;
+        
+        private AttachmentOrientation _attachmentOrientation;
+
+        private AttachmentViewModel _attachmentViewModel;
+
+        private AttributeTransformationViewModel _attributeTransformationViewModel;
+
+        private bool _isDisplayed;
+
+        private bool _isToBeRemoved;
 
         private ObservableCollection<MenuItemViewModel> _menuItemViewModels = new ObservableCollection<MenuItemViewModel>();
+
+        private int _nrColumns;
+
+        private int _nrRows;
+
         public ObservableCollection<MenuItemViewModel> MenuItemViewModels
         {
-            get
-            {
-                return _menuItemViewModels;
-            }
-            set
-            {
-                this.SetProperty(ref _menuItemViewModels, value);
-            }
+            get { return _menuItemViewModels; }
+            set { SetProperty(ref _menuItemViewModels, value); }
         }
 
-        private Pt _ankerPosition = new Pt();
         public Pt AnkerPosition
         {
-            get
-            {
-                return _ankerPosition;
-            }
-            set
-            {
-                this.SetProperty(ref _ankerPosition, value);
-            }
+            get { return _ankerPosition; }
+            set { SetProperty(ref _ankerPosition, value); }
         }
 
-        private bool _isDisplayed = false;
         public bool IsDisplayed
         {
-            get
-            {
-                return _isDisplayed;
-            }
-            set
-            {
-                this.SetProperty(ref _isDisplayed, value);
-            }
+            get { return _isDisplayed; }
+            set { SetProperty(ref _isDisplayed, value); }
         }
 
-        private int _nrColumns = 0;
         public int NrColumns
         {
-            get
-            {
-                return _nrColumns;
-            }
-            set
-            {
-                this.SetProperty(ref _nrColumns, value);
-            }
+            get { return _nrColumns; }
+            set { SetProperty(ref _nrColumns, value); }
         }
 
-        private int _nrRows = 0;
         public int NrRows
         {
-            get
-            {
-                return _nrRows;
-            }
-            set
-            {
-                this.SetProperty(ref _nrRows, value);
-            }
+            get { return _nrRows; }
+            set { SetProperty(ref _nrRows, value); }
         }
 
-        private bool _isToBeRemoved = false;
         public bool IsToBeRemoved
         {
-            get
-            {
-                return _isToBeRemoved;
-            }
-            set
-            {
-                this.SetProperty(ref _isToBeRemoved, value);
-            }
+            get { return _isToBeRemoved; }
+            set { SetProperty(ref _isToBeRemoved, value); }
         }
 
-        private AttributeTransformationViewModel _attributeTransformationViewModel = null;
         public AttributeTransformationViewModel AttributeTransformationViewModel
         {
-            get
-            {
-                return _attributeTransformationViewModel;
-            }
-            set
-            {
-                this.SetProperty(ref _attributeTransformationViewModel, value);
-            }
+            get { return _attributeTransformationViewModel; }
+            set { SetProperty(ref _attributeTransformationViewModel, value); }
         }
 
-        private AttachmentViewModel _attachmentViewModel = null;
         public AttachmentViewModel AttachmentViewModel
         {
-            get
-            {
-                return _attachmentViewModel;
-            }
-            set
-            {
-                this.SetProperty(ref _attachmentViewModel, value);
-            }
+            get { return _attachmentViewModel; }
+            set { SetProperty(ref _attachmentViewModel, value); }
         }
-        
 
-        private AttachmentOrientation _attachmentOrientation;
         public AttachmentOrientation AttachmentOrientation
         {
-            get
-            {
-                return _attachmentOrientation;
-            }
-            set
-            {
-                this.SetProperty(ref _attachmentOrientation, value);
-            }
+            get { return _attachmentOrientation; }
+            set { SetProperty(ref _attachmentOrientation, value); }
+        }
+
+        public event EventHandler Updated;
+
+        public void FireUpdate()
+        {
+            Updated?.Invoke(this, new EventArgs());
         }
     }
 
-    public class AttachedTo :ExtendedBindableBase
+    public class AttachedTo : ExtendedBindableBase
     {
-
-        private Pt _targetPosition = new Pt(0, 0);
-        public Pt TargetPosition
-        {
-            get
-            {
-                return _targetPosition;
-            }
-            set
-            {
-                this.SetProperty(ref _targetPosition, value);
-            }
-        }
+        private Pt _position = new Pt(0, 0);
 
         private Vec _size = new Vec(50, 50);
-        public Vec Size
+
+        private Pt _targetPosition = new Pt(0, 0);
+
+        public Pt TargetPosition
         {
-            get
-            {
-                return _size;
-            }
-            set
-            {
-                this.SetProperty(ref _size, value);
-            }
+            get { return _targetPosition; }
+            set { SetProperty(ref _targetPosition, value); }
         }
 
-        private Pt _position = new Pt(0, 0);
+        public Vec Size
+        {
+            get { return _size; }
+            set { SetProperty(ref _size, value); }
+        }
+
         public Pt Position
         {
-            get
-            {
-                return _position;
-            }
-            set
-            {
-                this.SetProperty(ref _position, value);
-            }
+            get { return _position; }
+            set { SetProperty(ref _position, value); }
         }
     }
 }

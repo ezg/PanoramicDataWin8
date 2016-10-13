@@ -11,11 +11,13 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Shapes;
+using GeoAPI.Geometries;
 using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.view.inq;
 
 namespace PanoramicDataWin8.view.vis.menu
 {
-    public class MenuView : UserControl
+    public class MenuView : UserControl, IScribbable
     {
         public static double GAP = 4;
 
@@ -141,6 +143,8 @@ namespace PanoramicDataWin8.view.vis.menu
                 model.PropertyChanged += MenuViewModel_PropertyChanged;
                 model.MenuItemViewModels.CollectionChanged -= MenuItemViewModels_CollectionChanged;
                 model.MenuItemViewModels.CollectionChanged += MenuItemViewModels_CollectionChanged;
+                model.Updated -= Model_Updated;
+                model.Updated += Model_Updated;
 
                 foreach (var item in model.MenuItemViewModels)
                 {
@@ -154,6 +158,11 @@ namespace PanoramicDataWin8.view.vis.menu
 
                 updateRendering();
             }
+        }
+
+        private void Model_Updated(object sender, EventArgs e)
+        {
+            updateRendering();
         }
 
         void MenuViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -224,6 +233,26 @@ namespace PanoramicDataWin8.view.vis.menu
                         }
                     }
                 }
+                if (model.AttachmentOrientation == AttachmentOrientation.Right)
+                {
+                    for (int col = 0; col < model.NrColumns; col++)
+                    {
+                        for (int row = 0; row < model.NrRows; row++)
+                        {
+                            var itemsInSameCol = model.MenuItemViewModels.Where(mi => mi.Row < row && (mi.Column == col || (mi.Column < col && mi.Column + mi.ColumnSpan - 1 >= col))).ToList();
+                            var itemsInSameRow = model.MenuItemViewModels.Where(mi => mi.Column < col && mi.Row == row).ToList();
+
+                            double currentY = model.AnkerPosition.Y + itemsInSameCol.Sum(mi => mi.Size.Y) + itemsInSameCol.Count * GAP;
+                            double currentX = model.AnkerPosition.X + itemsInSameRow.Sum(mi => mi.Size.X) + itemsInSameRow.Count() * GAP + GAP;
+
+                            var rowItem = model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
+                            if (rowItem != null)
+                            {
+                                rowItem.TargetPosition = new Pt(currentX, currentY);
+                            }
+                        }
+                    }
+                }
                 else if (model.AttachmentOrientation == AttachmentOrientation.Bottom)
                 {
                     for (int col = 0; col < model.NrColumns; col++)
@@ -275,6 +304,19 @@ namespace PanoramicDataWin8.view.vis.menu
         private double calculateMinPreferedSizeY(IEnumerable<AttachmentHeaderViewModel> headers)
         {
             return headers.Sum(h => h.PreferedItemSize.Y) + (headers.Count() - 1) * GAP;
+        }
+
+        public bool IsDeletable { get { return false; } }
+        public IGeometry Geometry { get; }
+
+        public List<IScribbable> Children
+        {
+            get { return _menuViewItems.Values.Select(a => a as IScribbable).ToList(); }
+        }
+
+        public bool Consume(InkStroke inkStroke)
+        {
+            throw new NotImplementedException();
         }
     }
 

@@ -13,12 +13,15 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using GeoAPI.Geometries;
+using PanoramicDataWin8.utils;
+using PanoramicDataWin8.view.inq;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace PanoramicDataWin8.view.vis.menu
 {
-    public sealed partial class MenuItemView : UserControl
+    public sealed partial class MenuItemView : UserControl, IScribbable
     {
         public MenuItemView()
         {
@@ -69,6 +72,29 @@ namespace PanoramicDataWin8.view.vis.menu
                 mainGrid.Children.Clear();
                 mainGrid.Children.Add(new AttributeTransformationMenuItemView());
             }
+        }
+
+
+        public bool IsDeletable { get { return true; } }
+
+        public IGeometry Geometry
+        {
+            get
+            {
+                MenuItemViewModel model = this.DataContext as MenuItemViewModel;
+
+                Rct bounds = new Rct(model.Position, model.Size);
+                return bounds.GetPolygon();
+            }
+        }
+
+        public List<IScribbable> Children
+        {
+            get { return new List<IScribbable>(); }
+        }
+        public bool Consume(InkStroke inkStroke)
+        {
+            return false;
         }
     }
 }

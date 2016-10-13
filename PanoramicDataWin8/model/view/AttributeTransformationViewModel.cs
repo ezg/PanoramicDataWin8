@@ -5,6 +5,7 @@ using Windows.UI.Xaml;
 using GeoAPI.Geometries;
 using Microsoft.Practices.Prism.Mvvm;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
@@ -16,9 +17,9 @@ namespace PanoramicDataWin8.model.view
 
         public AttributeTransformationViewModel() { }
 
-        public AttributeTransformationViewModel(HistogramOperationViewModel histogramOperationViewModel, AttributeTransformationModel attributeTransformationModel)
+        public AttributeTransformationViewModel(OperationViewModel operationViewModel, AttributeTransformationModel attributeTransformationModel)
         {
-            HistogramOperationViewModel = histogramOperationViewModel;
+            OperationViewModel = operationViewModel;
             AttributeTransformationModel = attributeTransformationModel;
         }
 
@@ -256,16 +257,16 @@ namespace PanoramicDataWin8.model.view
             }
         }
 
-        private HistogramOperationViewModel _histogramOperationViewModel = null;
-        public HistogramOperationViewModel HistogramOperationViewModel
+        private OperationViewModel _operationViewModel = null;
+        public OperationViewModel OperationViewModel
         {
             get
             {
-                return _histogramOperationViewModel;
+                return _operationViewModel;
             }
             set
             {
-                this.SetProperty(ref _histogramOperationViewModel, value);
+                this.SetProperty(ref _operationViewModel, value);
             }
         }
 

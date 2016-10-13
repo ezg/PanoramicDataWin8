@@ -277,7 +277,7 @@ namespace PanoramicDataWin8.view.vis.render
         void InputFieldViewInputFieldViewModelTapped(object sender, EventArgs e)
         {
             AttributeTransformationViewModel model = (sender as InputFieldView).DataContext as AttributeTransformationViewModel;
-            var visModel = model.HistogramOperationViewModel;
+            var visModel = model.OperationViewModel;
             if (DataContext == visModel)
             {
                 visModel.ActiveStopwatch.Restart();

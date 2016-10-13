@@ -213,22 +213,17 @@ namespace PanoramicDataWin8.model.view
                 this.SetProperty(ref _menuItemComponentViewModel, value);
             }
         }
+        
+        public event EventHandler Deleted;
+
+        public void FireDeleted()
+        {
+            Deleted?.Invoke(this, new EventArgs());
+        }
     }
 
     public abstract class MenuItemComponentViewModel : ExtendedBindableBase
     {
-        private bool _isEnabled = false;
-        public bool IsEnabled
-        {
-            get
-            {
-                return _isEnabled;
-            }
-            set
-            {
-                this.SetProperty(ref _isEnabled, value);
-            }
-        }
     }
 
     public class AttributeTransformationMenuItemViewModel : MenuItemComponentViewModel

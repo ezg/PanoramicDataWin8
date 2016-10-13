@@ -75,7 +75,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (args.NewValue != null)
             {
                 (DataContext as HistogramOperationViewModel).OperationModel.OperationModelUpdated += OperationModel_OperationModelUpdated;
-                //(DataContext as HistogramOperationViewModel).OperationModel.RequestRender += PlotRenderer_RequestRender;
+                //(DataContext as OperationViewModel).OperationModel.RequestRender += PlotRenderer_RequestRender;
             }
         }
         

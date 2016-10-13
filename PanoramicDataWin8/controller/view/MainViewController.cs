@@ -23,6 +23,7 @@ using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.view.vis;
+using PanoramicDataWin8.view.vis.menu;
 using PanoramicDataWin8.view.vis.render;
 
 namespace PanoramicDataWin8.controller.view
@@ -519,47 +520,18 @@ namespace PanoramicDataWin8.controller.view
                                 model.AttachmentHeaderViewModel.RemovedTriggered(model);
                             }
                         }
-                    }
-                }
-            }
-
-            if (recognizedGestures.Count == 0)// && e.InkStroke.IsErase)
-            {
-                List<IScribbable> allScribbables = new List<IScribbable>();
-                IScribbleHelpers.GetScribbablesRecursive(allScribbables, InkableScene.Elements.OfType<IScribbable>().ToList());
-                var inkStroke = e.InkStroke.GetResampled(20);
-                ILineString inkStrokeLine = inkStroke.GetLineString();
-
-                bool consumed = false;
-                foreach (IScribbable existingScribbable in allScribbables)
-                {
-                    IGeometry geom = existingScribbable.Geometry;
-                    if (geom != null)
-                    {
-                        /*Polygon p = new Polygon();
-                        PointCollection pc = new PointCollection(existingScribbable.Geometry.Coordinates.Select(c => new System.Windows.Point(c.X, c.Y)));
-                        p.Points = pc;
-                        p.Stroke = Brushes.Blue;
-                        p.StrokeThickness = 5;
-                        _inkableScene.Add(p);*/
-
-                        if (inkStrokeLine.Intersects(geom))
+                        else if (hitScribbable is MenuItemView)
                         {
-                            //existingScribbable.Consume(e.InkStroke);
-                            consumed = existingScribbable.Consume(e.InkStroke);
-                            if (consumed)
-                            {
-                                break;
-                            }
+                            var model = ((hitScribbable as MenuItemView).DataContext as MenuItemViewModel);
+                            model.FireDeleted();
                         }
                     }
                 }
-
-                if (!consumed)
-                {
-                    _inkableScene.Add(e.InkStroke);
-                }
             }
+
+
+            if (!e.InkStroke.IsErase && !recognizedGestures.Any())
+                _inkableScene.Add(e.InkStroke);
         }
 
         public void UpdateJobStatus()
