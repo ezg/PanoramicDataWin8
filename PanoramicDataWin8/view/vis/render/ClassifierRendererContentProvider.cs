@@ -25,7 +25,6 @@ using Microsoft.Graphics.Canvas.Text;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.model.data.progressive;
 using PanoramicDataWin8.view.inq;
 using Point = Windows.Foundation.Point;
 
@@ -109,7 +108,7 @@ namespace PanoramicDataWin8.view.vis.render
                     _strokes.Add(stroke);
                 }
 
-                var psm = (_classificationOperationModelClone.SchemaModel as ProgressiveSchemaModel);
+                var psm = (_classificationOperationModelClone.SchemaModel as IDEASchemaModel);
 
                 // get text for each feature
                 _recognizedText.Clear();

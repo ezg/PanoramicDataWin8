@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Windows.Data.Xml.Dom;
+﻿using Windows.Data.Xml.Dom;
 using Windows.UI.Notifications;
 
-namespace PanoramicDataWin8.model.data
+namespace PanoramicDataWin8.model.data.attribute
 {
     public class ErrorHandler
     {

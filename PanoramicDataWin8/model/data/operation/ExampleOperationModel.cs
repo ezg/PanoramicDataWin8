@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using PanoramicDataWin8.model.data.attribute;
 
 namespace PanoramicDataWin8.model.data.operation
 {

@@ -15,8 +15,10 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using WinRTXamlToolkit.Tools;
 

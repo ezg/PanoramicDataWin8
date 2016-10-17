@@ -1,15 +1,6 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Linq;
-using Windows.UI;
-using Windows.UI.Xaml.Media;
-using PanoramicDataWin8.model.data;
-using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.model.data.result;
-using PanoramicDataWin8.model.view.operation;
-using PanoramicDataWin8.utils;
+﻿using PanoramicDataWin8.model.data.operation;
 
-namespace PanoramicDataWin8.model.view
+namespace PanoramicDataWin8.model.view.operation
 {
     public class HistogramOperationViewModel : OperationViewModel
     {

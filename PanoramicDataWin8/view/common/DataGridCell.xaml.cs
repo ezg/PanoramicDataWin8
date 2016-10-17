@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.result;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236

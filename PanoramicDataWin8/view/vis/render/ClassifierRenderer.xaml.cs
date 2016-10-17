@@ -24,6 +24,7 @@ using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.view.inq;

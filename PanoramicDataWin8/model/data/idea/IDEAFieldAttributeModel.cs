@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using PanoramicDataWin8.model.data.attribute;
 
-namespace PanoramicDataWin8.model.data.progressive
+namespace PanoramicDataWin8.model.data.idea
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class ProgressiveFieldAttributeModel : AttributeFieldModel
+    public class IDEAFieldAttributeModel : AttributeFieldModel
     {
-        public ProgressiveFieldAttributeModel(string rawName, string displayName, int index, string inputDataType, string inputVisualizationType)
+        public IDEAFieldAttributeModel(string rawName, string displayName, int index, string inputDataType, string inputVisualizationType)
         {
             _rawName = rawName;
             _displayName = displayName;

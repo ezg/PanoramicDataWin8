@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Navigation;
 using GeoAPI.Geometries;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.view.inq;

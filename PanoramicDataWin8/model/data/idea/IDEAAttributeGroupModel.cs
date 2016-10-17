@@ -1,19 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PanoramicDataWin8.model.data.attribute;
 
-namespace PanoramicDataWin8.model.data.progressive
+namespace PanoramicDataWin8.model.data.idea
 {
-    public class ProgressiveAttributeGroupModel : AttributeGroupModel
+    public class IDEAAttributeGroupModel : AttributeGroupModel
     {
-        public ProgressiveAttributeGroupModel()
+        public IDEAAttributeGroupModel()
         {
 
         }
 
-        public ProgressiveAttributeGroupModel(string rawName, string displayName)
+        public IDEAAttributeGroupModel(string rawName, string displayName)
         {
             _rawName = rawName;
             _displayName = displayName;

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.UI;
 using Windows.UI.Xaml.Media;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view.operation

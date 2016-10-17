@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 
-namespace PanoramicDataWin8.model.view
+namespace PanoramicDataWin8.model.view.operation
 {
     public class StatisticalComparisonOperationViewModel : ExtendedBindableBase
     {

@@ -4,7 +4,7 @@ using IDEA_common.operations;
 using Newtonsoft.Json;
 using PanoramicDataWin8.utils;
 
-namespace PanoramicDataWin8.model.data
+namespace PanoramicDataWin8.model.data.operation
 {
     public interface IOperationModel : INotifyPropertyChanged
     {

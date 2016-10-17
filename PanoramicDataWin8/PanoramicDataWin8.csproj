@@ -141,10 +141,10 @@
     <Compile Include="model\data\operation\OperationModel.cs" />
     <Compile Include="model\data\operation\StatisticalComparableOperationModel.cs" />
     <Compile Include="model\data\OriginModel.cs" />
-    <Compile Include="model\data\progressive\ProgressiveFieldAttributeModel.cs" />
-    <Compile Include="model\data\progressive\ProgressiveAttributeGroupModel.cs" />
-    <Compile Include="model\data\progressive\ProgressiveOriginModel.cs" />
-    <Compile Include="model\data\progressive\ProgressiveSchemaModel.cs" />
+    <Compile Include="model\data\idea\IDEAFieldAttributeModel.cs" />
+    <Compile Include="model\data\idea\IDEAAttributeGroupModel.cs" />
+    <Compile Include="model\data\idea\IDEAOriginModel.cs" />
+    <Compile Include="model\data\idea\IDEASchemaModel.cs" />
     <Compile Include="model\data\operation\HistogramOperationModel.cs" />
     <Compile Include="model\data\result\ClassfierResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultDescriptionModel.cs" />

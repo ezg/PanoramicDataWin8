@@ -2,8 +2,10 @@
 using Windows.UI.Xaml;
 using IDEA_common.operations;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.model.view.operation;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 

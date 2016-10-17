@@ -4,13 +4,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Windows.UI.Xaml.Media;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
-using PanoramicDataWin8.view.inq;
-using PanoramicDataWin8.view.vis;
 
-namespace PanoramicDataWin8.model.view
+namespace PanoramicDataWin8.model.view.operation
 {
     public class OperationViewModelFactory
     {

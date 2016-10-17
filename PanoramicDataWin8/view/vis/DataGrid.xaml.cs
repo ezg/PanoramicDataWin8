@@ -28,7 +28,10 @@ using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
+using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.view.inq;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236

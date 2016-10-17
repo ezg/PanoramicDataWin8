@@ -11,8 +11,9 @@ using IDEA_common.operations.histogram;
 using IDEA_common.operations.risk;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.model.data.progressive;
 
 namespace PanoramicDataWin8.controller.data.progressive
 {
@@ -20,7 +21,7 @@ namespace PanoramicDataWin8.controller.data.progressive
     {
         public static ChiSquaredTestOperationParameters GetChiSquaredTestOperationParameters(StatisticalComparisonOperationModel model, int sampleSize)
         {
-            var psm = (model.SchemaModel as ProgressiveSchemaModel);
+            var psm = (model.SchemaModel as IDEASchemaModel);
             var parameters = new ChiSquaredTestOperationParameters()
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
@@ -34,7 +35,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         public static ExampleOperationParameters GetExampleOperationParameters(ExampleOperationModel model, int sampleSize)
         {
-            var psm = (model.SchemaModel as ProgressiveSchemaModel);
+            var psm = (model.SchemaModel as IDEASchemaModel);
             string filter = "";
             List<FilterModel> filterModels = new List<FilterModel>();
             filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
@@ -53,7 +54,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         public static HistogramOperationParameters GetHistogramOperationParameters(HistogramOperationModel model, int sampleSize)
         {
-            var psm = (model.SchemaModel as ProgressiveSchemaModel);
+            var psm = (model.SchemaModel as IDEASchemaModel);
             string filter = "";
             List<FilterModel> filterModels = new List<FilterModel>();
             filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);

@@ -18,7 +18,6 @@ using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.model.data.progressive;
 using PanoramicDataWin8.model.data.result;
 
 namespace PanoramicDataWin8.controller.data.progressive

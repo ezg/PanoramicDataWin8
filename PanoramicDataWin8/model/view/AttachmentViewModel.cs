@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 

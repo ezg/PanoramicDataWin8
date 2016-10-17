@@ -1,7 +1,8 @@
 ﻿using Microsoft.Practices.Prism.Mvvm;
 using Newtonsoft.Json;
+using PanoramicDataWin8.model.data.operation;
 
-namespace PanoramicDataWin8.model.data
+namespace PanoramicDataWin8.model.data.attribute
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class AttributeTransformationModel : BindableBase

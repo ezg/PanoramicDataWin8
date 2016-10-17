@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualBasic.CompilerServices;
 using Newtonsoft.Json;
-using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.model.data.result;
+using PanoramicDataWin8.model.data.attribute;
+
 // ReSharper disable All
 
-namespace PanoramicDataWin8.model.data
+namespace PanoramicDataWin8.model.data.operation
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class FilterModel

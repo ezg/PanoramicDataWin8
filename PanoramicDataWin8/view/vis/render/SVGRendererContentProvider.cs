@@ -21,6 +21,8 @@ using Microsoft.Graphics.Canvas.Text;
 using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 

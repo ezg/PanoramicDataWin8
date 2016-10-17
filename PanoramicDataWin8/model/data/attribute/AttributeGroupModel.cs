@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace PanoramicDataWin8.model.data
+namespace PanoramicDataWin8.model.data.attribute
 {
     public abstract class AttributeGroupModel : AttributeModel
     {

@@ -20,7 +20,7 @@ using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.inq;
-using LinkType = PanoramicDataWin8.model.data.LinkType;
+using LinkType = PanoramicDataWin8.model.data.operation.LinkType;
 using Polygon = Windows.UI.Xaml.Shapes.Polygon;
 
 namespace PanoramicDataWin8.view.vis

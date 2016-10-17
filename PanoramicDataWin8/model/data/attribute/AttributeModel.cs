@@ -1,7 +1,6 @@
-﻿using Microsoft.Practices.Prism.Mvvm;
-using PanoramicDataWin8.utils;
+﻿using PanoramicDataWin8.utils;
 
-namespace PanoramicDataWin8.model.data
+namespace PanoramicDataWin8.model.data.attribute
 {
     public abstract class AttributeModel : ExtendedBindableBase
     {

@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json;
-
-namespace PanoramicDataWin8.model.data
+﻿namespace PanoramicDataWin8.model.data.attribute
 {
     public abstract class AttributeFieldModel : AttributeModel
     {

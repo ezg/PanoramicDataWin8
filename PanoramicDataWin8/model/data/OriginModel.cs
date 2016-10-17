@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Practices.Prism.Mvvm;
 using Newtonsoft.Json;
+using PanoramicDataWin8.model.data.attribute;
 
 namespace PanoramicDataWin8.model.data
 {

@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using GeoAPI.Geometries;
 using Microsoft.Practices.Prism.Mvvm;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view

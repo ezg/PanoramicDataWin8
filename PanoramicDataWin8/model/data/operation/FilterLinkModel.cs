@@ -1,7 +1,6 @@
-﻿using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.utils;
+﻿using PanoramicDataWin8.utils;
 
-namespace PanoramicDataWin8.model.data
+namespace PanoramicDataWin8.model.data.operation
 {
     public class FilterLinkModel : ExtendedBindableBase
     {

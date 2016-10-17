@@ -6,9 +6,9 @@ using System.ComponentModel;
 using System.Linq;
 using Windows.UI;
 using Newtonsoft.Json;
-using PanoramicDataWin8.model.data.operation;
+using PanoramicDataWin8.model.data.attribute;
 
-namespace PanoramicDataWin8.model.data
+namespace PanoramicDataWin8.model.data.operation
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class HistogramOperationModel : OperationModel, IBrushableOperationModel,

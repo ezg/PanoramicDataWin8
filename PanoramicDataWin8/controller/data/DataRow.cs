@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.result;
 
 namespace PanoramicDataWin8.controller.data

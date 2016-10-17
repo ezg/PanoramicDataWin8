@@ -2,6 +2,8 @@
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Data;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 
 namespace PanoramicDataWin8.utils

@@ -19,6 +19,7 @@ using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 

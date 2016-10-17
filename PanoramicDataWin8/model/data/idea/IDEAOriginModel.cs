@@ -1,28 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using IDEA_common.catalog;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.input;
+using PanoramicDataWin8.model.data.attribute;
 using Attribute = IDEA_common.catalog.Attribute;
 
-namespace PanoramicDataWin8.model.data.progressive
+namespace PanoramicDataWin8.model.data.idea
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class ProgressiveOriginModel : OriginModel
+    public class IDEAOriginModel : OriginModel
     {
-        public ProgressiveOriginModel(DatasetConfiguration datasetConfiguration)
+        public IDEAOriginModel(DatasetConfiguration datasetConfiguration)
         {
             _datasetConfiguration = datasetConfiguration;
 
         }
 
-        private void recursiveCreateAttributeModels(AttributeGroup attributeGroup, ProgressiveAttributeGroupModel parentGroupModel)
+        private void recursiveCreateAttributeModels(AttributeGroup attributeGroup, IDEAAttributeGroupModel parentGroupModel)
         {
-            ProgressiveAttributeGroupModel groupModel = new ProgressiveAttributeGroupModel(attributeGroup.Name.ToString(), attributeGroup.Name.ToString());
+            IDEAAttributeGroupModel groupModel = new IDEAAttributeGroupModel(attributeGroup.Name.ToString(), attributeGroup.Name.ToString());
             groupModel.OriginModel = this;
             if (parentGroupModel != null)
             {
@@ -42,9 +38,9 @@ namespace PanoramicDataWin8.model.data.progressive
             }
         }
 
-        private void recursiveCreateAttributeModels(IDEA_common.catalog.Attribute attribute, ProgressiveAttributeGroupModel parentGroupModel)
+        private void recursiveCreateAttributeModels(IDEA_common.catalog.Attribute attribute, IDEAAttributeGroupModel parentGroupModel)
         {
-            ProgressiveFieldAttributeModel fieldAttributeModel = new ProgressiveFieldAttributeModel(attribute.RawName, attribute.DisplayName, attribute.Index,
+            IDEAFieldAttributeModel fieldAttributeModel = new IDEAFieldAttributeModel(attribute.RawName, attribute.DisplayName, attribute.Index,
                                 InputDataTypeConstants.FromDataType(attribute.DataType),
                                 InputDataTypeConstants.FromDataType(attribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric");
             fieldAttributeModel.OriginModel = this;

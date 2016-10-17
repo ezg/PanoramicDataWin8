@@ -1,23 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Newtonsoft.Json;
 using PanoramicDataWin8.controller.data;
-namespace PanoramicDataWin8.model.data.progressive
+
+namespace PanoramicDataWin8.model.data.idea
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class ProgressiveSchemaModel : SchemaModel
+    public class IDEASchemaModel : SchemaModel
     {
         private QueryExecuter _queryExecuter = null;
 
-        public ProgressiveSchemaModel()
+        public IDEASchemaModel()
         {
         }
 
-        private ProgressiveOriginModel _rootOriginModel = null;
-        public ProgressiveOriginModel RootOriginModel
+        private IDEAOriginModel _rootOriginModel = null;
+        public IDEAOriginModel RootOriginModel
         {
             get
             {

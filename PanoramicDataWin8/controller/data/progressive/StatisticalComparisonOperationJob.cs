@@ -9,7 +9,6 @@ using IDEA_common.operations.histogram;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.model.data.progressive;
 
 namespace PanoramicDataWin8.controller.data.progressive
 {

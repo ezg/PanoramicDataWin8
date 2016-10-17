@@ -16,8 +16,9 @@ using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.model.data.progressive;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
@@ -152,12 +153,12 @@ namespace PanoramicDataWin8.controller.view
 
             if (datasetConfiguration.Backend.ToLower() == "progressive")
             {
-                MainModel.SchemaModel = new ProgressiveSchemaModel();
+                MainModel.SchemaModel = new IDEASchemaModel();
                 MainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
                 MainModel.SampleSize = datasetConfiguration.SampleSize;
-                ((ProgressiveSchemaModel) MainModel.SchemaModel).QueryExecuter = new IDEAQueryExecuter();
-                ((ProgressiveSchemaModel) MainModel.SchemaModel).RootOriginModel = new ProgressiveOriginModel(datasetConfiguration);
-                ((ProgressiveSchemaModel) MainModel.SchemaModel).RootOriginModel.LoadInputFields();
+                ((IDEASchemaModel) MainModel.SchemaModel).QueryExecuter = new IDEAQueryExecuter();
+                ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel = new IDEAOriginModel(datasetConfiguration);
+                ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel.LoadInputFields();
             }
         }
 
