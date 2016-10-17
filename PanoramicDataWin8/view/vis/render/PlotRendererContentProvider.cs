@@ -40,8 +40,7 @@ namespace PanoramicDataWin8.view.vis.render
         private CanvasTextFormat _textFormat;
 
         private HistogramResult _histogramResult = null;
-
-        private HistogramOperationModel _histogramOperationModelClone = null;
+        
         private HistogramOperationModel _histogramOperationModel = null;
         private List<FilterModel> _filterModels = new List<FilterModel>();
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
@@ -64,7 +63,6 @@ namespace PanoramicDataWin8.view.vis.render
         public void UpdateData(IResult result, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone)
         {
             _histogramResult = (HistogramResult)result;
-            _histogramOperationModelClone = histogramOperationModelClone;
             _histogramOperationModel = histogramOperationModel;
             
             if (_histogramResult != null && _histogramResult.Bins != null)
@@ -88,7 +86,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 if (MainViewController.Instance.MainModel.GraphRenderOption == GraphRenderOptions.Cell)
                 {
-                    renderCell(canvas, canvasArgs);
+                    renderPlot(canvas, canvasArgs);
                 }
             }
             if (_isResultEmpty)
@@ -203,13 +201,18 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        private void renderCell(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
+        private void renderPlot(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
         {
             computeSizesAndRenderLabels(canvas, canvasArgs, true);
             
             if (_helper.DeviceHeight < 0 || _helper.DeviceWidth < 0)
             {
                 return;
+            }
+
+            if (_histogramResult.NullValueCount != 0)
+            {
+                DrawString(canvasArgs, _textFormat, 25, _helper.DeviceHeight + _helper.TopOffset + 25, "null values: " + _histogramResult.NullValueCount, _textColor, true, false, false);
             }
 
             var white = Color.FromArgb(255, 255, 255, 255);
@@ -308,6 +311,8 @@ namespace PanoramicDataWin8.view.vis.render
     {
         public float Value { get; set; }
         public Rect Rect { get; set; }
+        public Rect MarginRect { get; set; }
+        public double MarginPercentage { get; set; }
         public Color Color { get; set; }
         public int BrushIndex { get; set; }
     }
@@ -326,10 +331,10 @@ namespace PanoramicDataWin8.view.vis.render
         private ChartType _chartType = ChartType.HeatMap;
         public List<BinRange> VisualBinRanges { get; set; } = new List<BinRange>();
 
-        private float _leftOffset = 40;
-        private float _rightOffset = 20;
-        private float _topOffset = 20;
-        private float _bottomtOffset = 45;
+        public float LeftOffset { get; set; } = 40;
+        public float RightOffset { get; set; } = 20;
+        public float TopOffset { get; set; } = 20;
+        public float BottomtOffset { get; set; } = 45;
 
         public float DeviceWidth { get; set; } = 0;
         public float DeviceHeight { get; set; } = 0;
@@ -400,10 +405,10 @@ namespace PanoramicDataWin8.view.vis.render
             var layoutY = new CanvasTextLayout(canvas, maxYLabel.Label, textFormat, 1000f, 1000f);
             LabelMetricsY = layoutY.DrawBounds;
 
-            _leftOffset = (float)Math.Max(10, LabelMetricsY.Width + 10 + 20);
+            LeftOffset = (float)Math.Max(10, LabelMetricsY.Width + 10 + 20);
 
-            DeviceWidth = (float)(canvas.ActualWidth / _compositionScaleX - _leftOffset - _rightOffset);
-            DeviceHeight = (float)(canvas.ActualHeight / _compositionScaleY - _topOffset - _bottomtOffset);
+            DeviceWidth = (float)(canvas.ActualWidth / _compositionScaleX - LeftOffset - RightOffset);
+            DeviceHeight = (float)(canvas.ActualHeight / _compositionScaleY - TopOffset - BottomtOffset);
 
             DataMinX = (float)(xLabels.Min(dp => dp.MinValue));
             DataMinY = (float)(yLabels.Min(dp => dp.MinValue));
@@ -801,12 +806,12 @@ namespace PanoramicDataWin8.view.vis.render
 
         public float DataToScreenX(float x)
         {
-            return ((x - DataMinX) / _xScale) * (DeviceWidth) + (_leftOffset);
+            return ((x - DataMinX) / _xScale) * (DeviceWidth) + (LeftOffset);
         }
         public float DataToScreenY(float y, bool flip = true)
         {
             float retY = ((y - DataMinY) / _yScale) * (DeviceHeight);
-            return flip ? (DeviceHeight) - retY + (_topOffset) : retY + (_topOffset);
+            return flip ? (DeviceHeight) - retY + (TopOffset) : retY + (TopOffset);
         }
     }
 

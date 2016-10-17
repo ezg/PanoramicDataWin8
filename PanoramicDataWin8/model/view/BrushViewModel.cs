@@ -90,7 +90,7 @@ namespace PanoramicDataWin8.model.view
 
         public List<OperationViewModel> OperationViewModels
         {
-            get { return new List<OperationViewModel>(new OperationViewModel[] {_to, _from}); }
+            get { return new List<OperationViewModel>(new[] {_to, _from}); }
         }
 
         public BrushableOperationViewModelState BrushableOperationViewModelState
@@ -98,12 +98,5 @@ namespace PanoramicDataWin8.model.view
             get { return _brushableOperationViewModelState; }
             set { SetProperty(ref _brushableOperationViewModelState, value); }
         }
-    }
-
-    public enum BrushableOperationViewModelState
-    {
-        Opening,
-        Opened,
-        Closing
     }
 }

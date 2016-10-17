@@ -332,7 +332,12 @@ namespace PanoramicDataWin8.view.vis
                 var incomingRct = new Rct(incomingModel.Position,
                     new Vec(incomingModel.Size.X, incomingModel.Size.Y));
 
-                var inter =
+                var isInverted =
+                    filterLinkViewModel.FilterLinkModels.Where(lm => lm.IsInverted)
+                        .Select(lm => lm.FromOperationModel)
+                        .Contains(incomingModel.OperationModel as IFilterProviderOperationModel);
+
+                    var inter =
                     incomingRct.GetLineString()
                         .Intersection(
                             new Windows.Foundation.Point[]
@@ -375,19 +380,27 @@ namespace PanoramicDataWin8.view.vis
                     var arrowWidth = 8;
                     var arrowLength = 20;
                     var poly = new Polygon();
-                    poly.Points.Add((start - (n*thinkness/2.0)).GetWindowsPoint());
-                    poly.Points.Add((start + (n*thinkness/2.0)).GetWindowsPoint());
+
+                    if (!isInverted)
+                    {
+                        poly.Points.Add((start - (n*thinkness/2.0)).GetWindowsPoint());
+                        poly.Points.Add((start + (n*thinkness/2.0)).GetWindowsPoint());
+                    }
                     poly.Points.Add((trianglePos + (n*thinkness/2.0)).GetWindowsPoint());
                     poly.Points.Add((trianglePos + (n*((thinkness/2.0) + arrowWidth))).GetWindowsPoint());
-                    poly.Points.Add(
-                        (trianglePos + (distanceVec.Normalized()*arrowLength) + (n*((thinkness/2.0)))).GetWindowsPoint());
-                    poly.Points.Add((end + (n*thinkness/2.0)).GetWindowsPoint());
-                    poly.Points.Add((end - (n*thinkness/2.0)).GetWindowsPoint());
-                    poly.Points.Add(
-                        (trianglePos + (distanceVec.Normalized()*arrowLength) - (n*((thinkness/2.0)))).GetWindowsPoint());
+                    poly.Points.Add((trianglePos + (distanceVec.Normalized()*arrowLength) + (n*((thinkness/2.0)))).GetWindowsPoint());
+                    if (!isInverted)
+                    {
+                        poly.Points.Add((end + (n*thinkness/2.0)).GetWindowsPoint());
+                        poly.Points.Add((end - (n*thinkness/2.0)).GetWindowsPoint());
+                    }
+                    poly.Points.Add((trianglePos + (distanceVec.Normalized()*arrowLength) - (n*((thinkness/2.0)))).GetWindowsPoint());
                     poly.Points.Add((trianglePos - (n*((thinkness/2.0) + arrowWidth))).GetWindowsPoint());
                     poly.Points.Add((trianglePos - (n*thinkness/2.0)).GetWindowsPoint());
-                    poly.Points.Add((start - (n*thinkness/2.0)).GetWindowsPoint());
+                    if (!isInverted)
+                    {
+                        poly.Points.Add((start - (n*thinkness/2.0)).GetWindowsPoint());
+                    }
 
                     /*poly.Points.Add(new Windows.Foundation.Point(trianglePos.X + n.X*8, trianglePos.Y + n.Y*8));
                     poly.Points.Add(new Windows.Foundation.Point(trianglePos.X - n.X*8, trianglePos.Y - n.Y*8));
@@ -396,8 +409,30 @@ namespace PanoramicDataWin8.view.vis
                     poly.Points.Add(new Windows.Foundation.Point(trianglePos.X + n.X*8, trianglePos.Y + n.Y*8));*/
                     poly.Fill = _lightBrush;
                     poly.StrokeThickness = 1;
+                    //poly.StrokeDashArray = new DoubleCollection { 2 };
                     poly.Stroke = _backgroundBrush;
                     c.Children.Add(poly);
+
+                    if (isInverted)
+                    {
+                        var steps = Math.Floor((start - trianglePos).Length / 50);
+                        var from = start;
+                        var to = trianglePos;
+                        for (int s = 0; s < steps; s++)
+                        {
+                            var r = new Polygon();
+                            var f = from + distanceVec.Normalized() * s * 50.0;
+                            var t = from + distanceVec.Normalized() * (s + 1) * 50.0;
+
+                            poly.Points.Add((from - (n * thinkness / 2.0)).GetWindowsPoint());
+                            poly.Points.Add((from + (n * thinkness / 2.0)).GetWindowsPoint());
+
+                            r.Fill = _lightBrush;
+                            r.StrokeThickness = 1;
+                            r.Stroke = _backgroundBrush;
+                            c.Children.Add(r);
+                        }
+                    }
 
                     if (!_visualizationViewModelCenterGeometries.ContainsKey(incomingModel))
                     {

@@ -1,0 +1,33 @@
+﻿<UserControl
+    x:Class="PanoramicDataWin8.view.common.AttributeGroupView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:view="using:PanoramicDataWin8.model.view"
+    mc:Ignorable="d"
+    d:DesignHeight="100"
+    d:DesignWidth="100"
+    CacheMode="BitmapCache"
+    Width="{Binding Size.X}" Height="{Binding Size.Y}"
+    FontFamily="{StaticResource abel}">
+
+    <d:DesignProperties.DataContext>
+        <view:InputGroupViewModel>
+            <view:InputGroupViewModel.MainLabel>Cancellation code</view:InputGroupViewModel.MainLabel>
+        </view:InputGroupViewModel>
+    </d:DesignProperties.DataContext>
+
+    <Grid Name="mainGrid" Background="{StaticResource lightBrush}">
+        <Border Name="border" BorderBrush="{StaticResource backgroundBrush}">
+            <Viewbox Margin="2">
+                <TextBlock
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"  
+                    MaxWidth="{Binding Size.X}"
+                    Text="{Binding MainLabel}" FontSize="14" Foreground="{StaticResource darkBrush}" TextWrapping="Wrap"/>
+            </Viewbox>
+        </Border>
+    </Grid>
+</UserControl>

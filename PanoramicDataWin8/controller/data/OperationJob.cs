@@ -6,7 +6,6 @@ using Windows.UI.Core;
 using IDEA_common.operations;
 using Newtonsoft.Json;
 using PanoramicDataWin8.controller.data.progressive;
-using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 
@@ -94,11 +93,5 @@ namespace PanoramicDataWin8.controller.data
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
             await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { JobCompleted?.Invoke(this, jobEventArgs); });
         }
-    }
-
-
-    public class JobEventArgs : EventArgs
-    {
-        public IResult Result { get; set; }
     }
 }

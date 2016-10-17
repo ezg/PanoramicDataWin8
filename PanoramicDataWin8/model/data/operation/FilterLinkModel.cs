@@ -4,56 +4,36 @@ namespace PanoramicDataWin8.model.data.operation
 {
     public class FilterLinkModel : ExtendedBindableBase
     {
-        private IFilterProviderOperationModel _fromOperationModel = null;
-        public IFilterProviderOperationModel FromOperationModel
-        {
-            get
-            {
-                return _fromOperationModel;
-            }
-            set
-            {
-                this.SetProperty(ref _fromOperationModel, value);
-            }
-        }
+        private IFilterProviderOperationModel _fromOperationModel;
 
-        private IFilterConsumerOperationModel _toOperationModel = null;
-        public IFilterConsumerOperationModel ToOperationModel
-        {
-            get
-            {
-                return _toOperationModel;
-            }
-            set
-            {
-                this.SetProperty(ref _toOperationModel, value);
-            }
-        }
+        private bool _isInverted;
 
         private LinkType _linkType = LinkType.Filter;
-        public LinkType LinkType
+
+        private IFilterConsumerOperationModel _toOperationModel;
+
+        public IFilterProviderOperationModel FromOperationModel
         {
-            get
-            {
-                return _linkType;
-            }
-            set
-            {
-                this.SetProperty(ref _linkType, value);
-            }
+            get { return _fromOperationModel; }
+            set { SetProperty(ref _fromOperationModel, value); }
         }
 
-        private bool _isInverted = false;
+        public IFilterConsumerOperationModel ToOperationModel
+        {
+            get { return _toOperationModel; }
+            set { SetProperty(ref _toOperationModel, value); }
+        }
+
+        public LinkType LinkType
+        {
+            get { return _linkType; }
+            set { SetProperty(ref _linkType, value); }
+        }
+
         public bool IsInverted
         {
-            get
-            {
-                return _isInverted;
-            }
-            set
-            {
-                this.SetProperty(ref _isInverted, value);
-            }
+            get { return _isInverted; }
+            set { SetProperty(ref _isInverted, value); }
         }
 
         public override bool Equals(object obj)
@@ -62,19 +42,19 @@ namespace PanoramicDataWin8.model.data.operation
             {
                 var link = obj as FilterLinkModel;
                 return
-                    link.FromOperationModel.Equals(this.FromOperationModel) &&
-                    link.ToOperationModel.Equals(this.ToOperationModel) &&
-                    link.LinkType.Equals(this.LinkType);
+                    link.FromOperationModel.Equals(FromOperationModel) &&
+                    link.ToOperationModel.Equals(ToOperationModel) &&
+                    link.LinkType.Equals(LinkType);
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            int code = 0;
-            code ^= this.FromOperationModel.GetHashCode();
-            code ^= this.ToOperationModel.GetHashCode();
-            code ^= this.LinkType.GetHashCode();
+            var code = 0;
+            code ^= FromOperationModel.GetHashCode();
+            code ^= ToOperationModel.GetHashCode();
+            code ^= LinkType.GetHashCode();
             return code;
         }
     }

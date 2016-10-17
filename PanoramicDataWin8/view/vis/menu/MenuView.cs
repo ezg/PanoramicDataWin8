@@ -216,7 +216,6 @@ namespace PanoramicDataWin8.view.vis.menu
                         DataContext = (item as MenuItemViewModel)
                     };
                     var model = (item as MenuItemViewModel);
-                    var views = new List<AttachmentItemView>();
                     _menuViewItems.Add(model, menuItemView);
                     _contentCanvas.Children.Insert(0, menuItemView);
                     updateRendering();
@@ -311,17 +310,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 }
             }
         }
-
-        private double calculateMinPreferedSizeX(IEnumerable<AttachmentHeaderViewModel> headers)
-        {
-            return headers.Sum(h => h.PreferedItemSize.X) + (headers.Count() - 1) * GAP;
-        }
-
-        private double calculateMinPreferedSizeY(IEnumerable<AttachmentHeaderViewModel> headers)
-        {
-            return headers.Sum(h => h.PreferedItemSize.Y) + (headers.Count() - 1) * GAP;
-        }
-
+        
         public bool IsDeletable { get { return false; } }
         public IGeometry Geometry { get; }
 

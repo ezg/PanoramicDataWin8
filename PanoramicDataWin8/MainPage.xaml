@@ -12,7 +12,7 @@
 
     <Page.Resources>
         <DataTemplate x:Name="Foo">
-            <common:InputFieldView DataContext="{Binding}" />
+            <common:AttributeFieldView DataContext="{Binding}" />
         </DataTemplate>
     </Page.Resources>
 

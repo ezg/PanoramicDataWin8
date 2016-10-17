@@ -4,6 +4,5 @@ namespace PanoramicDataWin8.model.data.result
 {
     public abstract class ResultDescriptionModel : ExtendedBindableBase
     {
-
     }
 }

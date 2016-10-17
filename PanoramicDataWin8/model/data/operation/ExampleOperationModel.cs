@@ -10,6 +10,8 @@ namespace PanoramicDataWin8.model.data.operation
 
         private double _dummyValue = 50;
 
+        private ExampleOperationType _exampleOperationType = ExampleOperationType.A;
+
         public ExampleOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
@@ -28,7 +30,6 @@ namespace PanoramicDataWin8.model.data.operation
             }
         }
 
-        private ExampleOperationType _exampleOperationType = ExampleOperationType.A;
         public ExampleOperationType ExampleOperationType
         {
             get { return _exampleOperationType; }
@@ -55,10 +56,5 @@ namespace PanoramicDataWin8.model.data.operation
         {
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
-    }
-
-    public enum ExampleOperationType
-    {
-        A, B, C
     }
 }

@@ -1,21 +1,13 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Practices.Prism.Mvvm;
 using PanoramicDataWin8.controller.data;
-using PanoramicDataWin8.controller.data.virt;
 
 namespace PanoramicDataWin8.model.data
 {
     public abstract class SchemaModel : BindableBase
     {
-        public abstract List<OriginModel> OriginModels
-        {
-            get;
-        }
+        public abstract List<OriginModel> OriginModels { get; }
 
-        public abstract QueryExecuter QueryExecuter
-        {
-            get;
-            set;
-        }
+        public abstract QueryExecuter QueryExecuter { get; set; }
     }
 }

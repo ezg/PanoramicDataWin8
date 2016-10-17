@@ -16,25 +16,21 @@ namespace PanoramicDataWin8.model.view.operation
         {
             if (operationViewModel is HistogramOperationViewModel)
             {
-                HistogramOperationViewModel oldOperationViewModel = (HistogramOperationViewModel) operationViewModel;
-                HistogramOperationModel oldOperationModel = (HistogramOperationModel) oldOperationViewModel.OperationModel;
+                var oldOperationViewModel = (HistogramOperationViewModel) operationViewModel;
+                var oldOperationModel = (HistogramOperationModel) oldOperationViewModel.OperationModel;
 
-                HistogramOperationViewModel newHistogramOperationViewModel = CreateDefaultHistogramOperationViewModel(operationViewModel.OperationModel.SchemaModel, 
+                var newHistogramOperationViewModel = CreateDefaultHistogramOperationViewModel(operationViewModel.OperationModel.SchemaModel,
                     null, operationViewModel.Position);
-                HistogramOperationModel newOperationModel = (HistogramOperationModel)newHistogramOperationViewModel.OperationModel;
+                var newOperationModel = (HistogramOperationModel) newHistogramOperationViewModel.OperationModel;
                 newOperationModel.VisualizationType = VisualizationType.plot;
 
                 foreach (var usage in oldOperationModel.AttributeUsageTransformationModels.Keys.ToArray())
-                {
                     foreach (var atm in oldOperationModel.AttributeUsageTransformationModels[usage].ToArray())
-                    {
                         newOperationModel.AddAttributeUsageTransformationModel(usage,
                             new AttributeTransformationModel(atm.AttributeModel)
                             {
                                 AggregateFunction = atm.AggregateFunction
                             });
-                    }
-                }
                 newHistogramOperationViewModel.Size = operationViewModel.Size;
                 return newHistogramOperationViewModel;
             }
@@ -42,22 +38,22 @@ namespace PanoramicDataWin8.model.view.operation
         }
 
 
-        private static void createAxisMenu(HistogramOperationViewModel histogramOperationViewModel, AttachmentOrientation attachmentOrientation, 
+        private static void createAxisMenu(HistogramOperationViewModel histogramOperationViewModel, AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {
             var attachmentViewModel =
                 histogramOperationViewModel.AttachementViewModels.First(
                     avm => avm.AttachmentOrientation == attachmentOrientation);
 
-            MenuViewModel menuViewModel = new MenuViewModel()
+            var menuViewModel = new MenuViewModel
             {
                 AttachmentViewModel = attachmentViewModel,
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 3 : 2,
-                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2  :3
+                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 3
             };
 
-            var menuItem = new MenuItemViewModel()
+            var menuItem = new MenuItemViewModel
             {
                 MenuViewModel = menuViewModel,
                 Row = 0,
@@ -71,9 +67,9 @@ namespace PanoramicDataWin8.model.view.operation
                 IsWidthBoundToParent = isWidthBoundToParent,
                 IsHeightBoundToParent = isHeightBoundToParent
             };
-            AttributeTransformationMenuItemViewModel attr1 = new AttributeTransformationMenuItemViewModel()
+            var attr1 = new AttributeTransformationMenuItemViewModel
             {
-                TextAngle = textAngle, 
+                TextAngle = textAngle,
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"))
             };
             histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).CollectionChanged += (sender, args) =>
@@ -84,22 +80,20 @@ namespace PanoramicDataWin8.model.view.operation
 
                 // remove old ones first
                 foreach (var mvm in menuViewModel.MenuItemViewModels.Where(mvm => mvm.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel).ToArray())
-                {
                     menuViewModel.MenuItemViewModels.Remove(mvm);
-                }
 
                 var aom = attr1.AttributeTransformationViewModel.AttributeTransformationModel;
-                if (aom != null &&
-                    (((AttributeFieldModel)aom.AttributeModel).InputDataType == InputDataTypeConstants.INT ||
-                     ((AttributeFieldModel)aom.AttributeModel).InputDataType == InputDataTypeConstants.FLOAT))
+                if ((aom != null) &&
+                    ((((AttributeFieldModel) aom.AttributeModel).InputDataType == InputDataTypeConstants.INT) ||
+                     (((AttributeFieldModel) aom.AttributeModel).InputDataType == InputDataTypeConstants.FLOAT)))
                 {
-                    List<ToggleMenuItemComponentViewModel> toggles = new List<ToggleMenuItemComponentViewModel>();
-                    List<MenuItemViewModel> items = new List<MenuItemViewModel>();
+                    var toggles = new List<ToggleMenuItemComponentViewModel>();
+                    var items = new List<MenuItemViewModel>();
 
-                    int count = 0;
-                    foreach (var aggregationFunction in new AggregateFunction[] { AggregateFunction.None, AggregateFunction.Avg, AggregateFunction.Count})
+                    var count = 0;
+                    foreach (var aggregationFunction in new[] {AggregateFunction.None, AggregateFunction.Avg, AggregateFunction.Count})
                     {
-                        var toggleMenuItem = new MenuItemViewModel()
+                        var toggleMenuItem = new MenuItemViewModel
                         {
                             MenuViewModel = menuViewModel,
                             Row = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : count,
@@ -110,7 +104,7 @@ namespace PanoramicDataWin8.model.view.operation
                             TargetSize = new Vec(32, 50)
                         };
                         //toggleMenuItem.Position = attachmentItemViewModel.Position;
-                        ToggleMenuItemComponentViewModel toggle = new ToggleMenuItemComponentViewModel()
+                        var toggle = new ToggleMenuItemComponentViewModel
                         {
                             Label = aggregationFunction.ToString(),
                             IsChecked = aom.AggregateFunction == aggregationFunction
@@ -119,18 +113,14 @@ namespace PanoramicDataWin8.model.view.operation
                         toggleMenuItem.MenuItemComponentViewModel = toggle;
                         toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender2, args2) =>
                         {
-                            var model = (sender2 as ToggleMenuItemComponentViewModel);
+                            var model = sender2 as ToggleMenuItemComponentViewModel;
                             if (args2.PropertyName == model.GetPropertyName(() => model.IsChecked))
-                            {
                                 if (model.IsChecked)
                                 {
                                     aom.AggregateFunction = aggregationFunction;
                                     foreach (var tg in model.OtherToggles)
-                                    {
                                         tg.IsChecked = false;
-                                    }
                                 }
-                            }
                         };
                         menuViewModel.MenuItemViewModels.Add(toggleMenuItem);
                         items.Add(toggleMenuItem);
@@ -138,25 +128,18 @@ namespace PanoramicDataWin8.model.view.operation
                     }
 
                     foreach (var mi in items)
-                    {
                         (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
-                    }
                 }
             };
-            attr1.TappedTriggered = () =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-            attr1.DroppedTriggered = (attributeTransformationModel) =>
+            attr1.TappedTriggered = () => { attachmentViewModel.ActiveStopwatch.Restart(); };
+            attr1.DroppedTriggered = attributeTransformationModel =>
             {
                 if (histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).Any())
-                {
-                    histogramOperationViewModel.HistogramOperationModel.RemoveAttributeUsageTransformationModel(axis, 
+                    histogramOperationViewModel.HistogramOperationModel.RemoveAttributeUsageTransformationModel(axis,
                         histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).First());
-                }
                 if (!histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
                 {
-                    AttributeTransformationModel value = new AttributeTransformationModel(attributeTransformationModel.AttributeModel);
+                    var value = new AttributeTransformationModel(attributeTransformationModel.AttributeModel);
                     value.AggregateFunction = AggregateFunction.Count;
                     histogramOperationViewModel.HistogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
                 }
@@ -172,19 +155,17 @@ namespace PanoramicDataWin8.model.view.operation
         private static void addAttachmentViewModels(OperationViewModel operationViewModel)
         {
             foreach (var attachmentOrientation in Enum.GetValues(typeof(AttachmentOrientation)).Cast<AttachmentOrientation>())
-            {
-                operationViewModel.AttachementViewModels.Add(new AttachmentViewModel()
+                operationViewModel.AttachementViewModels.Add(new AttachmentViewModel
                 {
                     AttachmentOrientation = attachmentOrientation,
-                    OperationViewModel = operationViewModel,
+                    OperationViewModel = operationViewModel
                 });
-            }
         }
 
         public static HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(SchemaModel schemaModel, AttributeModel attributeModel, Pt position)
         {
-            HistogramOperationModel histogramOperationModel = new HistogramOperationModel(schemaModel);
-            HistogramOperationViewModel histogramOperationViewModel = new HistogramOperationViewModel(histogramOperationModel);
+            var histogramOperationModel = new HistogramOperationModel(schemaModel);
+            var histogramOperationViewModel = new HistogramOperationViewModel(histogramOperationModel);
             histogramOperationViewModel.Position = position;
             addAttachmentViewModels(histogramOperationViewModel);
 
@@ -193,20 +174,20 @@ namespace PanoramicDataWin8.model.view.operation
             createAxisMenu(histogramOperationViewModel, AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
 
 
-            if (attributeModel != null && attributeModel is AttributeFieldModel)
+            if ((attributeModel != null) && attributeModel is AttributeFieldModel)
             {
                 var inputFieldModel = attributeModel as AttributeFieldModel;
                 if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.ENUM)
                 {
                     histogramOperationModel.VisualizationType = VisualizationType.plot;
 
-                    AttributeTransformationModel x = new AttributeTransformationModel(inputFieldModel);
+                    var x = new AttributeTransformationModel(inputFieldModel);
                     x.AggregateFunction = AggregateFunction.None;
 
-                    AttributeTransformationModel value = new AttributeTransformationModel(inputFieldModel);
+                    var value = new AttributeTransformationModel(inputFieldModel);
                     value.AggregateFunction = AggregateFunction.Count;
 
-                    AttributeTransformationModel y = new AttributeTransformationModel(inputFieldModel);
+                    var y = new AttributeTransformationModel(inputFieldModel);
                     y.AggregateFunction = AggregateFunction.Count;
 
                     histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
@@ -217,13 +198,13 @@ namespace PanoramicDataWin8.model.view.operation
                 {
                     histogramOperationModel.VisualizationType = VisualizationType.plot;
 
-                    AttributeTransformationModel x = new AttributeTransformationModel(inputFieldModel);
+                    var x = new AttributeTransformationModel(inputFieldModel);
                     x.AggregateFunction = AggregateFunction.None;
 
-                    AttributeTransformationModel value = new AttributeTransformationModel(inputFieldModel);
+                    var value = new AttributeTransformationModel(inputFieldModel);
                     value.AggregateFunction = AggregateFunction.Count;
 
-                    AttributeTransformationModel y = new AttributeTransformationModel(inputFieldModel);
+                    var y = new AttributeTransformationModel(inputFieldModel);
                     y.AggregateFunction = AggregateFunction.Count;
 
                     histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
@@ -236,7 +217,7 @@ namespace PanoramicDataWin8.model.view.operation
                 else
                 {
                     histogramOperationModel.VisualizationType = VisualizationType.table;
-                    AttributeTransformationModel x = new AttributeTransformationModel(inputFieldModel);
+                    var x = new AttributeTransformationModel(inputFieldModel);
                     histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
                 }
             }
@@ -254,7 +235,7 @@ namespace PanoramicDataWin8.model.view.operation
                 exampleOperationViewModel.AttachementViewModels.First(
                     avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
 
-            MenuViewModel menuViewModel = new MenuViewModel()
+            var menuViewModel = new MenuViewModel
             {
                 AttachmentViewModel = attachmentViewModel,
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
@@ -262,7 +243,7 @@ namespace PanoramicDataWin8.model.view.operation
                 NrRows = 1
             };
 
-            var sliderItem = new MenuItemViewModel()
+            var sliderItem = new MenuItemViewModel
             {
                 MenuViewModel = menuViewModel,
                 Row = 0,
@@ -277,7 +258,7 @@ namespace PanoramicDataWin8.model.view.operation
                 IsHeightBoundToParent = false
             };
 
-            SliderMenuItemComponentViewModel attr1 = new SliderMenuItemComponentViewModel()
+            var attr1 = new SliderMenuItemComponentViewModel
             {
                 Label = "dummy slider",
                 Value = exampleOperationViewModel.ExampleOperationModel.DummyValue,
@@ -286,18 +267,15 @@ namespace PanoramicDataWin8.model.view.operation
             };
             attr1.PropertyChanged += (sender, args) =>
             {
-                var model = (sender as SliderMenuItemComponentViewModel);
+                var model = sender as SliderMenuItemComponentViewModel;
                 if (args.PropertyName == model.GetPropertyName(() => model.FinalValue))
-                {
                     exampleOperationViewModel.ExampleOperationModel.DummyValue = model.FinalValue;
-                }
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
 
             sliderItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(sliderItem);
             attachmentViewModel.MenuViewModel = menuViewModel;
-
         }
 
         private static void createBottomExampleMenu(ExampleOperationViewModel exampleOperationViewModel)
@@ -307,7 +285,7 @@ namespace PanoramicDataWin8.model.view.operation
                     avm => avm.AttachmentOrientation == AttachmentOrientation.Bottom);
             attachmentViewModel.ShowOnAttributeMove = true;
 
-            MenuViewModel menuViewModel = new MenuViewModel()
+            var menuViewModel = new MenuViewModel
             {
                 AttachmentViewModel = attachmentViewModel,
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
@@ -315,7 +293,7 @@ namespace PanoramicDataWin8.model.view.operation
                 NrRows = 1
             };
 
-            var addMenuItem = new MenuItemViewModel()
+            var addMenuItem = new MenuItemViewModel
             {
                 MenuViewModel = menuViewModel,
                 Row = 0,
@@ -329,17 +307,14 @@ namespace PanoramicDataWin8.model.view.operation
                 IsHeightBoundToParent = false,
                 Position = exampleOperationViewModel.Position
             };
-            AttributeTransformationMenuItemViewModel attr1 = new AttributeTransformationMenuItemViewModel()
+            var attr1 = new AttributeTransformationMenuItemViewModel
             {
                 Label = "+",
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
                 CanDrag = false,
                 CanDrop = true
             };
-            attr1.DroppedTriggered = (attributeTransformationModel) =>
-            {
-                exampleOperationViewModel.ExampleOperationModel.AttributeUsageTransformationModels.Add(attributeTransformationModel);
-            };
+            attr1.DroppedTriggered = attributeTransformationModel => { exampleOperationViewModel.ExampleOperationModel.AttributeUsageTransformationModels.Add(attributeTransformationModel); };
 
             addMenuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(addMenuItem);
@@ -351,37 +326,33 @@ namespace PanoramicDataWin8.model.view.operation
 
                 // remove old ones first
                 if (args.OldItems != null)
-                {
                     foreach (var oldItem in args.OldItems)
                     {
                         var oldAttributeTransformationModel = oldItem as AttributeTransformationModel;
                         var found = menuViewModel.MenuItemViewModels.FirstOrDefault(mvm =>
-                            ((AttributeTransformationMenuItemViewModel) mvm.MenuItemComponentViewModel).AttributeTransformationViewModel != null &&
-                            ((AttributeTransformationMenuItemViewModel) mvm.MenuItemComponentViewModel).AttributeTransformationViewModel.AttributeTransformationModel == oldAttributeTransformationModel);
+                            (((AttributeTransformationMenuItemViewModel) mvm.MenuItemComponentViewModel).AttributeTransformationViewModel != null) &&
+                            (((AttributeTransformationMenuItemViewModel) mvm.MenuItemComponentViewModel).AttributeTransformationViewModel.AttributeTransformationModel ==
+                             oldAttributeTransformationModel));
                         if (found != null)
-                        {
                             menuViewModel.MenuItemViewModels.Remove(found);
-                        }
                     }
-                }
 
-                menuViewModel.NrRows = (int)Math.Ceiling(coll.Count/3.0) +1;
+                menuViewModel.NrRows = (int) Math.Ceiling(coll.Count/3.0) + 1;
                 addMenuItem.Row = menuViewModel.NrRows - 1;
 
                 // add new ones
                 if (args.NewItems != null)
-                {
                     foreach (var newItem in args.NewItems)
                     {
                         var newAttributeTransformationModel = newItem as AttributeTransformationModel;
-                        var newMenuItem = new MenuItemViewModel()
+                        var newMenuItem = new MenuItemViewModel
                         {
                             MenuViewModel = menuViewModel,
                             Size = new Vec(50, 50),
                             TargetSize = new Vec(50, 50),
                             Position = addMenuItem.Position
                         };
-                        var newAttr = new AttributeTransformationMenuItemViewModel()
+                        var newAttr = new AttributeTransformationMenuItemViewModel
                         {
                             Label = newAttributeTransformationModel.GetLabel(),
                             AttributeTransformationViewModel = new AttributeTransformationViewModel(exampleOperationViewModel, newAttributeTransformationModel),
@@ -391,13 +362,13 @@ namespace PanoramicDataWin8.model.view.operation
                         };
                         newMenuItem.Deleted += (sender1, args1) =>
                         {
-                            var atm =  ((AttributeTransformationMenuItemViewModel) ((MenuItemViewModel) sender1).MenuItemComponentViewModel).AttributeTransformationViewModel.AttributeTransformationModel;
+                            var atm =
+                                ((AttributeTransformationMenuItemViewModel) ((MenuItemViewModel) sender1).MenuItemComponentViewModel).AttributeTransformationViewModel.AttributeTransformationModel;
                             exampleOperationViewModel.ExampleOperationModel.AttributeUsageTransformationModels.Remove(atm);
                         };
                         newMenuItem.MenuItemComponentViewModel = newAttr;
                         menuViewModel.MenuItemViewModels.Add(newMenuItem);
                     }
-                }
 
                 var count = 0;
                 foreach (var menuItemViewModel in menuViewModel.MenuItemViewModels.Where(mvm => mvm != addMenuItem))
@@ -417,7 +388,7 @@ namespace PanoramicDataWin8.model.view.operation
                 exampleOperationViewModel.AttachementViewModels.First(
                     avm => avm.AttachmentOrientation == AttachmentOrientation.Left);
 
-            MenuViewModel menuViewModel = new MenuViewModel()
+            var menuViewModel = new MenuViewModel
             {
                 AttachmentViewModel = attachmentViewModel,
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
@@ -426,13 +397,13 @@ namespace PanoramicDataWin8.model.view.operation
             };
             attachmentViewModel.MenuViewModel = menuViewModel;
 
-            List<ToggleMenuItemComponentViewModel> toggles = new List<ToggleMenuItemComponentViewModel>();
-            List<MenuItemViewModel> items = new List<MenuItemViewModel>();
+            var toggles = new List<ToggleMenuItemComponentViewModel>();
+            var items = new List<MenuItemViewModel>();
 
-            int count = 0;
-            foreach (var exampleOperationType in new ExampleOperationType[] { ExampleOperationType.A, ExampleOperationType.B, ExampleOperationType.C })
+            var count = 0;
+            foreach (var exampleOperationType in new[] {ExampleOperationType.A, ExampleOperationType.B, ExampleOperationType.C})
             {
-                var toggleMenuItem = new MenuItemViewModel()
+                var toggleMenuItem = new MenuItemViewModel
                 {
                     MenuViewModel = menuViewModel,
                     Row = count,
@@ -443,7 +414,7 @@ namespace PanoramicDataWin8.model.view.operation
                     TargetSize = new Vec(50, 32)
                 };
 
-                ToggleMenuItemComponentViewModel toggle = new ToggleMenuItemComponentViewModel()
+                var toggle = new ToggleMenuItemComponentViewModel
                 {
                     Label = exampleOperationType.ToString().ToLower(),
                     IsChecked = exampleOperationViewModel.ExampleOperationModel.ExampleOperationType == exampleOperationType
@@ -452,19 +423,15 @@ namespace PanoramicDataWin8.model.view.operation
                 toggleMenuItem.MenuItemComponentViewModel = toggle;
                 toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender2, args2) =>
                 {
-                    var model = (sender2 as ToggleMenuItemComponentViewModel);
+                    var model = sender2 as ToggleMenuItemComponentViewModel;
                     if (args2.PropertyName == model.GetPropertyName(() => model.IsChecked))
-                    {
                         if (model.IsChecked)
                         {
                             attachmentViewModel.ActiveStopwatch.Restart();
                             exampleOperationViewModel.ExampleOperationModel.ExampleOperationType = exampleOperationType;
                             foreach (var tg in model.OtherToggles)
-                            {
                                 tg.IsChecked = false;
-                            }
                         }
-                    }
                 };
                 menuViewModel.MenuItemViewModels.Add(toggleMenuItem);
                 items.Add(toggleMenuItem);
@@ -472,15 +439,13 @@ namespace PanoramicDataWin8.model.view.operation
             }
 
             foreach (var mi in items)
-            {
                 (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
-            }
         }
-        
+
         public static ExampleOperationViewModel CreateDefaultExampleOperationViewModel(SchemaModel schemaModel, Pt position)
         {
-            ExampleOperationModel exampleOperationModel = new ExampleOperationModel(schemaModel);
-            ExampleOperationViewModel exampleOperationViewModel = new ExampleOperationViewModel(exampleOperationModel);
+            var exampleOperationModel = new ExampleOperationModel(schemaModel);
+            var exampleOperationViewModel = new ExampleOperationViewModel(exampleOperationModel);
             exampleOperationViewModel.Position = position;
             addAttachmentViewModels(exampleOperationViewModel);
             createBottomExampleMenu(exampleOperationViewModel);

@@ -5,7 +5,7 @@ using Windows.Foundation;
 
 namespace PanoramicDataWin8.utils
 {
-    public class MathUtil
+    public static class MathUtil
     {
         public static double EPSILON = 0.0000001;
 

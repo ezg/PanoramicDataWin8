@@ -151,17 +151,6 @@ namespace PanoramicDataWin8.view.vis
             {
                 arcSegement1.Size = new Size((size / 2.0 - thickness / 2.0), (size / 2.0 - thickness / 2.0));
             }
-
-            // null labels
-            /*if (result.ResultDescriptionModel != null && (result.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount > 0)
-            {
-                tbNull.Visibility = Windows.UI.Xaml.Visibility.Visible;
-                tbNull.Text = "null values : " + (result.ResultDescriptionModel as VisualizationResultDescriptionModel).NullCount;
-            }
-            else
-            {
-                tbNull.Visibility = Windows.UI.Xaml.Visibility.Collapsed;
-            }*/
         }
 
         void operationTypeUpdated()
@@ -177,24 +166,9 @@ namespace PanoramicDataWin8.view.vis
             {
                 var histogramOperationModel = (HistogramOperationModel) operationViewModel.OperationModel;
 
-                if (histogramOperationModel.VisualizationType == VisualizationType.table)
-                {
-                    _renderer = new render.TableRenderer();
-                    contentGrid.Children.Add(_renderer);
-                }
-                else if (histogramOperationModel.VisualizationType == VisualizationType.plot)
+                if (histogramOperationModel.VisualizationType == VisualizationType.plot)
                 {
                     _renderer = new PlotRenderer();
-                    contentGrid.Children.Add(_renderer);
-                }
-                else if (histogramOperationModel.VisualizationType == VisualizationType.map)
-                {
-                    _renderer = new MapRenderer();
-                    contentGrid.Children.Add(_renderer);
-                }
-                else if (histogramOperationModel.VisualizationType == VisualizationType.county)
-                {
-                    _renderer = new SVGRenderer("county.json");
                     contentGrid.Children.Add(_renderer);
                 }
             }
@@ -203,20 +177,7 @@ namespace PanoramicDataWin8.view.vis
                 _renderer = new ExampleRenderer();
                 contentGrid.Children.Add(_renderer);
             }
-            else if (operationViewModel.OperationModel is ClassificationOperationModel)
-            {
-                var classificationOperationModel = (ClassificationOperationModel) operationViewModel.OperationModel;
-                if (classificationOperationModel.OperationTypeModel.Name != "frequent_itemsets")
-                {
-                    _renderer = new ClassifierRenderer();
-                    contentGrid.Children.Add(_renderer);
-                }
-                /* else if (classificationOperationModel.OperationTypeModel.Name == "frequent_itemsets")
-                 {
-                     _renderer = new FrequentItemsetRenderer();
-                     contentGrid.Children.Add(_renderer);
-                 }*/
-            }
+           
         }
 
         public void Pressed(FrameworkElement sender, PointerManagerEvent e)
@@ -296,14 +257,14 @@ namespace PanoramicDataWin8.view.vis
             _movingStarted = false;
             e.Handled = true;
             this.CapturePointer(e.Pointer);
-            this.PointerMoved += VisualizationContainerView_PointerMoved;
-            this.PointerReleased += VisualizationContainerView_PointerReleased;
+            this.PointerMoved += OperationContainerView_PointerMoved;
+            this.PointerReleased += OperationContainerView_PointerReleased;
             _fingerDown = true;
             
             ((OperationViewModel) DataContext).FireOperationViewModelTapped();
         }
 
-        async void VisualizationContainerView_PointerMoved(object sender, PointerRoutedEventArgs e)
+        async void OperationContainerView_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
             var currentPoint = e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position;
             if ((_initialPoint.GetVec() - currentPoint.GetVec()).Length2 > 100 || _movingStarted)
@@ -318,7 +279,7 @@ namespace PanoramicDataWin8.view.vis
             e.Handled = true;
         }
 
-        void VisualizationContainerView_PointerReleased(object sender, PointerRoutedEventArgs e)
+        void OperationContainerView_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             OperationViewModel model = (DataContext as OperationViewModel);
             if (_movingStarted)
@@ -340,8 +301,8 @@ namespace PanoramicDataWin8.view.vis
             }
             _fingerDown = false;
             this.ReleasePointerCapture(e.Pointer);
-            this.PointerMoved -= VisualizationContainerView_PointerMoved;
-            this.PointerReleased -= VisualizationContainerView_PointerReleased;
+            this.PointerMoved -= OperationContainerView_PointerMoved;
+            this.PointerReleased -= OperationContainerView_PointerReleased;
 
 
             foreach (var avm in model.AttachementViewModels)

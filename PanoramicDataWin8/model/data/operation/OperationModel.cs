@@ -1,26 +1,9 @@
-﻿using System;
-using System.ComponentModel;
-using IDEA_common.operations;
+﻿using IDEA_common.operations;
 using Newtonsoft.Json;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public interface IOperationModel : INotifyPropertyChanged
-    {
-        event OperationModel.OperationModelUpdatedHandler OperationModelUpdated;
-        void FireOperationModelUpdated(OperationModelUpdatedEventArgs args);
-
-        IResult Result { get; set; }
-
-        IOperationModel ResultCauserClone { get; set; }
-
-        SchemaModel SchemaModel { get; set; }
-
-        OperationModel Clone();
-    }
-
-
     [JsonObject(MemberSerialization.OptOut)]
     public class OperationModel : ExtendedBindableBase, IOperationModel
     {
@@ -31,7 +14,6 @@ namespace PanoramicDataWin8.model.data.operation
         private long _id;
 
         private IResult _result;
-        private IOperationModel _resultCauserClone;
 
         private SchemaModel _schemaModel;
 
@@ -44,6 +26,11 @@ namespace PanoramicDataWin8.model.data.operation
 
         public bool IsClone { get; set; }
 
+        public long Id
+        {
+            get { return _id; }
+            set { SetProperty(ref _id, value); }
+        }
 
 
         public SchemaModel SchemaModel
@@ -52,15 +39,9 @@ namespace PanoramicDataWin8.model.data.operation
             set { SetProperty(ref _schemaModel, value); }
         }
 
-        public long Id
+        public OperationModel Clone()
         {
-            get { return _id; }
-            set { SetProperty(ref _id, value); }
-        }
-
-        public  OperationModel Clone()
-        {
-            string serializedQueryModel = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
+            var serializedQueryModel = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
             {
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                 TypeNameHandling = TypeNameHandling.All
@@ -73,24 +54,6 @@ namespace PanoramicDataWin8.model.data.operation
                 TypeNameHandling = TypeNameHandling.Auto
             });
             return deserializeObject;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (obj is OperationModel)
-            {
-                var am = obj as OperationModel;
-                return
-                    am.Id.Equals(Id);
-            }
-            return false;
-        }
-
-        public override int GetHashCode()
-        {
-            int code = 0;
-            code ^= Id.GetHashCode();
-            return code;
         }
 
         public virtual void FireOperationModelUpdated(OperationModelUpdatedEventArgs args)
@@ -106,20 +69,26 @@ namespace PanoramicDataWin8.model.data.operation
         }
 
         [JsonIgnore]
-        public IOperationModel ResultCauserClone
-        {
-            get { return _resultCauserClone; }
-            set { _resultCauserClone = value; }
-        }
+        public IOperationModel ResultCauserClone { get; set; }
 
         public event OperationModelUpdatedHandler OperationModelUpdated;
-    }
 
-    public class OperationModelUpdatedEventArgs : EventArgs
-    {
-    }
+        public override bool Equals(object obj)
+        {
+            if (obj is OperationModel)
+            {
+                var am = obj as OperationModel;
+                return
+                    am.Id.Equals(Id);
+            }
+            return false;
+        }
 
-    public class VisualOperationModelUpdatedEventArgs : OperationModelUpdatedEventArgs
-    {
+        public override int GetHashCode()
+        {
+            var code = 0;
+            code ^= Id.GetHashCode();
+            return code;
+        }
     }
 }

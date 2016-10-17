@@ -8,35 +8,21 @@ namespace PanoramicDataWin8.model.data
     [JsonObject(MemberSerialization.OptOut)]
     public abstract class OriginModel : BindableBase
     {
-        private SchemaModel _schemaModel = null;
+        private SchemaModel _schemaModel;
+
         [JsonIgnore]
         public SchemaModel SchemaModel
         {
-            get
-            {
-                return _schemaModel;
-            }
-            set
-            {
-                this.SetProperty(ref _schemaModel, value);
-            }
+            get { return _schemaModel; }
+            set { SetProperty(ref _schemaModel, value); }
         }
 
-        public abstract string Name
-        {
-            get;
-        }
+        public abstract string Name { get; }
 
         [JsonIgnore]
-        public abstract List<AttributeModel> InputModels
-        {
-            get;
-        }
+        public abstract List<AttributeModel> InputModels { get; }
 
-        public abstract List<OriginModel> OriginModels
-        {
-            get;
-        }
+        public abstract List<OriginModel> OriginModels { get; }
 
         public override bool Equals(object obj)
         {
@@ -44,15 +30,15 @@ namespace PanoramicDataWin8.model.data
             {
                 var am = obj as OriginModel;
                 return
-                    am.Name.Equals(this.Name);
+                    am.Name.Equals(Name);
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            int code = 0;
-            code ^= this.Name.GetHashCode();
+            var code = 0;
+            code ^= Name.GetHashCode();
             return code;
         }
     }

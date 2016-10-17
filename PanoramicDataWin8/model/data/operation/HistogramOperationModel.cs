@@ -170,13 +170,4 @@ namespace PanoramicDataWin8.model.data.operation
             return _attributeUsageTransformationModels[attributeUsage];
         }
     }
-
-    public enum VisualizationType
-    {
-        table,
-        plot,
-        map,
-        line,
-        county
-    }
 }

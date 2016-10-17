@@ -1,5 +1,4 @@
-﻿using Windows.Data.Xml.Dom;
-using Windows.UI.Notifications;
+﻿using Windows.UI.Notifications;
 
 namespace PanoramicDataWin8.model.data.attribute
 {
@@ -7,10 +6,10 @@ namespace PanoramicDataWin8.model.data.attribute
     {
         public static void HandleError(string msg)
         {
-            XmlDocument x = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
-            XmlNodeList toastTextElements = x.GetElementsByTagName("text");
+            var x = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText01);
+            var toastTextElements = x.GetElementsByTagName("text");
             toastTextElements[0].AppendChild(x.CreateTextNode(msg));
-            ToastNotification toast = new ToastNotification(x);
+            var toast = new ToastNotification(x);
             ToastNotificationManager.CreateToastNotifier().Show(toast);
         }
     }

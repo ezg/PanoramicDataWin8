@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Windows.UI;
 using Windows.UI.Xaml.Media;
-using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.utils;
 
@@ -15,16 +11,16 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class OperationViewModel : ExtendedBindableBase
     {
-        public event EventHandler OperationViewModelTapped;
-
         public static double WIDTH = 200;
         public static double HEIGHT = 200;
 
         public static double MIN_WIDTH = 100;
         public static double MIN_HEIGHT = 100;
 
-        private static int _nextColorId = 0;
-        public static Color[] COLORS = new Color[] {
+        private static int _nextColorId;
+
+        public static Color[] COLORS =
+        {
             Color.FromArgb(255, 26, 188, 156),
             Color.FromArgb(255, 52, 152, 219),
             Color.FromArgb(255, 52, 73, 94),
@@ -45,139 +41,99 @@ namespace PanoramicDataWin8.model.view.operation
             Color.FromArgb(255, 192, 57, 43),
             Color.FromArgb(255, 127, 140, 141)
         };
-        
+
+        private Stopwatch _activeStopwatch = new Stopwatch();
+
+        private ObservableCollection<AttachmentViewModel> _attachementViewModels = new ObservableCollection<AttachmentViewModel>();
+
+        private SolidColorBrush _brush;
+
+        private Color _color = Color.FromArgb(0xff, 0x00, 0x00, 0x00);
+
+        private SolidColorBrush _faintBrush;
+
+        private OperationModel _operationModel;
+
+        private Pt _postion;
+
+        private Vec _size = new Vec(180, 100);
+
         public OperationViewModel(OperationModel operationModel)
         {
             _operationModel = operationModel;
             selectColor();
         }
 
-        public void FireOperationViewModelTapped()
-        {
-            OperationViewModelTapped?.Invoke(this, new EventArgs());
-        }
-
-        private Stopwatch _activeStopwatch = new Stopwatch();
         public Stopwatch ActiveStopwatch
         {
-            get
-            {
-                return _activeStopwatch;
-            }
-            set
-            {
-                this.SetProperty(ref _activeStopwatch, value);
-            }
+            get { return _activeStopwatch; }
+            set { SetProperty(ref _activeStopwatch, value); }
         }
 
-        private OperationModel _operationModel = null;
         public OperationModel OperationModel
         {
-            get
-            {
-                return _operationModel;
-            }
-            set
-            {
-                this.SetProperty(ref _operationModel, value);
-            }
+            get { return _operationModel; }
+            set { SetProperty(ref _operationModel, value); }
         }
 
-        private void selectColor()
-        {
-            if (_nextColorId >= COLORS.Count() - 1)
-            {
-                _nextColorId = 0;
-            }
-            Color = COLORS[_nextColorId++];
-        }
-
-        private ObservableCollection<AttachmentViewModel> _attachementViewModels = new ObservableCollection<AttachmentViewModel>();
         public ObservableCollection<AttachmentViewModel> AttachementViewModels
         {
-            get
-            {
-                return _attachementViewModels;
-            }
-            set
-            {
-                this.SetProperty(ref _attachementViewModels, value);
-            }
+            get { return _attachementViewModels; }
+            set { SetProperty(ref _attachementViewModels, value); }
         }
 
-        private SolidColorBrush _brush = null;
         public SolidColorBrush Brush
         {
-            get
-            {
-                return _brush;
-            }
-            set
-            {
-                this.SetProperty(ref _brush, value);
-            }
+            get { return _brush; }
+            set { SetProperty(ref _brush, value); }
         }
 
-        private SolidColorBrush _faintBrush = null;
         public SolidColorBrush FaintBrush
         {
-            get
-            {
-                return _faintBrush;
-            }
-            set
-            {
-                this.SetProperty(ref _faintBrush, value);
-            }
+            get { return _faintBrush; }
+            set { SetProperty(ref _faintBrush, value); }
         }
 
-        private Color _color = Color.FromArgb(0xff, 0x00, 0x00, 0x00);
         public Color Color
         {
-            get
-            {
-                return _color;
-            }
+            get { return _color; }
             set
             {
-                this.SetProperty(ref _color, value);
+                SetProperty(ref _color, value);
                 Brush = new SolidColorBrush(_color);
                 FaintBrush = new SolidColorBrush(Color.FromArgb(70, _color.R, _color.G, _color.B));
             }
         }
 
-        private Vec _size = new Vec(180, 100);
         public Vec Size
         {
-            get
-            {
-                return _size;
-            }
-            set
-            {
-                this.SetProperty(ref _size, value);
-            }
+            get { return _size; }
+            set { SetProperty(ref _size, value); }
         }
 
-        private Pt _postion;
         public Pt Position
         {
-            get
-            {
-                return _postion;
-            }
-            set
-            {
-                this.SetProperty(ref _postion, value);
-            }
+            get { return _postion; }
+            set { SetProperty(ref _postion, value); }
         }
 
         public Rct Bounds
         {
-            get
-            {
-                return new Rct(Position, Size);
-            }
+            get { return new Rct(Position, Size); }
+        }
+
+        public event EventHandler OperationViewModelTapped;
+
+        public void FireOperationViewModelTapped()
+        {
+            OperationViewModelTapped?.Invoke(this, new EventArgs());
+        }
+
+        private void selectColor()
+        {
+            if (_nextColorId >= COLORS.Count() - 1)
+                _nextColorId = 0;
+            Color = COLORS[_nextColorId++];
         }
     }
 }

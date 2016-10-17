@@ -2,15 +2,9 @@
 {
     public abstract class AttributeFieldModel : AttributeModel
     {
-        public abstract string InputVisualizationType
-        {
-            get;
-        }
+        public abstract string InputVisualizationType { get; }
 
-        public abstract string InputDataType
-        {
-            get;
-        }
+        public abstract string InputDataType { get; }
 
         public override bool Equals(object obj)
         {
@@ -18,21 +12,21 @@
             {
                 var am = obj as AttributeFieldModel;
                 return
-                    am.OriginModel.Equals(this.OriginModel) &&
-                    am.RawName.Equals(this.RawName) &&
-                    am.InputVisualizationType.Equals(this.InputVisualizationType) &&
-                    am.InputDataType.Equals(this.InputDataType);
+                    am.OriginModel.Equals(OriginModel) &&
+                    am.RawName.Equals(RawName) &&
+                    am.InputVisualizationType.Equals(InputVisualizationType) &&
+                    am.InputDataType.Equals(InputDataType);
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            int code = 0;
-            code ^= this.OriginModel.GetHashCode();
-            code ^= this.RawName.GetHashCode();
-            code ^= this.InputVisualizationType.GetHashCode();
-            code ^= this.InputDataType.GetHashCode();
+            var code = 0;
+            code ^= OriginModel.GetHashCode();
+            code ^= RawName.GetHashCode();
+            code ^= InputVisualizationType.GetHashCode();
+            code ^= InputDataType.GetHashCode();
             return code;
         }
     }

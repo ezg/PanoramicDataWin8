@@ -4,9 +4,12 @@ namespace PanoramicDataWin8.model.data.idea
 {
     public class IDEAAttributeGroupModel : AttributeGroupModel
     {
+        private string _displayName = "";
+
+        private string _rawName = "";
+
         public IDEAAttributeGroupModel()
         {
-
         }
 
         public IDEAAttributeGroupModel(string rawName, string displayName)
@@ -15,30 +18,16 @@ namespace PanoramicDataWin8.model.data.idea
             _displayName = displayName;
         }
 
-        private string _rawName = "";
         public override string RawName
         {
-            get
-            {
-                return _rawName;
-            }
-            set
-            {
-                this.SetProperty(ref _rawName, value);
-            }
+            get { return _rawName; }
+            set { SetProperty(ref _rawName, value); }
         }
 
-        private string _displayName = "";
         public override string DisplayName
         {
-            get
-            {
-                return _displayName;
-            }
-            set
-            {
-                this.SetProperty(ref _displayName, value);
-            }
+            get { return _displayName; }
+            set { SetProperty(ref _displayName, value); }
         }
 
         public override int Index { get; set; }

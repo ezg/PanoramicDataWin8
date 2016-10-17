@@ -32,7 +32,7 @@ namespace PanoramicDataWin8.view.vis.menu
 {
     public sealed partial class AttributeTransformationMenuItemView : UserControl, AttributeTransformationViewModelEventHandler
     {
-        private InputFieldView _shadow = null;
+        private AttributeFieldView _shadow = null;
         private long _manipulationStartTime = 0;
         private Pt _startDrag = new Point(0, 0);
         private Pt _currentFromInkableScene = new Point(0, 0);
@@ -192,7 +192,7 @@ namespace PanoramicDataWin8.view.vis.menu
             if (inkableScene != null && model != null)
             {
                 _currentFromInkableScene = fromInkableScene;
-                _shadow = new InputFieldView();
+                _shadow = new AttributeFieldView();
                 _shadow.DataContext = new AttributeTransformationViewModel(null, model.AttributeTransformationModel)
                 {
                     IsNoChrome = false,

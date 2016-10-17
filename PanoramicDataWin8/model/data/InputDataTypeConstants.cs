@@ -16,37 +16,25 @@ namespace PanoramicDataWin8.model.data
 
         public static string FromType(Type type)
         {
-            if (type == typeof (float) ||
-                type == typeof(double))
-            {
+            if ((type == typeof(float)) ||
+                (type == typeof(double)))
                 return FLOAT;
-            }
             if (type == typeof(DateTime))
-            {
                 return DATE;
-            }
             if (type == typeof(int))
-            {
                 return INT;
-            }
             return NVARCHAR;
         }
 
         public static string FromDataType(DataType type)
         {
-            if (type == DataType.Float ||
-                type == DataType.Double)
-            {
+            if ((type == DataType.Float) ||
+                (type == DataType.Double))
                 return FLOAT;
-            }
             if (type == DataType.DateTime)
-            {
                 return DATE;
-            }
             if (type == DataType.Int)
-            {
                 return INT;
-            }
             return NVARCHAR;
         }
     }

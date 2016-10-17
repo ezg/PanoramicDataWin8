@@ -72,11 +72,4 @@ namespace PanoramicDataWin8.model.view.operation
             set { SetProperty(ref _comparisonViewModelState, value); }
         }
     }
-
-    public enum ComparisonViewModelState
-    {
-        Opening,
-        Opened,
-        Closing
-    }
 }
