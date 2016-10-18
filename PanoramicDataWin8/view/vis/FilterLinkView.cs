@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
 using GeoAPI.Geometries;
+using MathNet.Numerics.Interpolation;
 using NetTopologySuite.Geometries;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
@@ -412,26 +413,11 @@ namespace PanoramicDataWin8.view.vis
                     //poly.StrokeDashArray = new DoubleCollection { 2 };
                     poly.Stroke = _backgroundBrush;
                     c.Children.Add(poly);
-
+                    
                     if (isInverted)
                     {
-                        var steps = Math.Floor((start - trianglePos).Length / 50);
-                        var from = start;
-                        var to = trianglePos;
-                        for (int s = 0; s < steps; s++)
-                        {
-                            var r = new Polygon();
-                            var f = from + distanceVec.Normalized() * s * 50.0;
-                            var t = from + distanceVec.Normalized() * (s + 1) * 50.0;
-
-                            poly.Points.Add((from - (n * thinkness / 2.0)).GetWindowsPoint());
-                            poly.Points.Add((from + (n * thinkness / 2.0)).GetWindowsPoint());
-
-                            r.Fill = _lightBrush;
-                            r.StrokeThickness = 1;
-                            r.Stroke = _backgroundBrush;
-                            c.Children.Add(r);
-                        }
+                        drawDashedLine(start, trianglePos, n, thinkness, c);
+                        drawDashedLine(trianglePos + (distanceVec.Normalized() * arrowLength), end, n, thinkness, c);
                     }
 
                     if (!_visualizationViewModelCenterGeometries.ContainsKey(incomingModel))
@@ -445,6 +431,42 @@ namespace PanoramicDataWin8.view.vis
                     }
                 }
             }
+        }
+
+        private void drawDashedLine(Vec from, Vec to, Vec normal, double thinkness, Canvas c)
+        {
+            Path path = new Path();
+            var pg = new PathGeometry();
+            path.Data = pg;
+           
+
+            var w = 10;
+            var g = 5;
+            var dn = (to - from).Normalized();
+            var l = (to - from).Length;
+            var steps = Math.Ceiling(l / (g + w));
+            for (int s = 0; s < steps; s++)
+            {
+                var r = new PolyLineSegment();
+                var f = from + dn * (s * (g + w));
+                var t = from + dn * Math.Min(s * (g + w) + w, l);
+
+                r.Points.Add((f - (normal * thinkness / 2.0)).GetWindowsPoint());
+                r.Points.Add((f + (normal * thinkness / 2.0)).GetWindowsPoint());
+
+                r.Points.Add((t + (normal * thinkness / 2.0)).GetWindowsPoint());
+                r.Points.Add((t - (normal * thinkness / 2.0)).GetWindowsPoint());
+                var pf = new PathFigure();
+                pf.StartPoint = (f - (normal*thinkness/2.0)).GetWindowsPoint();
+                pg.Figures.Add(pf);
+                pf.Segments.Add(r);
+            }
+
+
+            path.Fill = _lightBrush;
+            path.StrokeThickness = 1;
+            path.Stroke = _backgroundBrush;
+            c.Children.Add(path);
         }
 
         private void drawFilterAttachment(Vec attachmentCenter, Canvas c, AttachmentLocation attachmentLocation)

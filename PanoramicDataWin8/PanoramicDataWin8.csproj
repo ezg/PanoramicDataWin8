@@ -99,20 +99,17 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="controller\data\DataRow.cs" />
+    <Compile Include="controller\data\idea\ExecuteOperationModelEventArgs.cs" />
+    <Compile Include="controller\data\JobEventArgs.cs" />
     <Compile Include="controller\data\OperationJob.cs" />
-    <Compile Include="controller\data\progressive\ExampleOperationJob.cs" />
-    <Compile Include="controller\data\progressive\ResultCommand.cs" />
-    <Compile Include="controller\data\progressive\CatalogCommand.cs" />
-    <Compile Include="controller\data\progressive\IDEAGateway.cs" />
-    <Compile Include="controller\data\progressive\IDEAHelpers.cs" />
-    <Compile Include="controller\data\progressive\IDEAQueryExecuter.cs" />
-    <Compile Include="controller\data\progressive\HistogramOperationJob.cs" />
-    <Compile Include="controller\data\progressive\StatisticalComparisonOperationJob.cs" />
-    <Compile Include="controller\data\virt\AsyncVirtualizedCollection.cs" />
-    <Compile Include="controller\data\virt\DataPage.cs" />
-    <Compile Include="controller\data\virt\DataWrapper.cs" />
-    <Compile Include="controller\data\virt\IItemsProvider.cs" />
+    <Compile Include="controller\data\idea\ExampleOperationJob.cs" />
+    <Compile Include="controller\data\idea\ResultCommand.cs" />
+    <Compile Include="controller\data\idea\CatalogCommand.cs" />
+    <Compile Include="controller\data\idea\IDEAGateway.cs" />
+    <Compile Include="controller\data\idea\IDEAHelpers.cs" />
+    <Compile Include="controller\data\idea\IDEAQueryExecuter.cs" />
+    <Compile Include="controller\data\idea\HistogramOperationJob.cs" />
+    <Compile Include="controller\data\idea\StatisticalComparisonOperationJob.cs" />
     <Compile Include="controller\data\QueryExecuter.cs" />
     <Compile Include="controller\input\DatasetConfiguration.cs" />
     <Compile Include="controller\view\BrushableViewController.cs" />
@@ -122,24 +119,48 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="model\data\attribute\AggregateFunction.cs" />
     <Compile Include="model\data\attribute\ErrorHandler.cs" />
+    <Compile Include="model\data\attribute\ScaleFunction.cs" />
+    <Compile Include="model\data\attribute\SortMode.cs" />
+    <Compile Include="model\data\attribute\TransformationFunction.cs" />
     <Compile Include="model\data\InputDataTypeConstants.cs" />
     <Compile Include="model\data\attribute\AttributeGroupModel.cs" />
     <Compile Include="model\data\attribute\AttributeModel.cs" />
+    <Compile Include="model\data\OperationType.cs" />
+    <Compile Include="model\data\OperationTypeModelEventArgs.cs" />
+    <Compile Include="model\data\OperationTypeModelEventHandler.cs" />
     <Compile Include="model\data\operation\AttributeUsage.cs" />
     <Compile Include="model\data\attribute\AttributeFieldModel.cs" />
     <Compile Include="model\data\attribute\AttributeTransformationModel.cs" />
+    <Compile Include="model\data\operation\BrushOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\operation\ExampleOperationModel.cs" />
+    <Compile Include="model\data\operation\ExampleOperationType.cs" />
     <Compile Include="model\data\operation\FilteringOperation.cs" />
     <Compile Include="model\data\operation\FilterModel.cs" />
     <Compile Include="model\data\InputVisualizationTypeConstants.cs" />
     <Compile Include="model\data\operation\FilterLinkModel.cs" />
+    <Compile Include="model\data\operation\FilterOperationModelUpdatedEventArgs.cs" />
+    <Compile Include="model\data\operation\FilterOperationModelUpdatedEventType.cs" />
+    <Compile Include="model\data\operation\FilterProviderOperationModelImpl.cs" />
+    <Compile Include="model\data\operation\IBrushableOperationModel.cs" />
+    <Compile Include="model\data\operation\IBrusherOperationModel.cs" />
+    <Compile Include="model\data\operation\IFilterConsumerOperationModel.cs" />
+    <Compile Include="model\data\operation\IFilterProviderOperationModel.cs" />
+    <Compile Include="model\data\operation\IOperationModel.cs" />
+    <Compile Include="model\data\operation\IStatisticallyComparableOperationModel.cs" />
     <Compile Include="model\data\operation\LinkType.cs" />
-    <Compile Include="model\data\operation\BrushableOperationModel.cs" />
-    <Compile Include="model\data\operation\ClassificationOperationModel.cs" />
-    <Compile Include="model\data\operation\FilterableOperationModel.cs" />
+    <Compile Include="model\data\operation\BrushableOperationModelImpl.cs" />
+    <Compile Include="model\data\operation\FilterConsumerOperationModelImpl.cs" />
     <Compile Include="model\data\operation\OperationModel.cs" />
-    <Compile Include="model\data\operation\StatisticalComparableOperationModel.cs" />
+    <Compile Include="model\data\operation\OperationModelUpdatedEventArgs.cs" />
+    <Compile Include="model\data\operation\Predicate.cs" />
+    <Compile Include="model\data\operation\StatistalComparisonType.cs" />
+    <Compile Include="model\data\operation\StatisticallyComparableOperationModelImpl.cs" />
+    <Compile Include="model\data\operation\StatisticalComparisonOperationModel.cs" />
+    <Compile Include="model\data\operation\ValueComparison.cs" />
+    <Compile Include="model\data\operation\VisualizationType.cs" />
+    <Compile Include="model\data\operation\VisualOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\OriginModel.cs" />
     <Compile Include="model\data\idea\IDEAFieldAttributeModel.cs" />
     <Compile Include="model\data\idea\IDEAAttributeGroupModel.cs" />
@@ -149,19 +170,35 @@
     <Compile Include="model\data\result\ClassfierResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultItemModel.cs" />
-    <Compile Include="model\data\result\ResultItemValueModel.cs" />
     <Compile Include="model\data\result\ResultModel.cs" />
+    <Compile Include="model\data\result\ResultType.cs" />
     <Compile Include="model\data\SchemaModel.cs" />
     <Compile Include="model\data\OperationTypeGroupModel.cs" />
     <Compile Include="model\data\OperationTypeModel.cs" />
-    <Compile Include="model\view\AddAttachmentItemViewModel.cs" />
-    <Compile Include="model\view\AttachmentHeaderViewModel.cs" />
+    <Compile Include="model\view\AttachedTo.cs" />
+    <Compile Include="model\view\AttachmentOrientation.cs" />
+    <Compile Include="model\view\AttributeTransformationMenuItemViewModel.cs" />
+    <Compile Include="model\view\AttributeTransformationViewModelEventArgs.cs" />
+    <Compile Include="model\view\AttributeTransformationViewModelEventHandler.cs" />
+    <Compile Include="model\view\BrushableOperationViewModelState.cs" />
+    <Compile Include="model\view\GraphRenderOptions.cs" />
+    <Compile Include="model\view\InputGroupViewModelEventArgs.cs" />
+    <Compile Include="model\view\InputGroupViewModelEventHandler.cs" />
+    <Compile Include="model\view\MenuItemComponentViewModel.cs" />
+    <Compile Include="model\view\operation\ComparisonViewModelState.cs" />
+    <Compile Include="model\view\operation\ExampleOperationViewModel.cs" />
     <Compile Include="model\view\operation\StatisticalComparisonOperationViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
-    <Compile Include="model\view\operation\ClassificationOperationViewModel.cs" />
     <Compile Include="model\view\operation\OperationViewModel.cs" />
+    <Compile Include="model\view\SliderMenuItemComponentViewModel.cs" />
+    <Compile Include="model\view\tilemenu\Alignment.cs" />
+    <Compile Include="model\view\tilemenu\AttachPosition.cs" />
+    <Compile Include="model\view\tilemenu\InputFieldViewTileMenuContentViewModel.cs" />
+    <Compile Include="model\view\tilemenu\InputGroupViewTileMenuContentViewModel.cs" />
+    <Compile Include="model\view\tilemenu\OperationTypeGroupTileMenuContentViewModel.cs" />
+    <Compile Include="model\view\tilemenu\OperationTypeTileMenuContentViewModel.cs" />
+    <Compile Include="model\view\ToggleMenuItemComponentViewModel.cs" />
     <Compile Include="utils\ObservableDictionary.cs" />
-    <Compile Include="view\inq\IInkable.cs" />
     <Compile Include="view\vis\ComparisonView.xaml.cs">
       <DependentUpon>ComparisonView.xaml</DependentUpon>
     </Compile>
@@ -169,23 +206,20 @@
       <DependentUpon>BrushView.xaml</DependentUpon>
     </Compile>
     <Compile Include="model\view\BrushViewModel.cs" />
-    <Compile Include="model\view\tilemenu\TileMenuItemView.cs" />
+    <Compile Include="model\view\tilemenu\TileMenuItemViewModel.cs" />
     <Compile Include="model\view\tilemenu\TileMenuContentViewModel.cs" />
     <Compile Include="model\view\MenuViewModel.cs" />
     <Compile Include="model\view\MenuItemViewModel.cs" />
-    <Compile Include="model\view\AttachmentItemViewModel.cs" />
     <Compile Include="model\view\AttachmentViewModel.cs" />
     <Compile Include="model\view\AttributeTransformationViewModel.cs" />
     <Compile Include="model\view\FilterLinkViewModel.cs" />
     <Compile Include="model\view\MainModel.cs" />
-    <Compile Include="model\view\SchemaViewModel.cs" />
     <Compile Include="model\view\operation\HistogramOperationViewModel.cs" />
     <Compile Include="model\view\operation\OperationViewModelFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="utils\CommonExtensions.cs" />
     <Compile Include="utils\Converters.cs" />
     <Compile Include="utils\ConvexHull.cs" />
-    <Compile Include="utils\CSVParser.cs" />
     <Compile Include="utils\DateTimeUtil.cs" />
     <Compile Include="utils\ExtendedBindableBase.cs" />
     <Compile Include="utils\Geom.cs" />
@@ -202,20 +236,14 @@
     <Compile Include="view\common\GatewayErrorDialog.xaml.cs">
       <DependentUpon>GatewayErrorDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="view\common\InputGroupView.xaml.cs">
-      <DependentUpon>InputGroupView.xaml</DependentUpon>
+    <Compile Include="view\common\AttributeGroupView.xaml.cs">
+      <DependentUpon>AttributeGroupView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\common\OperationTypeView.xaml.cs">
       <DependentUpon>OperationTypeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\common\TileMenuItemView.xaml.cs">
       <DependentUpon>TileMenuItemView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="view\common\DataGridCell.xaml.cs">
-      <DependentUpon>DataGridCell.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="view\common\DataGridResizer.xaml.cs">
-      <DependentUpon>DataGridResizer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\inq\ConnectGesture.cs" />
     <Compile Include="view\inq\Gesturizer.cs" />
@@ -225,31 +253,21 @@
     <Compile Include="view\inq\InkStroke.cs" />
     <Compile Include="view\inq\InkStrokeElement.cs" />
     <Compile Include="view\inq\IScribbable.cs" />
-    <Compile Include="view\inq\IStroqConsumer.cs" />
     <Compile Include="view\inq\EraseGesture.cs" />
     <Compile Include="view\inq\ScribbleGesture.cs" />
     <Compile Include="view\inq\ShortStraw.cs" />
-    <Compile Include="view\common\InputFieldView.xaml.cs">
-      <DependentUpon>InputFieldView.xaml</DependentUpon>
+    <Compile Include="view\common\AttributeFieldView.xaml.cs">
+      <DependentUpon>AttributeFieldView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\style\ScrollViewStyle.xaml.cs">
       <DependentUpon>ScrollViewStyle.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\style\TwoFingerScrollBehavior.cs" />
-    <Compile Include="view\vis\AddAttachmentItemView.xaml.cs">
-      <DependentUpon>AddAttachmentItemView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="view\vis\AttachmentItemView.xaml.cs">
-      <DependentUpon>AttachmentItemView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="view\vis\menu\MenuItemView.xaml.cs">
       <DependentUpon>MenuItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\menu\MenuView.cs" />
     <Compile Include="view\vis\AttachmentView.cs" />
-    <Compile Include="view\vis\DataGrid.xaml.cs">
-      <DependentUpon>DataGrid.xaml</DependentUpon>
-    </Compile>
     <Compile Include="view\vis\FilterLinkView.cs" />
     <Compile Include="view\vis\menu\SliderMenuItemView.xaml.cs">
       <DependentUpon>SliderMenuItemView.xaml</DependentUpon>
@@ -260,36 +278,15 @@
     <Compile Include="view\vis\menu\ToggleMenuItemView.xaml.cs">
       <DependentUpon>ToggleMenuItemView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="view\vis\render\ClassifierRendererContentProvider.cs" />
-    <Compile Include="view\vis\render\ClassifierRendererPlotContentProvider.cs" />
-    <Compile Include="view\vis\render\MapRenderer.xaml.cs">
-      <DependentUpon>MapRenderer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="view\vis\render\ExampleRenderer.xaml.cs">
       <DependentUpon>ExampleRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\ExampleRendererContentProvider.cs" />
-    <Compile Include="view\vis\render\SVGRendererContentProvider.cs" />
-    <Compile Include="view\vis\render\SVGRenderer.xaml.cs">
-      <DependentUpon>SVGRenderer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="view\vis\render\PlotRenderer.xaml.cs">
       <DependentUpon>PlotRenderer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="view\vis\render\ClassifierRenderer.xaml.cs">
-      <DependentUpon>ClassifierRenderer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="view\vis\render\PlotRendererContentProvider.cs" />
     <Compile Include="view\vis\render\Renderer.cs" />
-    <Compile Include="view\vis\render\TableRenderer.xaml.cs">
-      <DependentUpon>TableRenderer.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="view\vis\render\XRenderer.xaml.cs">
-      <DependentUpon>XRenderer.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="view\vis\render\XYRenderer.xaml.cs">
-      <DependentUpon>XYRenderer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="view\vis\OperationContainerView.xaml.cs">
       <DependentUpon>OperationContainerView.xaml</DependentUpon>
     </Compile>
@@ -376,7 +373,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="view\common\InputGroupView.xaml">
+    <Page Include="view\common\AttributeGroupView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -388,36 +385,16 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="view\common\DataGridCell.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="view\common\DataGridResizer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="view\style\CoreStyle.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Page>
-    <Page Include="view\common\InputFieldView.xaml">
+    <Page Include="view\common\AttributeFieldView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\style\ScrollViewStyle.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="view\vis\AddAttachmentItemView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="view\vis\AttachmentItemView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="view\vis\DataGrid.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -437,37 +414,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="view\vis\render\MapRenderer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="view\vis\render\ExampleRenderer.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="view\vis\render\SVGRenderer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\render\PlotRenderer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="view\vis\render\ClassifierRenderer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="view\vis\render\TableRenderer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="view\vis\render\XRenderer.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="view\vis\render\XYRenderer.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\vis\OperationContainerView.xaml">
       <SubType>Designer</SubType>

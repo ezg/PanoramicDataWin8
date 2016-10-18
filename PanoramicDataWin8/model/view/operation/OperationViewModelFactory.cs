@@ -75,8 +75,17 @@ namespace PanoramicDataWin8.model.view.operation
             histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).CollectionChanged += (sender, args) =>
             {
                 var coll = sender as ObservableCollection<AttributeTransformationModel>;
-                attr1.Label = coll.FirstOrDefault() == null ? "" : coll.FirstOrDefault().GetLabel();
+                var attributeTransformationModel = coll.FirstOrDefault();
+                attr1.Label = attributeTransformationModel == null ? "" : attributeTransformationModel.GetLabel();
                 attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(histogramOperationViewModel, coll.FirstOrDefault());
+
+                if (attributeTransformationModel != null)
+                {
+                    attributeTransformationModel.PropertyChanged += (sender2, args2) =>
+                    {
+                        attr1.Label = (sender2 as AttributeTransformationModel).GetLabel();
+                    };
+                }
 
                 // remove old ones first
                 foreach (var mvm in menuViewModel.MenuItemViewModels.Where(mvm => mvm.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel).ToArray())
