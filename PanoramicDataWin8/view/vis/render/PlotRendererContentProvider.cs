@@ -732,8 +732,7 @@ namespace PanoramicDataWin8.view.vis.render
                     var yValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
                     yFrom = DataToScreenY((float)Math.Min(0, yValue));
                     yTo = DataToScreenY((float)Math.Max(0, yValue));
-
-                    var tt = _histogramResult.BinRanges[0].GetValueFromIndex(3);
+                    
                     xFrom = DataToScreenX((float)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
                     xTo = DataToScreenX((float)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
 
