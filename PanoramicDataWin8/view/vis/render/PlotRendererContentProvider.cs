@@ -235,7 +235,37 @@ namespace PanoramicDataWin8.view.vis.render
                         foreach (var binPrimitive in binPrimitiveCollection.BinPrimitives.Where(bp => bp.Value != 0.0 && bp.BrushIndex != _histogramResult.AllBrushIndex()))
                         {
                             canvasArgs.DrawingSession.FillRoundedRectangle(binPrimitive.Rect, 4, 4, binPrimitive.Color);
-                            canvasArgs.DrawingSession.FillRectangle(binPrimitive.MarginRect, dark);
+                            if (binPrimitive.MarginRect != Rect.Empty)
+                            {
+                                canvasArgs.DrawingSession.FillRectangle(binPrimitive.MarginRect, dark);
+                            }
+                            
+                            if (binPrimitive.MarginPercentage > 0.009)
+                            {
+                                var percentageText = binPrimitive.MarginPercentage.ToString("F2") + "%";
+                                var layout = new CanvasTextLayout(canvas, percentageText, _textFormat, 1000f, 1000f);
+                                var layoutBounds = layout.DrawBounds;
+                                layout.Dispose();
+                                var scale = (float) Math.Min(1.0, Math.Min((binPrimitive.Rect.Height - 5.0)/layoutBounds.Height, (binPrimitive.Rect.Width - 5.0)/layoutBounds.Width));
+                                var transMat = Matrix3x2.CreateTranslation(new Vector2(
+                                    (float)(binPrimitive.Rect.X + binPrimitive.Rect.Width / 2.0), 
+                                    (float)(binPrimitive.Rect.Y + binPrimitive.Rect.Height / 2.0)));
+                                var scaleMat = Matrix3x2.CreateScale(new Vector2(scale, scale));
+                                var transInvertMat = Matrix3x2.Identity;
+                                Matrix3x2.Invert(transMat, out transInvertMat);
+
+                                var mat = transInvertMat * scaleMat*transMat;
+                                var oldMat = canvasArgs.DrawingSession.Transform;
+
+                                canvasArgs.DrawingSession.Transform = mat*oldMat;
+
+                                DrawString(canvasArgs, _textFormat, 
+                                    (float)(binPrimitive.Rect.X + binPrimitive.Rect.Width / 2.0), 
+                                    (float)(binPrimitive.Rect.Y + binPrimitive.Rect.Height / 2.0), 
+                                    binPrimitive.MarginPercentage.ToString("F2") + "%", _textColor, false, true, true);
+                                canvasArgs.DrawingSession.Transform = oldMat;
+                                //canvasArgs.DrawingSession.dra(binPrimitive.MarginRect, dark);
+                            }
                         }
 
                         if (binPrimitiveCollection.FilterModel != null)
@@ -598,6 +628,7 @@ namespace PanoramicDataWin8.view.vis.render
             foreach (var brush in _histogramResult.Brushes)
             {
                 Rect marginRect = Rect.Empty;
+                double marginPercentage = 0.0;
                 float xFrom = 0;
                 float xTo = 0;
                 float yFrom = 0;
@@ -610,8 +641,7 @@ namespace PanoramicDataWin8.view.vis.render
                 Color color = Colors.White;
 
                 valueAggregateKey.BrushIndex = brush.BrushIndex;
-                marginAggregateKey.BrushIndex = brush.BrushIndex;
-                MarginAggregateResult margin = (MarginAggregateResult)bin.AggregateResults[marginAggregateKey];
+                MarginAggregateResult valueMargin = (MarginAggregateResult)bin.AggregateResults[marginAggregateKey];
 
                 float unNormalizedvalue = (float)((DoubleValueAggregateResult) bin.AggregateResults[valueAggregateKey]).Result;
                 if (unNormalizedvalue != 0)
@@ -650,7 +680,6 @@ namespace PanoramicDataWin8.view.vis.render
                     var allUnNormalizedValue = (float)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
                     var brushFactor = (unNormalizedvalue / allUnNormalizedValue);
                     
-
                     xFrom = DataToScreenX((float)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
                     xTo = DataToScreenX((float)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
 
@@ -674,6 +703,7 @@ namespace PanoramicDataWin8.view.vis.render
                     var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), baseColor, (float)(alpha + Math.Pow(value, 1.0 / 3.0) * (1.0 - alpha)));
                     var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
                     color = dataColor;
+                    marginPercentage = valueMargin.Margin;
                 }
                 else if (_chartType == ChartType.HorizontalBar)
                 {
@@ -703,6 +733,7 @@ namespace PanoramicDataWin8.view.vis.render
                     yFrom = DataToScreenY((float)Math.Min(0, yValue));
                     yTo = DataToScreenY((float)Math.Max(0, yValue));
 
+                    var tt = _histogramResult.BinRanges[0].GetValueFromIndex(3);
                     xFrom = DataToScreenX((float)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
                     xTo = DataToScreenX((float)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
 
@@ -782,6 +813,7 @@ namespace PanoramicDataWin8.view.vis.render
                         xTo - xFrom,
                         yFrom - yTo), 
                     MarginRect = marginRect,
+                    MarginPercentage = marginPercentage,
                     BrushIndex = brush.BrushIndex,
                     Color = color,
                     Value = unNormalizedvalue, 
@@ -828,11 +860,11 @@ namespace PanoramicDataWin8.view.vis.render
                         sum += bp.Rect.Height;
                     }
                 }
-                else if (_chartType == ChartType.HorizontalBar)
+                else if (_chartType == ChartType.HeatMap)
                 {
                     //var brushFactor = (bp.Value / allBrushBinPrimitive.Value);
-                    bp.Rect = new Rect(bp.Rect.X + sum, bp.Rect.Y, bp.Rect.Width, bp.Rect.Height);
-                    sum += bp.Rect.Width;
+                    //bp.Rect = new Rect(bp.Rect.X + sum, bp.Rect.Y, bp.Rect.Width, bp.Rect.Height);
+                    //sum += bp.Rect.Width;
                 }
             }
             binPrimitiveCollection.BinPrimitives.Reverse();

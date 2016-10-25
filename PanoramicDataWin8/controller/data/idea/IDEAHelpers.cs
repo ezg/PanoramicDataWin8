@@ -108,19 +108,25 @@ namespace PanoramicDataWin8.controller.data.progressive
                     Dimension = yIom.AttributeModel.Index
                 };
 
+            AggregateParameters sortAggregateParam = null;
             var aggregateParameters = new List<AggregateParameters>();
             foreach (var agg in aggregates)
             {
+                AggregateParameters aggParam = null;
                 if (agg.AggregateFunction == AggregateFunction.Avg)
-                    aggregateParameters.Add(new AverageAggregateParameters
+                    aggParam = new AverageAggregateParameters
                     {
                         Dimension = agg.AttributeModel.Index
-                    });
+                    };
                 else if (agg.AggregateFunction == AggregateFunction.Count)
-                    aggregateParameters.Add(new CountAggregateParameters
+                    aggParam = new CountAggregateParameters
                     {
                         Dimension = agg.AttributeModel.Index
-                    });
+                    };
+                aggregateParameters.Add(aggParam);
+
+                if (agg == model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).FirstOrDefault())
+                    sortAggregateParam = aggParam;
 
                 aggregateParameters.Add(new MarginAggregateParameters
                 {
@@ -152,6 +158,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 BinningParameters = Extensions.Yield(xBinning, yBinning).ToList(),
                 SampleStreamBlockSize = sampleSize,
                 PerBinAggregateParameters = aggregateParameters,
+                SortPerBinAggregateParameter = sortAggregateParam,
                 GlobalAggregateParameters = globalAggregates
             };
             return parameters;
