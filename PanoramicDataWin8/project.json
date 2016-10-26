@@ -1,6 +1,5 @@
 ﻿{
   "dependencies": {
-    "Esri.ArcGISRuntime.Toolkit": "10.2.7.1234",
     "GeoAPI": "1.7.4",
     "MathNet.Numerics": "3.11.0",
     "Microsoft.ApplicationInsights": "1.2.3",
