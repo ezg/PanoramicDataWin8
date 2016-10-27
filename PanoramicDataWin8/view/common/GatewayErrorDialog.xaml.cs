@@ -34,6 +34,21 @@ namespace PanoramicDataWin8.view.common
             get { return _content; }
         }
 
+
+        private string _stackTrace = "";
+        public string StackTrace
+        {
+            set
+            {
+                _stackTrace = value;
+                if (tbStackTrace != null)
+                {
+                    tbStackTrace.Text = _stackTrace;
+                }
+            }
+            get { return _stackTrace; }
+        }
+
         private string _ip = "";
 
         public string Ip

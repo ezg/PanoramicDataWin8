@@ -23,8 +23,11 @@
     <RestorePackages>true</RestorePackages>
     <NuGetPackageImportStamp>4aa295fa</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
-    <AppxBundlePlatforms>neutral</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>B654F35035F6C3A9FDCC3B3E136D9C5F59705753</PackageCertificateThumbprint>
+    <AppxBundlePlatforms>x64</AppxBundlePlatforms>
+    <PackageCertificateThumbprint>7CC55C0DE33D04B99C7657767236EEB41D2A933F</PackageCertificateThumbprint>
+    <AppxBundle>Always</AppxBundle>
+    <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+    <HockeyAppResourceId>acd270b7dad4436ba60fa158c6187574</HockeyAppResourceId>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DebugSymbols>true</DebugSymbols>
@@ -299,9 +302,11 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Assets\img\logo44x44.png" />
     <Content Include="Assets\svg\county.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="PanoramicDataWin8_TemporaryKey.pfx" />
     <None Include="project.json" />
     <Content Include="Assets\BadgeLogo.scale-400.png" />
     <Content Include="Assets\font\Lato-Light.ttf">
@@ -322,6 +327,7 @@
     <Content Include="Assets\data\main.ini">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="Vizdom-Key.snk" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\img\logo310x310.scale-100.png" />
@@ -446,8 +452,7 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>Vizdom-Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

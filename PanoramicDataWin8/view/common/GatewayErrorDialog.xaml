@@ -15,5 +15,8 @@
     <StackPanel Orientation="Vertical">
         <TextBlock Name="tbError"></TextBlock>
         <TextBox Name="tbIp"></TextBox>
+        <ScrollViewer Height="100" VerticalScrollBarVisibility="Auto">
+            <TextBox x:Name="tbStackTrace" AcceptsReturn="True" TextWrapping="Wrap"/>
+        </ScrollViewer>
     </StackPanel>
 </ContentDialog>

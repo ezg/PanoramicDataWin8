@@ -56,7 +56,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                     var dialog = new GatewayErrorDialog
                     {
                         Ip = MainViewController.Instance.MainModel.Ip,
-                        Content = e.Message
+                        Content = e.Message,
+                        StackTrace = (MainViewController.Instance.MainModel.Ip + "/" + endpoint) + "\n\n" + e.InnerException + "\n\n" + e.StackTrace
                     };
 
                     var result = await dialog.ShowAsync();
