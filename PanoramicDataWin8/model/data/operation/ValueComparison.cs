@@ -64,11 +64,19 @@ namespace PanoramicDataWin8.model.data.operation
             var val = Value.ToString();
             if (Value is string)
                 val = "\"" + val + "\"";
-            var ret = " " + AttributeTransformationModel.AttributeModel.RawName + " " + op + " " + val + " ";
-            return ret;
+            if (Predicate != Predicate.STARTS_WITH)
+            {
+                var ret = " " + AttributeTransformationModel.AttributeModel.RawName + " " + op + " " + val + " ";
+                return ret;
+            }
+            else
+            {
+                var ret = " " + AttributeTransformationModel.AttributeModel.RawName + ".StartsWith(" + val + ") ";
+                 return ret;
+            }
         }
 
-        public bool Compare(object value)
+        /*public bool Compare(object value)
         {
             if (Predicate == Predicate.EQUALS)
             {
@@ -106,6 +114,6 @@ namespace PanoramicDataWin8.model.data.operation
             }
 
             return false;
-        }
+        }*/
     }
 }

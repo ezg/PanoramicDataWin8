@@ -111,7 +111,7 @@ namespace PanoramicDataWin8.model.data.operation
                 {
                     if (ret != "")
                     {
-                        ret = "(" + ret + " &&  " + childrenJoined + ")";
+                        ret = "(" + ret + " &&  (" + childrenJoined + "))";
                     }
                     else
                     {

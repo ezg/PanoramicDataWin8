@@ -159,6 +159,7 @@ namespace PanoramicDataWin8.view.vis.render
                 count = 0;
                 foreach (var label in yLabels)
                 {
+                    var tt = _helper.VisualBinRanges[1].GetLabel(label.Value);
                     xFrom = _helper.DataToScreenX(_helper.DataMinX);
                     xTo = _helper.DataToScreenX(_helper.DataMaxX);
                     yFrom = _helper.DataToScreenY((float)label.MinValue);
@@ -730,9 +731,12 @@ namespace PanoramicDataWin8.view.vis.render
                 else if (_chartType == ChartType.VerticalBar)
                 {
                     var yValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
+                    //yValue = 1.15;//1.2;
                     yFrom = DataToScreenY((float)Math.Min(0, yValue));
                     yTo = DataToScreenY((float)Math.Max(0, yValue));
-                    
+
+                    var tt = _histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]);
+
                     xFrom = DataToScreenX((float)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
                     xTo = DataToScreenX((float)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
 
@@ -790,6 +794,11 @@ namespace PanoramicDataWin8.view.vis.render
                                 if (_histogramResult.BinRanges[i] is NominalBinRange)
                                 {
                                     filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.EQUALS,
+                                        _histogramResult.BinRanges[i].GetLabel(dataFrom)));
+                                }
+                                else if (_histogramResult.BinRanges[i] is AlphabeticBinRange)
+                                {
+                                    filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.STARTS_WITH,
                                         _histogramResult.BinRanges[i].GetLabel(dataFrom)));
                                 }
                                 else
