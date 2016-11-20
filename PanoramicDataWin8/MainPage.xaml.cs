@@ -23,6 +23,7 @@ using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.tilemenu;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
+using PanoramicDataWin8.view.vis;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -53,6 +54,10 @@ namespace PanoramicDataWin8
 
             _messageTimer.Interval = TimeSpan.FromMilliseconds(2000);
             _messageTimer.Tick += _messageTimer_Tick;
+
+            HypothesesView hypothesesView = new HypothesesView();
+            hypothesesView.DataContext = HypothesesViewController.Instance.HypothesesViewModel;
+            hypothesisCanvas.Children.Add(hypothesesView);
         }
 
         private void _messageTimer_Tick(object sender, object e)
@@ -189,6 +194,10 @@ namespace PanoramicDataWin8
                     q2.LinkModels.Add(lm);
 
                     var tt = q1.Clone();
+                }
+                else if (e.Key == VirtualKey.H)
+                {
+                    HypothesesViewController.Instance.HypothesesViewModel.HypothesisViewModels.Add(new HypothesisViewModel());
                 }
 
                 if (e.Key == VirtualKey.P)

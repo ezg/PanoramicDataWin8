@@ -32,6 +32,10 @@
             <Canvas Name="menuCanvas">
             </Canvas>
         </Grid>
+        <Grid Name="hypothesisGrid" Width="100" HorizontalAlignment="Right" Margin="0,0,60,0" Visibility="Visible">
+            <Canvas Name="hypothesisCanvas">
+            </Canvas>
+        </Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10,0,0,0" >
             <Button Name="addAttributeButton" Click="addAttributeButton_Click" Margin="0,0,0,4">
                 <Button.Template>
@@ -67,7 +71,27 @@
                 </Button.Template>
             </Button>
         </StackPanel>
-        <TextBlock Name="msgTextBlock" Text="" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="{StaticResource darkBrush}" Margin="10" Opacity="0"/>
+
+        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" >
+            <Button Name="hypothesisButton" Click="addAttributeButton_Click" Margin="0,0,0,4">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
+                            <TextBlock 
+                                    CacheMode="BitmapCache"
+                                    RenderTransformOrigin="0.5, 0.5"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    TextAlignment="Center"
+                                    MaxWidth="50"
+                                    Text="h" FontSize="30" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </StackPanel>
+
+            <TextBlock Name="msgTextBlock" Text="" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="{StaticResource darkBrush}" Margin="10" Opacity="0"/>
 
         <Grid Name="codeGrid" Visibility="Collapsed">
             <RichEditBox Name="editBox"/>
