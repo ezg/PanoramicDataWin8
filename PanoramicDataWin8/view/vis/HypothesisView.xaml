@@ -5,11 +5,12 @@
     xmlns:local="using:PanoramicDataWin8.view"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400">
-
-    <Grid Width="25" Height="25" Background="Blue">
-
+     Width="{Binding Size.X}" Height="{Binding Size.Y}"
+    FontFamily="{StaticResource abel}">
+    <UserControl.RenderTransform>
+        <TranslateTransform X="{Binding Position.X}" Y="{Binding Position.Y}"/>
+    </UserControl.RenderTransform>
+    <Grid Name="mainGrid" Background="{StaticResource lightBrush}">
+        <TextBlock Text="{Binding Text}" FontSize="11" Foreground="{StaticResource highlightBrush}" />
     </Grid>
 </UserControl>

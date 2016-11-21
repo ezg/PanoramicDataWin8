@@ -57,7 +57,7 @@ namespace PanoramicDataWin8
 
             HypothesesView hypothesesView = new HypothesesView();
             hypothesesView.DataContext = HypothesesViewController.Instance.HypothesesViewModel;
-            hypothesisCanvas.Children.Add(hypothesesView);
+            hypothesisGrid.Children.Add(hypothesesView);
         }
 
         private void _messageTimer_Tick(object sender, object e)

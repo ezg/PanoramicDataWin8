@@ -33,8 +33,6 @@
             </Canvas>
         </Grid>
         <Grid Name="hypothesisGrid" Width="100" HorizontalAlignment="Right" Margin="0,0,60,0" Visibility="Visible">
-            <Canvas Name="hypothesisCanvas">
-            </Canvas>
         </Grid>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10,0,0,0" >
             <Button Name="addAttributeButton" Click="addAttributeButton_Click" Margin="0,0,0,4">
@@ -72,8 +70,8 @@
             </Button>
         </StackPanel>
 
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" >
-            <Button Name="hypothesisButton" Click="addAttributeButton_Click" Margin="0,0,0,4">
+        <Grid HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" >
+            <Button Name="hypothesisButton" Click="addAttributeButton_Click" Margin="0,0,0,0">
                 <Button.Template>
                     <ControlTemplate>
                         <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
@@ -89,7 +87,7 @@
                     </ControlTemplate>
                 </Button.Template>
             </Button>
-        </StackPanel>
+        </Grid>
 
             <TextBlock Name="msgTextBlock" Text="" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="{StaticResource darkBrush}" Margin="10" Opacity="0"/>
 
