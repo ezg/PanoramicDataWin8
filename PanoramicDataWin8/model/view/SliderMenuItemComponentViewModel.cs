@@ -1,4 +1,6 @@
-﻿namespace PanoramicDataWin8.model.view
+﻿using System;
+
+namespace PanoramicDataWin8.model.view
 {
     public class SliderMenuItemComponentViewModel : MenuItemComponentViewModel
     {
@@ -12,6 +14,8 @@
 
         private double _value;
 
+        private Func<double, string> _formatter;
+
         public double FinalValue
         {
             get { return _finalValue; }
@@ -22,6 +26,12 @@
         {
             get { return _value; }
             set { SetProperty(ref _value, value); }
+        }
+
+        public Func<double, string> Formatter
+        {
+            get { return _formatter; }
+            set { SetProperty(ref _formatter, value); }
         }
 
         public double MaxValue

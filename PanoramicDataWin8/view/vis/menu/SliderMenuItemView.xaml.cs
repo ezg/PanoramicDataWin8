@@ -60,7 +60,14 @@ namespace PanoramicDataWin8.view.vis.menu
                 var menuItemModel = (DataContext as MenuItemViewModel);
                 var sliderModel = menuItemModel.MenuItemComponentViewModel as SliderMenuItemComponentViewModel;
 
-                txtBlock.Text = sliderModel.Label + " : " + sliderModel.Value;
+                if (sliderModel.Formatter == null)
+                {
+                    txtBlock.Text = sliderModel.Label + " : " + sliderModel.Value;
+                }
+                else
+                {
+                    txtBlock.Text = sliderModel.Formatter(sliderModel.Value);
+                }
 
                 double w = ((sliderModel.Value - sliderModel.MinValue) / (sliderModel.MaxValue - sliderModel.MinValue)) * menuItemModel.TargetSize.X;
                 rct.Width = Math.Max(1, w);

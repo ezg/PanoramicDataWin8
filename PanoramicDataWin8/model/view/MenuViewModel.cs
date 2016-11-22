@@ -60,18 +60,6 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _isToBeRemoved, value); }
         }
 
-        public AttributeTransformationViewModel AttributeTransformationViewModel
-        {
-            get { return _attributeTransformationViewModel; }
-            set { SetProperty(ref _attributeTransformationViewModel, value); }
-        }
-
-        public AttachmentViewModel AttachmentViewModel
-        {
-            get { return _attachmentViewModel; }
-            set { SetProperty(ref _attachmentViewModel, value); }
-        }
-
         public AttachmentOrientation AttachmentOrientation
         {
             get { return _attachmentOrientation; }

@@ -10,6 +10,7 @@ namespace PanoramicDataWin8.model.view
     public class HypothesisViewModel : ExtendedBindableBase
     {
         public static double DefaultHeight = 50;
+        public static double ExpandedWidth = 150;
         private static readonly Random random = new Random();
         private static int nextId = 0;
 
@@ -24,6 +25,8 @@ namespace PanoramicDataWin8.model.view
         private Pt _deltaTargetPosition = new Pt(0, 0);
 
         private bool _isDisplayed = false;
+
+        private bool _isExpanded = false;
 
         private Vec _targetSize = new Vec(50, DefaultHeight);
 
@@ -82,6 +85,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _isDisplayed; }
             set { SetProperty(ref _isDisplayed, value); }
+        }
+
+        public bool IsExpanded
+        {
+            get { return _isExpanded; }
+            set { SetProperty(ref _isExpanded, value); }
         }
     }
 }

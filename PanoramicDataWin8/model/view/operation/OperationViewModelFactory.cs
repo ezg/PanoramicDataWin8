@@ -47,7 +47,6 @@ namespace PanoramicDataWin8.model.view.operation
 
             var menuViewModel = new MenuViewModel
             {
-                AttachmentViewModel = attachmentViewModel,
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 3 : 2,
                 NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 3
@@ -246,7 +245,6 @@ namespace PanoramicDataWin8.model.view.operation
 
             var menuViewModel = new MenuViewModel
             {
-                AttachmentViewModel = attachmentViewModel,
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = 3,
                 NrRows = 1
@@ -296,7 +294,6 @@ namespace PanoramicDataWin8.model.view.operation
 
             var menuViewModel = new MenuViewModel
             {
-                AttachmentViewModel = attachmentViewModel,
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = 3,
                 NrRows = 1
@@ -399,7 +396,6 @@ namespace PanoramicDataWin8.model.view.operation
 
             var menuViewModel = new MenuViewModel
             {
-                AttachmentViewModel = attachmentViewModel,
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = 1,
                 NrRows = 3

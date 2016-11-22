@@ -32,8 +32,10 @@
             <Canvas Name="menuCanvas">
             </Canvas>
         </Grid>
-        <Grid Name="hypothesisGrid" Width="100" HorizontalAlignment="Right" Margin="0,0,60,0" Visibility="Visible">
+        <Grid Name="hypothesisGrid" Width="100" HorizontalAlignment="Right" Margin="0,0,10,64" Visibility="Visible">
         </Grid>
+        <Canvas Name="menuHypothesisGrid" Height="60" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="0,0,60,0" Visibility="Visible">
+        </Canvas>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10,0,0,0" >
             <Button Name="addAttributeButton" Click="addAttributeButton_Click" Margin="0,0,0,4">
                 <Button.Template>
@@ -70,8 +72,8 @@
             </Button>
         </StackPanel>
 
-        <Grid HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,10,0" >
-            <Button Name="hypothesisButton" Click="addAttributeButton_Click" Margin="0,0,0,0">
+        <Grid HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" >
+            <Button Name="hypothesisButton" Click="hypothesisButton_Click" Margin="0,0,0,0">
                 <Button.Template>
                     <ControlTemplate>
                         <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
@@ -110,7 +112,7 @@
     </Grid>
 
     <Page.BottomAppBar >
-        <CommandBar Name="commandBar" IsSticky="False" Background="White">
+        <CommandBar Name="commandBar" IsSticky="False" Background="Transparent">
             <CommandBar.SecondaryCommands >
             </CommandBar.SecondaryCommands>
         </CommandBar>

@@ -24,6 +24,7 @@ using PanoramicDataWin8.model.view.tilemenu;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.view.vis;
+using PanoramicDataWin8.view.vis.menu;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -49,15 +50,10 @@ namespace PanoramicDataWin8
             Loaded += MainPage_Loaded;
             DataContextChanged += MainPage_DataContextChanged;
             AddHandler(PointerPressedEvent, new PointerEventHandler(MainPage_PointerPressed), true);
-            //this.KeyUp += MainPage_KeyUp;
             KeyDown += MainPage_KeyDown;
 
             _messageTimer.Interval = TimeSpan.FromMilliseconds(2000);
             _messageTimer.Tick += _messageTimer_Tick;
-
-            HypothesesView hypothesesView = new HypothesesView();
-            hypothesesView.DataContext = HypothesesViewController.Instance.HypothesesViewModel;
-            hypothesisGrid.Children.Add(hypothesesView);
         }
 
         private void _messageTimer_Tick(object sender, object e)
@@ -255,8 +251,12 @@ namespace PanoramicDataWin8
 
             _mainPointerManager.Added += mainPointerManager_Added;
             _mainPointerManager.Moved += mainPointerManager_Moved;
-            _mainPointerManager.Removed += mainPointerManager_Removed;
+            _mainPointerManager.Removed += mainPointerManager_Removed; 
             _mainPointerManager.Attach(MainViewController.Instance.InkableScene);
+            
+            HypothesesView hypothesesView = new HypothesesView();
+            hypothesesView.DataContext = HypothesesViewController.Instance.HypothesesViewModel;
+            hypothesisGrid.Children.Add(hypothesesView);
 
             AddHandler(PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
             AddHandler(PointerReleasedEvent, new PointerEventHandler(InkableScene_PointerReleased), true);
@@ -447,7 +447,69 @@ namespace PanoramicDataWin8
                 _mainPointerManagerPreviousPoint = gt.TransformPoint(e.CurrentContacts.Values.ToList()[0].Position);
             }
         }
-        
+
+        private MenuView _hypothesisMenuView = null;
+        private MenuViewModel _hypothesisMenuViewModel = null;
+        private void hypothesisButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_hypothesisMenuView == null)
+            {
+                _hypothesisMenuViewModel = new MenuViewModel()
+                {
+                    AttachmentOrientation = AttachmentOrientation.Left,
+                    NrColumns = 3,
+                    NrRows = 1
+                };
+
+                var sliderItem = new MenuItemViewModel
+                {
+                    MenuViewModel = _hypothesisMenuViewModel,
+                    Row = 0,
+                    ColumnSpan = 1,
+                    RowSpan = 1,
+                    Column = 0,
+                    Position = new Pt(menuHypothesisGrid.ActualWidth, 0),
+                    Size = new Vec(100, 50),
+                    TargetSize = new Vec(100, 50),
+                    IsAlwaysDisplayed = false,
+                    IsWidthBoundToParent = false,
+                    IsHeightBoundToParent = false
+                };
+
+                var attr1 = new SliderMenuItemComponentViewModel
+                {
+                    Label = "alpha",
+                    Value = 500,
+                    MinValue = 1,
+                    MaxValue = 1000,
+                    Formatter = (d) =>
+                    {
+                        return Math.Round(d / 100.0, 1).ToString("F2")+"%";
+                    }
+                };
+                attr1.PropertyChanged += (sender2, args) =>
+                {
+                    var model = sender2 as SliderMenuItemComponentViewModel;
+                    if (args.PropertyName == model.GetPropertyName(() => model.FinalValue))
+                    {
+                        var tt = Math.Round(model.FinalValue/100.0, 1)*100.0;
+                        //exampleOperationViewModel.ExampleOperationModel.DummyValue = model.FinalValue;
+                    }
+                };
+
+                sliderItem.MenuItemComponentViewModel = attr1;
+                _hypothesisMenuViewModel.MenuItemViewModels.Add(sliderItem);
+
+                _hypothesisMenuView = new MenuView()
+                {
+                    DataContext = _hypothesisMenuViewModel
+                };
+                _hypothesisMenuViewModel.AnkerPosition = new Pt(menuHypothesisGrid.ActualWidth, 0);
+                menuHypothesisGrid.Children.Add(_hypothesisMenuView);
+            }
+            _hypothesisMenuViewModel.IsDisplayed = !_hypothesisMenuViewModel.IsDisplayed;
+        }
+
         private void addAttributeButton_Click(object sender, RoutedEventArgs e)
         {
             var mainModel = DataContext as MainModel;

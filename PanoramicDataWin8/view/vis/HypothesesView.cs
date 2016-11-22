@@ -12,7 +12,9 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using IDEA_common.operations.risk;
+using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.model.view.tilemenu;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.view.vis
@@ -42,9 +44,21 @@ namespace PanoramicDataWin8.view.vis
             this.ManipulationMode = ManipulationModes.All;
             this.ManipulationInertiaStarting += HypothesesView_ManipulationInertiaStarting;
 
+            MainViewController.Instance.InkableScene.AddHandler(PointerPressedEvent, new PointerEventHandler(MainPage_PointerPressed), true);
+
             _activeTimer.Interval = TimeSpan.FromMilliseconds(10);
             _activeTimer.Tick += _activeTimer_Tick;
             _activeTimer.Start();
+        }
+
+        private void MainPage_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            foreach (var hypo in _hypothesesViewModel.HypothesisViewModels)
+            {
+                hypo.TargetSize = new Vec(HypothesisViewModel.DefaultHeight, HypothesisViewModel.DefaultHeight);
+                hypo.IsExpanded = false;
+            }
+            updateRendering();
         }
 
         private void HypothesesView_ManipulationInertiaStarting(object sender, ManipulationInertiaStartingRoutedEventArgs e)
@@ -224,7 +238,7 @@ namespace PanoramicDataWin8.view.vis
             int elementsToShow = getElementsToShow();
 
             double currentX = 0;
-            double currentY = this.ActualHeight/2.0 - (elementsToShow * HypothesisViewModel.DefaultHeight + (elementsToShow - 1) * GAP) / 2.0;
+            double currentY = this.ActualHeight - (elementsToShow * HypothesisViewModel.DefaultHeight + (elementsToShow ) * GAP);
             int hiddenElementsTop = Math.Max(_lastVisibleIndex - elementsToShow + 1, 0);
             if (hiddenElementsTop > 0)
             {
@@ -259,7 +273,7 @@ namespace PanoramicDataWin8.view.vis
                         toggleDisplayed(hypo);
                     }
                 }
-                hypo.TargetPosition = new Pt(currentX + this.ActualWidth - hypo.Size.X - GAP, currentY);
+                hypo.TargetPosition = new Pt(currentX + this.ActualWidth - hypo.TargetSize.X, currentY);
                 hypo.DeltaTargetPosition = new Pt(0, 0);
                 currentY += GAP + hypo.Size.Y;
                 count++;
@@ -304,6 +318,7 @@ namespace PanoramicDataWin8.view.vis
                     if (_views.ContainsKey(hypo))
                     {
                         _contentCanvas.Children.Remove(_views[hypo]);
+                        _views[hypo].Tapped += hypothesisView_Tapped;
                         _views.Remove(hypo);
                     }
                 }
@@ -319,12 +334,29 @@ namespace PanoramicDataWin8.view.vis
                     _views.Add(hypo, v);
                     _contentCanvas.Children.Add(v);
                     v.Opacity = 0;
+                    v.Tapped += hypothesisView_Tapped;
                     hypo.IsDisplayed = true;
                     toggleDisplayed(hypo);
                 }
             }
 
             _lastVisibleIndex = ((IEnumerable<HypothesisViewModel>) sender).Count() - 1;
+            updateRendering();
+        }
+
+        private void hypothesisView_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            HypothesisView view = (HypothesisView) sender;
+            var hypo = (HypothesisViewModel) view.DataContext;
+            if (hypo.IsExpanded)
+            {
+                hypo.TargetSize = new Vec(HypothesisViewModel.DefaultHeight, HypothesisViewModel.DefaultHeight);
+            }
+            else
+            {
+                hypo.TargetSize = new Vec(HypothesisViewModel.ExpandedWidth, HypothesisViewModel.DefaultHeight);
+            }
+            hypo.IsExpanded = !hypo.IsExpanded;
             updateRendering();
         }
     }
