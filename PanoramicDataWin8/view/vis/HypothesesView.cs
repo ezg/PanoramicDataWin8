@@ -40,10 +40,17 @@ namespace PanoramicDataWin8.view.vis
             this.ManipulationDelta += HypothesesView_ManipulationDelta;
             this.ManipulationCompleted += HypothesesView_ManipulationCompleted;
             this.ManipulationMode = ManipulationModes.All;
+            this.ManipulationInertiaStarting += HypothesesView_ManipulationInertiaStarting;
 
             _activeTimer.Interval = TimeSpan.FromMilliseconds(10);
             _activeTimer.Tick += _activeTimer_Tick;
             _activeTimer.Start();
+        }
+
+        private void HypothesesView_ManipulationInertiaStarting(object sender, ManipulationInertiaStartingRoutedEventArgs e)
+        {
+           e.TranslationBehavior.DesiredDeceleration = 0.1;
+
         }
 
         private void HypothesesView_ManipulationCompleted(object sender, Windows.UI.Xaml.Input.ManipulationCompletedRoutedEventArgs e)
@@ -72,14 +79,13 @@ namespace PanoramicDataWin8.view.vis
             }
             else
             {
-                var movePixelBy = e.Cumulative.Translation.Y - (_lastVisibleIndex - _scrollStartLastIndex) * (HypothesisViewModel.DefaultHeight + GAP);
-                Debug.WriteLine(movePixelBy);
-                Debug.WriteLine(_lastVisibleIndex);
-                Debug.WriteLine(_scrollStartLastIndex);
-
+                var movePixelBy = e.Cumulative.Translation.Y + (_lastVisibleIndex - _scrollStartLastIndex) * (HypothesisViewModel.DefaultHeight + GAP);
+                //Debug.WriteLine(movePixelBy);
+                //Debug.WriteLine(_lastVisibleIndex);
+                //Debug.WriteLine(_scrollStartLastIndex);
                 foreach (var hypo in _hypothesesViewModel.HypothesisViewModels)
                 {
-                    hypo.DeltaTargetPosition = new Pt(0, movePixelBy);
+                    hypo.DeltaTargetPosition = new Pt(0, Math.Sign(movePixelBy) * Math.Sqrt(Math.Abs(movePixelBy)));
                 }
             }
         }
@@ -94,7 +100,8 @@ namespace PanoramicDataWin8.view.vis
         private Dictionary<HypothesisViewModel, Storyboard> _storyboards = new Dictionary<HypothesisViewModel, Storyboard>();
         void toggleDisplayed(HypothesisViewModel model)
         {
-            
+            var ts = TimeSpan.FromMilliseconds(300);
+
             // fade out
             if (!model.IsDisplayed)
             {
@@ -113,6 +120,8 @@ namespace PanoramicDataWin8.view.vis
                 storyboard.Children.Add(animation);
                 Storyboard.SetTarget(animation, _views[model]);
                 Storyboard.SetTargetProperty(animation, "Opacity");
+               // storyboard.Duration = new Duration(ts);
+               animation.Duration = new Duration(ts);
                 storyboard.Begin();
                 storyboard.Completed += (sender, o) =>
                 {
@@ -140,6 +149,7 @@ namespace PanoramicDataWin8.view.vis
                 storyboard.Children.Add(animation);
                 Storyboard.SetTarget(animation, _views[model]);
                 Storyboard.SetTargetProperty(animation, "Opacity");
+                animation.Duration = new Duration(ts);
                 storyboard.Begin();
                 storyboard.Completed += (sender, o) =>
                 {
@@ -203,7 +213,7 @@ namespace PanoramicDataWin8.view.vis
         {
             IEnumerable<HypothesisViewModel> hypos = _hypothesesViewModel.HypothesisViewModels;
             int elementsToShow = (int)Math.Floor(this.ActualHeight / (HypothesisViewModel.DefaultHeight + GAP));
-            elementsToShow = Math.Min(4, hypos.Count());
+            elementsToShow = Math.Min(8, hypos.Count());
             return elementsToShow;
         }
 
