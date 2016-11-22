@@ -328,7 +328,7 @@ namespace PanoramicDataWin8.view.vis
                 foreach (var item in e.NewItems)
                 {
                     var hypo = (HypothesisViewModel) item; 
-                    hypo.Position = new Pt(this.ActualWidth, this.ActualHeight / 2.0 - hypo.Size.Y / 2.0);
+                    hypo.Position = new Pt(this.ActualWidth, this.ActualHeight + hypo.Size.Y);
                     var v = new HypothesisView();
                     v.DataContext = hypo;
                     _views.Add(hypo, v);

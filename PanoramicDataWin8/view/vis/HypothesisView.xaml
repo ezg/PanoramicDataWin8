@@ -11,6 +11,6 @@
         <TranslateTransform X="{Binding Position.X}" Y="{Binding Position.Y}"/>
     </UserControl.RenderTransform>
     <Grid Name="mainGrid" Background="{StaticResource lightBrush}">
-        <TextBlock Text="{Binding Text}" FontSize="11" Foreground="{StaticResource highlightBrush}" />
+        <TextBlock Name="pValueTB" FontSize="11" Foreground="{StaticResource darkBrush}" />
     </Grid>
 </UserControl>

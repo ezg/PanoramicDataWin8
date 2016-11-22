@@ -28,9 +28,11 @@ namespace PanoramicDataWin8.model.view
 
         private bool _isExpanded = false;
 
-        private Vec _targetSize = new Vec(50, DefaultHeight);
+        private bool _isRejected = false;
 
-        private String _text = nextId++.ToString();
+        private Vec _targetSize = new Vec(50, DefaultHeight);
+        
+        private double _pValue = -1;
 
 
         public HypothesisViewModel()
@@ -44,10 +46,10 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _targetSize, value); }
         }
 
-        public string Text
+        public double PValue
         {
-            get { return _text; }
-            set { SetProperty(ref _text, value); }
+            get { return _pValue; }
+            set { SetProperty(ref _pValue, value); }
         }
 
         public Pt TargetPosition
@@ -55,7 +57,6 @@ namespace PanoramicDataWin8.model.view
             get { return _targetPosition; }
             set { SetProperty(ref _targetPosition, value); }
         }
-
 
         public Pt DeltaTargetPosition
         {
@@ -67,6 +68,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _size; }
             set { SetProperty(ref _size, value); }
+        }
+        
+        public bool IsRejected
+        {
+            get { return _isRejected; }
+            set { SetProperty(ref _isRejected, value); }
         }
 
         public Pt Position
