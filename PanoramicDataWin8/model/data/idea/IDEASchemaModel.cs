@@ -14,10 +14,7 @@ namespace PanoramicDataWin8.model.data.idea
             get { return _rootOriginModel; }
             set { SetProperty(ref _rootOriginModel, value); }
         }
-
-        [JsonIgnore]
-        public override QueryExecuter QueryExecuter { get; set; } = null;
-
+        
         public override List<OriginModel> OriginModels
         {
             get

@@ -16,17 +16,19 @@ namespace PanoramicDataWin8.controller.data.progressive
 {
     public static class IDEAHelpers
     {
-        public static ChiSquaredTestOperationParameters GetChiSquaredTestOperationParameters(StatisticalComparisonOperationModel model, int sampleSize)
+        public static AddComparisonParameters GetAddGoodnessOfFitComparisonOperationParameters(StatisticalComparisonOperationModel model, int sampleSize)
         {
-            var psm = model.SchemaModel as IDEASchemaModel;
-            var parameters = new ChiSquaredTestOperationParameters
+            var addComparison = new AddComparisonParameters
             {
-                AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
-                SampleStreamBlockSize = sampleSize,
-                DistObserved = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
-                DistTarget = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize)
+                ModelId = model.ModelId,
+                Comparison = new GoodnessOfFitComparison
+                {
+                    ComparisonOrder = 0,
+                    Dist0 = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
+                    Dist1 = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize),
+                },
             };
-            return parameters;
+            return addComparison;
         }
 
         public static ExampleOperationParameters GetExampleOperationParameters(ExampleOperationModel model, int sampleSize)

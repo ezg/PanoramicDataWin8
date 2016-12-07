@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.Practices.Prism.Mvvm;
+using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.model.data;
 
@@ -59,6 +60,8 @@ namespace PanoramicDataWin8.model.view
             get { return _ip; }
             set { SetProperty(ref _ip, value); }
         }
+
+        public QueryExecuter QueryExecuter { get; set; }
 
         public SchemaModel SchemaModel
         {

@@ -34,6 +34,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                             ActiveJobs.Remove(operationModel);
                         }
                         // determine if new job is even needed (i.e., are all relevant inputfieldmodels set)
+                        OperationJob newJob = null;
                         if (operationModel is HistogramOperationModel)
                         {
                             var histogramOperationModel = (HistogramOperationModel) operationModel;
@@ -41,39 +42,42 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 ((histogramOperationModel.VisualizationType != VisualizationType.table) && histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any() &&
                                  histogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).Any()))
                             {
-                                var histogramOperationJob = new HistogramOperationJob(
+                                newJob = new HistogramOperationJob(
                                     histogramOperationModel,
                                     TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
-
-                                ActiveJobs.Add(operationModel, histogramOperationJob);
-                                histogramOperationJob.JobUpdate += job_JobUpdate;
-                                histogramOperationJob.JobCompleted += job_JobCompleted;
-                                histogramOperationJob.Start();
                             }
                         }
                         else if (operationModel is StatisticalComparisonOperationModel)
                         {
                             var statisticalComparisonOperationModel = (StatisticalComparisonOperationModel) operationModel;
-                            var statisticalComparisonOperationJob = new StatisticalComparisonOperationJob(
+                            newJob = new StatisticalComparisonOperationJob(
                                 statisticalComparisonOperationModel,
                                 TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
 
-                            ActiveJobs.Add(operationModel, statisticalComparisonOperationJob);
-                            statisticalComparisonOperationJob.JobUpdate += job_JobUpdate;
-                            statisticalComparisonOperationJob.JobCompleted += job_JobCompleted;
-                            statisticalComparisonOperationJob.Start();
                         }
                         else if (operationModel is ExampleOperationModel)
                         {
                             var exampleOperationModel = (ExampleOperationModel) operationModel;
-                            var exampleOperationJob = new ExampleOperationJob(
+                            newJob = new ExampleOperationJob(
                                 exampleOperationModel,
                                 TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
+                        }
 
-                            ActiveJobs.Add(operationModel, exampleOperationJob);
-                            exampleOperationJob.JobUpdate += job_JobUpdate;
-                            exampleOperationJob.JobCompleted += job_JobCompleted;
-                            exampleOperationJob.Start();
+                        else if (operationModel is RiskOperationModel)
+                        {
+                            var riskOperationModel = (RiskOperationModel)operationModel;
+                            newJob = new RiskOperationJob(
+                                riskOperationModel,
+                                TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis));
+                        }
+
+                        if (newJob != null)
+                        {
+
+                            ActiveJobs.Add(operationModel, newJob);
+                            newJob.JobUpdate += job_JobUpdate;
+                            newJob.JobCompleted += job_JobCompleted;
+                            newJob.Start();
                         }
                     });
                 });

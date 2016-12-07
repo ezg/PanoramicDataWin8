@@ -46,7 +46,9 @@ namespace PanoramicDataWin8.controller.view
         {
             var current = sender as OperationViewModel;
             if (e.PropertyName == current.GetPropertyName(() => current.Position))
+            {
                 operationViewModelUpdated(current);
+            }
         }
 
         private void operationViewModelUpdated(OperationViewModel current)
@@ -64,15 +66,18 @@ namespace PanoramicDataWin8.controller.view
 
                     var areLinked = FilterLinkViewController.Instance.AreOperationViewModelsLinked(current, other);
                     if (!areLinked)
+                    {
                         if ((Math.Abs(diff.Y) < 300) &&
                             (boundHorizontalDistance(current.Bounds, other.Bounds) < 200) &&
                             _lastMoved.ContainsKey(other) &&
                             (other != current) &&
                             (Math.Abs((_lastMoved[other] - _lastMoved[current]).TotalMilliseconds) < 400))
+                        {
                             if (!StatisticalComparisonViews.Keys.Any(sov => sov.OperationViewModels.Contains(current) && sov.OperationViewModels.Contains(other)))
                             {
                                 var comparisonOperationViewModel = new StatisticalComparisonOperationViewModel(
                                     new StatisticalComparisonOperationModel(current.OperationModel.SchemaModel));
+                                
                                 comparisonOperationViewModel.OperationViewModels.Add(other);
                                 comparisonOperationViewModel.OperationViewModels.Add(current);
                                 comparisonOperationViewModel.Position =
@@ -87,7 +92,11 @@ namespace PanoramicDataWin8.controller.view
                                 view.DataContext = comparisonOperationViewModel;
                                 MainViewController.Instance.InkableScene.Children.Add(view);
                                 StatisticalComparisonViews.Add(comparisonOperationViewModel, view);
+
+                                HypothesesViewController.Instance.AddStatisticalComparisonOperationModel(comparisonOperationViewModel.StatisticalComparisonOperationModel);
                             }
+                        }
+                    }
                 }
             }
         }
@@ -105,7 +114,9 @@ namespace PanoramicDataWin8.controller.view
                 if ((Math.Abs(diff.Y) < 300) &&
                     (boundHorizontalDistance(comparisonViewModel.OperationViewModels[0].Bounds, comparisonViewModel.OperationViewModels[1].Bounds) < 300) &&
                     (dropped || (DateTime.Now.Ticks > TimeSpan.TicksPerSecond*1 + model.TicksSinceDwellStart)))
+                {
                     comparisonViewModel.ComparisonViewModelState = ComparisonViewModelState.Opened;
+                }
 
                 var areLinked = FilterLinkViewController.Instance.AreOperationViewModelsLinked(comparisonViewModel.OperationViewModels[0], comparisonViewModel.OperationViewModels[1]);
 
@@ -136,13 +147,25 @@ namespace PanoramicDataWin8.controller.view
         private void OperationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
+            {
                 foreach (var opViewModel in e.OldItems.OfType<OperationViewModel>())
+                {
                     if (opViewModel.OperationModel is IBrushableOperationModel)
+                    {
                         opViewModel.PropertyChanged -= OperationViewModel_PropertyChanged;
+                    }
+                }
+            }
             if (e.NewItems != null)
+            {
                 foreach (var opViewModel in e.NewItems.OfType<OperationViewModel>())
+                {
                     if (opViewModel.OperationModel is IBrushableOperationModel)
+                    {
                         opViewModel.PropertyChanged += OperationViewModel_PropertyChanged;
+                    }
+                }
+            }
         }
 
 
@@ -159,30 +182,27 @@ namespace PanoramicDataWin8.controller.view
         private void StatisticalComparisonViewsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
+            {
                 foreach (var item in e.OldItems)
                 {
                     var current = ((KeyValuePair<StatisticalComparisonOperationViewModel, ComparisonView>) item).Key;
-                    current.StatisticalComparisonOperationModel.OperationModelUpdated -= OperationModel_OperationModelUpdated;
-                    foreach (
-                        var m in
-                        current.StatisticalComparisonOperationModel.StatisticallyComparableOperationModels.ToArray())
+                    foreach (var m in current.StatisticalComparisonOperationModel.StatisticallyComparableOperationModels.ToArray())
+                    {
                         current.StatisticalComparisonOperationModel.RemoveStatisticallyComparableOperationModel(m);
+                    }
+                    HypothesesViewController.Instance.RemoveStatisticalComparisonOperationModel(current.StatisticalComparisonOperationModel);
                 }
+            }
             if (e.NewItems != null)
+            {
                 foreach (var item in e.NewItems)
                 {
                     var current = ((KeyValuePair<StatisticalComparisonOperationViewModel, ComparisonView>) item).Key;
                     current.StatisticalComparisonOperationModel.AddStatisticallyComparableOperationModel((IStatisticallyComparableOperationModel) current.OperationViewModels[0].OperationModel);
                     current.StatisticalComparisonOperationModel.AddStatisticallyComparableOperationModel((IStatisticallyComparableOperationModel) current.OperationViewModels[1].OperationModel);
-                    current.StatisticalComparisonOperationModel.OperationModelUpdated += OperationModel_OperationModelUpdated;
-                    current.StatisticalComparisonOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+                    HypothesesViewController.Instance.AddStatisticalComparisonOperationModel(current.StatisticalComparisonOperationModel);
                 }
-        }
-
-        private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
-        {
-            var model = (OperationModel) sender;
-            model.SchemaModel.QueryExecuter.ExecuteOperationModel(model);
+            }
         }
     }
-}
+} 

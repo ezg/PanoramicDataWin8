@@ -238,11 +238,11 @@ namespace PanoramicDataWin8.view.vis
             int elementsToShow = getElementsToShow();
 
             double currentX = 0;
-            double currentY = this.ActualHeight - (elementsToShow * HypothesisViewModel.DefaultHeight + (elementsToShow ) * GAP);
+            double currentY = this.ActualHeight - (elementsToShow * HypothesisViewModel.DefaultHeight + (elementsToShow -1) * GAP);
             int hiddenElementsTop = Math.Max(_lastVisibleIndex - elementsToShow + 1, 0);
             if (hiddenElementsTop > 0)
             {
-                currentY = currentY - (hiddenElementsTop*HypothesisViewModel.DefaultHeight + (hiddenElementsTop - 1)*GAP);
+                currentY = currentY - (hiddenElementsTop*HypothesisViewModel.DefaultHeight + (hiddenElementsTop)*GAP);
             }
 
             var count = 0;

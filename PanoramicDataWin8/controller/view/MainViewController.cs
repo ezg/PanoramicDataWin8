@@ -34,6 +34,7 @@ namespace PanoramicDataWin8.controller.view
             ComparisonViewController.CreateInstance(OperationViewModels);
 
             MainModel = new MainModel();
+            MainModel.QueryExecuter = new IDEAQueryExecuter();
 
             AttributeTransformationViewModel.AttributeTransformationViewModelDropped += AttributeTransformationViewModelDropped;
             AttributeTransformationViewModel.AttributeTransformationViewModelMoved += AttributeTransformationViewModelMoved;
@@ -81,6 +82,7 @@ namespace PanoramicDataWin8.controller.view
 
             MainModel.DatasetConfigurations.Clear();
             if (MainModel.Backend.ToLower() == "progressive")
+            {
                 try
                 {
                     MainModel.Ip = mainConifgContent.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
@@ -97,6 +99,7 @@ namespace PanoramicDataWin8.controller.view
                 {
                     ErrorHandler.HandleError(exc.Message);
                 }
+            }
         }
 
         public async void LoadCatalog()
@@ -118,9 +121,13 @@ namespace PanoramicDataWin8.controller.view
             }
 
             if (MainModel.DatasetConfigurations.Any(ds => ds.Schema.DisplayName.ToLower().Contains(MainModel.StartDataset)))
+            {
                 LoadData(MainModel.DatasetConfigurations.First(ds => ds.Schema.DisplayName.ToLower().Contains(MainModel.StartDataset)));
+            }
             else
+            {
                 LoadData(MainModel.DatasetConfigurations.First());
+            }
 
             setupOperationTypeModels();
         }
@@ -141,15 +148,16 @@ namespace PanoramicDataWin8.controller.view
 
         public void LoadData(DatasetConfiguration datasetConfiguration)
         {
-            if ((MainModel.SchemaModel != null) && (MainModel.SchemaModel.QueryExecuter != null))
-                MainModel.SchemaModel.QueryExecuter.HaltAllJobs();
+            if (MainModel.QueryExecuter != null)
+            {
+                MainModel.QueryExecuter.HaltAllJobs();
+            }
 
             if (datasetConfiguration.Backend.ToLower() == "progressive")
             {
                 MainModel.SchemaModel = new IDEASchemaModel();
                 MainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
                 MainModel.SampleSize = datasetConfiguration.SampleSize;
-                ((IDEASchemaModel) MainModel.SchemaModel).QueryExecuter = new IDEAQueryExecuter();
                 ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel = new IDEAOriginModel(datasetConfiguration);
                 ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel.LoadInputFields();
             }
@@ -210,23 +218,27 @@ namespace PanoramicDataWin8.controller.view
         public void RemoveOperationViewModel(OperationContainerView operationContainerView)
         {
             var operationViewModel = (OperationViewModel) operationContainerView.DataContext;
-            MainModel.SchemaModel.QueryExecuter.RemoveJob(operationViewModel.OperationModel);
+            MainModel.QueryExecuter.RemoveJob(operationViewModel.OperationModel);
             OperationViewModels.Remove(operationViewModel);
             Instance.InkableScene.Remove(operationContainerView);
 
             operationContainerView.Dispose();
             foreach (var attachmentView in Instance.InkableScene.Elements.Where(e => e is AttachmentView).ToList())
+            {
                 if (((AttachmentViewModel) attachmentView.DataContext).OperationViewModel == operationViewModel)
                 {
                     ((AttachmentView) attachmentView).Dispose();
                     Instance.InkableScene.Remove(attachmentView);
                 }
+            }
             if (operationViewModel.OperationModel is IFilterConsumerOperationModel)
+            {
                 foreach (var model in ((IFilterConsumerOperationModel) operationViewModel.OperationModel).LinkModels.ToArray())
                 {
                     ((IFilterConsumerOperationModel) model.FromOperationModel).LinkModels.Remove(model);
                     model.ToOperationModel.LinkModels.Remove(model);
                 }
+            }
         }
 
         private void OperationTypeModelMoved(object sender, OperationTypeModelEventArgs e)
@@ -244,9 +256,13 @@ namespace PanoramicDataWin8.controller.view
 
             OperationViewModel operationViewModel = null;
             if (operationTypeModel.OperationType == OperationType.Histogram)
+            {
                 operationViewModel = CreateDefaultHistogramOperationViewModel(null, position);
+            }
             else if (operationTypeModel.OperationType == OperationType.Example)
+            {
                 operationViewModel = CreateDefaultExampleOperationViewModel(position);
+            }
 
             if (operationViewModel != null)
             {
@@ -311,7 +327,9 @@ namespace PanoramicDataWin8.controller.view
             {
                 var geom = element.BoundsGeometry;
                 if ((geom != null) && mainPageBounds.Intersects(geom))
+                {
                     hits.Add(element);
+                }
             }
 
             var ops = InkableScene.GetDescendants().OfType<OperationContainerView>().ToList();
@@ -319,17 +337,25 @@ namespace PanoramicDataWin8.controller.view
             {
                 var geom = element.Geometry;
                 if ((geom != null) && (mainPageBounds.Distance(geom) < 100))
+                {
                     foreach (var a in (element.DataContext as OperationViewModel).AttachementViewModels)
+                    {
                         if (a.ShowOnAttributeMove)
+                        {
                             a.ActiveStopwatch.Restart();
+                        }
+                    }
+                }
             }
 
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
 
             foreach (var element in InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>())
+            {
                 element.AttributeTransformationViewModelMoved(
                     sender as AttributeTransformationViewModel, e,
                     (hits.Count() > 0) && (orderderHits[0] == element));
+            }
         }
 
         private void AttributeTransformationViewModelDropped(object sender, AttributeTransformationViewModelEventArgs e)
@@ -340,7 +366,9 @@ namespace PanoramicDataWin8.controller.view
             {
                 var geom = element.BoundsGeometry;
                 if ((geom != null) && mainPageBounds.Intersects(geom))
+                {
                     hits.Add(element);
+                }
             }
 
             var width = OperationViewModel.WIDTH;
@@ -350,9 +378,11 @@ namespace PanoramicDataWin8.controller.view
 
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
             foreach (var element in InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>())
+            {
                 element.AttributeTransformationViewModelDropped(
                     sender as AttributeTransformationViewModel, e,
                     (hits.Count() > 0) && (orderderHits[0] == element));
+            }
 
             if (!hits.Any())
             {
@@ -367,19 +397,27 @@ namespace PanoramicDataWin8.controller.view
         private void OperationViewViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
+            {
                 foreach (var item in e.OldItems)
                 {
                     ((OperationViewModel) item).OperationModel.OperationModelUpdated -= OperationModel_OperationModelUpdated;
                     if (((OperationViewModel) item).OperationModel is IFilterConsumerOperationModel)
+                    {
                         foreach (var link in ((IFilterConsumerOperationModel) ((OperationViewModel) item).OperationModel).LinkModels.ToArray())
+                        {
                             FilterLinkViewController.Instance.RemoveFilterLinkViewModel(link);
+                        }
+                    }
                 }
+            }
             if (e.NewItems != null)
+            {
                 foreach (var item in e.NewItems)
                 {
                     ((OperationViewModel) item).OperationModel.OperationModelUpdated += OperationModel_OperationModelUpdated;
                     ((OperationViewModel) item).OperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                 }
+            }
         }
 
         private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
@@ -388,11 +426,15 @@ namespace PanoramicDataWin8.controller.view
             if (model is IFilterProviderOperationModel &&
                 e is FilterOperationModelUpdatedEventArgs &&
                 ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.Links))
+            {
                 ((IFilterProviderOperationModel) model).ClearFilterModels();
+            }
 
             if (!(e is FilterOperationModelUpdatedEventArgs) || (e is FilterOperationModelUpdatedEventArgs &&
                                                                  ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType != FilterOperationModelUpdatedEventType.FilterModels)))
-                model.SchemaModel.QueryExecuter.ExecuteOperationModel(model);
+            {
+                MainModel.QueryExecuter.ExecuteOperationModel(model);
+            }
         }
 
 
@@ -401,6 +443,7 @@ namespace PanoramicDataWin8.controller.view
             var recognizedGestures = _gesturizer.Recognize(e.InkStroke.Clone());
 
             foreach (var recognizedGesture in recognizedGestures.ToList())
+            {
                 if (recognizedGesture is ConnectGesture)
                 {
                     var connect = recognizedGesture as ConnectGesture;
@@ -410,6 +453,7 @@ namespace PanoramicDataWin8.controller.view
                 {
                     var hitGesture = recognizedGesture as HitGesture;
                     foreach (var hitScribbable in hitGesture.HitScribbables)
+                    {
                         if (hitScribbable is InkStroke)
                         {
                             InkableScene.Remove(hitScribbable as InkStroke);
@@ -422,14 +466,18 @@ namespace PanoramicDataWin8.controller.view
                         {
                             var models = (hitScribbable as FilterLinkView).GetLinkModelsToRemove(e.InkStroke.Geometry);
                             foreach (var model in models)
+                            {
                                 FilterLinkViewController.Instance.RemoveFilterLinkViewModel(model);
+                            }
                         }
                         else if (hitScribbable is MenuItemView)
                         {
                             var model = (hitScribbable as MenuItemView).DataContext as MenuItemViewModel;
                             model.FireDeleted();
                         }
+                    }
                 }
+            }
 
 
             if (!e.InkStroke.IsErase && !recognizedGestures.Any())
@@ -444,15 +492,21 @@ namespace PanoramicDataWin8.controller.view
                 {
                     var geom = existingScribbable.Geometry;
                     if (geom != null)
+                    {
                         if (inkStrokeLine.Intersects(geom))
                         {
                             consumed = existingScribbable.Consume(e.InkStroke);
                             if (consumed)
+                            {
                                 break;
+                            }
                         }
+                    }
                 }
                 if (!consumed)
+                {
                     InkableScene.Add(e.InkStroke);
+                }
             }
         }
 
@@ -464,11 +518,15 @@ namespace PanoramicDataWin8.controller.view
                 var tg = InkableScene.TransformToVisual(MainPage);
                 var tt = tg.TransformBounds(current.Bounds);
 
-                if (!MainPage.GetBounds().IntersectsWith(tt) && MainModel.SchemaModel.QueryExecuter.IsJobRunning(current.OperationModel))
-                    MainModel.SchemaModel.QueryExecuter.HaltJob(current.OperationModel);
+                if (!MainPage.GetBounds().IntersectsWith(tt) && MainModel.QueryExecuter.IsJobRunning(current.OperationModel))
+                {
+                    MainModel.QueryExecuter.HaltJob(current.OperationModel);
+                }
                 else if (MainPage.GetBounds().IntersectsWith(tt) &&
-                         !MainModel.SchemaModel.QueryExecuter.IsJobRunning(current.OperationModel))
-                    MainModel.SchemaModel.QueryExecuter.ResumeJob(current.OperationModel);
+                         !MainModel.QueryExecuter.IsJobRunning(current.OperationModel))
+                {
+                    MainModel.QueryExecuter.ResumeJob(current.OperationModel);
+                }
             }
         }
     }

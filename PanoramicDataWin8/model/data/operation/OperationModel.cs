@@ -24,8 +24,6 @@ namespace PanoramicDataWin8.model.data.operation
             _id = _nextId++;
         }
 
-        public bool IsClone { get; set; }
-
         public long Id
         {
             get { return _id; }
