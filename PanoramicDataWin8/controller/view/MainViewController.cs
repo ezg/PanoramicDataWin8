@@ -34,8 +34,7 @@ namespace PanoramicDataWin8.controller.view
             ComparisonViewController.CreateInstance(OperationViewModels);
 
             MainModel = new MainModel();
-            MainModel.QueryExecuter = new IDEAQueryExecuter();
-
+           
             AttributeTransformationViewModel.AttributeTransformationViewModelDropped += AttributeTransformationViewModelDropped;
             AttributeTransformationViewModel.AttributeTransformationViewModelMoved += AttributeTransformationViewModelMoved;
 
@@ -158,6 +157,7 @@ namespace PanoramicDataWin8.controller.view
                 MainModel.SchemaModel = new IDEASchemaModel();
                 MainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
                 MainModel.SampleSize = datasetConfiguration.SampleSize;
+                MainModel.QueryExecuter = new IDEAQueryExecuter();
                 ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel = new IDEAOriginModel(datasetConfiguration);
                 ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel.LoadInputFields();
             }

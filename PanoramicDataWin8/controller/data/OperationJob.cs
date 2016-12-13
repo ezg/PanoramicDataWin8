@@ -85,13 +85,19 @@ namespace PanoramicDataWin8.controller.data
         protected async void FireJobUpdated(JobEventArgs jobEventArgs)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
-            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { JobUpdate?.Invoke(this, jobEventArgs); });
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                JobUpdate?.Invoke(this, jobEventArgs);
+            });
         }
 
         protected async void FireJobCompleted(JobEventArgs jobEventArgs)
         {
             var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
-            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => { JobCompleted?.Invoke(this, jobEventArgs); });
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                JobCompleted?.Invoke(this, jobEventArgs);
+            });
         }
     }
 }

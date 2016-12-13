@@ -4,10 +4,11 @@ using Microsoft.Practices.Prism.Mvvm;
 using PanoramicDataWin8.controller.data;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
 {
-    public class MainModel : BindableBase
+    public class MainModel : ExtendedBindableBase
     {
         private string _backend = "";
 
@@ -34,6 +35,7 @@ namespace PanoramicDataWin8.model.view
 
         private bool _showCodeGen;
 
+        private QueryExecuter _queryExecuter;
 
         private string _startDataset = "";
 
@@ -61,7 +63,11 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _ip, value); }
         }
 
-        public QueryExecuter QueryExecuter { get; set; }
+        public QueryExecuter QueryExecuter
+        {
+            get { return _queryExecuter; }
+            set { SetProperty(ref _queryExecuter, value); }
+        }
 
         public SchemaModel SchemaModel
         {

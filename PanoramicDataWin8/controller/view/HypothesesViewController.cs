@@ -1,33 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PanoramicDataWin8.controller.data.progressive;
+using IDEA_common.operations.risk;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
-using PanoramicDataWin8.model.view.operation;
-using PanoramicDataWin8.view.vis;
 
 namespace PanoramicDataWin8.controller.view
 {
     public class HypothesesViewController
     {
-        private static HypothesesViewController _instance;
-        private RiskOperationModel _riskOperationModel = null;
-        private ObservableCollection<StatisticalComparisonOperationModel> _statisticalComparisonOperationModels = new ObservableCollection<StatisticalComparisonOperationModel>();
+        private readonly RiskOperationModel _riskOperationModel;
+        private readonly ObservableCollection<StatisticalComparisonOperationModel> _statisticalComparisonOperationModels = new ObservableCollection<StatisticalComparisonOperationModel>();
+        private MainModel _mainModel = null;
 
-        private HypothesesViewController()
+
+        private HypothesesViewController(MainModel mainModel)
         {
             _riskOperationModel = new RiskOperationModel(null);
             _riskOperationModel.PropertyChanged += _riskOperationModel_PropertyChanged;
-            //MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(_riskOperationModel);
+            _mainModel = mainModel;
+            _mainModel.PropertyChanged += MainModel_PropertyChanged;
 
             _statisticalComparisonOperationModels.CollectionChanged += _statisticalComparisonOperationModels_CollectionChanged;
         }
 
-        private void _statisticalComparisonOperationModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void MainModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == _mainModel.GetPropertyName(() => _mainModel.QueryExecuter))
+            {
+                _mainModel.QueryExecuter.ExecuteOperationModel(_riskOperationModel);
+            }
+        }
+
+        public static HypothesesViewController Instance { get; private set; }
+
+        public HypothesesViewModel HypothesesViewModel { get; } = new HypothesesViewModel();
+
+        public static void CreateInstance(MainModel mainModel)
+        {
+            Instance = new HypothesesViewController(mainModel);
+        }
+
+        private void _statisticalComparisonOperationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
             {
@@ -45,15 +60,16 @@ namespace PanoramicDataWin8.controller.view
             {
                 foreach (var item in e.NewItems)
                 {
-                    var current = (StatisticalComparisonOperationModel)item;
+                    var current = (StatisticalComparisonOperationModel) item;
                     current.OperationModelUpdated += OperationModel_OperationModelUpdated;
                     current.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                 }
             }
         }
+
         private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
-            var model = (OperationModel)sender;
+            var model = (OperationModel) sender;
             MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model);
         }
 
@@ -66,31 +82,12 @@ namespace PanoramicDataWin8.controller.view
         {
             _statisticalComparisonOperationModels.Remove(model);
         }
-        
-        private void _riskOperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+
+        private void _riskOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == _riskOperationModel.GetPropertyName(() => _riskOperationModel.Result))
             {
-               
-            }
-        }
-
-        public static HypothesesViewController Instance
-        {
-            get
-            {
-                if (_instance == null)
-                    _instance = new HypothesesViewController();
-                return _instance;
-            }
-        }
-
-        private HypothesesViewModel _hypothesesViewModel = new HypothesesViewModel();
-        public HypothesesViewModel HypothesesViewModel
-        {
-            get
-            {
-                return _hypothesesViewModel;
+                _riskOperationModel.ModelId = ((NewModelOperationResult) _riskOperationModel.Result).ModelId;
             }
         }
     }

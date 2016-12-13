@@ -193,7 +193,7 @@ namespace PanoramicDataWin8
                 }
                 else if (e.Key == VirtualKey.H)
                 {
-                    HypothesesViewController.Instance.HypothesesViewModel.HypothesisViewModels.Add(new HypothesisViewModel());
+                    //HypothesesViewController.Instance.HypothesesViewModel.HypothesisViewModels.Add(new HypothesisViewModel());
                 }
 
                 if (e.Key == VirtualKey.P)
@@ -254,6 +254,7 @@ namespace PanoramicDataWin8
             _mainPointerManager.Removed += mainPointerManager_Removed; 
             _mainPointerManager.Attach(MainViewController.Instance.InkableScene);
             
+            HypothesesViewController.CreateInstance(MainViewController.Instance.MainModel);
             HypothesesView hypothesesView = new HypothesesView();
             hypothesesView.DataContext = HypothesesViewController.Instance.HypothesesViewModel;
             hypothesisGrid.Children.Add(hypothesesView);

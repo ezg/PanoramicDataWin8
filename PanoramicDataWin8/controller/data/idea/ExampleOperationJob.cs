@@ -20,7 +20,8 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             OperationParameters = new NewModelOperationParameters()
             {
-                //ModelType = ((RiskOperationModel)operationModel).ModelType
+                RiskControlTypes = ((RiskOperationModel)operationModel).RiskControlTypes,
+                Alpha = ((RiskOperationModel)operationModel).Alpha
             };
         }
     }
