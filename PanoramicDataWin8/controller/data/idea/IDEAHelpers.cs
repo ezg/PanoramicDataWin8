@@ -23,7 +23,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 ModelId = model.ModelId,
                 Comparison = new GoodnessOfFitComparison
                 {
-                    ComparisonOrder = 0,
+                    ComparisonOrder = model.ComparisonOrder,
                     Dist0 = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
                     Dist1 = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize),
                 },

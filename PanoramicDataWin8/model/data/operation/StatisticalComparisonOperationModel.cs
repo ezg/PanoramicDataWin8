@@ -3,10 +3,44 @@ using IDEA_common.operations.risk;
 
 namespace PanoramicDataWin8.model.data.operation
 {
+    public class StatisticalComparisonDecisionOperationModel : OperationModel
+    {
+        private ModelId _modelId;
+        private ComparisonId _comparisonId;
+        private RiskControlType _riskControlType = RiskControlType.PCER;
+
+        public StatisticalComparisonDecisionOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        {
+        }
+
+        public ModelId ModelId
+        {
+            get { return _modelId; }
+            set { SetProperty(ref _modelId, value); }
+        }
+
+
+        public ComparisonId ComparisonId
+        {
+            get { return _comparisonId; }
+            set { SetProperty(ref _comparisonId, value); }
+        }
+
+
+        public RiskControlType RiskControlType
+        {
+            get { return _riskControlType; }
+            set { SetProperty(ref _riskControlType, value); }
+        }
+    }
+
     public class StatisticalComparisonOperationModel : OperationModel
     {
         private ModelId _modelId;
+        private int _comparisionOrder = -1;
         private StatistalComparisonType _statistalComparisonType = StatistalComparisonType.histogram;
+        private StatisticalComparisonDecisionOperationModel _statisticalComparisonDecisionOperationModel;
+
 
         private ObservableCollection<IStatisticallyComparableOperationModel> _statisticallyComparableOperationModels =
             new ObservableCollection<IStatisticallyComparableOperationModel>();
@@ -27,6 +61,18 @@ namespace PanoramicDataWin8.model.data.operation
                     statisticallyComparableOperationModel.IncludeDistribution = _statistalComparisonType == StatistalComparisonType.distribution;
                 }
             }
+        }
+
+        public StatisticalComparisonDecisionOperationModel StatisticalComparisonDecisionOperationModel
+        {
+            get { return _statisticalComparisonDecisionOperationModel; }
+            set { SetProperty(ref _statisticalComparisonDecisionOperationModel, value); }
+        }
+
+        public int ComparisonOrder
+        {
+            get { return _comparisionOrder; }
+            set { SetProperty(ref _comparisionOrder, value); }
         }
 
         public ModelId ModelId

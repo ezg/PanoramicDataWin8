@@ -13,6 +13,7 @@ namespace PanoramicDataWin8.controller.view
         private readonly RiskOperationModel _riskOperationModel;
         private readonly ObservableCollection<StatisticalComparisonOperationModel> _statisticalComparisonOperationModels = new ObservableCollection<StatisticalComparisonOperationModel>();
         private MainModel _mainModel = null;
+        private static int _nextComparisonOrder = 0;
 
 
         private HypothesesViewController(MainModel mainModel)
@@ -49,7 +50,8 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var item in e.OldItems)
                 {
                     var current = (StatisticalComparisonOperationModel) item;
-                    current.OperationModelUpdated -= OperationModel_OperationModelUpdated;
+                    current.OperationModelUpdated -= StatisticalComparisonOperationModel_OperationModelUpdated;
+                    current.PropertyChanged -= StatisticalComparisonOperationModel_PropertyChanged;
                     foreach (var m in current.StatisticallyComparableOperationModels.ToArray())
                     {
                         current.RemoveStatisticallyComparableOperationModel(m);
@@ -61,13 +63,40 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var item in e.NewItems)
                 {
                     var current = (StatisticalComparisonOperationModel) item;
-                    current.OperationModelUpdated += OperationModel_OperationModelUpdated;
+                    current.OperationModelUpdated += StatisticalComparisonOperationModel_OperationModelUpdated;
+                    current.PropertyChanged += StatisticalComparisonOperationModel_PropertyChanged;
                     current.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                 }
             }
         }
 
-        private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
+        private void StatisticalComparisonOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var statOpModel = (StatisticalComparisonOperationModel) sender;
+            if (e.PropertyName == statOpModel.GetPropertyName(() => statOpModel.Result))
+            {
+                var res = (AddComparisonResult) statOpModel.Result;
+                if (statOpModel.StatisticalComparisonDecisionOperationModel == null)
+                {
+                    statOpModel.StatisticalComparisonDecisionOperationModel = new StatisticalComparisonDecisionOperationModel(statOpModel.SchemaModel);
+                    statOpModel.StatisticalComparisonDecisionOperationModel.PropertyChanged += StatisticalComparisonDecisionOperationModel_PropertyChanged;
+                }
+                statOpModel.StatisticalComparisonDecisionOperationModel.ModelId = statOpModel.ModelId;
+                statOpModel.StatisticalComparisonDecisionOperationModel.ComparisonId = res.ComparisonId;
+                statOpModel.StatisticalComparisonDecisionOperationModel.RiskControlType = _riskOperationModel.RiskControlType;
+                statOpModel.StatisticalComparisonDecisionOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+            }
+        }
+
+        private void StatisticalComparisonDecisionOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var statDesOpModel = (StatisticalComparisonDecisionOperationModel)sender;
+            if (e.PropertyName == statDesOpModel.GetPropertyName(() => statDesOpModel.Result))
+            {
+            }
+        }
+
+        private void StatisticalComparisonOperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
             var model = (OperationModel) sender;
             MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model);
@@ -75,6 +104,8 @@ namespace PanoramicDataWin8.controller.view
 
         public void AddStatisticalComparisonOperationModel(StatisticalComparisonOperationModel model)
         {
+            model.ModelId = _riskOperationModel.ModelId;
+            model.ComparisonOrder = _nextComparisonOrder++;
             _statisticalComparisonOperationModels.Add(model);
         }
 

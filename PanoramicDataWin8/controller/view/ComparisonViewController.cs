@@ -92,8 +92,6 @@ namespace PanoramicDataWin8.controller.view
                                 view.DataContext = comparisonOperationViewModel;
                                 MainViewController.Instance.InkableScene.Children.Add(view);
                                 StatisticalComparisonViews.Add(comparisonOperationViewModel, view);
-
-                                HypothesesViewController.Instance.AddStatisticalComparisonOperationModel(comparisonOperationViewModel.StatisticalComparisonOperationModel);
                             }
                         }
                     }

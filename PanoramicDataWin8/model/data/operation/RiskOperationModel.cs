@@ -6,7 +6,7 @@ namespace PanoramicDataWin8.model.data.operation
     public class RiskOperationModel : OperationModel
     {
         private double _alpha = 0.05;
-
+        private RiskControlType _riskControlType = RiskControlType.PCER;
         private ModelId _modelId;
 
         private List<RiskControlType> _riskControlTypes = new List<RiskControlType>
@@ -28,6 +28,12 @@ namespace PanoramicDataWin8.model.data.operation
 
         public RiskOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
+        }
+
+        public RiskControlType RiskControlType
+        {
+            get { return _riskControlType; }
+            set { SetProperty(ref _riskControlType, value); }
         }
 
         public ModelId ModelId 
