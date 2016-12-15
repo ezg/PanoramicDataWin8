@@ -5,12 +5,19 @@ namespace PanoramicDataWin8.model.data.operation
 {
     public class StatisticalComparisonDecisionOperationModel : OperationModel
     {
-        private ModelId _modelId;
         private ComparisonId _comparisonId;
+        private ModelId _modelId;
+        private StatisticalComparisonOperationModel _parent;
         private RiskControlType _riskControlType = RiskControlType.PCER;
 
         public StatisticalComparisonDecisionOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
+        }
+
+        public StatisticalComparisonOperationModel Parent
+        {
+            get { return _parent; }
+            set { SetProperty(ref _parent, value); }
         }
 
         public ModelId ModelId
@@ -36,8 +43,8 @@ namespace PanoramicDataWin8.model.data.operation
 
     public class StatisticalComparisonOperationModel : OperationModel
     {
-        private ModelId _modelId;
         private int _comparisionOrder = -1;
+        private ModelId _modelId;
         private StatistalComparisonType _statistalComparisonType = StatistalComparisonType.histogram;
         private StatisticalComparisonDecisionOperationModel _statisticalComparisonDecisionOperationModel;
 

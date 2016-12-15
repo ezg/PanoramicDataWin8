@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
+using IDEA_common.operations.risk;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
@@ -451,6 +452,7 @@ namespace PanoramicDataWin8
 
         private MenuView _hypothesisMenuView = null;
         private MenuViewModel _hypothesisMenuViewModel = null;
+
         private void hypothesisButton_Click(object sender, RoutedEventArgs e)
         {
             if (_hypothesisMenuView == null)
@@ -458,8 +460,8 @@ namespace PanoramicDataWin8
                 _hypothesisMenuViewModel = new MenuViewModel()
                 {
                     AttachmentOrientation = AttachmentOrientation.Left,
-                    NrColumns = 3,
-                    NrRows = 1
+                    NrColumns = 5,
+                    NrRows = 4
                 };
 
                 var sliderItem = new MenuItemViewModel
@@ -485,7 +487,7 @@ namespace PanoramicDataWin8
                     MaxValue = 1000,
                     Formatter = (d) =>
                     {
-                        return Math.Round(d / 100.0, 1).ToString("F2")+"%";
+                        return Math.Round(d/100.0, 1).ToString("F2") + "%";
                     }
                 };
                 attr1.PropertyChanged += (sender2, args) =>
@@ -501,13 +503,75 @@ namespace PanoramicDataWin8
                 sliderItem.MenuItemComponentViewModel = attr1;
                 _hypothesisMenuViewModel.MenuItemViewModels.Add(sliderItem);
 
+
+                // FDR
+                var toggles = new List<ToggleMenuItemComponentViewModel>();
+                var items = new List<MenuItemViewModel>();
+
+                var count = 0;
+                var col = 1;
+                foreach (var riskCtrlType in new[]
+                {
+                    RiskControlType.PCER,
+                    RiskControlType.Bonferroni, RiskControlType.AdaBonferroni, RiskControlType.HolmBonferroni,
+                    RiskControlType.BHFDR, RiskControlType.SeqFDR, RiskControlType.AlphaFDR, RiskControlType.BestFootForward,
+                    RiskControlType.BetaFarsighted, RiskControlType.GammaFixed, RiskControlType.DeltaHopeful, RiskControlType.EpsilonHybrid, RiskControlType.PsiSupport
+                })
+                {
+                    var toggleMenuItem = new MenuItemViewModel
+                    {
+                        MenuViewModel = _hypothesisMenuViewModel,
+                        Row = count % 4,
+                        RowSpan = 0,
+                        Position = new Pt(menuHypothesisGrid.ActualWidth, 0),
+                        Column = col,
+                        Size = new Vec(75, 50),
+                        TargetSize = new Vec(75, 50)
+                    };
+                    //toggleMenuItem.Position = attachmentItemViewModel.Position;
+                    var toggle = new ToggleMenuItemComponentViewModel
+                    {
+                        Label = riskCtrlType.ToString(),
+                        IsChecked = HypothesesViewController.Instance.RiskOperationModel.RiskControlType == riskCtrlType,
+                    };
+                    toggles.Add(toggle);
+                    toggleMenuItem.MenuItemComponentViewModel = toggle;
+                    toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender2, args2) =>
+                    {
+                         var model = sender2 as ToggleMenuItemComponentViewModel;
+                         if (args2.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                             if (model.IsChecked)
+                             {
+                                 HypothesesViewController.Instance.RiskOperationModel.RiskControlType = riskCtrlType;
+                                 foreach (var tg in model.OtherToggles)
+                                     tg.IsChecked = false;
+                             }
+                    };
+                    _hypothesisMenuViewModel.MenuItemViewModels.Add(toggleMenuItem);
+                    items.Add(toggleMenuItem);
+                    count++;
+                    if (count%4 == 0)
+                    {
+                        col += 1;
+                    }
+                }
+
+                foreach (var mi in items)
+                    (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
+
+                if (_hypothesisMenuView !=null)
+                {
+                    menuHypothesisGrid.Children.Remove(_hypothesisMenuView);
+                }
+
                 _hypothesisMenuView = new MenuView()
                 {
                     DataContext = _hypothesisMenuViewModel
                 };
-                _hypothesisMenuViewModel.AnkerPosition = new Pt(menuHypothesisGrid.ActualWidth, 0);
+                _hypothesisMenuViewModel.AnkerPosition = new Pt(menuHypothesisGrid.ActualWidth, -((_hypothesisMenuViewModel.NrRows - 1)*50 + (_hypothesisMenuViewModel.NrRows - 1)*4));
                 menuHypothesisGrid.Children.Add(_hypothesisMenuView);
             }
+
             _hypothesisMenuViewModel.IsDisplayed = !_hypothesisMenuViewModel.IsDisplayed;
         }
 

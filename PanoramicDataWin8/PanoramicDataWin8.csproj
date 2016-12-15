@@ -103,6 +103,8 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="controller\data\idea\ExecuteOperationModelEventArgs.cs" />
+    <Compile Include="controller\data\idea\RiskOperationJob.cs" />
+    <Compile Include="controller\data\idea\StatisticalComparisonDecisionOperationJob.cs" />
     <Compile Include="controller\data\JobEventArgs.cs" />
     <Compile Include="controller\data\OperationJob.cs" />
     <Compile Include="controller\data\idea\ExampleOperationJob.cs" />

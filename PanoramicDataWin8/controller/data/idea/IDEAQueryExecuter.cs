@@ -70,6 +70,14 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 riskOperationModel,
                                 TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis));
                         }
+                        else if (operationModel is StatisticalComparisonDecisionOperationModel)
+                        {
+                            var riskOperationModel = (StatisticalComparisonDecisionOperationModel)operationModel;
+                            newJob = new StatisticalComparisonDecisionOperationJob(
+                                riskOperationModel,
+                                TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis));
+                        }
+
 
                         if (newJob != null)
                         {

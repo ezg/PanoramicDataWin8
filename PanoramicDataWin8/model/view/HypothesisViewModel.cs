@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using IDEA_common.operations.risk;
 using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
@@ -16,40 +13,38 @@ namespace PanoramicDataWin8.model.view
 
         private double _dampingFactor;
 
+        private Pt _deltaTargetPosition = new Pt(0, 0);
+
+        private GetDecisionResult _getDecisionResult;
+
+        private bool _isDisplayed;
+
+        private bool _isExpanded;
+
         private Pt _position = new Pt(0, 0);
 
         private Vec _size = new Vec(50, DefaultHeight);
 
         private Pt _targetPosition = new Pt(0, 0);
 
-        private Pt _deltaTargetPosition = new Pt(0, 0);
-
-        private bool _isDisplayed = false;
-
-        private bool _isExpanded = false;
-
-        private bool _isRejected = false;
-
         private Vec _targetSize = new Vec(50, DefaultHeight);
-        
-        private double _pValue = -1;
 
 
         public HypothesisViewModel()
         {
-            _dampingFactor = random.NextDouble() * 3.0 + 3;
+            _dampingFactor = random.NextDouble()*3.0 + 3;
+        }
+
+        public GetDecisionResult GetDecisionResult
+        {
+            get { return _getDecisionResult; }
+            set { SetProperty(ref _getDecisionResult, value); }
         }
 
         public Vec TargetSize
         {
             get { return _targetSize; }
             set { SetProperty(ref _targetSize, value); }
-        }
-
-        public double PValue
-        {
-            get { return _pValue; }
-            set { SetProperty(ref _pValue, value); }
         }
 
         public Pt TargetPosition
@@ -68,12 +63,6 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _size; }
             set { SetProperty(ref _size, value); }
-        }
-        
-        public bool IsRejected
-        {
-            get { return _isRejected; }
-            set { SetProperty(ref _isRejected, value); }
         }
 
         public Pt Position

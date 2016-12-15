@@ -20,15 +20,26 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             var addComparison = new AddComparisonParameters
             {
+                ComparisonOrder = model.ComparisonOrder,
                 ModelId = model.ModelId,
                 Comparison = new GoodnessOfFitComparison
                 {
-                    ComparisonOrder = model.ComparisonOrder,
                     Dist0 = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
                     Dist1 = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize),
                 },
             };
             return addComparison;
+        }
+
+        public static GetDecisionParameters GetGetDecisionParameters(StatisticalComparisonDecisionOperationModel model)
+        {
+            var getDecisionParameters = new GetDecisionParameters()
+            {
+                ModelId = model.ModelId,
+                ComparisonId = model.ComparisonId,
+                RiskControlType = model.RiskControlType
+            };
+            return getDecisionParameters;
         }
 
         public static ExampleOperationParameters GetExampleOperationParameters(ExampleOperationModel model, int sampleSize)
