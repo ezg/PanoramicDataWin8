@@ -15,7 +15,7 @@ namespace PanoramicDataWin8.model.view
 
         private Pt _deltaTargetPosition = new Pt(0, 0);
 
-        private GetDecisionResult _getDecisionResult;
+        private Decision _decision;
 
         private bool _isDisplayed;
 
@@ -35,10 +35,10 @@ namespace PanoramicDataWin8.model.view
             _dampingFactor = random.NextDouble()*3.0 + 3;
         }
 
-        public GetDecisionResult GetDecisionResult
+        public Decision Decision
         {
-            get { return _getDecisionResult; }
-            set { SetProperty(ref _getDecisionResult, value); }
+            get { return _decision; }
+            set { SetProperty(ref _decision, value); }
         }
 
         public Vec TargetSize

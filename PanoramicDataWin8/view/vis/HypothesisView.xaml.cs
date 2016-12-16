@@ -49,7 +49,11 @@ namespace PanoramicDataWin8.view
 
         private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == _model.GetPropertyName(() => _model.GetDecisionResult))
+            if (e.PropertyName == _model.GetPropertyName(() => _model.Decision))
+            {
+                updateRendering();
+            }
+            else if (e.PropertyName == _model.GetPropertyName(() => _model.IsExpanded))
             {
                 updateRendering();
             }
@@ -57,10 +61,10 @@ namespace PanoramicDataWin8.view
 
         private void updateRendering()
         {
-            if (_model.GetDecisionResult != null)
+            if (_model.Decision != null)
             {
-                pValueTB.Text = _model.GetDecisionResult.Decision.PValue.ToString("F3");
-                if (_model.GetDecisionResult.Decision.Significance)
+                pValueTB.Text = _model.Decision.PValue.ToString("F3");
+                if (_model.Decision.Significance)
                 {
                     mainGrid.Background = _rejectedBrush;
                 }

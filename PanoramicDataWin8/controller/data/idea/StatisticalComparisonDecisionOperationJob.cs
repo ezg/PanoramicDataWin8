@@ -9,7 +9,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             TimeSpan throttle) : base(operationModel, throttle)
         {
             var model = (StatisticalComparisonDecisionOperationModel)operationModel.ResultCauserClone;
-            OperationParameters = IDEAHelpers.GetGetDecisionParameters(model);
+            OperationParameters = IDEAHelpers.GetDecisionsParameters(model);
         }
     }
 }

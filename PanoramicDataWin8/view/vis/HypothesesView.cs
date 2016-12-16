@@ -227,7 +227,7 @@ namespace PanoramicDataWin8.view.vis
         {
             IEnumerable<HypothesisViewModel> hypos = _hypothesesViewModel.HypothesisViewModels;
             int elementsToShow = (int)Math.Floor(this.ActualHeight / (HypothesisViewModel.DefaultHeight + GAP));
-            elementsToShow = Math.Min(8, hypos.Count());
+            //elementsToShow = Math.Min(8, hypos.Count());
             return elementsToShow;
         }
 

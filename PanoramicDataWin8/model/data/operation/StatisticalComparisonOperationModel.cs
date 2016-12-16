@@ -1,5 +1,7 @@
 ﻿using System.Collections.ObjectModel;
+using System.Linq;
 using IDEA_common.operations.risk;
+using PanoramicDataWin8.model.view.operation;
 
 namespace PanoramicDataWin8.model.data.operation
 {
@@ -55,6 +57,30 @@ namespace PanoramicDataWin8.model.data.operation
 
         public StatisticalComparisonOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
+            _statisticallyComparableOperationModels.CollectionChanged += _statisticallyComparableOperationModels_CollectionChanged;
+        }
+
+        private void _statisticallyComparableOperationModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (var statComp in e.OldItems.OfType<IStatisticallyComparableOperationModel>())
+                {
+                    statComp.OperationModelUpdated -= StatComp_OperationModelUpdated;
+                }
+            }
+            if (e.NewItems != null)
+            {
+                foreach (var statComp in e.NewItems.OfType<IStatisticallyComparableOperationModel>())
+                {
+                    statComp.OperationModelUpdated += StatComp_OperationModelUpdated;
+                }
+            }
+        }
+
+        private void StatComp_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
+        {
+            FireOperationModelUpdated(e);
         }
 
         public StatistalComparisonType StatistalComparisonType
@@ -98,8 +124,8 @@ namespace PanoramicDataWin8.model.data.operation
 
         public void RemoveStatisticallyComparableOperationModel(IStatisticallyComparableOperationModel model)
         {
-            model.IncludeDistribution = false;
             _statisticallyComparableOperationModels.Remove(model);
+            model.IncludeDistribution = false;
         }
 
         public void AddStatisticallyComparableOperationModel(IStatisticallyComparableOperationModel model)

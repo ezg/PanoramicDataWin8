@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using IDEA_common.aggregates;
 using IDEA_common.binning;
@@ -31,15 +32,17 @@ namespace PanoramicDataWin8.controller.data.progressive
             return addComparison;
         }
 
-        public static GetDecisionParameters GetGetDecisionParameters(StatisticalComparisonDecisionOperationModel model)
+        public static GetDecisionsParameters GetDecisionsParameters(StatisticalComparisonDecisionOperationModel model)
         {
-            var getDecisionParameters = new GetDecisionParameters()
+
+            var getDecisionsParameters = new GetDecisionsParameters()
             {
                 ModelId = model.ModelId,
-                ComparisonId = model.ComparisonId,
+                ComparisonIds = model.ComparisonId.Yield().ToList(),
                 RiskControlType = model.RiskControlType
             };
-            return getDecisionParameters;
+            Debug.WriteLine(getDecisionsParameters.ComparisonIds.FirstOrDefault());
+            return getDecisionsParameters;
         }
 
         public static ExampleOperationParameters GetExampleOperationParameters(ExampleOperationModel model, int sampleSize)

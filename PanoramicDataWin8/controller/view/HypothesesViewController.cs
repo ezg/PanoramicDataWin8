@@ -12,7 +12,7 @@ namespace PanoramicDataWin8.controller.view
     public class HypothesesViewController
     {
         private readonly RiskOperationModel _riskOperationModel;
-        private readonly Dictionary<StatisticalComparisonOperationModel, HypothesisViewModel> _statisticalComparisionToHypothesisViewModels = new Dictionary<StatisticalComparisonOperationModel, HypothesisViewModel>();
+        private readonly Dictionary<ComparisonId, HypothesisViewModel> _comparisonIdToHypothesisViewModels = new Dictionary<ComparisonId, HypothesisViewModel>();
         private MainModel _mainModel = null;
         private static int _nextComparisonOrder = 0;
 
@@ -54,45 +54,52 @@ namespace PanoramicDataWin8.controller.view
             if (e.PropertyName == statOpModel.GetPropertyName(() => statOpModel.Result))
             {
                 var res = (AddComparisonResult) statOpModel.Result;
-                if (statOpModel.StatisticalComparisonDecisionOperationModel == null)
+                if (res != null)
                 {
-                    statOpModel.StatisticalComparisonDecisionOperationModel = new StatisticalComparisonDecisionOperationModel(statOpModel.SchemaModel);
-                    statOpModel.StatisticalComparisonDecisionOperationModel.PropertyChanged += StatisticalComparisonDecisionOperationModel_PropertyChanged;
-                    statOpModel.StatisticalComparisonDecisionOperationModel.Parent = statOpModel;
+                    if (statOpModel.StatisticalComparisonDecisionOperationModel == null)
+                    {
+                        statOpModel.StatisticalComparisonDecisionOperationModel = new StatisticalComparisonDecisionOperationModel(statOpModel.SchemaModel);
+                        statOpModel.StatisticalComparisonDecisionOperationModel.PropertyChanged += StatisticalComparisonDecisionOperationModel_PropertyChanged;
+                        statOpModel.StatisticalComparisonDecisionOperationModel.Parent = statOpModel;
+                    }
+                    statOpModel.StatisticalComparisonDecisionOperationModel.ModelId = statOpModel.ModelId;
+                    statOpModel.StatisticalComparisonDecisionOperationModel.ComparisonId = res.ComparisonId;
+                    statOpModel.StatisticalComparisonDecisionOperationModel.RiskControlType = _riskOperationModel.RiskControlType;
+                    _mainModel.QueryExecuter.ExecuteOperationModel(statOpModel.StatisticalComparisonDecisionOperationModel);
+
+                    if (!_comparisonIdToHypothesisViewModels.ContainsKey(res.ComparisonId))
+                    {
+                        var vm = new HypothesisViewModel();
+                        HypothesesViewModel.HypothesisViewModels.Add(vm);
+                        _comparisonIdToHypothesisViewModels.Add(res.ComparisonId, vm);
+                    }
                 }
-                statOpModel.StatisticalComparisonDecisionOperationModel.ModelId = statOpModel.ModelId;
-                statOpModel.StatisticalComparisonDecisionOperationModel.ComparisonId = res.ComparisonId;
-                statOpModel.StatisticalComparisonDecisionOperationModel.RiskControlType = _riskOperationModel.RiskControlType;
-                _mainModel.QueryExecuter.ExecuteOperationModel(statOpModel.StatisticalComparisonDecisionOperationModel);
             }
         } 
 
         private void StatisticalComparisonDecisionOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var statDesOpModel = (StatisticalComparisonDecisionOperationModel)sender;
-            if (e.PropertyName == statDesOpModel.GetPropertyName(() => statDesOpModel.Result))
+            if (e.PropertyName == statDesOpModel.GetPropertyName(() => statDesOpModel.Result) && statDesOpModel.Result != null)
             {
-                _statisticalComparisionToHypothesisViewModels[statDesOpModel.Parent].GetDecisionResult = statDesOpModel.Result as GetDecisionResult;
+                var des = ((GetDecisionsResult) statDesOpModel.Result).Decisions.FirstOrDefault(d => d.ComparisonId != null && d.ComparisonId.Equals(statDesOpModel.ComparisonId));
+                _comparisonIdToHypothesisViewModels[statDesOpModel.ComparisonId].Decision = des;
             }
         }
 
         private void StatisticalComparisonOperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
-            var model = (OperationModel) sender;
-            MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model);
+            var model = (StatisticalComparisonOperationModel) sender;
+            if (model.StatisticallyComparableOperationModels.Count == 2 && !(e is BrushOperationModelUpdatedEventArgs))
+            {
+                model.ComparisonOrder = _nextComparisonOrder++;
+                MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model);
+            }
         }
 
         public void AddStatisticalComparisonOperationModel(StatisticalComparisonOperationModel model)
         {
             model.ModelId = _riskOperationModel.ModelId;
-            model.ComparisonOrder = _nextComparisonOrder++;
-
-
-            // do this only after results comes back 
-            var vm = new HypothesisViewModel();
-            HypothesesViewModel.HypothesisViewModels.Add(vm);
-            _statisticalComparisionToHypothesisViewModels.Add(model, vm);
-            //
 
             model.OperationModelUpdated += StatisticalComparisonOperationModel_OperationModelUpdated;
             model.PropertyChanged += StatisticalComparisonOperationModel_PropertyChanged;
@@ -101,7 +108,8 @@ namespace PanoramicDataWin8.controller.view
 
         public void RemoveStatisticalComparisonOperationModel(StatisticalComparisonOperationModel model)
         {
-
+            model.OperationModelUpdated -= StatisticalComparisonOperationModel_OperationModelUpdated;
+            model.PropertyChanged -= StatisticalComparisonOperationModel_PropertyChanged;
         }
 
         private void _riskOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
