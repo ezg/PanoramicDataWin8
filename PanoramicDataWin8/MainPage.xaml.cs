@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using Windows.Devices.Input;
@@ -37,13 +36,16 @@ namespace PanoramicDataWin8
     public sealed partial class MainPage : Page
     {
         private readonly Dictionary<uint, FrameworkElement> _deviceRenderings = new Dictionary<uint, FrameworkElement>();
+        private readonly PointerManager _mainPointerManager = new PointerManager();
+        private readonly DispatcherTimer _messageTimer = new DispatcherTimer();
 
         private TileMenuItemView _attributeMenu;
-        private TileMenuItemView _operationMenu;
+
+        private MenuView _hypothesisMenuView;
+        private MenuViewModel _hypothesisMenuViewModel;
         private double _length = 1;
-        private readonly PointerManager _mainPointerManager = new PointerManager();
         private Point _mainPointerManagerPreviousPoint;
-        private readonly DispatcherTimer _messageTimer = new DispatcherTimer();
+        private TileMenuItemView _operationMenu;
 
         public MainPage()
         {
@@ -214,11 +216,27 @@ namespace PanoramicDataWin8
         {
             var ancestors = (e.OriginalSource as FrameworkElement).GetAncestors();
             if (!ancestors.Contains(addAttributeButton) && !ancestors.Contains(menuGrid))
+            {
                 if (_attributeMenu != null)
+                {
                     ((TileMenuItemViewModel) _attributeMenu.DataContext).AreChildrenExpanded = false;
+                }
+            }
             if (!ancestors.Contains(addOperationButton) && !ancestors.Contains(menuGrid))
+            {
                 if (_operationMenu != null)
-                    ((TileMenuItemViewModel)_operationMenu.DataContext).AreChildrenExpanded = false;
+                {
+                    ((TileMenuItemViewModel) _operationMenu.DataContext).AreChildrenExpanded = false;
+                }
+            }
+
+            if (!ancestors.Contains(hypothesisButton) && !ancestors.Contains(_hypothesisMenuView))
+            {
+                if (_hypothesisMenuView != null)
+                {
+                    _hypothesisMenuViewModel.IsDisplayed = false;
+                }
+            }
         }
 
         private void MainPage_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
@@ -252,11 +270,11 @@ namespace PanoramicDataWin8
 
             _mainPointerManager.Added += mainPointerManager_Added;
             _mainPointerManager.Moved += mainPointerManager_Moved;
-            _mainPointerManager.Removed += mainPointerManager_Removed; 
+            _mainPointerManager.Removed += mainPointerManager_Removed;
             _mainPointerManager.Attach(MainViewController.Instance.InkableScene);
-            
+
             HypothesesViewController.CreateInstance(MainViewController.Instance.MainModel);
-            HypothesesView hypothesesView = new HypothesesView();
+            var hypothesesView = new HypothesesView();
             hypothesesView.DataContext = HypothesesViewController.Instance.HypothesesViewModel;
             hypothesisGrid.Children.Add(hypothesesView);
 
@@ -271,9 +289,13 @@ namespace PanoramicDataWin8
             {
                 FrameworkElement cnv = null;
                 if (e.Pointer.PointerDeviceType == PointerDeviceType.Pen)
+                {
                     cnv = createPen();
+                }
                 else
+                {
                     cnv = createFinger();
+                }
                 _deviceRenderings.Add(e.Pointer.PointerId, cnv);
                 var pos = e.GetCurrentPoint(fingerAndPenCanvas).Position;
                 (cnv.RenderTransform as TranslateTransform).X = pos.X;
@@ -296,6 +318,7 @@ namespace PanoramicDataWin8
         private void InkableScene_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
             if (MainViewController.Instance.MainModel.RenderFingersAndPen)
+            {
                 if (_deviceRenderings.ContainsKey(e.Pointer.PointerId))
                 {
                     var ell = _deviceRenderings[e.Pointer.PointerId];
@@ -303,6 +326,7 @@ namespace PanoramicDataWin8
                     (ell.RenderTransform as TranslateTransform).X = pos.X;
                     (ell.RenderTransform as TranslateTransform).Y = pos.Y;
                 }
+            }
         }
 
         private FrameworkElement createFinger()
@@ -450,18 +474,16 @@ namespace PanoramicDataWin8
             }
         }
 
-        private MenuView _hypothesisMenuView = null;
-        private MenuViewModel _hypothesisMenuViewModel = null;
-
         private void hypothesisButton_Click(object sender, RoutedEventArgs e)
         {
             if (_hypothesisMenuView == null)
             {
-                _hypothesisMenuViewModel = new MenuViewModel()
+                _hypothesisMenuViewModel = new MenuViewModel
                 {
                     AttachmentOrientation = AttachmentOrientation.Left,
                     NrColumns = 5,
-                    NrRows = 4
+                    NrRows = 4,
+                    MoveOnHide = true
                 };
 
                 var sliderItem = new MenuItemViewModel
@@ -485,10 +507,7 @@ namespace PanoramicDataWin8
                     Value = 500,
                     MinValue = 1,
                     MaxValue = 1000,
-                    Formatter = (d) =>
-                    {
-                        return Math.Round(d/100.0, 1).ToString("F2") + "%";
-                    }
+                    Formatter = d => { return Math.Round(d/100.0, 1).ToString("F2") + "%"; }
                 };
                 attr1.PropertyChanged += (sender2, args) =>
                 {
@@ -521,7 +540,7 @@ namespace PanoramicDataWin8
                     var toggleMenuItem = new MenuItemViewModel
                     {
                         MenuViewModel = _hypothesisMenuViewModel,
-                        Row = count % 4,
+                        Row = count%4,
                         RowSpan = 0,
                         Position = new Pt(menuHypothesisGrid.ActualWidth, 0),
                         Column = col,
@@ -532,20 +551,24 @@ namespace PanoramicDataWin8
                     var toggle = new ToggleMenuItemComponentViewModel
                     {
                         Label = riskCtrlType.ToString(),
-                        IsChecked = HypothesesViewController.Instance.RiskOperationModel.RiskControlType == riskCtrlType,
+                        IsChecked = HypothesesViewController.Instance.RiskOperationModel.RiskControlType == riskCtrlType
                     };
                     toggles.Add(toggle);
                     toggleMenuItem.MenuItemComponentViewModel = toggle;
                     toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender2, args2) =>
                     {
-                         var model = sender2 as ToggleMenuItemComponentViewModel;
-                         if (args2.PropertyName == model.GetPropertyName(() => model.IsChecked))
-                             if (model.IsChecked)
-                             {
-                                 HypothesesViewController.Instance.RiskOperationModel.RiskControlType = riskCtrlType;
-                                 foreach (var tg in model.OtherToggles)
-                                     tg.IsChecked = false;
-                             }
+                        var model = sender2 as ToggleMenuItemComponentViewModel;
+                        if (args2.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                        {
+                            if (model.IsChecked)
+                            {
+                                HypothesesViewController.Instance.RiskOperationModel.RiskControlType = riskCtrlType;
+                                foreach (var tg in model.OtherToggles)
+                                {
+                                    tg.IsChecked = false;
+                                }
+                            }
+                        }
                     };
                     _hypothesisMenuViewModel.MenuItemViewModels.Add(toggleMenuItem);
                     items.Add(toggleMenuItem);
@@ -557,18 +580,21 @@ namespace PanoramicDataWin8
                 }
 
                 foreach (var mi in items)
+                {
                     (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
+                }
 
-                if (_hypothesisMenuView !=null)
+                if (_hypothesisMenuView != null)
                 {
                     menuHypothesisGrid.Children.Remove(_hypothesisMenuView);
                 }
 
-                _hypothesisMenuView = new MenuView()
+                _hypothesisMenuView = new MenuView
                 {
                     DataContext = _hypothesisMenuViewModel
                 };
                 _hypothesisMenuViewModel.AnkerPosition = new Pt(menuHypothesisGrid.ActualWidth, -((_hypothesisMenuViewModel.NrRows - 1)*50 + (_hypothesisMenuViewModel.NrRows - 1)*4));
+                _hypothesisMenuViewModel.HidePosition = new Pt(menuHypothesisGrid.ActualWidth, 54);
                 menuHypothesisGrid.Children.Add(_hypothesisMenuView);
             }
 
@@ -620,7 +646,9 @@ namespace PanoramicDataWin8
                                     tileMenuItemViewModel.Row);
                     count++;
                     if (count == 8.0)
+                    {
                         count = 0;
+                    }
                 }
 
                 _attributeMenu = new TileMenuItemView {MenuCanvas = menuCanvas, DataContext = parentModel};
@@ -665,7 +693,9 @@ namespace PanoramicDataWin8
                     //currentTileMenuItemViewModel.Children.Add(childTileMenu);
                     count++;
                     if (count == 8.0)
+                    {
                         count = 0;
+                    }
                 }
             }
             else if (inputModel is AttributeFieldModel)
@@ -707,7 +737,9 @@ namespace PanoramicDataWin8
                     //currentTileMenuItemViewModel.Children.Add(childTileMenu);
                     count++;
                     if (count == 8.0)
+                    {
                         count = 0;
+                    }
                 }
             }
             else if (inputModel is OperationTypeModel)
@@ -727,41 +759,41 @@ namespace PanoramicDataWin8
 
         private void addOperationButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_operationMenu != null && ((TileMenuItemViewModel)_operationMenu.DataContext).AreChildrenExpanded)
+            if ((_operationMenu != null) && ((TileMenuItemViewModel) _operationMenu.DataContext).AreChildrenExpanded)
             {
-                ((TileMenuItemViewModel)_operationMenu.DataContext).AreChildrenExpanded = false;
+                ((TileMenuItemViewModel) _operationMenu.DataContext).AreChildrenExpanded = false;
             }
-            else if (_operationMenu != null && !((TileMenuItemViewModel)_operationMenu.DataContext).AreChildrenExpanded)
+            else if ((_operationMenu != null) && !((TileMenuItemViewModel) _operationMenu.DataContext).AreChildrenExpanded)
             {
-                ((TileMenuItemViewModel)_operationMenu.DataContext).AreChildrenExpanded = true;
+                ((TileMenuItemViewModel) _operationMenu.DataContext).AreChildrenExpanded = true;
             }
             else if (_operationMenu == null)
             {
-                MainModel mainModel = (DataContext as MainModel);
+                var mainModel = DataContext as MainModel;
                 var buttonBounds = addOperationButton.GetBounds(this);
                 var taskModels =
                     mainModel.OperationTypeModels;
 
                 if (_operationMenu != null)
                 {
-                    ((TileMenuItemViewModel)_operationMenu.DataContext).AreChildrenExpanded = false;
-                    ((TileMenuItemViewModel)_operationMenu.DataContext).IsBeingRemoved = true;
+                    ((TileMenuItemViewModel) _operationMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel) _operationMenu.DataContext).IsBeingRemoved = true;
                     _operationMenu.Dispose();
                     menuCanvas.Children.Remove(_operationMenu);
                 }
 
-                TileMenuItemViewModel parentModel = new TileMenuItemViewModel(null);
-                parentModel.ChildrenNrColumns = (int)Math.Ceiling(taskModels.Count() / 8.0);
-                parentModel.ChildrenNrRows = (int)Math.Min(8.0, taskModels.Count());
+                var parentModel = new TileMenuItemViewModel(null);
+                parentModel.ChildrenNrColumns = (int) Math.Ceiling(taskModels.Count()/8.0);
+                parentModel.ChildrenNrRows = (int) Math.Min(8.0, taskModels.Count());
                 parentModel.Alignment = Alignment.Center;
                 parentModel.AttachPosition = AttachPosition.Right;
 
-                int count = 0;
+                var count = 0;
                 foreach (var inputModel in taskModels)
                 {
-                    TileMenuItemViewModel tileMenuItemViewModel = recursiveCreateTileMenu(inputModel, parentModel);
+                    var tileMenuItemViewModel = recursiveCreateTileMenu(inputModel, parentModel);
                     tileMenuItemViewModel.Row = count;
-                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int)Math.Floor((parentModel.Children.Count - 1) / 8.0) - 1;
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor((parentModel.Children.Count - 1)/8.0) - 1;
                     tileMenuItemViewModel.RowSpan = 1;
                     tileMenuItemViewModel.ColumnSpan = 1;
                     Debug.WriteLine(inputModel.Name + " c: " + tileMenuItemViewModel.Column + " r : " + tileMenuItemViewModel.Row);
@@ -772,11 +804,11 @@ namespace PanoramicDataWin8
                     }
                 }
 
-                _operationMenu = new TileMenuItemView { MenuCanvas = menuCanvas, DataContext = parentModel };
+                _operationMenu = new TileMenuItemView {MenuCanvas = menuCanvas, DataContext = parentModel};
                 menuCanvas.Children.Add(_operationMenu);
 
-                parentModel.CurrentPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
-                parentModel.TargetPosition = new Pt(-(buttonBounds.Width), buttonBounds.Top);
+                parentModel.CurrentPosition = new Pt(-buttonBounds.Width, buttonBounds.Top);
+                parentModel.TargetPosition = new Pt(-buttonBounds.Width, buttonBounds.Top);
                 parentModel.Size = new Vec(buttonBounds.Width, buttonBounds.Height);
                 parentModel.AreChildrenExpanded = true;
             }

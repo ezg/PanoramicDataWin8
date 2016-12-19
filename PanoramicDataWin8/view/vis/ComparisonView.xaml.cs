@@ -296,7 +296,7 @@ namespace PanoramicDataWin8.view.vis
             
             _model.Position =
                 (((left.Bounds.Center.GetVec() + new Vec(left.Size.X / 2.0, 0)) +
-                  (right.Bounds.Center.GetVec() - new Vec(right.Size.X / 2.0, 0))) / 2.0 - _model.Size / 2.0).GetWindowsPoint();
+                  (right.Bounds.Center.GetVec() - new Vec(right.Size.X / 2.0, 0))) / 2.0 - _model.Size / 2.0 - new Vec(25, 0)).GetWindowsPoint();
         }
 
     }

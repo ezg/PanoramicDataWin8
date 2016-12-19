@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using IDEA_common.operations.risk;
 using PanoramicDataWin8.model.view.operation;
@@ -7,19 +8,12 @@ namespace PanoramicDataWin8.model.data.operation
 {
     public class StatisticalComparisonDecisionOperationModel : OperationModel
     {
-        private ComparisonId _comparisonId;
+        private List<ComparisonId> _comparisonIds = new List<ComparisonId>();
         private ModelId _modelId;
-        private StatisticalComparisonOperationModel _parent;
         private RiskControlType _riskControlType = RiskControlType.PCER;
 
         public StatisticalComparisonDecisionOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
-        }
-
-        public StatisticalComparisonOperationModel Parent
-        {
-            get { return _parent; }
-            set { SetProperty(ref _parent, value); }
         }
 
         public ModelId ModelId
@@ -29,10 +23,10 @@ namespace PanoramicDataWin8.model.data.operation
         }
 
 
-        public ComparisonId ComparisonId
+        public List<ComparisonId> ComparisonIds
         {
-            get { return _comparisonId; }
-            set { SetProperty(ref _comparisonId, value); }
+            get { return _comparisonIds; }
+            set { SetProperty(ref _comparisonIds, value); }
         }
 
 

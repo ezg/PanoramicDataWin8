@@ -66,16 +66,16 @@ namespace PanoramicDataWin8.view
                 pValueTB.Text = _model.Decision.PValue.ToString("F3");
                 if (_model.Decision.Significance)
                 {
-                    mainGrid.Background = _rejectedBrush;
+                    backgroundGrid.Background = _rejectedBrush;
                 }
                 else
                 {
-                    mainGrid.Background = _acceptedBrush;
+                    backgroundGrid.Background = _acceptedBrush;
                 }
             }
             else
             {
-                mainGrid.BorderBrush = _lightBrush;
+                backgroundGrid.BorderBrush = _lightBrush;
             }
         }
     }

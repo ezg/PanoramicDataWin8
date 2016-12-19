@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using IDEA_common.operations.risk;
+using IDEA_common.util;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 
@@ -60,10 +61,9 @@ namespace PanoramicDataWin8.controller.view
                     {
                         statOpModel.StatisticalComparisonDecisionOperationModel = new StatisticalComparisonDecisionOperationModel(statOpModel.SchemaModel);
                         statOpModel.StatisticalComparisonDecisionOperationModel.PropertyChanged += StatisticalComparisonDecisionOperationModel_PropertyChanged;
-                        statOpModel.StatisticalComparisonDecisionOperationModel.Parent = statOpModel;
                     }
                     statOpModel.StatisticalComparisonDecisionOperationModel.ModelId = statOpModel.ModelId;
-                    statOpModel.StatisticalComparisonDecisionOperationModel.ComparisonId = res.ComparisonId;
+                    statOpModel.StatisticalComparisonDecisionOperationModel.ComparisonIds = res.ComparisonId.Yield().ToList();
                     statOpModel.StatisticalComparisonDecisionOperationModel.RiskControlType = _riskOperationModel.RiskControlType;
                     _mainModel.QueryExecuter.ExecuteOperationModel(statOpModel.StatisticalComparisonDecisionOperationModel);
 
@@ -82,8 +82,10 @@ namespace PanoramicDataWin8.controller.view
             var statDesOpModel = (StatisticalComparisonDecisionOperationModel)sender;
             if (e.PropertyName == statDesOpModel.GetPropertyName(() => statDesOpModel.Result) && statDesOpModel.Result != null)
             {
-                var des = ((GetDecisionsResult) statDesOpModel.Result).Decisions.FirstOrDefault(d => d.ComparisonId != null && d.ComparisonId.Equals(statDesOpModel.ComparisonId));
-                _comparisonIdToHypothesisViewModels[statDesOpModel.ComparisonId].Decision = des;
+                foreach (var decision in ((GetDecisionsResult) statDesOpModel.Result).Decisions)
+                {
+                    _comparisonIdToHypothesisViewModels[decision.ComparisonId].Decision = decision;
+                }
             }
         }
 
@@ -112,11 +114,32 @@ namespace PanoramicDataWin8.controller.view
             model.PropertyChanged -= StatisticalComparisonOperationModel_PropertyChanged;
         }
 
+        public void ClearAllStatisticalComparison()
+        {
+            foreach(var ci in _comparisonIdToHypothesisViewModels.Keys.ToArray())
+            {
+                HypothesesViewModel.HypothesisViewModels.Remove(_comparisonIdToHypothesisViewModels[ci]);
+                _comparisonIdToHypothesisViewModels.Remove(ci);
+            }
+        }
+
         private void _riskOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == _riskOperationModel.GetPropertyName(() => _riskOperationModel.Result) && _riskOperationModel.Result != null)
             {
                 _riskOperationModel.ModelId = ((NewModelOperationResult) _riskOperationModel.Result).ModelId;
+            }
+            else if (e.PropertyName == _riskOperationModel.GetPropertyName(() => _riskOperationModel.RiskControlType))
+            {
+                var comparisonIds = _comparisonIdToHypothesisViewModels.Keys.ToList();
+
+                var opModel = new StatisticalComparisonDecisionOperationModel(_riskOperationModel.SchemaModel);
+                opModel.PropertyChanged += StatisticalComparisonDecisionOperationModel_PropertyChanged;
+
+                opModel.ModelId = _riskOperationModel.ModelId;
+                opModel.ComparisonIds = comparisonIds;
+                opModel.RiskControlType = _riskOperationModel.RiskControlType;
+                _mainModel.QueryExecuter.ExecuteOperationModel(opModel);
             }
         }
     }

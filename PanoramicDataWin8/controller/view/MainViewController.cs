@@ -158,6 +158,7 @@ namespace PanoramicDataWin8.controller.view
                 MainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
                 MainModel.SampleSize = datasetConfiguration.SampleSize;
                 MainModel.QueryExecuter = new IDEAQueryExecuter();
+                HypothesesViewController.Instance.ClearAllStatisticalComparison();
                 ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel = new IDEAOriginModel(datasetConfiguration);
                 ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel.LoadInputFields();
             }

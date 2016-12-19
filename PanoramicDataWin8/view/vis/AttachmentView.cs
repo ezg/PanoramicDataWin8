@@ -88,7 +88,7 @@ namespace PanoramicDataWin8.view.vis
 
         public void Dispose()
         {
-            if (_menuViewModel != null && !_menuViewModel.IsToBeRemoved)
+            if (_menuViewModel != null)
             {
                 MainViewController.Instance.InkableScene.Remove(_menuView);
             }

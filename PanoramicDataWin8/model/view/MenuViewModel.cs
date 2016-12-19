@@ -8,6 +8,8 @@ namespace PanoramicDataWin8.model.view
     {
         private Pt _ankerPosition;
 
+        private Pt _hidePosition;
+
         private AttachmentOrientation _attachmentOrientation;
 
         private AttachmentViewModel _attachmentViewModel;
@@ -16,7 +18,7 @@ namespace PanoramicDataWin8.model.view
 
         private bool _isDisplayed;
 
-        private bool _isToBeRemoved;
+        private bool _moveOnHide = false;
 
         private ObservableCollection<MenuItemViewModel> _menuItemViewModels = new ObservableCollection<MenuItemViewModel>();
 
@@ -29,6 +31,14 @@ namespace PanoramicDataWin8.model.view
             get { return _menuItemViewModels; }
             set { SetProperty(ref _menuItemViewModels, value); }
         }
+        
+
+        public Pt HidePosition
+        {
+            get { return _hidePosition; }
+            set { SetProperty(ref _hidePosition, value); }
+        }
+
 
         public Pt AnkerPosition
         {
@@ -54,10 +64,10 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _nrRows, value); }
         }
 
-        public bool IsToBeRemoved
+        public bool MoveOnHide
         {
-            get { return _isToBeRemoved; }
-            set { SetProperty(ref _isToBeRemoved, value); }
+            get { return _moveOnHide; }
+            set { SetProperty(ref _moveOnHide, value); }
         }
 
         public AttachmentOrientation AttachmentOrientation

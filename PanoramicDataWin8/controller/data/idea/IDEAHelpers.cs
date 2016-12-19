@@ -38,10 +38,9 @@ namespace PanoramicDataWin8.controller.data.progressive
             var getDecisionsParameters = new GetDecisionsParameters()
             {
                 ModelId = model.ModelId,
-                ComparisonIds = model.ComparisonId.Yield().ToList(),
+                ComparisonIds = model.ComparisonIds,
                 RiskControlType = model.RiskControlType
             };
-            Debug.WriteLine(getDecisionsParameters.ComparisonIds.FirstOrDefault());
             return getDecisionsParameters;
         }
 

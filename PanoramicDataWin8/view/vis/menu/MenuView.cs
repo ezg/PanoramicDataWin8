@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Shapes;
 using GeoAPI.Geometries;
+using Microsoft.Practices.Prism.Mvvm;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.view.inq;
 
@@ -186,6 +187,21 @@ namespace PanoramicDataWin8.view.vis.menu
             var model = (DataContext as MenuViewModel);
             if (e.PropertyName == model.GetPropertyName(() => model.IsDisplayed))
             {
+                if (model.MoveOnHide)
+                {
+                    if (model.IsDisplayed)
+                    {
+                        updateRendering();
+                    }
+                    else
+                    {
+                        foreach (var m in model.MenuItemViewModels)
+                        {
+                            m.TargetPosition = model.HidePosition;
+                        }
+
+                    }
+                }
                 toggleDisplayed();
             }
             else if (e.PropertyName == model.GetPropertyName(() => model.AnkerPosition))
@@ -226,7 +242,7 @@ namespace PanoramicDataWin8.view.vis.menu
         private void updateRendering()
         {
             MenuViewModel model = (DataContext as MenuViewModel);
-            if (!model.IsToBeRemoved)
+           
             {
                 if (model.AttachmentOrientation == AttachmentOrientation.Left)
                 {
