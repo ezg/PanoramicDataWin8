@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using IDEA_common.operations.risk;
 using IDEA_common.util;
+using Newtonsoft.Json;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 
@@ -14,6 +15,7 @@ namespace PanoramicDataWin8.controller.view
     {
         private readonly RiskOperationModel _riskOperationModel;
         private readonly Dictionary<ComparisonId, HypothesisViewModel> _comparisonIdToHypothesisViewModels = new Dictionary<ComparisonId, HypothesisViewModel>();
+        private readonly Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel> _modelToSaveViewModel = new Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel>();
         private MainModel _mainModel = null;
         private static int _nextComparisonOrder = 0;
 
@@ -47,7 +49,7 @@ namespace PanoramicDataWin8.controller.view
         {
             Instance = new HypothesesViewController(mainModel);
         }
-        
+
 
         private void StatisticalComparisonOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
@@ -70,16 +72,24 @@ namespace PanoramicDataWin8.controller.view
                     if (!_comparisonIdToHypothesisViewModels.ContainsKey(res.ComparisonId))
                     {
                         var vm = new HypothesisViewModel();
+                        vm.StatisticalComparisonSaveViewModel = _modelToSaveViewModel[statOpModel];
+                        vm.ViewOrdering = HypothesesViewModel.HypothesisViewModels.Count == 0 ? 0 : HypothesesViewModel.HypothesisViewModels.Max(h => h.ViewOrdering) + 1;
                         HypothesesViewModel.HypothesisViewModels.Add(vm);
                         _comparisonIdToHypothesisViewModels.Add(res.ComparisonId, vm);
                     }
+                    else
+                    {
+                        _comparisonIdToHypothesisViewModels[res.ComparisonId].ViewOrdering = HypothesesViewModel.HypothesisViewModels.Count == 0
+                            ? 0
+                            : HypothesesViewModel.HypothesisViewModels.Max(h => h.ViewOrdering) + 1;
+                    }
                 }
             }
-        } 
+        }
 
         private void StatisticalComparisonDecisionOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var statDesOpModel = (StatisticalComparisonDecisionOperationModel)sender;
+            var statDesOpModel = (StatisticalComparisonDecisionOperationModel) sender;
             if (e.PropertyName == statDesOpModel.GetPropertyName(() => statDesOpModel.Result) && statDesOpModel.Result != null)
             {
                 foreach (var decision in ((GetDecisionsResult) statDesOpModel.Result).Decisions)
@@ -95,6 +105,24 @@ namespace PanoramicDataWin8.controller.view
             if (model.StatisticallyComparableOperationModels.Count == 2 && !(e is BrushOperationModelUpdatedEventArgs))
             {
                 model.ComparisonOrder = _nextComparisonOrder++;
+                _modelToSaveViewModel[model] = new StatisticalComparisonSaveViewModel();
+
+                var filter = "";
+                var filterModels = new List<FilterModel>();
+                filter = FilterModel.GetFilterModelsRecursive(model.StatisticallyComparableOperationModels[0], new List<IFilterProviderOperationModel>(), filterModels, true);
+                _modelToSaveViewModel[model].FilterDist0 = filter;
+
+                filter = "";
+                filterModels = new List<FilterModel>();
+                filter = FilterModel.GetFilterModelsRecursive(model.StatisticallyComparableOperationModels[1], new List<IFilterProviderOperationModel>(), filterModels, true);
+                _modelToSaveViewModel[model].FilterDist1 = filter;
+
+
+                var tt = JsonConvert.SerializeObject(model);
+                _modelToSaveViewModel[model].SaveJson = tt;
+
+
+
                 MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model);
             }
         }
@@ -116,7 +144,7 @@ namespace PanoramicDataWin8.controller.view
 
         public void ClearAllStatisticalComparison()
         {
-            foreach(var ci in _comparisonIdToHypothesisViewModels.Keys.ToArray())
+            foreach (var ci in _comparisonIdToHypothesisViewModels.Keys.ToArray())
             {
                 HypothesesViewModel.HypothesisViewModels.Remove(_comparisonIdToHypothesisViewModels[ci]);
                 _comparisonIdToHypothesisViewModels.Remove(ci);

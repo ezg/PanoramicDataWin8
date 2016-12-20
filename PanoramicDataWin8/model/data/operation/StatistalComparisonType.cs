@@ -5,4 +5,10 @@
         histogram,
         distribution
     }
+
+    public enum TestType
+    {
+        chi2,
+        ttest
+    }
 }

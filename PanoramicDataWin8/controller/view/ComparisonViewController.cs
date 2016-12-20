@@ -99,7 +99,7 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        private void checkOpenOrCloseComparisionModels(bool dropped = false)
+        private void checkOpenOrCloseComparisonModels(bool dropped = false)
         {
             // views that need to be opened or closed
             foreach (var comparisonViewModel in StatisticalComparisonViews.Keys.ToList())
@@ -169,7 +169,7 @@ namespace PanoramicDataWin8.controller.view
 
         private void operationViewMovingTimer_Tick(object sender, object e)
         {
-            checkOpenOrCloseComparisionModels();
+            checkOpenOrCloseComparisonModels();
         }
 
         private double boundHorizontalDistance(Rct b1, Rct b2)

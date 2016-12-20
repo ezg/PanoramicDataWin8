@@ -39,9 +39,10 @@ namespace PanoramicDataWin8.model.data.operation
 
     public class StatisticalComparisonOperationModel : OperationModel
     {
-        private int _comparisionOrder = -1;
+        private int _comparisonOrder = -1;
         private ModelId _modelId;
         private StatistalComparisonType _statistalComparisonType = StatistalComparisonType.histogram;
+        private TestType _testType = TestType.chi2;
         private StatisticalComparisonDecisionOperationModel _statisticalComparisonDecisionOperationModel;
 
 
@@ -98,8 +99,8 @@ namespace PanoramicDataWin8.model.data.operation
 
         public int ComparisonOrder
         {
-            get { return _comparisionOrder; }
-            set { SetProperty(ref _comparisionOrder, value); }
+            get { return _comparisonOrder; }
+            set { SetProperty(ref _comparisonOrder, value); }
         }
 
         public ModelId ModelId
@@ -108,6 +109,15 @@ namespace PanoramicDataWin8.model.data.operation
             set { SetProperty(ref _modelId, value); }
         }
 
+        public TestType TestType
+        {
+            get { return _testType; }
+            set
+            {
+                SetProperty(ref _testType, value);
+                FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+            }
+        }
 
         public ObservableCollection<IStatisticallyComparableOperationModel> StatisticallyComparableOperationModels
         {

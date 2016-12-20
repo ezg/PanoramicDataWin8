@@ -77,6 +77,20 @@ namespace PanoramicDataWin8.view
             {
                 backgroundGrid.BorderBrush = _lightBrush;
             }
+
+            if (_model.IsExpanded)
+            {
+                pLabelTB.Visibility = Visibility.Visible;
+                pValueTB.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                pLabelTB.Visibility = Visibility.Collapsed;
+                pValueTB.Visibility = Visibility.Collapsed;
+            }
+
+            tbDist0.Text = _model.StatisticalComparisonSaveViewModel.FilterDist0;
+            tbDist1.Text = _model.StatisticalComparisonSaveViewModel.FilterDist1;
         }
     }
 }

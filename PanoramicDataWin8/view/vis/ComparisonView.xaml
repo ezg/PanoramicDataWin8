@@ -19,10 +19,16 @@
             <RowDefinition Height="*"></RowDefinition>
             <RowDefinition Height="*"></RowDefinition>
         </Grid.RowDefinitions>
-        <Canvas Grid.RowSpan="2">
-            <Rectangle Name="brushRectangle"></Rectangle>
-        </Canvas>
-        <TextBlock Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Name="tbPValue" Text="" FontSize="28" Foreground="{StaticResource darkBrush}" Margin="0,0,0,5"/>
-        <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="top" Name="tbDValue" Text="" FontSize="28" Foreground="{StaticResource darkBrush}" Margin="0,5,0,0"/>
+        <Grid Name="mainGrid" Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+        
+            <TextBlock Name="pLabelTB" FontSize="16" Text="p" Foreground="{StaticResource darkBrush}"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
+            <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Name="tbPValue" Text="" FontSize="11" Foreground="{StaticResource darkBrush}"/>
+        </Grid>
+        
+        <Canvas Grid.Row="1" Name="menuCanvas"></Canvas>
     </Grid>
 </UserControl>

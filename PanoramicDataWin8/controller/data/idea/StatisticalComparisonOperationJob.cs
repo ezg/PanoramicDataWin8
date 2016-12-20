@@ -15,7 +15,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             }
             else if (model.StatistalComparisonType == StatistalComparisonType.histogram)
             {
-                OperationParameters = IDEAHelpers.GetAddGoodnessOfFitComparisonOperationParameters((StatisticalComparisonOperationModel) operationModel.ResultCauserClone, sampleSize);
+                OperationParameters = IDEAHelpers.GetAddComparisonOperationParameters((StatisticalComparisonOperationModel) operationModel.ResultCauserClone, sampleSize);
             }
         }
     }

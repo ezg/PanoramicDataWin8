@@ -4,10 +4,39 @@ using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
 {
+
+    public class StatisticalComparisonSaveViewModel : ExtendedBindableBase
+    {
+        private string _filterDist0 = "";
+        private string _filterDist1 = "";
+        private string _saveJson = "";
+
+
+        public string FilterDist0
+        {
+            get { return _filterDist0; }
+            set { SetProperty(ref _filterDist0, value); }
+        }
+
+        public string FilterDist1
+        {
+            get { return _filterDist1; }
+            set { SetProperty(ref _filterDist1, value); }
+        }
+
+        public string SaveJson
+        {
+            get { return _saveJson; }
+            set { SetProperty(ref _saveJson, value); }
+        }
+    }
+
+
     public class HypothesisViewModel : ExtendedBindableBase
     {
-        public static double DefaultHeight = 50;
-        public static double ExpandedWidth = 150;
+        public static double DefaultSize = 15;
+        public static double ExpandedHeigth = 50;
+        public static double ExpandedWidth = 200;
         private static readonly Random random = new Random();
         private static int nextId = 0;
 
@@ -23,11 +52,15 @@ namespace PanoramicDataWin8.model.view
 
         private Pt _position = new Pt(0, 0);
 
-        private Vec _size = new Vec(50, DefaultHeight);
+        private Vec _size = new Vec(DefaultSize, DefaultSize);
 
         private Pt _targetPosition = new Pt(0, 0);
 
-        private Vec _targetSize = new Vec(50, DefaultHeight);
+        private Vec _targetSize = new Vec(DefaultSize, DefaultSize);
+
+        private int _viewOrdering = -1;
+
+        private StatisticalComparisonSaveViewModel _statisticalComparisonSaveViewModel = null;
 
 
         public HypothesisViewModel()
@@ -41,10 +74,23 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _decision, value); }
         }
 
+
+        public StatisticalComparisonSaveViewModel StatisticalComparisonSaveViewModel
+        {
+            get { return _statisticalComparisonSaveViewModel; }
+            set { SetProperty(ref _statisticalComparisonSaveViewModel, value); }
+        }
+
         public Vec TargetSize
         {
             get { return _targetSize; }
             set { SetProperty(ref _targetSize, value); }
+        }
+
+        public int ViewOrdering
+        {
+            get { return _viewOrdering; }
+            set { SetProperty(ref _viewOrdering, value); }
         }
 
         public Pt TargetPosition

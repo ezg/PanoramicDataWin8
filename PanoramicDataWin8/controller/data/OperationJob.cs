@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using IDEA_common.operations;
+using IDEA_common.operations.risk;
 using Newtonsoft.Json;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.model.data.attribute;

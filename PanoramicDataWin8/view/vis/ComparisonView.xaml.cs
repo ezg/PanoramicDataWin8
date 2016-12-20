@@ -14,12 +14,15 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
+using IDEA_common.operations.risk;
+using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
+using PanoramicDataWin8.view.vis.menu;
 using WinRTXamlToolkit.Tools;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
@@ -31,6 +34,9 @@ namespace PanoramicDataWin8.view.vis
         private StatisticalComparisonOperationViewModel _model = null;
         private Storyboard _pulsingOpeningStoryboard = null;
         private Storyboard _closingStoryboard = null;
+
+        private MenuViewModel _menuViewModel = null;
+        private MenuView _menuView = null;
 
         public ComparisonView()
         {
@@ -64,148 +70,112 @@ namespace PanoramicDataWin8.view.vis
             if (_model != null)
             {
                 _model.PropertyChanged -= _model_PropertyChanged;
+                _model.StatisticalComparisonOperationModel.PropertyChanged -= StatisticalComparisonOperationModel_PropertyChanged;
                 foreach (var vis in _model.OperationViewModels)
                 {
                     vis.PropertyChanged -= VisModel_PropertyChanged;
-                    vis.OperationModel.PropertyChanged -= QueryModel_PropertyChanged;
                 }
             }
             if (args.NewValue != null)
             {
                 _model = (StatisticalComparisonOperationViewModel)args.NewValue;
                 _model.PropertyChanged += _model_PropertyChanged;
+                _model.StatisticalComparisonOperationModel.PropertyChanged += StatisticalComparisonOperationModel_PropertyChanged;
                 foreach (var vis in _model.OperationViewModels)
                 {
                     vis.PropertyChanged += VisModel_PropertyChanged;
-                    vis.OperationModel.PropertyChanged += QueryModel_PropertyChanged;
                 }
                 updateRendering();
-                updateResult();
-            }
-        }
 
-        private void QueryModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            HistogramOperationModel model = (sender as HistogramOperationModel);
-            if (e.PropertyName == model.GetPropertyName(() => model.Result))
-            {
-                updateResult();
-            }
-        }
-        
-        private void updateResult()
-        {
-            /*var res1 = _model.OperationViewModels[0].OperationModel.Result.ResultDescriptionModel as VisualizationResultDescriptionModel;
-            var res2 = _model.OperationViewModels[1].OperationModel.Result.ResultDescriptionModel as VisualizationResultDescriptionModel;
-
-            if (res1 != null && res2 != null)
-            {
-                var dim = _model.OperationViewModels[0].OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).First();
-                if (_model.OperationViewModels[1].OperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any(i => i.AttributeModel == dim.AttributeModel))
+                if (_menuView == null)
                 {
-                    var n1 = res1.OverallCount[dim.AttributeModel.RawName];
-                    var n2 = res2.OverallCount[dim.AttributeModel.RawName];
-                    var m1 = res1.OverallMeans[dim.AttributeModel.RawName];
-                    var m2 = res2.OverallMeans[dim.AttributeModel.RawName];
-                    var v1 = Math.Sqrt(res1.OverallSampleStandardDeviations[dim.AttributeModel.RawName]);
-                    var v2 = Math.Sqrt(res2.OverallSampleStandardDeviations[dim.AttributeModel.RawName]);
-
-                    var df = Math.Min(n1, n2);
-                    var t = (m1 - m2)/Math.Sqrt((v1/n1) + (v2/n2));
-                    var p = tToP(t, df);
-
-                    var r = Math.Sqrt((t * t) / ((t * t) + (df * 1)));
-                    var d = (t * 2) / (Math.Sqrt(df));
-
-                    if (p < 0.001)
+                   _menuViewModel = new MenuViewModel
                     {
-                        tbPValue.Text = "p < 0.001";
-                    }
-                    else if (p < 0.01)
+                        AttachmentOrientation = AttachmentOrientation.Bottom,
+                        NrColumns = 2,
+                        NrRows = 1
+                    };
+                    var toggles = new List<ToggleMenuItemComponentViewModel>();
+                    var items = new List<MenuItemViewModel>();
+                    TestType[] types = new TestType[] {TestType.chi2,  TestType.ttest};
+                    int count = 0;
+                    foreach (var type in types)
                     {
-                        tbPValue.Text = "p < 0.01";
+                        var toggleMenuItem = new MenuItemViewModel
+                        {
+                            MenuViewModel = _menuViewModel,
+                            Row = 0,
+                            RowSpan = 0,
+                            Position = new Pt(0, 0),
+                            Column = count,
+                            Size = new Vec(35.5, 35.5),
+                            TargetSize = new Vec(35.5, 35.5)
+                        };
+                        //toggleMenuItem.Position = attachmentItemViewModel.Position;
+                        var toggle = new ToggleMenuItemComponentViewModel
+                        {
+                            Label = type.ToString(),
+                            IsChecked = _model.StatisticalComparisonOperationModel.TestType == type
+                        };
+                        toggles.Add(toggle);
+                        toggleMenuItem.MenuItemComponentViewModel = toggle;
+                        toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender2, args2) =>
+                        {
+                            var model = sender2 as ToggleMenuItemComponentViewModel;
+                            if (args2.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                            {
+                                if (model.IsChecked)
+                                {
+                                    _model.StatisticalComparisonOperationModel.TestType = type;
+                                    foreach (var tg in model.OtherToggles)
+                                    {
+                                        tg.IsChecked = false;
+                                    }
+                                }
+                            }
+                        };
+                        _menuViewModel.MenuItemViewModels.Add(toggleMenuItem);
+                        items.Add(toggleMenuItem);
+                        count++;
                     }
-                    else if (p < 0.05)
+                    foreach (var mi in items)
                     {
-                        tbPValue.Text = "p < 0.05";
+                        (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
                     }
-                    else if (p >= 0.05)
-                    {
-                        tbPValue.Text = "p > 0.05";
-                    }
-                    tbPValue.FontSize = 16;
 
-                    tbDValue.Text = "d = " + Math.Abs(d).ToString("F2");
-                    tbDValue.FontSize = 16;
+                    _menuView = new MenuView()
+                    {
+                        DataContext = _menuViewModel
+                    };
+                    menuCanvas.Children.Add(_menuView);
+                    _menuViewModel.IsDisplayed = true;
+
                 }
-            }*/
+            }
         }
 
-        private double tToP(double t, double df)
+        private void StatisticalComparisonOperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var abst = Math.Abs(t);
-            var tsq = t*t;
-            var p = 0.0;
-            if (df == 1)
+            var model = (StatisticalComparisonOperationModel) sender;
+            if (e.PropertyName == model.GetPropertyName(() => model.StatisticalComparisonDecisionOperationModel) &&  model.StatisticalComparisonDecisionOperationModel != null)
             {
-                p = 1 - 2.0*Math.Atan(abst)/Math.PI;
+                model.StatisticalComparisonDecisionOperationModel.PropertyChanged += StatisticalComparisonDecisionOperationModel_PropertyChanged;
             }
-            else if (df == 2)
-                p = 1 - abst/Math.Sqrt(tsq + 2);
-            else if (df == 3)
-                p = 1 - 2*(Math.Atan(abst/Math.Sqrt(3)) + abst*Math.Sqrt(3)/(tsq + 3))/Math.PI;
-            else if (df == 4)
-                p = 1 - abst*(1 + 2/(tsq + 4))/Math.Sqrt(tsq + 4);
-            else
-            {
-                var z = tToZ(abst, df);
-                if (df > 4)
-                    p = normP(z);
-            }
-            return p;
         }
 
-        private double tToZ(double t, double df)
+        private void StatisticalComparisonDecisionOperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            var A9 = df - 0.5;
-            var B9 = 48*A9*A9;
-            var T9 = t*t/df;
-            var Z8 = 0.0;
-            var P7 = 0.0;
-            var B7 = 0.0;
-            var z = 0.0;
-
-            if (T9 >= 0.04)
-                Z8 = A9*Math.Log(1 + T9);
-            else
+            var model = (StatisticalComparisonDecisionOperationModel) sender;
+            if (e.PropertyName == model.GetPropertyName(() => model.Result) && model.Result != null)
             {
-                Z8 = A9*(((1 - T9*0.75)*T9/3 - 0.5)*T9 + 1)*T9;
+                updateRendering();
             }
-            P7 = ((0.4 * Z8 + 3.3) * Z8 + 24) * Z8 + 85.5;
-            B7 = 0.8 * Math.Pow(Z8, 2) + 100 + B9;
-            z = (1 + (-P7 / B7 + Z8 + 3) / B9) * Math.Sqrt(Z8);
-            return z;
-        }
-
-        private double normP(double z)
-        {
-            var absz = Math.Abs(z);
-            var a1 = 0.0000053830;
-            var a2 = 0.0000488906;
-            var a3 = 0.0000380036;
-            var a4 = 0.0032776263;
-            var a5 = 0.0211410061;
-            var a6 = 0.0498673470;
-            var p = (((((a1*absz + a2)*absz + a3)*absz + a4)*absz + a5)*absz + a6)*absz + 1;
-            p = Math.Pow(p, -16);
-            return p;
         }
 
         private void VisModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             updateRendering();
         }
-
 
         void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
@@ -267,8 +237,7 @@ namespace PanoramicDataWin8.view.vis
             }
             updateRendering();
         }
-
-
+        
 
         private void updateRendering()
         {
@@ -287,16 +256,31 @@ namespace PanoramicDataWin8.view.vis
             var lineFrom = (new Pt(left.Bounds.Right, left.Bounds.Center.Y) - _model.Position).GetWindowsPoint();
             var lineTo = (new Pt(right.Bounds.Left, right.Bounds.Center.Y) - _model.Position).GetWindowsPoint();
 
-            _model.Size = new Vec(100,100);
-            var size = 100;
-            brushRectangle.Width = size;
-            brushRectangle.Height = size;
-            brushRectangle.Fill = Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush;
-            brushRectangle.RenderTransform = new TranslateTransform() { X = 0 };
+            var size = 75;
+            _model.Size = new Vec(size, size);
+
+
+            mainGrid.Background = Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush;
             
             _model.Position =
                 (((left.Bounds.Center.GetVec() + new Vec(left.Size.X / 2.0, 0)) +
                   (right.Bounds.Center.GetVec() - new Vec(right.Size.X / 2.0, 0))) / 2.0 - _model.Size / 2.0 - new Vec(25, 0)).GetWindowsPoint();
+
+
+            var getDeciRes = _model.StatisticalComparisonOperationModel?.StatisticalComparisonDecisionOperationModel?.Result as GetDecisionsResult;
+            if (getDeciRes != null)
+            {
+                var firstDescision = getDeciRes.Decisions.FirstOrDefault();
+                if (firstDescision.Significance)
+                {
+                    mainGrid.Background = Application.Current.Resources.MergedDictionaries[0]["rejectBrush"] as SolidColorBrush;
+                }
+                else
+                {
+                    mainGrid.Background = Application.Current.Resources.MergedDictionaries[0]["acceptBrush"] as SolidColorBrush;
+                }
+                tbPValue.Text = firstDescision.PValue.ToString("F3");
+            }
         }
 
     }

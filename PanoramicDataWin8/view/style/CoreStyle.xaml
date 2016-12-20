@@ -7,7 +7,10 @@
     <SolidColorBrush x:Key="lightBrush">#e6e6e6</SolidColorBrush>
     <SolidColorBrush x:Key="highlightBrush">#29aad5</SolidColorBrush>
     <SolidColorBrush x:Key="backgroundBrush">#ffffff</SolidColorBrush>
-
+    <SolidColorBrush x:Key="acceptBrush">#fd5d4c</SolidColorBrush>
+    <SolidColorBrush x:Key="rejectBrush">#6bc565</SolidColorBrush>
+    
+    
     <Color x:Key="darkColor">#111111</Color>
     <Color x:Key="lightColor">#e6e6e6</Color>
     <Color x:Key="highlightColor">#29aad5</Color>

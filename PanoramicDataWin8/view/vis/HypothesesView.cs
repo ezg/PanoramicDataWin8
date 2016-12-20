@@ -55,7 +55,7 @@ namespace PanoramicDataWin8.view.vis
         {
             foreach (var hypo in _hypothesesViewModel.HypothesisViewModels)
             {
-                hypo.TargetSize = new Vec(HypothesisViewModel.DefaultHeight, HypothesisViewModel.DefaultHeight);
+                hypo.TargetSize = new Vec(HypothesisViewModel.DefaultSize, HypothesisViewModel.DefaultSize);
                 hypo.IsExpanded = false;
             }
             updateRendering();
@@ -69,7 +69,7 @@ namespace PanoramicDataWin8.view.vis
 
         private void HypothesesView_ManipulationCompleted(object sender, Windows.UI.Xaml.Input.ManipulationCompletedRoutedEventArgs e)
         {
-            //var moveIndexBy = -Math.Floor(e.Cumulative.Translation.Y/(HypothesisViewModel.DefaultHeight + GAP));
+            //var moveIndexBy = -Math.Floor(e.Cumulative.Translation.Y/(HypothesisViewModel.DefaultSize + GAP));
             //_lastVisibleIndex += (int) moveIndexBy;
             //updateRendering();
             updateRendering();
@@ -79,9 +79,9 @@ namespace PanoramicDataWin8.view.vis
         private void HypothesesView_ManipulationDelta(object sender, Windows.UI.Xaml.Input.ManipulationDeltaRoutedEventArgs e)
         {
             //_currentCumulativeDelta += e.Delta.Translation.Y;
-            var moveIndexBy = Math.Floor(e.Cumulative.Translation.Y / (HypothesisViewModel.DefaultHeight + GAP));
+            var moveIndexBy = Math.Floor(e.Cumulative.Translation.Y / (HypothesisViewModel.DefaultSize + GAP));
             
-            //_currentCumulativeDelta -= moveIndexBy*(HypothesisViewModel.DefaultHeight + GAP);
+            //_currentCumulativeDelta -= moveIndexBy*(HypothesisViewModel.DefaultSize + GAP);
 
             var current = _lastVisibleIndex;
             updateLastVisibleIndex(_scrollStartLastIndex - (int) moveIndexBy);
@@ -93,7 +93,7 @@ namespace PanoramicDataWin8.view.vis
             }
             else
             {
-                var movePixelBy = e.Cumulative.Translation.Y + (_lastVisibleIndex - _scrollStartLastIndex) * (HypothesisViewModel.DefaultHeight + GAP);
+                var movePixelBy = e.Cumulative.Translation.Y + (_lastVisibleIndex - _scrollStartLastIndex) * (HypothesisViewModel.DefaultSize + GAP);
                 //Debug.WriteLine(movePixelBy);
                 //Debug.WriteLine(_lastVisibleIndex);
                 //Debug.WriteLine(_scrollStartLastIndex);
@@ -216,33 +216,35 @@ namespace PanoramicDataWin8.view.vis
 
         private void updateLastVisibleIndex(int newIndex)
         {
-            int elementsToShow = getElementsToShow();
-            IEnumerable<HypothesisViewModel> hypos = _hypothesesViewModel.HypothesisViewModels;
+            IEnumerable<HypothesisViewModel> hypos = _hypothesesViewModel.HypothesisViewModels.OrderBy(h => h.ViewOrdering);
+            int elementsToShow = getElementsToShow(hypos);
             _lastVisibleIndex = newIndex;
             _lastVisibleIndex = Math.Min(hypos.Count() - 1, _lastVisibleIndex);
             _lastVisibleIndex = Math.Max(elementsToShow - 1, _lastVisibleIndex);
         }
 
-        private int getElementsToShow()
+        private int getElementsToShow(IEnumerable<HypothesisViewModel> hypos)
         {
-            IEnumerable<HypothesisViewModel> hypos = _hypothesesViewModel.HypothesisViewModels;
-            int elementsToShow = (int)Math.Floor(this.ActualHeight / (HypothesisViewModel.DefaultHeight + GAP));
+            int elementsToShow = (int)Math.Floor(this.ActualHeight / (HypothesisViewModel.DefaultSize + GAP));
             elementsToShow = Math.Min(elementsToShow, hypos.Count());
             return elementsToShow;
         }
 
         private void updateRendering()
         {
-            IEnumerable<HypothesisViewModel> hypos = _hypothesesViewModel.HypothesisViewModels;
+            IEnumerable<HypothesisViewModel> hypos = _hypothesesViewModel.HypothesisViewModels.OrderBy(h => h.ViewOrdering);
 
-            int elementsToShow = getElementsToShow();
+            int elementsToShow = getElementsToShow(hypos);
 
             double currentX = 0;
-            double currentY = this.ActualHeight - (elementsToShow * HypothesisViewModel.DefaultHeight + (elementsToShow -1) * GAP);
+            var s = hypos.Skip(Math.Max(0, hypos.Count() - elementsToShow)).Sum(h => h.TargetSize.Y);
+
+            double currentY = this.ActualHeight - (s + (elementsToShow -1) * GAP);
             int hiddenElementsTop = Math.Max(_lastVisibleIndex - elementsToShow + 1, 0);
             if (hiddenElementsTop > 0)
             {
-                currentY = currentY - (hiddenElementsTop*HypothesisViewModel.DefaultHeight + (hiddenElementsTop)*GAP);
+                s = hypos.Take(hiddenElementsTop).Sum(h => h.TargetSize.Y);
+                currentY = currentY - (s + (hiddenElementsTop)*GAP);
             }
 
             var count = 0;
@@ -275,22 +277,8 @@ namespace PanoramicDataWin8.view.vis
                 }
                 hypo.TargetPosition = new Pt(currentX + this.ActualWidth - hypo.TargetSize.X, currentY);
                 hypo.DeltaTargetPosition = new Pt(0, 0);
-                currentY += GAP + hypo.Size.Y;
+                currentY += GAP + hypo.TargetSize.Y;
                 count++;
-            }
-
-            foreach (var hypo in hypos)
-            {
-                
-            }
-
-            
-           
-            foreach (var hypo in hypos)
-            {
-                //hypo.TargetPosition = new Pt(currentX + this.ActualWidth - hypo.Size.X - GAP, currentY);
-                //currentY += GAP + hypo.Size.Y;
-                    
             }
         }                           
 
@@ -314,6 +302,7 @@ namespace PanoramicDataWin8.view.vis
                 foreach (var item in e.OldItems)
                 {
                     var hypo = (HypothesisViewModel) item;
+                    hypo.PropertyChanged -= Hypo_PropertyChanged;
                     
                     if (_views.ContainsKey(hypo))
                     {
@@ -327,7 +316,8 @@ namespace PanoramicDataWin8.view.vis
             {
                 foreach (var item in e.NewItems)
                 {
-                    var hypo = (HypothesisViewModel) item; 
+                    var hypo = (HypothesisViewModel) item;
+                    hypo.PropertyChanged += Hypo_PropertyChanged;
                     hypo.Position = new Pt(this.ActualWidth, this.ActualHeight + hypo.Size.Y);
                     var v = new HypothesisView();
                     v.DataContext = hypo;
@@ -344,17 +334,26 @@ namespace PanoramicDataWin8.view.vis
             updateRendering();
         }
 
+        private void Hypo_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var statDesOpModel = (HypothesisViewModel)sender;
+            if (e.PropertyName == statDesOpModel.GetPropertyName(() => statDesOpModel.ViewOrdering))
+            {
+                updateRendering();
+            }
+        }
+
         private void hypothesisView_Tapped(object sender, TappedRoutedEventArgs e)
         {
             HypothesisView view = (HypothesisView) sender;
             var hypo = (HypothesisViewModel) view.DataContext;
             if (hypo.IsExpanded)
             {
-                hypo.TargetSize = new Vec(HypothesisViewModel.DefaultHeight, HypothesisViewModel.DefaultHeight);
+                hypo.TargetSize = new Vec(HypothesisViewModel.DefaultSize, HypothesisViewModel.DefaultSize);
             }
             else
             {
-                hypo.TargetSize = new Vec(HypothesisViewModel.ExpandedWidth, HypothesisViewModel.DefaultHeight);
+                hypo.TargetSize = new Vec(HypothesisViewModel.ExpandedWidth, HypothesisViewModel.ExpandedHeigth);
             }
             hypo.IsExpanded = !hypo.IsExpanded;
             updateRendering();

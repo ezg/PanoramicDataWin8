@@ -17,18 +17,31 @@ namespace PanoramicDataWin8.controller.data.progressive
 {
     public static class IDEAHelpers
     {
-        public static AddComparisonParameters GetAddGoodnessOfFitComparisonOperationParameters(StatisticalComparisonOperationModel model, int sampleSize)
+        public static AddComparisonParameters GetAddComparisonOperationParameters(StatisticalComparisonOperationModel model, int sampleSize)
         {
             var addComparison = new AddComparisonParameters
             {
                 ComparisonOrder = model.ComparisonOrder,
-                ModelId = model.ModelId,
-                Comparison = new GoodnessOfFitComparison
+                ModelId = model.ModelId
+            };
+
+            if (model.TestType == TestType.chi2)
+            {
+                addComparison.Comparison = new GoodnessOfFitComparison
                 {
                     Dist0 = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
                     Dist1 = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize),
-                },
-            };
+                };
+            }
+            else if (model.TestType == TestType.ttest)
+            {
+                addComparison.Comparison = new MeanDifferenceComparison()
+                {
+                    Dist0 = GetEmpiricalDistOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
+                    Dist1 = GetEmpiricalDistOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize),
+                };
+            }
+
             return addComparison;
         }
 
@@ -59,6 +72,28 @@ namespace PanoramicDataWin8.controller.data.progressive
                 DummyValue = model.DummyValue,
                 ExampleType = model.ExampleOperationType.ToString(),
                 SampleStreamBlockSize = sampleSize
+            };
+            return parameters;
+        }
+
+        public static EmpiricalDistOperationParameters GetEmpiricalDistOperationParameters(HistogramOperationModel model, int sampleSize)
+        {
+            var psm = model.SchemaModel as IDEASchemaModel;
+            var filter = "";
+            var filterModels = new List<FilterModel>();
+            filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
+            
+            var xIom = model.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+            var yIom = model.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
+            
+
+            var parameters = new EmpiricalDistOperationParameters()
+            {
+                AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
+                Filter = filter,
+                Attrs = new[] { xIom, yIom }.Select(a => a.AttributeModel.RawName).Distinct().ToList(),
+                SampleStreamBlockSize = sampleSize,
+                KeepSamples = false
             };
             return parameters;
         }

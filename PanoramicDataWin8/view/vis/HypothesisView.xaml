@@ -21,11 +21,28 @@
                 <RowDefinition Height="*"></RowDefinition>
                 <RowDefinition Height="*"></RowDefinition>
             </Grid.RowDefinitions>
-            <TextBlock FontSize="16" Text="p" Foreground="{StaticResource darkBrush}"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
-            <TextBlock Name="pValueTB" FontSize="11" Text="0.001"  Foreground="{StaticResource darkBrush}"  HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="1"/>
+            <TextBlock Name="pLabelTB" Visibility="Collapsed" FontSize="16" Text="p" Foreground="{StaticResource darkBrush}"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
+            <TextBlock Name="pValueTB" Visibility="Collapsed" FontSize="11" Text="0.001"  Foreground="{StaticResource darkBrush}"  HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="1"/>
 
         </Grid>
         <Grid Column="1" Name="detailGrid" Background="{StaticResource lightBrush}">
+            <Grid  Margin="3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"></ColumnDefinition>
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="H0: " FontSize="11" Grid.Column="0" Grid.Row="0" Foreground="{StaticResource darkBrush}" VerticalAlignment="Center"/>
+                <TextBlock Text="H1: " FontSize="11" Grid.Column="0" Grid.Row="1"  Foreground="{StaticResource darkBrush}" VerticalAlignment="Center"/>
+
+                <TextBlock Name="tbDist0" Text="" FontSize="11" Grid.Column="1" Grid.Row="0" Foreground="{StaticResource darkBrush}" VerticalAlignment="Center"/>
+                <TextBlock Name="tbDist1" Text="" FontSize="11" Grid.Column="1" Grid.Row="1"  Foreground="{StaticResource darkBrush}" VerticalAlignment="Center"/>
+            </Grid>
         </Grid>
     </Grid>
 </UserControl>
