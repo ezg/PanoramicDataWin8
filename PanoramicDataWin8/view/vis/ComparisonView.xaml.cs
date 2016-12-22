@@ -128,6 +128,7 @@ namespace PanoramicDataWin8.view.vis
                                 if (model.IsChecked)
                                 {
                                     _model.StatisticalComparisonOperationModel.TestType = type;
+                                    _model.StatisticalComparisonOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                                     foreach (var tg in model.OtherToggles)
                                     {
                                         tg.IsChecked = false;

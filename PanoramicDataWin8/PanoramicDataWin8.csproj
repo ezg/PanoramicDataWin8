@@ -200,6 +200,7 @@
     <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="model\view\operation\OperationViewModel.cs" />
     <Compile Include="model\view\SliderMenuItemComponentViewModel.cs" />
+    <Compile Include="model\view\StatisticalComparisonMenuItemViewModel.cs" />
     <Compile Include="model\view\tilemenu\Alignment.cs" />
     <Compile Include="model\view\tilemenu\AttachPosition.cs" />
     <Compile Include="model\view\tilemenu\InputFieldViewTileMenuContentViewModel.cs" />
@@ -287,6 +288,9 @@
     </Compile>
     <Compile Include="view\vis\menu\AttributeTransformationMenuItemView.xaml.cs">
       <DependentUpon>AttributeTransformationMenuItemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\menu\StatisticalComparisonMenuItemView.xaml.cs">
+      <DependentUpon>StatisticalComparisonMenuItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\menu\ToggleMenuItemView.xaml.cs">
       <DependentUpon>ToggleMenuItemView.xaml</DependentUpon>
@@ -429,6 +433,10 @@
     <Page Include="view\vis\menu\AttributeTransformationMenuItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="view\vis\menu\StatisticalComparisonMenuItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\vis\menu\ToggleMenuItemView.xaml">
       <SubType>Designer</SubType>

@@ -39,7 +39,7 @@ namespace PanoramicDataWin8.model.data.operation
             set
             {
                 SetProperty(ref _includeDistribution, value);
-                _host.FireOperationModelUpdated(new VisualOperationModelUpdatedEventArgs());
+               // _host.FireOperationModelUpdated(new VisualOperationModelUpdatedEventArgs());
             }
         }
     }

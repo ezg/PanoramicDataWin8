@@ -91,7 +91,7 @@
             </Button>
         </Grid>
 
-            <TextBlock Name="msgTextBlock" Text="" HorizontalAlignment="Right" VerticalAlignment="Bottom" Foreground="{StaticResource darkBrush}" Margin="10" Opacity="0"/>
+        <TextBlock Name="msgTextBlock" Text="" HorizontalAlignment="Left" VerticalAlignment="Bottom" Foreground="{StaticResource darkBrush}" Margin="10" Opacity="0"/>
 
         <Grid Name="codeGrid" Visibility="Collapsed">
             <RichEditBox Name="editBox"/>

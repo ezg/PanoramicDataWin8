@@ -11,12 +11,13 @@ using IDEA_common.util;
 using Newtonsoft.Json;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.model.view.operation;
+using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.controller.view
 {
     public class HypothesesViewController
     {
-        private readonly DispatcherTimer _operationViewMovingTimer = new DispatcherTimer();
         private readonly RiskOperationModel _riskOperationModel;
         private readonly Dictionary<ComparisonId, HypothesisViewModel> _comparisonIdToHypothesisViewModels = new Dictionary<ComparisonId, HypothesisViewModel>();
         private readonly Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel> _modelToSaveViewModel = new Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel>();
@@ -24,22 +25,99 @@ namespace PanoramicDataWin8.controller.view
         private static int _nextComparisonOrder = 0;
 
 
-        private HypothesesViewController(MainModel mainModel)
+        private HypothesesViewController(MainModel mainModel, ObservableCollection<OperationViewModel> operationViewModel)
         {
             _riskOperationModel = new RiskOperationModel(null);
             _riskOperationModel.PropertyChanged += _riskOperationModel_PropertyChanged;
             _mainModel = mainModel;
             _mainModel.PropertyChanged += MainModel_PropertyChanged;
-
-            _operationViewMovingTimer.Interval = TimeSpan.FromSeconds(2);
-            _operationViewMovingTimer.Tick += operationViewMovingTimer_Tick;
-            //_operationViewMovingTimer.Start();
+            operationViewModel.CollectionChanged += OperationViewModels_CollectionChanged;
+        }
+        private void OperationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.OldItems != null)
+            {
+                foreach (var opViewModel in e.OldItems.OfType<OperationViewModel>())
+                {
+                    if (opViewModel.OperationModel is HistogramOperationModel)
+                    {
+                        opViewModel.OperationModel.OperationModelUpdated -= OperationModel_OperationModelUpdated;
+                    }
+                }
+            }
+            if (e.NewItems != null)
+            {
+                foreach (var opViewModel in e.NewItems.OfType<OperationViewModel>())
+                {
+                    if (opViewModel.OperationModel is HistogramOperationModel)
+                    {
+                        opViewModel.OperationModel.OperationModelUpdated += OperationModel_OperationModelUpdated;
+                    }
+                }
+            }
         }
 
-        // periodically update all decisions
-        private void operationViewMovingTimer_Tick(object sender, object e)
+        private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
-            getAllDecisions();
+            if (_mainModel.IsDefaultHypothesisEnabled)
+            {
+                var model = sender as HistogramOperationModel;
+
+                var filter = "";
+                var filterModels = new List<FilterModel>();
+                filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
+
+                if (!filterModels.Any())
+                {
+                    if (model.StatisticalComparisonOperationModel != null)
+                    {
+                        RemoveStatisticalComparisonOperationModel(model.StatisticalComparisonOperationModel);
+                        model.StatisticalComparisonOperationModel = null;
+                    }
+                }
+                else
+                {
+                    bool anyComparison = false;
+                    foreach (var statisticalComparisonOperationViewModel in ComparisonViewController.Instance.StatisticalComparisonViews.Keys)
+                    {
+                        foreach (var ovm in statisticalComparisonOperationViewModel.OperationViewModels)
+                        {
+                            if (ovm.OperationModel == model)
+                            {
+                                anyComparison = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!anyComparison)
+                    {
+                        StatisticalComparisonOperationModel statModel = model.StatisticalComparisonOperationModel;
+                        bool add = false;
+                        if (model.StatisticalComparisonOperationModel == null)
+                        {
+                            statModel = new StatisticalComparisonOperationModel(model.SchemaModel);
+                            model.StatisticalComparisonOperationModel = statModel;
+                            add = true;
+                        }
+                        foreach (var m in statModel.StatisticallyComparableOperationModels.ToArray())
+                        {
+                            statModel.RemoveStatisticallyComparableOperationModel(m);
+                        }
+                        statModel.AddStatisticallyComparableOperationModel(model);
+                        statModel.AddStatisticallyComparableOperationModel(
+                            OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(
+                                model.SchemaModel,
+                                model.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel, new Pt()).HistogramOperationModel);
+
+
+                        if (add)
+                        {
+                            this.AddStatisticalComparisonOperationModel(statModel);
+                        }
+                    }
+                }
+            }
         }
 
         private void MainModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -59,9 +137,9 @@ namespace PanoramicDataWin8.controller.view
 
         public HypothesesViewModel HypothesesViewModel { get; } = new HypothesesViewModel();
 
-        public static void CreateInstance(MainModel mainModel)
+        public static void CreateInstance(MainModel mainModel, ObservableCollection<OperationViewModel> operationViewModel)
         {
-            Instance = new HypothesesViewController(mainModel);
+            Instance = new HypothesesViewController(mainModel, operationViewModel);
         }
 
 
@@ -82,17 +160,17 @@ namespace PanoramicDataWin8.controller.view
                     }
                     
                     _comparisonIdToHypothesisViewModels[res.ComparisonId].Decision = res.Decision[_riskOperationModel.RiskControlType];
-                    Debug.WriteLine(statOpModel.ExecutionId + ", " + statOpModel.ResultExecutionId);
+                    //Debug.WriteLine(statOpModel.ExecutionId + ", " + statOpModel.ResultExecutionId);
                     if (statOpModel.ExecutionId == statOpModel.ResultExecutionId)
                     {
                         statOpModel.Decision = res.Decision[_riskOperationModel.RiskControlType];
-                        _comparisonIdToHypothesisViewModels[res.ComparisonId].ViewOrdering = HypothesesViewModel.HypothesisViewModels.Count == 0
-                            ? 0
-                            : HypothesesViewModel.HypothesisViewModels.Max(h => h.ViewOrdering) + 1;
-                    }
-                    else
-                    {
-                        
+                        if (HypothesesViewModel.HypothesisViewModels.Any())
+                        {
+                            if (HypothesesViewModel.HypothesisViewModels.Max(h => h.ViewOrdering) >= _comparisonIdToHypothesisViewModels[res.ComparisonId].ViewOrdering)
+                            {
+                                _comparisonIdToHypothesisViewModels[res.ComparisonId].ViewOrdering = HypothesesViewModel.HypothesisViewModels.Max(h => h.ViewOrdering) + 1;
+                            }
+                        }
                     }
                 }
             }

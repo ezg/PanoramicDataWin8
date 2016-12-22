@@ -8,6 +8,7 @@ using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.utils;
+using PanoramicDataWin8.view.vis.menu;
 
 namespace PanoramicDataWin8.model.view.operation
 {
@@ -38,6 +39,105 @@ namespace PanoramicDataWin8.model.view.operation
             return null;
         }
 
+        private static void createRightHistogramMenu(HistogramOperationViewModel histogramOperationViewModel)
+        {
+            var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+            var menuViewModel = new MenuViewModel
+            {
+                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
+                NrColumns = 2,
+                NrRows = 2
+            };
+
+            histogramOperationViewModel.HistogramOperationModel.PropertyChanged += (sender, args) =>
+            {
+                var model = histogramOperationViewModel.HistogramOperationModel;
+                if (args.PropertyName == model.GetPropertyName(() => model.StatisticalComparisonOperationModel))
+                {
+                    if (model.StatisticalComparisonOperationModel == null)
+                    {
+                        foreach (var mvm in menuViewModel.MenuItemViewModels.ToArray())
+                        {
+                            menuViewModel.MenuItemViewModels.Remove(mvm);
+                        }
+                    }
+                    else
+                    {
+                        var menuItem = new MenuItemViewModel
+                        {
+                            MenuViewModel = menuViewModel,
+                            Row = 0,
+                            ColumnSpan = 1,
+                            RowSpan = 2,
+                            Column = 0,
+                            Size = new Vec(54, 54),
+                            Position = histogramOperationViewModel.Position,
+                            TargetSize = new Vec(54, 54),
+                            IsAlwaysDisplayed = true
+                        };
+                        var attr1 = new StatisticalComparisonMenuItemViewModel
+                        {
+                            StatisticalComparisonOperationModel = model.StatisticalComparisonOperationModel
+                        };
+
+                        menuItem.MenuItemComponentViewModel = attr1;
+                        menuViewModel.MenuItemViewModels.Add(menuItem);
+
+                        var toggles = new List<ToggleMenuItemComponentViewModel>();
+                        var items = new List<MenuItemViewModel>();
+                        TestType[] types = new TestType[] { TestType.chi2, TestType.ttest };
+                        int count = 0;
+                        foreach (var type in types)
+                        {
+                            var toggleMenuItem = new MenuItemViewModel
+                            {
+                                MenuViewModel = menuViewModel,
+                                Row = count,
+                                RowSpan = 0,
+                                Position = histogramOperationViewModel.Position,
+                                Column = 1,
+                                Size = new Vec(25, 25),
+                                TargetSize = new Vec(25, 25),
+                                IsAlwaysDisplayed = true
+                            };
+                            //toggleMenuItem.Position = attachmentItemViewModel.Position;
+                            var toggle = new ToggleMenuItemComponentViewModel
+                            {
+                                Label = type.ToString(),
+                                IsChecked = model.StatisticalComparisonOperationModel.TestType == type
+                            };
+                            toggles.Add(toggle);
+                            toggleMenuItem.MenuItemComponentViewModel = toggle;
+                            toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender2, args2) =>
+                            {
+                                var toogleModel = sender2 as ToggleMenuItemComponentViewModel;
+                                if (args2.PropertyName == model.GetPropertyName(() => toogleModel.IsChecked))
+                                {
+                                    if (toogleModel.IsChecked)
+                                    {
+                                        model.StatisticalComparisonOperationModel.TestType = type;
+                                        model.StatisticalComparisonOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+                                        foreach (var tg in toogleModel.OtherToggles)
+                                        {
+                                            tg.IsChecked = false;
+                                        }
+                                    }
+                                }
+                            };
+                            menuViewModel.MenuItemViewModels.Add(toggleMenuItem);
+                            items.Add(toggleMenuItem);
+                            count++;
+                        }
+                        foreach (var mi in items)
+                        {
+                            (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
+                        }
+                    }
+                }
+            };
+
+            attachmentViewModel.MenuViewModel = menuViewModel;
+        }
 
         private static void createAxisMenu(HistogramOperationViewModel histogramOperationViewModel, AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
@@ -181,6 +281,7 @@ namespace PanoramicDataWin8.model.view.operation
             // axis attachment view models
             createAxisMenu(histogramOperationViewModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
             createAxisMenu(histogramOperationViewModel, AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
+            createRightHistogramMenu(histogramOperationViewModel);
 
 
             if ((attributeModel != null) && attributeModel is AttributeFieldModel)

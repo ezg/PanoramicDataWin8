@@ -1,0 +1,23 @@
+﻿<UserControl
+    x:Class="PanoramicDataWin8.view.vis.menu.StatisticalComparisonMenuItemView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PanoramicDataWin8.view.vis.menu"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    FontFamily="{StaticResource abel}">
+
+    <Grid Width="{Binding Size.X}" Height="{Binding Size.Y}">
+        <Grid Column="0" Name="backgroundGrid" Background="{StaticResource lightBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="*"></RowDefinition>
+            </Grid.RowDefinitions>
+            <TextBlock Name="pLabelTB" Visibility="Collapsed" FontSize="16" Text="p" Foreground="{StaticResource darkBrush}"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
+            <TextBlock Name="pValueTB" Visibility="Collapsed" FontSize="11" Text="0.001"  Foreground="{StaticResource darkBrush}"  HorizontalAlignment="Center" VerticalAlignment="Top" Grid.Row="1"/>
+        </Grid>
+    </Grid>
+</UserControl>

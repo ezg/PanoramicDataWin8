@@ -25,6 +25,8 @@ namespace PanoramicDataWin8.model.data.operation
             _attributeUsageTransformationModels =
                 new Dictionary<AttributeUsage, ObservableCollection<AttributeTransformationModel>>();
 
+        private StatisticalComparisonOperationModel _statisticalComparisonOperationModel;
+
         private VisualizationType _visualizationType;
 
         public HistogramOperationModel(SchemaModel schemaModel) : base(schemaModel)
@@ -56,11 +58,20 @@ namespace PanoramicDataWin8.model.data.operation
             {
                 var retList = new List<AttributeTransformationModel>();
                 foreach (var key in _attributeUsageTransformationModels.Keys)
+                {
                     retList.AddRange(_attributeUsageTransformationModels[key]);
+                }
                 return retList;
             }
         }
+
         public int IExecutionId { get; set; } = 0;
+
+        public StatisticalComparisonOperationModel StatisticalComparisonOperationModel
+        {
+            get { return _statisticalComparisonOperationModel; }
+            set { SetProperty(ref _statisticalComparisonOperationModel, value); }
+        }
 
         public VisualizationType VisualizationType
         {
@@ -128,16 +139,22 @@ namespace PanoramicDataWin8.model.data.operation
             NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
+            {
                 foreach (var item in e.OldItems)
+                {
                     ((AttributeTransformationModel) item).PropertyChanged -=
                         AttributeTransformationModel_PropertyChanged;
+                }
+            }
             if (e.NewItems != null)
+            {
                 foreach (var item in e.NewItems)
                 {
                     ((AttributeTransformationModel) item).OperationModel = this;
                     ((AttributeTransformationModel) item).PropertyChanged +=
                         AttributeTransformationModel_PropertyChanged;
                 }
+            }
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
 
@@ -161,8 +178,12 @@ namespace PanoramicDataWin8.model.data.operation
         public void RemoveAttributeTransformationModel(AttributeTransformationModel attributeTransformationModel)
         {
             foreach (var key in _attributeUsageTransformationModels.Keys)
+            {
                 if (_attributeUsageTransformationModels[key].Any(aom => aom == attributeTransformationModel))
+                {
                     RemoveAttributeUsageTransformationModel(key, attributeTransformationModel);
+                }
+            }
         }
 
         public ObservableCollection<AttributeTransformationModel> GetAttributeUsageTransformationModel(

@@ -114,11 +114,7 @@ namespace PanoramicDataWin8.model.data.operation
         public TestType TestType
         {
             get { return _testType; }
-            set
-            {
-                SetProperty(ref _testType, value);
-                FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
-            }
+            set { SetProperty(ref _testType, value); }
         }
 
         public ObservableCollection<IStatisticallyComparableOperationModel> StatisticallyComparableOperationModels

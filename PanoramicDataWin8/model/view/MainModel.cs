@@ -35,6 +35,8 @@ namespace PanoramicDataWin8.model.view
 
         private bool _showCodeGen;
 
+        private bool _isDefaultHypothesisEnabled = true;
+
         private QueryExecuter _queryExecuter;
 
         private string _startDataset = "";
@@ -103,6 +105,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _throttleInMillis; }
             set { SetProperty(ref _throttleInMillis, value); }
+        }
+
+        public bool IsDefaultHypothesisEnabled
+        {
+            get { return _isDefaultHypothesisEnabled; }
+            set { SetProperty(ref _isDefaultHypothesisEnabled, value); }
         }
 
         public string StartDataset

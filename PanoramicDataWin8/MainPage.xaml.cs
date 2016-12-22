@@ -181,6 +181,15 @@ namespace PanoramicDataWin8
                     msgTextBlock.Opacity = 1;
                     _messageTimer.Start();
                 }
+                else if (e.Key == VirtualKey.H)
+                {
+                    MainViewController.Instance.MainModel.IsDefaultHypothesisEnabled = !MainViewController.Instance.MainModel.IsDefaultHypothesisEnabled;
+                    Debug.WriteLine("IsDefaultHypothesisEnabled : " + MainViewController.Instance.MainModel.IsDefaultHypothesisEnabled);
+
+                    msgTextBlock.Text = "IsDefaultHypothesisEnabled : " + MainViewController.Instance.MainModel.IsDefaultHypothesisEnabled;
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
+                }
                 if (e.Key == VirtualKey.T)
                 {
                     var q1 = new HistogramOperationModel(MainViewController.Instance.MainModel.SchemaModel);
@@ -194,10 +203,7 @@ namespace PanoramicDataWin8
 
                     var tt = q1.Clone();
                 }
-                else if (e.Key == VirtualKey.H)
-                {
-                    //HypothesesViewController.Instance.HypothesesViewModel.HypothesisViewModels.Add(new HypothesisViewModel());
-                }
+                
 
                 if (e.Key == VirtualKey.P)
                 {
@@ -273,7 +279,7 @@ namespace PanoramicDataWin8
             _mainPointerManager.Removed += mainPointerManager_Removed;
             _mainPointerManager.Attach(MainViewController.Instance.InkableScene);
 
-            HypothesesViewController.CreateInstance(MainViewController.Instance.MainModel);
+            HypothesesViewController.CreateInstance(MainViewController.Instance.MainModel, MainViewController.Instance.OperationViewModels);
             var hypothesesView = new HypothesesView();
             hypothesesView.DataContext = HypothesesViewController.Instance.HypothesesViewModel;
             hypothesisGrid.Children.Add(hypothesesView);
