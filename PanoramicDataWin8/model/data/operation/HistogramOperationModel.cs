@@ -60,6 +60,7 @@ namespace PanoramicDataWin8.model.data.operation
                 return retList;
             }
         }
+        public int IExecutionId { get; set; } = 0;
 
         public VisualizationType VisualizationType
         {

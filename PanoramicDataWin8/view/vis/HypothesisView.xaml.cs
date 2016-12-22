@@ -61,7 +61,7 @@ namespace PanoramicDataWin8.view
 
         private void updateRendering()
         {
-            if (_model.Decision != null)
+            if (_model.Decision != null && _model.Decision.Progress > 0)
             {
                 pValueTB.Text = _model.Decision.PValue.ToString("F3");
                 if (_model.Decision.Significance)

@@ -19,11 +19,13 @@ namespace PanoramicDataWin8.controller.data
         private readonly Stopwatch _stopWatch = new Stopwatch();
         private readonly TimeSpan _throttle;
         private bool _isRunning;
+        private int _executionId = -1;
 
         protected OperationJob(OperationModel operationModel, TimeSpan throttle)
         {
             OperationModel = operationModel;
             _throttle = throttle;
+            _executionId = operationModel.ResultCauserClone.ExecutionId;
         }
 
         public OperationModel OperationModel { get; set; }
@@ -58,12 +60,12 @@ namespace PanoramicDataWin8.controller.data
                     var result = await resultCommand.GetResult(OperationReference);
                     if (result != null)
                     {
-                        FireJobUpdated(new JobEventArgs {Result = result});
+                        FireJobUpdated(new JobEventArgs {Result = result, ResultExecutionId = _executionId });
 
                         if (result.Progress >= 1.0)
                         {
-                            Stop();
-                            FireJobCompleted(new JobEventArgs {Result = result});
+                            _isRunning = false;
+                            FireJobCompleted(new JobEventArgs {Result = result, ResultExecutionId = _executionId });
                         }
                     }
                     await Task.Delay(_throttle);

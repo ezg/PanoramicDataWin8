@@ -6,6 +6,7 @@ namespace PanoramicDataWin8.model.data.operation
     public interface IOperationModel : INotifyPropertyChanged
     {
         IResult Result { get; set; }
+        int ExecutionId { get; set; }
 
         IOperationModel ResultCauserClone { get; set; }
 

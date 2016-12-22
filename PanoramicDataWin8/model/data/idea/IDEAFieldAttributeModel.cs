@@ -1,4 +1,6 @@
-﻿using Newtonsoft.Json;
+﻿using System.Collections.Generic;
+using IDEA_common.catalog;
+using Newtonsoft.Json;
 using PanoramicDataWin8.model.data.attribute;
 
 namespace PanoramicDataWin8.model.data.idea
@@ -12,19 +14,29 @@ namespace PanoramicDataWin8.model.data.idea
 
         private string _rawName = "";
 
-        public IDEAFieldAttributeModel(string rawName, string displayName, int index, string inputDataType, string inputVisualizationType)
+        private List<VisualizationHint> _visualizationHints = new List<VisualizationHint>();
+
+        public IDEAFieldAttributeModel(string rawName, string displayName, int index, string inputDataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
         {
             _rawName = rawName;
             _displayName = displayName;
             InputDataType = inputDataType;
             InputVisualizationType = inputVisualizationType;
             _index = index;
+            _visualizationHints = visualizationHints;
         }
 
         public override string DisplayName
         {
             get { return _displayName; }
             set { SetProperty(ref _displayName, value); }
+        }
+
+
+        public override List<VisualizationHint> VisualizationHints
+        {
+            get { return _visualizationHints; }
+            set { SetProperty(ref _visualizationHints, value); }
         }
 
         public override int Index

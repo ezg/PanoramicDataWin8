@@ -51,7 +51,7 @@ namespace PanoramicDataWin8.model.data.idea
         {
             var fieldAttributeModel = new IDEAFieldAttributeModel(attribute.RawName, attribute.DisplayName, attribute.Index,
                 InputDataTypeConstants.FromDataType(attribute.DataType),
-                InputDataTypeConstants.FromDataType(attribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric");
+                InputDataTypeConstants.FromDataType(attribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric", attribute.VisualizationHints);
             fieldAttributeModel.OriginModel = this;
 
             if (parentGroupModel != null)

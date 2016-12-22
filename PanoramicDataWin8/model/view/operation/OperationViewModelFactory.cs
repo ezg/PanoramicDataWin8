@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using Windows.UI.Xaml.Media;
+using IDEA_common.catalog;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
@@ -198,8 +199,16 @@ namespace PanoramicDataWin8.model.view.operation
                     var y = new AttributeTransformationModel(inputFieldModel);
                     y.AggregateFunction = AggregateFunction.Count;
 
-                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
-                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.Y, y);
+                    if (attributeModel.VisualizationHints.Contains(VisualizationHint.DefaultFlipAxis))
+                    {
+                        histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, y);
+                        histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.Y, x);
+                    }
+                    else
+                    {
+                        histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
+                        histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.Y, y);
+                    }
                     histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
                 }
                 else if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
@@ -215,8 +224,16 @@ namespace PanoramicDataWin8.model.view.operation
                     var y = new AttributeTransformationModel(inputFieldModel);
                     y.AggregateFunction = AggregateFunction.Count;
 
-                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
-                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.Y, y);
+                    if (attributeModel.VisualizationHints.Contains(VisualizationHint.DefaultFlipAxis))
+                    {
+                        histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, y);
+                        histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.Y, x);
+                    }
+                    else
+                    {
+                        histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
+                        histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.Y, y);
+                    }
                     histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
                 }
                 else if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.GEOGRAPHY)

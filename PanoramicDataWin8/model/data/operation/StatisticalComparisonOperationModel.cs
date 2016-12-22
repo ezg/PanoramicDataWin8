@@ -41,9 +41,9 @@ namespace PanoramicDataWin8.model.data.operation
     {
         private int _comparisonOrder = -1;
         private ModelId _modelId;
+        private Decision _decision;
         private StatistalComparisonType _statistalComparisonType = StatistalComparisonType.histogram;
         private TestType _testType = TestType.chi2;
-        private StatisticalComparisonDecisionOperationModel _statisticalComparisonDecisionOperationModel;
 
 
         private ObservableCollection<IStatisticallyComparableOperationModel> _statisticallyComparableOperationModels =
@@ -91,11 +91,13 @@ namespace PanoramicDataWin8.model.data.operation
             }
         }
 
-        public StatisticalComparisonDecisionOperationModel StatisticalComparisonDecisionOperationModel
+
+        public Decision Decision
         {
-            get { return _statisticalComparisonDecisionOperationModel; }
-            set { SetProperty(ref _statisticalComparisonDecisionOperationModel, value); }
+            get { return _decision; }
+            set { SetProperty(ref _decision, value); }
         }
+
 
         public int ComparisonOrder
         {

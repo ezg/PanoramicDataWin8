@@ -24,6 +24,11 @@ namespace PanoramicDataWin8.model.data.operation
             _id = _nextId++;
         }
 
+        public int ExecutionId { get; set; } = 0;
+
+        [JsonIgnore]
+        public int ResultExecutionId { get; set; } = 0;
+
         public long Id
         {
             get { return _id; }
@@ -65,6 +70,7 @@ namespace PanoramicDataWin8.model.data.operation
             get { return _result; }
             set { SetProperty(ref _result, value); }
         }
+        
 
         [JsonIgnore]
         public IOperationModel ResultCauserClone { get; set; }

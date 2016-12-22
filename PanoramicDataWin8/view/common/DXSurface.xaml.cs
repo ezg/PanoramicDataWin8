@@ -112,7 +112,7 @@ namespace PanoramicDataWin8.view.common
 
         }
 
-        protected void DrawString(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, CanvasTextFormat textFormat, float x, float y, string text, Color textColor,
+        protected void DrawString(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, CanvasTextFormat textFormat, double x, double y, string text, Color textColor,
             bool leftAligned,
             bool horizontallyCentered, bool verticallyCentered)
         {
@@ -137,7 +137,7 @@ namespace PanoramicDataWin8.view.common
                 ctf.HorizontalAlignment = CanvasHorizontalAlignment.Right;
             }
 
-            canvasArgs.DrawingSession.DrawText(text, new Vector2(x, y), textColor, ctf);
+            canvasArgs.DrawingSession.DrawText(text, new Vector2((float)x, (float)y), textColor, ctf);
         }
     }
 }

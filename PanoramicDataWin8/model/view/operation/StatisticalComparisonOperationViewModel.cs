@@ -13,7 +13,7 @@ namespace PanoramicDataWin8.model.view.operation
 
         private Pt _position = new Pt(0, 0);
 
-        private Vec _size = new Vec(60, 60);
+        private Vec _size = new Vec(75, 75);
 
         private StatisticalComparisonOperationModel _statisticalComparisonOperationModel;
 

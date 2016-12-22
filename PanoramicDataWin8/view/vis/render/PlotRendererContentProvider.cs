@@ -46,8 +46,8 @@ namespace PanoramicDataWin8.view.vis.render
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
         private CanvasCachedGeometry _strokeRoundedRectGeom = null;
 
-        public float CompositionScaleX { get; set; }
-        public float CompositionScaleY { get; set; }
+        public double CompositionScaleX { get; set; }
+        public double CompositionScaleY { get; set; }
         public Dictionary<IGeometry, FilterModel> HitTargets { get; set; }
 
         public PlotRendererContentProvider()
@@ -79,7 +79,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         public override void Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
         {
-            var mat = Matrix3x2.CreateScale(new Vector2(CompositionScaleX, CompositionScaleY));
+            var mat = Matrix3x2.CreateScale(CommonExtensions.ToVector2(CompositionScaleX, CompositionScaleY));
             canvasArgs.DrawingSession.Transform = mat;
 
             if (_histogramResult != null && _histogramResult.Bins != null)
@@ -96,8 +96,8 @@ namespace PanoramicDataWin8.view.vis.render
                 var topOffset = 20;
                 var bottomtOffset = 45;
 
-                var deviceWidth = (float) (canvas.ActualWidth/CompositionScaleX - leftOffset - rightOffset);
-                var deviceHeight = (float)(canvas.ActualHeight / CompositionScaleY - topOffset - bottomtOffset);
+                var deviceWidth = (double) (canvas.ActualWidth/CompositionScaleX - leftOffset - rightOffset);
+                var deviceHeight = (double)(canvas.ActualHeight / CompositionScaleY - topOffset - bottomtOffset);
                 DrawString(canvasArgs, _textFormat, deviceWidth / 2.0f + leftOffset, deviceHeight / 2.0f + topOffset, "no datapoints", _textColor, true, true, false);
             }
         }
@@ -109,37 +109,39 @@ namespace PanoramicDataWin8.view.vis.render
 
             if (_helper.DeviceHeight > 0 && _helper.DeviceWidth > 0)
             {
-                float xFrom = 0; 
-                float xTo = 0;
-                float yFrom = 0;
-                float yTo = 0;
+                double xFrom = 0; 
+                double xTo = 0;
+                double yFrom = 0;
+                double yTo = 0;
                 bool lastLabel = false;
 
                 var xLabels = _helper.VisualBinRanges[0].GetLabels();
                 // x labels and grid lines
                 int mod = (int)Math.Ceiling(1.0 / (Math.Floor((_helper.DeviceWidth / (_helper.LabelMetricsX.Width + 5))) / xLabels.Count));
                 int count = 0;
+
                 foreach (var label in xLabels)
                 {
                     yFrom = _helper.DataToScreenY(_helper.DataMinY);
                     yTo = _helper.DataToScreenY(_helper.DataMaxY);
-                    xFrom = _helper.DataToScreenX((float)label.MinValue);
-                    xTo = _helper.DataToScreenX((float)label.MaxValue);
+                    xFrom = _helper.DataToScreenX(label.MinValue);
+                    xTo = _helper.DataToScreenX(label.MaxValue);
                     lastLabel = count + 1 == xLabels.Count;
 
                     if (renderLines)
                     {
-                        canvasArgs.DrawingSession.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xFrom, yTo), white, 0.5f);
+                        canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xFrom, yFrom), CommonExtensions.ToVector2(xFrom, yTo), white, 0.5f);
                         if (lastLabel)
                         {
-                            canvasArgs.DrawingSession.DrawLine(new Vector2(xTo, yFrom), new Vector2(xTo, yTo), white, 0.5f);
+                            canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xTo, yFrom), CommonExtensions.ToVector2(xTo, yTo), white, 0.5f);
                         }
                     }
                     if (count % mod == 0)
                     {
-                        if (_helper.VisualBinRanges[0] is QuantitativeBinRange)
+                        if (_helper.VisualBinRanges[0] is QuantitativeBinRange || _helper.VisualBinRanges[0] is DateTimeBinRange)
                         {
-                            DrawString(canvasArgs, _textFormat, xFrom, yFrom + 5, double.Parse(label.Label).ToString(), _textColor, true, true, false);
+                            var lbl = _helper.VisualBinRanges[0] is QuantitativeBinRange ? double.Parse(label.Label).ToString() : label.Label;
+                            DrawString(canvasArgs, _textFormat, xFrom, yFrom + 5, lbl, _textColor, true, true, false);
                             if (lastLabel)
                             {
                                // DrawString(canvasArgs, _textFormat, xTo, yFrom + 5, label.MaxValue.ToString(), _textColor, true, true, false);
@@ -162,23 +164,24 @@ namespace PanoramicDataWin8.view.vis.render
                     var tt = _helper.VisualBinRanges[1].GetLabel(label.Value);
                     xFrom = _helper.DataToScreenX(_helper.DataMinX);
                     xTo = _helper.DataToScreenX(_helper.DataMaxX);
-                    yFrom = _helper.DataToScreenY((float)label.MinValue);
-                    yTo = _helper.DataToScreenY((float)label.MaxValue);
+                    yFrom = _helper.DataToScreenY(label.MinValue);
+                    yTo = _helper.DataToScreenY(label.MaxValue);
                     lastLabel = count + 1 == yLabels.Count;
 
                     if (renderLines)
                     {
-                        canvasArgs.DrawingSession.DrawLine(new Vector2(xFrom, yFrom), new Vector2(xTo, yFrom), white, 0.5f);
+                        canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xFrom, yFrom), CommonExtensions.ToVector2(xTo, yFrom), white, 0.5f);
                         if (lastLabel)
                         {
-                            canvasArgs.DrawingSession.DrawLine(new Vector2(xFrom, yTo), new Vector2(xTo, yTo), white, 0.5f);
+                            canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xFrom, yTo), CommonExtensions.ToVector2(xTo, yTo), white, 0.5f);
                         }
                     }
                     if (count % mod == 0)
                     {
-                        if (_helper.VisualBinRanges[1] is QuantitativeBinRange)
+                        if (_helper.VisualBinRanges[1] is QuantitativeBinRange || _helper.VisualBinRanges[1] is DateTimeBinRange)
                         {
-                            DrawString(canvasArgs, _textFormat, xFrom - 10, yFrom, double.Parse(label.Label).ToString(), _textColor, false, false, true);
+                            var lbl = _helper.VisualBinRanges[1] is QuantitativeBinRange ? double.Parse(label.Label).ToString() : label.Label;
+                            DrawString(canvasArgs, _textFormat, xFrom - 10, yFrom, lbl, _textColor, false, false, true);
                             if (lastLabel)
                             {
                                // DrawString(canvasArgs, _textFormat, xFrom - 10, yTo, label.MaxValue.ToString(), _textColor, false, false, true);
@@ -194,8 +197,8 @@ namespace PanoramicDataWin8.view.vis.render
 
                 _fillRoundedRectGeom?.Dispose();
                 _strokeRoundedRectGeom?.Dispose();
-                var x = _helper.DataToScreenX((float)_helper.VisualBinRanges[0].AddStep(0)) - _helper.DataToScreenX(0);
-                var y = _helper.DataToScreenY((float)_helper.VisualBinRanges[1].AddStep(0), false) - _helper.DataToScreenY(0, false);
+                var x = _helper.DataToScreenX((double)_helper.VisualBinRanges[0].AddStep(0)) - _helper.DataToScreenX(0);
+                var y = _helper.DataToScreenY((double)_helper.VisualBinRanges[1].AddStep(0), false) - _helper.DataToScreenY(0, false);
 
                 _fillRoundedRectGeom = CanvasCachedGeometry.CreateFill(CanvasGeometry.CreateRoundedRectangle(canvas, new Rect(0, 0, x, y), 4, 4));
                 _strokeRoundedRectGeom = CanvasCachedGeometry.CreateStroke(CanvasGeometry.CreateRoundedRectangle(canvas, new Rect(0, 0, x, y), 4, 4), 0.5f);
@@ -247,11 +250,11 @@ namespace PanoramicDataWin8.view.vis.render
                                 var layout = new CanvasTextLayout(canvas, percentageText, _textFormat, 1000f, 1000f);
                                 var layoutBounds = layout.DrawBounds;
                                 layout.Dispose();
-                                var scale = (float) Math.Min(1.0, Math.Min((binPrimitive.Rect.Height - 5.0)/layoutBounds.Height, (binPrimitive.Rect.Width - 5.0)/layoutBounds.Width));
-                                var transMat = Matrix3x2.CreateTranslation(new Vector2(
-                                    (float)(binPrimitive.Rect.X + binPrimitive.Rect.Width / 2.0), 
-                                    (float)(binPrimitive.Rect.Y + binPrimitive.Rect.Height / 2.0)));
-                                var scaleMat = Matrix3x2.CreateScale(new Vector2(scale, scale));
+                                var scale = (double) Math.Min(1.0, Math.Min((binPrimitive.Rect.Height - 5.0)/layoutBounds.Height, (binPrimitive.Rect.Width - 5.0)/layoutBounds.Width));
+                                var transMat = Matrix3x2.CreateTranslation(CommonExtensions.ToVector2(
+                                    (double)(binPrimitive.Rect.X + binPrimitive.Rect.Width / 2.0), 
+                                    (double)(binPrimitive.Rect.Y + binPrimitive.Rect.Height / 2.0)));
+                                var scaleMat = Matrix3x2.CreateScale(CommonExtensions.ToVector2(scale, scale));
                                 var transInvertMat = Matrix3x2.Identity;
                                 Matrix3x2.Invert(transMat, out transInvertMat);
 
@@ -261,8 +264,8 @@ namespace PanoramicDataWin8.view.vis.render
                                 canvasArgs.DrawingSession.Transform = mat*oldMat;
 
                                 DrawString(canvasArgs, _textFormat, 
-                                    (float)(binPrimitive.Rect.X + binPrimitive.Rect.Width / 2.0), 
-                                    (float)(binPrimitive.Rect.Y + binPrimitive.Rect.Height / 2.0), 
+                                    (double)(binPrimitive.Rect.X + binPrimitive.Rect.Width / 2.0), 
+                                    (double)(binPrimitive.Rect.Y + binPrimitive.Rect.Height / 2.0), 
                                     binPrimitive.MarginPercentage.ToString("F2") + "%", _textColor, false, true, true);
                                 canvasArgs.DrawingSession.Transform = oldMat;
                                 //canvasArgs.DrawingSession.dra(binPrimitive.MarginRect, dark);
@@ -341,7 +344,7 @@ namespace PanoramicDataWin8.view.vis.render
 
     public class BinPrimitive
     {
-        public float Value { get; set; }
+        public double Value { get; set; }
         public Rect Rect { get; set; }
         public Rect MarginRect { get; set; }
         public double MarginPercentage { get; set; }
@@ -351,8 +354,8 @@ namespace PanoramicDataWin8.view.vis.render
 
     public class PlotRendererContentProviderHelper
     {
-        private float _compositionScaleX = 1;
-        private float _compositionScaleY = 1;
+        private double _compositionScaleX = 1;
+        private double _compositionScaleY = 1;
 
         private HistogramResult _histogramResult = null;
         private HistogramOperationModel _histogramOperationModelClone = null;
@@ -363,29 +366,29 @@ namespace PanoramicDataWin8.view.vis.render
         private ChartType _chartType = ChartType.HeatMap;
         public List<BinRange> VisualBinRanges { get; set; } = new List<BinRange>();
 
-        public float LeftOffset { get; set; } = 40;
-        public float RightOffset { get; set; } = 20;
-        public float TopOffset { get; set; } = 20;
-        public float BottomtOffset { get; set; } = 45;
+        public double LeftOffset { get; set; } = 40;
+        public double RightOffset { get; set; } = 20;
+        public double TopOffset { get; set; } = 20;
+        public double BottomtOffset { get; set; } = 45;
 
-        public float DeviceWidth { get; set; } = 0;
-        public float DeviceHeight { get; set; } = 0;
+        public double DeviceWidth { get; set; } = 0;
+        public double DeviceHeight { get; set; } = 0;
         
-        private float _xScale = 0;
-        private float _yScale = 0;
-        private float _minValue = 0;
-        private float _maxValue = 0;
-        public float DataMinX { get; set; } = 0;
-        public float DataMinY { get; set; } = 0;
-        public float DataMaxX { get; set; } = 0;
-        public float DataMaxY { get; set; } = 0;
+        private double _xScale = 0;
+        private double _yScale = 0;
+        private double _minValue = 0;
+        private double _maxValue = 0;
+        public double DataMinX { get; set; } = 0;
+        public double DataMinY { get; set; } = 0;
+        public double DataMaxX { get; set; } = 0;
+        public double DataMaxY { get; set; } = 0;
 
         public Rect LabelMetricsX { get; set; } = Rect.Empty;
         public Rect LabelMetricsY { get; set; } = Rect.Empty;
 
-        private static float TOLERANCE = 0.0001f;
+        private static double TOLERANCE = 0.0001f;
 
-        public PlotRendererContentProviderHelper(HistogramResult histogramResult, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone, float compositionScaleX, float compositionScaleY)
+        public PlotRendererContentProviderHelper(HistogramResult histogramResult, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone, double compositionScaleX, double compositionScaleY)
         {
             _compositionScaleX = compositionScaleX;
             _compositionScaleY = compositionScaleY;
@@ -405,15 +408,15 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             var aggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
-            _minValue = float.MaxValue;
-            _maxValue = float.MinValue;
+            _minValue = double.MaxValue;
+            _maxValue = double.MinValue;
             foreach (var brush in _histogramResult.Brushes)
             {
                 aggregateKey.BrushIndex = brush.BrushIndex;
                 foreach (var bin in _histogramResult.Bins.Values)
                 {
-                    _minValue = (float)Math.Min(_minValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
-                    _maxValue = (float)Math.Max(_maxValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
+                    _minValue = (double)Math.Min(_minValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
+                    _maxValue = (double)Math.Max(_maxValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
                 }
             }
             
@@ -437,15 +440,15 @@ namespace PanoramicDataWin8.view.vis.render
             var layoutY = new CanvasTextLayout(canvas, maxYLabel.Label, textFormat, 1000f, 1000f);
             LabelMetricsY = layoutY.DrawBounds;
 
-            LeftOffset = (float)Math.Max(10, LabelMetricsY.Width + 10 + 20);
+            LeftOffset = (double)Math.Max(10, LabelMetricsY.Width + 10 + 20);
 
-            DeviceWidth = (float)(canvas.ActualWidth / _compositionScaleX - LeftOffset - RightOffset);
-            DeviceHeight = (float)(canvas.ActualHeight / _compositionScaleY - TopOffset - BottomtOffset);
+            DeviceWidth = (double)(canvas.ActualWidth / _compositionScaleX - LeftOffset - RightOffset);
+            DeviceHeight = (double)(canvas.ActualHeight / _compositionScaleY - TopOffset - BottomtOffset);
 
-            DataMinX = (float)(xLabels.Min(dp => dp.MinValue));
-            DataMinY = (float)(yLabels.Min(dp => dp.MinValue));
-            DataMaxX = (float)(xLabels.Max(dp => dp.MaxValue));
-            DataMaxY = (float)(yLabels.Max(dp => dp.MaxValue));
+            DataMinX = (double)(xLabels.Min(dp => dp.MinValue));
+            DataMinY = (double)(yLabels.Min(dp => dp.MinValue));
+            DataMaxX = (double)(xLabels.Max(dp => dp.MaxValue));
+            DataMaxY = (double)(yLabels.Max(dp => dp.MaxValue));
 
             _xScale = DataMaxX - DataMinX;
             _yScale = DataMaxY - DataMinY;
@@ -522,15 +525,15 @@ namespace PanoramicDataWin8.view.vis.render
                 var aggregateKey = IDEAHelpers.CreateAggregateKey(atm, _histogramResult, _histogramResult.AllBrushIndex());
                 double factor = 0.0;
                 
-                var minValue = float.MaxValue;
-                var maxValue = float.MinValue;
+                var minValue = double.MaxValue;
+                var maxValue = double.MinValue;
                 foreach (var brush in _histogramResult.Brushes)
                 {
                     aggregateKey.BrushIndex = brush.BrushIndex;
                     foreach (var bin in _histogramResult.Bins.Values)
                     {
-                        minValue = (float)Math.Min(minValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
-                        maxValue = (float)Math.Max(maxValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
+                        minValue = (double)Math.Min(minValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
+                        maxValue = (double)Math.Max(maxValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
                     }
                 }
 
@@ -590,9 +593,9 @@ namespace PanoramicDataWin8.view.vis.render
                         dist =
                             points.Points.Select(
                                 p =>
-                                    new Vector2(
-                                        DataToScreenX((float)p.Y * (float)(count.Result * VisualBinRanges[1].AddStep(0))),
-                                        DataToScreenY((float)p.X))).ToList();
+                                    CommonExtensions.ToVector2(
+                                        DataToScreenX((double)p.Y * (double)(count.Result * VisualBinRanges[1].AddStep(0))),
+                                        DataToScreenY((double)p.X))).ToList();
                         returnList.Add(dist);
 
                     }
@@ -605,9 +608,9 @@ namespace PanoramicDataWin8.view.vis.render
                         dist =
                             points.Points.Select(
                                 p =>
-                                    new Vector2(
-                                        DataToScreenX((float)p.X),
-                                        DataToScreenY((float)p.Y * (float) (count.Result * VisualBinRanges[0].AddStep(0))))).ToList();
+                                    CommonExtensions.ToVector2(
+                                        DataToScreenX((double)p.X),
+                                        DataToScreenY((double)p.Y * (double) (count.Result * VisualBinRanges[0].AddStep(0))))).ToList();
                         returnList.Add(dist);
                     }
                 }
@@ -618,33 +621,33 @@ namespace PanoramicDataWin8.view.vis.render
         public BinPrimitiveCollection GetBinPrimitives(Bin bin)
         {
             BinPrimitiveCollection binPrimitiveCollection = new BinPrimitiveCollection();
-            float alpha = 0.15f;
+            double alpha = 0.15f;
             var baseColor = Colors.White;
 
             var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
             var marginAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, new MarginAggregateParameters()
                 {AggregateFunction = _valueIom.AggregateFunction.ToString()}, _histogramResult, _histogramResult.AllBrushIndex());
 
-            var brushFactorSum = 0.0f;
+            var brushFactorSum = 0.0;
             foreach (var brush in _histogramResult.Brushes)
             {
                 Rect marginRect = Rect.Empty;
                 double marginPercentage = 0.0;
-                float xFrom = 0;
-                float xTo = 0;
-                float yFrom = 0;
-                float yTo = 0;
-                float value = 0;
-                float xMargin = 0;
-                float yMargin = 0;
-                float xMarginAbsolute = 0;
-                float yMarginAbsolute = 0;
+                double xFrom = 0;
+                double xTo = 0;
+                double yFrom = 0;
+                double yTo = 0;
+                double value = 0;
+                double xMargin = 0;
+                double yMargin = 0;
+                double xMarginAbsolute = 0;
+                double yMarginAbsolute = 0;
                 Color color = Colors.White;
 
                 valueAggregateKey.BrushIndex = brush.BrushIndex;
                 MarginAggregateResult valueMargin = (MarginAggregateResult)bin.AggregateResults[marginAggregateKey];
 
-                float unNormalizedvalue = (float)((DoubleValueAggregateResult) bin.AggregateResults[valueAggregateKey]).Result;
+                double unNormalizedvalue = (double)((DoubleValueAggregateResult) bin.AggregateResults[valueAggregateKey]).Result;
                 if (unNormalizedvalue != 0)
                 {
                     value = (unNormalizedvalue - _minValue)/(Math.Abs((_maxValue - _minValue)) < TOLERANCE ? (unNormalizedvalue - _minValue) : (_maxValue - _minValue));
@@ -678,26 +681,26 @@ namespace PanoramicDataWin8.view.vis.render
                 if (_chartType == ChartType.HeatMap)
                 {
                     valueAggregateKey.BrushIndex = _histogramResult.AllBrushIndex();
-                    var allUnNormalizedValue = (float)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
+                    var allUnNormalizedValue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
                     var brushFactor = (unNormalizedvalue / allUnNormalizedValue);
                     
-                    xFrom = DataToScreenX((float)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
-                    xTo = DataToScreenX((float)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
+                    xFrom = DataToScreenX((double)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
+                    xTo = DataToScreenX((double)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
 
-                    yFrom = DataToScreenY((float)_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1]));
-                    yTo = DataToScreenY((float)_histogramResult.BinRanges[1].AddStep(_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1])));
+                    yFrom = DataToScreenY((double)_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1]));
+                    yTo = DataToScreenY((double)_histogramResult.BinRanges[1].AddStep(_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1])));
                     if (allUnNormalizedValue > 0 && unNormalizedvalue > 0)
                     {
                         brushFactorSum += brushFactor;
-                        brushFactorSum = (float) Math.Min(brushFactorSum, 1.0);
+                        brushFactorSum = (double) Math.Min(brushFactorSum, 1.0);
                         var tempRect = new Rect(xFrom, yTo, xTo - xFrom, yFrom - yTo);
                         var ratio = (tempRect.Width/tempRect.Height);
                         var newHeight = Math.Sqrt((1.0/ratio)*((tempRect.Width*tempRect.Height)* brushFactorSum));
                         var newWidth = newHeight*ratio;
-                        xFrom = (float) (tempRect.X + (tempRect.Width - newWidth)/2.0f);
-                        yTo = (float) (tempRect.Y + (tempRect.Height - newHeight)/2.0f);
-                        xTo = (float) (xFrom + newWidth);
-                        yFrom = (float) (yTo + newHeight);
+                        xFrom = (double) (tempRect.X + (tempRect.Width - newWidth)/2.0f);
+                        yTo = (double) (tempRect.Y + (tempRect.Height - newHeight)/2.0f);
+                        xTo = (double) (xFrom + newWidth);
+                        yFrom = (double) (yTo + newHeight);
                         var brushRect = new Rect(tempRect.X + (tempRect.Width - newWidth)/2.0f,
                             tempRect.Y + (tempRect.Height - newHeight)/2.0f, newWidth, newHeight);
                     }
@@ -709,22 +712,22 @@ namespace PanoramicDataWin8.view.vis.render
                 else if (_chartType == ChartType.HorizontalBar)
                 {
                     var xValue = ((DoubleValueAggregateResult) bin.AggregateResults[xAggregateKey]).Result;
-                    xFrom = DataToScreenX((float) Math.Min(0, xValue));
-                    xTo = DataToScreenX((float) Math.Max(0, xValue));
+                    xFrom = DataToScreenX((double) Math.Min(0, xValue));
+                    xTo = DataToScreenX((double) Math.Max(0, xValue));
 
-                    yFrom = DataToScreenY((float)_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1]));
-                    yTo = DataToScreenY((float)_histogramResult.BinRanges[1].AddStep(_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1])));
+                    yFrom = DataToScreenY((double)_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1]));
+                    yTo = DataToScreenY((double)_histogramResult.BinRanges[1].AddStep(_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1])));
 
-                    xMargin = (float) ((MarginAggregateResult) bin.AggregateResults[xMarginAggregateKey]).Margin;
-                    xMarginAbsolute = (float) ((MarginAggregateResult) bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
+                    xMargin = (double) ((MarginAggregateResult) bin.AggregateResults[xMarginAggregateKey]).Margin;
+                    xMarginAbsolute = (double) ((MarginAggregateResult) bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
 
                     var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), baseColor, (float)(alpha + Math.Pow(value, 1.0 / 3.0) * (1.0 - alpha)));
                     var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
                         color = baseColor;
 
-                    marginRect = new Rect(DataToScreenX((float)(xValue - xMarginAbsolute)),
+                    marginRect = new Rect(DataToScreenX((double)(xValue - xMarginAbsolute)),
                                          yTo + (yFrom - yTo) / 2.0 - 2,
-                                         DataToScreenX((float)(xValue + xMarginAbsolute)) - DataToScreenX((float)(xValue - xMarginAbsolute)),
+                                         DataToScreenX((double)(xValue + xMarginAbsolute)) - DataToScreenX((double)(xValue - xMarginAbsolute)),
                                          4.0);
                 }
 
@@ -732,42 +735,42 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     var yValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
                     //yValue = 1.15;//1.2;
-                    yFrom = DataToScreenY((float)Math.Min(0, yValue));
-                    yTo = DataToScreenY((float)Math.Max(0, yValue));
+                    yFrom = DataToScreenY((double)Math.Min(0, yValue));
+                    yTo = DataToScreenY((double)Math.Max(0, yValue));
 
                     var tt = _histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]);
 
-                    xFrom = DataToScreenX((float)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
-                    xTo = DataToScreenX((float)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
+                    xFrom = DataToScreenX((double)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
+                    xTo = DataToScreenX((double)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
 
-                    yMargin = (float)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
-                    yMarginAbsolute = (float)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
+                    yMargin = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
+                    yMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
 
                     var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), baseColor, (float)(alpha + Math.Pow(value, 1.0 / 3.0) * (1.0 - alpha)));
                     var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
                     color = baseColor;
 
                     marginRect = new Rect(xFrom + (xTo - xFrom) / 2.0 - 2,
-                                          DataToScreenY((float)(yValue + yMarginAbsolute)),
+                                          DataToScreenY((double)(yValue + yMarginAbsolute)),
                                           4,
-                                          DataToScreenY((float)(yValue - yMarginAbsolute)) - DataToScreenY((float)(yValue + yMarginAbsolute)));
+                                          DataToScreenY((double)(yValue - yMarginAbsolute)) - DataToScreenY((double)(yValue + yMarginAbsolute)));
                 }
 
                 else if (_chartType == ChartType.SinglePoint)
                 {
                     var xValue = ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result;
-                    xFrom = DataToScreenX((float) xValue) - 5;
-                    xTo = DataToScreenX((float) xValue) + 5;
+                    xFrom = DataToScreenX((double) xValue) - 5;
+                    xTo = DataToScreenX((double) xValue) + 5;
 
                     var yValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
-                    yFrom = DataToScreenY((float)yValue) + 5;
-                    yTo = DataToScreenY((float)yValue);
+                    yFrom = DataToScreenY((double)yValue) + 5;
+                    yTo = DataToScreenY((double)yValue);
 
-                    xMargin = (float)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).Margin;
-                    xMarginAbsolute = (float)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
+                    xMargin = (double)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).Margin;
+                    xMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
                     
-                    yMargin = (float)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
-                    yMarginAbsolute = (float)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
+                    yMargin = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
+                    yMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
 
                     color = baseColor;
                 }
@@ -879,14 +882,14 @@ namespace PanoramicDataWin8.view.vis.render
             return binPrimitiveCollection;
         }
 
-        public float DataToScreenX(float x)
+        public double DataToScreenX(double x)
         {
-            return ((x - DataMinX) / _xScale) * (DeviceWidth) + (LeftOffset);
+            return (double)(((x - DataMinX) / _xScale) * (DeviceWidth) + (LeftOffset));
         }
-        public float DataToScreenY(float y, bool flip = true)
+        public double DataToScreenY(double y, bool flip = true)
         {
-            float retY = ((y - DataMinY) / _yScale) * (DeviceHeight);
-            return flip ? (DeviceHeight) - retY + (TopOffset) : retY + (TopOffset);
+            double retY = ((y - DataMinY) / _yScale) * (DeviceHeight);
+            return (double)(flip ? (DeviceHeight) - retY + (TopOffset) : retY + (TopOffset));
         }
     }
 

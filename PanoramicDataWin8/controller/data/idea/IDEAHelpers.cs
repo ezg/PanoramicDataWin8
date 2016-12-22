@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using IDEA_common.aggregates;
 using IDEA_common.binning;
+using IDEA_common.operations;
 using IDEA_common.operations.example;
 using IDEA_common.operations.histogram;
 using IDEA_common.operations.risk;
@@ -27,18 +28,30 @@ namespace PanoramicDataWin8.controller.data.progressive
 
             if (model.TestType == TestType.chi2)
             {
-                addComparison.Comparison = new GoodnessOfFitComparison
+                addComparison.ChildOperationParameters = new List<OperationParameters>()
                 {
-                    Dist0 = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
-                    Dist1 = GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize),
+                    new ChiSquaredTestOperationParameters
+                    {
+                        ChildOperationParameters = new List<OperationParameters>
+                        {
+                            GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
+                            GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize)
+                        }
+                    }
                 };
             }
             else if (model.TestType == TestType.ttest)
             {
-                addComparison.Comparison = new MeanDifferenceComparison()
+                addComparison.ChildOperationParameters = new List<OperationParameters>()
                 {
-                    Dist0 = GetEmpiricalDistOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
-                    Dist1 = GetEmpiricalDistOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize),
+                    new TTestOperationParameters()
+                    {
+                        ChildOperationParameters = new List<OperationParameters>
+                        {
+                            GetEmpiricalDistOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
+                            GetEmpiricalDistOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize)
+                        }
+                    }
                 };
             }
 

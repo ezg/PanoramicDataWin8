@@ -71,7 +71,7 @@ namespace PanoramicDataWin8.model.data.operation
             }
             else
             {
-                var ret = " " + AttributeTransformationModel.AttributeModel.RawName + ".StartsWith(" + val + ") ";
+                var ret = " " + AttributeTransformationModel.AttributeModel.RawName + " != null && " + AttributeTransformationModel.AttributeModel.RawName + ".StartsWith(" + val + ") ";
                  return ret;
             }
         }

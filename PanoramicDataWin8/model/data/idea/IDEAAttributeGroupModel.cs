@@ -1,4 +1,6 @@
-﻿using PanoramicDataWin8.model.data.attribute;
+﻿using System.Collections.Generic;
+using IDEA_common.catalog;
+using PanoramicDataWin8.model.data.attribute;
 
 namespace PanoramicDataWin8.model.data.idea
 {
@@ -29,6 +31,8 @@ namespace PanoramicDataWin8.model.data.idea
             get { return _displayName; }
             set { SetProperty(ref _displayName, value); }
         }
+
+        public override List<VisualizationHint> VisualizationHints { get; set; }
 
         public override int Index { get; set; }
     }

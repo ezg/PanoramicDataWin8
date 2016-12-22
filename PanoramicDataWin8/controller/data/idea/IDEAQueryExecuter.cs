@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Linq;
 using Windows.ApplicationModel.Core;
@@ -26,11 +27,15 @@ namespace PanoramicDataWin8.controller.data.progressive
                         operationModel.ResultCauserClone = operationModel.Clone();
                         operationModel.Result = null;
 
-                        if (ActiveJobs.ContainsKey(operationModel))
+                        if (ActiveJobs.ContainsKey(operationModel) && arg.EventArgs.StopPreviousExecution)
                         {
-                            ActiveJobs[operationModel].Stop();
-                            ActiveJobs[operationModel].JobUpdate -= job_JobUpdate;
-                            ActiveJobs[operationModel].JobCompleted -= job_JobCompleted;
+                            foreach (var executionId in ActiveJobs[operationModel].Keys)
+                            {
+                                ActiveJobs[operationModel][executionId].Stop();
+                                ActiveJobs[operationModel][executionId].JobUpdate -= job_JobUpdate;
+                                ActiveJobs[operationModel][executionId].JobCompleted -= job_JobCompleted;
+                            }
+                         
                             ActiveJobs.Remove(operationModel);
                         }
                         // determine if new job is even needed (i.e., are all relevant inputfieldmodels set)
@@ -81,8 +86,11 @@ namespace PanoramicDataWin8.controller.data.progressive
 
                         if (newJob != null)
                         {
-
-                            ActiveJobs.Add(operationModel, newJob);
+                            if (!ActiveJobs.ContainsKey(operationModel))
+                            {
+                                ActiveJobs.Add(operationModel, new Dictionary<int, OperationJob>());
+                            }
+                            ActiveJobs[operationModel][operationModel.ExecutionId] = newJob;
                             newJob.JobUpdate += job_JobUpdate;
                             newJob.JobCompleted += job_JobCompleted;
                             newJob.Start();
@@ -95,31 +103,39 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         public override void HaltJob(IOperationModel operationModel)
         {
-            ActiveJobs[operationModel].Stop();
-            ActiveJobs[operationModel].JobUpdate -= job_JobUpdate;
-            ActiveJobs[operationModel].JobCompleted -= job_JobCompleted;
+            foreach (var executionId in ActiveJobs[operationModel].Keys)
+            {
+                ActiveJobs[operationModel][executionId].Stop();
+                ActiveJobs[operationModel][executionId].JobUpdate -= job_JobUpdate;
+                ActiveJobs[operationModel][executionId].JobCompleted -= job_JobCompleted;
+            }
+
             ActiveJobs.Remove(operationModel);
         }
 
         public override void ResumeJob(IOperationModel operationModel)
         {
-            ExecuteOperationModel(operationModel);
+            ExecuteOperationModel(operationModel, true);
         }
 
-        public override void ExecuteOperationModel(IOperationModel operationModel)
+        public override void ExecuteOperationModel(IOperationModel operationModel, bool stopPreviousExecutions)
         {
             if (ExecuteQueryEvent != null)
-                ExecuteQueryEvent(this, new ExecuteOperationModelEventArgs(operationModel));
+                ExecuteQueryEvent(this, new ExecuteOperationModelEventArgs(operationModel, stopPreviousExecutions));
         }
 
-        public override void RemoveJob(IOperationModel histogramOperationModel)
+        public override void RemoveJob(IOperationModel operationModel)
         {
-            if (ActiveJobs.ContainsKey(histogramOperationModel))
+            if (ActiveJobs.ContainsKey(operationModel))
             {
-                ActiveJobs[histogramOperationModel].Stop();
-                ActiveJobs[histogramOperationModel].JobUpdate -= job_JobUpdate;
-                ActiveJobs[histogramOperationModel].JobCompleted -= job_JobCompleted;
-                ActiveJobs.Remove(histogramOperationModel);
+                foreach (var executionId in ActiveJobs[operationModel].Keys)
+                {
+                    ActiveJobs[operationModel][executionId].Stop();
+                    ActiveJobs[operationModel][executionId].JobUpdate -= job_JobUpdate;
+                    ActiveJobs[operationModel][executionId].JobCompleted -= job_JobCompleted;
+                }
+                
+                ActiveJobs.Remove(operationModel);
             }
         }
 
@@ -134,6 +150,7 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             var operationJob = (OperationJob) sender;
             var operationModel = operationJob.OperationModel;
+            operationModel.ResultExecutionId = jobEventArgs.ResultExecutionId;
             operationModel.Result = jobEventArgs.Result;
         }
     }

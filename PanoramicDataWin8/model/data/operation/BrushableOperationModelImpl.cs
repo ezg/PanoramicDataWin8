@@ -18,7 +18,7 @@ namespace PanoramicDataWin8.model.data.operation
             _host = host;
             _brushOperationModels.CollectionChanged += BrushOperationModelsCollectionChanged;
         }
-
+        public int ExecutionId { get; set; } = 0;
         public ObservableCollection<IBrushableOperationModel> BrushOperationModels
         {
             get { return _brushOperationModels; }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Foundation;
@@ -46,6 +47,11 @@ namespace PanoramicDataWin8.utils
         public static Vec GetVec(this Pt c)
         {
             return new Vec(c.X, c.Y);
+        }
+
+        public static Vector2 ToVector2(double d1, double d2)
+        {
+            return new Vector2((float) d1, (float) d2);
         }
 
         public static GeoAPI.Geometries.IPoint GetPoint(this Point c)

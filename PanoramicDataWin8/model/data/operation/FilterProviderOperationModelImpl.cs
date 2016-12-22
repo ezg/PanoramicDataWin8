@@ -58,7 +58,7 @@ namespace PanoramicDataWin8.model.data.operation
         {
             _host.FireOperationModelUpdated(args);
         }
-
+        public int ExecutionId { get; set; } = 0;
         public IResult Result { get; set; }
         public IOperationModel ResultCauserClone { get; set; }
         public SchemaModel SchemaModel { get; set; }

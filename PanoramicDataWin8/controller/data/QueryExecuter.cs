@@ -6,7 +6,7 @@ namespace PanoramicDataWin8.controller.data
 {
     public abstract class QueryExecuter
     {
-        public Dictionary<IOperationModel, OperationJob> ActiveJobs { get; set; } = new Dictionary<IOperationModel, OperationJob>();
+        public Dictionary<IOperationModel, Dictionary<int, OperationJob>> ActiveJobs { get; set; } = new Dictionary<IOperationModel, Dictionary<int, OperationJob>>();
 
         public virtual void RemoveJob(IOperationModel operationModel)
         {
@@ -33,6 +33,6 @@ namespace PanoramicDataWin8.controller.data
             return false;
         }
 
-        public abstract void ExecuteOperationModel(IOperationModel operationModel);
+        public abstract void ExecuteOperationModel(IOperationModel operationModel, bool stopPreviousExecutions);
     }
 }

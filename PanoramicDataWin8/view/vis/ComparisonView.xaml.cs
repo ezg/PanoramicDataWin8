@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -157,16 +158,7 @@ namespace PanoramicDataWin8.view.vis
         private void StatisticalComparisonOperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var model = (StatisticalComparisonOperationModel) sender;
-            if (e.PropertyName == model.GetPropertyName(() => model.StatisticalComparisonDecisionOperationModel) &&  model.StatisticalComparisonDecisionOperationModel != null)
-            {
-                model.StatisticalComparisonDecisionOperationModel.PropertyChanged += StatisticalComparisonDecisionOperationModel_PropertyChanged;
-            }
-        }
-
-        private void StatisticalComparisonDecisionOperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            var model = (StatisticalComparisonDecisionOperationModel) sender;
-            if (e.PropertyName == model.GetPropertyName(() => model.Result) && model.Result != null)
+            if (e.PropertyName == model.GetPropertyName(() => model.Decision))
             {
                 updateRendering();
             }
@@ -255,23 +247,21 @@ namespace PanoramicDataWin8.view.vis
 
             var lineFrom = (new Pt(left.Bounds.Right, left.Bounds.Center.Y) - _model.Position).GetWindowsPoint();
             var lineTo = (new Pt(right.Bounds.Left, right.Bounds.Center.Y) - _model.Position).GetWindowsPoint();
-
-            var size = 75;
-            _model.Size = new Vec(size, size);
-
-
-            mainGrid.Background = Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush;
             
+
             _model.Position =
                 (((left.Bounds.Center.GetVec() + new Vec(left.Size.X / 2.0, 0)) +
                   (right.Bounds.Center.GetVec() - new Vec(right.Size.X / 2.0, 0))) / 2.0 - _model.Size / 2.0 - new Vec(25, 0)).GetWindowsPoint();
 
-
-            var getDeciRes = _model.StatisticalComparisonOperationModel?.StatisticalComparisonDecisionOperationModel?.Result as GetDecisionsResult;
-            if (getDeciRes != null)
+            
+            var getDeciRes = _model.StatisticalComparisonOperationModel.Decision;
+            if (getDeciRes != null && getDeciRes.Progress > 0)
             {
-                var firstDescision = getDeciRes.Decisions.FirstOrDefault();
-                if (firstDescision.Significance)
+                
+                tbPValue.Visibility = Visibility.Visible;
+                pLabelTB.Visibility = Visibility.Visible;
+                
+                if (getDeciRes.Significance)
                 {
                     mainGrid.Background = Application.Current.Resources.MergedDictionaries[0]["rejectBrush"] as SolidColorBrush;
                 }
@@ -279,7 +269,13 @@ namespace PanoramicDataWin8.view.vis
                 {
                     mainGrid.Background = Application.Current.Resources.MergedDictionaries[0]["acceptBrush"] as SolidColorBrush;
                 }
-                tbPValue.Text = firstDescision.PValue.ToString("F3");
+                tbPValue.Text = getDeciRes.PValue.ToString("F3");
+            }
+            else
+            {
+                mainGrid.Background = Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush;
+                tbPValue.Visibility = Visibility.Collapsed;
+                pLabelTB.Visibility = Visibility.Collapsed;
             }
         }
 

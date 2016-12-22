@@ -6,5 +6,6 @@ namespace PanoramicDataWin8.controller.data
     public class JobEventArgs : EventArgs
     {
         public IResult Result { get; set; }
+        public int ResultExecutionId { get; set; }
     }
 }

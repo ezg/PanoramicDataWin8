@@ -24,6 +24,7 @@ namespace PanoramicDataWin8.model.data.operation
         }
 
         public IResult Result { get; set; }
+        public int ExecutionId { get; set; } = 0;
         public IOperationModel ResultCauserClone { get; set; }
         public SchemaModel SchemaModel { get; set; }
 
