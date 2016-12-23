@@ -96,8 +96,8 @@ namespace PanoramicDataWin8.model.view.operation
                                 RowSpan = 0,
                                 Position = histogramOperationViewModel.Position,
                                 Column = 1,
-                                Size = new Vec(25, 25),
-                                TargetSize = new Vec(25, 25),
+                                Size = new Vec(54, 25),
+                                TargetSize = new Vec(54, 25),
                                 IsAlwaysDisplayed = true
                             };
                             //toggleMenuItem.Position = attachmentItemViewModel.Position;

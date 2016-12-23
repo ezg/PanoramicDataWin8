@@ -796,8 +796,11 @@ namespace PanoramicDataWin8.view.vis.render
 
                                 if (_histogramResult.BinRanges[i] is NominalBinRange)
                                 {
-                                    filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.EQUALS,
-                                        _histogramResult.BinRanges[i].GetLabel(dataFrom)));
+                                    var dd = _histogramResult.BinRanges[i].GetIndexFromScaleValue(bin.BinIndex.Indices[i]);
+                                    var tt = _histogramResult.BinRanges[i].GetLabel(dd);
+                                    var xx = _histogramResult.BinRanges[i].GetLabel(dataFrom);
+
+                                    filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.EQUALS, tt));
                                 }
                                 else if (_histogramResult.BinRanges[i] is AlphabeticBinRange)
                                 {
