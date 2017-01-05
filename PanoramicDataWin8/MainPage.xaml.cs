@@ -648,8 +648,7 @@ namespace PanoramicDataWin8
                                                    (int) Math.Floor((parentModel.Children.Count - 1)/8.0) - 1;
                     tileMenuItemViewModel.RowSpan = 1;
                     tileMenuItemViewModel.ColumnSpan = 1;
-                    Debug.WriteLine(inputModel.RawName + " c: " + tileMenuItemViewModel.Column + " r : " +
-                                    tileMenuItemViewModel.Row);
+                   
                     count++;
                     if (count == 8.0)
                     {

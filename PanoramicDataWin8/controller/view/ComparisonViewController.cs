@@ -196,6 +196,18 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var item in e.NewItems)
                 {
                     var current = ((KeyValuePair<StatisticalComparisonOperationViewModel, ComparisonView>) item).Key;
+                   
+                    HypothesesViewController.Instance.RemoveStatisticalComparisonOperationModel((current.OperationViewModels[0].OperationModel as HistogramOperationModel)
+                        .StatisticalComparisonOperationModel);
+                    (current.OperationViewModels[0].OperationModel as HistogramOperationModel)
+                        .StatisticalComparisonOperationModel = null;
+
+                    (current.OperationViewModels[1].OperationModel as HistogramOperationModel)
+                       .StatisticalComparisonOperationModel = null;
+                    HypothesesViewController.Instance.RemoveStatisticalComparisonOperationModel((current.OperationViewModels[1].OperationModel as HistogramOperationModel)
+                       .StatisticalComparisonOperationModel);
+
+
                     current.StatisticalComparisonOperationModel.AddStatisticallyComparableOperationModel((IStatisticallyComparableOperationModel) current.OperationViewModels[0].OperationModel);
                     current.StatisticalComparisonOperationModel.AddStatisticallyComparableOperationModel((IStatisticallyComparableOperationModel) current.OperationViewModels[1].OperationModel);
                     HypothesesViewController.Instance.AddStatisticalComparisonOperationModel(current.StatisticalComparisonOperationModel);

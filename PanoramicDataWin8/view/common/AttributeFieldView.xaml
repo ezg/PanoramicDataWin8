@@ -43,7 +43,7 @@
                         HorizontalAlignment="Stretch"
                         TextAlignment="Center"
                         MaxWidth="{Binding Size.X}"
-                        Text="{Binding MainLabel}" FontSize="11" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
+                        Text="{Binding MainLabel}" FontSize="10" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
                 </transform:LayoutTransformControl>
             </Viewbox>
         </Border>

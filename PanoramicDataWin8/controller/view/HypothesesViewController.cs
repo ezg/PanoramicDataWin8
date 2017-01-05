@@ -215,6 +215,9 @@ namespace PanoramicDataWin8.controller.view
         {
             model.ModelId = _riskOperationModel.ModelId;
 
+            model.OperationModelUpdated -= StatisticalComparisonOperationModel_OperationModelUpdated;
+            model.PropertyChanged -= StatisticalComparisonOperationModel_PropertyChanged;
+
             model.OperationModelUpdated += StatisticalComparisonOperationModel_OperationModelUpdated;
             model.PropertyChanged += StatisticalComparisonOperationModel_PropertyChanged;
             model.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
@@ -222,8 +225,11 @@ namespace PanoramicDataWin8.controller.view
 
         public void RemoveStatisticalComparisonOperationModel(StatisticalComparisonOperationModel model)
         {
-            model.OperationModelUpdated -= StatisticalComparisonOperationModel_OperationModelUpdated;
-            model.PropertyChanged -= StatisticalComparisonOperationModel_PropertyChanged;
+            if (model != null)
+            {
+                model.OperationModelUpdated -= StatisticalComparisonOperationModel_OperationModelUpdated;
+                model.PropertyChanged -= StatisticalComparisonOperationModel_PropertyChanged;
+            }
         }
 
         public void ClearAllStatisticalComparison()
