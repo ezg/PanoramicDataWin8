@@ -31,13 +31,13 @@ namespace PanoramicDataWin8
         /// </summary>
         public App()
         {
-            WindowsAppInitializer.InitializeAsync();
+           // WindowsAppInitializer.InitializeAsync();
 
             this.InitializeComponent();
             this.Suspending += OnSuspending;
 
-            var tc = new TelemetryClient();
-            tc.TrackEvent("VizdomStarted");
+            //var tc = new TelemetryClient();
+            //tc.TrackEvent("VizdomStarted");
         }
 
         /// <summary>

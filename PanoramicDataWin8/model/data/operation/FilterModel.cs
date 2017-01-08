@@ -61,6 +61,12 @@ namespace PanoramicDataWin8.model.data.operation
             return ret;
         }
 
+        public static string And(params string[] filters)
+        {
+            var ret = string.Join(" && ", filters.Where(f => !string.IsNullOrEmpty(f)));
+            return ret;
+        }
+
         public static string GetFilterModelsRecursive(object filterGraphNode, List<IFilterProviderOperationModel> visitedFilterProviders, List<FilterModel> filterModels, bool isFirst)
         {
             var ret = "";

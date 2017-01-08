@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
@@ -80,6 +82,24 @@ namespace PanoramicDataWin8.controller.view
                                 
                                 comparisonOperationViewModel.OperationViewModels.Add(other);
                                 comparisonOperationViewModel.OperationViewModels.Add(current);
+
+                                var a1 = (other.OperationModel as HistogramOperationModel)
+                                    .GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+                                var a2 = (current.OperationModel as HistogramOperationModel)
+                                    .GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+
+                                comparisonOperationViewModel.StatisticalComparisonOperationModel.TestType = TestType.chi2;
+                                if (a1.AttributeModel.RawName != a2.AttributeModel.RawName)
+                                {
+                                    comparisonOperationViewModel.StatisticalComparisonOperationModel.TestType = TestType.corr;
+                                }
+                                else if ((a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.FLOAT ||
+                                         (a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.INT)
+                                {
+                                    comparisonOperationViewModel.StatisticalComparisonOperationModel.TestType = TestType.ttest;
+                                }
+
+
                                 comparisonOperationViewModel.Position =
                                     (comparisonOperationViewModel.OperationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec())/2.0 - comparisonOperationViewModel.Size/2.0)
                                         .GetWindowsPoint();
@@ -206,8 +226,7 @@ namespace PanoramicDataWin8.controller.view
                        .StatisticalComparisonOperationModel = null;
                     HypothesesViewController.Instance.RemoveStatisticalComparisonOperationModel((current.OperationViewModels[1].OperationModel as HistogramOperationModel)
                        .StatisticalComparisonOperationModel);
-
-
+                    
                     current.StatisticalComparisonOperationModel.AddStatisticallyComparableOperationModel((IStatisticallyComparableOperationModel) current.OperationViewModels[0].OperationModel);
                     current.StatisticalComparisonOperationModel.AddStatisticallyComparableOperationModel((IStatisticallyComparableOperationModel) current.OperationViewModels[1].OperationModel);
                     HypothesesViewController.Instance.AddStatisticalComparisonOperationModel(current.StatisticalComparisonOperationModel);

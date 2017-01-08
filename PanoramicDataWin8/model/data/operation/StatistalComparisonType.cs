@@ -9,6 +9,7 @@
     public enum TestType
     {
         chi2,
-        ttest
+        ttest,
+        corr
     }
 }

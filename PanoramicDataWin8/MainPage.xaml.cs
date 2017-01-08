@@ -634,8 +634,8 @@ namespace PanoramicDataWin8
                 }
 
                 var parentModel = new TileMenuItemViewModel(null);
-                parentModel.ChildrenNrColumns = (int) Math.Ceiling(inputModels.Count()/8.0);
-                parentModel.ChildrenNrRows = (int) Math.Min(8.0, inputModels.Count());
+                parentModel.ChildrenNrColumns = (int) Math.Ceiling(inputModels.Count()/10.0);
+                parentModel.ChildrenNrRows = (int) Math.Min(10.0, inputModels.Count());
                 parentModel.Alignment = Alignment.Center;
                 parentModel.AttachPosition = AttachPosition.Right;
 
@@ -645,12 +645,12 @@ namespace PanoramicDataWin8
                     var tileMenuItemViewModel = recursiveCreateTileMenu(inputModel, parentModel);
                     tileMenuItemViewModel.Row = count;
                     tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
-                                                   (int) Math.Floor((parentModel.Children.Count - 1)/8.0) - 1;
+                                                   (int) Math.Floor((parentModel.Children.Count - 1)/10.0) - 1;
                     tileMenuItemViewModel.RowSpan = 1;
                     tileMenuItemViewModel.ColumnSpan = 1;
                    
                     count++;
-                    if (count == 8.0)
+                    if (count == 10.0)
                     {
                         count = 0;
                     }
@@ -681,8 +681,8 @@ namespace PanoramicDataWin8
                 };
 
                 currentTileMenuItemViewModel.ChildrenNrColumns =
-                    (int) Math.Ceiling(inputGroupModel.InputModels.Count()/8.0);
-                currentTileMenuItemViewModel.ChildrenNrRows = (int) Math.Min(8.0, inputGroupModel.InputModels.Count());
+                    (int) Math.Ceiling(inputGroupModel.InputModels.Count()/10.0);
+                currentTileMenuItemViewModel.ChildrenNrRows = (int) Math.Min(10.0, inputGroupModel.InputModels.Count());
                 currentTileMenuItemViewModel.Alignment = Alignment.Center;
                 currentTileMenuItemViewModel.AttachPosition = AttachPosition.Right;
 
@@ -692,12 +692,12 @@ namespace PanoramicDataWin8
                     var childTileMenu = recursiveCreateTileMenu(childInputModel, currentTileMenuItemViewModel);
                     childTileMenu.Row = count; // TileMenuItemViewModel.Children.Count;
                     childTileMenu.Column = currentTileMenuItemViewModel.ChildrenNrColumns - 1 -
-                                           (int) Math.Floor((currentTileMenuItemViewModel.Children.Count - 1)/8.0);
+                                           (int) Math.Floor((currentTileMenuItemViewModel.Children.Count - 1)/10.0);
                     childTileMenu.RowSpan = 1;
                     childTileMenu.ColumnSpan = 1;
                     //currentTileMenuItemViewModel.Children.Add(childTileMenu);
                     count++;
-                    if (count == 8.0)
+                    if (count == 10.0)
                     {
                         count = 0;
                     }
@@ -725,8 +725,8 @@ namespace PanoramicDataWin8
                 };
 
                 currentTileMenuItemViewModel.ChildrenNrColumns =
-                    (int) Math.Ceiling(taskGroupModel.OperationTypeModels.Count()/8.0);
-                currentTileMenuItemViewModel.ChildrenNrRows = (int) Math.Min(8.0, taskGroupModel.OperationTypeModels.Count());
+                    (int) Math.Ceiling(taskGroupModel.OperationTypeModels.Count()/10.0);
+                currentTileMenuItemViewModel.ChildrenNrRows = (int) Math.Min(10.0, taskGroupModel.OperationTypeModels.Count());
                 currentTileMenuItemViewModel.Alignment = Alignment.Center;
                 currentTileMenuItemViewModel.AttachPosition = AttachPosition.Right;
 
@@ -736,12 +736,12 @@ namespace PanoramicDataWin8
                     var childTileMenu = recursiveCreateTileMenu(childInputModel, currentTileMenuItemViewModel);
                     childTileMenu.Row = count; // TileMenuItemViewModel.Children.Count;
                     childTileMenu.Column = currentTileMenuItemViewModel.ChildrenNrColumns - 1 -
-                                           (int) Math.Floor((currentTileMenuItemViewModel.Children.Count - 1)/8.0);
+                                           (int) Math.Floor((currentTileMenuItemViewModel.Children.Count - 1)/10.0);
                     childTileMenu.RowSpan = 1;
                     childTileMenu.ColumnSpan = 1;
                     //currentTileMenuItemViewModel.Children.Add(childTileMenu);
                     count++;
-                    if (count == 8.0)
+                    if (count == 10.0)
                     {
                         count = 0;
                     }
@@ -788,8 +788,8 @@ namespace PanoramicDataWin8
                 }
 
                 var parentModel = new TileMenuItemViewModel(null);
-                parentModel.ChildrenNrColumns = (int) Math.Ceiling(taskModels.Count()/8.0);
-                parentModel.ChildrenNrRows = (int) Math.Min(8.0, taskModels.Count());
+                parentModel.ChildrenNrColumns = (int) Math.Ceiling(taskModels.Count()/10.0);
+                parentModel.ChildrenNrRows = (int) Math.Min(10.0, taskModels.Count());
                 parentModel.Alignment = Alignment.Center;
                 parentModel.AttachPosition = AttachPosition.Right;
 
@@ -798,12 +798,12 @@ namespace PanoramicDataWin8
                 {
                     var tileMenuItemViewModel = recursiveCreateTileMenu(inputModel, parentModel);
                     tileMenuItemViewModel.Row = count;
-                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor((parentModel.Children.Count - 1)/8.0) - 1;
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns - (int) Math.Floor((parentModel.Children.Count - 1)/10.0) - 1;
                     tileMenuItemViewModel.RowSpan = 1;
                     tileMenuItemViewModel.ColumnSpan = 1;
                     Debug.WriteLine(inputModel.Name + " c: " + tileMenuItemViewModel.Column + " r : " + tileMenuItemViewModel.Row);
                     count++;
-                    if (count == 8.0)
+                    if (count == 10.0)
                     {
                         count = 0;
                     }

@@ -30,7 +30,8 @@ namespace PanoramicDataWin8.controller.view
             InkableScene = inkableScene;
             MainPage = mainPage;
 
-            BrushableViewController.CreateInstance(OperationViewModels);
+            // disable for cidr demo
+            //BrushableViewController.CreateInstance(OperationViewModels);
             ComparisonViewController.CreateInstance(OperationViewModels);
 
             MainModel = new MainModel();

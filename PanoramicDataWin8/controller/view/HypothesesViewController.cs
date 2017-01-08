@@ -9,6 +9,8 @@ using Windows.UI.Xaml;
 using IDEA_common.operations.risk;
 using IDEA_common.util;
 using Newtonsoft.Json;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
@@ -97,6 +99,12 @@ namespace PanoramicDataWin8.controller.view
                         if (model.StatisticalComparisonOperationModel == null)
                         {
                             statModel = new StatisticalComparisonOperationModel(model.SchemaModel);
+                            var a1 = model.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+                            if ((a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.FLOAT ||
+                                (a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.INT)
+                            {
+                                //statModel.TestType = TestType.ttest;
+                            }
                             model.StatisticalComparisonOperationModel = statModel;
                             add = true;
                         }

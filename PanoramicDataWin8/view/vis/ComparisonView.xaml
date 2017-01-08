@@ -15,10 +15,10 @@
     </UserControl.RenderTransform>
 
     <Grid Width="{Binding Size.X}" Height="{Binding Size.Y}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"></RowDefinition>
-            <RowDefinition Height="*"></RowDefinition>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+            <ColumnDefinition Width="*"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
         <Grid Name="mainGrid" Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"></RowDefinition>
@@ -26,9 +26,9 @@
             </Grid.RowDefinitions>
         
             <TextBlock Name="pLabelTB" FontSize="16" Text="p" Foreground="{StaticResource darkBrush}"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
-            <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Name="tbPValue" Text="" FontSize="11" Foreground="{StaticResource darkBrush}"/>
+            <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Name="tbPValue" Text="" FontSize="11" Foreground="{StaticResource darkBrush}"/>
         </Grid>
         
-        <Canvas Grid.Row="1" Name="menuCanvas"></Canvas>
+        <Canvas Grid.Column="1" Name="menuCanvas"></Canvas>
     </Grid>
 </UserControl>

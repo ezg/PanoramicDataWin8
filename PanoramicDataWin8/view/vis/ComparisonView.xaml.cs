@@ -92,25 +92,25 @@ namespace PanoramicDataWin8.view.vis
                 {
                    _menuViewModel = new MenuViewModel
                     {
-                        AttachmentOrientation = AttachmentOrientation.Bottom,
-                        NrColumns = 2,
-                        NrRows = 1
+                        AttachmentOrientation = AttachmentOrientation.Right,
+                        NrColumns = 1,
+                        NrRows = 3
                     };
                     var toggles = new List<ToggleMenuItemComponentViewModel>();
                     var items = new List<MenuItemViewModel>();
-                    TestType[] types = new TestType[] {TestType.chi2,  TestType.ttest};
+                    TestType[] types = new TestType[] {TestType.chi2,  TestType.ttest, TestType.corr };
                     int count = 0;
                     foreach (var type in types)
                     {
                         var toggleMenuItem = new MenuItemViewModel
                         {
                             MenuViewModel = _menuViewModel,
-                            Row = 0,
+                            Row = count,
                             RowSpan = 0,
                             Position = new Pt(0, 0),
-                            Column = count,
-                            Size = new Vec(35.5, 35.5),
-                            TargetSize = new Vec(35.5, 35.5)
+                            Column = 0,
+                            Size = new Vec(50, 22.333),
+                            TargetSize = new Vec(50, 22.333),
                         };
                         //toggleMenuItem.Position = attachmentItemViewModel.Position;
                         var toggle = new ToggleMenuItemComponentViewModel

@@ -54,6 +54,21 @@ namespace PanoramicDataWin8.controller.data.progressive
                     }
                 };
             }
+            else if (model.TestType == TestType.corr)
+            {
+                addComparison.ChildOperationParameters = new List<OperationParameters>()
+                {
+                    new CorrelationTestOperationParameters()
+                    {
+                        ChildOperationParameters = new List<OperationParameters>
+                        {
+                            GetEmpiricalDistOperationParameters(
+                                model.StatisticallyComparableOperationModels[0] as HistogramOperationModel,
+                                model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize)
+                        }
+                    }
+                };
+            }
 
             return addComparison;
         }
@@ -110,6 +125,34 @@ namespace PanoramicDataWin8.controller.data.progressive
             };
             return parameters;
         }
+
+        public static EmpiricalDistOperationParameters GetEmpiricalDistOperationParameters(HistogramOperationModel m1, HistogramOperationModel m2, int sampleSize)
+        {
+            var psm = m1.SchemaModel as IDEASchemaModel;
+
+            var filter1 = "";
+            var filterModels = new List<FilterModel>();
+            filter1 = FilterModel.GetFilterModelsRecursive(m1, new List<IFilterProviderOperationModel>(), filterModels, true);
+
+            var filter2 = "";
+            filterModels = new List<FilterModel>();
+            filter2 = FilterModel.GetFilterModelsRecursive(m2, new List<IFilterProviderOperationModel>(), filterModels, true);
+
+            var m1Iom = m1.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+            var m2Iom = m2.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+
+
+            var parameters = new EmpiricalDistOperationParameters()
+            {
+                AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
+                Filter = FilterModel.And(filter1, filter2),
+                Attrs = new[] { m1Iom, m2Iom }.Select(a => a.AttributeModel.RawName).ToList(),
+                SampleStreamBlockSize = sampleSize,
+                KeepSamples = false
+            };
+            return parameters;
+        }
+
 
         public static HistogramOperationParameters GetHistogramOperationParameters(HistogramOperationModel model, int sampleSize)
         {
