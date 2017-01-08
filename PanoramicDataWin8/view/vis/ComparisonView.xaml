@@ -26,7 +26,7 @@
             </Grid.RowDefinitions>
         
             <TextBlock Name="pLabelTB" FontSize="16" Text="p" Foreground="{StaticResource darkBrush}"  HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="0"/>
-            <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Name="tbPValue" Text="" FontSize="11" Foreground="{StaticResource darkBrush}"/>
+            <TextBlock Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Top" Name="tbPValue" Text="" FontSize="16" Foreground="{StaticResource darkBrush}"/>
         </Grid>
         
         <Canvas Grid.Column="1" Name="menuCanvas"></Canvas>
