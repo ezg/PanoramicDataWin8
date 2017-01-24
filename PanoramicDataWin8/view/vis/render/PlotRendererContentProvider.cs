@@ -43,21 +43,29 @@ namespace PanoramicDataWin8.view.vis.render
         
         private HistogramOperationModel _histogramOperationModel = null;
         private List<FilterModel> _filterModels = new List<FilterModel>();
+        private List<BczBinMapModel> _bczBinMapModels = new List<BczBinMapModel>();
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
         private CanvasCachedGeometry _strokeRoundedRectGeom = null;
 
         public double CompositionScaleX { get; set; }
         public double CompositionScaleY { get; set; }
         public Dictionary<IGeometry, FilterModel> HitTargets { get; set; }
+        public Dictionary<IGeometry, BczBinMapModel> BczHitTargets { get; set; }
 
         public PlotRendererContentProvider()
         {
             HitTargets = new Dictionary<IGeometry, FilterModel>();
+            BczHitTargets = new Dictionary<IGeometry, BczBinMapModel>();
         }
 
         public void UpdateFilterModels(List<FilterModel> filterModels)
         {
             _filterModels = filterModels;
+        }
+
+        public void UpdateBczBinMapModels(List<BczBinMapModel> binMapModels)
+        {
+            _bczBinMapModels = binMapModels;
         }
 
         public void UpdateData(IResult result, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone)
@@ -102,98 +110,14 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        private void computeSizesAndRenderLabels(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, bool renderLines)
+        private void  computeSizesAndRenderLabels(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, bool renderLines, Dictionary<int,int> sortedXList, Dictionary<int, int> sortedYList)
         {
             _helper.ComputeSizes(canvas, _textFormat);
-            var white = Color.FromArgb(255, 255, 255, 255);
-
+            
             if (_helper.DeviceHeight > 0 && _helper.DeviceWidth > 0)
             {
-                double xFrom = 0; 
-                double xTo = 0;
-                double yFrom = 0;
-                double yTo = 0;
-                bool lastLabel = false;
-
-                var xLabels = _helper.VisualBinRanges[0].GetLabels();
-                // x labels and grid lines
-                int mod = (int)Math.Ceiling(1.0 / (Math.Floor((_helper.DeviceWidth / (_helper.LabelMetricsX.Width + 5))) / xLabels.Count));
-                int count = 0;
-
-                foreach (var label in xLabels)
-                {
-                    yFrom = _helper.DataToScreenY(_helper.DataMinY);
-                    yTo = _helper.DataToScreenY(_helper.DataMaxY);
-                    xFrom = _helper.DataToScreenX(label.MinValue);
-                    xTo = _helper.DataToScreenX(label.MaxValue);
-                    lastLabel = count + 1 == xLabels.Count;
-
-                    if (renderLines)
-                    {
-                        canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xFrom, yFrom), CommonExtensions.ToVector2(xFrom, yTo), white, 0.5f);
-                        if (lastLabel)
-                        {
-                            canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xTo, yFrom), CommonExtensions.ToVector2(xTo, yTo), white, 0.5f);
-                        }
-                    }
-                    if (count % mod == 0)
-                    {
-                        if (_helper.VisualBinRanges[0] is QuantitativeBinRange || _helper.VisualBinRanges[0] is DateTimeBinRange)
-                        {
-                            var lbl = _helper.VisualBinRanges[0] is QuantitativeBinRange ? double.Parse(label.Label).ToString() : label.Label;
-                            DrawString(canvasArgs, _textFormat, xFrom, yFrom + 5, lbl, _textColor, true, true, false);
-                            if (lastLabel)
-                            {
-                               // DrawString(canvasArgs, _textFormat, xTo, yFrom + 5, label.MaxValue.ToString(), _textColor, true, true, false);
-                            }
-                        }
-                        else
-                        {
-                            DrawString(canvasArgs, _textFormat, xFrom + (xTo - xFrom) / 2.0f, yFrom + 5, label.Label.ToString(), _textColor, true, true, false);
-                        }
-                    }
-                    count++;
-                }
-
-                // y labels and grid lines
-                var yLabels = _helper.VisualBinRanges[1].GetLabels();
-                mod = (int)Math.Ceiling(1.0 / (Math.Floor((_helper.DeviceHeight / (_helper.LabelMetricsY.Height + 5))) / yLabels.Count));
-                count = 0;
-                foreach (var label in yLabels)
-                {
-                    var tt = _helper.VisualBinRanges[1].GetLabel(label.Value);
-                    xFrom = _helper.DataToScreenX(_helper.DataMinX);
-                    xTo = _helper.DataToScreenX(_helper.DataMaxX);
-                    yFrom = _helper.DataToScreenY(label.MinValue);
-                    yTo = _helper.DataToScreenY(label.MaxValue);
-                    lastLabel = count + 1 == yLabels.Count;
-
-                    if (renderLines)
-                    {
-                        canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xFrom, yFrom), CommonExtensions.ToVector2(xTo, yFrom), white, 0.5f);
-                        if (lastLabel)
-                        {
-                            canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xFrom, yTo), CommonExtensions.ToVector2(xTo, yTo), white, 0.5f);
-                        }
-                    }
-                    if (count % mod == 0)
-                    {
-                        if (_helper.VisualBinRanges[1] is QuantitativeBinRange || _helper.VisualBinRanges[1] is DateTimeBinRange)
-                        {
-                            var lbl = _helper.VisualBinRanges[1] is QuantitativeBinRange ? double.Parse(label.Label).ToString() : label.Label;
-                            DrawString(canvasArgs, _textFormat, xFrom - 10, yFrom, lbl, _textColor, false, false, true);
-                            if (lastLabel)
-                            {
-                               // DrawString(canvasArgs, _textFormat, xFrom - 10, yTo, label.MaxValue.ToString(), _textColor, false, false, true);
-                            }
-                        }
-                        else
-                        {
-                            DrawString(canvasArgs, _textFormat, xFrom - 10, yFrom + (yTo - yFrom) / 2.0f, label.Label.ToString(), _textColor, false, false, true);
-                        }
-                    }
-                    count++;
-                }
+                drawLabelsAndGridLines(canvasArgs, renderLines, true,  sortedXList);   // x labels and grid lines\
+                drawLabelsAndGridLines(canvasArgs, renderLines, false, sortedYList);   // y labels and grid lines
 
                 _fillRoundedRectGeom?.Dispose();
                 _strokeRoundedRectGeom?.Dispose();
@@ -205,10 +129,97 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
+        void drawLabelsAndGridLines(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, bool renderLines, bool xaxis, Dictionary<int, int> sortedList)
+        {
+            double xFrom = 0, xTo = 0, yFrom = 0, yTo = 0;
+            var white    = Color.FromArgb(255, 255, 255, 255);
+            var binRange = _helper.VisualBinRanges[xaxis ? 0 : 1];
+            var Labels   = binRange.GetLabels();
+            var dim = xaxis ? _helper.DeviceWidth  / (_helper.LabelMetricsX.Width  + 5) :
+                              _helper.DeviceHeight / (_helper.LabelMetricsY.Height + 5);
+            int mod = (int)Math.Ceiling(1.0 / Math.Floor(dim / Labels.Count));
+
+            foreach (var label in Labels)
+            {
+                xFrom = _helper.DataToScreenX(xaxis ? label.MinValue   : _helper.DataMinX);
+                xTo   = _helper.DataToScreenX(xaxis ? label.MaxValue   : _helper.DataMinY);
+                yFrom = _helper.DataToScreenY(xaxis ? _helper.DataMinY : label.MinValue);
+                yTo   = _helper.DataToScreenY(xaxis ? _helper.DataMaxY : label.MaxValue);
+                
+                var drawBinIndex = Labels.IndexOf(label);
+                foreach (var l in sortedList)
+                    if (l.Value == drawBinIndex)
+                    {
+                        drawBinIndex = l.Key;
+                        break;
+                    }
+                var drawLabel = Labels[drawBinIndex];
+                if (_helper.ChartType == ChartType.HeatMap || _helper.ChartType == (xaxis ? ChartType.HorizontalBar : ChartType.VerticalBar))
+                {
+                    var binPrimitive = new BinPrimitive()
+                    {
+                        Rect = new Rect(xaxis ? xFrom       : xFrom - 20,
+                                        xaxis ? yFrom + 5   : yTo,
+                                        xaxis ? xTo - xFrom : 10,
+                                        xaxis ? 15          : yFrom - yTo),
+                        Color = Color.FromArgb(25, 125, 125, 125)
+                    };
+
+                    // add hit targets for sorting by clicking this label
+                    var bmc = new BinPrimitiveCollection();
+                    bmc.BinPrimitives.Add(binPrimitive);
+                    bmc.HitGeom = new Rct(binPrimitive.Rect.Left, binPrimitive.Rect.Top, binPrimitive.Rect.Right, binPrimitive.Rect.Bottom).GetPolygon();
+                    bmc.BczBinMapModel = new BczBinMapModel(_helper.ChartType == ChartType.HeatMap ? drawLabel.Value : 0, xaxis);
+                    if (_bczBinMapModels.Contains(bmc.BczBinMapModel))
+                    {
+                        binPrimitive.Color = Color.FromArgb((byte)150, 125, 125, 125);
+                        bmc.BczBinMapModel.SortUp = _bczBinMapModels[_bczBinMapModels.IndexOf(bmc.BczBinMapModel)].SortUp;
+                    }
+                    BczHitTargets.Add(bmc.HitGeom, bmc.BczBinMapModel);
+
+                    // draw hit target
+                    canvasArgs.DrawingSession.FillRoundedRectangle(binPrimitive.Rect, 4, 4, binPrimitive.Color);
+                }
+                
+                if (renderLines)
+                {
+                    canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xFrom, yFrom), CommonExtensions.ToVector2(xaxis ? xFrom:xTo, xaxis ? yTo:yFrom), white, 0.5f);
+                    if (label == Labels.Last())
+                    {
+                        canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xaxis ? xTo:xFrom, xaxis ? yFrom:yTo), CommonExtensions.ToVector2(xTo, yTo), white, 0.5f);
+                    }
+                }
+                if (Labels.IndexOf(label) % mod == 0)
+                {
+                    var xStart = xaxis ? xFrom + (xTo - xFrom) / 2.0f : xFrom - 10;
+                    var yStart = xaxis ? yFrom + 5                    : yFrom + (yTo - yFrom) / 2.0f;
+                    var text = drawLabel.Label.ToString();
+                    if (binRange is QuantitativeBinRange || binRange is DateTimeBinRange)
+                    {
+                        xStart = xaxis ? xFrom  : xStart;
+                        yStart = xaxis ? yStart : yFrom;
+                        if (binRange is QuantitativeBinRange)
+                            text = double.Parse(drawLabel.Label).ToString();
+                        if (label == Labels.Last())              
+                        {
+                            // DrawString(canvasArgs, _textFormat, xTo, yFrom + 5, label.MaxValue.ToString(), _textColor, true, true, false);
+                        }
+                    }
+                    DrawString(canvasArgs, _textFormat, xStart, yStart, text, _textColor, xaxis, xaxis, !xaxis);
+                }
+            }
+        }
+
         private void renderPlot(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
         {
-            computeSizesAndRenderLabels(canvas, canvasArgs, true);
-            
+            // bcz index sorting
+            BczHitTargets.Clear();
+            var xLabelOrderings = SortBinsByValue(false);
+            var yLabelOrderings = SortBinsByValue(true);
+
+            computeSizesAndRenderLabels(canvas, canvasArgs, true, xLabelOrderings, yLabelOrderings);
+          
+
             if (_helper.DeviceHeight < 0 || _helper.DeviceWidth < 0)
             {
                 return;
@@ -224,16 +235,17 @@ namespace PanoramicDataWin8.view.vis.render
 
             List<BinPrimitiveCollection> allBinPrimitiveCollections = new List<BinPrimitiveCollection>();
             HitTargets.Clear();
+
             for (int xi = 0; xi < _histogramResult.BinRanges[0].GetBins().Count; xi++)
             {
                 for (int yi = 0; yi < _histogramResult.BinRanges[1].GetBins().Count; yi++)
                 {
                     BinIndex binIndex = new BinIndex(xi, yi);
-                    
+
                     if (_histogramResult.Bins.ContainsKey(binIndex))
                     {
                         var bin = _histogramResult.Bins[binIndex];
-                        var binPrimitiveCollection = _helper.GetBinPrimitives(bin);
+                        var binPrimitiveCollection = _helper.GetBinPrimitives(bin,xLabelOrderings, yLabelOrderings);
                         allBinPrimitiveCollections.Add(binPrimitiveCollection);
 
                         foreach (var binPrimitive in binPrimitiveCollection.BinPrimitives.Where(bp => bp.Value != 0.0 && bp.BrushIndex != _histogramResult.AllBrushIndex()))
@@ -243,29 +255,29 @@ namespace PanoramicDataWin8.view.vis.render
                             {
                                 canvasArgs.DrawingSession.FillRectangle(binPrimitive.MarginRect, dark);
                             }
-                            
+
                             if (binPrimitive.MarginPercentage > 0.009)
                             {
                                 var percentageText = binPrimitive.MarginPercentage.ToString("F2") + "%";
                                 var layout = new CanvasTextLayout(canvas, percentageText, _textFormat, 1000f, 1000f);
                                 var layoutBounds = layout.DrawBounds;
                                 layout.Dispose();
-                                var scale = (double) Math.Min(1.0, Math.Min((binPrimitive.Rect.Height - 5.0)/layoutBounds.Height, (binPrimitive.Rect.Width - 5.0)/layoutBounds.Width));
+                                var scale = (double)Math.Min(1.0, Math.Min((binPrimitive.Rect.Height - 5.0) / layoutBounds.Height, (binPrimitive.Rect.Width - 5.0) / layoutBounds.Width));
                                 var transMat = Matrix3x2.CreateTranslation(CommonExtensions.ToVector2(
-                                    (double)(binPrimitive.Rect.X + binPrimitive.Rect.Width / 2.0), 
+                                    (double)(binPrimitive.Rect.X + binPrimitive.Rect.Width / 2.0),
                                     (double)(binPrimitive.Rect.Y + binPrimitive.Rect.Height / 2.0)));
                                 var scaleMat = Matrix3x2.CreateScale(CommonExtensions.ToVector2(scale, scale));
                                 var transInvertMat = Matrix3x2.Identity;
                                 Matrix3x2.Invert(transMat, out transInvertMat);
 
-                                var mat = transInvertMat * scaleMat*transMat;
+                                var mat = transInvertMat * scaleMat * transMat;
                                 var oldMat = canvasArgs.DrawingSession.Transform;
 
-                                canvasArgs.DrawingSession.Transform = mat*oldMat;
+                                canvasArgs.DrawingSession.Transform = mat * oldMat;
 
-                                DrawString(canvasArgs, _textFormat, 
-                                    (double)(binPrimitive.Rect.X + binPrimitive.Rect.Width / 2.0), 
-                                    (double)(binPrimitive.Rect.Y + binPrimitive.Rect.Height / 2.0), 
+                                DrawString(canvasArgs, _textFormat,
+                                    (double)(binPrimitive.Rect.X + binPrimitive.Rect.Width / 2.0),
+                                    (double)(binPrimitive.Rect.Y + binPrimitive.Rect.Height / 2.0),
                                     binPrimitive.MarginPercentage.ToString("F2") + "%", _textColor, false, true, true);
                                 canvasArgs.DrawingSession.Transform = oldMat;
                                 //canvasArgs.DrawingSession.dra(binPrimitive.MarginRect, dark);
@@ -295,7 +307,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (_histogramOperationModel.IncludeDistribution)
             {
                 //canvasArgs.DrawingSession.FillRectangle(new Rect(0, 0, canvas.ActualWidth, canvas.ActualHeight),
-                    //Color.FromArgb(150, 230, 230, 230));
+                //Color.FromArgb(150, 230, 230, 230));
 
                 List<List<Vector2>> paths = _helper.GetDistribution();
                 foreach (var path in paths)
@@ -325,6 +337,47 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
+        Dictionary<int,int> SortBinsByValue(bool sortAxis)
+        {
+            var sortedIndexList = new SortedList<double, int>();
+            var binIndexDict = new Dictionary<int, int>();
+            int sortBinIndex = -1;
+            bool reverse = false;
+            foreach (var fm in _bczBinMapModels)
+                if (sortAxis == fm.SortAxis)
+                {
+                    reverse = !fm.SortUp;
+                    sortBinIndex = _histogramResult.BinRanges[!sortAxis ? 1 : 0].GetIndexFromScaleValue(fm.Value);
+                }
+
+            for (int xi = 0; xi < _histogramResult.BinRanges[sortAxis ? 1 :0].GetBins().Count; xi++)
+            {
+                var binValue = _helper.VisualBinRanges[sortAxis ? 1 : 0].GetLabels()[xi].Value;
+                var binIndex = _histogramResult.BinRanges[sortAxis ? 1 : 0].GetIndexFromScaleValue(binValue);
+                var newXi = binIndex;
+                var newYi = sortBinIndex;
+                if (sortAxis)
+                {
+                    newYi = newXi;
+                    newXi = sortBinIndex;
+                }
+                double sortValue = sortBinIndex == -1 ? xi : _helper.GetBinValue(_histogramResult.Bins[new BinIndex(newXi, newYi)], !sortAxis);
+
+                while (sortedIndexList.ContainsKey(sortValue))
+                    sortValue += reverse ? -1e-7 : 1e-7;
+                sortedIndexList.Add(sortValue, binIndex);
+            }
+            for (int xi = 0; xi < _histogramResult.BinRanges[sortAxis ? 1 : 0].GetBins().Count; xi++)
+            {
+                var binValue = _helper.VisualBinRanges[sortAxis ? 1 : 0].GetLabels()[xi].Value;
+                var binIndex = _histogramResult.BinRanges[sortAxis ? 1 : 0].GetIndexFromScaleValue(binValue);
+                var list = reverse ? new List<int>(sortedIndexList.Values.Reverse()) : sortedIndexList.Values;
+                binIndexDict.Add(binIndex, list.IndexOf(binIndex));
+            }
+            return binIndexDict;
+         //   return reverse ? sortedIndexList.Values.Reverse() : sortedIndexList.Values;
+        }
+
         public override void Load(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs canvasArgs)
         {
             _textFormat = new CanvasTextFormat()
@@ -342,6 +395,7 @@ namespace PanoramicDataWin8.view.vis.render
         public List<BinPrimitive>  BinPrimitives { get; set; } = new List<BinPrimitive>();
         public IGeometry HitGeom { get; set; }
         public FilterModel FilterModel { get; set; }
+        public BczBinMapModel BczBinMapModel { get; set; }
     }
 
     public class BinPrimitive
@@ -366,6 +420,7 @@ namespace PanoramicDataWin8.view.vis.render
         private AttributeTransformationModel _yIom = null;
         private AttributeTransformationModel _valueIom = null;
         private ChartType _chartType = ChartType.HeatMap;
+        public ChartType ChartType {  get { return _chartType;  } }
         public List<BinRange> VisualBinRanges { get; set; } = new List<BinRange>();
 
         public double LeftOffset { get; set; } = 40;
@@ -620,7 +675,36 @@ namespace PanoramicDataWin8.view.vis.render
             return returnList;
         }
 
-        public BinPrimitiveCollection GetBinPrimitives(Bin bin)
+        public double GetBinValue(Bin bin, bool x)
+        {
+            foreach (var brush in _histogramResult.Brushes)
+            {
+                if (brush.BrushIndex == _histogramResult.AllBrushIndex())
+                {
+                    double theValue = 0;
+                    if (_chartType == ChartType.HeatMap)
+                    {
+                        var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
+                        valueAggregateKey.BrushIndex = _histogramResult.AllBrushIndex();
+                        theValue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
+                    }
+                    else if (_chartType == ChartType.HorizontalBar)
+                    {
+                        var xAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);
+                        theValue = ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result;
+                    }
+                    else if (_chartType == ChartType.VerticalBar)
+                    {
+                        var yAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex);
+                        theValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
+                    }
+                    return theValue;
+                }
+            }
+            return 0;
+        }
+
+        public BinPrimitiveCollection GetBinPrimitives(Bin bin, Dictionary<int,int> slistXValues, Dictionary<int, int> slistYValues)
         {
             BinPrimitiveCollection binPrimitiveCollection = new BinPrimitiveCollection();
             double alpha = 0.15f;
@@ -631,6 +715,8 @@ namespace PanoramicDataWin8.view.vis.render
                 {AggregateFunction = _valueIom.AggregateFunction.ToString()}, _histogramResult, _histogramResult.AllBrushIndex());
 
             var brushFactorSum = 0.0;
+
+
             foreach (var brush in _histogramResult.Brushes)
             {
                 Rect marginRect = Rect.Empty;
@@ -685,12 +771,17 @@ namespace PanoramicDataWin8.view.vis.render
                     valueAggregateKey.BrushIndex = _histogramResult.AllBrushIndex();
                     var allUnNormalizedValue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
                     var brushFactor = (unNormalizedvalue / allUnNormalizedValue);
-                    
-                    xFrom = DataToScreenX((double)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
-                    xTo = DataToScreenX((double)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
+                    var mappedXBinIndex = slistXValues[bin.BinIndex.Indices[0]];
+                    var mappedYBinIndex = slistYValues[bin.BinIndex.Indices[1]];
 
-                    yFrom = DataToScreenY((double)_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1]));
-                    yTo = DataToScreenY((double)_histogramResult.BinRanges[1].AddStep(_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1])));
+                    var tx = (double)_histogramResult.BinRanges[0].GetValueFromIndex(mappedXBinIndex);
+                    xFrom = DataToScreenX(tx);
+                    xTo = DataToScreenX((double)_histogramResult.BinRanges[0].AddStep(tx));
+
+                    var ty = (double)_histogramResult.BinRanges[1].GetValueFromIndex(mappedYBinIndex); //_histogramResult.BinRanges[1].GetIndexFromScaleValue(VisualBinRanges[1].GetLabels()[slistYValues.IndexOf(bin.BinIndex.Indices[1])].Value);
+
+                    yFrom = DataToScreenY(ty);
+                    yTo   = DataToScreenY((double)_histogramResult.BinRanges[1].AddStep(ty));
                     if (allUnNormalizedValue > 0 && unNormalizedvalue > 0)
                     {
                         brushFactorSum += brushFactor;
@@ -717,8 +808,10 @@ namespace PanoramicDataWin8.view.vis.render
                     xFrom = DataToScreenX((double) Math.Min(0, xValue));
                     xTo = DataToScreenX((double) Math.Max(0, xValue));
 
-                    yFrom = DataToScreenY((double)_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1]));
-                    yTo = DataToScreenY((double)_histogramResult.BinRanges[1].AddStep(_histogramResult.BinRanges[1].GetValueFromIndex(bin.BinIndex.Indices[1])));
+                    var tt = _histogramResult.BinRanges[1].GetValueFromIndex(slistYValues[bin.BinIndex.Indices[1]]); //  slistYValues.IndexOf(bin.BinIndex.Indices[1]));
+
+                    yFrom = DataToScreenY(tt);
+                    yTo = DataToScreenY((double)_histogramResult.BinRanges[1].AddStep(tt));
 
                     xMargin = (double) ((MarginAggregateResult) bin.AggregateResults[xMarginAggregateKey]).Margin;
                     xMarginAbsolute = (double) ((MarginAggregateResult) bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
@@ -740,10 +833,10 @@ namespace PanoramicDataWin8.view.vis.render
                     yFrom = DataToScreenY((double)Math.Min(0, yValue));
                     yTo = DataToScreenY((double)Math.Max(0, yValue));
 
-                    var tt = _histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]);
+                    var tt = _histogramResult.BinRanges[0].GetValueFromIndex(slistXValues[bin.BinIndex.Indices[0]]); //  slistXValues.IndexOf(bin.BinIndex.Indices[0]));
 
-                    xFrom = DataToScreenX((double)_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0]));
-                    xTo = DataToScreenX((double)_histogramResult.BinRanges[0].AddStep(_histogramResult.BinRanges[0].GetValueFromIndex(bin.BinIndex.Indices[0])));
+                    xFrom = DataToScreenX((double)tt);
+                    xTo = DataToScreenX((double)_histogramResult.BinRanges[0].AddStep(tt));
 
                     yMargin = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
                     yMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
@@ -782,41 +875,10 @@ namespace PanoramicDataWin8.view.vis.render
                 if (brush.BrushIndex == _histogramResult.AllBrushIndex())
                 {
                     IGeometry hitGeom = null;
-                    FilterModel filterModel = null;
-                    AttributeTransformationModel[] dimensions = new AttributeTransformationModel[] {_xIom, _yIom};
                     //if (_chartType != ChartType.HeatMap)
-                    {
-                        hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
-                        filterModel = new FilterModel();
-                        filterModel.Value = unNormalizedvalue;
-                        for (int i = 0; i < _histogramResult.BinRanges.Count; i++)
-                        {
-                            if (!(_histogramResult.BinRanges[i] is AggregateBinRange))
-                            {
-                                var dataFrom = _histogramResult.BinRanges[i].GetValueFromIndex(bin.BinIndex.Indices[i]);
-                                var dataTo = _histogramResult.BinRanges[i].AddStep(_histogramResult.BinRanges[i].GetValueFromIndex(bin.BinIndex.Indices[i]));
 
-                                if (_histogramResult.BinRanges[i] is NominalBinRange)
-                                {
-                                    var dd = _histogramResult.BinRanges[i].GetIndexFromScaleValue(bin.BinIndex.Indices[i]);
-                                    var tt = _histogramResult.BinRanges[i].GetLabel(dd);
-                                    var xx = _histogramResult.BinRanges[i].GetLabel(dataFrom);
-
-                                    filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.EQUALS, tt));
-                                }
-                                else if (_histogramResult.BinRanges[i] is AlphabeticBinRange)
-                                {
-                                    filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.STARTS_WITH,
-                                        _histogramResult.BinRanges[i].GetLabel(dataFrom)));
-                                }
-                                else
-                                {
-                                    filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.GREATER_THAN_EQUAL, dataFrom));
-                                    filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.LESS_THAN, dataTo));
-                                }
-                            }
-                        }
-                    }
+                    hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
+                    FilterModel filterModel = GetBinFilterModel(bin, brush.BrushIndex);
                     binPrimitiveCollection.FilterModel = filterModel;
                     binPrimitiveCollection.HitGeom = hitGeom;
                 }
@@ -885,6 +947,50 @@ namespace PanoramicDataWin8.view.vis.render
             }
             binPrimitiveCollection.BinPrimitives.Reverse();
             return binPrimitiveCollection;
+        }
+
+        public FilterModel GetBinFilterModel(Bin bin, int brushIndex)
+        {
+            AttributeTransformationModel[] dimensions = new AttributeTransformationModel[] { _xIom, _yIom };
+            FilterModel filterModel;
+            filterModel = new FilterModel();
+
+            var marginAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, new MarginAggregateParameters()
+            { AggregateFunction = _valueIom.AggregateFunction.ToString() }, _histogramResult, _histogramResult.AllBrushIndex());
+            var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
+            valueAggregateKey.BrushIndex = brushIndex;
+            MarginAggregateResult valueMargin = (MarginAggregateResult)bin.AggregateResults[marginAggregateKey];
+            double unNormalizedvalue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
+
+            filterModel.Value = unNormalizedvalue;
+            for (int i = 0; i < _histogramResult.BinRanges.Count; i++)
+            {
+                if (!(_histogramResult.BinRanges[i] is AggregateBinRange))
+                {
+                    var dataFrom = _histogramResult.BinRanges[i].GetValueFromIndex(bin.BinIndex.Indices[i]);
+                    var dataTo = _histogramResult.BinRanges[i].AddStep(_histogramResult.BinRanges[i].GetValueFromIndex(bin.BinIndex.Indices[i]));
+
+                    if (_histogramResult.BinRanges[i] is NominalBinRange)
+                    {
+                        var dd = _histogramResult.BinRanges[i].GetIndexFromScaleValue(bin.BinIndex.Indices[i]);
+                        var tt = _histogramResult.BinRanges[i].GetLabel(dd);
+                        var xx = _histogramResult.BinRanges[i].GetLabel(dataFrom);
+
+                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.EQUALS, tt));
+                    }
+                    else if (_histogramResult.BinRanges[i] is AlphabeticBinRange)
+                    {
+                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.STARTS_WITH,
+                            _histogramResult.BinRanges[i].GetLabel(dataFrom)));
+                    }
+                    else
+                    {
+                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.GREATER_THAN_EQUAL, dataFrom));
+                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.LESS_THAN, dataTo));
+                    }
+                }
+            }
+            return filterModel;
         }
 
         public double DataToScreenX(double x)

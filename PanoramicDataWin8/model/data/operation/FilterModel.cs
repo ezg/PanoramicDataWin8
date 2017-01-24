@@ -14,7 +14,7 @@ namespace PanoramicDataWin8.model.data.operation
             ValueComparisons = new List<ValueComparison>();
             GroupAggregateComparisons = "";
         }
-
+        
         public double? Value { get; set; }
         public List<ValueComparison> ValueComparisons { get; set; }
         public string GroupAggregateComparisons { get; set; }
@@ -30,7 +30,6 @@ namespace PanoramicDataWin8.model.data.operation
             if (obj is FilterModel)
             {
                 compareTo = obj as FilterModel;
-
                 var valueComp = Compare(this.ValueComparisons, compareTo.ValueComparisons);
                 return valueComp;
             }
@@ -126,6 +125,36 @@ namespace PanoramicDataWin8.model.data.operation
                 }
             }
             return ret;
+        }
+    }
+    [JsonObject(MemberSerialization.OptOut)]
+    public class BczBinMapModel
+    {
+        public BczBinMapModel()
+        {
+        }
+        public BczBinMapModel(double value, bool sortAxis)
+        {
+            Value = value;
+            SortAxis = sortAxis;
+        }
+
+        public bool SortAxis { get; set; }
+        public bool SortUp  { get; set; }
+        public double Value { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            BczBinMapModel compareTo = null;
+            if (obj is BczBinMapModel)
+            {
+                compareTo = obj as BczBinMapModel;
+                if (SortAxis == compareTo.SortAxis && Value == compareTo.Value)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

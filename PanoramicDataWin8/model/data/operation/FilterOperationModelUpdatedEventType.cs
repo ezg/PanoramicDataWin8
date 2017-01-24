@@ -4,6 +4,7 @@
     {
         Links,
         FilterModels,
+        BczBinMapModels,
         ClearFilterModels
     }
 }

@@ -31,7 +31,7 @@ namespace PanoramicDataWin8.controller.view
             MainPage = mainPage;
 
             // disable for cidr demo
-            //BrushableViewController.CreateInstance(OperationViewModels);
+            BrushableViewController.CreateInstance(OperationViewModels);
             ComparisonViewController.CreateInstance(OperationViewModels);
 
             MainModel = new MainModel();
