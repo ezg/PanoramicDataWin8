@@ -52,6 +52,24 @@ namespace PanoramicDataWin8.view.vis
             this.Loaded += OperationContainerView_Loaded;
             this.DataContextChanged += operationContainerView_DataContextChanged;
             MainViewController.Instance.InkableScene.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
+            this.PointerMoved += OperationContainerView_PointerHover;
+            this.PointerEntered += OperationContainerView_PointerEntered;
+            this.PointerExited += OperationContainerView_PointerExited;
+        }
+
+        private void OperationContainerView_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            OperationViewModel model = (DataContext as OperationViewModel);
+        }
+
+        private void OperationContainerView_PointerEntered(object sender, PointerRoutedEventArgs e)
+        {
+            OperationViewModel model = (DataContext as OperationViewModel);
+        }
+
+        private void OperationContainerView_PointerHover(object sender, PointerRoutedEventArgs e)
+        {
+            OperationViewModel model = (DataContext as OperationViewModel);
         }
 
         public void Dispose()

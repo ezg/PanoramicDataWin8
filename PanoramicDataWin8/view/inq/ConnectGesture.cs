@@ -36,27 +36,47 @@ namespace PanoramicDataWin8.view.inq
                 _filterProviderOperationViewModel = null;
                 _filterConsumerOperationViewModel = null;
 
+
                 foreach (OperationContainerView view in _inkableScene.Elements.Where(e => e is OperationContainerView))
                 {
                     var operationModel = ((OperationViewModel) view.DataContext).OperationModel;
 
+                    bool withinView = false;
                     if (view.Geometry.Contains(inkStroke.Points[0].GetPoint()) && operationModel is IFilterProviderOperationModel)
                     {
                         _filterProviderOperationViewModel = operationModel as IFilterProviderOperationModel;
+                        withinView = true;
                     }
-                    if (view.Geometry.Contains(inkStroke.Points[inkStroke.Points.Count - 1].GetPoint()) &&
-                        _filterProviderOperationViewModel != operationModel && operationModel is IFilterConsumerOperationModel)  
+                    if (view.Geometry.Contains(inkStroke.Points[inkStroke.Points.Count - 1].GetPoint()) && operationModel is IFilterConsumerOperationModel)
                     {
-                        _filterConsumerOperationViewModel = operationModel as IFilterConsumerOperationModel;
+                        if (_filterProviderOperationViewModel != operationModel)
+                            _filterConsumerOperationViewModel = operationModel as IFilterConsumerOperationModel;
+                        else if (withinView)
+                            return false;
                     }
                 }
 
-                if (_filterProviderOperationViewModel != null && _filterConsumerOperationViewModel != null)
+                if (_filterProviderOperationViewModel != null)// && _filterConsumerOperationViewModel != null)
                 {
                     return true;
                 }
             }
             return false;
+        }
+        public void CreateConsumer(InkStroke inkStroke)
+        {
+            foreach (OperationContainerView view in _inkableScene.Elements.Where(e => e is OperationContainerView))
+            {
+                var operationModel = ((OperationViewModel)view.DataContext).OperationModel;
+
+                if (view.Geometry.Contains(inkStroke.Points[0].GetPoint()) && operationModel is IFilterProviderOperationModel)
+                {
+                    var operationContainerView = PanoramicDataWin8.controller.view.MainViewController.Instance.CopyOperationViewModel(view.DataContext as OperationViewModel, inkStroke.Points.Last());
+                    //_filterConsumerOperationViewModel = (operationContainerView.DataContext as OperationViewModel).OperationModel as IFilterConsumerOperationModel;
+                    Recognize(inkStroke);
+                    break;
+                }
+            }
         }
     }
 }

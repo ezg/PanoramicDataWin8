@@ -99,6 +99,7 @@ namespace PanoramicDataWin8.model.data.operation
         public void ClearFilterModels()
         {
             _filterProviderOperationModelImpl.ClearFilterModels();
+            _filterProviderOperationModelImpl.ClearBczBinMapModels();
         }
 
         public void AddFilterModels(List<FilterModel> filterModels)

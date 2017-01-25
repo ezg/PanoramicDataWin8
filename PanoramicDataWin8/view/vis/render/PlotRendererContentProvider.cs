@@ -137,12 +137,12 @@ namespace PanoramicDataWin8.view.vis.render
             var Labels   = binRange.GetLabels();
             var dim = xaxis ? _helper.DeviceWidth  / (_helper.LabelMetricsX.Width  + 5) :
                               _helper.DeviceHeight / (_helper.LabelMetricsY.Height + 5);
-            int mod = (int)Math.Ceiling(1.0 / Math.Floor(dim / Labels.Count));
+            int mod = (int)Math.Ceiling(Labels.Count / dim );
 
             foreach (var label in Labels)
             {
                 xFrom = _helper.DataToScreenX(xaxis ? label.MinValue   : _helper.DataMinX);
-                xTo   = _helper.DataToScreenX(xaxis ? label.MaxValue   : _helper.DataMinY);
+                xTo   = _helper.DataToScreenX(xaxis ? label.MaxValue   : _helper.DataMaxX);
                 yFrom = _helper.DataToScreenY(xaxis ? _helper.DataMinY : label.MinValue);
                 yTo   = _helper.DataToScreenY(xaxis ? _helper.DataMaxY : label.MaxValue);
                 
@@ -154,7 +154,9 @@ namespace PanoramicDataWin8.view.vis.render
                         break;
                     }
                 var drawLabel = Labels[drawBinIndex];
-                if (_helper.ChartType == ChartType.HeatMap || _helper.ChartType == (xaxis ? ChartType.HorizontalBar : ChartType.VerticalBar))
+                if (false && // adds targets on x/Y axis for sorting
+                    (_helper.ChartType == ChartType.HeatMap || 
+                     _helper.ChartType == (xaxis ? ChartType.HorizontalBar : ChartType.VerticalBar)))
                 {
                     var binPrimitive = new BinPrimitive()
                     {
@@ -164,7 +166,6 @@ namespace PanoramicDataWin8.view.vis.render
                                         xaxis ? 15          : yFrom - yTo),
                         Color = Color.FromArgb(25, 125, 125, 125)
                     };
-
                     // add hit targets for sorting by clicking this label
                     var bmc = new BinPrimitiveCollection();
                     bmc.BinPrimitives.Add(binPrimitive);
@@ -183,10 +184,12 @@ namespace PanoramicDataWin8.view.vis.render
                 
                 if (renderLines)
                 {
-                    canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xFrom, yFrom), CommonExtensions.ToVector2(xaxis ? xFrom:xTo, xaxis ? yTo:yFrom), white, 0.5f);
+                    canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xFrom, yFrom), 
+                                                       CommonExtensions.ToVector2(xaxis ? xFrom:xTo, xaxis ? yTo:yFrom), white, 0.5f);
                     if (label == Labels.Last())
                     {
-                        canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xaxis ? xTo:xFrom, xaxis ? yFrom:yTo), CommonExtensions.ToVector2(xTo, yTo), white, 0.5f);
+                        canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xaxis ? xTo:xFrom, xaxis ? yFrom:yTo), 
+                                                           CommonExtensions.ToVector2(xTo, yTo), white, 0.5f);
                     }
                 }
                 if (Labels.IndexOf(label) % mod == 0)

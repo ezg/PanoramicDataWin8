@@ -191,7 +191,7 @@ namespace PanoramicDataWin8.controller.view
         }
 
 
-        public void CopyOperationViewModel(OperationViewModel operationViewModel, Pt centerPoint)
+        public OperationContainerView CopyOperationViewModel(OperationViewModel operationViewModel, Pt centerPoint)
         {
             var newOperationContainerView = new OperationContainerView();
             var newOperationViewModel = OperationViewModelFactory.CopyOperationViewModel(operationViewModel);
@@ -202,6 +202,7 @@ namespace PanoramicDataWin8.controller.view
 
             newOperationContainerView.DataContext = newOperationViewModel;
             InkableScene.Add(newOperationContainerView);
+            return newOperationContainerView;
         }
 
         private void addAttachmentViews(OperationViewModel visModel)
@@ -433,7 +434,8 @@ namespace PanoramicDataWin8.controller.view
             }
 
             if (!(e is FilterOperationModelUpdatedEventArgs) || (e is FilterOperationModelUpdatedEventArgs &&
-                                                                 ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType != FilterOperationModelUpdatedEventType.FilterModels)))
+         ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType != FilterOperationModelUpdatedEventType.BczBinMapModels) &&
+         ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType != FilterOperationModelUpdatedEventType.FilterModels)))
             {
                 MainModel.QueryExecuter.ExecuteOperationModel(model, true);
             }
@@ -449,6 +451,8 @@ namespace PanoramicDataWin8.controller.view
                 if (recognizedGesture is ConnectGesture)
                 {
                     var connect = recognizedGesture as ConnectGesture;
+                    if (connect.FilterConsumerOperationViewModel == null)
+                        connect.CreateConsumer(e.InkStroke.Clone());
                     FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, connect.FilterConsumerOperationViewModel);
                 }
                 else if (recognizedGesture is HitGesture)
