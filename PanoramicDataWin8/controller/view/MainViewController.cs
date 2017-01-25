@@ -453,13 +453,8 @@ namespace PanoramicDataWin8.controller.view
                 {
                     var connect = recognizedGesture as ConnectGesture;
                     if (connect.FilterConsumerOperationViewModel == null)
-                    {
-                        var consumer = connect.CreateConsumer(e.InkStroke.Clone());
-                        FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, connect.FilterConsumerOperationViewModel);
-              
-                    }
-                    else
-                        FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, connect.FilterConsumerOperationViewModel);
+                        connect.CreateConsumer(e.InkStroke.Clone());
+                    FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, connect.FilterConsumerOperationViewModel);
 
                 }
                 else if (recognizedGesture is HitGesture)
