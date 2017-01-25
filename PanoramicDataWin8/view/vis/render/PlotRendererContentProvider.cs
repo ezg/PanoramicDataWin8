@@ -120,6 +120,8 @@ namespace PanoramicDataWin8.view.vis.render
                 int mod = (int)Math.Ceiling(1.0 / (Math.Floor((_helper.DeviceWidth / (_helper.LabelMetricsX.Width + 5))) / xLabels.Count));
                 int count = 0;
 
+                var hh = _histogramResult.Bins[new BinIndex(0, 0)];
+
                 foreach (var label in xLabels)
                 {
                     yFrom = _helper.DataToScreenY(_helper.DataMinY);
