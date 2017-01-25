@@ -191,14 +191,15 @@ namespace PanoramicDataWin8.controller.view
         }
 
 
-        public OperationContainerView CopyOperationViewModel(OperationViewModel operationViewModel, Pt centerPoint)
+        public OperationContainerView CopyOperationViewModel(OperationViewModel operationViewModel, Pt? centerPoint)
         {
             var newOperationContainerView = new OperationContainerView();
             var newOperationViewModel = OperationViewModelFactory.CopyOperationViewModel(operationViewModel);
             addAttachmentViews(newOperationViewModel);
             OperationViewModels.Add(newOperationViewModel);
 
-            newOperationViewModel.Position = centerPoint - operationViewModel.Size/2.0;
+            if (centerPoint.HasValue)
+                newOperationViewModel.Position = (Pt)centerPoint - operationViewModel.Size/2.0;
 
             newOperationContainerView.DataContext = newOperationViewModel;
             InkableScene.Add(newOperationContainerView);
@@ -426,12 +427,12 @@ namespace PanoramicDataWin8.controller.view
         private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
             var model = (OperationModel) sender;
-            //if (model is IFilterProviderOperationModel &&
-            //    e is FilterOperationModelUpdatedEventArgs &&
-            //    ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.Links))
-            //{
-            //    ((IFilterProviderOperationModel) model).ClearFilterModels();
-            //}
+            if (model is IFilterProviderOperationModel &&
+                e is FilterOperationModelUpdatedEventArgs &&
+                ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.Links))
+            {
+                ((IFilterProviderOperationModel) model).ClearFilterModels();
+            }
 
             if (!(e is FilterOperationModelUpdatedEventArgs) || (e is FilterOperationModelUpdatedEventArgs &&
          ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType != FilterOperationModelUpdatedEventType.BczBinMapModels) &&
@@ -452,8 +453,14 @@ namespace PanoramicDataWin8.controller.view
                 {
                     var connect = recognizedGesture as ConnectGesture;
                     if (connect.FilterConsumerOperationViewModel == null)
-                        connect.CreateConsumer(e.InkStroke.Clone());
-                    FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, connect.FilterConsumerOperationViewModel);
+                    {
+                        var consumer = connect.CreateConsumer(e.InkStroke.Clone());
+                        FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, connect.FilterConsumerOperationViewModel);
+              
+                    }
+                    else
+                        FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, connect.FilterConsumerOperationViewModel);
+
                 }
                 else if (recognizedGesture is HitGesture)
                 {

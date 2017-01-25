@@ -42,21 +42,23 @@ namespace PanoramicDataWin8.model.data.operation
         public void AddBczBinMapModels(List<BczBinMapModel> binMapModels)
         {
             var newbinMaps = new ObservableCollection<BczBinMapModel>();
-            foreach (var binMapModel in binMapModels)
-                BczBinMapModels.Add(binMapModel);// newbinMaps.Add(fm);
+            foreach (var fm in binMapModels) {
+                newbinMaps.Clear();
+                newbinMaps.Add(fm);
+            }
             // remove any existing binMap model that has the same sort axis as a new bin map model
-            //foreach (var binMapModel in BczBinMapModels)
-            //{
-            //    bool skip = false;
-            //    foreach (var fm in newbinMaps)
-            //        if (fm.SortAxis == binMapModel.SortAxis)
-            //            skip = true;
-            //    if (!skip)
-            //        newbinMaps.Add(binMapModel);
-            //}
-            //BczBinMapModels.Clear();
-            //foreach (var fm in newbinMaps)
-            //    BczBinMapModels.Add(fm);
+            foreach (var binMapModel in BczBinMapModels)
+            {
+                bool skip = false;
+                foreach (var fm in newbinMaps)
+                    if (fm.SortAxis == binMapModel.SortAxis)
+                        skip = true;
+                if (!skip)
+                    newbinMaps.Add(binMapModel);
+            }
+            BczBinMapModels.Clear();
+            foreach (var fm in newbinMaps)
+                BczBinMapModels.Add(fm);
 
             fireFilterOperationModelUpdated(FilterOperationModelUpdatedEventType.BczBinMapModels);
         }

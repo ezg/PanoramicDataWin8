@@ -34,6 +34,16 @@ namespace PanoramicDataWin8.controller.view
             _operationViewMovingTimer.Start();
         }
 
+        public void Remove(IBrushableOperationModel bmodel)
+        {
+            foreach (var view in BrushViews.ToArray()) {
+                if (view.Key.From.OperationModel == bmodel || view.Key.To.OperationModel == bmodel) {
+                    BrushViews.Remove(view);
+                    MainViewController.Instance.InkableScene.Children.Remove(view.Value);
+                }
+            }
+        }
+
         public static BrushableViewController Instance { get; private set; }
 
         public static void CreateInstance(ObservableCollection<OperationViewModel> operationViewModel)

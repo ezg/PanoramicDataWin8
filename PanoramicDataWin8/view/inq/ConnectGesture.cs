@@ -63,7 +63,7 @@ namespace PanoramicDataWin8.view.inq
             }
             return false;
         }
-        public void CreateConsumer(InkStroke inkStroke)
+        public OperationContainerView CreateConsumer(InkStroke inkStroke)
         {
             foreach (OperationContainerView view in _inkableScene.Elements.Where(e => e is OperationContainerView))
             {
@@ -71,12 +71,13 @@ namespace PanoramicDataWin8.view.inq
 
                 if (view.Geometry.Contains(inkStroke.Points[0].GetPoint()) && operationModel is IFilterProviderOperationModel)
                 {
-                    var operationContainerView = PanoramicDataWin8.controller.view.MainViewController.Instance.CopyOperationViewModel(view.DataContext as OperationViewModel, inkStroke.Points.Last());
-                    //_filterConsumerOperationViewModel = (operationContainerView.DataContext as OperationViewModel).OperationModel as IFilterConsumerOperationModel;
-                    Recognize(inkStroke);
-                    break;
+                    var operationContainerView = PanoramicDataWin8.controller.view.MainViewController.Instance.CopyOperationViewModel(
+                        view.DataContext as OperationViewModel, inkStroke.Points.Last());
+                    _filterConsumerOperationViewModel = (operationContainerView.DataContext as OperationViewModel).OperationModel as IFilterConsumerOperationModel;
+                    return operationContainerView;
                 }
             }
+            return null;
         }
     }
 }
