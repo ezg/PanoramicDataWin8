@@ -123,7 +123,7 @@ namespace PanoramicDataWin8.view.vis.render
                 _strokeRoundedRectGeom?.Dispose();
                 var x = _helper.DataToScreenX((double)_helper.VisualBinRanges[0].AddStep(0)) - _helper.DataToScreenX(0);
                 var y = _helper.DataToScreenY((double)_helper.VisualBinRanges[1].AddStep(0), false) - _helper.DataToScreenY(0, false);
-
+                
                 _fillRoundedRectGeom = CanvasCachedGeometry.CreateFill(CanvasGeometry.CreateRoundedRectangle(canvas, new Rect(0, 0, x, y), 4, 4));
                 _strokeRoundedRectGeom = CanvasCachedGeometry.CreateStroke(CanvasGeometry.CreateRoundedRectangle(canvas, new Rect(0, 0, x, y), 4, 4), 0.5f);
             }

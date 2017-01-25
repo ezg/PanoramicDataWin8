@@ -108,12 +108,23 @@ namespace PanoramicDataWin8.controller.view
 
             if (chain.Contains(filterLinkModel.FromOperationModel as IFilterConsumerOperationModel))
                 return false;
+
+            var brushModels = ((IBrushableOperationModel)filterLinkModel.FromOperationModel).BrushOperationModels.ToList();
+            foreach (var brushableOperationModel in brushModels)
+            {
+                foreach (var linkModel in linkModels)
+                {
+                    if (brushableOperationModel == linkModel.FromOperationModel)
+                    {
+                        return false;
+                    }
+                }
+            }
             return true;
         }
 
         private void recursiveCheckForCiruclarLinking(List<FilterLinkModel> links, HashSet<IFilterConsumerOperationModel> chain)
         {
-            var ret = false;
             foreach (var link in links)
             {
                 chain.Add(link.ToOperationModel);
