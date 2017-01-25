@@ -114,7 +114,7 @@ namespace PanoramicDataWin8.controller.view
             {
                 foreach (var linkModel in linkModels)
                 {
-                    if (brushableOperationModel == linkModel.FromOperationModel)
+                    if (brushableOperationModel == linkModel.ToOperationModel)
                     {
                         return false;
                     }
