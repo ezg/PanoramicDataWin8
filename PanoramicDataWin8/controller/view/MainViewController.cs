@@ -426,12 +426,12 @@ namespace PanoramicDataWin8.controller.view
         private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
             var model = (OperationModel) sender;
-            if (model is IFilterProviderOperationModel &&
-                e is FilterOperationModelUpdatedEventArgs &&
-                ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.Links))
-            {
-                ((IFilterProviderOperationModel) model).ClearFilterModels();
-            }
+            //if (model is IFilterProviderOperationModel &&
+            //    e is FilterOperationModelUpdatedEventArgs &&
+            //    ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.Links))
+            //{
+            //    ((IFilterProviderOperationModel) model).ClearFilterModels();
+            //}
 
             if (!(e is FilterOperationModelUpdatedEventArgs) || (e is FilterOperationModelUpdatedEventArgs &&
          ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType != FilterOperationModelUpdatedEventType.BczBinMapModels) &&

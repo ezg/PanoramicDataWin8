@@ -178,7 +178,6 @@ namespace PanoramicDataWin8.model.data.operation
             }
             ClearFilterModels();
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
-            FireOperationModelUpdated(new FilterOperationModelUpdatedEventArgs(FilterOperationModelUpdatedEventType.ClearFilterModels));
         }
 
         private void AttributeTransformationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)

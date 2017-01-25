@@ -108,6 +108,18 @@ namespace PanoramicDataWin8.view.vis.render
         void OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
             if (e is FilterOperationModelUpdatedEventArgs &&
+                  (((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.FilterModels ||
+                  ((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.ClearFilterModels))
+            {
+                _plotRendererContentProvider.UpdateFilterModels((sender as HistogramOperationModel).FilterModels.ToList());
+                render();
+            }
+            if (e is VisualOperationModelUpdatedEventArgs)
+            {
+                render();
+            }
+            return;
+                if (e is FilterOperationModelUpdatedEventArgs &&
                 ((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.ClearFilterModels)
             {
                 _plotRendererContentProvider.UpdateFilterModels(new List<FilterModel>());
