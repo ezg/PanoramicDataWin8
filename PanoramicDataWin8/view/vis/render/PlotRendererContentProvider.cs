@@ -154,9 +154,9 @@ namespace PanoramicDataWin8.view.vis.render
                         break;
                     }
                 var drawLabel = Labels[drawBinIndex];
-                if (false && // adds targets on x/Y axis for sorting
-                    (_helper.ChartType == ChartType.HeatMap || 
-                     _helper.ChartType == (xaxis ? ChartType.HorizontalBar : ChartType.VerticalBar)))
+                if (// adds targets on x/Y axis for sorting
+                    (false && _helper.ChartType == ChartType.HeatMap) || 
+                     _helper.ChartType == (xaxis ? ChartType.HorizontalBar : ChartType.VerticalBar))
                 {
                     var binPrimitive = new BinPrimitive()
                     {
