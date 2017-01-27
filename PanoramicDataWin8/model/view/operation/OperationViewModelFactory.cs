@@ -243,9 +243,15 @@ namespace PanoramicDataWin8.model.view.operation
             attr1.TappedTriggered = () => { attachmentViewModel.ActiveStopwatch.Restart(); };
             attr1.DroppedTriggered = attributeTransformationModel =>
             {
-                if (histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).Any())
-                    histogramOperationViewModel.HistogramOperationModel.RemoveAttributeUsageTransformationModel(axis,
-                        histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).First());
+                var otherAxis = axis == AttributeUsage.X ? AttributeUsage.Y : AttributeUsage.X;
+                var existingModel = histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).Any() ? 
+                      histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).First() : null;
+                var existingOtherModel = histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(otherAxis).Any() ?
+                    histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(otherAxis).First() : null;
+                var swapAxes = existingModel != null && existingOtherModel.AttributeModel == attributeTransformationModel.AttributeModel;
+
+                if (existingModel != null)
+                    histogramOperationViewModel.HistogramOperationModel.RemoveAttributeUsageTransformationModel(axis, existingModel);
                 if (!histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
                 {
                     var value = new AttributeTransformationModel(attributeTransformationModel.AttributeModel);
@@ -254,6 +260,18 @@ namespace PanoramicDataWin8.model.view.operation
                 }
                 histogramOperationViewModel.HistogramOperationModel.AddAttributeUsageTransformationModel(axis, attributeTransformationModel);
                 attachmentViewModel.ActiveStopwatch.Restart();
+                if (swapAxes)
+                {
+                    histogramOperationViewModel.HistogramOperationModel.RemoveAttributeUsageTransformationModel(otherAxis, existingOtherModel);
+                    if (!histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
+                    {
+                        var value = new AttributeTransformationModel(attributeTransformationModel.AttributeModel);
+                        value.AggregateFunction = AggregateFunction.Count;
+                        histogramOperationViewModel.HistogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
+                    }
+                    histogramOperationViewModel.HistogramOperationModel.AddAttributeUsageTransformationModel(otherAxis, existingModel);
+
+                }
             };
 
             menuItem.MenuItemComponentViewModel = attr1;
