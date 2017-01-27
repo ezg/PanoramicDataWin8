@@ -111,18 +111,11 @@ namespace PanoramicDataWin8.view.vis.render
                 ((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.ClearFilterModels)
             {
                 _plotRendererContentProvider.UpdateFilterModels(new List<FilterModel>());
-                _plotRendererContentProvider.UpdateBczBinMapModels(new List<BczBinMapModel> ());
             }
             if (e is FilterOperationModelUpdatedEventArgs && 
                 ((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.FilterModels)
             {
                 _plotRendererContentProvider.UpdateFilterModels((sender as HistogramOperationModel).FilterModels.ToList());
-                render();
-            }
-            if (e is FilterOperationModelUpdatedEventArgs && 
-                ((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.BczBinMapModels)
-            {
-                _plotRendererContentProvider.UpdateBczBinMapModels((sender as HistogramOperationModel).BczBinMapModels.ToList());
                 render();
             }
             if (e is VisualOperationModelUpdatedEventArgs)
@@ -186,32 +179,17 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 return true;
             }
-            List<BczBinMapModel> bczhits = new List<BczBinMapModel>();
 
+            var bczhits = new List<BczBinMapModel>();
             foreach (var geom in _plotRendererContentProvider.BczHitTargets.Keys)
             {
                 if (convexHullPoly.Intersects(geom))
-                {
                     bczhits.Add(_plotRendererContentProvider.BczHitTargets[geom]);
-                }
             }
             if (bczhits.Count > 0)
             {
-                HistogramOperationModel histogramOperationModel = (HistogramOperationModel)((HistogramOperationViewModel)DataContext).OperationModel;
-
-                if (bczhits.Any(h => histogramOperationModel.BczBinMapModels.Contains(h)))
-                {
-                    histogramOperationModel.RemoveBczBinMapModels(bczhits);
-                    if (!bczhits.First().SortUp)
-                    {
-                        bczhits.First().SortUp = true;
-                        histogramOperationModel.AddBczBinMapModels(bczhits);
-                    }
-                }
-                else
-                {
-                    histogramOperationModel.AddBczBinMapModels(bczhits);
-                }
+                _plotRendererContentProvider.UpdateBinSortings(bczhits);
+                render();
                 return true;
             }
             return false;
@@ -294,31 +272,16 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else
             {
-                List<BczBinMapModel> bczhits = new List<BczBinMapModel>();
+                var bczhits = new List<BczBinMapModel>();
                 foreach (var geom in _plotRendererContentProvider.BczHitTargets.Keys)
                 {
                     if (convexHullPoly.Intersects(geom))
-                    {
                         bczhits.Add(_plotRendererContentProvider.BczHitTargets[geom]);
-                    }
                 }
                 if (bczhits.Count > 0)
                 {
-
-                    HistogramOperationModel histogramOperationModel = (HistogramOperationModel)((HistogramOperationViewModel)DataContext).OperationModel;
-
-                    if (bczhits.Any(h => histogramOperationModel.BczBinMapModels.Contains(h)))
-                    {
-                        if (!bczhits.First().SortUp)
-                            bczhits.First().SortUp = true;
-                        else
-                            histogramOperationModel.RemoveBczBinMapModels(bczhits);
-                    }
-                    else
-                    {
-                        histogramOperationModel.AddBczBinMapModels(bczhits);
-                    }
-
+                    _plotRendererContentProvider.UpdateBinSortings(bczhits);
+                    render();
                 }
             }
             return true;

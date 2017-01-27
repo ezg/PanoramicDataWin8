@@ -248,7 +248,8 @@ namespace PanoramicDataWin8.model.view.operation
                       histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(axis).First() : null;
                 var existingOtherModel = histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(otherAxis).Any() ?
                     histogramOperationViewModel.HistogramOperationModel.GetAttributeUsageTransformationModel(otherAxis).First() : null;
-                var swapAxes = existingModel != null && existingOtherModel.AttributeModel == attributeTransformationModel.AttributeModel;
+                var swapAxes = existingModel != null && existingOtherModel.AttributeModel == attributeTransformationModel.AttributeModel &&
+                existingOtherModel.AggregateFunction == attributeTransformationModel.AggregateFunction;
 
                 if (existingModel != null)
                     histogramOperationViewModel.HistogramOperationModel.RemoveAttributeUsageTransformationModel(axis, existingModel);

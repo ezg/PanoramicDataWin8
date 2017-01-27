@@ -63,9 +63,49 @@ namespace PanoramicDataWin8.view.vis.render
             _filterModels = filterModels;
         }
 
+        public void RemoveBczBinMapModels(List<BczBinMapModel> binMapModels)
+        {
+            foreach (var mapItem in binMapModels)
+                _bczBinMapModels.Remove(mapItem);
+        }
         public void UpdateBczBinMapModels(List<BczBinMapModel> binMapModels)
         {
+            var newbinMaps = new List<BczBinMapModel>();
+            foreach (var fm in binMapModels)
+            {
+                newbinMaps.Clear();
+                newbinMaps.Add(fm);
+            }
+            // remove any existing binMap _bczBinMapModels that has the same sort axis as a new bin map model
+            foreach (var binMapModel in _bczBinMapModels)
+            {
+                bool skip = false;
+                foreach (var fm in newbinMaps)
+                    if (fm.SortAxis == binMapModel.SortAxis)
+                        skip = true;
+                if (!skip)
+                    newbinMaps.Add(binMapModel);
+            }
+            _bczBinMapModels.Clear();
+            foreach (var fm in newbinMaps)
+                _bczBinMapModels.Add(fm);
             _bczBinMapModels = binMapModels;
+        }
+        public void UpdateBinSortings(List<BczBinMapModel> bczhits)
+        {
+            if (bczhits.Any(h => _bczBinMapModels.Contains(h)))
+            {
+                RemoveBczBinMapModels(bczhits);
+                if (!bczhits.First().SortUp)
+                {
+                    bczhits.First().SortUp = true;
+                    UpdateBczBinMapModels(bczhits);
+                }
+            }
+            else
+            {
+                UpdateBczBinMapModels(bczhits);
+            }
         }
 
         public void UpdateData(IResult result, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone)

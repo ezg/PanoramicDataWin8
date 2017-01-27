@@ -435,7 +435,6 @@ namespace PanoramicDataWin8.controller.view
             }
 
             if (!(e is FilterOperationModelUpdatedEventArgs) || (e is FilterOperationModelUpdatedEventArgs &&
-         ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType != FilterOperationModelUpdatedEventType.BczBinMapModels) &&
          ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType != FilterOperationModelUpdatedEventType.FilterModels)))
             {
                 MainModel.QueryExecuter.ExecuteOperationModel(model, true);

@@ -91,51 +91,30 @@ namespace PanoramicDataWin8.model.data.operation
         {
             get { return _filterProviderOperationModelImpl.FilterModels; }
         }
-        public ObservableCollection<BczBinMapModel> BczBinMapModels
-        {
-            get { return _filterProviderOperationModelImpl.BczBinMapModels; }
-        }
 
         public void ClearFilterModels()
         {
             _filterProviderOperationModelImpl.ClearFilterModels();
-            _filterProviderOperationModelImpl.ClearBczBinMapModels();
         }
 
         public void AddFilterModels(List<FilterModel> filterModels)
         {
             _filterProviderOperationModelImpl.AddFilterModels(filterModels);
         }
-        public void AddBczBinMapModels(List<BczBinMapModel> binMapModels)
-        {
-            _filterProviderOperationModelImpl.AddBczBinMapModels(binMapModels);
-        }
 
         public void AddFilterModel(FilterModel filterModel)
         {
             _filterProviderOperationModelImpl.AddFilterModel(filterModel);
-        }
-        public void AddBczBinMapModel(BczBinMapModel binMapModel)
-        {
-            _filterProviderOperationModelImpl.AddBczBinMapModel(binMapModel);
         }
 
         public void RemoveFilterModel(FilterModel filterModel)
         {
             _filterProviderOperationModelImpl.RemoveFilterModel(filterModel);
         }
-        public void RemoveBczBinMapModel(BczBinMapModel binMapModel)
-        {
-            _filterProviderOperationModelImpl.RemoveBczBinMapModel(binMapModel);
-        }
 
         public void RemoveFilterModels(List<FilterModel> filterModels)
         {
             _filterProviderOperationModelImpl.RemoveFilterModels(filterModels);
-        }
-        public void RemoveBczBinMapModels(List<BczBinMapModel> binMapModels)
-        {
-            _filterProviderOperationModelImpl.RemoveBczBinMapModels(binMapModels);
         }
 
         public FilteringOperation FilteringOperation
