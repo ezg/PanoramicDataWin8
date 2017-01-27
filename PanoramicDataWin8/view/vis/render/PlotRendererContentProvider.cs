@@ -63,12 +63,12 @@ namespace PanoramicDataWin8.view.vis.render
             _filterModels = filterModels;
         }
 
-        public void RemoveBczBinMapModels(List<BczBinMapModel> binMapModels)
+        void removeBczBinMapModels(List<BczBinMapModel> binMapModels)
         {
             foreach (var mapItem in binMapModels)
                 _bczBinMapModels.Remove(mapItem);
         }
-        public void UpdateBczBinMapModels(List<BczBinMapModel> binMapModels)
+        void addBczBinMapModels(List<BczBinMapModel> binMapModels)
         {
             var newbinMaps = new List<BczBinMapModel>();
             foreach (var fm in binMapModels)
@@ -95,16 +95,16 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (bczhits.Any(h => _bczBinMapModels.Contains(h)))
             {
-                RemoveBczBinMapModels(bczhits);
+                removeBczBinMapModels(bczhits);
                 if (!bczhits.First().SortUp)
                 {
                     bczhits.First().SortUp = true;
-                    UpdateBczBinMapModels(bczhits);
+                    addBczBinMapModels(bczhits);
                 }
             }
             else
             {
-                UpdateBczBinMapModels(bczhits);
+                addBczBinMapModels(bczhits);
             }
         }
 
@@ -127,6 +127,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         public override void Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
         {
+            if (_helper != null && _helper.ChartType == ChartType.HeatMap && _bczBinMapModels.Count > 0)
+                _bczBinMapModels.Clear();
             var mat = Matrix3x2.CreateScale(CommonExtensions.ToVector2(CompositionScaleX, CompositionScaleY));
             canvasArgs.DrawingSession.Transform = mat;
 
