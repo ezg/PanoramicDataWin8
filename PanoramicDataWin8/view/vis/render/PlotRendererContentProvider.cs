@@ -100,7 +100,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (bczhits.Any(h => _bczBinMapModels.Contains(h)))
             {
                 removeBczBinMapModels(bczhits);
-                if (false && !bczhits.First().SortUp)
+                if (false && !bczhits.First().SortUp) // bcz: tri-state toggle of sort axis (turned off because of 'false')
                 {
                     bczhits.First().SortUp = true;
                     addBczBinMapModels(bczhits);
@@ -131,8 +131,6 @@ namespace PanoramicDataWin8.view.vis.render
 
         public override void Draw(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
         {
-            //if (_helper != null && _helper.ChartType == ChartType.HeatMap && _bczBinMapModels.Count > 0)
-            //    _bczBinMapModels.Clear();
             var mat = Matrix3x2.CreateScale(CommonExtensions.ToVector2(CompositionScaleX, CompositionScaleY));
             canvasArgs.DrawingSession.Transform = mat;
 
@@ -187,11 +185,11 @@ namespace PanoramicDataWin8.view.vis.render
 
             foreach (var label in Labels)
             {
-                xFrom = _helper.DataToScreenX(xaxis ? label.MinValue   : _helper.DataMinX);
-                xTo   = _helper.DataToScreenX(xaxis ? label.MaxValue   : _helper.DataMaxX);
+                xFrom = _helper.DataToScreenX(xaxis ? label.MinValue : _helper.DataMinX);
+                xTo = _helper.DataToScreenX(xaxis ? label.MaxValue : _helper.DataMaxX);
                 yFrom = _helper.DataToScreenY(xaxis ? _helper.DataMinY : label.MinValue);
-                yTo   = _helper.DataToScreenY(xaxis ? _helper.DataMaxY : label.MaxValue);
-                
+                yTo = _helper.DataToScreenY(xaxis ? _helper.DataMaxY : label.MaxValue);
+
                 var drawBinIndex = Labels.IndexOf(label);
                 foreach (var l in sortedList)
                     if (l.Value == drawBinIndex)
@@ -200,57 +198,31 @@ namespace PanoramicDataWin8.view.vis.render
                         break;
                     }
                 var drawLabel = Labels[drawBinIndex];
-                if (true// adds targets on x/Y axis for sorting or normalizing
-                    //(_helper.ChartType == ChartType.HeatMap) || 
-                    // _helper.ChartType == (xaxis ? ChartType.HorizontalBar : ChartType.VerticalBar)
-                     )
-                {
-                    var binPrimitive = new BinPrimitive()
-                    {
-                        Rect = new Rect(xaxis ? xFrom       : xFrom - 20,
-                                        xaxis ? yFrom + 5   : yTo,
-                                        xaxis ? xTo - xFrom : 10,
-                                        xaxis ? 15          : yFrom - yTo),
-                        Color = Color.FromArgb(25, 125, 125, 125)
-                    };
-                    // add hit targets for sorting by clicking this label
-                    var bmc = new BinPrimitiveCollection();
-                    bmc.BinPrimitives.Add(binPrimitive);
-                    bmc.HitGeom = new Rct(binPrimitive.Rect.Left, binPrimitive.Rect.Top, binPrimitive.Rect.Right, binPrimitive.Rect.Bottom).GetPolygon();
-                    bmc.BczBinMapModel = new BczBinMapModel(_helper.ChartType == ChartType.HeatMap ? drawLabel.Value : 0, xaxis);
-                    if (_bczBinMapModels.Contains(bmc.BczBinMapModel))
-                    {
-                        binPrimitive.Color = Color.FromArgb((byte)150, 125, 125, 125);
-                        bmc.BczBinMapModel.SortUp = _bczBinMapModels[_bczBinMapModels.IndexOf(bmc.BczBinMapModel)].SortUp;
-                    }
-                    BczHitTargets.Add(bmc.HitGeom, bmc.BczBinMapModel);
 
-                    // draw hit target
-                    canvasArgs.DrawingSession.FillRoundedRectangle(binPrimitive.Rect, 4, 4, binPrimitive.Color);
-                }
-                
+                createAxisFunctionButton(canvasArgs, xaxis, xFrom, xTo, yFrom, yTo, drawLabel);
+
                 if (renderLines)
                 {
-                    canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xFrom, yFrom), 
-                                                       CommonExtensions.ToVector2(xaxis ? xFrom:xTo, xaxis ? yTo:yFrom), white, 0.5f);
+                    canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xFrom, yFrom),
+                                                       CommonExtensions.ToVector2(xaxis ? xFrom : xTo, xaxis ? yTo : yFrom), white, 0.5f);
                     if (label == Labels.Last())
                     {
-                        canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xaxis ? xTo:xFrom, xaxis ? yFrom:yTo), 
+                        canvasArgs.DrawingSession.DrawLine(CommonExtensions.ToVector2(xaxis ? xTo : xFrom, xaxis ? yFrom : yTo),
                                                            CommonExtensions.ToVector2(xTo, yTo), white, 0.5f);
                     }
                 }
                 if (Labels.IndexOf(label) % mod == 0)
                 {
                     var xStart = xaxis ? xFrom + (xTo - xFrom) / 2.0f : xFrom - 10;
-                    var yStart = xaxis ? yFrom + 5                    : yFrom + (yTo - yFrom) / 2.0f;
+                    var yStart = xaxis ? yFrom + 5 : yFrom + (yTo - yFrom) / 2.0f;
                     var text = drawLabel.Label.ToString();
                     if (binRange is QuantitativeBinRange || binRange is DateTimeBinRange)
                     {
-                        xStart = xaxis ? xFrom  : xStart;
+                        xStart = xaxis ? xFrom : xStart;
                         yStart = xaxis ? yStart : yFrom;
                         if (binRange is QuantitativeBinRange)
                             text = double.Parse(drawLabel.Label).ToString();
-                        if (label == Labels.Last())              
+                        if (label == Labels.Last())
                         {
                             // DrawString(canvasArgs, _textFormat, xTo, yFrom + 5, label.MaxValue.ToString(), _textColor, true, true, false);
                         }
@@ -258,6 +230,33 @@ namespace PanoramicDataWin8.view.vis.render
                     DrawString(canvasArgs, _textFormat, xStart, yStart, text, _textColor, xaxis, xaxis, !xaxis);
                 }
             }
+        }
+
+        void createAxisFunctionButton(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, bool xaxis, double xFrom, double xTo, double yFrom, double yTo, BinLabel drawLabel)
+        {
+            // adds targets on x/Y axis for sorting or normalizing
+            var binPrimitive = new BinPrimitive()
+            {
+                Rect = new Rect(xaxis ? xFrom : xFrom - 20,
+                                xaxis ? yFrom + 5 : yTo,
+                                xaxis ? xTo - xFrom : 10,
+                                xaxis ? 15 : yFrom - yTo),
+                Color = Color.FromArgb(25, 125, 125, 125)
+            };
+            // add hit targets for sorting by clicking this label
+            var bmc = new BinPrimitiveCollection();
+            bmc.BinPrimitives.Add(binPrimitive);
+            bmc.HitGeom = new Rct(binPrimitive.Rect.Left, binPrimitive.Rect.Top, binPrimitive.Rect.Right, binPrimitive.Rect.Bottom).GetPolygon();
+            bmc.BczBinMapModel = new BczBinMapModel(_helper.ChartType == ChartType.HeatMap ? drawLabel.Value : 0, xaxis);
+            if (_bczBinMapModels.Contains(bmc.BczBinMapModel))
+            {
+                binPrimitive.Color = Color.FromArgb((byte)150, 125, 125, 125);
+                bmc.BczBinMapModel.SortUp = _bczBinMapModels[_bczBinMapModels.IndexOf(bmc.BczBinMapModel)].SortUp;
+            }
+            BczHitTargets.Add(bmc.HitGeom, bmc.BczBinMapModel);
+
+            // draw hit target
+            canvasArgs.DrawingSession.FillRoundedRectangle(binPrimitive.Rect, 4, 4, binPrimitive.Color);
         }
 
         private void renderPlot(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
@@ -452,7 +451,7 @@ namespace PanoramicDataWin8.view.vis.render
                     if (sortAxis == fm.SortAxis)
                     {
                         reverse = !fm.SortUp;
-                        sortBinIndex = 0;// _histogramResult.BinRanges[!sortAxis ? 1 : 0].GetIndexFromScaleValue(fm.Value);
+                        sortBinIndex = 0;// bcz: used to sort HeatMaps by row/col:  _histogramResult.BinRanges[!sortAxis ? 1 : 0].GetIndexFromScaleValue(fm.Value);
                     }
 
             for (int xi = 0; xi < _histogramResult.BinRanges[sortAxis ? 1 :0].GetBins().Count; xi++)
@@ -479,7 +478,6 @@ namespace PanoramicDataWin8.view.vis.render
                 binIndexDict.Add(binIndex, list.IndexOf(binIndex));
             }
             return binIndexDict;
-         //   return reverse ? sortedIndexList.Values.Reverse() : sortedIndexList.Values;
         }
 
         public override void Load(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs canvasArgs)
@@ -828,8 +826,8 @@ namespace PanoramicDataWin8.view.vis.render
 
             var brushFactorSum = 0.0;
 
-            BczNormalization normalization = new BczNormalization();
-            foreach (var map in binMapModels) {
+            var normalization = new BczNormalization();
+            foreach (var map in binMapModels) {  // search through binMapModels to see if we're normalizing the graph
                 if (_chartType == ChartType.HeatMap)
                     normalization.Axis = map.SortAxis ? BczNormalization.axis.X : BczNormalization.axis.Y;
                 else if (_chartType == ChartType.VerticalBar)
@@ -842,6 +840,7 @@ namespace PanoramicDataWin8.view.vis.render
                     if (!map.SortAxis)
                         normalization.Axis = BczNormalization.axis.Y;
                 }
+                // choose whether to normalize from 0-to-SumOfValues  or Min-to-Max value
                 normalization.Scope = map.SortUp ? BczNormalization.Scoping.ZeroToSum : BczNormalization.Scoping.MinToMax;
             }
 

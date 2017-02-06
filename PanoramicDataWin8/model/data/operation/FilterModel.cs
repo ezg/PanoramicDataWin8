@@ -173,7 +173,7 @@ namespace PanoramicDataWin8.model.data.operation
             if (obj is BczBinMapModel)
             {
                 compareTo = obj as BczBinMapModel;
-                if (SortAxis == compareTo.SortAxis)// && Value == compareTo.Value)
+                if (SortAxis == compareTo.SortAxis)// && Value == compareTo.Value) // bcz: if we can sort by row/col then include Value in the test
                 {
                     return true;
                 }
