@@ -127,6 +127,26 @@ namespace PanoramicDataWin8.model.data.operation
             return ret;
         }
     }
+
+    public class BczNormalization
+    {
+        public enum Scoping
+        {
+            MinToMax,
+            ZeroToSum
+        }
+        public enum axis {
+            None = 0,
+            X = 1,
+            Y = 2,
+            XY = 3
+        }
+        public axis     Axis  { get; set; }
+        public Scoping  Scope { get; set; }
+        public BczNormalization() { Axis = BczNormalization.axis.None; }
+    }
+
+
     [JsonObject(MemberSerialization.OptOut)]
     public class BczBinMapModel
     {
@@ -139,17 +159,21 @@ namespace PanoramicDataWin8.model.data.operation
             SortAxis = sortAxis;
         }
 
-        public bool SortAxis { get; set; }
-        public bool SortUp  { get; set; }
-        public double Value { get; set; }
+        public bool   SortAxis { get; set; }
+        public bool   SortUp   { get; set; }
+        public double Value    { get; set; }
 
+        public override int GetHashCode()
+        {
+            return SortAxis.GetHashCode() ^ Value.GetHashCode();
+        }
         public override bool Equals(object obj)
         {
             BczBinMapModel compareTo = null;
             if (obj is BczBinMapModel)
             {
                 compareTo = obj as BczBinMapModel;
-                if (SortAxis == compareTo.SortAxis && Value == compareTo.Value)
+                if (SortAxis == compareTo.SortAxis)// && Value == compareTo.Value)
                 {
                     return true;
                 }
