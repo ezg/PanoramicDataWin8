@@ -42,6 +42,8 @@ namespace PanoramicDataWin8.view.inq
 
         public bool IsErase { get; set; }
 
+        public bool IsPause { get; set; }
+
         public void Add(Point point)
         {
             _points.Add(point);
@@ -169,6 +171,7 @@ namespace PanoramicDataWin8.view.inq
         {
             var s = new InkStroke();
             s.IsErase = this.IsErase;
+            s.IsPause = this.IsPause;
             foreach (Point point in _points)
             {
                 s.Points.Add(new Point(point.X, point.Y));

@@ -4,6 +4,7 @@ using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.vis;
+using System;
 
 namespace PanoramicDataWin8.view.inq
 {
@@ -56,7 +57,7 @@ namespace PanoramicDataWin8.view.inq
                     }
                 }
 
-                if (_filterProviderOperationViewModel != null)// && _filterConsumerOperationViewModel != null)
+                if (_filterProviderOperationViewModel != null && inkStroke.IsPause)// && _filterConsumerOperationViewModel != null)
                 {
                     return true;
                 }

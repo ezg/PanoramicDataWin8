@@ -3,6 +3,7 @@ using System.Linq;
 using Windows.Foundation;
 using GeoAPI.Geometries;
 using PanoramicDataWin8.utils;
+using System;
 
 namespace PanoramicDataWin8.view.inq
 {

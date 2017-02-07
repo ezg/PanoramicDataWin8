@@ -211,12 +211,12 @@ namespace PanoramicDataWin8.view.vis.render
                                                            CommonExtensions.ToVector2(xTo, yTo), white, 0.5f);
                     }
                 }
-                if (Labels.IndexOf(label) % mod == 0 && (_helper.ChartType == ChartType.HeatMap || 
-                    _bczBinMapModels.Where((m) => m.SortAxis != xaxis).Count() == 0) || 
-                    (xaxis && _helper.ChartType == ChartType.VerticalBar) ||
-
-                    (!xaxis && _helper.ChartType == ChartType.HorizontalBar)
-                    )
+                if (Labels.IndexOf(label) % mod == 0 && (
+                        (_helper.ChartType == ChartType.HeatMap || 
+                        _bczBinMapModels.Where((m) => m.SortAxis != xaxis).Count() == 0) || 
+                        (xaxis && _helper.ChartType == ChartType.VerticalBar) ||
+                        (!xaxis && _helper.ChartType == ChartType.HorizontalBar)
+                    ))
                 {
                     var xStart = xaxis ? xFrom + (xTo - xFrom) / 2.0f : xFrom - 10;
                     var yStart = xaxis ? yFrom + 5 : yFrom + (yTo - yFrom) / 2.0f;
@@ -542,9 +542,7 @@ namespace PanoramicDataWin8.view.vis.render
         private double _yScale = 0;
         private double _minValue = 0;
         private double _maxValue = 0;
-        private double _minXValue = 0;
         private double _maxXValue = 0;
-        private double _minYValue = 0;
         private double _maxYValue = 0;
         public double DataMinX { get; set; } = 0;
         public double DataMinY { get; set; } = 0;
@@ -851,283 +849,48 @@ namespace PanoramicDataWin8.view.vis.render
             List<BczBinMapModel> binMapModels
             )
         {
-            BinPrimitiveCollection binPrimitiveCollection = new BinPrimitiveCollection();
-            double alpha = 0.15f;
-            var baseColor = Colors.White;
-
-
-            var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
-            var marginAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, new MarginAggregateParameters()
-            { AggregateFunction = _valueIom.AggregateFunction.ToString() }, _histogramResult, _histogramResult.AllBrushIndex());
+            var binPrimitiveCollection = new BinPrimitiveCollection();
+            binPrimitiveCollection.FilterModel = GetBinFilterModel(bin, _histogramResult.AllBrushIndex(), slistXValues, slistYValues);
 
             var brushFactorSum = 0.0;
 
-            var normalization = new BczNormalization();
-            foreach (var map in binMapModels) {  // search through binMapModels to see if we're normalizing the graph
-                if (_chartType == ChartType.HeatMap)
-                    normalization.Axis = map.SortAxis ? BczNormalization.axis.X : BczNormalization.axis.Y;
-                else if (_chartType == ChartType.VerticalBar)
-                {
-                    if (map.SortAxis)
-                        normalization.Axis = BczNormalization.axis.X;
-                }
-                else if (_chartType == ChartType.HorizontalBar)
-                {
-                    if (!map.SortAxis)
-                        normalization.Axis = BczNormalization.axis.Y;
-                }
-                // choose whether to normalize from 0-to-SumOfValues  or Min-to-Max value
-                normalization.Scope = map.SortUp ? BczNormalization.Scoping.ZeroToSum : BczNormalization.Scoping.MinToMax;
-            }
-            var binBrushMinAxis = double.MaxValue;
-            var binBrushMaxAxis = double.MinValue;
-            var binBrushMinValue = double.MaxValue;
-            var binBrushMaxValue = 0.0;
-            foreach (var Brush in _histogramResult.Brushes)
-            {
-                var maxAggregateKey = IDEAHelpers.CreateAggregateKey(normalization.Axis == BczNormalization.axis.X ? _yIom : _xIom, _histogramResult, Brush.BrushIndex);
-                if (bin.AggregateResults.ContainsKey(maxAggregateKey))
-                {
-                    var val = (double)((DoubleValueAggregateResult)bin.AggregateResults[maxAggregateKey]).Result;
-                    if (val > binBrushMaxAxis)
-                        binBrushMaxAxis = val;
-                    if (val < binBrushMinAxis)
-                        binBrushMinAxis = val;
-                }
-
-                var maxValAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, Brush.BrushIndex);
-                if (bin.AggregateResults.ContainsKey(maxValAggregateKey))
-                {
-                    var val = (double)((DoubleValueAggregateResult)bin.AggregateResults[maxValAggregateKey]).Result;
-                    if (val > binBrushMaxValue)
-                        binBrushMaxValue = val;
-                    if (val < binBrushMinValue && val != 0)
-                        binBrushMinValue = val;
-                }
-            }
-            if (binBrushMinValue == double.MaxValue)
-                binBrushMinValue = binBrushMaxValue;
+            var normalization   = getBinNormalization(binMapModels);
+            var binBrushMaxAxis = getBinBrushAxisRange(bin, normalization);
+            double binBrushMinValue, binBrushMaxValue;
+            getBinBrushValueRange(bin, normalization, out binBrushMinValue, out binBrushMaxValue);
 
             foreach (var brush in _histogramResult.Brushes)
             {
-                Rect marginRect = Rect.Empty;
-                double marginPercentage = 0.0;
-                double xFrom = 0;
-                double xTo = 0;
-                double yFrom = 0;
-                double yTo = 0;
-                double value = 0;
-                double xMargin = 0;
-                double yMargin = 0;
-                double xMarginAbsolute = 0;
-                double yMarginAbsolute = 0;
-                Color color = Colors.White;
-
-                valueAggregateKey.BrushIndex = brush.BrushIndex;
-                var valueMargin = (MarginAggregateResult)bin.AggregateResults[marginAggregateKey];
-
-                var localminValue = 0.0;
-                var localmaxValue = 0.0;
+                var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, brush.BrushIndex);
                 double unNormalizedvalue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
-                if (normalization.Axis != BczNormalization.axis.None)
-                {
-                    var binIndex = normalization.Axis == BczNormalization.axis.X ? bin.BinIndex.Indices.First() : bin.BinIndex.Indices.Last();
-                    if (normalization.Scope == BczNormalization.Scoping.ZeroToSum)
-                    {
-                        localmaxValue = (normalization.Axis == BczNormalization.axis.X ? xaxisSizes : yaxisSizes)[binIndex];
-                    }
-                    else if (normalization.Scope == BczNormalization.Scoping.MinToMax)
-                    {
-                        var range = (normalization.Axis == BczNormalization.axis.X ? xaxisRanges : yaxisRanges)[binIndex];
-                        localminValue = range.Item1 == 0 ? localminValue : range.Item1;
-                        localmaxValue = range.Item2;
-                    }
-
-                }
-                if (unNormalizedvalue != 0)
-                {
-                    if (binBrushMinValue != binBrushMaxValue && normalization.Axis != BczNormalization.axis.None && brush.BrushIndex != _histogramResult.AllBrushIndex())
-                    {
-                        localminValue = binBrushMinValue;
-                        localmaxValue = binBrushMaxValue;
-                    }
-                    else if (localminValue == localmaxValue)
-                    {
-                        localminValue = _minValue;
-                        localmaxValue = _maxValue;
-                        if (normalization.Axis != BczNormalization.axis.None)
-                            unNormalizedvalue = _maxValue;// bcz: this makes a lone bin in a normalized column/row be a Max value
-                    }
-                    value = (unNormalizedvalue - localminValue) / (Math.Abs((localmaxValue - localminValue)) < TOLERANCE ? unNormalizedvalue : (localmaxValue - localminValue));
-                }
-
-                if (brush.BrushIndex == _histogramResult.RestBrushIndex())
-                {
-                    baseColor = Windows.UI.Color.FromArgb(255, 40, 170, 213);
-                }
-                else if (brush.BrushIndex == _histogramResult.OverlapBrushIndex())
-                {
-                    baseColor = Color.FromArgb(255, 17, 17, 17);
-                }
-                else if (brush.BrushIndex == _histogramResult.AllBrushIndex())
-                {
-                    baseColor = Windows.UI.Color.FromArgb(255, 255, 0, 0);
-                }
-                else
-                {
-                    baseColor = _histogramOperationModelClone.BrushColors[brush.BrushIndex % _histogramOperationModelClone.BrushColors.Count];
-                }
-
-                var xAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);
-                var yAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex);
-                var xMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, new MarginAggregateParameters()
-                    {AggregateFunction = _xIom.AggregateFunction.ToString()}, _histogramResult, brush.BrushIndex);
-                var yMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, new MarginAggregateParameters()
-                    {AggregateFunction = _yIom.AggregateFunction.ToString()}, _histogramResult, brush.BrushIndex);
 
                 var mappedXBinIndex = slistXValues[bin.BinIndex.Indices[0]];
                 var mappedYBinIndex = slistYValues[bin.BinIndex.Indices[1]];
-                valueAggregateKey.BrushIndex = _histogramResult.AllBrushIndex();
-                var allUnNormalizedValue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
+                
                 // read out value depinding on chart type
                 if (_chartType == ChartType.HeatMap)
                 {
-                    var brushFactor = (unNormalizedvalue / allUnNormalizedValue);
+                    var value = getHeatMapBinValue(bin, xaxisRanges, yaxisRanges, xaxisSizes, yaxisSizes, normalization, binBrushMinValue, binBrushMaxValue, brush, ref unNormalizedvalue);
 
-                    var tx = (double)_histogramResult.BinRanges[0].GetValueFromIndex(mappedXBinIndex);
-                    xFrom = DataToScreenX(tx);
-                    xTo = DataToScreenX((double)_histogramResult.BinRanges[0].AddStep(tx));
-
-                    var ty = (double)_histogramResult.BinRanges[1].GetValueFromIndex(mappedYBinIndex); //_histogramResult.BinRanges[1].GetIndexFromScaleValue(VisualBinRanges[1].GetLabels()[slistYValues.IndexOf(bin.BinIndex.Indices[1])].Value);
-                    yFrom = DataToScreenY(ty);
-                    yTo = DataToScreenY((double)_histogramResult.BinRanges[1].AddStep(ty));
-
-                    if (allUnNormalizedValue > 0 && unNormalizedvalue > 0)
-                    {
-                        brushFactorSum += brushFactor;
-                        brushFactorSum = (double)Math.Min(brushFactorSum, 1.0);
-                        var tempRect = new Rect(xFrom, yTo, xTo - xFrom, yFrom - yTo);
-                        var ratio = (tempRect.Width / tempRect.Height);
-                        var newHeight = Math.Sqrt((1.0 / ratio) * ((tempRect.Width * tempRect.Height) * brushFactorSum));
-                        var newWidth = newHeight * ratio;
-                        xFrom = (double)(tempRect.X + (tempRect.Width - newWidth) / 2.0f);
-                        yTo = (double)(tempRect.Y + (tempRect.Height - newHeight) / 2.0f);
-                        xTo = (double)(xFrom + newWidth);
-                        yFrom = (double)(yTo + newHeight);
-                        var brushRect = new Rect(tempRect.X + (tempRect.Width - newWidth) / 2.0f,
-                            tempRect.Y + (tempRect.Height - newHeight) / 2.0f, newWidth, newHeight);
-                    }
-                    if (double.IsNaN(value))
-                        value = 1;
-                    var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), baseColor, (float)(alpha + Math.Pow(value, 1.0 / 3.0) * (1.0 - alpha)));
-                    var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
-                    color = dataColor;
-                    marginPercentage = valueMargin.Margin;
+                    createHeatMapBinPrimitives(bin, binPrimitiveCollection, normalization, brush, unNormalizedvalue, mappedXBinIndex, 
+                                               mappedYBinIndex, ref brushFactorSum, value);
                 }
                 else if (_chartType == ChartType.HorizontalBar)
                 {
-                    var dataValue = ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result;
-
-                    var xValue = normalization.Axis != BczNormalization.axis.Y || binBrushMaxAxis == 0 ?
-                        dataValue : (dataValue - 0) / (binBrushMaxAxis - 0) * _maxXValue;
-                    xFrom = DataToScreenX((double)Math.Min(0, xValue));
-                    xTo = DataToScreenX((double)Math.Max(0, xValue));
-
-                    var tt = _histogramResult.BinRanges[1].GetValueFromIndex(mappedYBinIndex);
-                    yFrom = DataToScreenY(tt);
-                    yTo = DataToScreenY((double)_histogramResult.BinRanges[1].AddStep(tt));
-
-                    xMargin = (double)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).Margin;
-                    xMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
-
-                    var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), baseColor, (float)(alpha + Math.Pow(value, 1.0 / 3.0) * (1.0 - alpha)));
-                    var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
-                    color = baseColor;
-
-                    marginRect = new Rect(DataToScreenX((double)(xValue - xMarginAbsolute)),
-                                         yTo + (yFrom - yTo) / 2.0 - 2,
-                                         DataToScreenX((double)(xValue + xMarginAbsolute)) - DataToScreenX((double)(xValue - xMarginAbsolute)),
-                                         4.0);
+                    createHorizontalBarChartBinPrimitives(bin, binPrimitiveCollection, normalization, binBrushMaxAxis, brush, unNormalizedvalue,  mappedYBinIndex);
                 }
-
                 else if (_chartType == ChartType.VerticalBar)
                 {
-                    var dataValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
-                 
-                    var yValue =  normalization.Axis != BczNormalization.axis.X || binBrushMaxAxis == 0 ? 
-                        dataValue : (dataValue - 0) / (binBrushMaxAxis - 0) * _maxYValue;
-                    yFrom = DataToScreenY((double)Math.Min(0, yValue));
-                    yTo   = DataToScreenY((double)Math.Max(0, yValue));
-
-                    var tt = _histogramResult.BinRanges[0].GetValueFromIndex(mappedXBinIndex); 
-                    xFrom = DataToScreenX((double)tt);
-                    xTo   = DataToScreenX((double)_histogramResult.BinRanges[0].AddStep(tt));
-
-                    yMargin = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
-                    yMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
-                  
-                    var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), baseColor, 
-                        (float)(alpha + Math.Pow(double.IsNaN(value) ? 1 : value, 1.0 / 3.0) * (1.0 - alpha)));
-                    var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
-                    color = baseColor;
-
-                    marginRect = new Rect(xFrom + (xTo - xFrom) / 2.0 - 2,
-                                          DataToScreenY((double)(yValue + yMarginAbsolute)),
-                                          4,
-                                          DataToScreenY((double)(yValue - yMarginAbsolute)) - DataToScreenY((double)(yValue + yMarginAbsolute)));
+                    createVerticalBarChartBinPrimitives(bin, binPrimitiveCollection, normalization, binBrushMaxAxis, brush, unNormalizedvalue,  mappedXBinIndex);
                 }
-
                 else if (_chartType == ChartType.SinglePoint)
                 {
-                    var xValue = ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result;
-                    xFrom = DataToScreenX((double) xValue) - 5;
-                    xTo = DataToScreenX((double) xValue) + 5;
-
-                    var yValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
-                    yFrom = DataToScreenY((double)yValue) + 5;
-                    yTo = DataToScreenY((double)yValue);
-
-                    xMargin = (double)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).Margin;
-                    xMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
-                    
-                    yMargin = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
-                    yMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
-
-                    color = baseColor;
+                    createSinglePointBinPrimitives(bin, binPrimitiveCollection, brush, unNormalizedvalue);
                 }
-
-
-                
-                if (brush.BrushIndex == _histogramResult.AllBrushIndex())
-                {
-                    IGeometry hitGeom = null;
-                    //if (_chartType != ChartType.HeatMap)
-
-                    hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
-                    FilterModel filterModel = GetBinFilterModel(bin, brush.BrushIndex, slistXValues, slistYValues);
-                    binPrimitiveCollection.FilterModel = filterModel;
-                    binPrimitiveCollection.HitGeom = hitGeom;
-                }
-
-                BinPrimitive binPrimitive = new BinPrimitive()
-                {
-                    Rect = new Rect(
-                        xFrom,
-                        yTo,
-                        xTo - xFrom,
-                        yFrom - yTo), 
-                    MarginRect = marginRect,
-                    MarginPercentage = marginPercentage,
-                    BrushIndex = brush.BrushIndex,
-                    Color = color,
-                    Value = unNormalizedvalue, 
-                };
-                binPrimitiveCollection.BinPrimitives.Add(binPrimitive);
             }
-
-
+            
             // adjust brush rects (stacking or not)
-            BinPrimitive allBrushBinPrimitive = binPrimitiveCollection.BinPrimitives.FirstOrDefault(b => b.BrushIndex == _histogramResult.AllBrushIndex());
+            var allBrushBinPrimitive = binPrimitiveCollection.BinPrimitives.FirstOrDefault(b => b.BrushIndex == _histogramResult.AllBrushIndex());
             double sum = 0.0f;
             double count = binPrimitiveCollection.BinPrimitives.Count(b => b.BrushIndex != _histogramResult.AllBrushIndex() && b.Value != 0.0);
             foreach (var bp in binPrimitiveCollection.BinPrimitives.Where(b => b.BrushIndex != _histogramResult.AllBrushIndex() && b.Value != 0.0))
@@ -1175,17 +938,300 @@ namespace PanoramicDataWin8.view.vis.render
             return binPrimitiveCollection;
         }
 
+        void createSinglePointBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, Brush brush, double unNormalizedvalue)
+        {
+            var xAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);
+            var yAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex);
+            var xMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, new MarginAggregateParameters() { AggregateFunction = _xIom.AggregateFunction.ToString() }, _histogramResult, brush.BrushIndex);
+            var yMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, new MarginAggregateParameters() { AggregateFunction = _yIom.AggregateFunction.ToString() }, _histogramResult, brush.BrushIndex);
+            Rect marginRect = Rect.Empty;
+            double marginPercentage = 0.0;
+            var xValue = ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result;
+            var xFrom = DataToScreenX((double)xValue) - 5;
+            var xTo = DataToScreenX((double)xValue) + 5;
+
+            var yValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
+            var yFrom = DataToScreenY((double)yValue) + 5;
+            var yTo = DataToScreenY((double)yValue);
+
+            var xMargin = (double)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).Margin;
+            var xMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
+
+            var yMargin = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
+            var yMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
+            
+            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage,
+                               xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue);
+        }
+
+        void createVerticalBarChartBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, BczNormalization normalization, 
+            double binBrushMaxAxis, Brush brush, double unNormalizedvalue, int mappedXBinIndex)
+        {
+            var yAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex);
+            var yMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, new MarginAggregateParameters() { AggregateFunction = _yIom.AggregateFunction.ToString() }, _histogramResult, brush.BrushIndex);
+            double marginPercentage = 0.0;
+            var dataValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
+
+            var yValue = normalization.Axis != BczNormalization.axis.X || binBrushMaxAxis == 0 ? dataValue : (dataValue - 0) / (binBrushMaxAxis - 0) * _maxYValue;
+            var yFrom  = DataToScreenY((double)Math.Min(0, yValue));
+            var yTo    = DataToScreenY((double)Math.Max(0, yValue));
+
+            var tt    = _histogramResult.BinRanges[0].GetValueFromIndex(mappedXBinIndex);
+            var xFrom = DataToScreenX((double)tt);
+            var xTo   = DataToScreenX((double)_histogramResult.BinRanges[0].AddStep(tt));
+
+            var yMargin = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
+            var yMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
+
+            var marginRect = new Rect(xFrom + (xTo - xFrom) / 2.0 - 2,
+                                  DataToScreenY((double)(yValue + yMarginAbsolute)),
+                                  4,
+                                  DataToScreenY((double)(yValue - yMarginAbsolute)) - DataToScreenY((double)(yValue + yMarginAbsolute)));
+            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage,
+                               xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue);
+        }
+
+        void createHorizontalBarChartBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, BczNormalization normalization, 
+            double binBrushMaxAxis, Brush brush, double unNormalizedvalue, int mappedYBinIndex)
+        {
+            var xAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);
+            var xMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, new MarginAggregateParameters() { AggregateFunction = _xIom.AggregateFunction.ToString() }, _histogramResult, brush.BrushIndex);
+            double marginPercentage = 0.0;
+            var dataValue = ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result;
+
+            var xValue = normalization.Axis != BczNormalization.axis.Y || binBrushMaxAxis == 0 ? dataValue : (dataValue - 0) / (binBrushMaxAxis - 0) * _maxXValue;
+            var xFrom  = DataToScreenX((double)Math.Min(0, xValue));
+            var xTo    = DataToScreenX((double)Math.Max(0, xValue));
+
+            var tt    = _histogramResult.BinRanges[1].GetValueFromIndex(mappedYBinIndex);
+            var yFrom = DataToScreenY(tt);
+            var yTo   = DataToScreenY((double)_histogramResult.BinRanges[1].AddStep(tt));
+
+            var xMargin = (double)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).Margin;
+            var xMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[xMarginAggregateKey]).AbsolutMargin;
+
+            var marginRect = new Rect(DataToScreenX((double)(xValue - xMarginAbsolute)),
+                                 yTo + (yFrom - yTo) / 2.0 - 2,
+                                 DataToScreenX((double)(xValue + xMarginAbsolute)) - DataToScreenX((double)(xValue - xMarginAbsolute)),
+                                 4.0);
+            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage,
+                               xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue);
+        }
+
+        void createHeatMapBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, BczNormalization normalization,
+            Brush brush, double unNormalizedvalue, int mappedXBinIndex, int mappedYBinIndex, ref double brushFactorSum, double value)
+        {
+            Rect marginRect = Rect.Empty;
+            double marginPercentage = 0.0;
+            double xFrom = 0;
+            double xTo = 0;
+            double yFrom = 0;
+            double yTo = 0;
+            var color = baseColorFromBrush(brush);
+
+            var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
+            var allUnNormalizedValue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
+            var brushFactor = (unNormalizedvalue / allUnNormalizedValue);
+
+            var tx = (double)_histogramResult.BinRanges[0].GetValueFromIndex(mappedXBinIndex);
+            xFrom = DataToScreenX(tx);
+            xTo = DataToScreenX((double)_histogramResult.BinRanges[0].AddStep(tx));
+
+            var ty = (double)_histogramResult.BinRanges[1].GetValueFromIndex(mappedYBinIndex);
+            yFrom = DataToScreenY(ty);
+            yTo = DataToScreenY((double)_histogramResult.BinRanges[1].AddStep(ty));
+
+            if (allUnNormalizedValue > 0 && unNormalizedvalue > 0)
+            {
+                brushFactorSum += brushFactor;
+                brushFactorSum = (double)Math.Min(brushFactorSum, 1.0);
+                var tempRect = new Rect(xFrom, yTo, xTo - xFrom, yFrom - yTo);
+                var ratio = (tempRect.Width / tempRect.Height);
+                var newHeight = Math.Sqrt((1.0 / ratio) * ((tempRect.Width * tempRect.Height) * brushFactorSum));
+                var newWidth = newHeight * ratio;
+                xFrom = (double)(tempRect.X + (tempRect.Width - newWidth) / 2.0f);
+                yTo = (double)(tempRect.Y + (tempRect.Height - newHeight) / 2.0f);
+                xTo = (double)(xFrom + newWidth);
+                yFrom = (double)(yTo + newHeight);
+                var brushRect = new Rect(tempRect.X + (tempRect.Width - newWidth) / 2.0f,
+                    tempRect.Y + (tempRect.Height - newHeight) / 2.0f, newWidth, newHeight);
+            }
+            if (double.IsNaN(value))
+                value = 1;
+            var alpha = 0.15f;
+            var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), color, (float)(alpha + Math.Pow(value, 1.0 / 3.0) * (1.0 - alpha)));
+            var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
+
+            var marginAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, new MarginAggregateParameters()
+            { AggregateFunction = _valueIom.AggregateFunction.ToString() }, _histogramResult, _histogramResult.AllBrushIndex());
+            var valueMargin = (MarginAggregateResult)bin.AggregateResults[marginAggregateKey];
+            marginPercentage = valueMargin.Margin;
+            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage, xFrom, xTo, yFrom, yTo, color, unNormalizedvalue);
+        }
+
+        double getHeatMapBinValue(Bin bin, List<Tuple<double, double>> xaxisRanges, List<Tuple<double, double>> yaxisRanges, 
+            List<double> xaxisSizes, List<double> yaxisSizes, BczNormalization normalization, 
+            double binBrushMinValue, double binBrushMaxValue, Brush brush, ref double unNormalizedvalue)
+        {
+            double value = 0;
+            var localminValue = 0.0;
+            var localmaxValue = 0.0;
+            if (normalization.Axis != BczNormalization.axis.None)
+            {
+                var binIndex = normalization.Axis == BczNormalization.axis.X ? bin.BinIndex.Indices.First() : bin.BinIndex.Indices.Last();
+                if (normalization.Scope == BczNormalization.Scoping.ZeroToSum)
+                {
+                    localmaxValue = (normalization.Axis == BczNormalization.axis.X ? xaxisSizes : yaxisSizes)[binIndex];
+                }
+                else if (normalization.Scope == BczNormalization.Scoping.MinToMax)
+                {
+                    var range = (normalization.Axis == BczNormalization.axis.X ? xaxisRanges : yaxisRanges)[binIndex];
+                    localminValue = range.Item1 == 0 ? localminValue : range.Item1;
+                    localmaxValue = range.Item2;
+                }
+
+            }
+            if (unNormalizedvalue != 0)
+            {
+                if (binBrushMinValue != binBrushMaxValue && normalization.Axis != BczNormalization.axis.None && brush.BrushIndex != _histogramResult.AllBrushIndex())
+                {
+                    localminValue = binBrushMinValue;
+                    localmaxValue = binBrushMaxValue;
+                }
+                else if (localminValue == localmaxValue)
+                {
+                    localminValue = _minValue;
+                    localmaxValue = _maxValue;
+                    if (normalization.Axis != BczNormalization.axis.None)
+                        unNormalizedvalue = _maxValue;// bcz: this makes a lone bin in a normalized column/row be a Max value
+                }
+                value = (unNormalizedvalue - localminValue) / (Math.Abs((localmaxValue - localminValue)) < TOLERANCE ? unNormalizedvalue : (localmaxValue - localminValue));
+            }
+
+            return value;
+        }
+
+        void createBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, Brush brush, Rect marginRect, double marginPercentage, double xFrom, double xTo, double yFrom, double yTo, Color color, double unNormalizedvalue)
+        {
+            if (brush.BrushIndex == _histogramResult.AllBrushIndex())
+            {
+                IGeometry hitGeom = null;
+
+                hitGeom = new Rct(xFrom, yTo, xTo, yFrom).GetPolygon();
+                binPrimitiveCollection.HitGeom = hitGeom;
+            }
+
+            BinPrimitive binPrimitive = new BinPrimitive()
+            {
+                Rect = new Rect(
+                    xFrom,
+                    yTo,
+                    xTo - xFrom,
+                    yFrom - yTo),
+                MarginRect = marginRect,
+                MarginPercentage = marginPercentage,
+                BrushIndex = brush.BrushIndex,
+                Color = color,
+                Value = unNormalizedvalue,
+            };
+            binPrimitiveCollection.BinPrimitives.Add(binPrimitive);
+        }
+
+        double getBinBrushAxisRange(Bin bin, BczNormalization normalization)
+        {
+            var binBrushMaxAxis = double.MinValue;
+            binBrushMaxAxis = double.MinValue;
+            foreach (var Brush in _histogramResult.Brushes)
+            {
+                var maxAggregateKey = IDEAHelpers.CreateAggregateKey(normalization.Axis == BczNormalization.axis.X ? _yIom : _xIom, _histogramResult, Brush.BrushIndex);
+                if (bin.AggregateResults.ContainsKey(maxAggregateKey))
+                {
+                    var val = (double)((DoubleValueAggregateResult)bin.AggregateResults[maxAggregateKey]).Result;
+                    if (val > binBrushMaxAxis)
+                        binBrushMaxAxis = val;
+                    //if (val < binBrushMinAxis)
+                    //    binBrushMinAxis = val;
+                }
+            }
+            return binBrushMaxAxis;
+        }
+
+        void getBinBrushValueRange(Bin bin, BczNormalization normalization, out double binBrushMinValue, out double binBrushMaxValue)
+        {
+            binBrushMinValue = double.MaxValue;
+            binBrushMaxValue = 0.0;
+            foreach (var Brush in _histogramResult.Brushes)
+            {
+                var maxValAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, Brush.BrushIndex);
+                if (bin.AggregateResults.ContainsKey(maxValAggregateKey))
+                {
+                    var val = (double)((DoubleValueAggregateResult)bin.AggregateResults[maxValAggregateKey]).Result;
+                    if (val > binBrushMaxValue)
+                        binBrushMaxValue = val;
+                    if (val < binBrushMinValue && val != 0)
+                        binBrushMinValue = val;
+                }
+            }
+            if (binBrushMinValue == double.MaxValue)
+                binBrushMinValue = binBrushMaxValue;
+        }
+
+        BczNormalization getBinNormalization(List<BczBinMapModel> binMapModels)
+        {
+            var normalization = new BczNormalization();
+            foreach (var map in binMapModels)
+            {  // search through binMapModels to see if we're normalizing the graph
+                if (_chartType == ChartType.HeatMap)
+                    normalization.Axis = map.SortAxis ? BczNormalization.axis.X : BczNormalization.axis.Y;
+                else if (_chartType == ChartType.VerticalBar)
+                {
+                    if (map.SortAxis)
+                        normalization.Axis = BczNormalization.axis.X;
+                }
+                else if (_chartType == ChartType.HorizontalBar)
+                {
+                    if (!map.SortAxis)
+                        normalization.Axis = BczNormalization.axis.Y;
+                }
+                // choose whether to normalize from 0-to-SumOfValues  or Min-to-Max value
+                normalization.Scope = map.SortUp ? BczNormalization.Scoping.ZeroToSum : BczNormalization.Scoping.MinToMax;
+            }
+
+            return normalization;
+        }
+
+        Color baseColorFromBrush(Brush brush)
+        {
+            Color baseColor;
+            if (brush.BrushIndex == _histogramResult.RestBrushIndex())
+            {
+                baseColor = Windows.UI.Color.FromArgb(255, 40, 170, 213);
+            }
+            else if (brush.BrushIndex == _histogramResult.OverlapBrushIndex())
+            {
+                baseColor = Color.FromArgb(255, 17, 17, 17);
+            }
+            else if (brush.BrushIndex == _histogramResult.AllBrushIndex())
+            {
+                baseColor = Windows.UI.Color.FromArgb(255, 255, 0, 0);
+            }
+            else
+            {
+                baseColor = _histogramOperationModelClone.BrushColors[brush.BrushIndex % _histogramOperationModelClone.BrushColors.Count];
+            }
+
+            return baseColor;
+        }
+
         public FilterModel GetBinFilterModel(Bin bin, int brushIndex, Dictionary<int,int> slistXValues, Dictionary<int,int> slistYValues)
         {
             AttributeTransformationModel[] dimensions = new AttributeTransformationModel[] { _xIom, _yIom };
-            FilterModel filterModel;
-            filterModel = new FilterModel();
+            FilterModel filterModel = new FilterModel();
 
             var marginAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, new MarginAggregateParameters()
             { AggregateFunction = _valueIom.AggregateFunction.ToString() }, _histogramResult, _histogramResult.AllBrushIndex());
             var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
             valueAggregateKey.BrushIndex = brushIndex;
-            MarginAggregateResult valueMargin = (MarginAggregateResult)bin.AggregateResults[marginAggregateKey];
             double unNormalizedvalue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
 
             filterModel.Value = unNormalizedvalue;
