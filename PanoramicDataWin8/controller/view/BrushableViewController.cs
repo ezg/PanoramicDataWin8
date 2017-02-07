@@ -140,8 +140,8 @@ namespace PanoramicDataWin8.controller.view
                     var areLinked = FilterLinkViewController.Instance.AreOperationViewModelsLinked(current, other);
                     if (!areLinked &&
                         (!_lastMoved.ContainsKey(other) || (DateTime.Now - _lastMoved[other] > TimeSpan.FromSeconds(0.5))))
-                        if ((Math.Abs(diff.Y) < 300) &&
-                            (boundHorizontalDistance(current.Bounds, other.Bounds) < 100))
+                    {
+                        if ((boundHorizontalDistance(current.Bounds, other.Bounds) > 100))
                         {
                             if (BrushViews.Keys.Any(sov => (sov.To == current) && (sov.From == other)))
                             {
@@ -158,13 +158,19 @@ namespace PanoramicDataWin8.controller.view
                                 });
                             }
 
-                            if (!BrushViews.Keys.Any(sov => (sov.From == current) && (sov.To == other)))
+                        }
+                        if ((Math.Abs(diff.Y) < 300) &&
+                                (boundHorizontalDistance(current.Bounds, other.Bounds) < 100))
+                        {
+
+                            if (!BrushViews.Keys.Any(sov => (sov.To == current) && (sov.From == other)) &&
+                                !BrushViews.Keys.Any(sov => (sov.From == current) && (sov.To == other)))
                             {
                                 var inputCohorts = BrushViews.Keys.Where(icv => icv.To == other).ToList();
 
                                 var allColorIndex = Enumerable.Range(0, BrushViewModel.ColorScheme1.Count);
                                 allColorIndex = allColorIndex.Except(inputCohorts.Select(c => c.ColorIndex));
-                                var colorIndex = inputCohorts.Count%BrushViewModel.ColorScheme1.Count;
+                                var colorIndex = inputCohorts.Count % BrushViewModel.ColorScheme1.Count;
                                 if (allColorIndex.Any())
                                     colorIndex = allColorIndex.First();
 
@@ -174,7 +180,7 @@ namespace PanoramicDataWin8.controller.view
                                 brushViewModel.From = current;
                                 brushViewModel.To = other;
                                 brushViewModel.Position =
-                                    (brushViewModel.OperationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec())/2.0 - brushViewModel.Size/2.0).GetWindowsPoint();
+                                    (brushViewModel.OperationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec()) / 2.0 - brushViewModel.Size / 2.0).GetWindowsPoint();
 
                                 brushViewModel.BrushableOperationViewModelState = BrushableOperationViewModelState.Opening;
                                 brushViewModel.DwellStartPosition = current.Position;
@@ -186,6 +192,7 @@ namespace PanoramicDataWin8.controller.view
                                 BrushViews.Add(brushViewModel, view);
                             }
                         }
+                    }
                 }
             }
         }
@@ -194,6 +201,8 @@ namespace PanoramicDataWin8.controller.view
         {
             var current = sender as OperationViewModel;
             if (e.PropertyName == current.GetPropertyName(() => current.Position))
+                operationViewModelUpdated(current);
+            else if (e.PropertyName == current.GetPropertyName(() => current.Size))
                 operationViewModelUpdated(current);
         }
 

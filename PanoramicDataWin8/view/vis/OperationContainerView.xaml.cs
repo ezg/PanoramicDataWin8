@@ -279,7 +279,7 @@ namespace PanoramicDataWin8.view.vis
             this.PointerReleased += OperationContainerView_PointerReleased;
             _fingerDown = true;
             
-            ((OperationViewModel) DataContext).FireOperationViewModelTapped();
+          //  ((OperationViewModel) DataContext).FireOperationViewModelTapped();  // bcz: removed so views can be interacted on without changing the brushing models
         }
 
         async void OperationContainerView_PointerMoved(object sender, PointerRoutedEventArgs e)

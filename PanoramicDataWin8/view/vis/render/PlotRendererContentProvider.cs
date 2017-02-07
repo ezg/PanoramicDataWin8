@@ -211,7 +211,12 @@ namespace PanoramicDataWin8.view.vis.render
                                                            CommonExtensions.ToVector2(xTo, yTo), white, 0.5f);
                     }
                 }
-                if (Labels.IndexOf(label) % mod == 0)
+                if (Labels.IndexOf(label) % mod == 0 && (_helper.ChartType == ChartType.HeatMap || 
+                    _bczBinMapModels.Where((m) => m.SortAxis != xaxis).Count() == 0) || 
+                    (xaxis && _helper.ChartType == ChartType.VerticalBar) ||
+
+                    (!xaxis && _helper.ChartType == ChartType.HorizontalBar)
+                    )
                 {
                     var xStart = xaxis ? xFrom + (xTo - xFrom) / 2.0f : xFrom - 10;
                     var yStart = xaxis ? yFrom + 5 : yFrom + (yTo - yFrom) / 2.0f;
@@ -256,7 +261,7 @@ namespace PanoramicDataWin8.view.vis.render
             BczHitTargets.Add(bmc.HitGeom, bmc.BczBinMapModel);
 
             // draw hit target
-            canvasArgs.DrawingSession.FillRoundedRectangle(binPrimitive.Rect, 4, 4, binPrimitive.Color);
+            canvasArgs.DrawingSession.FillRectangle(binPrimitive.Rect, binPrimitive.Color);
         }
 
         private void renderPlot(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs)
@@ -408,7 +413,7 @@ namespace PanoramicDataWin8.view.vis.render
                     var binIndex = sortAxis ? new BinIndex(xi, yi) : new BinIndex(yi, xi);
                     if (_histogramResult.Bins.ContainsKey(binIndex)) {
                         double sortValue = _helper.GetBinValue(_histogramResult.Bins[binIndex]);
-                        //if (sortValue != 0)
+                        if (sortValue != 0)
                         {
                             if (sortValue < minaxis)
                                 minaxis = sortValue;
@@ -537,6 +542,10 @@ namespace PanoramicDataWin8.view.vis.render
         private double _yScale = 0;
         private double _minValue = 0;
         private double _maxValue = 0;
+        private double _minXValue = 0;
+        private double _maxXValue = 0;
+        private double _minYValue = 0;
+        private double _maxYValue = 0;
         public double DataMinX { get; set; } = 0;
         public double DataMinY { get; set; } = 0;
         public double DataMaxX { get; set; } = 0;
@@ -578,7 +587,33 @@ namespace PanoramicDataWin8.view.vis.render
                     _maxValue = (double)Math.Max(_maxValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
                 }
             }
-            
+
+
+            _maxYValue = double.MinValue;
+            foreach (var Brush in _histogramResult.Brushes)
+                foreach (var Bin in _histogramResult.Bins.Values)
+                {
+                    var maxYAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, _histogramResult, Brush.BrushIndex);
+                    if (Bin.AggregateResults.ContainsKey(maxYAggregateKey))
+                    {
+                        var yval = (double)((DoubleValueAggregateResult)Bin.AggregateResults[maxYAggregateKey]).Result;
+                        if (yval > _maxYValue)
+                            _maxYValue = yval;
+                    }
+                }
+            _maxXValue = double.MinValue;
+            foreach (var Brush in _histogramResult.Brushes)
+                foreach (var Bin in _histogramResult.Bins.Values)
+                {
+                    var maxXAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, _histogramResult, Brush.BrushIndex);
+                    if (Bin.AggregateResults.ContainsKey(maxXAggregateKey))
+                    {
+                        var xval = (double)((DoubleValueAggregateResult)Bin.AggregateResults[maxXAggregateKey]).Result;
+                        if (xval > _maxXValue)
+                            _maxXValue = xval;
+                    }
+                }
+
             initializeChartType(_histogramResult.BinRanges);
 
             VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[0], _xIom, histogramOperationModel.IncludeDistribution));
@@ -820,6 +855,7 @@ namespace PanoramicDataWin8.view.vis.render
             double alpha = 0.15f;
             var baseColor = Colors.White;
 
+
             var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
             var marginAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, new MarginAggregateParameters()
             { AggregateFunction = _valueIom.AggregateFunction.ToString() }, _histogramResult, _histogramResult.AllBrushIndex());
@@ -843,6 +879,34 @@ namespace PanoramicDataWin8.view.vis.render
                 // choose whether to normalize from 0-to-SumOfValues  or Min-to-Max value
                 normalization.Scope = map.SortUp ? BczNormalization.Scoping.ZeroToSum : BczNormalization.Scoping.MinToMax;
             }
+            var binBrushMinAxis = double.MaxValue;
+            var binBrushMaxAxis = double.MinValue;
+            var binBrushMinValue = double.MaxValue;
+            var binBrushMaxValue = 0.0;
+            foreach (var Brush in _histogramResult.Brushes)
+            {
+                var maxAggregateKey = IDEAHelpers.CreateAggregateKey(normalization.Axis == BczNormalization.axis.X ? _yIom : _xIom, _histogramResult, Brush.BrushIndex);
+                if (bin.AggregateResults.ContainsKey(maxAggregateKey))
+                {
+                    var val = (double)((DoubleValueAggregateResult)bin.AggregateResults[maxAggregateKey]).Result;
+                    if (val > binBrushMaxAxis)
+                        binBrushMaxAxis = val;
+                    if (val < binBrushMinAxis)
+                        binBrushMinAxis = val;
+                }
+
+                var maxValAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, Brush.BrushIndex);
+                if (bin.AggregateResults.ContainsKey(maxValAggregateKey))
+                {
+                    var val = (double)((DoubleValueAggregateResult)bin.AggregateResults[maxValAggregateKey]).Result;
+                    if (val > binBrushMaxValue)
+                        binBrushMaxValue = val;
+                    if (val < binBrushMinValue && val != 0)
+                        binBrushMinValue = val;
+                }
+            }
+            if (binBrushMinValue == double.MaxValue)
+                binBrushMinValue = binBrushMaxValue;
 
             foreach (var brush in _histogramResult.Brushes)
             {
@@ -862,26 +926,39 @@ namespace PanoramicDataWin8.view.vis.render
                 valueAggregateKey.BrushIndex = brush.BrushIndex;
                 var valueMargin = (MarginAggregateResult)bin.AggregateResults[marginAggregateKey];
 
-                var minValue = _minValue;
-                var maxValue = _maxValue;
-                double unNormalizedvalue = (double)((DoubleValueAggregateResult) bin.AggregateResults[valueAggregateKey]).Result;
-                if (normalization.Axis != BczNormalization.axis.None && brush.BrushIndex == _histogramResult.RestBrushIndex())
+                var localminValue = 0.0;
+                var localmaxValue = 0.0;
+                double unNormalizedvalue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
+                if (normalization.Axis != BczNormalization.axis.None)
                 {
                     var binIndex = normalization.Axis == BczNormalization.axis.X ? bin.BinIndex.Indices.First() : bin.BinIndex.Indices.Last();
                     if (normalization.Scope == BczNormalization.Scoping.ZeroToSum)
                     {
-                        maxValue = (normalization.Axis == BczNormalization.axis.X ? xaxisSizes : yaxisSizes)[binIndex];
+                        localmaxValue = (normalization.Axis == BczNormalization.axis.X ? xaxisSizes : yaxisSizes)[binIndex];
                     }
                     else if (normalization.Scope == BczNormalization.Scoping.MinToMax)
                     {
-                        minValue = (normalization.Axis == BczNormalization.axis.X ? xaxisRanges : yaxisRanges)[binIndex].Item1;
-                        maxValue = (normalization.Axis == BczNormalization.axis.X ? xaxisRanges : yaxisRanges)[binIndex].Item2;
+                        var range = (normalization.Axis == BczNormalization.axis.X ? xaxisRanges : yaxisRanges)[binIndex];
+                        localminValue = range.Item1 == 0 ? localminValue : range.Item1;
+                        localmaxValue = range.Item2;
                     }
+
                 }
                 if (unNormalizedvalue != 0)
                 {
-                    value = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
-                    value = (value - minValue) / (Math.Abs((maxValue - minValue)) < TOLERANCE ? (value - minValue) : (maxValue - minValue));
+                    if (binBrushMinValue != binBrushMaxValue && normalization.Axis != BczNormalization.axis.None && brush.BrushIndex != _histogramResult.AllBrushIndex())
+                    {
+                        localminValue = binBrushMinValue;
+                        localmaxValue = binBrushMaxValue;
+                    }
+                    else if (localminValue == localmaxValue)
+                    {
+                        localminValue = _minValue;
+                        localmaxValue = _maxValue;
+                        if (normalization.Axis != BczNormalization.axis.None)
+                            unNormalizedvalue = _maxValue;// bcz: this makes a lone bin in a normalized column/row be a Max value
+                    }
+                    value = (unNormalizedvalue - localminValue) / (Math.Abs((localmaxValue - localminValue)) < TOLERANCE ? unNormalizedvalue : (localmaxValue - localminValue));
                 }
 
                 if (brush.BrushIndex == _histogramResult.RestBrushIndex())
@@ -951,8 +1028,8 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     var dataValue = ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result;
 
-                    var xValue = normalization.Axis != BczNormalization.axis.Y || allUnNormalizedValue == _minValue ? 
-                        dataValue : (dataValue - _minValue) / (allUnNormalizedValue - _minValue) * _maxValue;
+                    var xValue = normalization.Axis != BczNormalization.axis.Y || binBrushMaxAxis == 0 ?
+                        dataValue : (dataValue - 0) / (binBrushMaxAxis - 0) * _maxXValue;
                     xFrom = DataToScreenX((double)Math.Min(0, xValue));
                     xTo = DataToScreenX((double)Math.Max(0, xValue));
 
@@ -976,9 +1053,9 @@ namespace PanoramicDataWin8.view.vis.render
                 else if (_chartType == ChartType.VerticalBar)
                 {
                     var dataValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
-                   
-                    var yValue =  normalization.Axis != BczNormalization.axis.X || allUnNormalizedValue == _minValue ? 
-                        dataValue : (dataValue - _minValue) / (allUnNormalizedValue - _minValue) * _maxValue;
+                 
+                    var yValue =  normalization.Axis != BczNormalization.axis.X || binBrushMaxAxis == 0 ? 
+                        dataValue : (dataValue - 0) / (binBrushMaxAxis - 0) * _maxYValue;
                     yFrom = DataToScreenY((double)Math.Min(0, yValue));
                     yTo   = DataToScreenY((double)Math.Max(0, yValue));
 
