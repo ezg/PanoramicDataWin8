@@ -234,10 +234,11 @@ namespace PanoramicDataWin8.view.vis.render
         public bool Consume(InkStroke inkStroke)
         {
             GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
-            List<Windows.Foundation.Point> selectionPoints = inkStroke.Points.Select(p => gt.TransformPoint(p)).ToList();
+            List<Windows.Foundation.Point> selectionPoints = inkStroke.Points.Select(p => gt.TransformPoint(p)).
+                GetLineString().Buffer(1).Coordinates.Select(c => c.GetWindowsPoint()).ToList();
 
             IList<Vec> convexHull = Convexhull.convexhull(selectionPoints);
-            IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon().Buffer(1);
+            IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon();
 
             List<FilterModel> hits = new List<FilterModel>();
             foreach (var geom in _plotRendererContentProvider.HitTargets.Keys)

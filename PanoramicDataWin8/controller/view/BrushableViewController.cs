@@ -98,19 +98,29 @@ namespace PanoramicDataWin8.controller.view
         private void OperationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
+            {
                 foreach (var opViewModel in e.OldItems.OfType<OperationViewModel>())
+                {
                     if (opViewModel.OperationModel is IBrushableOperationModel)
                     {
                         opViewModel.PropertyChanged -= OperationViewModel_PropertyChanged;
                         opViewModel.OperationViewModelTapped -= OpViewModel_OperationViewModelTapped;
+
+                        Remove((IBrushableOperationModel)opViewModel.OperationModel);
                     }
+                }
+            }
             if (e.NewItems != null)
+            {
                 foreach (var opViewModel in e.NewItems.OfType<OperationViewModel>())
+                {
                     if (opViewModel.OperationModel is IBrushableOperationModel)
                     {
                         opViewModel.PropertyChanged += OperationViewModel_PropertyChanged;
                         opViewModel.OperationViewModelTapped += OpViewModel_OperationViewModelTapped;
                     }
+                }
+            }
         }
 
         private void OpViewModel_OperationViewModelTapped(object sender, EventArgs e)

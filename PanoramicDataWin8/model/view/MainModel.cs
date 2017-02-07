@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.model.view
 
         private bool _showCodeGen;
 
-        private bool _isDefaultHypothesisEnabled = true;
+        private bool _isDefaultHypothesisEnabled = false;
 
         private QueryExecuter _queryExecuter;
 
