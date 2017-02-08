@@ -200,6 +200,7 @@
     <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="model\view\operation\OperationViewModel.cs" />
     <Compile Include="model\view\SliderMenuItemComponentViewModel.cs" />
+    <Compile Include="model\view\CreateLinkMenuItemViewModel.cs" />
     <Compile Include="model\view\StatisticalComparisonMenuItemViewModel.cs" />
     <Compile Include="model\view\tilemenu\Alignment.cs" />
     <Compile Include="model\view\tilemenu\AttachPosition.cs" />

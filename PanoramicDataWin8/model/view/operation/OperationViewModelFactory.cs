@@ -39,6 +39,38 @@ namespace PanoramicDataWin8.model.view.operation
             return null;
         }
 
+        private static void createTopHistogramMenu(HistogramOperationViewModel histogramOperationViewModel)
+        {
+            var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Top);
+            var menuViewModel = new MenuViewModel
+            {
+                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
+                NrColumns = 1,
+                NrRows = 1
+            };
+
+            var menuItem = new MenuItemViewModel
+            {
+                MenuViewModel = menuViewModel,
+                Row = 0,
+                ColumnSpan = 1,
+                RowSpan = 1,
+                Column = 0,
+                Size = new Vec(25, 25),
+                Position = histogramOperationViewModel.Position,
+                TargetSize = new Vec(25, 25),
+                IsAlwaysDisplayed = false
+            };
+            var attr1 = new CreateLinkMenuItemViewModel()
+            {
+              //  StatisticalComparisonOperationModel = model.StatisticalComparisonOperationModel
+            };
+
+            menuItem.MenuItemComponentViewModel = attr1;
+            menuViewModel.MenuItemViewModels.Add(menuItem);
+
+            attachmentViewModel.MenuViewModel = menuViewModel;
+        }
         private static void createRightHistogramMenu(HistogramOperationViewModel histogramOperationViewModel)
         {
             var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
@@ -192,15 +224,20 @@ namespace PanoramicDataWin8.model.view.operation
                     menuViewModel.MenuItemViewModels.Remove(mvm);
 
                 var aom = attr1.AttributeTransformationViewModel.AttributeTransformationModel;
-                if ((aom != null) &&
-                    ((((AttributeFieldModel) aom.AttributeModel).InputDataType == InputDataTypeConstants.INT) ||
-                     (((AttributeFieldModel) aom.AttributeModel).InputDataType == InputDataTypeConstants.FLOAT)))
+                var aggregateFunctions = new[] {AggregateFunction.None, AggregateFunction.Count}.ToList();
+                if (aom != null)
                 {
+                    if (((AttributeFieldModel) aom.AttributeModel).InputDataType == InputDataTypeConstants.INT ||
+                        (((AttributeFieldModel) aom.AttributeModel).InputDataType == InputDataTypeConstants.FLOAT))
+                    {
+                        aggregateFunctions.Add(AggregateFunction.Avg);
+                    }
+                    
                     var toggles = new List<ToggleMenuItemComponentViewModel>();
                     var items = new List<MenuItemViewModel>();
 
                     var count = 0;
-                    foreach (var aggregationFunction in new[] {AggregateFunction.None, AggregateFunction.Avg, AggregateFunction.Count})
+                    foreach (var aggregationFunction in aggregateFunctions)
                     {
                         var toggleMenuItem = new MenuItemViewModel
                         {
@@ -239,6 +276,7 @@ namespace PanoramicDataWin8.model.view.operation
                     foreach (var mi in items)
                         (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
                 }
+
             };
             attr1.TappedTriggered = () => { attachmentViewModel.ActiveStopwatch.Restart(); };
             attr1.DroppedTriggered = attributeTransformationModel =>
@@ -301,6 +339,7 @@ namespace PanoramicDataWin8.model.view.operation
             createAxisMenu(histogramOperationViewModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
             createAxisMenu(histogramOperationViewModel, AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
             createRightHistogramMenu(histogramOperationViewModel);
+            createTopHistogramMenu(histogramOperationViewModel);
 
 
             if ((attributeModel != null) && attributeModel is AttributeFieldModel)

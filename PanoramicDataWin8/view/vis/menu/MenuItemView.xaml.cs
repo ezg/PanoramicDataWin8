@@ -77,6 +77,11 @@ namespace PanoramicDataWin8.view.vis.menu
                 mainGrid.Children.Clear();
                 mainGrid.Children.Add(new StatisticalComparisonMenuItemView());
             }
+            else if (model.MenuItemComponentViewModel is CreateLinkMenuItemViewModel)
+            {
+                mainGrid.Children.Clear();
+                //mainGrid.Children.Add(new StatisticalComparisonMenuItemView());
+            }
         }
 
 
