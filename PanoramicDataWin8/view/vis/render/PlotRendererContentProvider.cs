@@ -1027,7 +1027,6 @@ namespace PanoramicDataWin8.view.vis.render
             double xTo = 0;
             double yFrom = 0;
             double yTo = 0;
-            var color = baseColorFromBrush(brush);
 
             var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
             var allUnNormalizedValue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
@@ -1059,6 +1058,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (double.IsNaN(value))
                 value = 1;
             var alpha = 0.15f;
+            var color = baseColorFromBrush(brush);
             var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), color, (float)(alpha + Math.Pow(value, 1.0 / 3.0) * (1.0 - alpha)));
             var dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
 
@@ -1066,7 +1066,7 @@ namespace PanoramicDataWin8.view.vis.render
             { AggregateFunction = _valueIom.AggregateFunction.ToString() }, _histogramResult, _histogramResult.AllBrushIndex());
             var valueMargin = (MarginAggregateResult)bin.AggregateResults[marginAggregateKey];
             marginPercentage = valueMargin.Margin;
-            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage, xFrom, xTo, yFrom, yTo, color, unNormalizedvalue);
+            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage, xFrom, xTo, yFrom, yTo, dataColor, unNormalizedvalue);
         }
 
         double getHeatMapBinValue(Bin bin, List<Tuple<double, double>> xaxisRanges, List<Tuple<double, double>> yaxisRanges, 
