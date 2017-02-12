@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using GeoAPI.Geometries;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
+using PanoramicDataWin8.utils;
+using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.view.vis;
 
 namespace PanoramicDataWin8.controller.view
@@ -63,6 +66,27 @@ namespace PanoramicDataWin8.controller.view
                         ((linkModel.FromOperationModel == other.OperationModel) && (linkModel.ToOperationModel == current.OperationModel)))
                         areLinked = true;
             return areLinked;
+        }
+
+        public FilterLinkViewModel CreateFilterLinkViewModel(IOperationModel from, Rct bounds)
+        {
+            IGeometry inputBounds = bounds.GetPolygon();
+            var hits = new List<OperationContainerView>();
+            var tt = MainViewController.Instance.InkableScene.GetDescendants().OfType<OperationContainerView>().ToList();
+            foreach (var element in tt)
+            {
+                var geom = element.Geometry;
+                if ((geom != null) && geom.Intersects(inputBounds))
+                {
+                    hits.Add(element);
+                }
+            }
+
+            if (hits.Any())
+            {
+                return CreateFilterLinkViewModel(from, ((OperationViewModel) hits.First().DataContext).OperationModel);
+            }
+            return null;
         }
 
 

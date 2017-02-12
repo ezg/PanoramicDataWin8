@@ -1,15 +1,17 @@
-﻿using PanoramicDataWin8.model.data.operation;
+﻿using Windows.Foundation;
+using PanoramicDataWin8.model.data.operation;
+using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
 {
     public class CreateLinkMenuItemViewModel : MenuItemComponentViewModel
     {
-        private StatisticalComparisonOperationModel _statisticalComparisonOperationModel;
-        
-        public StatisticalComparisonOperationModel StatisticalComparisonOperationModel
+        public delegate void CreateLinkHandler(object sender, Rct bounds);
+        public event CreateLinkHandler CreateLinkEvent;
+
+        public void FireCreateLinkEvent(Rct bounds)
         {
-            get { return _statisticalComparisonOperationModel; }
-            set { SetProperty(ref _statisticalComparisonOperationModel, value); }
+            CreateLinkEvent?.Invoke(this, bounds);
         }
     }
 }
