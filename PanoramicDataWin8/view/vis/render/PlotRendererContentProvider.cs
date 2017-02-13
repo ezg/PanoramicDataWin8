@@ -724,9 +724,8 @@ namespace PanoramicDataWin8.view.vis.render
                     aggregateKey.BrushIndex = brush.BrushIndex;
                     foreach (var bin in _histogramResult.Bins.Values)
                     {
-                        var v = ((DoubleValueAggregateResult) bin.AggregateResults[aggregateKey]).Result;
-                        minValue = (double)Math.Min(minValue, v);
-                        maxValue = (double)Math.Max(maxValue, v);
+                        minValue = (double)Math.Min(minValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
+                        maxValue = (double)Math.Max(maxValue, ((DoubleValueAggregateResult)bin.AggregateResults[aggregateKey]).Result);
                     }
                 }
 
@@ -1245,11 +1244,11 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     var mappedbinIndex = i == 0 ? slistXValues[bin.BinIndex.Indices[i]] : slistYValues[bin.BinIndex.Indices[i]];
                     var dataFrom = _histogramResult.BinRanges[i].GetValueFromIndex(mappedbinIndex);
-                    var dataTo = _histogramResult.BinRanges[i].AddStep(_histogramResult.BinRanges[i].GetValueFromIndex(mappedbinIndex));
+                    var dataTo   = _histogramResult.BinRanges[i].AddStep(_histogramResult.BinRanges[i].GetValueFromIndex(mappedbinIndex));
 
                     if (_histogramResult.BinRanges[i] is NominalBinRange)
                     {
-                        var dd = mappedbinIndex;
+                        var dd = bin.BinIndex.Indices[i]; 
                         var tt = _histogramResult.BinRanges[i].GetLabel(dd);
                         var xx = _histogramResult.BinRanges[i].GetLabel(dataFrom);
 
