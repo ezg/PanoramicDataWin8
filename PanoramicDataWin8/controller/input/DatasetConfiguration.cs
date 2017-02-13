@@ -15,7 +15,7 @@ namespace PanoramicDataWin8.controller.input
         private List<string> _inputFieldNames = new List<string>();
 
         private List<string> _inputFieldVisualizationTypes = new List<string>();
-
+        
         private int _nrOfRecords;
 
         private double _sampleSize = 1;

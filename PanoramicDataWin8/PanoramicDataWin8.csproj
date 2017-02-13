@@ -290,6 +290,9 @@
     <Compile Include="view\vis\menu\AttributeTransformationMenuItemView.xaml.cs">
       <DependentUpon>AttributeTransformationMenuItemView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\vis\menu\CreateLinkMenuItemView.xaml.cs">
+      <DependentUpon>CreateLinkMenuItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\menu\StatisticalComparisonMenuItemView.xaml.cs">
       <DependentUpon>StatisticalComparisonMenuItemView.xaml</DependentUpon>
     </Compile>
@@ -432,6 +435,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\menu\AttributeTransformationMenuItemView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="view\vis\menu\CreateLinkMenuItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

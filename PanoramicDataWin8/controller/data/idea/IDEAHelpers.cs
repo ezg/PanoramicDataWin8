@@ -195,7 +195,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 ? new EquiWidthBinningParameters
                 {
                     Dimension = xIom.AttributeModel.Index,
-                    RequestedNrOfBins = MainViewController.Instance.MainModel.NrOfXBins
+                    RequestedNrOfBins = MainViewController.Instance.MainModel.NrOfXBins, 
                 }
                 : (BinningParameters) new SingleBinBinningParameters
                 {
@@ -220,15 +220,29 @@ namespace PanoramicDataWin8.controller.data.progressive
             {
                 AggregateParameters aggParam = null;
                 if (agg.AggregateFunction == AggregateFunction.Avg)
+                {
                     aggParam = new AverageAggregateParameters
                     {
-                        Dimension = agg.AttributeModel.Index
+                        Dimension = agg.AttributeModel.Index,
+                        DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
                     };
+                }
                 else if (agg.AggregateFunction == AggregateFunction.Count)
+                {
                     aggParam = new CountAggregateParameters
                     {
-                        Dimension = agg.AttributeModel.Index
+                        Dimension = agg.AttributeModel.Index,
+                        DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
                     };
+                }
+                else if (agg.AggregateFunction == AggregateFunction.Sum)
+                {
+                    aggParam = new SumAggregateParameters()
+                    {
+                        Dimension = agg.AttributeModel.Index,
+                        DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
+                    };
+                }
                 aggregateParameters.Add(aggParam);
 
                 if (agg == model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).FirstOrDefault())
@@ -237,6 +251,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 aggregateParameters.Add(new MarginAggregateParameters
                 {
                     Dimension = agg.AttributeModel.Index,
+                    DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension,
                     AggregateFunction = agg.AggregateFunction.ToString()
                 });
             }
@@ -248,11 +263,13 @@ namespace PanoramicDataWin8.controller.data.progressive
                 globalAggregates.Add(new KDEAggregateParameters
                 {
                     Dimension = index,
-                    NrOfSamples = 50
+                    NrOfSamples = 50,
+                    DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
                 });
                 globalAggregates.Add(new CountAggregateParameters
                 {
-                    Dimension = index
+                    Dimension = index,
+                    DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
                 });
             }
 

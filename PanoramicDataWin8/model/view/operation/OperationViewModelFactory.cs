@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Windows.UI.Xaml.Media;
 using IDEA_common.catalog;
+using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
@@ -61,9 +62,10 @@ namespace PanoramicDataWin8.model.view.operation
                 TargetSize = new Vec(25, 25),
                 IsAlwaysDisplayed = false
             };
-            var attr1 = new CreateLinkMenuItemViewModel()
+            var attr1 = new CreateLinkMenuItemViewModel();
+            attr1.CreateLinkEvent += (sender, bounds) =>
             {
-              //  StatisticalComparisonOperationModel = model.StatisticalComparisonOperationModel
+                FilterLinkViewController.Instance.CreateFilterLinkViewModel(histogramOperationViewModel.OperationModel, bounds);
             };
 
             menuItem.MenuItemComponentViewModel = attr1;
@@ -71,6 +73,7 @@ namespace PanoramicDataWin8.model.view.operation
 
             attachmentViewModel.MenuViewModel = menuViewModel;
         }
+
         private static void createRightHistogramMenu(HistogramOperationViewModel histogramOperationViewModel)
         {
             var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
@@ -181,16 +184,16 @@ namespace PanoramicDataWin8.model.view.operation
             var menuViewModel = new MenuViewModel
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 3 : 2,
-                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 3
+                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 4 : 2,
+                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 4
             };
 
             var menuItem = new MenuItemViewModel
             {
                 MenuViewModel = menuViewModel,
                 Row = 0,
-                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 3 : 1,
-                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 3,
+                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 4 : 1,
+                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 4,
                 Column = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
                 Size = size,
                 Position = histogramOperationViewModel.Position,
@@ -231,6 +234,7 @@ namespace PanoramicDataWin8.model.view.operation
                         (((AttributeFieldModel) aom.AttributeModel).InputDataType == InputDataTypeConstants.FLOAT))
                     {
                         aggregateFunctions.Add(AggregateFunction.Avg);
+                        aggregateFunctions.Add(AggregateFunction.Sum);
                     }
                     
                     var toggles = new List<ToggleMenuItemComponentViewModel>();
@@ -246,8 +250,8 @@ namespace PanoramicDataWin8.model.view.operation
                             RowSpan = 0,
                             Position = histogramOperationViewModel.Position,
                             Column = attachmentOrientation == AttachmentOrientation.Bottom ? count : 0,
-                            Size = new Vec(32, 50),
-                            TargetSize = new Vec(32, 50)
+                            Size = new Vec(32, 32),
+                            TargetSize = new Vec(32, 32)
                         };
                         //toggleMenuItem.Position = attachmentItemViewModel.Position;
                         var toggle = new ToggleMenuItemComponentViewModel
