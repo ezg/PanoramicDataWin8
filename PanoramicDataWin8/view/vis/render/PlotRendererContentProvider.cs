@@ -177,14 +177,16 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var labels = new List<BinLabel>();
             if (_bczBinMapModels.Where((m) => m.SortAxis != xaxis).Count() != 0 && ((xaxis && _helper.ChartType == ChartType.HorizontalBar) ||
-                (!xaxis && _helper.ChartType == ChartType.VerticalBar))) {
-                for (double val = range.MinValue; val < range.MaxValue; val += (range.MaxValue - range.MinValue) / 8)
+                (!xaxis && _helper.ChartType == ChartType.VerticalBar)))
+            {
+                double steps = 6;
+                for (double val = range.MinValue; val <= range.MaxValue; val += (range.MaxValue - range.MinValue) / steps)
                 {
                     labels.Add(new BinLabel
                     {
                         Value = val,
                         MinValue = val,
-                        MaxValue = val + 0.125,
+                        MaxValue = Math.Min(range.MaxValue, val + (range.MaxValue - range.MinValue) / steps),
                         Label = ((val - range.MinValue) / (range.MaxValue - range.MinValue)).ToString("F2")
                     });
                 }
