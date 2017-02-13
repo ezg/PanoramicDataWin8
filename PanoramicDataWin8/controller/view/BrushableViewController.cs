@@ -63,8 +63,13 @@ namespace PanoramicDataWin8.controller.view
             {
                 var diff = brushViewModel.OperationViewModels[0].Position - brushViewModel.OperationViewModels[1].Position;
 
+                var currentRect = RectHelper.FromLocationAndSize(brushViewModel.OperationViewModels[0].Position, 
+                                     (Windows.Foundation.Size)brushViewModel.OperationViewModels[0].Size);
+                var otherRect = RectHelper.FromLocationAndSize(brushViewModel.OperationViewModels[1].Position, 
+                                     (Windows.Foundation.Size)brushViewModel.OperationViewModels[1].Size);
+
                 // views to open
-                if ((Math.Abs(diff.Y) < 300) &&
+                if (RectYOverlap(currentRect, otherRect) && // (Math.Abs(diff.Y) < 300) &&
                     (boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) < 100) &&
                     (dropped || (DateTime.Now.Ticks > TimeSpan.TicksPerSecond*1 + brushViewModel.TicksSinceDwellStart)))
                     brushViewModel.BrushableOperationViewModelState = BrushableOperationViewModelState.Opened;
@@ -74,7 +79,7 @@ namespace PanoramicDataWin8.controller.view
 
                 // Views to close
                 if (areLinked ||
-                    (Math.Abs(diff.Y) >= 300) ||
+                    !RectYOverlap(currentRect, otherRect) || //(Math.Abs(diff.Y) >= 300) ||
                     ((brushViewModel.BrushableOperationViewModelState == BrushableOperationViewModelState.Opening) &&
                      (boundHorizontalDistance(brushViewModel.OperationViewModels[0].Bounds, brushViewModel.OperationViewModels[1].Bounds) >= 100)) ||
                     ((brushViewModel.BrushableOperationViewModelState == BrushableOperationViewModelState.Opened) &&
@@ -136,8 +141,7 @@ namespace PanoramicDataWin8.controller.view
         }
 
         private void recursiveCheckForCircularBrushing(IOperationModel current, HashSet<IOperationModel> chain)
-        {
-           // var linkModels = ((IFilterConsumerOperationModel)filterLinkModel.FromOperationModel).LinkModels.Where(lm => lm.FromOperationModel == filterLinkModel.FromOperationModel).ToList();
+        {            
             if (!chain.Contains(current))
             {
                 var links = ((IFilterConsumerOperationModel) current).LinkModels;
@@ -165,7 +169,12 @@ namespace PanoramicDataWin8.controller.view
             return Math.Min(Math.Abs(b1.Right - b2.Left), Math.Abs(b1.Left - b2.Right));
         }
 
-
+        bool RectYOverlap(Windows.Foundation.Rect r1, Windows.Foundation.Rect r2)
+        {
+            if (r1.Top > r2.Bottom || r2.Top > r1.Bottom)
+                return false;
+            return true;
+        }
         private void operationViewModelUpdated(OperationViewModel current)
         {
             if (current.OperationModel is IBrusherOperationModel)
@@ -178,6 +187,8 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var other in allBrushableOperationViewModels)
                 {
                     var diff = current.Position - other.Position;
+                    var currentRect = RectHelper.FromLocationAndSize(current.Position, (Windows.Foundation.Size)current.Size);
+                    var otherRect = RectHelper.FromLocationAndSize(other.Position, (Windows.Foundation.Size)other.Size);
 
                     var areLinked = FilterLinkViewController.Instance.AreOperationViewModelsLinked(current, other);
                     var isBrushAllowed = this.isBrushAllowed(current, other);
@@ -202,14 +213,24 @@ namespace PanoramicDataWin8.controller.view
                             }
 
                         }
-                        if ((Math.Abs(diff.Y) < 300) &&
+
+                        if (RectYOverlap(currentRect, otherRect) && // (Math.Abs(diff.Y) < 300) &&
                                 (boundHorizontalDistance(current.Bounds, other.Bounds) < 100) && isBrushAllowed)
                         {
 
                             if (!BrushViews.Keys.Any(sov => (sov.To == current) && (sov.From == other)) &&
                                 !BrushViews.Keys.Any(sov => (sov.From == current) && (sov.To == other)))
                             {
-                                var inputCohorts = BrushViews.Keys.Where(icv => icv.To == other).ToList();
+                                var otherview = other;
+                                if (current is HistogramOperationViewModel && otherview is HistogramOperationViewModel &&
+                                    (current as HistogramOperationViewModel).HistogramOperationModel.FilterModels.Count == 0 &&
+                                    (other as HistogramOperationViewModel).HistogramOperationModel.FilterModels.Count != 0)
+                                {
+                                    var tmp = current;
+                                    current = otherview;
+                                    otherview = tmp;
+                                }
+                                var inputCohorts = BrushViews.Keys.Where(icv => icv.To == otherview).ToList();
 
                                 var allColorIndex = Enumerable.Range(0, BrushViewModel.ColorScheme1.Count);
                                 allColorIndex = allColorIndex.Except(inputCohorts.Select(c => c.ColorIndex));
@@ -221,7 +242,7 @@ namespace PanoramicDataWin8.controller.view
                                 brushViewModel.ColorIndex = colorIndex;
                                 brushViewModel.Color = BrushViewModel.ColorScheme1[colorIndex];
                                 brushViewModel.From = current;
-                                brushViewModel.To = other;
+                                brushViewModel.To = otherview;
                                 brushViewModel.Position =
                                     (brushViewModel.OperationViewModels.Aggregate(new Vec(), (a, b) => a + b.Bounds.Center.GetVec()) / 2.0 - brushViewModel.Size / 2.0).GetWindowsPoint();
 
