@@ -248,7 +248,7 @@ namespace PanoramicDataWin8.view.vis
                     {
                         foreach (var avm in model.AttachementViewModels)
                         {
-                            avm.ActiveStopwatch.Restart();
+                            //avm.ActiveStopwatch.Restart();
                         }
                     }
                 }
@@ -313,7 +313,7 @@ namespace PanoramicDataWin8.view.vis
                 {
                     foreach (var avm in model.AttachementViewModels)
                     {
-                        avm.ActiveStopwatch.Restart();
+                        //avm.ActiveStopwatch.Restart();
                     }
                 }
             }

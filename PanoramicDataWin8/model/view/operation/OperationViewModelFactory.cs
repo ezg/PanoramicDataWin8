@@ -60,7 +60,7 @@ namespace PanoramicDataWin8.model.view.operation
                 Size = new Vec(25, 25),
                 Position = histogramOperationViewModel.Position,
                 TargetSize = new Vec(25, 25),
-                IsAlwaysDisplayed = false
+                IsAlwaysDisplayed = true
             };
             var attr1 = new CreateLinkMenuItemViewModel();
             attr1.CreateLinkEvent += (sender, bounds) =>
