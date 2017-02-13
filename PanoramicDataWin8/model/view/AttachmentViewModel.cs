@@ -15,7 +15,7 @@ namespace PanoramicDataWin8.model.view
 
         public AttachmentViewModel()
         {
-            ActiveStopwatch.Start();
+            //ActiveStopwatch.Start();
         }
 
         public OperationViewModel OperationViewModel

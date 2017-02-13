@@ -169,6 +169,14 @@ namespace PanoramicDataWin8.view.vis.menu
                     {
                         DataContext = item
                     };
+                    if (model.IsDisplayed || item.IsAlwaysDisplayed)
+                    {
+                        menuItemView.Opacity = 1;
+                    }
+                    else
+                    {
+                        menuItemView.Opacity = 0;
+                    }
                     _menuViewItems.Add(item, menuItemView);
                     _contentCanvas.Children.Add(menuItemView);
                 }
