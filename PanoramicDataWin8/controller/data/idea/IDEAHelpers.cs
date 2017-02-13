@@ -166,7 +166,11 @@ namespace PanoramicDataWin8.controller.data.progressive
             foreach (var brushOperationModel in model.BrushOperationModels)
             {
                 filterModels = new List<FilterModel>();
-                var brush = FilterModel.GetFilterModelsRecursive(brushOperationModel, new List<IFilterProviderOperationModel>(), filterModels, false);
+                var brush = "";
+                if ((brushOperationModel as IFilterProviderOperationModel).FilterModels.Any())
+                {
+                    brush = FilterModel.GetFilterModelsRecursive(brushOperationModel, new List<IFilterProviderOperationModel>(), filterModels, false);
+                }
                 brushes.Add(brush);
             }
 
