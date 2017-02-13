@@ -173,12 +173,33 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
+        public virtual List<BinLabel> GetAxisLabels(BinRange range, bool xaxis)
+        {
+            var labels = new List<BinLabel>();
+            if (_bczBinMapModels.Where((m) => m.SortAxis != xaxis).Count() != 0 && ((xaxis && _helper.ChartType == ChartType.HorizontalBar) ||
+                (!xaxis && _helper.ChartType == ChartType.VerticalBar))) {
+                for (double val = range.MinValue; val < range.MaxValue; val += (range.MaxValue - range.MinValue) / 8)
+                {
+                    labels.Add(new BinLabel
+                    {
+                        Value = val,
+                        MinValue = val,
+                        MaxValue = val + 0.125,
+                        Label = ((val - range.MinValue) / (range.MaxValue - range.MinValue)).ToString("F2")
+                    });
+                }
+            } else
+                labels = range.GetLabels();
+
+            return labels;
+        }
         void drawLabelsAndGridLines(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, bool renderLines, bool xaxis, Dictionary<int, int> sortedList)
         {
             double xFrom = 0, xTo = 0, yFrom = 0, yTo = 0;
             var white    = Color.FromArgb(255, 255, 255, 255);
             var binRange = _helper.VisualBinRanges[xaxis ? 0 : 1];
-            var Labels   = binRange.GetLabels();
+            var Labels = GetAxisLabels(binRange, xaxis);
+            
             var dim = xaxis ? _helper.DeviceWidth  / (_helper.LabelMetricsX.Width  + 5) :
                               _helper.DeviceHeight / (_helper.LabelMetricsY.Height + 5);
             int mod = (int)Math.Ceiling(Labels.Count / dim );
@@ -186,9 +207,9 @@ namespace PanoramicDataWin8.view.vis.render
             foreach (var label in Labels)
             {
                 xFrom = _helper.DataToScreenX(xaxis ? label.MinValue : _helper.DataMinX);
-                xTo = _helper.DataToScreenX(xaxis ? label.MaxValue : _helper.DataMaxX);
+                xTo   = _helper.DataToScreenX(xaxis ? label.MaxValue : _helper.DataMaxX);
                 yFrom = _helper.DataToScreenY(xaxis ? _helper.DataMinY : label.MinValue);
-                yTo = _helper.DataToScreenY(xaxis ? _helper.DataMaxY : label.MaxValue);
+                yTo   = _helper.DataToScreenY(xaxis ? _helper.DataMaxY : label.MaxValue);
 
                 var drawBinIndex = Labels.IndexOf(label);
                 foreach (var l in sortedList)
@@ -213,7 +234,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 if (Labels.IndexOf(label) % mod == 0 && (
                         (_helper.ChartType == ChartType.HeatMap || 
-                        _bczBinMapModels.Where((m) => m.SortAxis != xaxis).Count() == 0) || 
+                        true) || //_bczBinMapModels.Where((m) => m.SortAxis != xaxis).Count() == 0) || 
                         (xaxis && _helper.ChartType == ChartType.VerticalBar) ||
                         (!xaxis && _helper.ChartType == ChartType.HorizontalBar)
                     ))
@@ -975,7 +996,7 @@ namespace PanoramicDataWin8.view.vis.render
             double marginPercentage = 0.0;
             var dataValue = ((DoubleValueAggregateResult)bin.AggregateResults[yAggregateKey]).Result;
 
-            var yValue = normalization.Axis != BczNormalization.axis.X || binBrushMaxAxis == 0 ? dataValue : (dataValue - 0) / (binBrushMaxAxis - 0) * _maxYValue;
+            var yValue = normalization.Axis != BczNormalization.axis.X || binBrushMaxAxis == 0 ? dataValue : (dataValue - 0) / (binBrushMaxAxis - 0) * _yScale;
             var yFrom  = DataToScreenY((double)Math.Min(0, yValue));
             var yTo    = DataToScreenY((double)Math.Max(0, yValue));
 
@@ -1002,7 +1023,7 @@ namespace PanoramicDataWin8.view.vis.render
             double marginPercentage = 0.0;
             var dataValue = ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result;
 
-            var xValue = normalization.Axis != BczNormalization.axis.Y || binBrushMaxAxis == 0 ? dataValue : (dataValue - 0) / (binBrushMaxAxis - 0) * _maxXValue;
+            var xValue = normalization.Axis != BczNormalization.axis.Y || binBrushMaxAxis == 0 ? dataValue : (dataValue - 0) / (binBrushMaxAxis - 0) * _xScale;
             var xFrom  = DataToScreenX((double)Math.Min(0, xValue));
             var xTo    = DataToScreenX((double)Math.Max(0, xValue));
 
