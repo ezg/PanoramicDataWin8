@@ -61,10 +61,16 @@ namespace PanoramicDataWin8.controller.view
         {
             var areLinked = false;
             if (current.OperationModel is IFilterConsumerOperationModel && other.OperationModel is IFilterConsumerOperationModel)
+            {
                 foreach (var linkModel in (current.OperationModel as IFilterConsumerOperationModel).LinkModels)
+                {
                     if (((linkModel.FromOperationModel == current.OperationModel) && (linkModel.ToOperationModel == other.OperationModel)) ||
                         ((linkModel.FromOperationModel == other.OperationModel) && (linkModel.ToOperationModel == current.OperationModel)))
+                    {
                         areLinked = true;
+                    }
+                }
+            }
             return areLinked;
         }
 

@@ -123,6 +123,38 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
+        private bool isBrushAllowed(OperationViewModel current, OperationViewModel other)
+        {
+            var chain = new HashSet<IOperationModel>();
+            recursiveCheckForCircularBrushing(other.OperationModel, chain);
+            if (chain.Contains(current.OperationModel as IFilterConsumerOperationModel))
+            {
+                return false;
+            }
+            
+            return true;
+        }
+
+        private void recursiveCheckForCircularBrushing(IOperationModel current, HashSet<IOperationModel> chain)
+        {
+           // var linkModels = ((IFilterConsumerOperationModel)filterLinkModel.FromOperationModel).LinkModels.Where(lm => lm.FromOperationModel == filterLinkModel.FromOperationModel).ToList();
+            if (!chain.Contains(current))
+            {
+                var links = ((IFilterConsumerOperationModel) current).LinkModels;
+                foreach (var link in links)
+                {
+                    chain.Add(link.ToOperationModel);
+                    recursiveCheckForCircularBrushing(link.ToOperationModel, chain);
+                }
+                var brushes = ((IBrushableOperationModel) current).BrushOperationModels;
+                foreach (var brush in brushes)
+                {
+                    chain.Add(brush);
+                    recursiveCheckForCircularBrushing(brush, chain);
+                }
+            }
+        }
+
         private void OpViewModel_OperationViewModelTapped(object sender, EventArgs e)
         {
             operationViewModelUpdated((OperationViewModel) sender);
@@ -148,6 +180,7 @@ namespace PanoramicDataWin8.controller.view
                     var diff = current.Position - other.Position;
 
                     var areLinked = FilterLinkViewController.Instance.AreOperationViewModelsLinked(current, other);
+                    var isBrushAllowed = this.isBrushAllowed(current, other);
                     if (!areLinked &&
                         (!_lastMoved.ContainsKey(other) || (DateTime.Now - _lastMoved[other] > TimeSpan.FromSeconds(0.5))))
                     {
@@ -170,7 +203,7 @@ namespace PanoramicDataWin8.controller.view
 
                         }
                         if ((Math.Abs(diff.Y) < 300) &&
-                                (boundHorizontalDistance(current.Bounds, other.Bounds) < 100))
+                                (boundHorizontalDistance(current.Bounds, other.Bounds) < 100) && isBrushAllowed)
                         {
 
                             if (!BrushViews.Keys.Any(sov => (sov.To == current) && (sov.From == other)) &&
