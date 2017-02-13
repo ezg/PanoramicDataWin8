@@ -859,7 +859,10 @@ namespace PanoramicDataWin8.view.vis.render
             double binBrushMinValue, binBrushMaxValue;
             getBinBrushValueRange(bin, normalization, out binBrushMinValue, out binBrushMaxValue);
 
-            foreach (var brush in _histogramResult.Brushes)
+            var orderedBrushes = new List<Brush>(new Brush[] { _histogramResult.Brushes.First() });
+            orderedBrushes.Add(_histogramResult.Brushes[_histogramResult.OverlapBrushIndex()]);
+            orderedBrushes.AddRange(_histogramResult.Brushes.Where((b) => b.BrushIndex != 0 && b.BrushIndex != _histogramResult.OverlapBrushIndex()));
+            foreach (var brush in orderedBrushes)
             {
                 var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, brush.BrushIndex);
                 double unNormalizedvalue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
