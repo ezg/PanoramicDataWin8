@@ -850,7 +850,7 @@ namespace PanoramicDataWin8.view.vis.render
             )
         {
             var binPrimitiveCollection = new BinPrimitiveCollection();
-            binPrimitiveCollection.FilterModel = GetBinFilterModel(bin, _histogramResult.AllBrushIndex(), slistXValues, slistYValues);
+            binPrimitiveCollection.FilterModel = GetBinFilterModel(bin, _histogramResult.AllBrushIndex());
 
             var brushFactorSum = 0.0;
 
@@ -1226,7 +1226,7 @@ namespace PanoramicDataWin8.view.vis.render
             return baseColor;
         }
 
-        public FilterModel GetBinFilterModel(Bin bin, int brushIndex, Dictionary<int,int> slistXValues, Dictionary<int,int> slistYValues)
+        public FilterModel GetBinFilterModel(Bin bin, int brushIndex)
         {
             AttributeTransformationModel[] dimensions = new AttributeTransformationModel[] { _xIom, _yIom };
             FilterModel filterModel = new FilterModel();
@@ -1242,14 +1242,12 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 if (!(_histogramResult.BinRanges[i] is AggregateBinRange))
                 {
-                    var mappedbinIndex = i == 0 ? slistXValues[bin.BinIndex.Indices[i]] : slistYValues[bin.BinIndex.Indices[i]];
-                    var dataFrom = _histogramResult.BinRanges[i].GetValueFromIndex(mappedbinIndex);
-                    var dataTo   = _histogramResult.BinRanges[i].AddStep(_histogramResult.BinRanges[i].GetValueFromIndex(mappedbinIndex));
+                    var dataFrom = _histogramResult.BinRanges[i].GetValueFromIndex(bin.BinIndex.Indices[i]);
+                    var dataTo   = _histogramResult.BinRanges[i].AddStep(_histogramResult.BinRanges[i].GetValueFromIndex(bin.BinIndex.Indices[i]));
 
                     if (_histogramResult.BinRanges[i] is NominalBinRange)
                     {
-                        var dd = bin.BinIndex.Indices[i]; 
-                        var tt = _histogramResult.BinRanges[i].GetLabel(dd);
+                        var tt = _histogramResult.BinRanges[i].GetLabel(bin.BinIndex.Indices[i]);
                         var xx = _histogramResult.BinRanges[i].GetLabel(dataFrom);
 
                         filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.EQUALS, tt));
