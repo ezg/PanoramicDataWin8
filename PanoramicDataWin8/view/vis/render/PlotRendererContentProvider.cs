@@ -42,7 +42,7 @@ namespace PanoramicDataWin8.view.vis.render
         private HistogramResult _histogramResult = null;
         
         private HistogramOperationModel _histogramOperationModel = null;
-        private List<FilterModel> _filterModels = new List<FilterModel>();
+        private List<FilterModel>       _filterModels = new List<FilterModel>();
         private List<BczBinMapModel> _bczBinMapModels = new List<BczBinMapModel>();
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
         private CanvasCachedGeometry _strokeRoundedRectGeom = null;
@@ -61,6 +61,11 @@ namespace PanoramicDataWin8.view.vis.render
         public void UpdateFilterModels(List<FilterModel> filterModels)
         {
             _filterModels = filterModels;
+        }
+
+        public bool HasFilterModel(FilterModel fm)
+        {
+            return fm != null && _filterModels.Contains(fm);
         }
 
         void removeBczBinMapModels(List<BczBinMapModel> binMapModels)
@@ -318,7 +323,7 @@ namespace PanoramicDataWin8.view.vis.render
             var white = Color.FromArgb(255, 255, 255, 255);
             var dark = Color.FromArgb(255, 11, 11, 11);
 
-            List<BinPrimitiveCollection> allBinPrimitiveCollections = new List<BinPrimitiveCollection>();
+            var highlightedBinPrimitiveCollections = new List<BinPrimitiveCollection>();
             HitTargets.Clear();
 
             for (int xi = 0; xi < _histogramResult.BinRanges[0].GetBins().Count; xi++)
@@ -333,7 +338,8 @@ namespace PanoramicDataWin8.view.vis.render
                         var binPrimitiveCollection = _helper.GetBinPrimitives(bin, xLabelOrderings, yLabelOrderings,
                                     xAxisRanges , yAxisRanges,
                                      xAxisSizes , yAxisSizes, _bczBinMapModels);
-                        allBinPrimitiveCollections.Add(binPrimitiveCollection);
+                        if (HasFilterModel(binPrimitiveCollection.FilterModel))
+                            highlightedBinPrimitiveCollections.Add(binPrimitiveCollection);
 
                         foreach (var binPrimitive in binPrimitiveCollection.BinPrimitives.Where(bp => bp.Value != 0.0 && bp.BrushIndex != _histogramResult.AllBrushIndex()))
                         {
@@ -380,14 +386,9 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             // highlight selected bars
-            foreach (var binPrimitiveCollection in allBinPrimitiveCollections)
+            foreach (var binPrimitiveCollection in highlightedBinPrimitiveCollections)
             {
-                if (binPrimitiveCollection.FilterModel != null && _filterModels.Contains(binPrimitiveCollection.FilterModel))
-                {
-                    canvasArgs.DrawingSession.DrawRoundedRectangle(binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex()).Rect, 4, 4, dark, 2.0f);
-                    //canvasArgs.DrawingSession.FillRoundedRectangle(binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex()).Rect, 4, 4, dark);
-
-                }
+                highlightPrimitiveCollection(canvasArgs, dark, binPrimitiveCollection);
             }
 
             // render distributions if needed
@@ -420,6 +421,36 @@ namespace PanoramicDataWin8.view.vis.render
                         canvasArgs.DrawingSession.DrawGeometry(geometry, Color.FromArgb(150, 230, 230, 230), 4, strokeStyle);
                         canvasArgs.DrawingSession.DrawGeometry(geometry, dark, 1, strokeStyle);
                     }
+                }
+            }
+        }
+
+        void highlightPrimitiveCollection(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, Color dark, BinPrimitiveCollection binPrimitiveCollection)
+        {
+            var bpc = binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex());
+            canvasArgs.DrawingSession.DrawRoundedRectangle(bpc.Rect, 4, 4, dark, 2.0f);
+
+            if (_bczBinMapModels.Where((m) => m.SortAxis).Count() == 0)
+            {
+                var decimals = Math.IEEERemainder(bpc.DataValue, 1);
+                var dplaces = decimals == 0 ? 0 : bpc.DataValue > 1000 ? 0 : bpc.DataValue > 100 ? 1 : bpc.DataValue > 10 ? 2 : 3;
+                var tc = Color.FromArgb(255, _textColor.R, _textColor.G, _textColor.B);
+                if (_helper.ChartType == ChartType.VerticalBar)
+                {
+                    var labelRect = new Rect(_helper.DataToScreenX(_helper.DataMinX) - 50, bpc.Rect.Top - 7.5, 40, 15);
+                    canvasArgs.DrawingSession.FillRoundedRectangle(labelRect, 4, 4, Color.FromArgb(255, 175, 175, 175));
+                    DrawString(canvasArgs, _textFormat, _helper.DataToScreenX(_helper.DataMinX) - 10, bpc.Rect.Top, bpc.DataValue.ToString("F" + dplaces), tc, false, false, true);
+                }
+                if (_helper.ChartType == ChartType.HorizontalBar)
+                {
+                    var labelRect = new Rect(bpc.Rect.Right - 20, _helper.DataToScreenY(_helper.DataMinY) + 20, 40, 15);
+                    canvasArgs.DrawingSession.FillRoundedRectangle(labelRect, 4, 4, Color.FromArgb(255, 175, 175, 175));
+                    DrawString(canvasArgs, _textFormat, bpc.Rect.Right, _helper.DataToScreenY(_helper.DataMinY) + 20, bpc.DataValue.ToString("F" + dplaces), tc, true, true, false);
+                }
+                if (_helper.ChartType == ChartType.HeatMap)
+                {
+                    if (bpc.DataValue != 0)
+                        DrawString(canvasArgs, _textFormat, (bpc.Rect.Right + bpc.Rect.Left) / 2, (bpc.Rect.Top + bpc.Rect.Bottom) / 2, bpc.DataValue.ToString("F" + dplaces), tc, false, true, true);
                 }
             }
         }
@@ -530,6 +561,7 @@ namespace PanoramicDataWin8.view.vis.render
 
     public class BinPrimitive
     {
+        public double DataValue { get; set; }
         public double Value { get; set; }
         public Rect Rect { get; set; }
         public Rect MarginRect { get; set; }
@@ -862,7 +894,8 @@ namespace PanoramicDataWin8.view.vis.render
             return 0;
         }
 
-        public BinPrimitiveCollection GetBinPrimitives(Bin bin,
+        public BinPrimitiveCollection GetBinPrimitives(
+            Bin bin,
             Dictionary<int, int> slistXValues, //mapping of X axis indices (to implement sorting based on Y axis values)
             Dictionary<int, int> slistYValues, //mapping of Y axis indices (to implement sorting based on X axis values)
             List<Tuple<double, double>> xaxisRanges,   // min/max value of other axis values for normalize axis bin
@@ -987,7 +1020,7 @@ namespace PanoramicDataWin8.view.vis.render
             var yMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
             
             createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage,
-                               xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue);
+                               xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue, unNormalizedvalue);
         }
 
         void createVerticalBarChartBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, BczNormalization normalization, 
@@ -1014,7 +1047,7 @@ namespace PanoramicDataWin8.view.vis.render
                                   4,
                                   DataToScreenY((double)(yValue - yMarginAbsolute)) - DataToScreenY((double)(yValue + yMarginAbsolute)));
             createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage,
-                               xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue);
+                               xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue, dataValue);
         }
 
         void createHorizontalBarChartBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, BczNormalization normalization, 
@@ -1041,7 +1074,7 @@ namespace PanoramicDataWin8.view.vis.render
                                  DataToScreenX((double)(xValue + xMarginAbsolute)) - DataToScreenX((double)(xValue - xMarginAbsolute)),
                                  4.0);
             createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage,
-                               xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue);
+                               xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue, dataValue);
         }
 
         void createHeatMapBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, BczNormalization normalization,
@@ -1092,7 +1125,7 @@ namespace PanoramicDataWin8.view.vis.render
             { AggregateFunction = _valueIom.AggregateFunction.ToString() }, _histogramResult, _histogramResult.AllBrushIndex());
             var valueMargin = (MarginAggregateResult)bin.AggregateResults[marginAggregateKey];
             marginPercentage = valueMargin.Margin;
-            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage, xFrom, xTo, yFrom, yTo, dataColor, unNormalizedvalue);
+            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage, xFrom, xTo, yFrom, yTo, dataColor, unNormalizedvalue, unNormalizedvalue);
         }
 
         double getHeatMapBinValue(Bin bin, List<Tuple<double, double>> xaxisRanges, List<Tuple<double, double>> yaxisRanges, 
@@ -1137,7 +1170,8 @@ namespace PanoramicDataWin8.view.vis.render
             return value;
         }
 
-        void createBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, Brush brush, Rect marginRect, double marginPercentage, double xFrom, double xTo, double yFrom, double yTo, Color color, double unNormalizedvalue)
+        void createBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, Brush brush, Rect marginRect, 
+            double marginPercentage, double xFrom, double xTo, double yFrom, double yTo, Color color, double unNormalizedvalue, double dataValue)
         {
             if (brush.BrushIndex == _histogramResult.AllBrushIndex())
             {
@@ -1159,6 +1193,7 @@ namespace PanoramicDataWin8.view.vis.render
                 BrushIndex = brush.BrushIndex,
                 Color = color,
                 Value = unNormalizedvalue,
+                DataValue = dataValue
             };
             binPrimitiveCollection.BinPrimitives.Add(binPrimitive);
         }
@@ -1298,6 +1333,15 @@ namespace PanoramicDataWin8.view.vis.render
         {
             double retY = ((y - DataMinY) / _yScale) * (DeviceHeight);
             return (double)(flip ? (DeviceHeight) - retY + (TopOffset) : retY + (TopOffset));
+        }
+        public double DataFromScreenY(double y, bool flip = true)
+        {
+            double retY = (flip ? (DeviceHeight) - y + (TopOffset) : y - (TopOffset));
+            return retY / DeviceHeight * _yScale + DataMinY;
+        }
+        public double DataFromScreenX(double x, bool flip = true)
+        {
+            return (x - LeftOffset) / DeviceWidth * _xScale + DataMinX;
         }
     }
 

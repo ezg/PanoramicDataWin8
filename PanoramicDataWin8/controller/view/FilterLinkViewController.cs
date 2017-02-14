@@ -74,7 +74,7 @@ namespace PanoramicDataWin8.controller.view
             return areLinked;
         }
 
-        public FilterLinkViewModel CreateFilterLinkViewModel(IOperationModel from, Rct bounds)
+        public FilterLinkViewModel CreateFilterLinkViewModel(OperationViewModel from, Rct bounds)
         {
             IGeometry inputBounds = bounds.GetPolygon();
             var hits = new List<OperationContainerView>();
@@ -90,11 +90,14 @@ namespace PanoramicDataWin8.controller.view
 
             if (hits.Any())
             {
-                return CreateFilterLinkViewModel(from, ((OperationViewModel) hits.First().DataContext).OperationModel);
+                return CreateFilterLinkViewModel(from.OperationModel, ((OperationViewModel)hits.First().DataContext).OperationModel);
             }
-            return null;
+            else
+            {
+                var copyContainer = PanoramicDataWin8.controller.view.MainViewController.Instance.CopyOperationViewModel(from, bounds.Center);
+                return CreateFilterLinkViewModel(from.OperationModel, (copyContainer.DataContext as OperationViewModel).OperationModel);
+            }
         }
-
 
         public FilterLinkViewModel CreateFilterLinkViewModel(IOperationModel from, IOperationModel to)
         {
