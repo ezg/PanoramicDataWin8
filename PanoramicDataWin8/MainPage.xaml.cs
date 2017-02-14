@@ -190,6 +190,15 @@ namespace PanoramicDataWin8
                     msgTextBlock.Opacity = 1;
                     _messageTimer.Start();
                 }
+                else if (e.Key == VirtualKey.U)
+                {
+                    MainViewController.Instance.MainModel.IsUnknownUnknownEnabled = !MainViewController.Instance.MainModel.IsUnknownUnknownEnabled;
+                    Debug.WriteLine("IsUnknownUnknownEnabled : " + MainViewController.Instance.MainModel.IsUnknownUnknownEnabled);
+
+                    msgTextBlock.Text = "IsUnknownUnknownEnabled : " + MainViewController.Instance.MainModel.IsUnknownUnknownEnabled;
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
+                }
                 if (e.Key == VirtualKey.T)
                 {
                     var q1 = new HistogramOperationModel(MainViewController.Instance.MainModel.SchemaModel);

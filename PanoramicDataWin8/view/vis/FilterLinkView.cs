@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using Windows.UI;
+using Windows.UI.Input;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -739,32 +740,45 @@ namespace PanoramicDataWin8.view.vis
             _linkViewGeometry = r.GetPolygon().Buffer(3);
         }
 
-        private void LinkView_PointerPressed(object sender, PointerRoutedEventArgs e)
+
+        private void LinkView_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             var p = e.GetCurrentPoint(MainViewController.Instance.InkableScene).Position.GetVec().GetCoord().GetPoint();
             var filterLinkViewModel = DataContext as FilterLinkViewModel;
+            var properties = e.GetCurrentPoint(this).Properties;
 
-            /*foreach (var visModel in _visualizationViewModelIconGeometries.Keys)
+            if (e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse &&
+                properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
             {
-                if (_visualizationViewModelIconGeometries[visModel].Buffer(3).Intersects(p))
+                var models = GetLinkModelsToRemove(p);
+                foreach (var model in models)
                 {
-                    FilterLinkModel linkModel = linkViewModel.LinkModels.Where(lm => lm.FromOperationModel == visModel.OperationModel).First();
-                    linkModel.LinkType = linkModel.LinkType == LinkType.Brush ? LinkType.Filter : LinkType.Brush;
-
-                    e.Handled = true;
-                    break;
+                    FilterLinkViewController.Instance.RemoveFilterLinkViewModel(model);
                 }
-            }*/
-
-
-            if (_linkViewGeometry.Intersects(p))
-            {
-                var op = ((IFilterConsumerOperationModel) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation;
-                ((IFilterConsumerOperationModel) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation = op == FilteringOperation.AND ? FilteringOperation.OR : FilteringOperation.AND;
-                e.Handled = true;
-                foreach (var linkModel in filterLinkViewModel.FilterLinkModels)
-                    linkModel.ToOperationModel.FireOperationModelUpdated(new FilterOperationModelUpdatedEventArgs(FilterOperationModelUpdatedEventType.Links));
             }
+            else
+            {
+                if (_linkViewGeometry.Intersects(p))
+                {
+                    var op = ((IFilterConsumerOperationModel) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation;
+                    ((IFilterConsumerOperationModel) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation = op == FilteringOperation.AND
+                        ? FilteringOperation.OR
+                        : FilteringOperation.AND;
+                    e.Handled = true;
+                    foreach (var linkModel in filterLinkViewModel.FilterLinkModels)
+                        linkModel.ToOperationModel.FireOperationModelUpdated(new FilterOperationModelUpdatedEventArgs(FilterOperationModelUpdatedEventType.Links));
+                }
+            }
+
+            this.ReleasePointerCapture(e.Pointer);
+            this.PointerReleased -= LinkView_PointerReleased;
+        }
+
+
+        private void LinkView_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            this.CapturePointer(e.Pointer);
+            this.PointerReleased += LinkView_PointerReleased;
         }
 
         public List<FilterLinkModel> GetLinkModelsToRemove(IGeometry scribble)

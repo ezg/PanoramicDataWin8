@@ -47,7 +47,7 @@ namespace PanoramicDataWin8.view.vis
                 {
                     _menuViewModel.IsDisplayed = false;
                 }
-                if (model.ActiveStopwatch.Elapsed < TimeSpan.FromSeconds(2.5) && !_menuViewModel.IsDisplayed)
+                if (model.ActiveStopwatch.Elapsed.Ticks > 0 && model.ActiveStopwatch.Elapsed < TimeSpan.FromSeconds(2.5) && !_menuViewModel.IsDisplayed)
                 {
                     _menuViewModel.IsDisplayed = true;
                 }
@@ -69,7 +69,7 @@ namespace PanoramicDataWin8.view.vis
                     };
                     setMenuViewModelAnkerPosition();
                     MainViewController.Instance.InkableScene.Add(_menuView);
-                    _menuViewModel.IsDisplayed = true;
+                    //_menuViewModel.IsDisplayed = true;
 
                 }
                 model.OperationViewModel.PropertyChanged += OperationViewModel_PropertyChanged;

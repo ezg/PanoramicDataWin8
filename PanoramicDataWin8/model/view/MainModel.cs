@@ -37,6 +37,8 @@ namespace PanoramicDataWin8.model.view
 
         private bool _isDefaultHypothesisEnabled = false;
 
+        private bool _isUnknownUnknownEnabled = false;
+
         private QueryExecuter _queryExecuter;
 
         private string _startDataset = "";
@@ -111,6 +113,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _isDefaultHypothesisEnabled; }
             set { SetProperty(ref _isDefaultHypothesisEnabled, value); }
+        }
+
+        public bool IsUnknownUnknownEnabled
+        {
+            get { return _isUnknownUnknownEnabled; }
+            set { SetProperty(ref _isUnknownUnknownEnabled, value); }
         }
 
         public string StartDataset

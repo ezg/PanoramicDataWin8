@@ -4,6 +4,7 @@
     {
         None,
         Sum,
+        SumE,
         Count,
         Min,
         Max,

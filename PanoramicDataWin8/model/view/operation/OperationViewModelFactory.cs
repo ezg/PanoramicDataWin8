@@ -184,16 +184,16 @@ namespace PanoramicDataWin8.model.view.operation
             var menuViewModel = new MenuViewModel
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 4 : 2,
-                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 4
+                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
+                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
             };
 
             var menuItem = new MenuItemViewModel
             {
                 MenuViewModel = menuViewModel,
                 Row = 0,
-                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 4 : 1,
-                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 4,
+                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 1,
+                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 5,
                 Column = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
                 Size = size,
                 Position = histogramOperationViewModel.Position,
@@ -235,6 +235,10 @@ namespace PanoramicDataWin8.model.view.operation
                     {
                         aggregateFunctions.Add(AggregateFunction.Avg);
                         aggregateFunctions.Add(AggregateFunction.Sum);
+                        if (MainViewController.Instance.MainModel.IsUnknownUnknownEnabled)
+                        {
+                            aggregateFunctions.Add(AggregateFunction.SumE);
+                        }
                     }
                     
                     var toggles = new List<ToggleMenuItemComponentViewModel>();
