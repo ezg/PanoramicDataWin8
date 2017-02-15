@@ -247,6 +247,14 @@ namespace PanoramicDataWin8.controller.data.progressive
                         DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
                     };
                 }
+                else if (agg.AggregateFunction == AggregateFunction.SumE)
+                {
+                    aggParam = new SumEstimationAggregateParameters()
+                    {
+                        Dimension = agg.AttributeModel.Index,
+                        DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
+                    };
+                }
                 aggregateParameters.Add(aggParam);
 
                 if (agg == model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).FirstOrDefault())
@@ -291,7 +299,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             return parameters;
         }
 
-        public static AggregateParameters CreateAggregateParameters(AttributeTransformationModel iom)
+        private static AggregateParameters createAggregateParameters(AttributeTransformationModel iom)
         {
             if (iom.AggregateFunction == AggregateFunction.Count)
                 return new CountAggregateParameters {Dimension = iom.AttributeModel.Index};
@@ -305,6 +313,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                 return new SumAggregateParameters {Dimension = iom.AttributeModel.Index};
             if (iom.AggregateFunction == AggregateFunction.Count)
                 return new CountAggregateParameters {Dimension = iom.AttributeModel.Index};
+            if (iom.AggregateFunction == AggregateFunction.SumE)
+                return new SumEstimationAggregateParameters() { Dimension = iom.AttributeModel.Index };
             return null;
         }
 
@@ -313,7 +323,7 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             return new AggregateKey
             {
-                AggregateParameterIndex = histogramResult.GetAggregateParametersIndex(CreateAggregateParameters(iom)),
+                AggregateParameterIndex = histogramResult.GetAggregateParametersIndex(createAggregateParameters(iom)),
                 BrushIndex = brushIndex
             };
         }

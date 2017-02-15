@@ -338,6 +338,30 @@ namespace PanoramicDataWin8.view.vis.render
                         foreach (var binPrimitive in binPrimitiveCollection.BinPrimitives.Where(bp => bp.Value != 0.0 && bp.BrushIndex != _histogramResult.AllBrushIndex()))
                         {
                             canvasArgs.DrawingSession.FillRoundedRectangle(binPrimitive.Rect, 4, 4, binPrimitive.Color);
+
+                            if (binPrimitive.EstimationRect != Rect.Empty)
+                            {
+                                //
+                                var geom = CanvasGeometry.CreateRoundedRectangle(canvas, binPrimitive.EstimationRect, 4, 4);
+                                var mat = Matrix3x2.Identity;
+                                using (canvasArgs.DrawingSession.CreateLayer(1, geom, mat))
+                                {
+                                    var step = 8.0f;
+                                    for (double x = binPrimitive.EstimationRect.X;
+                                        x < binPrimitive.EstimationRect.X + (2*Math.Max(binPrimitive.EstimationRect.Width, binPrimitive.EstimationRect.Height));
+                                        x += step)
+                                    {
+                                        float i = (float) (x - binPrimitive.EstimationRect.X)/ step;
+                                        canvasArgs.DrawingSession.DrawLine(
+                                            new Vector2((float) binPrimitive.EstimationRect.X, (i* step) + (float) binPrimitive.EstimationRect.Y),
+                                            new Vector2((float) x, (float) binPrimitive.EstimationRect.Y), Color.FromArgb(255, 230, 230, 230), 2);
+
+
+                                    }
+                                }
+                                geom.Dispose();
+                                //canvasArgs.DrawingSession.DrawRoundedRectangle(binPrimitive.EstimationRect, 4, 4, Color.FromArgb(255, 230, 230, 230), 2);
+                            }
                             if (binPrimitive.MarginRect != Rect.Empty)
                             {
                                 canvasArgs.DrawingSession.FillRectangle(binPrimitive.MarginRect, dark);
@@ -532,6 +556,7 @@ namespace PanoramicDataWin8.view.vis.render
     {
         public double Value { get; set; }
         public Rect Rect { get; set; }
+        public Rect EstimationRect { get; set; }
         public Rect MarginRect { get; set; }
         public double MarginPercentage { get; set; }
         public Color Color { get; set; }
@@ -986,7 +1011,7 @@ namespace PanoramicDataWin8.view.vis.render
             var yMargin = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
             var yMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
             
-            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage,
+            createBinPrimitives(bin, binPrimitiveCollection, brush, Rect.Empty, marginRect, marginPercentage,
                                xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue);
         }
 
@@ -1009,11 +1034,25 @@ namespace PanoramicDataWin8.view.vis.render
             var yMargin = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).Margin;
             var yMarginAbsolute = (double)((MarginAggregateResult)bin.AggregateResults[yMarginAggregateKey]).AbsolutMargin;
 
+
+            var estimationRect = Rect.Empty;
+            if (bin.AggregateResults[yAggregateKey] is SumEstimationAggregateResult)
+            {
+                var estimationValue = ((SumEstimationAggregateResult)bin.AggregateResults[yAggregateKey]).SumEstimation;
+                var eYFrom = DataToScreenY(yValue- estimationValue);
+                var eYTo = DataToScreenY((double)Math.Max(0, yValue));
+                estimationRect = new Rect(
+                    xFrom,
+                    yTo,
+                    xTo - xFrom,
+                    eYFrom - eYTo);
+            }
+
             var marginRect = new Rect(xFrom + (xTo - xFrom) / 2.0 - 2,
                                   DataToScreenY((double)(yValue + yMarginAbsolute)),
                                   4,
                                   DataToScreenY((double)(yValue - yMarginAbsolute)) - DataToScreenY((double)(yValue + yMarginAbsolute)));
-            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage,
+            createBinPrimitives(bin, binPrimitiveCollection, brush, estimationRect, marginRect, marginPercentage,
                                xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue);
         }
 
@@ -1024,7 +1063,7 @@ namespace PanoramicDataWin8.view.vis.render
             var xMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, new MarginAggregateParameters() { AggregateFunction = _xIom.AggregateFunction.ToString() }, _histogramResult, brush.BrushIndex);
             double marginPercentage = 0.0;
             var dataValue = ((DoubleValueAggregateResult)bin.AggregateResults[xAggregateKey]).Result;
-
+           
             var xValue = normalization.Axis != BczNormalization.axis.Y || binBrushMaxAxis == 0 ? dataValue : (dataValue - 0) / (binBrushMaxAxis - 0) * _xScale;
             var xFrom  = DataToScreenX((double)Math.Min(0, xValue));
             var xTo    = DataToScreenX((double)Math.Max(0, xValue));
@@ -1040,7 +1079,7 @@ namespace PanoramicDataWin8.view.vis.render
                                  yTo + (yFrom - yTo) / 2.0 - 2,
                                  DataToScreenX((double)(xValue + xMarginAbsolute)) - DataToScreenX((double)(xValue - xMarginAbsolute)),
                                  4.0);
-            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage,
+            createBinPrimitives(bin, binPrimitiveCollection, brush, Rect.Empty, marginRect, marginPercentage,
                                xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue);
         }
 
@@ -1092,7 +1131,7 @@ namespace PanoramicDataWin8.view.vis.render
             { AggregateFunction = _valueIom.AggregateFunction.ToString() }, _histogramResult, _histogramResult.AllBrushIndex());
             var valueMargin = (MarginAggregateResult)bin.AggregateResults[marginAggregateKey];
             marginPercentage = valueMargin.Margin;
-            createBinPrimitives(bin, binPrimitiveCollection, brush, marginRect, marginPercentage, xFrom, xTo, yFrom, yTo, dataColor, unNormalizedvalue);
+            createBinPrimitives(bin, binPrimitiveCollection, brush, Rect.Empty, marginRect, marginPercentage, xFrom, xTo, yFrom, yTo, dataColor, unNormalizedvalue);
         }
 
         double getHeatMapBinValue(Bin bin, List<Tuple<double, double>> xaxisRanges, List<Tuple<double, double>> yaxisRanges, 
@@ -1137,7 +1176,7 @@ namespace PanoramicDataWin8.view.vis.render
             return value;
         }
 
-        void createBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, Brush brush, Rect marginRect, double marginPercentage, double xFrom, double xTo, double yFrom, double yTo, Color color, double unNormalizedvalue)
+        void createBinPrimitives(Bin bin, BinPrimitiveCollection binPrimitiveCollection, Brush brush, Rect estimationRect, Rect marginRect, double marginPercentage, double xFrom, double xTo, double yFrom, double yTo, Color color, double unNormalizedvalue)
         {
             if (brush.BrushIndex == _histogramResult.AllBrushIndex())
             {
@@ -1154,6 +1193,7 @@ namespace PanoramicDataWin8.view.vis.render
                     yTo,
                     xTo - xFrom,
                     yFrom - yTo),
+                EstimationRect = estimationRect,
                 MarginRect = marginRect,
                 MarginPercentage = marginPercentage,
                 BrushIndex = brush.BrushIndex,

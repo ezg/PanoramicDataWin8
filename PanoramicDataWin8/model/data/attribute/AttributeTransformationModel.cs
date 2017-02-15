@@ -104,6 +104,8 @@ namespace PanoramicDataWin8.model.data.attribute
                 name = "min(" + name + ")";
             else if (AggregateFunction == AggregateFunction.Sum)
                 name = "sum(" + name + ")";
+             else if (AggregateFunction == AggregateFunction.SumE)
+                name = "sumE(" + name + ")";
             /*else if (AttributeTransformationViewModel.AggregateFunction == AggregateFunction.Bin)
             {
                 name = "Bin Range(" + name + ")";
