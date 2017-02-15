@@ -65,7 +65,7 @@ namespace PanoramicDataWin8.model.view.operation
             var attr1 = new CreateLinkMenuItemViewModel();
             attr1.CreateLinkEvent += (sender, bounds) =>
             {
-                FilterLinkViewController.Instance.CreateFilterLinkViewModel(histogramOperationViewModel.OperationModel, bounds);
+                FilterLinkViewController.Instance.CreateFilterLinkViewModel(histogramOperationViewModel, bounds);
             };
 
             menuItem.MenuItemComponentViewModel = attr1;

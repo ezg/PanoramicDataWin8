@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.view.inq
             this.RenderTransform = new MatrixTransform();
 
             Polyline pl = new Polyline();
-            pl.Stroke = _inkStroke.IsErase ? ERASE_COLOR : _inkStroke.IsPause ? ERASE_COLOR : COLOR;
+            pl.Stroke = _inkStroke.IsErase ? ERASE_COLOR : /*_inkStroke.IsPause ? ERASE_COLOR :*/ COLOR;
             pl.StrokeThickness = 3;
             pl.Points = new PointCollection();
 
