@@ -1,0 +1,21 @@
+﻿<local:Renderer
+    x:Class="PanoramicDataWin8.view.vis.render.FilterRenderer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PanoramicDataWin8.view.vis.render"
+    xmlns:common="using:PanoramicDataWin8.view.common"
+    xmlns:utils="using:PanoramicDataWin8.utils"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:inq="using:PanoramicDataWin8.view.inq"
+    mc:Ignorable="d"
+    FontFamily="{StaticResource abel}">
+    <Grid Background="{StaticResource lightBrush}">
+        <inq:InkableScene x:Name="inkableScene" utils:ClipToBounds.ClipToBounds="True"></inq:InkableScene>
+        <TextBlock 
+                Name="txtBlock"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Right"
+                Text="filter" FontSize="11" Foreground="{StaticResource highlightBrush}"/>
+    </Grid>
+</local:Renderer>

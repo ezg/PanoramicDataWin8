@@ -55,7 +55,23 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             if (args.NewValue != null)
             {
-                //(args.NewValue as MenuItemViewModel).MenuItemComponentViewModel.PropertyChanged += MenuItemComponentViewModel_PropertyChanged;
+                (args.NewValue as MenuItemViewModel).PropertyChanged += AttributeTransformationMenuItemView_PropertyChanged;
+            }
+        }
+
+        private void AttributeTransformationMenuItemView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var model = sender as MenuItemViewModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Size))
+            {
+                if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 270)
+                {
+                    txtBlock.MaxWidth = model.Size.Y;
+                }
+                if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 0)
+                {
+                    txtBlock.MaxWidth = model.Size.X;
+                }
             }
         }
 

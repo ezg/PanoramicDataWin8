@@ -142,6 +142,7 @@ namespace PanoramicDataWin8.controller.view
             var other = new OperationTypeGroupModel {Name = "other", OperationType = OperationType.Group};
             parent.OperationTypeModels.Add(other);
             other.OperationTypeModels.Add(new OperationTypeModel {Name = "example", OperationType = OperationType.Example});
+            other.OperationTypeModels.Add(new OperationTypeModel { Name = "filter", OperationType = OperationType.Filter });
 
             MainModel.OperationTypeModels = parent.OperationTypeModels.ToList();
         }
@@ -190,20 +191,33 @@ namespace PanoramicDataWin8.controller.view
             return visModel;
         }
 
+        public FilterOperationViewModel CreateDefaultFilterOperationViewModel(Pt position)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultFilterOperationViewModel(MainModel.SchemaModel, position);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
+
 
         public OperationContainerView CopyOperationViewModel(OperationViewModel operationViewModel, Pt? centerPoint)
         {
             var newOperationContainerView = new OperationContainerView();
             var newOperationViewModel = OperationViewModelFactory.CopyOperationViewModel(operationViewModel);
-            addAttachmentViews(newOperationViewModel);
-            OperationViewModels.Add(newOperationViewModel);
+            if (newOperationViewModel != null)
+            {
+                addAttachmentViews(newOperationViewModel);
+                OperationViewModels.Add(newOperationViewModel);
 
-            if (centerPoint.HasValue)
-                newOperationViewModel.Position = (Pt)centerPoint - operationViewModel.Size/2.0;
+                if (centerPoint.HasValue)
+                    newOperationViewModel.Position = (Pt) centerPoint - operationViewModel.Size/2.0;
 
-            newOperationContainerView.DataContext = newOperationViewModel;
-            InkableScene.Add(newOperationContainerView);
-            return newOperationContainerView;
+                newOperationContainerView.DataContext = newOperationViewModel;
+                InkableScene.Add(newOperationContainerView);
+                return newOperationContainerView;
+            }
+            return null;
         }
 
         private void addAttachmentViews(OperationViewModel visModel)
@@ -266,6 +280,10 @@ namespace PanoramicDataWin8.controller.view
             else if (operationTypeModel.OperationType == OperationType.Example)
             {
                 operationViewModel = CreateDefaultExampleOperationViewModel(position);
+            }
+            else if (operationTypeModel.OperationType == OperationType.Filter)
+            {
+                operationViewModel = CreateDefaultFilterOperationViewModel(position);
             }
 
             if (operationViewModel != null)
@@ -487,7 +505,7 @@ namespace PanoramicDataWin8.controller.view
             }
 
 
-            if (!e.InkStroke.IsErase && !recognizedGestures.Any())
+            if (!recognizedGestures.Any())
             {
                 var allScribbables = new List<IScribbable>();
                 IScribbleHelpers.GetScribbablesRecursive(allScribbables, InkableScene.Elements.OfType<IScribbable>().ToList());
@@ -510,7 +528,7 @@ namespace PanoramicDataWin8.controller.view
                         }
                     }
                 }
-                if (!consumed)
+                if (!consumed && !e.InkStroke.IsErase)
                 {
                     InkableScene.Add(e.InkStroke);
                 }

@@ -142,7 +142,7 @@ namespace PanoramicDataWin8.controller.view
 
         private void recursiveCheckForCircularBrushing(IOperationModel current, HashSet<IOperationModel> chain)
         {            
-            if (!chain.Contains(current))
+            if (!chain.Contains(current) && current is IFilterConsumerOperationModel)
             {
                 var links = ((IFilterConsumerOperationModel) current).LinkModels;
                 foreach (var link in links)

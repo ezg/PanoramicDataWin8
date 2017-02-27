@@ -489,6 +489,19 @@ namespace PanoramicDataWin8
             }
         }
 
+        private void notesButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (notesBox.Visibility == Visibility.Collapsed)
+            {
+                notesBox.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                notesBox.Visibility = Visibility.Collapsed;
+            }
+        }
+
+
         private void hypothesisButton_Click(object sender, RoutedEventArgs e)
         {
             if (_hypothesisMenuView == null)

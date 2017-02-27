@@ -143,31 +143,39 @@ namespace PanoramicDataWin8.view.vis
         {
             IResult resultModel = ((OperationViewModel)DataContext).OperationModel.Result;
 
-            // progress
-            double size = 14;
-            double thickness = 2;
-
-            double progress = resultModel?.Progress ?? 0;
-            
-            tbPercentage1.Text = (progress * 100).ToString("F1") + "%";
-            double percentage = Math.Min(progress, 0.999999);
-            if (percentage > 0.5)
+            if (resultModel != null)
             {
-                arcSegement1.IsLargeArc = true;
+                progressGrid.Visibility = Visibility.Visible;
+                // progress
+                double size = 14;
+                double thickness = 2;
+
+                double progress = resultModel?.Progress ?? 0;
+
+                tbPercentage1.Text = (progress*100).ToString("F1") + "%";
+                double percentage = Math.Min(progress, 0.999999);
+                if (percentage > 0.5)
+                {
+                    arcSegement1.IsLargeArc = true;
+                }
+                else
+                {
+                    arcSegement1.IsLargeArc = false;
+                }
+                double angle = 2*Math.PI*percentage - Math.PI/2.0;
+                double x = size/2.0;
+                double y = size/2.0;
+
+                Windows.Foundation.Point p = new Windows.Foundation.Point(Math.Cos(angle)*(size/2.0 - thickness/2.0) + x, Math.Sin(angle)*(size/2.0 - thickness/2.0) + y);
+                arcSegement1.Point = p;
+                if ((size/2.0 - thickness/2.0) > 0.0)
+                {
+                    arcSegement1.Size = new Size((size/2.0 - thickness/2.0), (size/2.0 - thickness/2.0));
+                }
             }
             else
             {
-                arcSegement1.IsLargeArc = false;
-            }
-            double angle = 2 * Math.PI * percentage - Math.PI / 2.0;
-            double x = size / 2.0;
-            double y = size / 2.0;
-
-            Windows.Foundation.Point p = new Windows.Foundation.Point(Math.Cos(angle) * (size / 2.0 - thickness / 2.0) + x, Math.Sin(angle) * (size / 2.0 - thickness / 2.0) + y);
-            arcSegement1.Point = p;
-            if ((size / 2.0 - thickness / 2.0) > 0.0)
-            {
-                arcSegement1.Size = new Size((size / 2.0 - thickness / 2.0), (size / 2.0 - thickness / 2.0));
+                progressGrid.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -195,7 +203,11 @@ namespace PanoramicDataWin8.view.vis
                 _renderer = new ExampleRenderer();
                 contentGrid.Children.Add(_renderer);
             }
-           
+            else if (operationViewModel.OperationModel is FilterOperationModel)
+            {
+                _renderer = new FilterRenderer();
+                contentGrid.Children.Add(_renderer);
+            }
         }
 
         public void Pressed(FrameworkElement sender, PointerManagerEvent e)
