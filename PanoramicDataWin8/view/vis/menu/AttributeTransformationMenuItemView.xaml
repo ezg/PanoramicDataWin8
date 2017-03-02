@@ -37,8 +37,8 @@
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch"
                         TextAlignment="Center"
-                        MaxWidth="{Binding Size.X}"
-                        Text="{Binding MenuItemComponentViewModel.Label}" FontSize="11" Foreground="{Binding MenuItemComponentViewModel.TextBrush}" TextWrapping="Wrap"/>
+                        Text="{Binding MenuItemComponentViewModel.Label}" FontSize="11" 
+                        Foreground="{Binding MenuItemComponentViewModel.TextBrush}" TextWrapping="Wrap"/>
                 </controls:LayoutTransformControl>
             </Viewbox>
         </Border>

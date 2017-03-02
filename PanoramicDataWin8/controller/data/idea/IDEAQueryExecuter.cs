@@ -58,7 +58,6 @@ namespace PanoramicDataWin8.controller.data.progressive
                             newJob = new StatisticalComparisonOperationJob(
                                 statisticalComparisonOperationModel,
                                 TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
-
                         }
                         else if (operationModel is ExampleOperationModel)
                         {
@@ -67,7 +66,6 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 exampleOperationModel,
                                 TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
                         }
-
                         else if (operationModel is RiskOperationModel)
                         {
                             var riskOperationModel = (RiskOperationModel)operationModel;

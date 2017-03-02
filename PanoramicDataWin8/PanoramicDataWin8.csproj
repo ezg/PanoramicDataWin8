@@ -146,6 +146,7 @@
     <Compile Include="model\data\operation\FilterModel.cs" />
     <Compile Include="model\data\InputVisualizationTypeConstants.cs" />
     <Compile Include="model\data\operation\FilterLinkModel.cs" />
+    <Compile Include="model\data\operation\FilterOperationModel.cs" />
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventType.cs" />
     <Compile Include="model\data\operation\FilterProviderOperationModelImpl.cs" />
@@ -196,6 +197,7 @@
     <Compile Include="model\view\MenuItemComponentViewModel.cs" />
     <Compile Include="model\view\operation\ComparisonViewModelState.cs" />
     <Compile Include="model\view\operation\ExampleOperationViewModel.cs" />
+    <Compile Include="model\view\operation\FilterOperationViewModel.cs" />
     <Compile Include="model\view\operation\StatisticalComparisonOperationViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="model\view\operation\OperationViewModel.cs" />
@@ -209,6 +211,7 @@
     <Compile Include="model\view\tilemenu\OperationTypeGroupTileMenuContentViewModel.cs" />
     <Compile Include="model\view\tilemenu\OperationTypeTileMenuContentViewModel.cs" />
     <Compile Include="model\view\ToggleMenuItemComponentViewModel.cs" />
+    <Compile Include="utils\ClipToBounds.cs" />
     <Compile Include="utils\ObservableDictionary.cs" />
     <Compile Include="view\vis\HypothesisView.xaml.cs">
       <DependentUpon>HypothesisView.xaml</DependentUpon>
@@ -298,6 +301,9 @@
     </Compile>
     <Compile Include="view\vis\menu\ToggleMenuItemView.xaml.cs">
       <DependentUpon>ToggleMenuItemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\render\FilterRenderer.xaml.cs">
+      <DependentUpon>FilterRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\ExampleRenderer.xaml.cs">
       <DependentUpon>ExampleRenderer.xaml</DependentUpon>
@@ -449,6 +455,10 @@
     <Page Include="view\vis\menu\ToggleMenuItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\FilterRenderer.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\render\ExampleRenderer.xaml">
       <Generator>MSBuild:Compile</Generator>

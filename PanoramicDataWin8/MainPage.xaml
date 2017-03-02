@@ -91,6 +91,32 @@
             </Button>
         </Grid>
 
+        <Grid HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="10,0,10,10" >
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <RichEditBox Name="notesBox" Width="300" Height="200" 
+                         Grid.Row="0" Background="{StaticResource lightBrush}" SelectionHighlightColor="{StaticResource highlightBrush}"
+                         Visibility="Collapsed"/>
+            <Button Name="notesButton" Click="notesButton_Click" Margin="0,4,0,0" Grid.Row="1">
+                <Button.Template>
+                    <ControlTemplate>
+                        <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">
+                            <TextBlock 
+                                    CacheMode="BitmapCache"
+                                    RenderTransformOrigin="0.5, 0.5"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    TextAlignment="Center"
+                                    MaxWidth="50"
+                                    Text="n" FontSize="30" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Button.Template>
+            </Button>
+        </Grid>
+
         <TextBlock Name="msgTextBlock" Text="" HorizontalAlignment="Left" VerticalAlignment="Bottom" Foreground="{StaticResource darkBrush}" Margin="10" Opacity="0"/>
 
         <Grid Name="codeGrid" Visibility="Collapsed">

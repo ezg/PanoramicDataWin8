@@ -48,16 +48,16 @@ namespace PanoramicDataWin8.view.inq
                         _filterProviderOperationViewModel = operationModel as IFilterProviderOperationModel;
                         withinView = true;
                     }
-                    if (view.Geometry.Contains(inkStroke.Points[inkStroke.Points.Count - 1].GetPoint()) && operationModel is IFilterConsumerOperationModel)
+                    if (view.Geometry.Contains(inkStroke.Points[inkStroke.Points.Count - 1].GetPoint()))
                     {
-                        if (_filterProviderOperationViewModel != operationModel)
+                        if (operationModel is IFilterConsumerOperationModel && _filterProviderOperationViewModel != operationModel)
                             _filterConsumerOperationViewModel = operationModel as IFilterConsumerOperationModel;
                         else if (withinView)
                             return false;
                     }
                 }
 
-                if (_filterProviderOperationViewModel != null && (inkStroke.IsPause || _filterConsumerOperationViewModel != null))
+                if (_filterProviderOperationViewModel != null && (inkStroke.IsPause || _filterConsumerOperationViewModel != null) && _filterProviderOperationViewModel is IFilterConsumerOperationModel)
                 {
                     return true;
                 }

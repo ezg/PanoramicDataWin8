@@ -642,5 +642,17 @@ namespace PanoramicDataWin8.model.view.operation
             createLeftExampleMenu(exampleOperationViewModel);
             return exampleOperationViewModel;
         }
+
+        public static FilterOperationViewModel CreateDefaultFilterOperationViewModel(SchemaModel schemaModel, Pt position)
+        {
+            var filterOperationModel = new FilterOperationModel(schemaModel);
+            var filterOperationViewModel = new FilterOperationViewModel(filterOperationModel);
+            filterOperationViewModel.Position = position;
+            addAttachmentViewModels(filterOperationViewModel);
+            //createBottomExampleMenu(exampleOperationViewModel);
+            //createRightExampleMenu(exampleOperationViewModel);
+            //createLeftExampleMenu(exampleOperationViewModel);
+            return filterOperationViewModel;
+        }
     }
 }

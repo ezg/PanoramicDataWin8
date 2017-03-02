@@ -4,6 +4,7 @@
     {
         Group,
         Histogram,
-        Example
+        Example,
+        Filter
     }
 }
