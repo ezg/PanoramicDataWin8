@@ -537,27 +537,24 @@ namespace PanoramicDataWin8.view.vis.render
                         sortBinIndex = 0;// bcz: used to sort HeatMaps by row/col:  _histogramResult.BinRanges[!sortAxis ? 1 : 0].GetIndexFromScaleValue(fm.Value);
                     }
 
-            for (int xi = 0; xi < _histogramResult.BinRanges[sortAxis ? 1 :0].GetBins().Count; xi++)
+            for (int binIndex = 0; binIndex < _histogramResult.BinRanges[sortAxis ? 1 :0].GetBins().Count; binIndex++)
             {
-                var binValue = _helper.VisualBinRanges[sortAxis ? 1 : 0].GetLabels()[xi].Value;
-                var binIndex = _histogramResult.BinRanges[sortAxis ? 1 : 0].GetIndexFromScaleValue(binValue);
-                var newXi = binIndex;
+                var binValue = _helper.VisualBinRanges[sortAxis ? 1 : 0].GetValueFromIndex(binIndex); 
+                var newXi = _histogramResult.BinRanges[sortAxis ? 1 : 0].GetIndexFromScaleValue(_helper.VisualBinRanges[sortAxis ? 1 : 0].GetLabels()[binIndex].Value);
                 var newYi = sortBinIndex;
                 if (sortAxis)
                 {
                     newYi = newXi;
                     newXi = sortBinIndex;
                 }
-                double sortValue = sortBinIndex == -1 ? xi : _helper.GetBinValue(_histogramResult.Bins[new BinIndex(newXi, newYi)]);
+                double sortValue = sortBinIndex == -1 ? binValue : _helper.GetBinValue(_histogramResult.Bins[new BinIndex(newXi, newYi)]);
                 while (sortedIndexList.ContainsKey(sortValue))
                     sortValue += reverse ? -1e-7 : 1e-7;
                 sortedIndexList.Add(sortValue, binIndex);
             }
-            for (int xi = 0; xi < _histogramResult.BinRanges[sortAxis ? 1 : 0].GetBins().Count; xi++)
+            var list = reverse ? new List<int>(sortedIndexList.Values.Reverse()) : sortedIndexList.Values;
+            for (int binIndex = 0; binIndex < _histogramResult.BinRanges[sortAxis ? 1 : 0].GetBins().Count; binIndex++)
             {
-                var binValue = _helper.VisualBinRanges[sortAxis ? 1 : 0].GetLabels()[xi].Value;
-                var binIndex = _histogramResult.BinRanges[sortAxis ? 1 : 0].GetIndexFromScaleValue(binValue);
-                var list = reverse ? new List<int>(sortedIndexList.Values.Reverse()) : sortedIndexList.Values;
                 binIndexDict.Add(binIndex, list.IndexOf(binIndex));
             }
             return binIndexDict;
@@ -930,6 +927,8 @@ namespace PanoramicDataWin8.view.vis.render
             List<BczBinMapModel> binMapModels
             )
         {
+            var mappedXBinIndex = slistXValues[bin.BinIndex.Indices[0]];
+            var mappedYBinIndex = slistYValues[bin.BinIndex.Indices[1]];
             var binPrimitiveCollection = new BinPrimitiveCollection();
             binPrimitiveCollection.FilterModel = GetBinFilterModel(bin, _histogramResult.AllBrushIndex());
 
@@ -948,8 +947,6 @@ namespace PanoramicDataWin8.view.vis.render
                 var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, brush.BrushIndex);
                 double unNormalizedvalue = (double)((DoubleValueAggregateResult)bin.AggregateResults[valueAggregateKey]).Result;
 
-                var mappedXBinIndex = slistXValues[bin.BinIndex.Indices[0]];
-                var mappedYBinIndex = slistYValues[bin.BinIndex.Indices[1]];
                 
                 // read out value depinding on chart type
                 if (_chartType == ChartType.HeatMap)
@@ -1344,12 +1341,11 @@ namespace PanoramicDataWin8.view.vis.render
                 if (!(_histogramResult.BinRanges[i] is AggregateBinRange))
                 {
                     var dataFrom = _histogramResult.BinRanges[i].GetValueFromIndex(bin.BinIndex.Indices[i]);
-                    var dataTo   = _histogramResult.BinRanges[i].AddStep(_histogramResult.BinRanges[i].GetValueFromIndex(bin.BinIndex.Indices[i]));
+                    var dataTo   = _histogramResult.BinRanges[i].AddStep(dataFrom);
 
                     if (_histogramResult.BinRanges[i] is NominalBinRange)
                     {
-                        var tt = _histogramResult.BinRanges[i].GetLabel(bin.BinIndex.Indices[i]);
-                        var xx = _histogramResult.BinRanges[i].GetLabel(dataFrom);
+                        var tt = _histogramResult.BinRanges[i].GetLabel(dataFrom);
 
                         filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.EQUALS, tt));
                     }
