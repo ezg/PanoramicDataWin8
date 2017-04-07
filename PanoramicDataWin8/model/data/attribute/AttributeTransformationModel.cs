@@ -87,7 +87,7 @@ namespace PanoramicDataWin8.model.data.attribute
 
         public string GetLabel()
         {
-            var mainLabel = addDetailToLabel(AttributeModel.RawName);
+            var mainLabel = addDetailToLabel(AttributeModel.DisplayName);
             mainLabel = mainLabel.Replace("_", " ");
             return mainLabel;
         }

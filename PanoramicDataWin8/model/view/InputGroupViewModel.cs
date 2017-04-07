@@ -81,7 +81,7 @@ namespace PanoramicDataWin8.model.view
 
         private void updateLabels()
         {
-            MainLabel = _inpuGroupModel.RawName.Replace("_", "");
+            MainLabel = _inpuGroupModel.DisplayName.Replace("_", " ");
         }
     }
 }

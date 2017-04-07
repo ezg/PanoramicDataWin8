@@ -698,7 +698,7 @@ namespace PanoramicDataWin8
                 var inputGroupViewModel = new InputGroupViewModel(null, inputGroupModel);
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new InputGroupViewTileMenuContentViewModel
                 {
-                    Name = inputGroupModel.RawName,
+                    Name = inputGroupModel.DisplayName,
                     InputGroupViewModel = inputGroupViewModel
                 };
 

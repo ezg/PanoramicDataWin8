@@ -326,7 +326,15 @@ namespace PanoramicDataWin8.view.common
                                 currentY -= colMaxY / 2.0;
                                 currentY += model.Size.Y / 2.0;
                             }
-                            double currentX = model.CurrentPosition.X + itemsInSameRow.Sum(mi => mi.Size.X) +
+                            var x = model.CurrentPosition.X;
+                            if (model.Parent != null)
+                            {
+                                x = model.Parent.Children.Max(c => c.CurrentPosition.X);
+                            }
+
+
+                            double currentX = x + 
+                                              itemsInSameRow.Sum(mi => mi.Size.X) +   
                                               model.Size.X +
                                               itemsInSameRow.Count() * model.Gap + model.Gap;
 

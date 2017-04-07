@@ -39,6 +39,7 @@ namespace PanoramicDataWin8.controller.view
             foreach (var view in BrushViews.ToArray()) {
                 if (view.Key.From.OperationModel == bmodel || view.Key.To.OperationModel == bmodel) {
                     BrushViews.Remove(view);
+                    view.Value.DataContext = null;
                     MainViewController.Instance.InkableScene.Children.Remove(view.Value);
                 }
             }
@@ -94,6 +95,7 @@ namespace PanoramicDataWin8.controller.view
                     dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                     {
                         await Task.Delay(TimeSpan.FromMilliseconds(1000));
+                        view.DataContext = null;
                         MainViewController.Instance.InkableScene.Children.Remove(view);
                     });
                 }
@@ -208,6 +210,7 @@ namespace PanoramicDataWin8.controller.view
                                 dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
                                 {
                                     await Task.Delay(TimeSpan.FromMilliseconds(1000));
+                                    view.DataContext = null;
                                     MainViewController.Instance.InkableScene.Children.Remove(view);
                                 });
                             }

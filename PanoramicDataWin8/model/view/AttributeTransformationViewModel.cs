@@ -213,9 +213,9 @@ namespace PanoramicDataWin8.model.view
         {
             if (_attributeTransformationModel != null)
             {
-                MainLabel = _attributeTransformationModel.AttributeModel.RawName; //columnDescriptor.GetLabels(out mainLabel, out subLabel);
+                MainLabel = _attributeTransformationModel.AttributeModel.DisplayName; //columnDescriptor.GetLabels(out mainLabel, out subLabel);
 
-                var mainLabel = _attributeTransformationModel.AttributeModel.RawName;
+                var mainLabel = _attributeTransformationModel.AttributeModel.DisplayName;
                 var subLabel = "";
 
                 if (!HideAggregationFunction)
