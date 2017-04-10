@@ -178,8 +178,9 @@ namespace PanoramicDataWin8.controller.view
                 if (linkViewModel.FilterLinkModels.Count == 0)
                 {
                     FilterLinkViewModels.Remove(linkViewModel);
-                    MainViewController.Instance.InkableScene.Remove(
-                        MainViewController.Instance.InkableScene.Elements.First(e => e is FilterLinkView && ((e as FilterLinkView).DataContext == linkViewModel)));
+                    var view = MainViewController.Instance.InkableScene.Elements.First(e => e is FilterLinkView && ((e as FilterLinkView).DataContext == linkViewModel));
+                    view.DataContext = null;
+                    MainViewController.Instance.InkableScene.Remove(view);
                 }
             }
         }

@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Linq;
+using Windows.ApplicationModel.Core;
 using Windows.UI;
+using Windows.UI.Core;
 using Windows.UI.Input;
 using Windows.UI.Text;
 using Windows.UI.Xaml;
@@ -15,6 +18,7 @@ using Windows.UI.Xaml.Shapes;
 using GeoAPI.Geometries;
 using MathNet.Numerics.Interpolation;
 using NetTopologySuite.Geometries;
+using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
@@ -29,6 +33,8 @@ namespace PanoramicDataWin8.view.vis
 {
     public class FilterLinkView : UserControl, IScribbable
     {
+        private Canvas _contentCanvas = new Canvas();
+
         private readonly double _attachmentRectHalfSize = 15;
         private SolidColorBrush _backgroundBrush = new SolidColorBrush(Helpers.GetColorFromString("#ffffff"));
         //private Dictionary<FilteringType, Vec> _attachmentCenters = new Dictionary<FilteringType, Vec>(); 
@@ -41,7 +47,9 @@ namespace PanoramicDataWin8.view.vis
 
         private readonly SolidColorBrush _lightBrush = new SolidColorBrush(Helpers.GetColorFromString("#e6e6e6"));
         private IGeometry _linkViewGeometry;
-        private List<IDisposable> _sourceDisposables = new List<IDisposable>();
+
+        private FilterLinkViewModel _currentModel = null;
+        private IDisposable _toDisposable = null;
 
         private readonly Dictionary<OperationViewModel, IGeometry> _visualizationViewModelCenterGeometries =
             new Dictionary<OperationViewModel, IGeometry>();
@@ -56,6 +64,7 @@ namespace PanoramicDataWin8.view.vis
         {
             DataContextChanged += LinkView_DataContextChanged;
             PointerPressed += LinkView_PointerPressed;
+            this.Content = _contentCanvas;
         }
 
         public IGeometry Geometry
@@ -111,17 +120,39 @@ namespace PanoramicDataWin8.view.vis
             get { return true; }
         }
 
+        
         private void LinkView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs e)
         {
+            if (_currentModel != null)
+            {
+                _currentModel.FilterLinkModels.CollectionChanged -= LinkModels_CollectionChanged;
+                _currentModel.FromOperationViewModels.CollectionChanged -= FromVisualizationViewModels_CollectionChanged;
+                _currentModel.ToOperationViewModel.OperationModel.PropertyChanged -= QueryModel_PropertyChanged;
+                if (_toDisposable != null)
+                {
+                    _toDisposable.Dispose();
+                    _toDisposable = null;
+                }
+                _currentModel = null;
+            }
+            
             if (e.NewValue != null)
             {
-                (e.NewValue as FilterLinkViewModel).FilterLinkModels.CollectionChanged += LinkModels_CollectionChanged;
-                (e.NewValue as FilterLinkViewModel).FromOperationViewModels.CollectionChanged +=
-                    FromVisualizationViewModels_CollectionChanged;
-                (e.NewValue as FilterLinkViewModel).ToOperationViewModel.PropertyChanged +=
-                    ToVisualizationViewModel_PropertyChanged;
-                (e.NewValue as FilterLinkViewModel).ToOperationViewModel.OperationModel.PropertyChanged +=
-                    QueryModel_PropertyChanged;
+                _currentModel = ((FilterLinkViewModel) e.NewValue);
+                _currentModel.FilterLinkModels.CollectionChanged += LinkModels_CollectionChanged;
+                _currentModel.FromOperationViewModels.CollectionChanged += FromVisualizationViewModels_CollectionChanged;
+                _currentModel.ToOperationViewModel.OperationModel.PropertyChanged += QueryModel_PropertyChanged;
+
+                _toDisposable = Observable.FromEventPattern<PropertyChangedEventArgs>(_currentModel.ToOperationViewModel, "PropertyChanged")
+                    .Sample(TimeSpan.FromMilliseconds(25))
+                    .Subscribe(async arg =>
+                    {
+                        var dispatcher = this.Dispatcher;
+                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                        {
+                            updateRendering();
+                        });
+                    });
                 updateRendering();
             }
         }
@@ -131,35 +162,63 @@ namespace PanoramicDataWin8.view.vis
             updateRendering();
         }
 
-        private void FromVisualizationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+
+        private Dictionary<HistogramOperationViewModel, IDisposable> _fromDisposables = new Dictionary<HistogramOperationViewModel, IDisposable>();
+        private async void FromVisualizationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            HistogramOperationViewModel hm = null;
             if (e.OldItems != null)
+            {
                 foreach (var item in e.OldItems)
-                    (item as HistogramOperationViewModel).PropertyChanged -= FromVisualizationViewModel_PropertyChanged;
+                {
+                    hm = (HistogramOperationViewModel) item;
+                    if (_fromDisposables.ContainsKey(hm))
+                    {
+                        _fromDisposables[hm].Dispose();
+                        _fromDisposables.Remove(hm);
+                    }
+                }
+            }
             if (e.NewItems != null)
+            {
                 foreach (var item in e.NewItems)
-                    (item as HistogramOperationViewModel).PropertyChanged += FromVisualizationViewModel_PropertyChanged;
+                {
+                    hm = (HistogramOperationViewModel)item;
+                    IDisposable disposable = Observable.FromEventPattern<PropertyChangedEventArgs>(hm, "PropertyChanged")
+                        .Sample(TimeSpan.FromMilliseconds(25))
+                        .Subscribe(async arg =>
+                        {
+                            var dispatcher = this.Dispatcher;
+                            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                            {
+                                updateRendering();
+                            });
+                        });
+                    _fromDisposables.Add(hm, disposable);
+                }
+            }
             updateRendering();
         }
-
-        private void ToVisualizationViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            updateRendering();
-        }
-
-        private void FromVisualizationViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            updateRendering();
-        }
-
+        
         private void LinkModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            FilterLinkModel fm = null;
             if (e.OldItems != null)
+            {
                 foreach (var item in e.OldItems)
-                    (item as FilterLinkModel).PropertyChanged -= LinkView_PropertyChanged;
+                {
+                    fm = (FilterLinkModel) item;
+                    fm.PropertyChanged -= LinkView_PropertyChanged;
+                }
+            }
             if (e.NewItems != null)
+            {
                 foreach (var item in e.NewItems)
-                    (item as FilterLinkModel).PropertyChanged += LinkView_PropertyChanged;
+                {
+                    fm = (FilterLinkModel)item;
+                    fm.PropertyChanged += LinkView_PropertyChanged;
+                } 
+            }
             updateRendering();
         }
 
@@ -170,30 +229,28 @@ namespace PanoramicDataWin8.view.vis
 
         private void updateRendering()
         {
-            var c = new Canvas();
-            var filterLinkViewModel = DataContext as FilterLinkViewModel;
+            _contentCanvas.Children.Clear();
+            var filterLinkViewModel = (FilterLinkViewModel) DataContext;
             if (filterLinkViewModel.FromOperationViewModels.Count > 0)
             {
                 _visualizationViewModelGeometries.Clear();
                 _visualizationViewModelCenterGeometries.Clear();
                 _visualizationViewModelIconGeometries.Clear();
                 
-                var destinationRct = new Rct(filterLinkViewModel.ToOperationViewModel.Position,
-                    new Vec(filterLinkViewModel.ToOperationViewModel.Size.X, filterLinkViewModel.ToOperationViewModel.Size.Y));
+                var destinationRct = new Rct(filterLinkViewModel.ToOperationViewModel.Position, filterLinkViewModel.ToOperationViewModel.Size);
 
-                var attachmentCenter = updateAttachmentCenter(LinkType.Filter, c);
+                var attachmentCenter = updateAttachmentCenter(LinkType.Filter, _contentCanvas);
                 var attachmentLocation = getAttachmentLocation(destinationRct, attachmentCenter);
 
-                drawLinesFromModelsToAttachmentCenter(LinkType.Filter, attachmentCenter, c);
+                drawLinesFromModelsToAttachmentCenter(LinkType.Filter, attachmentCenter, _contentCanvas);
                 if (filterLinkViewModel.FilterLinkModels.Any(lm => lm.LinkType == LinkType.Filter))
-                    drawFilterAttachment(attachmentCenter, c, attachmentLocation);
+                    drawFilterAttachment(attachmentCenter, _contentCanvas, attachmentLocation);
 
-                attachmentCenter = updateAttachmentCenter(LinkType.Brush, c);
-                drawLinesFromModelsToAttachmentCenter(LinkType.Brush, attachmentCenter, c);
+                attachmentCenter = updateAttachmentCenter(LinkType.Brush, _contentCanvas);
+                drawLinesFromModelsToAttachmentCenter(LinkType.Brush, attachmentCenter, _contentCanvas);
                 if (filterLinkViewModel.FilterLinkModels.Any(lm => lm.LinkType == LinkType.Brush))
-                    drawBrushAttachment(attachmentCenter, c);
+                    drawBrushAttachment(attachmentCenter, _contentCanvas);
             }
-            Content = c;
         }
 
         private AttachmentLocation getAttachmentLocation(Rct destinationRct, Vec attachmentCenter)
@@ -233,12 +290,11 @@ namespace PanoramicDataWin8.view.vis
                     filterLinkViewModel.ToOperationViewModel.Size/2.0,
                     from.Position + from.Size/2.0
                 }.GetLineString();
-                var sourceRct = new Rct(from.Position,
-                    new Vec(from.Size.X, from.Size.Y)).GetLineString();
+                var sourceRct = new Rct(from.Position, from.Size).GetLineString();
                 var interPtSource = sourceRct.Intersection(fromCenterToCenter);
                 var interPtDestination = destinationGeom.Intersection(fromCenterToCenter);
 
-                var midPoint = new Vec();
+                Vec midPoint = Vec.Down;
                 if (interPtDestination.IsEmpty || interPtSource.IsEmpty)
                     midPoint = (filterLinkViewModel.ToOperationViewModel.Position +
                                 filterLinkViewModel.ToOperationViewModel.Size/2.0 +
@@ -260,15 +316,11 @@ namespace PanoramicDataWin8.view.vis
                         destinationRct.Bottom + _attachmentRectHalfSize - 2);
 
             var tempAttachment = midPoints.Aggregate((p1, p2) => p1 + p2).GetVec()/midPoints.Count;
-            var destinationVec = new Vec(
-                (filterLinkViewModel.ToOperationViewModel.Position + filterLinkViewModel.ToOperationViewModel.Size/2.0)
-                    .X,
-                (filterLinkViewModel.ToOperationViewModel.Position + filterLinkViewModel.ToOperationViewModel.Size/2.0)
-                    .Y);
+            var destinationVec = (filterLinkViewModel.ToOperationViewModel.Position + filterLinkViewModel.ToOperationViewModel.Size / 2.0).GetVec();
             var inter =
                 destinationGeom.Intersection(
                     new Windows.Foundation.Point[]
-                        {tempAttachment.GetCoord().GetPt(), destinationVec.GetCoord().GetPt()}.GetLineString());
+                        {tempAttachment.GetWindowsPoint(), destinationVec.GetWindowsPoint()}.GetLineString());
             var attachmentCenter = new Vec();
 
             if (inter.IsEmpty)
@@ -278,40 +330,46 @@ namespace PanoramicDataWin8.view.vis
                 dirVec += tempAttachment;
                 inter =
                     destinationGeom.Intersection(
-                        new Windows.Foundation.Point[] {dirVec.GetCoord().GetPt(), destinationVec.GetCoord().GetPt()}
+                        new Windows.Foundation.Point[] {dirVec.GetWindowsPoint(), destinationVec.GetWindowsPoint() }
                             .GetLineString());
-                attachmentCenter = new Vec(inter.Centroid.X, inter.Centroid.Y);
+                attachmentCenter.X = inter.Centroid.X;
+                attachmentCenter.Y = inter.Centroid.Y;
             }
             else
             {
-                attachmentCenter = new Vec(inter.Centroid.X, inter.Centroid.Y);
+                attachmentCenter.X = inter.Centroid.X;
+                attachmentCenter.Y = inter.Centroid.Y;
             }
 
             var attachmentLocation = getAttachmentLocation(destinationRct, attachmentCenter);
             // left
             if (attachmentLocation == AttachmentLocation.Left)
-                attachmentCenter = new Vec(
-                    attachmentCenter.X - _attachmentRectHalfSize + 2,
-                    Math.Min(Math.Max(attachmentCenter.Y, destinationRct.Top + _attachmentRectHalfSize),
-                        destinationRct.Bottom - _attachmentRectHalfSize));
+            {
+                attachmentCenter.X = attachmentCenter.X - _attachmentRectHalfSize + 2;
+                attachmentCenter.Y = Math.Min(Math.Max(attachmentCenter.Y, destinationRct.Top + _attachmentRectHalfSize),
+                    destinationRct.Bottom - _attachmentRectHalfSize);
+            }
             // right
             else if (attachmentLocation == AttachmentLocation.Right)
-                attachmentCenter = new Vec(
-                    attachmentCenter.X + _attachmentRectHalfSize - 2,
-                    Math.Min(Math.Max(attachmentCenter.Y, destinationRct.Top + _attachmentRectHalfSize),
-                        destinationRct.Bottom - _attachmentRectHalfSize));
+            {
+                attachmentCenter.X = attachmentCenter.X + _attachmentRectHalfSize - 2;
+                attachmentCenter.Y = Math.Min(Math.Max(attachmentCenter.Y, destinationRct.Top + _attachmentRectHalfSize),
+                        destinationRct.Bottom - _attachmentRectHalfSize);
+            }
             // top
             else if (attachmentLocation == AttachmentLocation.Top)
-                attachmentCenter = new Vec(
-                    Math.Min(Math.Max(attachmentCenter.X, destinationRct.Left + _attachmentRectHalfSize),
-                        destinationRct.Right - _attachmentRectHalfSize),
-                    attachmentCenter.Y - _attachmentRectHalfSize + 2);
+            {
+                attachmentCenter.X = Math.Min(Math.Max(attachmentCenter.X, destinationRct.Left + _attachmentRectHalfSize),
+                        destinationRct.Right - _attachmentRectHalfSize);
+                attachmentCenter.Y = attachmentCenter.Y - _attachmentRectHalfSize + 2;
+            }
             // bottom
             else if (attachmentLocation == AttachmentLocation.Bottom)
-                attachmentCenter = new Vec(
-                    Math.Min(Math.Max(attachmentCenter.X, destinationRct.Left + _attachmentRectHalfSize),
-                        destinationRct.Right - _attachmentRectHalfSize),
-                    attachmentCenter.Y + _attachmentRectHalfSize - 2);
+            {
+                attachmentCenter.X = Math.Min(Math.Max(attachmentCenter.X, destinationRct.Left + _attachmentRectHalfSize),
+                    destinationRct.Right - _attachmentRectHalfSize);
+                attachmentCenter.Y = attachmentCenter.Y + _attachmentRectHalfSize - 2;
+            } 
 
             return attachmentCenter;
         }
@@ -328,11 +386,8 @@ namespace PanoramicDataWin8.view.vis
                             .Select(lvm => lvm.FromOperationModel)
                             .Contains(vvm.OperationModel as IFilterProviderOperationModel)))
             {
-                var incomingCenter = new Vec(
-                    (incomingModel.Position + incomingModel.Size/2.0).X,
-                    (incomingModel.Position + incomingModel.Size/2.0).Y);
-                var incomingRct = new Rct(incomingModel.Position,
-                    new Vec(incomingModel.Size.X, incomingModel.Size.Y));
+                Vec incomingCenter = (incomingModel.Position + incomingModel.Size / 2.0).GetVec();
+                var incomingRct = new Rct(incomingModel.Position, incomingModel.Size);
 
                 var isInverted =
                     filterLinkViewModel.FilterLinkModels.Where(lm => lm.IsInverted)
@@ -343,7 +398,7 @@ namespace PanoramicDataWin8.view.vis
                     incomingRct.GetLineString()
                         .Intersection(
                             new Windows.Foundation.Point[]
-                                    {attachmentCenter.GetCoord().GetPt(), incomingCenter.GetCoord().GetPt()}
+                                    {attachmentCenter.GetWindowsPoint(), incomingCenter.GetWindowsPoint()}
                                 .GetLineString());
                 var incomingStart = new Vec();
 
@@ -427,7 +482,7 @@ namespace PanoramicDataWin8.view.vis
                             poly.Points.GetPolygon().Buffer(3));
                         _visualizationViewModelGeometries.Add(incomingModel,
                             new Windows.Foundation.Point[]
-                                    {incomingStart.GetCoord().GetPt(), (incomingStart + cutOff).GetCoord().GetPt()}
+                                    {incomingStart.GetWindowsPoint(), (incomingStart + cutOff).GetWindowsPoint()}
                                 .GetLineString());
                     }
                 }
@@ -470,6 +525,12 @@ namespace PanoramicDataWin8.view.vis
             c.Children.Add(path);
         }
 
+        private Rectangle r1 = new Rectangle();
+        private Rectangle r2 = new Rectangle();
+        private Rectangle r3 = new Rectangle();
+        private Polygon filterIcon = null;
+        private TextBlock label = null;
+
         private void drawFilterAttachment(Vec attachmentCenter, Canvas c, AttachmentLocation attachmentLocation)
         {
             var filterLinkViewModel = DataContext as FilterLinkViewModel;
@@ -493,7 +554,6 @@ namespace PanoramicDataWin8.view.vis
             var overlap = 2;
             if (attachmentLocation == AttachmentLocation.Left)
             {
-                var r1 = new Rectangle();
                 r1.Fill = outline;
                 r1.Width = _attachmentRectHalfSize * 2 + thickness - overlap;
                 r1.Height = thickness;
@@ -503,8 +563,7 @@ namespace PanoramicDataWin8.view.vis
                     Y = attachmentCenter.Y + _attachmentRectHalfSize
                 };
                 c.Children.Add(r1);
-
-                var r2 = new Rectangle();
+                
                 r2.Fill = outline;
                 r2.Width = _attachmentRectHalfSize * 2 + thickness - overlap;
                 r2.Height = thickness;
@@ -514,8 +573,7 @@ namespace PanoramicDataWin8.view.vis
                     Y = attachmentCenter.Y - _attachmentRectHalfSize - thickness
                 };
                 c.Children.Add(r2);
-
-                var r3 = new Rectangle();
+                
                 r3.Fill = outline;
                 r3.Width = thickness;
                 r3.Height = _attachmentRectHalfSize * 2 + thickness - overlap;
@@ -528,8 +586,6 @@ namespace PanoramicDataWin8.view.vis
             }
             if (attachmentLocation == AttachmentLocation.Right)
             {
-
-                var r1 = new Rectangle();
                 r1.Fill = outline;
                 r1.Width = _attachmentRectHalfSize * 2 + thickness - overlap;
                 r1.Height = thickness;
@@ -539,8 +595,7 @@ namespace PanoramicDataWin8.view.vis
                     Y = attachmentCenter.Y + _attachmentRectHalfSize
                 };
                 c.Children.Add(r1);
-
-                var r2 = new Rectangle();
+                
                 r2.Fill = outline;
                 r2.Width = _attachmentRectHalfSize * 2 + thickness - overlap;
                 r2.Height = thickness;
@@ -550,8 +605,7 @@ namespace PanoramicDataWin8.view.vis
                     Y = attachmentCenter.Y - _attachmentRectHalfSize - thickness
                 };
                 c.Children.Add(r2);
-
-                var r3 = new Rectangle();
+                
                 r3.Fill = outline;
                 r3.Width = thickness;
                 r3.Height = _attachmentRectHalfSize * 2 + thickness * 2;
@@ -564,7 +618,6 @@ namespace PanoramicDataWin8.view.vis
             }
             if (attachmentLocation == AttachmentLocation.Top)
             {
-                var r1 = new Rectangle();
                 r1.Fill = outline;
                 r1.Width = _attachmentRectHalfSize * 2 + thickness * 2;
                 r1.Height = thickness;
@@ -574,8 +627,7 @@ namespace PanoramicDataWin8.view.vis
                     Y = attachmentCenter.Y - _attachmentRectHalfSize - thickness
                 };
                 c.Children.Add(r1);
-
-                var r2 = new Rectangle();
+                
                 r2.Fill = outline;
                 r2.Width = thickness;
                 r2.Height = _attachmentRectHalfSize * 2 + thickness - overlap;
@@ -585,8 +637,7 @@ namespace PanoramicDataWin8.view.vis
                     Y = attachmentCenter.Y - _attachmentRectHalfSize - thickness
                 };
                 c.Children.Add(r2);
-
-                var r3 = new Rectangle();
+                
                 r3.Fill = outline;
                 r3.Width = thickness;
                 r3.Height = _attachmentRectHalfSize * 2 + thickness - overlap;
@@ -599,7 +650,6 @@ namespace PanoramicDataWin8.view.vis
             }
             if (attachmentLocation == AttachmentLocation.Bottom)
             {
-                var r1 = new Rectangle();
                 r1.Fill = outline;
                 r1.Width = _attachmentRectHalfSize * 2 + thickness * 2;
                 r1.Height = thickness;
@@ -609,8 +659,7 @@ namespace PanoramicDataWin8.view.vis
                     Y = attachmentCenter.Y + _attachmentRectHalfSize
                 };
                 c.Children.Add(r1);
-
-                var r2 = new Rectangle();
+                
                 r2.Fill = outline;
                 r2.Width = thickness;
                 r2.Height = _attachmentRectHalfSize * 2 + thickness - overlap;
@@ -620,8 +669,7 @@ namespace PanoramicDataWin8.view.vis
                     Y = attachmentCenter.Y - _attachmentRectHalfSize
                 };
                 c.Children.Add(r2);
-
-                var r3 = new Rectangle();
+                
                 r3.Fill = outline;
                 r3.Width = thickness;
                 r3.Height = _attachmentRectHalfSize * 2 + thickness - overlap;
@@ -632,19 +680,21 @@ namespace PanoramicDataWin8.view.vis
                 };
                 c.Children.Add(r3);
             }
-            
 
-            var filterIcon = new Polygon();
-            filterIcon.Points = new PointCollection();
-            filterIcon.Points.Add(new Windows.Foundation.Point(0, 0));
-            filterIcon.Points.Add(new Windows.Foundation.Point(15, 0));
-            filterIcon.Points.Add(new Windows.Foundation.Point(10, 6));
-            filterIcon.Points.Add(new Windows.Foundation.Point(10, 14));
-            filterIcon.Points.Add(new Windows.Foundation.Point(5, 12));
-            filterIcon.Points.Add(new Windows.Foundation.Point(5, 6));
+            if (filterIcon == null)
+            {
+                filterIcon = new Polygon();
+                filterIcon.Points = new PointCollection();
+                filterIcon.Points.Add(new Windows.Foundation.Point(0, 0));
+                filterIcon.Points.Add(new Windows.Foundation.Point(15, 0));
+                filterIcon.Points.Add(new Windows.Foundation.Point(10, 6));
+                filterIcon.Points.Add(new Windows.Foundation.Point(10, 14));
+                filterIcon.Points.Add(new Windows.Foundation.Point(5, 12));
+                filterIcon.Points.Add(new Windows.Foundation.Point(5, 6));
+                filterIcon.Width = _attachmentRectHalfSize * 2;
+                filterIcon.Height = _attachmentRectHalfSize * 2;
+            }
             filterIcon.Fill = sourceCount > 1 ? _highlightFaintBrush : _highlightBrush;
-            filterIcon.Width = _attachmentRectHalfSize*2;
-            filterIcon.Height = _attachmentRectHalfSize*2;
             var mat = Mat.Translate(attachmentCenter.X - _attachmentRectHalfSize + 6,
                           attachmentCenter.Y - _attachmentRectHalfSize + 7 + (sourceCount > 1 ? 0 : 0))*
                       Mat.Scale(1.2, 1.2);
@@ -653,18 +703,21 @@ namespace PanoramicDataWin8.view.vis
 
             if (sourceCount > 1)
             {
-                var label = new TextBlock();
-                if (((IFilterConsumerOperationModel) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.AND)
+                if (label == null)
+                {
+                    label = new TextBlock();
+                    label.TextAlignment = TextAlignment.Center;
+                    label.FontSize = 9;
+                    label.FontWeight = FontWeights.Bold;
+                    label.Width = _attachmentRectHalfSize * 2;
+                    label.Foreground = _highlightBrush;
+                    label.Height = _attachmentRectHalfSize * 2;
+                    c.UseLayoutRounding = false;
+                }
+                if (((IFilterConsumerOperationModel)filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.AND)
                     label.Text = "AND";
-                else if (((IFilterConsumerOperationModel) filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.OR)
+                else if (((IFilterConsumerOperationModel)filterLinkViewModel.ToOperationViewModel.OperationModel).FilteringOperation == FilteringOperation.OR)
                     label.Text = "OR";
-                label.TextAlignment = TextAlignment.Center;
-                label.FontSize = 9;
-                label.FontWeight = FontWeights.Bold;
-                label.Width = _attachmentRectHalfSize*2;
-                label.Foreground = _highlightBrush;
-                label.Height = _attachmentRectHalfSize*2;
-                c.UseLayoutRounding = false;
                 label.RenderTransform = new TranslateTransform
                 {
                     X = attachmentCenter.X - _attachmentRectHalfSize,
