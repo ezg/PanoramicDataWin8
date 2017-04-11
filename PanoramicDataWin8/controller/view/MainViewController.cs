@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Linq;
 using Windows.ApplicationModel;
 using Windows.Storage;
+using Windows.UI.Core;
 using GeoAPI.Geometries;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.input;
@@ -37,7 +40,16 @@ namespace PanoramicDataWin8.controller.view
             MainModel = new MainModel();
            
             AttributeTransformationViewModel.AttributeTransformationViewModelDropped += AttributeTransformationViewModelDropped;
-            AttributeTransformationViewModel.AttributeTransformationViewModelMoved += AttributeTransformationViewModelMoved;
+            IDisposable disposable = Observable.FromEventPattern<AttributeTransformationViewModelEventArgs>(typeof(AttributeTransformationViewModel), "AttributeTransformationViewModelMoved")
+                .Sample(TimeSpan.FromMilliseconds(80))
+                .Subscribe(async arg =>
+                {
+                    var dispatcher = MainPage.Dispatcher;
+                    await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    {
+                        AttributeTransformationViewModelMoved(arg.Sender, arg.EventArgs);
+                    });
+                });
 
             InputGroupViewModel.InputGroupViewModelDropped += InputGroupViewModelDropped;
             InputGroupViewModel.InputGroupViewModelMoved += InputGroupViewModelMoved;
@@ -344,8 +356,8 @@ namespace PanoramicDataWin8.controller.view
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
             var hits = new List<AttributeTransformationViewModelEventHandler>();
-            var tt = InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>().ToList();
-            foreach (var element in tt)
+            var attTransDescendants = InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>().ToList();
+            foreach (var element in attTransDescendants)
             {
                 var geom = element.BoundsGeometry;
                 if ((geom != null) && mainPageBounds.Intersects(geom))
@@ -354,13 +366,13 @@ namespace PanoramicDataWin8.controller.view
                 }
             }
 
-            var ops = InkableScene.GetDescendants().OfType<OperationContainerView>().ToList();
-            foreach (var element in ops)
+            /*var ops = InkableScene.GetDescendants().OfType<OperationContainerView>().ToList();
+            foreach (var element in OperationViewModels)
             {
-                var geom = element.Geometry;
+                var geom = element.Bounds.GetPolygon();
                 if ((geom != null) && (mainPageBounds.Distance(geom) < 100))
                 {
-                    foreach (var a in (element.DataContext as OperationViewModel).AttachementViewModels)
+                    foreach (var a in element.AttachementViewModels)
                     {
                         if (a.ShowOnAttributeMove)
                         {
@@ -368,11 +380,11 @@ namespace PanoramicDataWin8.controller.view
                         }
                     }
                 }
-            }
+            }*/
 
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
 
-            foreach (var element in InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>())
+            foreach (var element in attTransDescendants)
             {
                 element.AttributeTransformationViewModelMoved(
                     sender as AttributeTransformationViewModel, e,
@@ -384,7 +396,8 @@ namespace PanoramicDataWin8.controller.view
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
             var hits = new List<AttributeTransformationViewModelEventHandler>();
-            foreach (var element in InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>())
+            var attTransDescendants = InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>().ToList();
+            foreach (var element in attTransDescendants)
             {
                 var geom = element.BoundsGeometry;
                 if ((geom != null) && mainPageBounds.Intersects(geom))
@@ -399,7 +412,7 @@ namespace PanoramicDataWin8.controller.view
             var position = (Pt) new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size/2.0;
 
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
-            foreach (var element in InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>())
+            foreach (var element in attTransDescendants)
             {
                 element.AttributeTransformationViewModelDropped(
                     sender as AttributeTransformationViewModel, e,

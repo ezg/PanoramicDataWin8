@@ -89,19 +89,22 @@ namespace PanoramicDataWin8.view.common
             model.Children.CollectionChanged += Children_CollectionChanged;
 
             // initialize children
-            foreach (var oldChildrenViews in _childernMenuItemViews)
+            if (_childernMenuItemViews.Count == 0)
             {
-                oldChildrenViews.Dispose();
-                if (MenuCanvas != null && MenuCanvas.Children.Contains(oldChildrenViews))
+                foreach (var oldChildrenViews in _childernMenuItemViews)
                 {
-                    MenuCanvas.Children.Remove(oldChildrenViews);
+                    oldChildrenViews.Dispose();
+                    if (MenuCanvas != null && MenuCanvas.Children.Contains(oldChildrenViews))
+                    {
+                        MenuCanvas.Children.Remove(oldChildrenViews);
+                    }
                 }
-            }
-            _childernMenuItemViews.Clear();
-            foreach (var menuItemViewModel in model.Children)
-            {
-                TileMenuItemView menutItemView = new TileMenuItemView() { DataContext = menuItemViewModel };
-                _childernMenuItemViews.Add(menutItemView);
+                _childernMenuItemViews.Clear();
+                foreach (var menuItemViewModel in model.Children)
+                {
+                    TileMenuItemView menutItemView = new TileMenuItemView() {DataContext = menuItemViewModel};
+                    _childernMenuItemViews.Add(menutItemView);
+                }
             }
             updateChildrenTargetPositions();
 

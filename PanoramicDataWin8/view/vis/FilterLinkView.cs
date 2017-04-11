@@ -231,7 +231,7 @@ namespace PanoramicDataWin8.view.vis
         {
             _contentCanvas.Children.Clear();
             var filterLinkViewModel = (FilterLinkViewModel) DataContext;
-            if (filterLinkViewModel.FromOperationViewModels.Count > 0)
+            if (filterLinkViewModel != null && filterLinkViewModel.FromOperationViewModels.Count > 0)
             {
                 _visualizationViewModelGeometries.Clear();
                 _visualizationViewModelCenterGeometries.Clear();

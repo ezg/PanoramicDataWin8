@@ -2,8 +2,10 @@
 using PanoramicDataWin8.model.view;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.UI.Xaml;
@@ -54,8 +56,13 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
+        private IDisposable _disposable = null;
         void AttachmentView_DataContextChanged(FrameworkElement sender, Windows.UI.Xaml.DataContextChangedEventArgs e)
         {
+            if (_disposable != null)
+            {
+                _disposable.Dispose();
+            }
             if (e.NewValue != null)
             {
                 var model = (e.NewValue as AttachmentViewModel);
@@ -73,10 +80,21 @@ namespace PanoramicDataWin8.view.vis
 
                 }
                 model.OperationViewModel.PropertyChanged += OperationViewModel_PropertyChanged;
+                _disposable = Observable.FromEventPattern<PropertyChangedEventArgs>(model, "PropertyChanged")
+                    .Sample(TimeSpan.FromMilliseconds(50))
+                    .Subscribe(async arg =>
+                    {
+                        var dispatcher = this.Dispatcher;
+                        await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                        {
+                            OperationViewModel_PropertyChanged(arg.Sender, arg.EventArgs);
+                        });
+                    });
+
             }
         }
 
-        void OperationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        void OperationViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var visModel = (DataContext as AttachmentViewModel).OperationViewModel;
             if (e.PropertyName == visModel.GetPropertyName(() => visModel.Size) ||

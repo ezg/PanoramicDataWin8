@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
@@ -102,7 +103,8 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        private void OperationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private Dictionary<OperationViewModel, IDisposable> _disposables = new Dictionary<OperationViewModel, IDisposable>();
+        private async void OperationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
             {
@@ -110,8 +112,12 @@ namespace PanoramicDataWin8.controller.view
                 {
                     if (opViewModel.OperationModel is IBrushableOperationModel)
                     {
-                        opViewModel.PropertyChanged -= OperationViewModel_PropertyChanged;
                         opViewModel.OperationViewModelTapped -= OpViewModel_OperationViewModelTapped;
+                        if (_disposables.ContainsKey(opViewModel))
+                        {
+                            _disposables[opViewModel].Dispose();
+                            _disposables.Remove(opViewModel);
+                        }
 
                         Remove((IBrushableOperationModel)opViewModel.OperationModel);
                     }
@@ -123,8 +129,20 @@ namespace PanoramicDataWin8.controller.view
                 {
                     if (opViewModel.OperationModel is IBrushableOperationModel)
                     {
-                        opViewModel.PropertyChanged += OperationViewModel_PropertyChanged;
                         opViewModel.OperationViewModelTapped += OpViewModel_OperationViewModelTapped;
+                        opViewModel.PropertyChanged += OperationViewModel_PropertyChanged;
+
+                        IDisposable disposable = Observable.FromEventPattern<PropertyChangedEventArgs>(opViewModel, "PropertyChanged")
+                            .Sample(TimeSpan.FromMilliseconds(50))
+                            .Subscribe(async arg =>
+                            {
+                                var dispatcher = MainViewController.Instance.MainPage.Dispatcher;
+                                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                                {
+                                    OperationViewModel_PropertyChanged(arg.Sender, arg.EventArgs);
+                                });
+                            });
+                        _disposables.Add(opViewModel, disposable);
                     }
                 }
             }
