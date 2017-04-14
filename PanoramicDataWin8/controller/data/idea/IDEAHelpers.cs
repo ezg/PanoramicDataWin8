@@ -268,9 +268,9 @@ namespace PanoramicDataWin8.controller.data.progressive
                 });
             }
 
-            var kdeDatatypes = new[] {InputDataTypeConstants.INT, InputDataTypeConstants.FLOAT}.ToList();
+            var numericDataTypes = new[] {InputDataTypeConstants.INT, InputDataTypeConstants.FLOAT}.ToList();
             var globalAggregates = new List<AggregateParameters>();
-            foreach (var index in new[] {xIom, yIom}.Where(a => kdeDatatypes.Contains((a.AttributeModel as AttributeFieldModel).InputDataType)).Select(a => a.AttributeModel.Index).Distinct())
+            foreach (var index in new[] {xIom, yIom}.Where(a => numericDataTypes.Contains((a.AttributeModel as AttributeFieldModel).InputDataType)).Select(a => a.AttributeModel.Index).Distinct())
             {
                 globalAggregates.Add(new KDEAggregateParameters
                 {
@@ -284,6 +284,15 @@ namespace PanoramicDataWin8.controller.data.progressive
                     DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
                 });
             }
+
+            foreach (var iom in new[] {xIom, yIom}.Where(i => i.AggregateFunction == AggregateFunction.None && numericDataTypes.Contains((i.AttributeModel as AttributeFieldModel).InputDataType)))
+            {
+                globalAggregates.Add(new AverageAggregateParameters()
+                {
+                    Dimension = iom.AttributeModel.Index
+                });
+            }
+
 
             var parameters = new HistogramOperationParameters
             {
