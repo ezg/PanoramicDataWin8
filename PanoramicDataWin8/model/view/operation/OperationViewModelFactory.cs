@@ -42,7 +42,7 @@ namespace PanoramicDataWin8.model.view.operation
 
         private static void createTopHistogramMenu(HistogramOperationViewModel histogramOperationViewModel)
         {
-            var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Top);
+            /*var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Top);
             var menuViewModel = new MenuViewModel
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
@@ -63,7 +63,7 @@ namespace PanoramicDataWin8.model.view.operation
                 IsAlwaysDisplayed = true
             };
             var attr1 = new CreateLinkMenuItemViewModel();
-            attr1.CreateLinkEvent += (sender, bounds) =>
+            attr1.CreateRecommendationEvent += (sender, bounds) =>
             {
                 FilterLinkViewController.Instance.CreateFilterLinkViewModel(histogramOperationViewModel, bounds);
             };
@@ -71,12 +71,9 @@ namespace PanoramicDataWin8.model.view.operation
             menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);
 
-            attachmentViewModel.MenuViewModel = menuViewModel;
-        }
+            attachmentViewModel.MenuViewModel = menuViewModel;*/
 
-        private static void createRightHistogramMenu(HistogramOperationViewModel histogramOperationViewModel)
-        {
-            var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+            var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Top);
             var menuViewModel = new MenuViewModel
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
@@ -170,6 +167,44 @@ namespace PanoramicDataWin8.model.view.operation
                     }
                 }
             };
+
+            attachmentViewModel.MenuViewModel = menuViewModel;
+        }
+
+        private static void createRightHistogramMenu(HistogramOperationViewModel histogramOperationViewModel)
+        {
+            var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+            var menuViewModel = new MenuViewModel
+            {
+                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
+                NrColumns = 1,
+                NrRows = 1
+            };
+
+            var menuItem = new MenuItemViewModel
+            {
+                MenuViewModel = menuViewModel,
+                Row = 0,
+                ColumnSpan = 1,
+                RowSpan = 1,
+                Column = 0,
+                Size = new Vec(54, 54),
+                Position = histogramOperationViewModel.Position,
+                TargetSize = new Vec(54, 54),
+                IsAlwaysDisplayed = false
+            };
+            var attr1 = new RecommenderMenuItemViewModel();
+            attr1.CreateRecommendationEvent += (sender, bounds) =>
+            {
+                FilterLinkViewController.Instance.CreateFilterLinkViewModel(histogramOperationViewModel, bounds);
+            };
+
+            histogramOperationViewModel.OperationViewModelTapped += (sender, args) =>
+            {
+                attachmentViewModel.ActiveStopwatch.Restart();
+            };
+            menuItem.MenuItemComponentViewModel = attr1;
+            menuViewModel.MenuItemViewModels.Add(menuItem);
 
             attachmentViewModel.MenuViewModel = menuViewModel;
         }

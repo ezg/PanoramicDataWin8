@@ -112,7 +112,7 @@ namespace PanoramicDataWin8.controller.view
                 {
                     if (opViewModel.OperationModel is IBrushableOperationModel)
                     {
-                        opViewModel.OperationViewModelTapped -= OpViewModel_OperationViewModelTapped;
+                        //opViewModel.OperationViewModelTapped -= OpViewModel_OperationViewModelTapped;
                         if (_disposables.ContainsKey(opViewModel))
                         {
                             _disposables[opViewModel].Dispose();
@@ -129,7 +129,7 @@ namespace PanoramicDataWin8.controller.view
                 {
                     if (opViewModel.OperationModel is IBrushableOperationModel)
                     {
-                        opViewModel.OperationViewModelTapped += OpViewModel_OperationViewModelTapped;
+                        //opViewModel.OperationViewModelTapped += OpViewModel_OperationViewModelTapped;
                         opViewModel.PropertyChanged += OperationViewModel_PropertyChanged;
 
                         IDisposable disposable = Observable.FromEventPattern<PropertyChangedEventArgs>(opViewModel, "PropertyChanged")

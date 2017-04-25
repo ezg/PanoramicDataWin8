@@ -290,8 +290,6 @@ namespace PanoramicDataWin8.view.vis
             this.PointerMoved += OperationContainerView_PointerMoved;
             this.PointerReleased += OperationContainerView_PointerReleased;
             _fingerDown = true;
-            
-          //  ((OperationViewModel) DataContext).FireOperationViewModelTapped();  // bcz: removed so views can be interacted on without changing the brushing models
         }
 
         async void OperationContainerView_PointerMoved(object sender, PointerRoutedEventArgs e)
@@ -323,6 +321,7 @@ namespace PanoramicDataWin8.view.vis
 
                 if (!used)
                 {
+                    ((OperationViewModel)DataContext).FireOperationViewModelTapped();
                     foreach (var avm in model.AttachementViewModels)
                     {
                         //avm.ActiveStopwatch.Restart();

@@ -732,6 +732,16 @@ namespace PanoramicDataWin8.view.vis.render
                     }
                 }
 
+
+            if (_xIom.AggregateFunction == AggregateFunction.Avg && _maxXValue < 0)
+            {
+                //_maxXValue = 0;
+            }
+            if (_yIom.AggregateFunction == AggregateFunction.Avg && _maxYValue < 0)
+            {
+                //_maxYValue = 0;
+            }
+
             initializeChartType(_histogramResult.BinRanges);
 
             VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[0], _xIom, histogramOperationModel.IncludeDistribution));
@@ -796,8 +806,8 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 if (dataBinRange is QuantitativeBinRange && includeDistribution)
                 {
-                    var maxDistX = (double) dataBinRange.DataMaxValue;
-                    var minDistX = (double) dataBinRange.DataMinValue;
+                    var maxDistX = (double) dataBinRange.MaxValue;
+                    var minDistX = (double) dataBinRange.MinValue;
                     foreach (var brush in _histogramResult.Brushes)
                     {
                         var kdeAggregateKey = new AggregateKey
@@ -860,7 +870,7 @@ namespace PanoramicDataWin8.view.vis.render
                 visualBinRange = QuantitativeBinRange.Initialize(minValue*(1.0 - factor), maxValue*(1.0 + factor), 10, false);
                 if (_chartType == ChartType.HorizontalBar || _chartType == ChartType.VerticalBar)
                 {
-                    visualBinRange = QuantitativeBinRange.Initialize(Math.Min(0, minValue), visualBinRange.DataMaxValue, 10, false);
+                    visualBinRange = QuantitativeBinRange.Initialize(Math.Min(0, minValue), Math.Max(0, (double)visualBinRange.MaxValue), 10, false);
                 }
             }
             

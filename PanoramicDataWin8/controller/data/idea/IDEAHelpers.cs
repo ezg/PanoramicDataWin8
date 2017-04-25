@@ -272,7 +272,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             var globalAggregates = new List<AggregateParameters>();
             foreach (var index in new[] {xIom, yIom}.Where(a => numericDataTypes.Contains((a.AttributeModel as AttributeFieldModel).InputDataType)).Select(a => a.AttributeModel.Index).Distinct())
             {
-                globalAggregates.Add(new KDEAggregateParameters
+                /*globalAggregates.Add(new KDEAggregateParameters
                 {
                     Dimension = index,
                     NrOfSamples = 50,
@@ -282,7 +282,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 {
                     Dimension = index,
                     DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
-                });
+                });*/
             }
 
             foreach (var iom in new[] {xIom, yIom}.Where(i => i.AggregateFunction == AggregateFunction.None && numericDataTypes.Contains((i.AttributeModel as AttributeFieldModel).InputDataType)))

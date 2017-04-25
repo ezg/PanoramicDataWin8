@@ -82,6 +82,11 @@ namespace PanoramicDataWin8.view.vis.menu
                 mainGrid.Children.Clear();
                 mainGrid.Children.Add(new CreateLinkMenuItemView());
             }
+            else if (model.MenuItemComponentViewModel is RecommenderMenuItemViewModel)
+            {
+                mainGrid.Children.Clear();
+                mainGrid.Children.Add(new RecommenderMenuItemView());
+            }
         }
 
 
