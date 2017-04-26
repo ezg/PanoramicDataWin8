@@ -8,7 +8,7 @@ namespace PanoramicDataWin8.controller.data.progressive
     {
         public async Task<Result> GetResult(OperationReference reference)
         {
-            var response = await IDEAGateway.Request(JsonConvert.SerializeObject(reference, IDEAGateway.JsonSerializerSettings), "result");
+            var response = await IDEAGateway.Request(JsonConvert.SerializeObject(new ResultParameters() {OperationReference = reference}, IDEAGateway.JsonSerializerSettings), "result");
             if (response != "null")
             {
                 var result = JsonConvert.DeserializeObject<Result>(response, IDEAGateway.JsonSerializerSettings);

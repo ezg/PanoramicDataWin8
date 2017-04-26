@@ -120,6 +120,7 @@
     <Compile Include="controller\view\BrushableViewController.cs" />
     <Compile Include="controller\view\ComparisonViewController.cs" />
     <Compile Include="controller\view\FilterLinkViewController.cs" />
+    <Compile Include="controller\view\RecommenderViewController.cs" />
     <Compile Include="controller\view\HypothesesViewController.cs" />
     <Compile Include="controller\view\MainViewController.cs" />
     <Compile Include="MainPage.xaml.cs">
