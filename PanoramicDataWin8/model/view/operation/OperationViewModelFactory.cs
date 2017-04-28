@@ -196,7 +196,18 @@ namespace PanoramicDataWin8.model.view.operation
             var attr1 = new RecommenderMenuItemViewModel();
             attr1.CreateRecommendationEvent += (sender, bounds) =>
             {
-                RecommenderViewController.Instance.CreateRecommenderOperationViewModel(histogramOperationViewModel);
+                if (histogramOperationViewModel.RecommenderOperationViewModel == null)
+                {
+                    var rovm = RecommenderViewController.Instance.CreateRecommenderOperationViewModel(histogramOperationViewModel);
+                    rovm.RecommenderOperationModel.PropertyChanged += (o, args) =>
+                    {
+                        var model = rovm.RecommenderOperationModel;
+                        if (args.PropertyName == model.GetPropertyName(() => model.Result))
+                        {
+                            
+                        }
+                    };
+                }
             };
 
             histogramOperationViewModel.OperationViewModelTapped += (sender, args) =>
@@ -208,7 +219,7 @@ namespace PanoramicDataWin8.model.view.operation
 
             attachmentViewModel.MenuViewModel = menuViewModel;
         }
-
+        
         private static void createAxisMenu(HistogramOperationViewModel histogramOperationViewModel, AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {

@@ -30,6 +30,8 @@ namespace PanoramicDataWin8.controller.view
         {
             RecommenderOperationModel model = new RecommenderOperationModel(_mainModel.SchemaModel);
             RecommenderOperationViewModel viewModel = new RecommenderOperationViewModel(model);
+            histogramViewModel.RecommenderOperationViewModel = viewModel;
+
             MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model, true);
             return viewModel;
         }
