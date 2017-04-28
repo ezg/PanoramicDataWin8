@@ -70,7 +70,15 @@ namespace PanoramicDataWin8.model.data.operation
             get { return _result; }
             set { SetProperty(ref _result, value); }
         }
-        
+
+        [JsonIgnore]
+        public virtual ResultParameters ResultParameters
+        {
+            get
+            {
+                return new ResultParameters();
+            }
+        }
 
         [JsonIgnore]
         public IOperationModel ResultCauserClone { get; set; }

@@ -248,7 +248,7 @@ namespace PanoramicDataWin8.controller.view
         public void RemoveOperationViewModel(OperationContainerView operationContainerView)
         {
             var operationViewModel = (OperationViewModel) operationContainerView.DataContext;
-            MainModel.QueryExecuter.RemoveJob(operationViewModel.OperationModel);
+            MainModel.QueryExecuter.HaltJob(operationViewModel.OperationModel);
             OperationViewModels.Remove(operationViewModel);
             Instance.InkableScene.Remove(operationContainerView);
 

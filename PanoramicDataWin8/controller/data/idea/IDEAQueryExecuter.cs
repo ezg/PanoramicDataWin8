@@ -80,6 +80,13 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 riskOperationModel,
                                 TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis));
                         }
+                        else if (operationModel is RecommenderOperationModel)
+                        {
+                            var recommenderOperationModel = (RecommenderOperationModel)operationModel;
+                            newJob = new RecommenderOperationJob(
+                                recommenderOperationModel,
+                                TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
+                        }
 
 
                         if (newJob != null)
@@ -101,14 +108,17 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         public override void HaltJob(IOperationModel operationModel)
         {
-            foreach (var executionId in ActiveJobs[operationModel].Keys)
+            if (ActiveJobs.ContainsKey(operationModel))
             {
-                ActiveJobs[operationModel][executionId].Stop();
-                ActiveJobs[operationModel][executionId].JobUpdate -= job_JobUpdate;
-                ActiveJobs[operationModel][executionId].JobCompleted -= job_JobCompleted;
-            }
+                foreach (var executionId in ActiveJobs[operationModel].Keys)
+                {
+                    ActiveJobs[operationModel][executionId].Stop();
+                    ActiveJobs[operationModel][executionId].JobUpdate -= job_JobUpdate;
+                    ActiveJobs[operationModel][executionId].JobCompleted -= job_JobCompleted;
+                }
 
-            ActiveJobs.Remove(operationModel);
+                ActiveJobs.Remove(operationModel);
+            }
         }
 
         public override void ResumeJob(IOperationModel operationModel)
@@ -120,21 +130,6 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             if (ExecuteQueryEvent != null)
                 ExecuteQueryEvent(this, new ExecuteOperationModelEventArgs(operationModel, stopPreviousExecutions));
-        }
-
-        public override void RemoveJob(IOperationModel operationModel)
-        {
-            if (ActiveJobs.ContainsKey(operationModel))
-            {
-                foreach (var executionId in ActiveJobs[operationModel].Keys)
-                {
-                    ActiveJobs[operationModel][executionId].Stop();
-                    ActiveJobs[operationModel][executionId].JobUpdate -= job_JobUpdate;
-                    ActiveJobs[operationModel][executionId].JobCompleted -= job_JobCompleted;
-                }
-                
-                ActiveJobs.Remove(operationModel);
-            }
         }
 
         private void job_JobCompleted(object sender, JobEventArgs jobEventArgs)

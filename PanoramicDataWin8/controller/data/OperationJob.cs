@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
+using PanoramicDataWin8.model.data.result;
 
 namespace PanoramicDataWin8.controller.data
 {
@@ -57,7 +58,9 @@ namespace PanoramicDataWin8.controller.data
                 // starting looping for updates
                 while (_isRunning)
                 {
-                    var result = await resultCommand.GetResult(OperationReference);
+                    var resultParams = OperationModel.ResultParameters;
+                    resultParams.OperationReference = OperationReference;
+                    var result = await resultCommand.GetResult(resultParams);
                     if (result != null)
                     {
                         FireJobUpdated(new JobEventArgs {Result = result, ResultExecutionId = _executionId });

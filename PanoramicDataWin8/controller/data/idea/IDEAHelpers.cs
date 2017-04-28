@@ -6,6 +6,7 @@ using IDEA_common.binning;
 using IDEA_common.operations;
 using IDEA_common.operations.example;
 using IDEA_common.operations.histogram;
+using IDEA_common.operations.recommender;
 using IDEA_common.operations.risk;
 using IDEA_common.util;
 using PanoramicDataWin8.controller.view;
@@ -153,6 +154,17 @@ namespace PanoramicDataWin8.controller.data.progressive
             return parameters;
         }
 
+        public static RecommenderOperationParameters GetRecommenderOperationParameters(RecommenderOperationModel model, int sampleSize)
+        {
+            var psm = model.SchemaModel as IDEASchemaModel;
+            var param = new RecommenderOperationParameters()
+            {
+                AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
+                SampleStreamBlockSize = sampleSize
+
+            };
+            return param;
+        }
 
         public static HistogramOperationParameters GetHistogramOperationParameters(HistogramOperationModel model, int sampleSize)
         {

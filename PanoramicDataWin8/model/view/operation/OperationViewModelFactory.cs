@@ -196,7 +196,7 @@ namespace PanoramicDataWin8.model.view.operation
             var attr1 = new RecommenderMenuItemViewModel();
             attr1.CreateRecommendationEvent += (sender, bounds) =>
             {
-                FilterLinkViewController.Instance.CreateFilterLinkViewModel(histogramOperationViewModel, bounds);
+                RecommenderViewController.Instance.CreateRecommenderOperationViewModel(histogramOperationViewModel);
             };
 
             histogramOperationViewModel.OperationViewModelTapped += (sender, args) =>
