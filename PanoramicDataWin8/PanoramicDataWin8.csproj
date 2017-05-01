@@ -194,6 +194,8 @@
     <Compile Include="model\view\BrushableOperationViewModelState.cs" />
     <Compile Include="model\view\operation\RecommenderOperationViewModel.cs" />
     <Compile Include="model\view\RecommenderHandleViewModel.cs" />
+    <Compile Include="model\view\RecommendedHistogramMenuItemViewModel.cs" />
+    <Compile Include="model\view\PagingMenuItemViewModel.cs" />
     <Compile Include="model\view\RecommenderMenuItemViewModel.cs" />
     <Compile Include="model\view\GraphRenderOptions.cs" />
     <Compile Include="model\view\HypothesisViewModel.cs" />
@@ -287,8 +289,14 @@
     </Compile>
     <Compile Include="view\style\TwoFingerScrollBehavior.cs" />
     <Compile Include="view\vis\HypothesesView.cs" />
+    <Compile Include="view\vis\menu\PagingMenuItemView.xaml.cs">
+      <DependentUpon>PagingMenuItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\menu\RecommenderHandleView.xaml.cs">
       <DependentUpon>RecommenderHandleView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\menu\RecommendedHistogramMenuItemView.xaml.cs">
+      <DependentUpon>RecommendedHistogramMenuItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\menu\RecommenderMenuItemView.xaml.cs">
       <DependentUpon>RecommenderMenuItemView.xaml</DependentUpon>
@@ -444,7 +452,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="view\vis\menu\PagingMenuItemView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="view\vis\menu\RecommenderHandleView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="view\vis\menu\RecommendedHistogramMenuItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

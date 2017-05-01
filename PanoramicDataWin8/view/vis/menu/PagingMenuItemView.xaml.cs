@@ -26,10 +26,10 @@ using PanoramicDataWin8.view.inq;
 
 namespace PanoramicDataWin8.view.vis.menu
 {
-    public sealed partial class RecommenderHandleView : UserControl
+    public sealed partial class PagingMenuItemView : UserControl
     {
-        private RecommenderHandleViewModel _model = null;
-        public RecommenderHandleView()
+        private PagingMenuItemViewModel _model = null;
+        public PagingMenuItemView()
         {
             this.InitializeComponent();
             this.DataContextChanged += RecommenderHandleView_DataContextChanged;
@@ -44,40 +44,20 @@ namespace PanoramicDataWin8.view.vis.menu
             }
             if (args.NewValue != null)
             {
-                _model = (RecommenderHandleViewModel) args.NewValue;
+                _model = ((MenuItemViewModel)this.DataContext).MenuItemComponentViewModel as PagingMenuItemViewModel;
                 _model.PropertyChanged += _model_PropertyChanged;
-                updatePercentage();
+                updateRendering();
             }
         }
 
         private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == _model.GetPropertyName(() => _model.Percentage))
-            {
-                updatePercentage();
-            }
-
-            if (e.PropertyName == _model.GetPropertyName(() => _model.Position))
-            {
-                updatePosition();
-            }
-
-            _model.AttachmentViewModel.ActiveStopwatch.Restart();
+            
         }
 
-        private void updatePosition()
+        private void updateRendering()
         {
-            Vec diff = _model.Position - _model.StartPosition;
-            var w = 1.0 - Math.Min(Math.Max(0.01, Math.Pow(Math.Abs(diff.X) / 600.0, 2)), 1.0);
-            var y = Math.Min(Math.Max(0, Math.Pow(Math.Abs(diff.Y) / 300.0, 2)), 1.0) * w * Math.Sign(diff.Y) * 100.0;
-
-            _model.Percentage = Math.Min(100, Math.Max(1, _model.StartPercentage - y));
-            Debug.WriteLine(_model.Percentage);
-        }
-
-        private void updatePercentage()
-        {
-            lblPercentage.Text = _model.Percentage.ToString("F0") + "%";
+            lbl.Text = _model.PagingDirection == PagingDirection.Left ? "<" : ">";
         }
     }
 }

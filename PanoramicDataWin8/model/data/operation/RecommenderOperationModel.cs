@@ -1,34 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Linq;
-using Windows.UI;
-using IDEA_common.operations;
+﻿using IDEA_common.operations;
 using Newtonsoft.Json;
-using PanoramicDataWin8.model.data.attribute;
 
 namespace PanoramicDataWin8.model.data.operation
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class RecommenderOperationModel : OperationModel
     {
+        private int _page;
+
+
+        private int _pageSize = 9;
 
         public RecommenderOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
         }
 
-        public override ResultParameters ResultParameters
+        public int PageSize
         {
-            get
-            {
-                return new RecommenderResultParameters()
-                {
-                    From = -1,
-                    To = -1
-                };
-            }
+            get { return _pageSize; }
+            set { SetProperty(ref _pageSize, value); }
         }
+
+        public int Page
+        {
+            get { return _page; }
+            set { SetProperty(ref _page, value); }
+        }
+        
+        public override ResultParameters ResultParameters => new RecommenderResultParameters
+        {
+            From = _pageSize * _page,
+            To = _pageSize * _page + _pageSize
+        };
     }
 }
+
+ 

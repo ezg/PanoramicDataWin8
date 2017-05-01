@@ -106,8 +106,12 @@ namespace PanoramicDataWin8.view.vis.menu
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
             if (inkableScene != null)
             {
+                var model = ((MenuItemViewModel)this.DataContext).MenuItemComponentViewModel as RecommenderMenuItemViewModel;
                 _shadow = new RecommenderHandleView();
-                var shadowModel = new RecommenderHandleViewModel();
+                var shadowModel = new RecommenderHandleViewModel()
+                {
+                    AttachmentViewModel = model.AttachmentViewModel
+                };
                 _shadow.DataContext = shadowModel;
                 
                 shadowModel.Size = new Vec(this.ActualWidth, this.ActualHeight);
