@@ -39,32 +39,6 @@ namespace PanoramicDataWin8.view.inq
                 _filterProviderOperationViewModel = null;
                 _filterConsumerOperationViewModel = null;
 
-                
-                foreach (var operationViewModel in MainViewController.Instance.OperationViewModels)
-                {
-                    foreach (var attachmentViewModel in operationViewModel.AttachementViewModels)      
-                    {
-                        foreach (var menuItemViewModel in attachmentViewModel.MenuViewModel.MenuItemViewModels)
-                        {
-                            if (menuItemViewModel.MenuItemComponentViewModel is AttributeTransformationMenuItemViewModel &&
-                                menuItemViewModel.Bounds.Contains(inkStroke.Points[0]))
-                            {
-                                var attr = (menuItemViewModel.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).AttributeTransformationViewModel.AttributeTransformationModel;
-                                var name = attr.AttributeModel.RawName;
-                            }
-                        }
-                    }
-                }
-
-                var hits = MainViewController.Instance.OperationViewModels
-                    .SelectMany(ovm => ovm.AttachementViewModels)
-                    .Select(att => att.MenuViewModel)
-                    .SelectMany(mvm => mvm.MenuItemViewModels)
-                    .Where(mivm => mivm.MenuItemComponentViewModel is AttributeTransformationMenuItemViewModel && mivm.Bounds.Contains(inkStroke.Points[0]))
-                    .Select(mivm => mivm.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel);
-
-                var tt = hits.ToArray();
-
                 foreach (OperationContainerView view in _inkableScene.Elements.Where(e => e is OperationContainerView))
                 {
                     var operationModel = ((OperationViewModel) view.DataContext).OperationModel;
