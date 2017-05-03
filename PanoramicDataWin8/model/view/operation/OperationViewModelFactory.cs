@@ -173,6 +173,7 @@ namespace PanoramicDataWin8.model.view.operation
 
         private static void createRightHistogramMenu(HistogramOperationViewModel histogramOperationViewModel)
         {
+            return;
             var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
             var menuViewModel = new MenuViewModel
             {
