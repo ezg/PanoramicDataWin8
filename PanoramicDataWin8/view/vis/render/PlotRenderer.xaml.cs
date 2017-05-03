@@ -24,6 +24,7 @@ using GeoAPI.Geometries;
 using IDEA_common.operations;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view.operation;
@@ -127,9 +128,23 @@ namespace PanoramicDataWin8.view.vis.render
         void loadResult(IResult result)
         {
             HistogramOperationViewModel model = (DataContext as HistogramOperationViewModel);
-            _plotRendererContentProvider.UpdateData(result,
-                (HistogramOperationModel) model.OperationModel,
-                (HistogramOperationModel) model.OperationModel.ResultCauserClone);
+            var clone = (HistogramOperationModel) model.OperationModel.ResultCauserClone;
+            AttributeTransformationModel xIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+            AttributeTransformationModel yIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
+            AttributeTransformationModel valueIom = null;
+
+            if (clone.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
+            {
+                valueIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.Value).First();
+            }
+            else if (clone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
+            {
+                valueIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
+            }
+            
+            _plotRendererContentProvider.UpdateData(result, model.HistogramOperationModel.IncludeDistribution, 
+                model.HistogramOperationModel.BrushColors,
+                xIom, yIom, valueIom);
         }
 
 

@@ -322,7 +322,7 @@ namespace PanoramicDataWin8.view.vis.menu
                     }
                     foreach (var rowItem in model.MenuItemViewModels.Where(ri => ri.MenuYAlign.HasFlag(MenuYAlign.WithRow)))
                     {
-                        var allInRow = model.MenuItemViewModels.Where(mi => rowItem != mi && mi.Row <= rowItem.Row);
+                        var allInRow = model.MenuItemViewModels.Where(mi => rowItem != mi && mi.Row < rowItem.Row);
                         if (allInRow.Any())
                         {
                             var maxRow = allInRow.Max(mi => mi.TargetPosition.Y + mi.TargetSize.Y + GAP);

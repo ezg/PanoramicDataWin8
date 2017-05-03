@@ -35,13 +35,13 @@ namespace PanoramicDataWin8.view.vis.render
         private bool _isResultEmpty = false;
 
         private PlotRendererContentProviderHelper _helper = null;
+        private bool _includeDistribution = false;
 
         private Color _textColor;
         private CanvasTextFormat _textFormat;
 
         private HistogramResult _histogramResult = null;
         
-        private HistogramOperationModel _histogramOperationModel = null;
         private List<FilterModel>       _filterModels = new List<FilterModel>();
         private List<BczBinMapModel> _bczBinMapModels = new List<BczBinMapModel>();
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
@@ -117,16 +117,22 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        public void UpdateData(IResult result, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone)
+        public void UpdateData(
+            IResult result,
+            bool includeDistribution,
+            List<Color> brushColors,
+            AttributeTransformationModel xIom,
+            AttributeTransformationModel yIom,
+            AttributeTransformationModel valueIom)
         {
             _histogramResult = (HistogramResult)result;
-            _histogramOperationModel = histogramOperationModel;
+            _includeDistribution = includeDistribution;
             
             if (_histogramResult != null && _histogramResult.Bins != null)
             {
-                _helper = new PlotRendererContentProviderHelper((HistogramResult)result, histogramOperationModel, histogramOperationModelClone, CompositionScaleX, CompositionScaleY);
+                _helper = new PlotRendererContentProviderHelper(
+                    (HistogramResult)result, includeDistribution, brushColors, xIom, yIom, valueIom, CompositionScaleX, CompositionScaleY);
                 _isResultEmpty = false;
-                
             }
             else
             {
@@ -433,7 +439,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             // render distributions if needed
-            if (_histogramOperationModel.IncludeDistribution)
+            if (_includeDistribution)
             {
                 //canvasArgs.DrawingSession.FillRectangle(new Rect(0, 0, canvas.ActualWidth, canvas.ActualHeight),
                 //Color.FromArgb(150, 230, 230, 230));
@@ -630,10 +636,10 @@ namespace PanoramicDataWin8.view.vis.render
     {
         private double _compositionScaleX = 1;
         private double _compositionScaleY = 1;
+        private bool _includeDistribution = false;
+        private List<Color> _brushColors = null;
 
         private HistogramResult _histogramResult = null;
-        private HistogramOperationModel _histogramOperationModelClone = null;
-        private HistogramOperationModel _histogramOperationModel = null;
         private AttributeTransformationModel _xIom = null;
         private AttributeTransformationModel _yIom = null;
         private AttributeTransformationModel _valueIom = null;
@@ -665,24 +671,24 @@ namespace PanoramicDataWin8.view.vis.render
 
         private static double TOLERANCE = 0.0001f;
 
-        public PlotRendererContentProviderHelper(HistogramResult histogramResult, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone, double compositionScaleX, double compositionScaleY)
+        public PlotRendererContentProviderHelper(
+            HistogramResult histogramResult, 
+            bool includeDistribution, 
+            List<Color> brushColors, 
+            AttributeTransformationModel xIom,
+            AttributeTransformationModel yIom,
+            AttributeTransformationModel valueIom,
+            double compositionScaleX, double compositionScaleY)
         {
             _compositionScaleX = compositionScaleX;
             _compositionScaleY = compositionScaleY;
             _histogramResult = histogramResult;
-            _histogramOperationModelClone = histogramOperationModelClone;
-            _histogramOperationModel = histogramOperationModel;
-            _xIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
-            _yIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
+            _includeDistribution = includeDistribution;
+            _brushColors = brushColors;
 
-            if (_histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
-            {
-                _valueIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Value).First();
-            }
-            else if (_histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
-            {
-                _valueIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
-            }
+            _xIom = xIom;
+            _yIom = yIom;
+            _valueIom = valueIom;
 
             var aggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
             _minValue = double.MaxValue;
@@ -744,8 +750,8 @@ namespace PanoramicDataWin8.view.vis.render
 
             initializeChartType(_histogramResult.BinRanges);
 
-            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[0], _xIom, histogramOperationModel.IncludeDistribution));
-            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[1], _yIom, histogramOperationModel.IncludeDistribution));
+            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[0], _xIom));
+            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[1], _yIom));
         }
 
         public void ComputeSizes(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, CanvasTextFormat textFormat)
@@ -799,12 +805,12 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        private BinRange createVisualBinRange(BinRange dataBinRange, AttributeTransformationModel atm, bool includeDistribution)
+        private BinRange createVisualBinRange(BinRange dataBinRange, AttributeTransformationModel atm)
         {
             BinRange visualBinRange = null;
             if (!(dataBinRange is AggregateBinRange))
             {
-                if (dataBinRange is QuantitativeBinRange && includeDistribution)
+                if (dataBinRange is QuantitativeBinRange && _includeDistribution)
                 {
                     var maxDistX = (double) dataBinRange.MaxValue;
                     var minDistX = (double) dataBinRange.MinValue;
@@ -931,7 +937,7 @@ namespace PanoramicDataWin8.view.vis.render
         public List<List<Vector2>> GetDistribution()
         {
             List<List<Vector2>> returnList = new List<List<Vector2>>();
-            if (_histogramOperationModel.IncludeDistribution && 
+            if (_includeDistribution && 
                 (_chartType == ChartType.HorizontalBar || _chartType == ChartType.VerticalBar))
             {
                 foreach (var brush in _histogramResult.Brushes)
@@ -1437,7 +1443,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else
             {
-                baseColor = _histogramOperationModelClone.BrushColors[brush.BrushIndex % _histogramOperationModelClone.BrushColors.Count];
+                baseColor = _brushColors[brush.BrushIndex % _brushColors.Count];
             }
 
             return baseColor;

@@ -154,6 +154,11 @@ namespace PanoramicDataWin8.model.view
         {
             Deleted?.Invoke(this, new EventArgs());
         }
+
+        public Rct Bounds
+        {
+            get { return new Rct(Position, Size); }
+        }
     }
 
     [Flags]

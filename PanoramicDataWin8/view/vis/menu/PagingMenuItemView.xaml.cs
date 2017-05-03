@@ -29,9 +29,17 @@ namespace PanoramicDataWin8.view.vis.menu
     public sealed partial class PagingMenuItemView : UserControl
     {
         private PagingMenuItemViewModel _model = null;
+        private PointerManager _mainPointerManager = new PointerManager();
+        private Point _mainPointerManagerPreviousPoint = new Point();
+        private Pt _mainPointerManagerStartPoint = new Point();
+
         public PagingMenuItemView()
         {
             this.InitializeComponent();
+            _mainPointerManager.Added += mainPointerManager_Added;
+            _mainPointerManager.Moved += mainPointerManager_Moved;
+            _mainPointerManager.Removed += mainPointerManager_Removed;
+            _mainPointerManager.Attach(this);
             this.DataContextChanged += RecommenderHandleView_DataContextChanged;
         }
 
@@ -59,5 +67,29 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             lbl.Text = _model.PagingDirection == PagingDirection.Left ? "<" : ">";
         }
+
+
+        private void mainPointerManager_Added(object sender, PointerManagerEvent e)
+        {
+            if (e.NumActiveContacts == 1)
+            {
+                GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
+                _mainPointerManagerPreviousPoint = gt.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position);
+                _mainPointerManagerStartPoint = _mainPointerManagerPreviousPoint;
+            }
+        }
+
+        void mainPointerManager_Moved(object sender, PointerManagerEvent e)
+        {
+        }
+
+        void mainPointerManager_Removed(object sender, PointerManagerEvent e)
+        {
+            if (_model != null)
+            {
+                _model.FireCreateRecommendationEvent();
+            }
+        }
+
     }
 }

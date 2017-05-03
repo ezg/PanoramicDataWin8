@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using IDEA_common.operations;
 using IDEA_common.operations.recommender;
 using IDEA_common.operations.risk;
 using PanoramicDataWin8.model.data;
@@ -39,14 +40,21 @@ namespace PanoramicDataWin8.controller.view
 
 
             model.PropertyChanged += Model_PropertyChanged;
+            model.OperationModelUpdated += Model_OperationModelUpdated;
             MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model, true);
             return viewModel;
+        }
+
+        private void Model_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
+        {
+            //MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(sender as RecommenderOperationModel, true);
+            MainViewController.Instance.MainModel.QueryExecuter.UpdateResultParameters(sender as RecommenderOperationModel);
         }
 
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var model = sender as RecommenderOperationModel;
-            if (e.PropertyName == model.GetPropertyName(() => model.Result))
+            if (e.PropertyName == model.GetPropertyName(() => model.Result) && model.Result != null)
             {
                 var result = model.Result as RecommenderResult;
                 var viewModel = _recommenderOperationViewModels[model];
@@ -90,8 +98,11 @@ namespace PanoramicDataWin8.controller.view
                             TargetSize = new Vec(54, 54),
                             IsAlwaysDisplayed = true
                         };
-                        var recHistogramModel = new RecommendedHistogramMenuItemViewModel();
-                        recHistogramModel.Id = recommendedHistogram.Id;
+                        var recHistogramModel = new RecommendedHistogramMenuItemViewModel
+                        {
+                            Id = recommendedHistogram.Id,
+                            RecommendedHistogram = recommendedHistogram
+                        };
                         newModel.MenuItemComponentViewModel = recHistogramModel;
 
                         newModel.Column = col + 1;
@@ -115,55 +126,64 @@ namespace PanoramicDataWin8.controller.view
             var left = menuViewModel.MenuItemViewModels.FirstOrDefault(mi => (mi.MenuItemComponentViewModel as PagingMenuItemViewModel)?.PagingDirection == PagingDirection.Left);
             var right = menuViewModel.MenuItemViewModels.FirstOrDefault(mi => (mi.MenuItemComponentViewModel as PagingMenuItemViewModel)?.PagingDirection == PagingDirection.Right);
 
-            if (model.Page > 0 && left == null)
+            if (model.Page > 0)
             {
-                var newModel = new MenuItemViewModel()
+                if (left == null)
                 {
-                    Size = new Vec(25, 25),
-                    TargetSize = new Vec(25, 25),
-                    IsAlwaysDisplayed = true
-                };
-                var paging = new PagingMenuItemViewModel() { PagingDirection = PagingDirection.Left };
-                paging.PagingEvent += Paging_PagingEvent;
-                newModel.MenuItemComponentViewModel = paging;
+                    var newModel = new MenuItemViewModel()
+                    {
+                        Size = new Vec(25, 25),
+                        TargetSize = new Vec(25, 25),
+                        IsAlwaysDisplayed = true
+                    };
+                    var paging = new PagingMenuItemViewModel() {PagingDirection = PagingDirection.Left};
+                    paging.PagingEvent += (sender, direction) =>
+                    {
+                        model.Page -= 1;
+                        model.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+                    };
+                    newModel.MenuItemComponentViewModel = paging;
 
-                newModel.Column = 1;
-                newModel.Row = 3;
-                menuViewModel.MenuItemViewModels.Add(newModel);
+                    newModel.Column = 1;
+                    newModel.Row = 3;
+                    menuViewModel.MenuItemViewModels.Add(newModel);
+                }
             }
             else if (left != null)
             {
                 menuViewModel.MenuItemViewModels.Remove(left);
             }
 
-            if (model.Page * model.PageSize < result.TotalCount && right == null)
+            if (model.Page * model.PageSize + model.PageSize < result.TotalCount)
             {
-                var newModel = new MenuItemViewModel()
+                if (right == null)
                 {
-                    Size = new Vec(25, 25),
-                    TargetSize = new Vec(25, 25),
-                    IsAlwaysDisplayed = true
-                };
-                var paging = new PagingMenuItemViewModel() {PagingDirection = PagingDirection.Right};
-                paging.PagingEvent += Paging_PagingEvent;
-                newModel.MenuItemComponentViewModel = paging;
+                    var newModel = new MenuItemViewModel()
+                    {
+                        Size = new Vec(25, 25),
+                        TargetSize = new Vec(25, 25),
+                        IsAlwaysDisplayed = true
+                    };
+                    var paging = new PagingMenuItemViewModel() {PagingDirection = PagingDirection.Right};
+                    paging.PagingEvent += (sender, direction) =>
+                    {
+                        model.Page += 1;
+                        model.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+                    };
+                    newModel.MenuItemComponentViewModel = paging;
 
-                newModel.Column = 3;
-                newModel.Row = 3;
-                newModel.MenuXAlign = MenuXAlign.WithColumn;
-                newModel.MenuYAlign = MenuYAlign.WithRow;
+                    newModel.Column = 3;
+                    newModel.Row = 3;
+                    newModel.MenuXAlign = MenuXAlign.WithColumn;
+                    newModel.MenuYAlign = MenuYAlign.WithRow;
 
-                menuViewModel.MenuItemViewModels.Add(newModel);
+                    menuViewModel.MenuItemViewModels.Add(newModel);
+                }
             }
             else if (right != null)
             {
-                menuViewModel.MenuItemViewModels.Remove(left);
+                menuViewModel.MenuItemViewModels.Remove(right);
             }
-        }
-
-        private void Paging_PagingEvent(object sender, PagingDirection pagingDirection)
-        {
-            throw new System.NotImplementedException();
         }
 
         public static void CreateInstance(MainModel mainModel, ObservableCollection<OperationViewModel> operationViewModel)

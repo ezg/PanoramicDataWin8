@@ -15,8 +15,8 @@ namespace PanoramicDataWin8.controller.data
         public virtual void ResumeJob(IOperationModel operationModel)
         {
         }
-
-        public virtual void UpdateResultParametersJob(IOperationModel operationModel)
+        
+        public virtual void UpdateResultParameters(IOperationModel operationModel)
         {
         }
 
