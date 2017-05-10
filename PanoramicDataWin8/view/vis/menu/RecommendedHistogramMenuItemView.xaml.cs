@@ -14,9 +14,13 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using IDEA_common.operations;
+using IDEA_common.operations.histogram;
 using IDEA_common.operations.recommender;
+using IDEA_common.util;
 using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
@@ -60,15 +64,31 @@ namespace PanoramicDataWin8.view.vis.menu
                 
                 if (_model.RecommendedHistogram.HistogramResult != null)
                 {
-                    loadResult(_model.RecommendedHistogram.HistogramResult);
+                    loadResult(_model.RecommendedHistogram);
                     render();
                 }
             }
         }
 
-        void loadResult(IResult result)
+        void loadResult(RecommendedHistogram recommendedHistogram)
         {
-            //_plotRendererContentProvider.UpdateData(result);
+            if (recommendedHistogram.HistogramResult != null)
+            {
+                var xIom = new AttributeTransformationModel(new IDEAFieldAttributeModel(recommendedHistogram.XAttribute.RawName,
+                    recommendedHistogram.XAttribute.DisplayName, recommendedHistogram.XAttribute.Index,
+                    InputDataTypeConstants.FromDataType(recommendedHistogram.XAttribute.DataType),
+                    InputDataTypeConstants.FromDataType(recommendedHistogram.XAttribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric",
+                    recommendedHistogram.XAttribute.VisualizationHints));
+
+                var yIom = new AttributeTransformationModel(new IDEAFieldAttributeModel(recommendedHistogram.YAttribute.RawName,
+                    recommendedHistogram.YAttribute.DisplayName, recommendedHistogram.YAttribute.Index,
+                    InputDataTypeConstants.FromDataType(recommendedHistogram.YAttribute.DataType),
+                    InputDataTypeConstants.FromDataType(recommendedHistogram.YAttribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric",
+                    recommendedHistogram.YAttribute.VisualizationHints)) {AggregateFunction = AggregateFunction.Count};
+
+                _plotRendererContentProvider.UpdateData(recommendedHistogram.HistogramResult, 
+                    false, BrushViewModel.ColorScheme1.First().Yield().ToList(), xIom, yIom, yIom, 5);
+            }
         }
 
 
@@ -79,15 +99,10 @@ namespace PanoramicDataWin8.view.vis.menu
 
         void RecommendedHistogramMenuItemViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            HistogramOperationModel operationModel = (HistogramOperationModel)((OperationViewModel)DataContext).OperationModel;
-            if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.Result))
+            if (e.PropertyName == _model.GetPropertyName(() => _model.RecommendedHistogram))
             {
-                var result = (DataContext as HistogramOperationViewModel).OperationModel.Result;
-                if (result != null)
-                {
-                    loadResult(result);
-                    render();
-                }
+                loadResult(_model.RecommendedHistogram);
+                render();
             }
         }
 

@@ -270,7 +270,6 @@ namespace PanoramicDataWin8.view.vis.menu
         private void updateRendering()
         {
             MenuViewModel model = (DataContext as MenuViewModel);
-           
             {
                 if (model.AttachmentOrientation == AttachmentOrientation.Left)
                 {
@@ -327,6 +326,15 @@ namespace PanoramicDataWin8.view.vis.menu
                         {
                             var maxRow = allInRow.Max(mi => mi.TargetPosition.Y + mi.TargetSize.Y + GAP);
                             rowItem.TargetPosition = new Pt(rowItem.TargetPosition.X, maxRow);
+                        }
+                    }
+                    foreach (var rowItem in model.MenuItemViewModels.Where(ri => ri.MenuXAlign.HasFlag(MenuXAlign.Right)))
+                    {
+                        var allInCol = model.MenuItemViewModels.Where(mi => rowItem != mi && mi.Column == rowItem.Column);
+                        if (allInCol.Any())
+                        {
+                            var maxCol = allInCol.Max(mi => mi.TargetPosition.X + mi.TargetSize.X);
+                            rowItem.TargetPosition = new Pt(maxCol - rowItem.TargetSize.X, rowItem.TargetPosition.Y);
                         }
                     }
                 }

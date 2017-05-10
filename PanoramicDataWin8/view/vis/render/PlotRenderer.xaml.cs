@@ -144,7 +144,7 @@ namespace PanoramicDataWin8.view.vis.render
             
             _plotRendererContentProvider.UpdateData(result, model.HistogramOperationModel.IncludeDistribution, 
                 model.HistogramOperationModel.BrushColors,
-                xIom, yIom, valueIom);
+                xIom, yIom, valueIom, 30);
         }
 
 

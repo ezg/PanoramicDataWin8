@@ -174,7 +174,7 @@ namespace PanoramicDataWin8.controller.view
 
                     newModel.Column = 3;
                     newModel.Row = 3;
-                    newModel.MenuXAlign = MenuXAlign.WithColumn;
+                    newModel.MenuXAlign = MenuXAlign.WithColumn & MenuXAlign.WithColumn;
                     newModel.MenuYAlign = MenuYAlign.WithRow;
 
                     menuViewModel.MenuItemViewModels.Add(newModel);
