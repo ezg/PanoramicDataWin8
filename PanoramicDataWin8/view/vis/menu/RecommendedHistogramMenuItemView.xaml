@@ -6,13 +6,28 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:common="using:PanoramicDataWin8.view.common"
+    xmlns:controls="using:WinRTXamlToolkit.Controls"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400"
     FontFamily="{StaticResource abel}">
 
     <Grid Background="{StaticResource lightBrush}">
-        <common:DXSurface x:Name="dxSurface"></common:DXSurface>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="0.6*"></RowDefinition>
+            <RowDefinition Height="0.4*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <common:DXSurface x:Name="dxSurface" Grid.Row="0"></common:DXSurface>
+        <Viewbox Margin="2" Grid.Row="1">
+            <TextBlock 
+                Name="txtBlock"
+                CacheMode="BitmapCache"
+                VerticalAlignment="Stretch"
+                HorizontalAlignment="Stretch"
+                TextAlignment="Center"
+                FontSize="11" 
+                Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
+        </Viewbox>
         </Grid>
 </UserControl>
     

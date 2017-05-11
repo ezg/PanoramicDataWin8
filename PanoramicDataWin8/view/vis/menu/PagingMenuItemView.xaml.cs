@@ -65,7 +65,8 @@ namespace PanoramicDataWin8.view.vis.menu
 
         private void updateRendering()
         {
-            lbl.Text = _model.PagingDirection == PagingDirection.Left ? "<" : ">";
+            left.Visibility = _model.PagingDirection == PagingDirection.Left ? Visibility.Visible : Visibility.Collapsed;
+            right.Visibility = _model.PagingDirection == PagingDirection.Right ? Visibility.Visible : Visibility.Collapsed;
         }
 
 

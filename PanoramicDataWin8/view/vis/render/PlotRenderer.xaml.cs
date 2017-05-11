@@ -141,7 +141,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 valueIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
             }
-            
+            _plotRendererContentProvider.UpdateFilterModels(model.HistogramOperationModel.FilterModels.ToList());
             _plotRendererContentProvider.UpdateData(result, model.HistogramOperationModel.IncludeDistribution, 
                 model.HistogramOperationModel.BrushColors,
                 xIom, yIom, valueIom, 30);

@@ -298,6 +298,8 @@ namespace PanoramicDataWin8
             AddHandler(PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
             AddHandler(PointerReleasedEvent, new PointerEventHandler(InkableScene_PointerReleased), true);
             AddHandler(PointerMovedEvent, new PointerEventHandler(InkableScene_PointerMoved), true);
+
+            hypothesisButton.DataContext = new BudgetViewModel();
         }
 
         private void InkableScene_PointerPressed(object sender, PointerRoutedEventArgs e)

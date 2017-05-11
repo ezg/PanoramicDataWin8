@@ -6,12 +6,15 @@ using System.Linq;
 using IDEA_common.operations;
 using IDEA_common.operations.recommender;
 using IDEA_common.operations.risk;
+using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
+using PanoramicDataWin8.view.inq;
+using PanoramicDataWin8.view.vis;
 
 namespace PanoramicDataWin8.controller.view
 {
@@ -82,6 +85,7 @@ namespace PanoramicDataWin8.controller.view
                     }
                     else
                     {
+                        (existingModel.MenuItemComponentViewModel as RecommendedHistogramMenuItemViewModel).DroppedEvent -= RecHistogramModel_DroppedEvent;
                         menuViewModel.MenuItemViewModels.Remove(existingModel);
                     }
                 }
@@ -105,6 +109,7 @@ namespace PanoramicDataWin8.controller.view
                             HistogramOperationViewModel = parent
                         };
                         newModel.MenuItemComponentViewModel = recHistogramModel;
+                        recHistogramModel.DroppedEvent += RecHistogramModel_DroppedEvent;
 
                         newModel.Column = col + 1;
                         newModel.Row = row;
@@ -120,6 +125,27 @@ namespace PanoramicDataWin8.controller.view
 
                 addPagingControls(menuViewModel, result, model);
             }
+        }
+
+        private void RecHistogramModel_DroppedEvent(object sender, Rct bounds)
+        {
+            var operationContainerView = new OperationContainerView();
+            var width = OperationViewModel.WIDTH;
+            var height = OperationViewModel.HEIGHT;
+
+            var model = sender as RecommendedHistogramMenuItemViewModel;
+            var attr = IDEAHelpers.GetAttributeModelFromAttribute(model.RecommendedHistogram.XAttribute);
+            var filterModels = IDEAHelpers.GetFilterModelsFromSelections(model.RecommendedHistogram.Selections);
+            attr.OriginModel = MainViewController.Instance.MainModel.SchemaModel.OriginModels.First();
+            var operationViewModel = MainViewController.Instance.CreateDefaultHistogramOperationViewModel(attr, bounds.Center - new Vec(width / 2.0, height / 2.0));
+            operationViewModel.HistogramOperationModel.AddFilterModels(filterModels);
+            FilterLinkViewController.Instance.CreateFilterLinkViewModel(operationViewModel.OperationModel, model.HistogramOperationViewModel.OperationModel);
+
+            var size = new Vec(width, height);
+            operationViewModel.Size = size;
+            operationContainerView.DataContext = operationViewModel;
+            MainViewController.Instance.InkableScene.Add(operationContainerView);
+
         }
 
         private void addPagingControls(MenuViewModel menuViewModel, RecommenderResult result, RecommenderOperationModel model)

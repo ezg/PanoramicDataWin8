@@ -243,8 +243,7 @@ namespace PanoramicDataWin8.controller.view
                 InkableScene.Add(attachmentView);
             }
         }
-
-
+        
         public void RemoveOperationViewModel(OperationContainerView operationContainerView)
         {
             var operationViewModel = (OperationViewModel) operationContainerView.DataContext;

@@ -42,7 +42,7 @@ namespace PanoramicDataWin8.view.vis.menu
         private RecommendedHistogramMenuItemViewModel _model = null;
         private HistogramOperationViewModel _brusher = null;
         private Color _brushColor = Colors.White;
-        private AttributeFieldView _shadow = null;
+        private MenuItemView _shadow = null;
         private long _manipulationStartTime = 0;
         private Pt _startDrag = new Point(0, 0);
         private Pt _currentFromInkableScene = new Point(0, 0);
@@ -80,7 +80,6 @@ namespace PanoramicDataWin8.view.vis.menu
             {
                 _model = (DataContext as MenuItemViewModel).MenuItemComponentViewModel as RecommendedHistogramMenuItemViewModel;
                 _model.PropertyChanged += RecommendedHistogramMenuItemViewModel_PropertyChanged;
-                
                 if (_model.RecommendedHistogram.HistogramResult != null)
                 {
                     loadResult(_model.RecommendedHistogram);
@@ -98,11 +97,14 @@ namespace PanoramicDataWin8.view.vis.menu
                 {
                     AggregateFunction = AggregateFunction.Count
                 };
+
+                txtBlock.Text = xIom.GetLabel();
+
                 var filterModels = IDEAHelpers.GetFilterModelsFromSelections(_model.RecommendedHistogram.Selections);
                 _plotRendererContentProvider.UpdateFilterModels(filterModels);
 
                 _plotRendererContentProvider.UpdateData(recommendedHistogram.HistogramResult, 
-                    false, BrushViewModel.ColorScheme1.First().Yield().ToList(), xIom, yIom, yIom, 5);
+                    false, BrushViewModel.ColorScheme1.First().Yield().ToList(), xIom, yIom, yIom, 0);
             }
         }
 
@@ -128,7 +130,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 
 
                 if (_shadow == null && _brusher == null &&
-                    _manipulationStartTime + TimeSpan.FromSeconds(0.1).Ticks < DateTime.Now.Ticks)
+                    _manipulationStartTime + TimeSpan.FromSeconds(0.3).Ticks < DateTime.Now.Ticks)
                 {
                     Debug.WriteLine("create Brush " + currentPoint);
 
@@ -150,27 +152,23 @@ namespace PanoramicDataWin8.view.vis.menu
 
                 }
 
-                if (delta.Length > 50 && _shadow == null && _brusher == null)
+                if (delta.Length > 50 && _shadow == null)
                 {
+                    if (_brusher != null)
+                    {
+                        disposeBrusher();
+                    }
                     Debug.WriteLine("create shadow " + currentPoint);
                     createShadow(currentPoint);
                 }
 
                 if (_shadow != null)
                 {
-                    InkableScene inkableScene = MainViewController.Instance.InkableScene;
                     _shadow.RenderTransform = new TranslateTransform()
                     {
                         X = currentPoint.X - _shadow.Width / 2.0,
                         Y = currentPoint.Y - _shadow.Height
                     };
-                    if (inkableScene != null)
-                    {
-                        inkableScene.Add(_shadow);
-
-                        Rct bounds = _shadow.GetBounds(inkableScene);
-                       
-                    }
                 }
 
                 _mainPointerManagerPreviousPoint = currentPoint;
@@ -181,44 +179,40 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             if (_brusher != null)
             {
-                var toModel = _model.HistogramOperationViewModel.HistogramOperationModel;
-                toModel.BrushColors.Remove(_brushColor);
-                toModel.BrushOperationModels.Remove(_brusher.HistogramOperationModel as IBrushableOperationModel);
-                _brusher = null;
+                disposeBrusher();
             }
             if (_shadow != null)
             {
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
-
                 Rct bounds = _shadow.GetBounds(inkableScene);
+                _model.FireDroppedEvent(bounds);
+                inkableScene.Remove(_shadow);
                 _shadow = null;
             }
 
             _manipulationStartTime = 0;
         }
 
+        private void disposeBrusher()
+        {
+            var toModel = _model.HistogramOperationViewModel.HistogramOperationModel;
+            toModel.BrushColors.Remove(_brushColor);
+            toModel.BrushOperationModels.Remove(_brusher.HistogramOperationModel as IBrushableOperationModel);
+            _brusher = null;
+        }
+
         public void createShadow(Point fromInkableScene)
         {
-            /*InkableScene inkableScene = MainViewController.Instance.InkableScene;
-            var model = ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel).AttributeTransformationViewModel;
+            InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
-            if (inkableScene != null && model != null)
+            if (inkableScene != null && _model.RecommendedHistogram.HistogramResult != null)
             {
                 _currentFromInkableScene = fromInkableScene;
-                _shadow = new AttributeFieldView();
-                _shadow.DataContext = new AttributeTransformationViewModel(null, model.AttributeTransformationModel)
-                {
-                    IsNoChrome = false,
-                    IsMenuEnabled = true,
-                    IsShadow = true
-                };
+                _shadow = new MenuItemView();
+                _shadow.DataContext = this.DataContext;
 
                 _shadow.Measure(new Size(double.PositiveInfinity,
                     double.PositiveInfinity));
-
-                double add = model.IsNoChrome ? 30 : 0;
-                //_shadow.Width = this.ActualWidth + add;
-                //_shadow.Height = _shadow.DesiredSize.Height;
 
                 _shadow.RenderTransform = new TranslateTransform()
                 {
@@ -231,8 +225,8 @@ namespace PanoramicDataWin8.view.vis.menu
                 _shadow.SendToFront();
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                model.FireMoved(bounds, model.AttributeTransformationModel);
-            }*/
+                //model.FireMoved(bounds, model.AttributeTransformationModel);
+            }
         }
 
 

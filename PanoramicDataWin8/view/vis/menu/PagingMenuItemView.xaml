@@ -11,12 +11,10 @@
     FontFamily="{StaticResource abel}">
     
     <Grid Background="{StaticResource lightBrush}">
-
-        <TextBlock Name="lbl"
-                   FontSize="16"
-                   HorizontalAlignment="Center"
-                   Text=""
-                   VerticalAlignment="Center"></TextBlock>
+        <Grid Margin="8">
+            <Polygon Name="right"  Stretch="Fill" Points="0,0 80,50, 0,100" Fill="{StaticResource highlightBrush}" Visibility="Collapsed" />
+            <Polygon Name="left"  Stretch="Fill" Points="80,0 0,50, 80,100" Fill="{StaticResource highlightBrush}"  Visibility="Collapsed"/>
+        </Grid>
     </Grid>
 </UserControl>
     
