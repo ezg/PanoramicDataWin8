@@ -164,7 +164,6 @@
     <Compile Include="model\data\operation\FilterConsumerOperationModelImpl.cs" />
     <Compile Include="model\data\operation\OperationModel.cs" />
     <Compile Include="model\data\operation\OperationModelUpdatedEventArgs.cs" />
-    <Compile Include="model\data\operation\Predicate.cs" />
     <Compile Include="model\data\operation\RiskOperationModel.cs" />
     <Compile Include="model\data\operation\StatistalComparisonType.cs" />
     <Compile Include="model\data\operation\StatisticallyComparableOperationModelImpl.cs" />

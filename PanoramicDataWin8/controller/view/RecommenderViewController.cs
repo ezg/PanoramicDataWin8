@@ -101,7 +101,8 @@ namespace PanoramicDataWin8.controller.view
                         var recHistogramModel = new RecommendedHistogramMenuItemViewModel
                         {
                             Id = recommendedHistogram.Id,
-                            RecommendedHistogram = recommendedHistogram
+                            RecommendedHistogram = recommendedHistogram,
+                            HistogramOperationViewModel = parent
                         };
                         newModel.MenuItemComponentViewModel = recHistogramModel;
 
@@ -174,7 +175,7 @@ namespace PanoramicDataWin8.controller.view
 
                     newModel.Column = 3;
                     newModel.Row = 3;
-                    newModel.MenuXAlign = MenuXAlign.WithColumn & MenuXAlign.WithColumn;
+                    newModel.MenuXAlign = MenuXAlign.WithColumn | MenuXAlign.Right;
                     newModel.MenuYAlign = MenuYAlign.WithRow;
 
                     menuViewModel.MenuItemViewModels.Add(newModel);

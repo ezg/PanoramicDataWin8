@@ -251,13 +251,7 @@ namespace PanoramicDataWin8.controller.view
                                     current = otherview;
                                     otherview = tmp;
                                 }
-                                var inputCohorts = BrushViews.Keys.Where(icv => icv.To == otherview).ToList();
-
-                                var allColorIndex = Enumerable.Range(0, BrushViewModel.ColorScheme1.Count);
-                                allColorIndex = allColorIndex.Except(inputCohorts.Select(c => c.ColorIndex));
-                                var colorIndex = inputCohorts.Count % BrushViewModel.ColorScheme1.Count;
-                                if (allColorIndex.Any())
-                                    colorIndex = allColorIndex.First();
+                                var colorIndex = GetColorIndex(otherview);
 
                                 var brushViewModel = new BrushViewModel();
                                 brushViewModel.ColorIndex = colorIndex;
@@ -280,6 +274,19 @@ namespace PanoramicDataWin8.controller.view
                     }
                 }
             }
+        }
+
+        public int GetColorIndex(OperationViewModel targetViewModel)
+        {
+            var inputCohorts = BrushViews.Keys.Where(icv => icv.To == targetViewModel).ToList();
+
+            var allColorIndex = Enumerable.Range(0, BrushViewModel.ColorScheme1.Count);
+            allColorIndex = allColorIndex.Except(inputCohorts.Select(c => c.ColorIndex));
+            var colorIndex = inputCohorts.Count % BrushViewModel.ColorScheme1.Count;
+            if (allColorIndex.Any())
+                colorIndex = allColorIndex.First();
+
+            return colorIndex;
         }
 
         private void OperationViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)

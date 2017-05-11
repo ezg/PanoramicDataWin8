@@ -479,7 +479,7 @@ namespace PanoramicDataWin8.view.vis.render
         void highlightPrimitiveCollection(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, Color dark, BinPrimitiveCollection binPrimitiveCollection)
         {
             var bpc = binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex());
-            canvasArgs.DrawingSession.DrawRoundedRectangle(bpc.Rect, _helper.CornerRadius, _helper.CornerRadius, dark, 2.0f);
+            canvasArgs.DrawingSession.DrawRoundedRectangle(bpc.Rect, _helper.CornerRadius, _helper.CornerRadius, dark, _helper.Small ? 1.0f : 2.0f);
 
             if (!_bczBinMapModels.Where((m) => m.SortAxis).Any())
             {
@@ -1072,7 +1072,7 @@ namespace PanoramicDataWin8.view.vis.render
             var mappedXBinIndex = slistXValues[bin.BinIndex.Indices[0]];
             var mappedYBinIndex = slistYValues[bin.BinIndex.Indices[1]];
             var binPrimitiveCollection = new BinPrimitiveCollection();
-            binPrimitiveCollection.FilterModel = GetBinFilterModel(bin, _histogramResult.AllBrushIndex());
+            binPrimitiveCollection.FilterModel = IDEAHelpers.GetBinFilterModel(bin, _histogramResult.AllBrushIndex(), _histogramResult, _xIom, _yIom);
 
             var brushFactorSum = 0.0;
 
@@ -1478,49 +1478,6 @@ namespace PanoramicDataWin8.view.vis.render
             return baseColor;
         }
 
-        public FilterModel GetBinFilterModel(Bin bin, int brushIndex)
-        {
-            AttributeTransformationModel[] dimensions = new AttributeTransformationModel[] {_xIom, _yIom};
-            FilterModel filterModel = new FilterModel();
-
-            var marginAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, new MarginAggregateParameters()
-                {AggregateFunction = _valueIom.AggregateFunction.ToString()}, _histogramResult, _histogramResult.AllBrushIndex());
-            var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
-            valueAggregateKey.BrushIndex = brushIndex;
-            var unNormalizedvalue = ((DoubleValueAggregateResult) bin.GetAggregateResult(valueAggregateKey)).Result;
-
-            if (unNormalizedvalue.HasValue)
-            {
-                filterModel.Value = unNormalizedvalue.Value;
-            }
-            for (int i = 0; i < _histogramResult.BinRanges.Count; i++)
-            {
-                if (!(_histogramResult.BinRanges[i] is AggregateBinRange))
-                {
-                    var dataFrom = _histogramResult.BinRanges[i].GetValueFromIndex(bin.BinIndex.Indices[i]);
-                    var dataTo = _histogramResult.BinRanges[i].AddStep(dataFrom);
-
-                    if (_histogramResult.BinRanges[i] is NominalBinRange)
-                    {
-                        var tt = _histogramResult.BinRanges[i].GetLabel(dataFrom);
-
-                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.EQUALS, tt));
-                    }
-                    else if (_histogramResult.BinRanges[i] is AlphabeticBinRange)
-                    {
-                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.STARTS_WITH,
-                            _histogramResult.BinRanges[i].GetLabel(dataFrom)));
-                    }
-                    else
-                    {
-                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.GREATER_THAN_EQUAL, dataFrom));
-                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.LESS_THAN, dataTo));
-                    }
-                }
-            }
-
-            return filterModel;
-        }
 
         public double DataToScreenX(double x)
         {

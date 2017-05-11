@@ -15,7 +15,6 @@ namespace PanoramicDataWin8.model.data.operation
             GroupAggregateComparisons = "";
         }
         
-        public double? Value { get; set; }
         public List<ValueComparison> ValueComparisons { get; set; }
         public string GroupAggregateComparisons { get; set; }
 

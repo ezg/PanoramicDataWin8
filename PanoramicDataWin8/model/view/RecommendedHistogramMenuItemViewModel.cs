@@ -1,4 +1,5 @@
 ﻿using IDEA_common.operations.recommender;
+using PanoramicDataWin8.model.view.operation;
 
 namespace PanoramicDataWin8.model.view
 {
@@ -18,5 +19,7 @@ namespace PanoramicDataWin8.model.view
             get { return _recommendedHistogram; }
             set { SetProperty(ref _recommendedHistogram, value); }
         }
+
+        public HistogramOperationViewModel HistogramOperationViewModel { get; set; }
     }
 }
