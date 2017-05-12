@@ -24,6 +24,8 @@ namespace PanoramicDataWin8.model.data.operation
         }
 
 
+        public override bool ResetFilterModelWhenInputLinksChange { get { return false; } }
+
         public void AddFilterModels(List<FilterModel> filterModels)
         {
             _filterProviderOperationModelImpl.AddFilterModels(filterModels);

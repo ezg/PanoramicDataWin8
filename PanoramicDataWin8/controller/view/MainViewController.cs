@@ -479,7 +479,8 @@ namespace PanoramicDataWin8.controller.view
                 e is FilterOperationModelUpdatedEventArgs &&
                 ((e as FilterOperationModelUpdatedEventArgs).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.Links))
             {
-                ((IFilterProviderOperationModel) model).ClearFilterModels();
+                if (model.ResetFilterModelWhenInputLinksChange)
+                    ((IFilterProviderOperationModel) model).ClearFilterModels();
             }
 
             if (!(e is FilterOperationModelUpdatedEventArgs) || (e is FilterOperationModelUpdatedEventArgs &&
@@ -501,7 +502,14 @@ namespace PanoramicDataWin8.controller.view
                     var connect = recognizedGesture as ConnectGesture;
                     if (connect.FilterConsumerOperationViewModel == null)
                         connect.CreateConsumer(e.InkStroke.Clone());
-                    FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, connect.FilterConsumerOperationViewModel);
+                    if (connect.FilterProviderOperationViewModel is FilterOperationModel &&
+                        connect.FilterConsumerOperationViewModel is FilterOperationModel)
+                    {
+                        FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterConsumerOperationViewModel,
+                                                                                    connect.FilterProviderOperationViewModel);
+                    } else
+                        FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, 
+                                                                                    connect.FilterConsumerOperationViewModel);
 
                 }
                 else if (recognizedGesture is HitGesture)

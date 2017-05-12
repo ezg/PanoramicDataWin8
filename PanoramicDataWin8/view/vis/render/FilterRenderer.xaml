@@ -54,10 +54,10 @@
                                                     <DiscreteObjectKeyFrame KeyTime="0" Value="0" />
                                                 </ObjectAnimationUsingKeyFrames>
                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentElement">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource highlightBrush}"/>
                                                 </ObjectAnimationUsingKeyFrames>
                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="PlaceholderTextContentPresenter">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource highlightBrush}"/>
                                                 </ObjectAnimationUsingKeyFrames>
                                             </Storyboard>
                                         </VisualState>
@@ -70,10 +70,10 @@
                                                     <DiscreteObjectKeyFrame KeyTime="0" Value="0" />
                                                 </ObjectAnimationUsingKeyFrames>
                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="PlaceholderTextContentPresenter">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource darkBrush}"/>
                                                 </ObjectAnimationUsingKeyFrames>
                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentElement">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource darkBrush}"/>
                                                 </ObjectAnimationUsingKeyFrames>
                                             </Storyboard>
                                         </VisualState>
@@ -86,18 +86,15 @@
                                                     <DiscreteObjectKeyFrame KeyTime="0" Value="0" />
                                                 </ObjectAnimationUsingKeyFrames>
                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="PlaceholderTextContentPresenter">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource darkBrush}"/>
                                                 </ObjectAnimationUsingKeyFrames>
                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentElement">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Gray"/>
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource darkBrush}"/>
                                                 </ObjectAnimationUsingKeyFrames>
                                             </Storyboard>
                                         </VisualState>
                                         <VisualState x:Name="Focused">
                                             <Storyboard>
-                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="PlaceholderTextContentPresenter">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
-                                                </ObjectAnimationUsingKeyFrames>
                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderThickness" Storyboard.TargetName="BorderElement">
                                                     <DiscreteObjectKeyFrame KeyTime="0" Value="0" />
                                                 </ObjectAnimationUsingKeyFrames>
@@ -107,8 +104,11 @@
                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="BorderBrush" Storyboard.TargetName="BorderElement">
                                                     <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
                                                 </ObjectAnimationUsingKeyFrames>
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="PlaceholderTextContentPresenter">
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource darkBrush}"/>
+                                                </ObjectAnimationUsingKeyFrames>
                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="Foreground" Storyboard.TargetName="ContentElement">
-                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="Black"/>
+                                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource darkBrush}"/>
                                                 </ObjectAnimationUsingKeyFrames>
                                                 <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="RequestedTheme" Storyboard.TargetName="ContentElement">
                                                     <DiscreteObjectKeyFrame KeyTime="0" Value="Light"/>
@@ -167,7 +167,7 @@
                 </Grid>
             </Grid>
             <Grid x:Name="TypingPanel" HorizontalAlignment="Stretch">
-                <TextBox  x:Name="ExpressionTextBox" IsEnabled="False" Text="" FontSize="30" TextAlignment="Center" KeyDown="ExpressionTextBox_KeyDown"  PointerExited="ExpressionTextBox_PointerExited"   />
+                <TextBox  x:Name="ExpressionTextBox" IsEnabled="False" Text="" IsSpellCheckEnabled="False" FontSize="30" TextAlignment="Center" KeyDown="ExpressionTextBox_KeyDown"  PointerExited="ExpressionTextBox_PointerExited"   />
             </Grid>
         </Grid>
     </Page>

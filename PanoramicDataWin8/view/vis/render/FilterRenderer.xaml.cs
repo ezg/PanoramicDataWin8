@@ -265,6 +265,19 @@ namespace PanoramicDataWin8.view.vis.render
             return attributeTransformationModel;
         }
 
+        public static string FieldType(string str)
+        {
+            var inputModels = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First()
+                     .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
+            AttributeFieldModel fieldModel = null;
+            foreach (var im in inputModels)
+                if (im.RawName.ToLower().StartsWith(str.ToLower()))
+                    fieldModel = im as AttributeFieldModel;
+            foreach (var im in inputModels)
+                if (im.RawName.ToLower() == str.ToLower())
+                    fieldModel = im as AttributeFieldModel; 
+            return fieldModel != null ? fieldModel.InputDataType : null;
+        }
 
         InkManager AddStrokesToInkManager(InkableScene scene)
         {
@@ -354,7 +367,9 @@ namespace PanoramicDataWin8.view.vis.render
                 case Predicate.LESS_THAN: return "<";
                 case Predicate.LESS_THAN_EQUAL: return "<=";
                 case Predicate.LIKE: return "Like";
-                case Predicate.STARTS_WITH: return "^";
+                case Predicate.STARTS_WITH: return "^=";
+                case Predicate.ENDS_WITH: return "$=";
+                case Predicate.CONTAINS: return "~=";
 
             }
             return "";
@@ -370,7 +385,7 @@ namespace PanoramicDataWin8.view.vis.render
                 case "<=": return Predicate.LESS_THAN_EQUAL;
 
             }
-            return Predicate.STARTS_WITH;
+            return Predicate.EQUALS;
         }
         Predicate ToLvalPredicate(string s)
         {
@@ -383,17 +398,52 @@ namespace PanoramicDataWin8.view.vis.render
                 case ">=": return Predicate.LESS_THAN_EQUAL;
 
             }
+            return Predicate.EQUALS;
+        }
+        Predicate ToStringPredicate(string s)
+        {
+            switch (s)
+            {
+                case "=": return Predicate.EQUALS;
+                case "<": return Predicate.GREATER_THAN;
+                case "<=": return Predicate.GREATER_THAN_EQUAL;
+                case ">": return Predicate.LESS_THAN;
+                case ">=": return Predicate.LESS_THAN_EQUAL;
+                case "^=": return Predicate.STARTS_WITH;
+                case "$=": return Predicate.ENDS_WITH;
+                case "~=": return Predicate.CONTAINS;
+
+            }
             return Predicate.STARTS_WITH;
         }
 
 
-        void AddFilterModel(AttributeTransformationModel attributeTransformationModel, Predicate p, double value)
+        void AddFilterModel(AttributeTransformationModel attributeTransformationModel, Predicate p, string value)
         {
             var filterModel = (this.DataContext as FilterOperationViewModel).FilterOperationModel.FilterModels.LastOrDefault();
             if (filterModel == null)
             {
                 filterModel = new FilterModel();
                 (DataContext as FilterOperationViewModel).FilterOperationModel.AddFilterModel(filterModel);
+            }
+
+            if (attributeTransformationModel != null)
+                OpField.Text = attributeTransformationModel.AttributeModel.DisplayName;
+            
+            Op2Text.Text = ToString(ToRvalPredicate(ToString(p)));
+            if (attributeTransformationModel == null)
+                filterModel = null;
+            else filterModel.ValueComparisons.Add(new ValueComparison(attributeTransformationModel, p, value));
+
+            UpdateFilterDisplay();
+            render();
+        }
+        void AddFilterModel(AttributeTransformationModel attributeTransformationModel, Predicate p, double value)
+        {
+            var filterModel = (this.DataContext as FilterOperationViewModel).FilterOperationModel.FilterModels.LastOrDefault();
+            if (filterModel == null)
+            {
+                filterModel = new FilterModel();
             }
 
             if (attributeTransformationModel != null)
@@ -410,6 +460,8 @@ namespace PanoramicDataWin8.view.vis.render
             if (attributeTransformationModel == null)
                 filterModel = null;
             else filterModel.ValueComparisons.Add(new ValueComparison(attributeTransformationModel, p, value));
+            if (!(DataContext as FilterOperationViewModel).FilterOperationModel.FilterModels.Contains(filterModel))
+                (DataContext as FilterOperationViewModel).FilterOperationModel.AddFilterModel(filterModel);
 
             UpdateFilterDisplay();
             render();
@@ -454,10 +506,18 @@ namespace PanoramicDataWin8.view.vis.render
             (DataContext as FilterOperationViewModel).FilterOperationModel.ClearFilterModels();
             AddFilterModel(validField(field), p, value);
         }
+        public void SetFilter(string field, Predicate p, string value)
+        {
+            Op1Val.Text = Op2Val.Text = "";
+            Op2Val.Text = value;
+
+            (DataContext as FilterOperationViewModel).FilterOperationModel.ClearFilterModels();
+            AddFilterModel(validField(field), p, value);
+        }
 
         string tokenize(ref string accum, char letter)
         {
-            string token = null;
+            var token = "";
             switch (letter)
             {
                 case ' ':
@@ -465,10 +525,13 @@ namespace PanoramicDataWin8.view.vis.render
                     accum = "";
                     return token;
                 case '=':
-                    if (accum.Last() == '<' || accum.Last() == '>') {
+                    if (accum != "" && (accum.Last() == '<' || accum.Last() == '>'))
+                    {
                         token = accum + '=';
                         accum = "";
                     }
+                    else
+                        accum += letter;
                     return token;
                 case '>':
                 case '<':
@@ -495,7 +558,7 @@ namespace PanoramicDataWin8.view.vis.render
                 (DataContext as FilterOperationViewModel).FilterOperationModel.ClearFilterModels();
 
                 var splits = new List<String>();
-                var exprText = ExpressionTextBox.Text.ToLower();
+                var exprText = ExpressionTextBox.Text;
                 string accum = "";
                 for (int i = 0; i < exprText.Length; i++)
                 {
@@ -509,24 +572,29 @@ namespace PanoramicDataWin8.view.vis.render
                 double val = 0;
                 if (splits.Count() > 2)
                 {
-                    if (double.TryParse(splits.First(), out val))
+                    var vfield = FieldType(splits.First());
+                    if (vfield != null && vfield == InputDataTypeConstants.NVARCHAR)
                     {
-                        var p = ToLvalPredicate(splits[1]);
-                        if (p != Predicate.STARTS_WITH)
+                        var p = ToStringPredicate(splits[1]);
+                        AddFilterModel(validField(splits[0]), p, splits[2]);
+                    }
+                    else
+                    {
+                        if (double.TryParse(splits.First(), out val))
                         {
+                            var p = ToLvalPredicate(splits[1]);
                             AddFilterModel(validField(splits[2]), p, val);
                             splits.RemoveAt(0);
                             splits.RemoveAt(0);
                         }
-                    }
-                    if (splits.Count() > 2)
-                    {
-                        var p = ToRvalPredicate(splits[1]);
-                        if (p != Predicate.STARTS_WITH)
+                        if (splits.Count() > 2)
+                        {
+                            var p = ToRvalPredicate(splits[1]);
                             if (double.TryParse(splits[2], out val))
                             {
                                 AddFilterModel(validField(splits[0]), p, val);
                             }
+                        }
                     }
                 }
                 e.Handled = true;

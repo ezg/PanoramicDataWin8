@@ -837,12 +837,15 @@ namespace PanoramicDataWin8.view.vis
         {
             var filterLinkViewModel = DataContext as FilterLinkViewModel;
             var models = new List<FilterLinkModel>();
-            if (scribble.Intersects(_linkViewGeometry.Buffer(3)))
-                models = filterLinkViewModel.FilterLinkModels.ToList();
-            else
-                foreach (var model in _visualizationViewModelGeometries.Keys)
-                    if (_visualizationViewModelGeometries[model].Buffer(3).Intersects(scribble))
-                        models.Add(filterLinkViewModel.FilterLinkModels.First(lm => lm.FromOperationModel == model.OperationModel));
+            if (filterLinkViewModel != null)
+            {
+                if (scribble.Intersects(_linkViewGeometry.Buffer(3)))
+                    models = filterLinkViewModel.FilterLinkModels.ToList();
+                else
+                    foreach (var model in _visualizationViewModelGeometries.Keys)
+                        if (_visualizationViewModelGeometries[model].Buffer(3).Intersects(scribble))
+                            models.Add(filterLinkViewModel.FilterLinkModels.First(lm => lm.FromOperationModel == model.OperationModel));
+            }
             return models;
         }
     }

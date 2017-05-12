@@ -35,6 +35,7 @@ namespace PanoramicDataWin8.model.data.operation
             set { SetProperty(ref _id, value); }
         }
 
+        public virtual bool ResetFilterModelWhenInputLinksChange {  get { return true;  } }
 
         public SchemaModel SchemaModel
         {

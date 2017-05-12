@@ -65,15 +65,21 @@ namespace PanoramicDataWin8.model.data.operation
             var val = Value.ToString();
             if (Value is string)
                 val = "\"" + val + "\"";
-            if (Predicate != Predicate.STARTS_WITH)
+            var ret = " ";
+            switch (Predicate)
             {
-                var ret = " " + AttributeTransformationModel.AttributeModel.RawName + " " + op + " " + val + " ";
-                return ret;
-            }
-            else
-            {
-                var ret = " " + AttributeTransformationModel.AttributeModel.RawName + " != null && " + AttributeTransformationModel.AttributeModel.RawName + ".StartsWith(" + val + ") ";
-                 return ret;
+                case Predicate.STARTS_WITH: 
+                    ret += AttributeTransformationModel.AttributeModel.RawName + " != null && " + AttributeTransformationModel.AttributeModel.RawName + ".StartsWith(" + val + ") ";
+                    return ret;
+                case Predicate.ENDS_WITH:
+                    ret += AttributeTransformationModel.AttributeModel.RawName + " != null && " + AttributeTransformationModel.AttributeModel.RawName + ".EndsWith(" + val + ") ";
+                    return ret;
+                case Predicate.CONTAINS:
+                    ret += AttributeTransformationModel.AttributeModel.RawName + " != null && " + AttributeTransformationModel.AttributeModel.RawName + ".Contains(" + val + ") ";
+                    return ret;
+                default:
+                    ret += AttributeTransformationModel.AttributeModel.RawName + " " + op + " " + val + " ";
+                    return ret;
             }
         }
 
