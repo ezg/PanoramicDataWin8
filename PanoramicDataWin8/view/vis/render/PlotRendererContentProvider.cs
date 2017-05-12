@@ -1247,7 +1247,7 @@ namespace PanoramicDataWin8.view.vis.render
                     DataToScreenY((double) (yValue - yMarginAbsolute)) - DataToScreenY((double) (yValue + yMarginAbsolute)));
 
                 createBinPrimitives(bin, binPrimitiveCollection, brush, estimationRect, marginRect, marginPercentage,
-                    xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue, dataValue.Value);
+                    xFrom, xTo, yFrom, yTo, normalization.Axis == BczNormalization.axis.X ? baseColorFromBrush(brush, 0.8*binBrushMaxAxis/_yScale + 0.2): baseColorFromBrush(brush), unNormalizedvalue, dataValue.Value);
             }
         }
 
@@ -1278,7 +1278,7 @@ namespace PanoramicDataWin8.view.vis.render
                     4.0);
 
                 createBinPrimitives(bin, binPrimitiveCollection, brush, Rect.Empty, marginRect, marginPercentage,
-                    xFrom, xTo, yFrom, yTo, baseColorFromBrush(brush), unNormalizedvalue, dataValue.Value);
+                    xFrom, xTo, yFrom, yTo, normalization.Axis == BczNormalization.axis.Y ? baseColorFromBrush(brush, 0.8 * binBrushMaxAxis / _xScale + 0.2) : baseColorFromBrush(brush), unNormalizedvalue, dataValue.Value);
             }
         }
 
@@ -1474,7 +1474,7 @@ namespace PanoramicDataWin8.view.vis.render
             return normalization;
         }
 
-        Color baseColorFromBrush(Brush brush)
+        Color baseColorFromBrush(Brush brush, double opacity = 1)
         {
             Color baseColor;
             if (brush.BrushIndex == _histogramResult.RestBrushIndex())
@@ -1501,7 +1501,8 @@ namespace PanoramicDataWin8.view.vis.render
                 }
             }
 
-            return baseColor;
+            //return Windows.UI.Color.FromArgb(255, (byte)(opacity * baseColor.R), (byte)(opacity * baseColor.G), (byte)(opacity * baseColor.B));
+            return Windows.UI.Color.FromArgb((byte)(opacity * 255), baseColor.R, baseColor.G, baseColor.B);
         }
 
 
