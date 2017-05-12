@@ -88,7 +88,7 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             if (_model != null)
             {
-                _model.FireCreateRecommendationEvent();
+                _model.FirePagingEvent();
             }
         }
 

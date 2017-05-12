@@ -7,8 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:common="using:PanoramicDataWin8.view.common"
     mc:Ignorable="d"
-    d:DesignHeight="300"
-    d:DesignWidth="400"
+    d:DesignHeight="50"
+    d:DesignWidth="50"
     FontFamily="{StaticResource abel}">
 
     <Grid Width="{Binding Size.X}" Height="{Binding Size.Y}" Background="{StaticResource lightBrush}">

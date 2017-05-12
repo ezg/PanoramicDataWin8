@@ -97,6 +97,11 @@ namespace PanoramicDataWin8.view.vis.menu
                 mainGrid.Children.Clear();
                 mainGrid.Children.Add(new PagingMenuItemView());
             }
+            else if (model.MenuItemComponentViewModel is RecommenderProgressMenuItemViewModel)
+            {
+                mainGrid.Children.Clear();
+                mainGrid.Children.Add(new RecommenderProgressMenuItemView());
+            }
         }
 
 

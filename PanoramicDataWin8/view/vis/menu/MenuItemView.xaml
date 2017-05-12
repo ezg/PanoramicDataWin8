@@ -18,6 +18,6 @@
         </model:MenuItemViewModel>
     </d:DesignProperties.DataContext>
 
-    <Grid Name="mainGrid" Background="{StaticResource lightBrush}">
+    <Grid Name="mainGrid">
     </Grid>
 </UserControl>

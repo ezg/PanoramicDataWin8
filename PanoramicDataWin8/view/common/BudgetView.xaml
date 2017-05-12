@@ -13,9 +13,9 @@
     <Grid Background="{StaticResource lightBrush}">
         <Grid Name="alphaGrid" Visibility="Collapsed">
             <Grid.RowDefinitions>
-                <RowDefinition x:Name="top" Height="*"></RowDefinition>
-                <RowDefinition x:Name="middle" Height="*"></RowDefinition>
-                <RowDefinition x:Name="bottom" Height="*"></RowDefinition>
+                <RowDefinition x:Name="top" Height="0*"></RowDefinition>
+                <RowDefinition x:Name="middle" Height="0*"></RowDefinition>
+                <RowDefinition x:Name="bottom" Height="1*"></RowDefinition>
             </Grid.RowDefinitions>
 
             <Grid Grid.Row="0"></Grid>
@@ -29,7 +29,7 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Center"
                 TextAlignment="Center"
-                Text="70%" FontSize="20" Foreground="{StaticResource darkBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
+                Text="100%" FontSize="20" Foreground="{StaticResource darkBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
         </Grid>
         <Grid Name="defaultGrid" Visibility="Collapsed">
             <TextBlock 

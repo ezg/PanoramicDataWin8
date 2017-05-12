@@ -13,10 +13,12 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using IDEA_common.operations;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.view.inq;
@@ -31,6 +33,7 @@ namespace PanoramicDataWin8.view.vis.menu
         private PointerManager _mainPointerManager = new PointerManager();
         private Point _mainPointerManagerPreviousPoint = new Point();
         private Pt _mainPointerManagerStartPoint = new Point();
+        private RecommenderMenuItemViewModel _model = null;
 
         public RecommenderMenuItemView()
         {
@@ -40,6 +43,7 @@ namespace PanoramicDataWin8.view.vis.menu
             _mainPointerManager.Removed += mainPointerManager_Removed;
             _mainPointerManager.Attach(this);
             Loaded += RecommenderMenuItemView_Loaded;
+            this.DataContextChanged += RecommenderHandleView_DataContextChanged;
         }
 
         private void RecommenderMenuItemView_Loaded(object sender, RoutedEventArgs e)
@@ -48,6 +52,18 @@ namespace PanoramicDataWin8.view.vis.menu
             {
                 DefaultLabel = "rec"
             };
+        }
+
+        private void RecommenderHandleView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        {
+            if (_model != null)
+            {
+                _model = null;
+            }
+            if (args.NewValue != null)
+            {
+                _model = ((MenuItemViewModel)this.DataContext).MenuItemComponentViewModel as RecommenderMenuItemViewModel;
+            }
         }
 
         private void mainPointerManager_Added(object sender, PointerManagerEvent e)

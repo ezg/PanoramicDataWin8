@@ -311,6 +311,9 @@
     <Compile Include="view\vis\menu\MenuView.cs" />
     <Compile Include="view\vis\AttachmentView.cs" />
     <Compile Include="view\vis\FilterLinkView.cs" />
+    <Compile Include="view\vis\menu\RecommenderProgressMenuItemView.xaml.cs">
+      <DependentUpon>RecommenderProgressMenuItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\menu\SliderMenuItemView.xaml.cs">
       <DependentUpon>SliderMenuItemView.xaml</DependentUpon>
     </Compile>
@@ -477,6 +480,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\menu\MenuItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\menu\RecommenderProgressMenuItemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

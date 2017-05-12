@@ -197,7 +197,7 @@ namespace PanoramicDataWin8.model.view.operation
                 MenuViewModel = menuViewModel,
                 Row = 0,
                 ColumnSpan = 1,
-                RowSpan = 4,
+                RowSpan = 1,
                 Column = 0,
                 Size = new Vec(54, 54),
                 Position = histogramOperationViewModel.Position,
@@ -213,15 +213,35 @@ namespace PanoramicDataWin8.model.view.operation
                 if (histogramOperationViewModel.RecommenderOperationViewModel == null)
                 {
                     var rovm = RecommenderViewController.Instance.CreateRecommenderOperationViewModel(histogramOperationViewModel);
+                    menuItem.IsAlwaysDisplayed = true;
+                    var subMenuItem = new MenuItemViewModel
+                    {
+                        MenuViewModel = menuViewModel,
+                        Row = 1,
+                        ColumnSpan = 1,
+                        RowSpan = 3,
+                        Column = 0,
+                        Size = new Vec(54, 54),
+                        Position = histogramOperationViewModel.Position,
+                        TargetSize = new Vec(54, 54),
+                        IsAlwaysDisplayed = true
+                    };
+                    var attr2 = new RecommenderProgressMenuItemViewModel()
+                    {
+                        HistogramOperationViewModel = histogramOperationViewModel
+                    };
+                    subMenuItem.MenuItemComponentViewModel = attr2;
+                    menuViewModel.MenuItemViewModels.Add(subMenuItem);
                 }
             };
+            menuItem.MenuItemComponentViewModel = attr1;
+            menuViewModel.MenuItemViewModels.Add(menuItem);
+            
 
             histogramOperationViewModel.OperationViewModelTapped += (sender, args) =>
             {
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
-            menuItem.MenuItemComponentViewModel = attr1;
-            menuViewModel.MenuItemViewModels.Add(menuItem);
 
             attachmentViewModel.MenuViewModel = menuViewModel;
         }

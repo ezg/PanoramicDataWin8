@@ -16,7 +16,7 @@ namespace PanoramicDataWin8.model.view
 
         public event PagingHandler PagingEvent;
 
-        public void FireCreateRecommendationEvent()
+        public void FirePagingEvent()
         {
             PagingEvent?.Invoke(this, this.PagingDirection);
         }

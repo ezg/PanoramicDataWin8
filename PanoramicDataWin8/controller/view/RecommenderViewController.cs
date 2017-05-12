@@ -77,6 +77,7 @@ namespace PanoramicDataWin8.controller.view
                     {
                         existingModel.Column = col + 1;
                         existingModel.Row = row;
+                        existingModel.MenuXAlign = MenuXAlign.WithColumn;
                         col++;
                         if (col == 3)
                         {
@@ -114,6 +115,7 @@ namespace PanoramicDataWin8.controller.view
 
                         newModel.Column = col + 1;
                         newModel.Row = row;
+                        newModel.MenuXAlign = MenuXAlign.WithColumn;
                         col++;
                         if (col == 3)
                         {
