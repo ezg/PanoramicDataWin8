@@ -17,7 +17,7 @@
                 <Setter Property="MinHeight" Value="{ThemeResource TextControlThemeMinHeight}"/>
                 <Setter Property="Foreground" Value="{Binding FallbackValue=Yellow}"/>
                 <Setter Property="Background" Value="Transparent"/>
-                <Setter Property="SelectionHighlightColor" Value="Blue"/>
+                <Setter Property="SelectionHighlightColor" Value="{StaticResource highlightBrush}"/>
                 <Setter Property="BorderBrush" Value="{Binding FallbackValue=DarkGray}" />
                 <Setter Property="BorderThickness" Value="0,0,0,1"/>
                 <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>

@@ -5,6 +5,7 @@ using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.vis;
 using System;
+using IDEA_common.operations.recommender;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.view.vis.render;
@@ -142,6 +143,7 @@ namespace PanoramicDataWin8.view.inq
             foreach (var im in inputModels)
                 if (im.RawName.ToLower() == field)
                     attributeTransformationModel = new AttributeTransformationModel(im as AttributeFieldModel);
+            
             var filterModel = new FilterModel();
             filterModel.ValueComparisons.Add(new ValueComparison(attributeTransformationModel, pred, value));
             return controller.view.MainViewController.Instance.CreateDefaultFilterOperationViewModel(p, useTypingUI);

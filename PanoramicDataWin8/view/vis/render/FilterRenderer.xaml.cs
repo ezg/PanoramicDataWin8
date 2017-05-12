@@ -34,6 +34,7 @@ using PanoramicDataWin8.model.data.attribute;
 using System.Globalization;
 using Windows.UI;
 using System.Runtime.InteropServices;
+using IDEA_common.operations.recommender;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
