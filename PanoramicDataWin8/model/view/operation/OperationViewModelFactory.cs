@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using Windows.UI.Xaml.Media;
 using IDEA_common.catalog;
@@ -207,6 +208,31 @@ namespace PanoramicDataWin8.model.view.operation
             var attr1 = new RecommenderMenuItemViewModel()
             {
                 AttachmentViewModel = attachmentViewModel
+            };
+            attr1.Exlude.CollectionChanged += (sender, args) =>
+            {
+
+                Debug.WriteLine("---");
+                foreach (var attributeModel in attr1.Include)
+                {
+                    Debug.WriteLine("+ ", attributeModel.DisplayName);
+                }
+                foreach (var attributeModel in attr1.Exlude)
+                {
+                    Debug.WriteLine("- ", attributeModel.DisplayName);
+                }
+            }; attr1.Include.CollectionChanged += (sender, args) =>
+            {
+
+                Debug.WriteLine("---");
+                foreach (var attributeModel in attr1.Include)
+                {
+                    Debug.WriteLine("+ ", attributeModel.DisplayName);
+                }
+                foreach (var attributeModel in attr1.Exlude)
+                {
+                    Debug.WriteLine("- ", attributeModel.DisplayName);
+                }
             };
             attr1.CreateRecommendationEvent += (sender, bounds) =>
             {

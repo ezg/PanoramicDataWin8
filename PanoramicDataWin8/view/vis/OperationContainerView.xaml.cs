@@ -22,6 +22,7 @@ using Windows.UI.Input;
 using IDEA_common.operations;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
@@ -427,6 +428,8 @@ namespace PanoramicDataWin8.view.vis
                 inputModelEventHandler.AttributeTransformationViewModelDropped(sender, e, overElement);
             }
         }
+
+        public AttributeTransformationModel CurrentAttributeTransformationModel { get { return null; } }
 
         public GeoAPI.Geometries.IGeometry BoundsGeometry
         {

@@ -288,5 +288,14 @@ namespace PanoramicDataWin8.view.vis.menu
                 }
             }
         }
+
+        public AttributeTransformationModel CurrentAttributeTransformationModel
+        {
+            get
+            {
+                var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
+                return model?.AttributeTransformationViewModel?.AttributeTransformationModel;
+            }
+        }
     }
 }

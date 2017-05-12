@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using GeoAPI.Geometries;
 using IDEA_common.operations.risk;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data.attribute;
@@ -29,6 +31,10 @@ namespace PanoramicDataWin8.view.vis.menu
 {
     public sealed partial class RecommenderHandleView : UserControl
     {
+        public ObservableCollection<AttributeModel> Include = null;
+        public ObservableCollection<AttributeModel> Exclude = null;
+
+
         private RecommenderHandleViewModel _model = null;
         public RecommenderHandleView()
         {
@@ -87,7 +93,78 @@ namespace PanoramicDataWin8.view.vis.menu
             var y = Math.Min(Math.Max(0, Math.Pow(Math.Abs(diff.Y) / 300.0, 2)), 1.0) * w * Math.Sign(diff.Y) * 100.0;
 
             _model.Percentage = Math.Min(100, Math.Max(1, _model.StartPercentage - y));
-            Debug.WriteLine(_model.Percentage);
+            
+
+            checkHits();
+        }
+
+        public void TerminateInteraction()
+        {
+            checkIncludeExclude();
+        }
+
+        private AttributeModel _current = null;
+        private Stopwatch _stopwatch = new Stopwatch();
+        private void checkHits()
+        {
+            IGeometry mainPageBounds = _model.Bounds.GetPolygon();
+            var hits = new List<AttributeTransformationViewModelEventHandler>();
+            var attTransDescendants = MainViewController.Instance.InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>().ToList();
+            foreach (var element in attTransDescendants)
+            {
+                var geom = element.BoundsGeometry;
+                if ((geom != null) && mainPageBounds.Intersects(geom))
+                {
+                    hits.Add(element);
+                }
+            }
+
+            var firstHit = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - _model.Bounds.Center.GetVec()).LengthSquared).FirstOrDefault();
+            if (firstHit != null)
+            {
+                var attribute = firstHit.CurrentAttributeTransformationModel.AttributeModel;
+                if (_current != attribute)
+                {
+                    _stopwatch = new Stopwatch();
+                    _stopwatch.Start();
+                    _current = attribute;
+                }
+            }
+            else
+            {
+                checkIncludeExclude();
+                _current = null;
+            }
+        }
+
+        private void checkIncludeExclude()
+        {
+            if (_current != null && Exclude != null && Include != null)
+            {
+                if (_stopwatch.ElapsedMilliseconds > 500)
+                {
+                    if (Exclude.Contains(_current))
+                    {
+                        Exclude.Remove(_current);
+                    }
+                    else
+                    {
+                        Exclude.Add(_current);
+                    }
+                }
+                else if (_stopwatch.ElapsedMilliseconds > 100)
+                {
+                    if (Include.Contains(_current))
+                    {
+                        Include.Remove(_current);
+                    }
+                    else
+                    {
+                        Include.Add(_current);
+                    }
+                }
+                _current = null;
+            }
         }
 
         private void updatePercentage()

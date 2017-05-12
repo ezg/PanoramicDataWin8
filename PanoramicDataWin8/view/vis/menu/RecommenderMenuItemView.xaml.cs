@@ -115,6 +115,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 Rct bounds = _shadow.GetBounds(inkableScene);
                 (budgetView.DataContext as BudgetViewModel).BudgetToSpend = 0;
                 (_shadow.DataContext as RecommenderHandleViewModel).PropertyChanged -= ShadowModel_PropertyChanged;
+                _shadow.TerminateInteraction();
                 inkableScene.Remove(_shadow);
                 _shadow = null;
 
@@ -138,7 +139,10 @@ namespace PanoramicDataWin8.view.vis.menu
                 {
                     AttachmentViewModel = model.AttachmentViewModel
                 };
+                _shadow.Exclude = model.Exlude;
+                _shadow.Include = model.Include;
                 _shadow.DataContext = shadowModel;
+
                 shadowModel.PropertyChanged += ShadowModel_PropertyChanged;
                 
                 shadowModel.Size = new Vec(this.ActualWidth, this.ActualHeight);

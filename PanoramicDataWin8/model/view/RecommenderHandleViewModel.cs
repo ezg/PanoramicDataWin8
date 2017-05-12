@@ -43,11 +43,15 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _percentage, value); }
         }
 
-
         public double StartPercentage
         {
             get { return _startPercentage; }
             set { SetProperty(ref _startPercentage, value); }
+        }
+
+        public Rct Bounds
+        {
+            get { return new Rct(Position, Size); }
         }
     }
 }
