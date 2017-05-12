@@ -441,6 +441,10 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 highlightPrimitiveCollection(canvasArgs, dark, binPrimitiveCollection);
             }
+            if (!_bczBinMapModels.Where((m) => m.SortAxis).Any() && highlightedBinPrimitiveCollections.Count > 0)
+            {
+                DrawHighlightAverage(canvasArgs, dark, highlightedBinPrimitiveCollections);
+            }
 
             // render distributions if needed
             if (_includeDistribution)
@@ -480,33 +484,44 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var bpc = binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex());
             canvasArgs.DrawingSession.DrawRoundedRectangle(bpc.Rect, _helper.CornerRadius, _helper.CornerRadius, dark, _helper.Small ? 1.0f : 2.0f);
-
-            if (!_bczBinMapModels.Where((m) => m.SortAxis).Any())
+            if (_helper.ChartType == ChartType.HeatMap)
             {
+                var tc = Color.FromArgb(255, _textColor.R, _textColor.G, _textColor.B);
+                var decimals = Math.IEEERemainder(bpc.DataValue.Value, 1);
+                var dplaces = decimals == 0 ? 0 : bpc.DataValue.Value > 1000 ? 0 : bpc.DataValue.Value > 100 ? 1 : bpc.DataValue.Value > 10 ? 2 : 3;
+                if (bpc.DataValue != 0)
+                    DrawString(canvasArgs, _textFormat, (bpc.Rect.Right + bpc.Rect.Left) / 2, (bpc.Rect.Top + bpc.Rect.Bottom) / 2, bpc.DataValue.Value.ToString("F" + dplaces), tc, false, true,
+                        true);
+            }
+        }
+        void DrawHighlightAverage(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, Color dark, List<BinPrimitiveCollection> highlightedBinPrimitiveCollections)
+        {
+            double avg = 0;
+            double bpcrecttopavg = 0, bpcrectrightavg = 0;
+            var tc = Color.FromArgb(255, _textColor.R, _textColor.G, _textColor.B);
+            foreach (var binPrimitiveCollection in highlightedBinPrimitiveCollections)
+            {
+                var bpc = binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex());
                 if (bpc.DataValue.HasValue)
                 {
-                    var decimals = Math.IEEERemainder(bpc.DataValue.Value, 1);
-                    var dplaces = decimals == 0 ? 0 : bpc.DataValue > 1000 ? 0 : bpc.DataValue > 100 ? 1 : bpc.DataValue > 10 ? 2 : 3;
-                    var tc = Color.FromArgb(255, _textColor.R, _textColor.G, _textColor.B);
-                    if (_helper.ChartType == ChartType.VerticalBar)
-                    {
-                        var labelRect = new Rect(_helper.DataToScreenX(_helper.DataMinX) - 50, bpc.Rect.Top - 7.5, 40, 15);
-                        canvasArgs.DrawingSession.FillRoundedRectangle(labelRect, _helper.CornerRadius, _helper.CornerRadius, Color.FromArgb(255, 175, 175, 175));
-                        DrawString(canvasArgs, _textFormat, _helper.DataToScreenX(_helper.DataMinX) - 10, bpc.Rect.Top, bpc.DataValue.Value.ToString("F" + dplaces), tc, false, false, true);
-                    }
-                    if (_helper.ChartType == ChartType.HorizontalBar)
-                    {
-                        var labelRect = new Rect(bpc.Rect.Right - 20, _helper.DataToScreenY(_helper.DataMinY) + 20, 40, 15);
-                        canvasArgs.DrawingSession.FillRoundedRectangle(labelRect, _helper.CornerRadius, _helper.CornerRadius, Color.FromArgb(255, 175, 175, 175));
-                        DrawString(canvasArgs, _textFormat, bpc.Rect.Right, _helper.DataToScreenY(_helper.DataMinY) + 20, bpc.DataValue.Value.ToString("F" + dplaces), tc, true, true, false);
-                    }
-                    if (_helper.ChartType == ChartType.HeatMap)
-                    {
-                        if (bpc.DataValue != 0)
-                            DrawString(canvasArgs, _textFormat, (bpc.Rect.Right + bpc.Rect.Left) / 2, (bpc.Rect.Top + bpc.Rect.Bottom) / 2, bpc.DataValue.Value.ToString("F" + dplaces), tc, false, true,
-                                true);
-                    }
+                    avg += bpc.DataValue.Value / highlightedBinPrimitiveCollections.Count;
+                    bpcrecttopavg += bpc.Rect.Top / highlightedBinPrimitiveCollections.Count;
+                    bpcrectrightavg += bpc.Rect.Right / highlightedBinPrimitiveCollections.Count;
                 }
+            }
+            var decimals = Math.IEEERemainder(avg, 1);
+            var dplaces = decimals == 0 ? 0 : avg > 1000 ? 0 : avg > 100 ? 1 : avg > 10 ? 2 : 3;
+            if (_helper.ChartType == ChartType.VerticalBar)
+            {
+                var labelRect = new Rect(_helper.DataToScreenX(_helper.DataMinX) - 50, bpcrecttopavg - 7.5, 40, 15);
+                canvasArgs.DrawingSession.FillRoundedRectangle(labelRect, _helper.CornerRadius, _helper.CornerRadius, Color.FromArgb(255, 175, 175, 175));
+                DrawString(canvasArgs, _textFormat, _helper.DataToScreenX(_helper.DataMinX) - 10, bpcrecttopavg, avg.ToString("F" + dplaces), tc, false, false, true);
+            }
+            if (_helper.ChartType == ChartType.HorizontalBar)
+            {
+                var labelRect = new Rect(bpcrectrightavg - 20, _helper.DataToScreenY(_helper.DataMinY) + 20, 40, 15);
+                canvasArgs.DrawingSession.FillRoundedRectangle(labelRect, _helper.CornerRadius, _helper.CornerRadius, Color.FromArgb(255, 175, 175, 175));
+                DrawString(canvasArgs, _textFormat, bpcrectrightavg, _helper.DataToScreenY(_helper.DataMinY) + 20, avg.ToString("F" + dplaces), tc, true, true, false);
             }
         }
 

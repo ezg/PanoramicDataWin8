@@ -269,7 +269,7 @@ namespace PanoramicDataWin8.view.vis
             }
             _fingerDown = false;
 
-            if (isRightMouse)
+            if (isRightMouse && !_movingStarted)
             {
                 MainViewController.Instance.RemoveOperationViewModel(this);
             }
@@ -311,6 +311,7 @@ namespace PanoramicDataWin8.view.vis
 
         void OperationContainerView_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
+            var canRemove = !_movingStarted;
             OperationViewModel model = (DataContext as OperationViewModel);
             if (_movingStarted)
             {
@@ -341,7 +342,7 @@ namespace PanoramicDataWin8.view.vis
                 //avm.IsDisplayed = false;
             }
 
-            if (e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+            if (canRemove && e.Pointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
             {
                 var properties = e.GetCurrentPoint(this).Properties;
                 if (properties.PointerUpdateKind == PointerUpdateKind.RightButtonReleased)
