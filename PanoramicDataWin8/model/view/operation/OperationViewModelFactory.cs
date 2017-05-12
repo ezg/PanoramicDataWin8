@@ -37,6 +37,17 @@ namespace PanoramicDataWin8.model.view.operation
                 newHistogramOperationViewModel.Size = operationViewModel.Size;
                 return newHistogramOperationViewModel;
             }
+            if (operationViewModel is FilterOperationViewModel)
+            {
+                var oldOperationViewModel = (FilterOperationViewModel)operationViewModel;
+                var oldOperationModel = (FilterOperationModel)oldOperationViewModel.OperationModel;
+
+                var newFilterOperationViewModel = CreateDefaultFilterOperationViewModel(operationViewModel.OperationModel.SchemaModel,
+                    operationViewModel.Position, controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse);
+                var newOperationModel = (FilterOperationModel)newFilterOperationViewModel.OperationModel;
+                
+                return newFilterOperationViewModel;
+            }
             return null;
         }
 
@@ -678,10 +689,10 @@ namespace PanoramicDataWin8.model.view.operation
             return exampleOperationViewModel;
         }
 
-        public static FilterOperationViewModel CreateDefaultFilterOperationViewModel(SchemaModel schemaModel, Pt position)
+        public static FilterOperationViewModel CreateDefaultFilterOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse)
         {
             var filterOperationModel = new FilterOperationModel(schemaModel);
-            var filterOperationViewModel = new FilterOperationViewModel(filterOperationModel);
+            var filterOperationViewModel = new FilterOperationViewModel(filterOperationModel, fromMouse);
             filterOperationViewModel.Position = position;
             addAttachmentViewModels(filterOperationViewModel);
             //createBottomExampleMenu(exampleOperationViewModel);

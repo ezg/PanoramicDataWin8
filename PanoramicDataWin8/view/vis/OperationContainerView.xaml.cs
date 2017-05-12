@@ -45,6 +45,8 @@ namespace PanoramicDataWin8.view.vis
 
         private Renderer _renderer = null;
 
+        public Renderer Renderer { get { return _renderer; } }
+
         public OperationContainerView()
         {
             this.InitializeComponent();
@@ -371,7 +373,7 @@ namespace PanoramicDataWin8.view.vis
 
                 Vec delta = _resizePointerManagerPreviousPoint.GetVec() - currentPoint.GetVec();
                 OperationViewModel model = (DataContext as OperationViewModel);
-                model.Size = new Vec(Math.Max(model.Size.X - delta.X, OperationViewModel.MIN_WIDTH), Math.Max(model.Size.Y - delta.Y, OperationViewModel.MIN_HEIGHT));
+                model.Size = new Vec(Math.Max(model.Size.X - delta.X, _renderer.MinWidth), Math.Max(model.Size.Y - delta.Y, _renderer.MinHeight));
                 _resizePointerManagerPreviousPoint = currentPoint;
             }
         }

@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.UI.Xaml.Controls;
+using PanoramicDataWin8.model.view.operation;
+
 
 namespace PanoramicDataWin8.view.vis.render
 {
@@ -16,6 +18,11 @@ namespace PanoramicDataWin8.view.vis.render
         public virtual bool EndSelection()
         {
             return false;
+        }
+        public Renderer()
+        {
+            MinWidth  = OperationViewModel.MIN_WIDTH;
+            MinHeight = OperationViewModel.MIN_HEIGHT;
         }
     }
 }

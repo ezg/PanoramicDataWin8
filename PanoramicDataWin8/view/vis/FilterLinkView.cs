@@ -163,39 +163,38 @@ namespace PanoramicDataWin8.view.vis
         }
 
 
-        private Dictionary<HistogramOperationViewModel, IDisposable> _fromDisposables = new Dictionary<HistogramOperationViewModel, IDisposable>();
+        private Dictionary<OperationViewModel, IDisposable> _fromDisposables = new Dictionary<OperationViewModel, IDisposable>();
         private async void FromVisualizationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            HistogramOperationViewModel hm = null;
             if (e.OldItems != null)
             {
                 foreach (var item in e.OldItems)
                 {
-                    hm = (HistogramOperationViewModel) item;
-                    if (_fromDisposables.ContainsKey(hm))
+                    OperationViewModel om = (OperationViewModel) item;
+                    if (_fromDisposables.ContainsKey(om))
                     {
-                        _fromDisposables[hm].Dispose();
-                        _fromDisposables.Remove(hm);
+                        _fromDisposables[om].Dispose();
+                        _fromDisposables.Remove(om);
                     }
                 }
             }
             if (e.NewItems != null)
             {
                 foreach (var item in e.NewItems)
-                {
-                    hm = (HistogramOperationViewModel)item;
-                    IDisposable disposable = Observable.FromEventPattern<PropertyChangedEventArgs>(hm, "PropertyChanged")
-                        .Sample(TimeSpan.FromMilliseconds(25))
-                        .Subscribe(async arg =>
-                        {
-                            var dispatcher = this.Dispatcher;
-                            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                    if (item is OperationViewModel) { // bcz : check if it's any operationModel
+                        var om = (OperationViewModel)item;
+                        IDisposable disposable = Observable.FromEventPattern<PropertyChangedEventArgs>(om, "PropertyChanged")
+                            .Sample(TimeSpan.FromMilliseconds(25))
+                            .Subscribe(async arg =>
                             {
-                                updateRendering();
+                                var dispatcher = this.Dispatcher;
+                                await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+                                {
+                                    updateRendering();
+                                });
                             });
-                        });
-                    _fromDisposables.Add(hm, disposable);
-                }
+                        _fromDisposables.Add(om, disposable);
+                    } 
             }
             updateRendering();
         }

@@ -5,6 +5,10 @@ using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.vis;
 using System;
+using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.view.vis.render;
+using PanoramicDataWin8.controller.view;
 
 namespace PanoramicDataWin8.view.inq
 {
@@ -37,7 +41,7 @@ namespace PanoramicDataWin8.view.inq
                 _filterProviderOperationViewModel = null;
                 _filterConsumerOperationViewModel = null;
 
-
+                
                 foreach (OperationContainerView view in _inkableScene.Elements.Where(e => e is OperationContainerView))
                 {
                     var operationModel = ((OperationViewModel) view.DataContext).OperationModel;
@@ -57,7 +61,7 @@ namespace PanoramicDataWin8.view.inq
                     }
                 }
 
-                if (_filterProviderOperationViewModel != null && (inkStroke.IsPause || _filterConsumerOperationViewModel != null) && _filterProviderOperationViewModel is IFilterConsumerOperationModel)
+                if (_filterProviderOperationViewModel != null && (inkStroke.IsPause || _filterConsumerOperationViewModel != null)) // && _filterProviderOperationViewModel is IFilterConsumerOperationModel)
                 {
                     return true;
                 }
@@ -80,5 +84,67 @@ namespace PanoramicDataWin8.view.inq
             }
             return null;
         }
+    }
+    public class FilterGesture : IGesture
+    {
+        private InkableScene _inkableScene = null;
+
+        public FilterGesture(InkableScene inkableScene)
+        {
+            this._inkableScene = inkableScene;
+        }
+
+        
+
+        public bool Recognize(InkStroke inkStroke)
+        {
+            if (!inkStroke.IsErase)
+            {
+
+                foreach (var operationViewModel in controller.view.MainViewController.Instance.OperationViewModels)
+                {
+                    foreach (var attachmentViewModel in operationViewModel.AttachementViewModels)
+                    {
+                        if (attachmentViewModel.MenuViewModel != null)
+                            foreach (var menuItemViewModel in attachmentViewModel.MenuViewModel.MenuItemViewModels)
+                            {
+                                if (menuItemViewModel.MenuItemComponentViewModel is AttributeTransformationMenuItemViewModel &&
+                                    new Rct(menuItemViewModel.Position, menuItemViewModel.Size).Contains(inkStroke.Points[0]))
+                                {
+                                    var attr = (menuItemViewModel.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).AttributeTransformationViewModel.AttributeTransformationModel;
+                                    var name = attr.AttributeModel.RawName;
+                                    var filterOperationViewModel = AddFilterModel(name, Predicate.GREATER_THAN, 0, inkStroke.Points.Last(), controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse);
+                                    var width = OperationViewModel.WIDTH;
+                                    var height = controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse ? 50 : OperationViewModel.HEIGHT;
+                                    var size = new Vec(width, height);
+                                    var operationContainerView = new OperationContainerView();
+                                    filterOperationViewModel.Size = size;
+                                    operationContainerView.DataContext = filterOperationViewModel;
+                                    controller.view.MainViewController.Instance.InkableScene.Add(operationContainerView);
+                                    (operationContainerView.Renderer as FilterRenderer).SetFilter(name, Predicate.LESS_THAN, 0);
+                                    FilterLinkViewController.Instance.CreateFilterLinkViewModel(filterOperationViewModel.OperationModel,
+                                        (OperationModel)operationViewModel.OperationModel);
+
+                                    return true;
+                                }
+                            }
+                    }
+                }
+            }
+            return false;
+        }
+        private FilterOperationViewModel AddFilterModel(string field, Predicate pred, double value, Pt p, bool useTypingUI)
+        {
+            var schemaModel = (controller.view.MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel;
+            var inputModels = schemaModel.OriginModels.First().InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
+            var attributeTransformationModel = new AttributeTransformationModel(inputModels.First() as AttributeFieldModel);
+            foreach (var im in inputModels)
+                if (im.RawName.ToLower() == field)
+                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeFieldModel);
+            var filterModel = new FilterModel();
+            filterModel.ValueComparisons.Add(new ValueComparison(attributeTransformationModel, pred, value));
+            return controller.view.MainViewController.Instance.CreateDefaultFilterOperationViewModel(p, useTypingUI);
+        }
+        
     }
 }

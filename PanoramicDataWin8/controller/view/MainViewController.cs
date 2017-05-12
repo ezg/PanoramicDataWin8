@@ -60,6 +60,7 @@ namespace PanoramicDataWin8.controller.view
             InkableScene.InkCollectedEvent += InkableSceneInkCollectedEvent;
             OperationViewModels.CollectionChanged += OperationViewViewModels_CollectionChanged;
 
+            _gesturizer.AddGesture(new FilterGesture(InkableScene));
             _gesturizer.AddGesture(new ConnectGesture(InkableScene));
             _gesturizer.AddGesture(new EraseGesture(InkableScene));
             //_gesturizer.AddGesture(new ScribbleGesture(_root));
@@ -203,9 +204,9 @@ namespace PanoramicDataWin8.controller.view
             return visModel;
         }
 
-        public FilterOperationViewModel CreateDefaultFilterOperationViewModel(Pt position)
+        public FilterOperationViewModel CreateDefaultFilterOperationViewModel(Pt position, bool fromMouse)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultFilterOperationViewModel(MainModel.SchemaModel, position);
+            var visModel = OperationViewModelFactory.CreateDefaultFilterOperationViewModel(MainModel.SchemaModel, position, fromMouse);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -263,10 +264,18 @@ namespace PanoramicDataWin8.controller.view
             }
             if (operationViewModel.OperationModel is IFilterConsumerOperationModel)
             {
-                foreach (var model in ((IFilterConsumerOperationModel) operationViewModel.OperationModel).LinkModels.ToArray())
+                foreach (var model in ((IFilterConsumerOperationModel) operationViewModel.OperationModel).ConsumerLinkModels.ToArray())
                 {
-                    ((IFilterConsumerOperationModel) model.FromOperationModel).LinkModels.Remove(model);
-                    model.ToOperationModel.LinkModels.Remove(model);
+                    ((IFilterConsumerOperationModel) model.FromOperationModel).ConsumerLinkModels.Remove(model);
+                    ((IFilterConsumerOperationModel) model.ToOperationModel).ConsumerLinkModels.Remove(model);
+                }
+            }
+            if (operationViewModel.OperationModel is IFilterProviderOperationModel)
+            {
+                foreach (var model in ((IFilterProviderOperationModel)operationViewModel.OperationModel).ProviderLinkModels.ToArray())
+                {
+                    ((IFilterProviderOperationModel)model.FromOperationModel).ProviderLinkModels.Remove(model);
+                    ((IFilterProviderOperationModel)model.ToOperationModel).ProviderLinkModels.Remove(model);
                 }
             }
         }
@@ -295,7 +304,9 @@ namespace PanoramicDataWin8.controller.view
             }
             else if (operationTypeModel.OperationType == OperationType.Filter)
             {
-                operationViewModel = CreateDefaultFilterOperationViewModel(position);
+                operationViewModel = CreateDefaultFilterOperationViewModel(position, controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse);
+                height = controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse ? 50 : height;
+                size = new Vec(width, height);
             }
 
             if (operationViewModel != null)
@@ -436,9 +447,16 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var item in e.OldItems)
                 {
                     ((OperationViewModel) item).OperationModel.OperationModelUpdated -= OperationModel_OperationModelUpdated;
-                    if (((OperationViewModel) item).OperationModel is IFilterConsumerOperationModel)
+                    if (((OperationViewModel) item).OperationModel is IFilterProviderOperationModel)
                     {
-                        foreach (var link in ((IFilterConsumerOperationModel) ((OperationViewModel) item).OperationModel).LinkModels.ToArray())
+                        foreach (var link in ((IFilterProviderOperationModel) ((OperationViewModel) item).OperationModel).ProviderLinkModels.ToArray())
+                        {
+                            FilterLinkViewController.Instance.RemoveFilterLinkViewModel(link);
+                        }
+                    }
+                    if (((OperationViewModel)item).OperationModel is IFilterConsumerOperationModel)
+                    {
+                        foreach (var link in ((IFilterConsumerOperationModel)((OperationViewModel)item).OperationModel).ConsumerLinkModels.ToArray())
                         {
                             FilterLinkViewController.Instance.RemoveFilterLinkViewModel(link);
                         }

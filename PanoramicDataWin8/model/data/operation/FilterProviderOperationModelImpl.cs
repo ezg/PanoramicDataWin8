@@ -4,12 +4,14 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using IDEA_common.operations;
 using PanoramicDataWin8.utils;
+using System.Collections.Specialized;
 
 namespace PanoramicDataWin8.model.data.operation
 {
     public class FilterProviderOperationModelImpl : ExtendedBindableBase, IFilterProviderOperationModel
     {
         private readonly IOperationModel _host;
+        private ObservableCollection<FilterLinkModel> _linkProviderModels = new ObservableCollection<FilterLinkModel>();
 
         public FilterProviderOperationModelImpl(IOperationModel host)
         {
@@ -17,12 +19,20 @@ namespace PanoramicDataWin8.model.data.operation
         }
 
         public ObservableCollection<FilterModel> FilterModels { get; } = new ObservableCollection<FilterModel>();
+        public ObservableCollection<FilterLinkModel> ProviderLinkModels
+        {
+            get { return _linkProviderModels; }
+            set { SetProperty(ref _linkProviderModels, value); }
+        }
 
         public void ClearFilterModels()
         {
-            foreach (var filterModel in FilterModels.ToArray())
-                FilterModels.Remove(filterModel);
-            fireFilterOperationModelUpdated(FilterOperationModelUpdatedEventType.ClearFilterModels);
+            if (FilterModels.Count > 0)
+            {
+                foreach (var filterModel in FilterModels.ToArray())
+                    FilterModels.Remove(filterModel);
+                fireFilterOperationModelUpdated(FilterOperationModelUpdatedEventType.ClearFilterModels);
+            }
         }
 
 

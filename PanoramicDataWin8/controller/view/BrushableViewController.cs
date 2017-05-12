@@ -164,7 +164,7 @@ namespace PanoramicDataWin8.controller.view
         {            
             if (!chain.Contains(current) && current is IFilterConsumerOperationModel)
             {
-                var links = ((IFilterConsumerOperationModel) current).LinkModels;
+                var links = ((IFilterConsumerOperationModel) current).ConsumerLinkModels;
                 foreach (var link in links)
                 {
                     chain.Add(link.ToOperationModel);

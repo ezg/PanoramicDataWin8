@@ -17,7 +17,7 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             var stream = Observable.FromEventPattern<ExecuteOperationModelEventArgs>(this, "ExecuteQueryEvent");
             stream.GroupByUntil(k => k.EventArgs.OperationModel, g => Observable.Timer(TimeSpan.FromMilliseconds(50)))
-                .SelectMany(y => y.FirstAsync())
+                .SelectMany(y => y.LastAsync())
                 .Subscribe(async arg =>
                 {
                     var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;

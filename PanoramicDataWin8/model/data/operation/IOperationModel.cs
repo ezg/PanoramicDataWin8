@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using IDEA_common.operations;
+using System.Collections.ObjectModel;
 
 namespace PanoramicDataWin8.model.data.operation
 {

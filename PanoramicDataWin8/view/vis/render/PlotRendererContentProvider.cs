@@ -1134,10 +1134,14 @@ namespace PanoramicDataWin8.view.vis.render
             Rect marginRect = Rect.Empty;
             double marginPercentage = 0.0;
             var xValue = ((DoubleValueAggregateResult)bin.GetAggregateResult(xAggregateKey)).Result;
+            if (xValue == null)
+                return;
             var xFrom = DataToScreenX((double)xValue) - 5;
             var xTo = DataToScreenX((double)xValue) + 5;
 
             var yValue = ((DoubleValueAggregateResult)bin.GetAggregateResult(yAggregateKey)).Result;
+            if (yValue == null)
+                return;
             var yFrom = DataToScreenY((double)yValue) + 5;
             var yTo = DataToScreenY((double)yValue);
 

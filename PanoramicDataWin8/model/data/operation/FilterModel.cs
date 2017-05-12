@@ -95,7 +95,7 @@ namespace PanoramicDataWin8.model.data.operation
             {
                 var filterConsumer = ((IFilterConsumerOperationModel) filterGraphNode);
                 var children = new List<string>();
-                foreach (var linkModel in filterConsumer.LinkModels)
+                foreach (var linkModel in filterConsumer.ConsumerLinkModels)
                 {
                     if (linkModel.FromOperationModel != null && !visitedFilterProviders.Contains(linkModel.FromOperationModel))
                     {

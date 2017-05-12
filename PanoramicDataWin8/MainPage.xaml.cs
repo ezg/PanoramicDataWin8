@@ -207,8 +207,8 @@ namespace PanoramicDataWin8
                     var lm = new FilterLinkModel();
                     lm.FromOperationModel = q1;
                     lm.ToOperationModel = q2;
-                    q1.LinkModels.Add(lm);
-                    q2.LinkModels.Add(lm);
+                    q1.ConsumerLinkModels.Add(lm);
+                    q2.ConsumerLinkModels.Add(lm);
 
                     var tt = q1.Clone();
                 }
@@ -297,9 +297,10 @@ namespace PanoramicDataWin8
             AddHandler(PointerReleasedEvent, new PointerEventHandler(InkableScene_PointerReleased), true);
             AddHandler(PointerMovedEvent, new PointerEventHandler(InkableScene_PointerMoved), true);
         }
-
+        public bool LastTouchWasMouse = false;
         private void InkableScene_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+            LastTouchWasMouse = e.Pointer.PointerDeviceType == PointerDeviceType.Mouse;
             if (MainViewController.Instance.MainModel.RenderFingersAndPen)
             {
                 FrameworkElement cnv = null;

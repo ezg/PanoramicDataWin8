@@ -44,11 +44,13 @@ namespace PanoramicDataWin8.controller.view
                 };
                 if (isLinkAllowed(filterLinkModel))
                 {
-                    if (!((IFilterConsumerOperationModel) filterLinkModel.FromOperationModel).LinkModels.Contains(filterLinkModel) &&
-                        !filterLinkModel.ToOperationModel.LinkModels.Contains(filterLinkModel))
+                    if (!filterLinkModel.FromOperationModel.ProviderLinkModels.Contains(filterLinkModel))
                     {
-                        ((IFilterConsumerOperationModel) filterLinkModel.FromOperationModel).LinkModels.Add(filterLinkModel);
-                        filterLinkModel.ToOperationModel.LinkModels.Add(filterLinkModel);
+                        filterLinkModel.FromOperationModel.ProviderLinkModels.Add(filterLinkModel);
+                    }
+                    if (!filterLinkModel.ToOperationModel.ConsumerLinkModels.Contains(filterLinkModel))
+                    {
+                        filterLinkModel.ToOperationModel.ConsumerLinkModels.Add(filterLinkModel);
                     }
                     return filterLinkModel;
                 }
@@ -62,7 +64,7 @@ namespace PanoramicDataWin8.controller.view
             var areLinked = false;
             if (current.OperationModel is IFilterConsumerOperationModel && other.OperationModel is IFilterConsumerOperationModel)
             {
-                foreach (var linkModel in (current.OperationModel as IFilterConsumerOperationModel).LinkModels)
+                foreach (var linkModel in (current.OperationModel as IFilterConsumerOperationModel).ConsumerLinkModels)
                 {
                     if (((linkModel.FromOperationModel == current.OperationModel) && (linkModel.ToOperationModel == other.OperationModel)) ||
                         ((linkModel.FromOperationModel == other.OperationModel) && (linkModel.ToOperationModel == current.OperationModel)))
@@ -134,7 +136,9 @@ namespace PanoramicDataWin8.controller.view
 
         private bool isLinkAllowed(FilterLinkModel filterLinkModel)
         {
-            var linkModels = ((IFilterConsumerOperationModel) filterLinkModel.FromOperationModel).LinkModels.Where(lm => lm.FromOperationModel == filterLinkModel.FromOperationModel).ToList();
+            if (!(filterLinkModel.FromOperationModel is IFilterConsumerOperationModel)) // bcz: if source is a filter not a histogram then we can add it
+                return true;
+            var linkModels = ((IFilterConsumerOperationModel)filterLinkModel.FromOperationModel).ConsumerLinkModels.Where(lm => lm.FromOperationModel == filterLinkModel.FromOperationModel).ToList();
             linkModels.Add(filterLinkModel);
             var chain = new HashSet<IFilterConsumerOperationModel>();
             recursiveCheckForCiruclarLinking(linkModels, chain);
@@ -142,15 +146,17 @@ namespace PanoramicDataWin8.controller.view
             if (chain.Contains(filterLinkModel.FromOperationModel as IFilterConsumerOperationModel))
                 return false;
 
-            var brushModels = ((IBrushableOperationModel)filterLinkModel.FromOperationModel).BrushOperationModels.ToList();
-            foreach (var brushableOperationModel in brushModels)
-            {
-                foreach (var linkModel in linkModels)
+            if (filterLinkModel.FromOperationModel is IBrushableOperationModel) {
+                var brushModels = ((IBrushableOperationModel)filterLinkModel.FromOperationModel).BrushOperationModels.ToList();
+                foreach (var brushableOperationModel in brushModels)
                 {
-                    if (brushableOperationModel == linkModel.ToOperationModel)
+                    foreach (var linkModel in linkModels)
                     {
-                        BrushableViewController.Instance.Remove(brushableOperationModel);
-                        return true;
+                        if (brushableOperationModel == linkModel.ToOperationModel)
+                        {
+                            BrushableViewController.Instance.Remove(brushableOperationModel);
+                            return true;
+                        }
                     }
                 }
             }
@@ -162,15 +168,16 @@ namespace PanoramicDataWin8.controller.view
             foreach (var link in links)
             {
                 chain.Add(link.ToOperationModel);
-                recursiveCheckForCiruclarLinking(link.ToOperationModel.LinkModels.Where(lm => lm.FromOperationModel == link.ToOperationModel).ToList(), chain);
+                recursiveCheckForCiruclarLinking(link.ToOperationModel.ConsumerLinkModels.Where(lm => lm.FromOperationModel == link.ToOperationModel).ToList(), chain);
             }
         }
 
 
         public void RemoveFilterLinkViewModel(FilterLinkModel filterLinkModel)
         {
-            (filterLinkModel.FromOperationModel as IFilterConsumerOperationModel).LinkModels.Remove(filterLinkModel);
-            filterLinkModel.ToOperationModel.LinkModels.Remove(filterLinkModel);
+            if (filterLinkModel is IFilterConsumerOperationModel)  // bcz: if FromOperationModel is a consumer, then remove this from it.
+                (filterLinkModel.FromOperationModel as IFilterConsumerOperationModel).ConsumerLinkModels.Remove(filterLinkModel);
+            filterLinkModel.ToOperationModel.ConsumerLinkModels.Remove(filterLinkModel);
             foreach (var linkViewModel in FilterLinkViewModels.ToArray())
             {
                 if (linkViewModel.FilterLinkModels.Contains(filterLinkModel))

@@ -27,6 +27,7 @@
                     <MatrixTransform Matrix="1 0 0 1 -25000 -25000"/>
                 </inq:InkableScene.RenderTransform>
             </inq:InkableScene>
+            <TextBox x:Name="FocusSink" x:FieldModifier="public" Visibility="Collapsed" Width="1" Height="1"></TextBox>
         </Canvas>
         <Grid Name="menuGrid" Width="100" HorizontalAlignment="Left" Margin="60,0,0,0" Visibility="Visible">
             <Canvas Name="menuCanvas">

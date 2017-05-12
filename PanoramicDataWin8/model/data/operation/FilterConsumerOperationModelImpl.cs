@@ -25,7 +25,7 @@ namespace PanoramicDataWin8.model.data.operation
             set { SetProperty(ref _filteringOperation, value); }
         }
         public int ExecutionId { get; set; } = 0;
-        public ObservableCollection<FilterLinkModel> LinkModels
+        public ObservableCollection<FilterLinkModel> ConsumerLinkModels
         {
             get { return _linkModels; }
             set { SetProperty(ref _linkModels, value); }

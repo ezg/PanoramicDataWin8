@@ -11,5 +11,6 @@ namespace PanoramicDataWin8.model.data.operation
         void RemoveFilterModel(FilterModel filterModel);
         void RemoveFilterModels(List<FilterModel> filterModels);
         void ClearFilterModels();
+        ObservableCollection<FilterLinkModel> ProviderLinkModels { get; }
     }
 }

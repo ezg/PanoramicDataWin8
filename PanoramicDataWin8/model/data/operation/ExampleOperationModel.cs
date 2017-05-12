@@ -46,10 +46,10 @@ namespace PanoramicDataWin8.model.data.operation
             set { _filterConsumerOperationModelImpl.FilteringOperation = value; }
         }
 
-        public ObservableCollection<FilterLinkModel> LinkModels
+        public ObservableCollection<FilterLinkModel> ConsumerLinkModels
         {
-            get { return _filterConsumerOperationModelImpl.LinkModels; }
-            set { _filterConsumerOperationModelImpl.LinkModels = value; }
+            get { return _filterConsumerOperationModelImpl.ConsumerLinkModels; }
+            set { _filterConsumerOperationModelImpl.ConsumerLinkModels = value; }
         }
 
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

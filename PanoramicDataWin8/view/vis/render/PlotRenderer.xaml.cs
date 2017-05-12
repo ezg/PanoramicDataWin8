@@ -42,16 +42,17 @@ namespace PanoramicDataWin8.view.vis.render
         {
             this.InitializeComponent();
 
+            _plotRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
+            _plotRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
+            dxSurface.ContentProvider = _plotRendererContentProvider;
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
         }
 
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
-         
             _plotRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
             _plotRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
-            dxSurface.ContentProvider = _plotRendererContentProvider;
         }
 
         public override void Dispose()
