@@ -1476,7 +1476,14 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else
             {
-                baseColor = _brushColors[brush.BrushIndex % _brushColors.Count];
+                if (_brushColors.Any())
+                {
+                    baseColor = _brushColors[brush.BrushIndex % _brushColors.Count];
+                }
+                else
+                {
+                    baseColor = Windows.UI.Color.FromArgb(255, 40, 170, 213);
+                }
             }
 
             return baseColor;

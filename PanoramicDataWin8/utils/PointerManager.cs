@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.utils
             return _numActiveContacts;
         }
 
-        public void Attach(FrameworkElement frameworkElement)
+        public void Attach(FrameworkElement frameworkElement, bool handledEventsToo = false)
         {
             _frameworkElement = frameworkElement;
             _numActiveContacts = 0;
@@ -43,20 +43,32 @@ namespace PanoramicDataWin8.utils
             _startContacts = new Dictionary<uint, PointerPoint>((int)_supportedContacts.Contacts);
             _currentPointers = new List<Pointer>((int)_supportedContacts.Contacts);
 
-            _frameworkElement.PointerPressed += new PointerEventHandler(frameworkElement_PointerPressed);
+            _frameworkElement.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(frameworkElement_PointerPressed), handledEventsToo);
+            _frameworkElement.AddHandler(UIElement.PointerReleasedEvent, new PointerEventHandler(frameworkElement_PointerReleased), handledEventsToo);
+            _frameworkElement.AddHandler(UIElement.PointerCanceledEvent, new PointerEventHandler(frameworkElement_PointerCanceled), handledEventsToo);
+            _frameworkElement.AddHandler(UIElement.PointerCaptureLostEvent, new PointerEventHandler(frameworkElement_PointerCaptureLost), handledEventsToo);
+            _frameworkElement.AddHandler(UIElement.PointerMovedEvent, new PointerEventHandler(frameworkElement_PointerMoved), handledEventsToo);
+            
+            /*_frameworkElement.PointerPressed += new PointerEventHandler(frameworkElement_PointerPressed);
             _frameworkElement.PointerReleased += new PointerEventHandler(frameworkElement_PointerReleased);
             _frameworkElement.PointerCanceled += new PointerEventHandler(frameworkElement_PointerCanceled);
             _frameworkElement.PointerCaptureLost += new PointerEventHandler(frameworkElement_PointerCaptureLost);
-            _frameworkElement.PointerMoved += new PointerEventHandler(frameworkElement_PointerMoved);
+            _frameworkElement.PointerMoved += new PointerEventHandler(frameworkElement_PointerMoved);*/
         }
 
         public void Detach()
         {
-            _frameworkElement.PointerPressed -= new PointerEventHandler(frameworkElement_PointerPressed);
+            /*_frameworkElement.PointerPressed -= new PointerEventHandler(frameworkElement_PointerPressed);
             _frameworkElement.PointerReleased -= new PointerEventHandler(frameworkElement_PointerReleased);
             _frameworkElement.PointerCanceled -= new PointerEventHandler(frameworkElement_PointerCanceled);
             _frameworkElement.PointerCaptureLost -= new PointerEventHandler(frameworkElement_PointerCaptureLost);
-            _frameworkElement.PointerMoved -= new PointerEventHandler(frameworkElement_PointerMoved);
+            _frameworkElement.PointerMoved -= new PointerEventHandler(frameworkElement_PointerMoved);*/
+
+            _frameworkElement.RemoveHandler(UIElement.PointerPressedEvent, new PointerEventHandler(frameworkElement_PointerPressed));
+            _frameworkElement.RemoveHandler(UIElement.PointerReleasedEvent, new PointerEventHandler(frameworkElement_PointerReleased));
+            _frameworkElement.RemoveHandler(UIElement.PointerCanceledEvent, new PointerEventHandler(frameworkElement_PointerCanceled));
+            _frameworkElement.RemoveHandler(UIElement.PointerCaptureLostEvent, new PointerEventHandler(frameworkElement_PointerCaptureLost));
+            _frameworkElement.RemoveHandler(UIElement.PointerMovedEvent, new PointerEventHandler(frameworkElement_PointerMoved));
         }
 
         void frameworkElement_PointerPressed(object sender, PointerRoutedEventArgs e)
@@ -78,6 +90,7 @@ namespace PanoramicDataWin8.utils
             {
                 return;
             }
+            
             _frameworkElement.CapturePointer(e.Pointer);
             if (!_currentPointers.Any(p => p.PointerId == e.Pointer.PointerId))
             {
@@ -86,8 +99,7 @@ namespace PanoramicDataWin8.utils
             _currentContacts[pt.PointerId] = pt;
             _startContacts[pt.PointerId] = pt;
             ++_numActiveContacts;
-            fireAdded(e.Pointer, e);
-            e.Handled = true;
+            e.Handled = fireAdded(e.Pointer, e); 
         }
 
         void frameworkElement_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
@@ -102,9 +114,7 @@ namespace PanoramicDataWin8.utils
                 _currentContacts.Remove(pt.PointerId);
                 _startContacts.Remove(pt.PointerId);
                 --_numActiveContacts;
-                fireRemoved(e.Pointer, e);
-
-                e.Handled = true;
+                e.Handled = fireRemoved(e.Pointer, e); 
             }
         }
 
@@ -139,8 +149,7 @@ namespace PanoramicDataWin8.utils
                 if (_startContacts.ContainsKey(pt.PointerId))
                 {
                     _currentContacts[pt.PointerId] = pt;
-                    fireMoved(e.Pointer, e);
-                    e.Handled = true;
+                    e.Handled = fireMoved(e.Pointer, e); 
                 }
             }
         }
@@ -187,28 +196,34 @@ namespace PanoramicDataWin8.utils
             };
         }
 
-        void fireAdded(Pointer triggeringPointer, PointerRoutedEventArgs e)
+        bool fireAdded(Pointer triggeringPointer, PointerRoutedEventArgs e)
         {
+            var pme = createPointerManagerEvent(triggeringPointer, e);
             if (Added != null)
             {
-                Added(this, createPointerManagerEvent(triggeringPointer, e));
+                Added(this, pme);
             }
+            return pme.DoHandle;
         }
 
-        void fireMoved(Pointer triggeringPointer, PointerRoutedEventArgs e)
+        bool fireMoved(Pointer triggeringPointer, PointerRoutedEventArgs e)
         {
+            var pme = createPointerManagerEvent(triggeringPointer, e);
             if (Moved != null)
             {
-                Moved(this, createPointerManagerEvent(triggeringPointer, e));
+                Moved(this, pme);
             }
+            return pme.DoHandle;
         }
 
-        void fireRemoved(Pointer triggeringPointer, PointerRoutedEventArgs e)
+        bool fireRemoved(Pointer triggeringPointer, PointerRoutedEventArgs e)
         {
+            var pme = createPointerManagerEvent(triggeringPointer, e);
             if (Removed != null)
             {
-                Removed(this, createPointerManagerEvent(triggeringPointer, e));
+                Removed(this, pme);
             }
+            return pme.DoHandle;
         }
     }
     public class PointerManagerEvent : EventArgs
@@ -219,5 +234,6 @@ namespace PanoramicDataWin8.utils
         public List<Pointer> CurrentPointers { get; set; }
         public Dictionary<uint, PointerPoint> CurrentContacts { get; set; }
         public Dictionary<uint, PointerPoint> StartContacts { get; set; }
+        public bool DoHandle { get; set; } = true;
     }
 }

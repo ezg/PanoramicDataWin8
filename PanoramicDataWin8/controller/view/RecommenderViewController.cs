@@ -36,6 +36,7 @@ namespace PanoramicDataWin8.controller.view
         public RecommenderOperationViewModel CreateRecommenderOperationViewModel(HistogramOperationViewModel histogramViewModel)
         {
             RecommenderOperationModel model = new RecommenderOperationModel(_mainModel.SchemaModel);
+            model.ModelId = HypothesesViewController.Instance.RiskOperationModel.ModelId;
             RecommenderOperationViewModel viewModel = new RecommenderOperationViewModel(model);
             histogramViewModel.RecommenderOperationViewModel = viewModel;
             _recommenderOperationViewModels.Add(model, viewModel);

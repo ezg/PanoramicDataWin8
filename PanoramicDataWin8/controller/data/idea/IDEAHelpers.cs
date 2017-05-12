@@ -162,8 +162,8 @@ namespace PanoramicDataWin8.controller.data.progressive
             var param = new RecommenderOperationParameters()
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
-                SampleStreamBlockSize = sampleSize
-
+                SampleStreamBlockSize = sampleSize, 
+                ModelId = model.ModelId
             };
             return param;
         }

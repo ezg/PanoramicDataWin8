@@ -127,7 +127,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 Point currentPoint = gt.TransformPoint(e.CurrentContacts[e.TriggeringPointer.PointerId].Position);
 
                 Vec delta = gt.TransformPoint(e.StartContacts[e.TriggeringPointer.PointerId].Position).GetVec() - currentPoint.GetVec();
-                
+
 
                 if (_shadow == null && _brusher == null &&
                     _manipulationStartTime + TimeSpan.FromSeconds(0.3).Ticks < DateTime.Now.Ticks)
@@ -172,6 +172,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 }
 
                 _mainPointerManagerPreviousPoint = currentPoint;
+                e.DoHandle = false;
             }
         }
 
