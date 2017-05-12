@@ -13,12 +13,22 @@
         <TranslateTransform X="{Binding Position.X}" Y="{Binding Position.Y}"/>
     </UserControl.RenderTransform>
 
-    <Grid Width="{Binding Size.X}" Height="{Binding Size.Y}" Background="{StaticResource highlightBrush}">
+    <Grid Width="{Binding Size.X}" Height="{Binding Size.Y}" >
 
-        <TextBlock Name="lblPercentage"
-                   FontSize="16"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"></TextBlock>
+        <Grid Name="alphaGrid" Background="{StaticResource alternativeBrush}">
+            <TextBlock Name="lblPercentage"
+                       FontSize="16"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"></TextBlock>
+        </Grid>
+        
+        <Grid Name="defaultGrid" Background="{StaticResource lightBrush}">
+            <TextBlock FontSize="16"
+                       Foreground="{StaticResource highlightBrush}"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Text="rec"></TextBlock>
+        </Grid>
     </Grid>
 </UserControl>
     

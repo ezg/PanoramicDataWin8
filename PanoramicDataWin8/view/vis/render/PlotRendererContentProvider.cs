@@ -35,20 +35,20 @@ namespace PanoramicDataWin8.view.vis.render
         private bool _isResultEmpty = false;
 
         private PlotRendererContentProviderHelper _helper = null;
+        private bool _includeDistribution = false;
 
         private Color _textColor;
         private CanvasTextFormat _textFormat;
 
         private HistogramResult _histogramResult = null;
         
-        private HistogramOperationModel _histogramOperationModel = null;
         private List<FilterModel>       _filterModels = new List<FilterModel>();
         private List<BczBinMapModel> _bczBinMapModels = new List<BczBinMapModel>();
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
         private CanvasCachedGeometry _strokeRoundedRectGeom = null;
 
-        public double CompositionScaleX { get; set; }
-        public double CompositionScaleY { get; set; }
+        public double CompositionScaleX { get; set; } = 1;
+        public double CompositionScaleY { get; set; } = 1;
         public Dictionary<IGeometry, FilterModel> HitTargets { get; set; }
         public Dictionary<IGeometry, BczBinMapModel> BczHitTargets { get; set; }
 
@@ -117,16 +117,23 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        public void UpdateData(IResult result, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone)
+        public void UpdateData(
+            IResult result,
+            bool includeDistribution,
+            List<Color> brushColors,
+            AttributeTransformationModel xIom,
+            AttributeTransformationModel yIom,
+            AttributeTransformationModel valueIom, 
+            double defaultBottomOffset)
         {
             _histogramResult = (HistogramResult)result;
-            _histogramOperationModel = histogramOperationModel;
+            _includeDistribution = includeDistribution;
             
             if (_histogramResult != null && _histogramResult.Bins != null)
             {
-                _helper = new PlotRendererContentProviderHelper((HistogramResult)result, histogramOperationModel, histogramOperationModelClone, CompositionScaleX, CompositionScaleY);
+                _helper = new PlotRendererContentProviderHelper(
+                    (HistogramResult)result, includeDistribution, brushColors, xIom, yIom, valueIom, CompositionScaleX, CompositionScaleY, defaultBottomOffset);
                 _isResultEmpty = false;
-                
             }
             else
             {
@@ -165,16 +172,19 @@ namespace PanoramicDataWin8.view.vis.render
             
             if (_helper.DeviceHeight > 0 && _helper.DeviceWidth > 0)
             {
-                drawLabelsAndGridLines(canvasArgs, renderLines, true,  sortedXList);   // x labels and grid lines
-                drawLabelsAndGridLines(canvasArgs, renderLines, false, sortedYList);   // y labels and grid lines
+                if (!_helper.Small)
+                {
+                    drawLabelsAndGridLines(canvasArgs, renderLines, true, sortedXList); // x labels and grid lines
+                    drawLabelsAndGridLines(canvasArgs, renderLines, false, sortedYList); // y labels and grid lines
+                }
 
                 _fillRoundedRectGeom?.Dispose();
                 _strokeRoundedRectGeom?.Dispose();
                 var x = _helper.DataToScreenX((double)_helper.VisualBinRanges[0].AddStep(0)) - _helper.DataToScreenX(0);
                 var y = _helper.DataToScreenY((double)_helper.VisualBinRanges[1].AddStep(0), false) - _helper.DataToScreenY(0, false);
                 
-                _fillRoundedRectGeom = CanvasCachedGeometry.CreateFill(CanvasGeometry.CreateRoundedRectangle(canvas, new Rect(0, 0, x, y), 4, 4));
-                _strokeRoundedRectGeom = CanvasCachedGeometry.CreateStroke(CanvasGeometry.CreateRoundedRectangle(canvas, new Rect(0, 0, x, y), 4, 4), 0.5f);
+                _fillRoundedRectGeom = CanvasCachedGeometry.CreateFill(CanvasGeometry.CreateRoundedRectangle(canvas, new Rect(0, 0, x, y), _helper.CornerRadius, _helper.CornerRadius));
+                _strokeRoundedRectGeom = CanvasCachedGeometry.CreateStroke(CanvasGeometry.CreateRoundedRectangle(canvas, new Rect(0, 0, x, y), _helper.CornerRadius, _helper.CornerRadius), 0.5f);
             }
         }
 
@@ -343,12 +353,12 @@ namespace PanoramicDataWin8.view.vis.render
 
                         foreach (var binPrimitive in binPrimitiveCollection.BinPrimitives.Where(bp => bp.Value != null && bp.BrushIndex != _histogramResult.AllBrushIndex()))
                         {
-                            canvasArgs.DrawingSession.FillRoundedRectangle(binPrimitive.Rect, 4, 4, binPrimitive.Color);
+                            canvasArgs.DrawingSession.FillRoundedRectangle(binPrimitive.Rect, _helper.CornerRadius, _helper.CornerRadius, binPrimitive.Color);
 
                             if (binPrimitive.EstimationRect != Rect.Empty)
                             {
                                 //
-                                var geom = CanvasGeometry.CreateRoundedRectangle(canvas, binPrimitive.EstimationRect, 4, 4);
+                                var geom = CanvasGeometry.CreateRoundedRectangle(canvas, binPrimitive.EstimationRect, _helper.CornerRadius, _helper.CornerRadius);
                                 var mat = Matrix3x2.Identity;
                                 using (canvasArgs.DrawingSession.CreateLayer(1, geom, mat))
                                 {
@@ -366,7 +376,7 @@ namespace PanoramicDataWin8.view.vis.render
                                     }
                                 }
                                 geom.Dispose();
-                                //canvasArgs.DrawingSession.DrawRoundedRectangle(binPrimitive.EstimationRect, 4, 4, Color.FromArgb(255, 230, 230, 230), 2);
+                                //canvasArgs.DrawingSession.DrawRoundedRectangle(binPrimitive.EstimationRect, _helper.CornerRadius, _helper.CornerRadius, Color.FromArgb(255, 230, 230, 230), 2);
                             }
                             if (binPrimitive.MarginRect != Rect.Empty)
                             {
@@ -433,7 +443,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             // render distributions if needed
-            if (_histogramOperationModel.IncludeDistribution)
+            if (_includeDistribution)
             {
                 //canvasArgs.DrawingSession.FillRectangle(new Rect(0, 0, canvas.ActualWidth, canvas.ActualHeight),
                 //Color.FromArgb(150, 230, 230, 230));
@@ -469,7 +479,7 @@ namespace PanoramicDataWin8.view.vis.render
         void highlightPrimitiveCollection(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, Color dark, BinPrimitiveCollection binPrimitiveCollection)
         {
             var bpc = binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex());
-            canvasArgs.DrawingSession.DrawRoundedRectangle(bpc.Rect, 4, 4, dark, 2.0f);
+            canvasArgs.DrawingSession.DrawRoundedRectangle(bpc.Rect, _helper.CornerRadius, _helper.CornerRadius, dark, _helper.Small ? 1.0f : 2.0f);
 
             if (!_bczBinMapModels.Where((m) => m.SortAxis).Any())
             {
@@ -481,13 +491,13 @@ namespace PanoramicDataWin8.view.vis.render
                     if (_helper.ChartType == ChartType.VerticalBar)
                     {
                         var labelRect = new Rect(_helper.DataToScreenX(_helper.DataMinX) - 50, bpc.Rect.Top - 7.5, 40, 15);
-                        canvasArgs.DrawingSession.FillRoundedRectangle(labelRect, 4, 4, Color.FromArgb(255, 175, 175, 175));
+                        canvasArgs.DrawingSession.FillRoundedRectangle(labelRect, _helper.CornerRadius, _helper.CornerRadius, Color.FromArgb(255, 175, 175, 175));
                         DrawString(canvasArgs, _textFormat, _helper.DataToScreenX(_helper.DataMinX) - 10, bpc.Rect.Top, bpc.DataValue.Value.ToString("F" + dplaces), tc, false, false, true);
                     }
                     if (_helper.ChartType == ChartType.HorizontalBar)
                     {
                         var labelRect = new Rect(bpc.Rect.Right - 20, _helper.DataToScreenY(_helper.DataMinY) + 20, 40, 15);
-                        canvasArgs.DrawingSession.FillRoundedRectangle(labelRect, 4, 4, Color.FromArgb(255, 175, 175, 175));
+                        canvasArgs.DrawingSession.FillRoundedRectangle(labelRect, _helper.CornerRadius, _helper.CornerRadius, Color.FromArgb(255, 175, 175, 175));
                         DrawString(canvasArgs, _textFormat, bpc.Rect.Right, _helper.DataToScreenY(_helper.DataMinY) + 20, bpc.DataValue.Value.ToString("F" + dplaces), tc, true, true, false);
                     }
                     if (_helper.ChartType == ChartType.HeatMap)
@@ -630,10 +640,10 @@ namespace PanoramicDataWin8.view.vis.render
     {
         private double _compositionScaleX = 1;
         private double _compositionScaleY = 1;
+        private bool _includeDistribution = false;
+        private List<Color> _brushColors = null;
 
         private HistogramResult _histogramResult = null;
-        private HistogramOperationModel _histogramOperationModelClone = null;
-        private HistogramOperationModel _histogramOperationModel = null;
         private AttributeTransformationModel _xIom = null;
         private AttributeTransformationModel _yIom = null;
         private AttributeTransformationModel _valueIom = null;
@@ -641,13 +651,15 @@ namespace PanoramicDataWin8.view.vis.render
         public ChartType ChartType {  get { return _chartType;  } }
         public List<BinRange> VisualBinRanges { get; set; } = new List<BinRange>();
 
-        public double LeftOffset { get; set; } = 40;
-        public double RightOffset { get; set; } = 20;
-        public double TopOffset { get; set; } = 20;
-        public double BottomtOffset { get; set; } = 45;
+        public double LeftOffset { get; set; } = 0;
+        public double RightOffset { get; set; } = 0;
+        public double TopOffset { get; set; } = 0;
+        public double BottomOffset { get; set; } = 0;
 
         public double DeviceWidth { get; set; } = 0;
         public double DeviceHeight { get; set; } = 0;
+
+        public float CornerRadius { get; set; } = 4;
         
         private double _xScale = 0;
         private double _yScale = 0;
@@ -663,26 +675,29 @@ namespace PanoramicDataWin8.view.vis.render
         public Rect LabelMetricsX { get; set; } = Rect.Empty;
         public Rect LabelMetricsY { get; set; } = Rect.Empty;
 
+        public bool Small { get; set; } = false;
         private static double TOLERANCE = 0.0001f;
+        private double _defaultBottomOffset = 0;
 
-        public PlotRendererContentProviderHelper(HistogramResult histogramResult, HistogramOperationModel histogramOperationModel, HistogramOperationModel histogramOperationModelClone, double compositionScaleX, double compositionScaleY)
+        public PlotRendererContentProviderHelper(
+            HistogramResult histogramResult, 
+            bool includeDistribution, 
+            List<Color> brushColors, 
+            AttributeTransformationModel xIom,
+            AttributeTransformationModel yIom,
+            AttributeTransformationModel valueIom,
+            double compositionScaleX, double compositionScaleY, double defaultBottomOffset)
         {
             _compositionScaleX = compositionScaleX;
             _compositionScaleY = compositionScaleY;
+            _defaultBottomOffset = defaultBottomOffset;
             _histogramResult = histogramResult;
-            _histogramOperationModelClone = histogramOperationModelClone;
-            _histogramOperationModel = histogramOperationModel;
-            _xIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
-            _yIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
+            _includeDistribution = includeDistribution;
+            _brushColors = brushColors;
 
-            if (_histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
-            {
-                _valueIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.Value).First();
-            }
-            else if (_histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
-            {
-                _valueIom = _histogramOperationModelClone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
-            }
+            _xIom = xIom;
+            _yIom = yIom;
+            _valueIom = valueIom;
 
             var aggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
             _minValue = double.MaxValue;
@@ -744,12 +759,19 @@ namespace PanoramicDataWin8.view.vis.render
 
             initializeChartType(_histogramResult.BinRanges);
 
-            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[0], _xIom, histogramOperationModel.IncludeDistribution));
-            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[1], _yIom, histogramOperationModel.IncludeDistribution));
+            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[0], _xIom));
+            VisualBinRanges.Add(createVisualBinRange(_histogramResult.BinRanges[1], _yIom));
         }
 
         public void ComputeSizes(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, CanvasTextFormat textFormat)
         {
+            LeftOffset = 40;
+            RightOffset  = 20;
+            TopOffset = 20;
+            BottomOffset = 45;
+            Small = false;
+            CornerRadius = 4; 
+
             var xLabels = VisualBinRanges[0].GetLabels();
             var yLabels = VisualBinRanges[1].GetLabels();
             var maxXLabelLength = xLabels.Max(b => b.Label.Length);
@@ -765,7 +787,20 @@ namespace PanoramicDataWin8.view.vis.render
             LeftOffset = (double)Math.Max(10, LabelMetricsY.Width + 10 + 20);
 
             DeviceWidth = (double)(canvas.ActualWidth / _compositionScaleX - LeftOffset - RightOffset);
-            DeviceHeight = (double)(canvas.ActualHeight / _compositionScaleY - TopOffset - BottomtOffset);
+            DeviceHeight = (double)(canvas.ActualHeight / _compositionScaleY - TopOffset - BottomOffset);
+
+            if (DeviceWidth < 50 && DeviceHeight < 50)
+            {
+                LeftOffset = 5;
+                RightOffset = 5;
+                TopOffset = 5;
+                BottomOffset = _defaultBottomOffset;
+
+                DeviceWidth = (double)(canvas.ActualWidth / _compositionScaleX - LeftOffset - RightOffset);
+                DeviceHeight = (double)(canvas.ActualHeight / _compositionScaleY - TopOffset - BottomOffset);
+                Small = true;
+                CornerRadius = 2;
+            }
 
             DataMinX = (double)(xLabels.Min(dp => dp.MinValue));
             DataMinY = (double)(yLabels.Min(dp => dp.MinValue));
@@ -799,12 +834,12 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        private BinRange createVisualBinRange(BinRange dataBinRange, AttributeTransformationModel atm, bool includeDistribution)
+        private BinRange createVisualBinRange(BinRange dataBinRange, AttributeTransformationModel atm)
         {
             BinRange visualBinRange = null;
             if (!(dataBinRange is AggregateBinRange))
             {
-                if (dataBinRange is QuantitativeBinRange && includeDistribution)
+                if (dataBinRange is QuantitativeBinRange && _includeDistribution)
                 {
                     var maxDistX = (double) dataBinRange.MaxValue;
                     var minDistX = (double) dataBinRange.MinValue;
@@ -931,7 +966,7 @@ namespace PanoramicDataWin8.view.vis.render
         public List<List<Vector2>> GetDistribution()
         {
             List<List<Vector2>> returnList = new List<List<Vector2>>();
-            if (_histogramOperationModel.IncludeDistribution && 
+            if (_includeDistribution && 
                 (_chartType == ChartType.HorizontalBar || _chartType == ChartType.VerticalBar))
             {
                 foreach (var brush in _histogramResult.Brushes)
@@ -1037,7 +1072,7 @@ namespace PanoramicDataWin8.view.vis.render
             var mappedXBinIndex = slistXValues[bin.BinIndex.Indices[0]];
             var mappedYBinIndex = slistYValues[bin.BinIndex.Indices[1]];
             var binPrimitiveCollection = new BinPrimitiveCollection();
-            binPrimitiveCollection.FilterModel = GetBinFilterModel(bin, _histogramResult.AllBrushIndex());
+            binPrimitiveCollection.FilterModel = IDEAHelpers.GetBinFilterModel(bin, _histogramResult.AllBrushIndex(), _histogramResult, _xIom, _yIom);
 
             var brushFactorSum = 0.0;
 
@@ -1174,8 +1209,8 @@ namespace PanoramicDataWin8.view.vis.render
                 var xFrom = DataToScreenX((double) tt);
                 var xTo = DataToScreenX((double) _histogramResult.BinRanges[0].AddStep(tt));
 
-                var yMargin = (double) ((MarginAggregateResult) bin.GetAggregateResult(yMarginAggregateKey)).Margin;
-                var yMarginAbsolute = (double) ((MarginAggregateResult) bin.GetAggregateResult(yMarginAggregateKey)).AbsolutMargin;
+                //var yMargin = (double) ((MarginAggregateResult) bin.GetAggregateResult(yMarginAggregateKey)).Margin;
+                var yMarginAbsolute = Small ? 0 : (double) ((MarginAggregateResult) bin.GetAggregateResult(yMarginAggregateKey)).AbsolutMargin;
 
 
                 var estimationRect = Rect.Empty;
@@ -1441,55 +1476,12 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else
             {
-                baseColor = _histogramOperationModelClone.BrushColors[brush.BrushIndex % _histogramOperationModelClone.BrushColors.Count];
+                baseColor = _brushColors[brush.BrushIndex % _brushColors.Count];
             }
 
             return baseColor;
         }
 
-        public FilterModel GetBinFilterModel(Bin bin, int brushIndex)
-        {
-            AttributeTransformationModel[] dimensions = new AttributeTransformationModel[] {_xIom, _yIom};
-            FilterModel filterModel = new FilterModel();
-
-            var marginAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, new MarginAggregateParameters()
-                {AggregateFunction = _valueIom.AggregateFunction.ToString()}, _histogramResult, _histogramResult.AllBrushIndex());
-            var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
-            valueAggregateKey.BrushIndex = brushIndex;
-            var unNormalizedvalue = ((DoubleValueAggregateResult) bin.GetAggregateResult(valueAggregateKey)).Result;
-
-            if (unNormalizedvalue.HasValue)
-            {
-                filterModel.Value = unNormalizedvalue.Value;
-            }
-            for (int i = 0; i < _histogramResult.BinRanges.Count; i++)
-            {
-                if (!(_histogramResult.BinRanges[i] is AggregateBinRange))
-                {
-                    var dataFrom = _histogramResult.BinRanges[i].GetValueFromIndex(bin.BinIndex.Indices[i]);
-                    var dataTo = _histogramResult.BinRanges[i].AddStep(dataFrom);
-
-                    if (_histogramResult.BinRanges[i] is NominalBinRange)
-                    {
-                        var tt = _histogramResult.BinRanges[i].GetLabel(dataFrom);
-
-                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.EQUALS, tt));
-                    }
-                    else if (_histogramResult.BinRanges[i] is AlphabeticBinRange)
-                    {
-                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.STARTS_WITH,
-                            _histogramResult.BinRanges[i].GetLabel(dataFrom)));
-                    }
-                    else
-                    {
-                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.GREATER_THAN_EQUAL, dataFrom));
-                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.LESS_THAN, dataTo));
-                    }
-                }
-            }
-
-            return filterModel;
-        }
 
         public double DataToScreenX(double x)
         {

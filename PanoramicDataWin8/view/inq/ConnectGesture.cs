@@ -9,6 +9,7 @@ using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.view.vis.render;
 using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.view.vis.menu;
 
 namespace PanoramicDataWin8.view.inq
 {

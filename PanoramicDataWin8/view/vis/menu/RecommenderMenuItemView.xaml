@@ -5,16 +5,14 @@
     xmlns:local="using:PanoramicDataWin8.view.vis.menu"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:common="using:PanoramicDataWin8.view.common"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400"
     FontFamily="{StaticResource abel}">
 
     <Grid Width="{Binding Size.X}" Height="{Binding Size.Y}" Background="{StaticResource lightBrush}">
-        <!--<Grid Column="0" Name="backgroundGrid" Margin="4">
-            <Rectangle Width="4" Fill="{StaticResource backgroundBrush}"></Rectangle>
-            <Rectangle Height="4" Fill="{StaticResource backgroundBrush}"></Rectangle>
-        </Grid>-->
+        <common:BudgetView x:Name="budgetView"/>
     </Grid>
 </UserControl>
     

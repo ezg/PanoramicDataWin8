@@ -102,7 +102,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="controller\data\idea\ModelWealthCommand.cs" />
     <Compile Include="controller\data\idea\ExecuteOperationModelEventArgs.cs" />
+    <Compile Include="controller\data\idea\RecommenderOperationJob.cs" />
     <Compile Include="controller\data\idea\RiskOperationJob.cs" />
     <Compile Include="controller\data\idea\StatisticalComparisonDecisionOperationJob.cs" />
     <Compile Include="controller\data\JobEventArgs.cs" />
@@ -151,6 +153,7 @@
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventType.cs" />
     <Compile Include="model\data\operation\FilterProviderOperationModelImpl.cs" />
+    <Compile Include="model\data\operation\RecommenderOperationModel.cs" />
     <Compile Include="model\data\operation\IBrushableOperationModel.cs" />
     <Compile Include="model\data\operation\IBrusherOperationModel.cs" />
     <Compile Include="model\data\operation\IFilterConsumerOperationModel.cs" />
@@ -162,7 +165,6 @@
     <Compile Include="model\data\operation\FilterConsumerOperationModelImpl.cs" />
     <Compile Include="model\data\operation\OperationModel.cs" />
     <Compile Include="model\data\operation\OperationModelUpdatedEventArgs.cs" />
-    <Compile Include="model\data\operation\Predicate.cs" />
     <Compile Include="model\data\operation\RiskOperationModel.cs" />
     <Compile Include="model\data\operation\StatistalComparisonType.cs" />
     <Compile Include="model\data\operation\StatisticallyComparableOperationModelImpl.cs" />
@@ -190,7 +192,11 @@
     <Compile Include="model\view\AttributeTransformationViewModelEventArgs.cs" />
     <Compile Include="model\view\AttributeTransformationViewModelEventHandler.cs" />
     <Compile Include="model\view\BrushableOperationViewModelState.cs" />
+    <Compile Include="model\view\BudgetViewModel.cs" />
+    <Compile Include="model\view\operation\RecommenderOperationViewModel.cs" />
     <Compile Include="model\view\RecommenderHandleViewModel.cs" />
+    <Compile Include="model\view\RecommendedHistogramMenuItemViewModel.cs" />
+    <Compile Include="model\view\PagingMenuItemViewModel.cs" />
     <Compile Include="model\view\RecommenderMenuItemViewModel.cs" />
     <Compile Include="model\view\GraphRenderOptions.cs" />
     <Compile Include="model\view\HypothesisViewModel.cs" />
@@ -216,6 +222,9 @@
     <Compile Include="model\view\ToggleMenuItemComponentViewModel.cs" />
     <Compile Include="utils\ClipToBounds.cs" />
     <Compile Include="utils\ObservableDictionary.cs" />
+    <Compile Include="view\common\BudgetView.xaml.cs">
+      <DependentUpon>BudgetView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\HypothesisView.xaml.cs">
       <DependentUpon>HypothesisView.xaml</DependentUpon>
     </Compile>
@@ -284,8 +293,14 @@
     </Compile>
     <Compile Include="view\style\TwoFingerScrollBehavior.cs" />
     <Compile Include="view\vis\HypothesesView.cs" />
+    <Compile Include="view\vis\menu\PagingMenuItemView.xaml.cs">
+      <DependentUpon>PagingMenuItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\menu\RecommenderHandleView.xaml.cs">
       <DependentUpon>RecommenderHandleView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\menu\RecommendedHistogramMenuItemView.xaml.cs">
+      <DependentUpon>RecommendedHistogramMenuItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\menu\RecommenderMenuItemView.xaml.cs">
       <DependentUpon>RecommenderMenuItemView.xaml</DependentUpon>
@@ -396,6 +411,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="view\common\BudgetView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="view\vis\HypothesisView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -441,7 +460,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="view\vis\menu\PagingMenuItemView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="view\vis\menu\RecommenderHandleView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="view\vis\menu\RecommendedHistogramMenuItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

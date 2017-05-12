@@ -18,5 +18,19 @@ namespace PanoramicDataWin8.model.view
             get { return _hypothesisViewModels; }
             set { SetProperty(ref _hypothesisViewModels, value); }
         }
+
+        private double _startWealth = -1;
+        public double StartWealth
+        {
+            get { return _startWealth; }
+            set { SetProperty(ref _startWealth, value); }
+        }
+        
+        private double _wealth = -1;
+        public double Wealth
+        {
+            get { return _wealth; }
+            set { SetProperty(ref _wealth, value); }
+        }
     }
 }

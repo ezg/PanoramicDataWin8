@@ -7,16 +7,16 @@ namespace PanoramicDataWin8.controller.data
     public abstract class QueryExecuter
     {
         public Dictionary<IOperationModel, Dictionary<int, OperationJob>> ActiveJobs { get; set; } = new Dictionary<IOperationModel, Dictionary<int, OperationJob>>();
-
-        public virtual void RemoveJob(IOperationModel operationModel)
-        {
-        }
-
+        
         public virtual void HaltJob(IOperationModel operationModel)
         {
         }
 
         public virtual void ResumeJob(IOperationModel operationModel)
+        {
+        }
+        
+        public virtual void UpdateResultParameters(IOperationModel operationModel)
         {
         }
 

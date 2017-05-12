@@ -9,6 +9,7 @@ using Windows.UI.Xaml;
 using IDEA_common.operations.risk;
 using IDEA_common.util;
 using Newtonsoft.Json;
+using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
@@ -20,11 +21,23 @@ namespace PanoramicDataWin8.controller.view
 {
     public class HypothesesViewController
     {
+        public static event EventHandler Initialized;
+
+        private static void fireInitializedEvent()
+        {
+            Initialized?.Invoke(typeof(HypothesesViewController), EventArgs.Empty);
+        }
+
         private readonly RiskOperationModel _riskOperationModel;
         private readonly Dictionary<ComparisonId, HypothesisViewModel> _comparisonIdToHypothesisViewModels = new Dictionary<ComparisonId, HypothesisViewModel>();
-        private readonly Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel> _modelToSaveViewModel = new Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel>();
+
+        private readonly Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel> _modelToSaveViewModel =
+            new Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel>();
+
         private MainModel _mainModel = null;
         private static int _nextComparisonOrder = 0;
+        private readonly ModelWealthCommand _modelWealthCommand = new ModelWealthCommand();
+        private readonly DispatcherTimer _getModelWealthTimer = new DispatcherTimer();
 
 
         private HypothesesViewController(MainModel mainModel, ObservableCollection<OperationViewModel> operationViewModel)
@@ -34,7 +47,11 @@ namespace PanoramicDataWin8.controller.view
             _mainModel = mainModel;
             _mainModel.PropertyChanged += MainModel_PropertyChanged;
             operationViewModel.CollectionChanged += OperationViewModels_CollectionChanged;
+
+            _getModelWealthTimer.Interval = TimeSpan.FromMilliseconds(200);
+            _getModelWealthTimer.Tick += getModelWealthTimer_tick;
         }
+
         private void OperationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
@@ -115,8 +132,9 @@ namespace PanoramicDataWin8.controller.view
                         statModel.AddStatisticallyComparableOperationModel(model);
                         statModel.AddStatisticallyComparableOperationModel(
                             OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(
-                                model.SchemaModel,
-                                model.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel, new Pt()).HistogramOperationModel);
+                                    model.SchemaModel,
+                                    model.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel, new Pt())
+                                .HistogramOperationModel);
 
 
                         if (add)
@@ -148,6 +166,7 @@ namespace PanoramicDataWin8.controller.view
         public static void CreateInstance(MainModel mainModel, ObservableCollection<OperationViewModel> operationViewModel)
         {
             Instance = new HypothesesViewController(mainModel, operationViewModel);
+            fireInitializedEvent();
         }
 
 
@@ -166,7 +185,7 @@ namespace PanoramicDataWin8.controller.view
                         HypothesesViewModel.HypothesisViewModels.Add(vm);
                         _comparisonIdToHypothesisViewModels.Add(res.ComparisonId, vm);
                     }
-                    
+
                     _comparisonIdToHypothesisViewModels[res.ComparisonId].Decision = res.Decision[_riskOperationModel.RiskControlType];
                     //Debug.WriteLine(statOpModel.ExecutionId + ", " + statOpModel.ResultExecutionId);
                     if (statOpModel.ExecutionId == statOpModel.ResultExecutionId)
@@ -267,11 +286,20 @@ namespace PanoramicDataWin8.controller.view
             if (e.PropertyName == _riskOperationModel.GetPropertyName(() => _riskOperationModel.Result) && _riskOperationModel.Result != null)
             {
                 _riskOperationModel.ModelId = ((NewModelOperationResult) _riskOperationModel.Result).ModelId;
+                _getModelWealthTimer.Stop();
+                _getModelWealthTimer.Start();
             }
             else if (e.PropertyName == _riskOperationModel.GetPropertyName(() => _riskOperationModel.RiskControlType))
             {
                 getAllDecisions();
             }
+        }
+
+        private async void getModelWealthTimer_tick(object sender, object e)
+        {
+            ModelWealthResult modelWealthResult = await _modelWealthCommand.GetModelWealth(_riskOperationModel.ModelId, _riskOperationModel.RiskControlType);
+            HypothesesViewModel.StartWealth = modelWealthResult.StartWealth;
+            HypothesesViewModel.Wealth = modelWealthResult.Wealth;
         }
     }
 }

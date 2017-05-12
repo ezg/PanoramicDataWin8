@@ -3,271 +3,221 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using IDEA_common.operations;
+using IDEA_common.operations.recommender;
 using IDEA_common.operations.risk;
+using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
+using PanoramicDataWin8.view.inq;
+using PanoramicDataWin8.view.vis;
 
 namespace PanoramicDataWin8.controller.view
 {
     public class RecommenderViewController
     {
-        private static int _nextComparisonOrder;
-        private readonly Dictionary<ComparisonId, HypothesisViewModel> _comparisonIdToHypothesisViewModels = new Dictionary<ComparisonId, HypothesisViewModel>();
-
-        private readonly Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel> _modelToSaveViewModel =
-            new Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel>();
-
-        private readonly MainModel _mainModel;
+         private readonly MainModel _mainModel;
+        private Dictionary<RecommenderOperationModel, RecommenderOperationViewModel> _recommenderOperationViewModels = new Dictionary<RecommenderOperationModel, RecommenderOperationViewModel>();
+        private Dictionary<RecommenderOperationViewModel, HistogramOperationViewModel> _parentHistogramOperationViewModels = new Dictionary<RecommenderOperationViewModel, HistogramOperationViewModel>();
 
 
         private RecommenderViewController(MainModel mainModel, ObservableCollection<OperationViewModel> operationViewModel)
         {
-            RiskOperationModel = new RiskOperationModel(null);
-            RiskOperationModel.PropertyChanged += _riskOperationModel_PropertyChanged;
             _mainModel = mainModel;
-            _mainModel.PropertyChanged += MainModel_PropertyChanged;
-            operationViewModel.CollectionChanged += OperationViewModels_CollectionChanged;
+            //MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model, false);
         }
 
         public static RecommenderViewController Instance { get; private set; }
 
-        public RiskOperationModel RiskOperationModel { get; }
-
-        public HypothesesViewModel HypothesesViewModel { get; } = new HypothesesViewModel();
-
-        private void OperationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        public RecommenderOperationViewModel CreateRecommenderOperationViewModel(HistogramOperationViewModel histogramViewModel)
         {
-            if (e.OldItems != null)
+            RecommenderOperationModel model = new RecommenderOperationModel(_mainModel.SchemaModel);
+            RecommenderOperationViewModel viewModel = new RecommenderOperationViewModel(model);
+            histogramViewModel.RecommenderOperationViewModel = viewModel;
+            _recommenderOperationViewModels.Add(model, viewModel);
+            _parentHistogramOperationViewModels.Add(viewModel, histogramViewModel);
+
+
+            model.PropertyChanged += Model_PropertyChanged;
+            model.OperationModelUpdated += Model_OperationModelUpdated;
+            MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model, true);
+            return viewModel;
+        }
+
+        private void Model_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
+        {
+            //MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(sender as RecommenderOperationModel, true);
+            MainViewController.Instance.MainModel.QueryExecuter.UpdateResultParameters(sender as RecommenderOperationModel);
+        }
+
+        private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var model = sender as RecommenderOperationModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Result) && model.Result != null)
             {
-                foreach (var opViewModel in e.OldItems.OfType<OperationViewModel>())
+                var result = model.Result as RecommenderResult;
+                var viewModel = _recommenderOperationViewModels[model];
+                var parent = _parentHistogramOperationViewModels[viewModel];
+
+                var attachmentViewModel = parent.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+                var menuViewModel = attachmentViewModel.MenuViewModel;
+                menuViewModel.MenuItemViewModels.First().IsAlwaysDisplayed = true;
+
+                int col = 0;
+                int row = 0;
+                
+                foreach (var existingModel in menuViewModel.MenuItemViewModels.Where(mi => mi.MenuItemComponentViewModel is RecommendedHistogramMenuItemViewModel).ToArray())
                 {
-                    if (opViewModel.OperationModel is HistogramOperationModel)
+                    if (result.RecommendedHistograms.Any(rh => rh.Id == (existingModel.MenuItemComponentViewModel as RecommendedHistogramMenuItemViewModel).Id))
                     {
-                        opViewModel.OperationModel.OperationModelUpdated -= OperationModel_OperationModelUpdated;
+                        existingModel.Column = col + 1;
+                        existingModel.Row = row;
+                        col++;
+                        if (col == 3)
+                        {
+                            col = 0;
+                            row += 1;
+                        }
+                    }
+                    else
+                    {
+                        (existingModel.MenuItemComponentViewModel as RecommendedHistogramMenuItemViewModel).DroppedEvent -= RecHistogramModel_DroppedEvent;
+                        menuViewModel.MenuItemViewModels.Remove(existingModel);
                     }
                 }
-            }
-            if (e.NewItems != null)
-            {
-                foreach (var opViewModel in e.NewItems.OfType<OperationViewModel>())
+
+                foreach (var recommendedHistogram in result.RecommendedHistograms.ToArray())
                 {
-                    if (opViewModel.OperationModel is HistogramOperationModel)
+                    if (!menuViewModel.MenuItemViewModels.Where(mi => mi.MenuItemComponentViewModel is RecommendedHistogramMenuItemViewModel)
+                        .Any(mi => (mi.MenuItemComponentViewModel as RecommendedHistogramMenuItemViewModel).Id == recommendedHistogram.Id))
                     {
-                        opViewModel.OperationModel.OperationModelUpdated += OperationModel_OperationModelUpdated;
+                        var newModel = new MenuItemViewModel()
+                        {
+                            Position = menuViewModel.MenuItemViewModels.First().Position,
+                            Size = new Vec(54, 54),
+                            TargetSize = new Vec(54, 54),
+                            IsAlwaysDisplayed = true
+                        };
+                        var recHistogramModel = new RecommendedHistogramMenuItemViewModel
+                        {
+                            Id = recommendedHistogram.Id,
+                            RecommendedHistogram = recommendedHistogram,
+                            HistogramOperationViewModel = parent
+                        };
+                        newModel.MenuItemComponentViewModel = recHistogramModel;
+                        recHistogramModel.DroppedEvent += RecHistogramModel_DroppedEvent;
+
+                        newModel.Column = col + 1;
+                        newModel.Row = row;
+                        col++;
+                        if (col == 3)
+                        {
+                            col = 0;
+                            row += 1;
+                        }
+                        menuViewModel.MenuItemViewModels.Add(newModel);
                     }
                 }
+
+                addPagingControls(menuViewModel, result, model);
             }
         }
 
-        private void OperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
+        private void RecHistogramModel_DroppedEvent(object sender, Rct bounds)
         {
-            if (_mainModel.IsDefaultHypothesisEnabled)
-            {
-                var model = sender as HistogramOperationModel;
+            var operationContainerView = new OperationContainerView();
+            var width = OperationViewModel.WIDTH;
+            var height = OperationViewModel.HEIGHT;
 
-                var filter = "";
-                var filterModels = new List<FilterModel>();
-                filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
+            var model = sender as RecommendedHistogramMenuItemViewModel;
+            var attr = IDEAHelpers.GetAttributeModelFromAttribute(model.RecommendedHistogram.XAttribute);
+            var filterModels = IDEAHelpers.GetFilterModelsFromSelections(model.RecommendedHistogram.Selections);
+            attr.OriginModel = MainViewController.Instance.MainModel.SchemaModel.OriginModels.First();
+            var operationViewModel = MainViewController.Instance.CreateDefaultHistogramOperationViewModel(attr, bounds.Center - new Vec(width / 2.0, height / 2.0));
+            operationViewModel.HistogramOperationModel.AddFilterModels(filterModels);
+            FilterLinkViewController.Instance.CreateFilterLinkViewModel(operationViewModel.OperationModel, model.HistogramOperationViewModel.OperationModel);
 
-                if (!filterModels.Any())
-                {
-                    if (model.StatisticalComparisonOperationModel != null)
-                    {
-                        RemoveStatisticalComparisonOperationModel(model.StatisticalComparisonOperationModel);
-                        model.StatisticalComparisonOperationModel = null;
-                    }
-                }
-                else
-                {
-                    var anyComparison = false;
-                    foreach (var statisticalComparisonOperationViewModel in ComparisonViewController.Instance.StatisticalComparisonViews.Keys)
-                    {
-                        foreach (var ovm in statisticalComparisonOperationViewModel.OperationViewModels)
-                        {
-                            if (ovm.OperationModel == model)
-                            {
-                                anyComparison = true;
-                                break;
-                            }
-                        }
-                    }
+            var size = new Vec(width, height);
+            operationViewModel.Size = size;
+            operationContainerView.DataContext = operationViewModel;
+            MainViewController.Instance.InkableScene.Add(operationContainerView);
 
-                    if (!anyComparison)
-                    {
-                        var statModel = model.StatisticalComparisonOperationModel;
-                        var add = false;
-                        if (model.StatisticalComparisonOperationModel == null)
-                        {
-                            statModel = new StatisticalComparisonOperationModel(model.SchemaModel);
-                            var a1 = model.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
-                            if ((a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.FLOAT ||
-                                (a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.INT)
-                            {
-                                //statModel.TestType = TestType.ttest;
-                            }
-                            model.StatisticalComparisonOperationModel = statModel;
-                            add = true;
-                        }
-                        foreach (var m in statModel.StatisticallyComparableOperationModels.ToArray())
-                        {
-                            statModel.RemoveStatisticallyComparableOperationModel(m);
-                        }
-                        statModel.AddStatisticallyComparableOperationModel(model);
-                        statModel.AddStatisticallyComparableOperationModel(
-                            OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(
-                                    model.SchemaModel,
-                                    model.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel, new Pt())
-                                .HistogramOperationModel);
-
-
-                        if (add)
-                        {
-                            AddStatisticalComparisonOperationModel(statModel);
-                        }
-                    }
-                }
-            }
         }
 
-        private void MainModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void addPagingControls(MenuViewModel menuViewModel, RecommenderResult result, RecommenderOperationModel model)
         {
-            if (e.PropertyName == _mainModel.GetPropertyName(() => _mainModel.QueryExecuter))
+            var left = menuViewModel.MenuItemViewModels.FirstOrDefault(mi => (mi.MenuItemComponentViewModel as PagingMenuItemViewModel)?.PagingDirection == PagingDirection.Left);
+            var right = menuViewModel.MenuItemViewModels.FirstOrDefault(mi => (mi.MenuItemComponentViewModel as PagingMenuItemViewModel)?.PagingDirection == PagingDirection.Right);
+
+            if (model.Page > 0)
             {
-                _mainModel.QueryExecuter.ExecuteOperationModel(RiskOperationModel, true);
+                if (left == null)
+                {
+                    var newModel = new MenuItemViewModel()
+                    {
+                        Size = new Vec(25, 25),
+                        TargetSize = new Vec(25, 25),
+                        IsAlwaysDisplayed = true
+                    };
+                    var paging = new PagingMenuItemViewModel() {PagingDirection = PagingDirection.Left};
+                    paging.PagingEvent += (sender, direction) =>
+                    {
+                        model.Page -= 1;
+                        model.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+                    };
+                    newModel.MenuItemComponentViewModel = paging;
+
+                    newModel.Column = 1;
+                    newModel.Row = 3;
+                    menuViewModel.MenuItemViewModels.Add(newModel);
+                }
+            }
+            else if (left != null)
+            {
+                menuViewModel.MenuItemViewModels.Remove(left);
+            }
+
+            if (model.Page * model.PageSize + model.PageSize < result.TotalCount)
+            {
+                if (right == null)
+                {
+                    var newModel = new MenuItemViewModel()
+                    {
+                        Size = new Vec(25, 25),
+                        TargetSize = new Vec(25, 25),
+                        IsAlwaysDisplayed = true
+                    };
+                    var paging = new PagingMenuItemViewModel() {PagingDirection = PagingDirection.Right};
+                    paging.PagingEvent += (sender, direction) =>
+                    {
+                        model.Page += 1;
+                        model.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+                    };
+                    newModel.MenuItemComponentViewModel = paging;
+
+                    newModel.Column = 3;
+                    newModel.Row = 3;
+                    newModel.MenuXAlign = MenuXAlign.WithColumn | MenuXAlign.Right;
+                    newModel.MenuYAlign = MenuYAlign.WithRow;
+
+                    menuViewModel.MenuItemViewModels.Add(newModel);
+                }
+            }
+            else if (right != null)
+            {
+                menuViewModel.MenuItemViewModels.Remove(right);
             }
         }
 
         public static void CreateInstance(MainModel mainModel, ObservableCollection<OperationViewModel> operationViewModel)
         {
             Instance = new RecommenderViewController(mainModel, operationViewModel);
+          
         }
 
-
-        private void StatisticalComparisonOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            var statOpModel = (StatisticalComparisonOperationModel) sender;
-            if (e.PropertyName == statOpModel.GetPropertyName(() => statOpModel.Result))
-            {
-                var res = (AddComparisonResult) statOpModel.Result;
-                if (res != null)
-                {
-                    if (!_comparisonIdToHypothesisViewModels.ContainsKey(res.ComparisonId))
-                    {
-                        var vm = new HypothesisViewModel();
-                        vm.StatisticalComparisonSaveViewModel = _modelToSaveViewModel[statOpModel];
-                        HypothesesViewModel.HypothesisViewModels.Add(vm);
-                        _comparisonIdToHypothesisViewModels.Add(res.ComparisonId, vm);
-                    }
-
-                    _comparisonIdToHypothesisViewModels[res.ComparisonId].Decision = res.Decision[RiskOperationModel.RiskControlType];
-                    //Debug.WriteLine(statOpModel.ExecutionId + ", " + statOpModel.ResultExecutionId);
-                    if (statOpModel.ExecutionId == statOpModel.ResultExecutionId)
-                    {
-                        statOpModel.Decision = res.Decision[RiskOperationModel.RiskControlType];
-                        if (HypothesesViewModel.HypothesisViewModels.Any())
-                        {
-                            if (HypothesesViewModel.HypothesisViewModels.Max(h => h.ViewOrdering) >= _comparisonIdToHypothesisViewModels[res.ComparisonId].ViewOrdering)
-                            {
-                                _comparisonIdToHypothesisViewModels[res.ComparisonId].ViewOrdering = HypothesesViewModel.HypothesisViewModels.Max(h => h.ViewOrdering) + 1;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        private void StatisticalComparisonDecisionOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            var statDesOpModel = (StatisticalComparisonDecisionOperationModel) sender;
-            if (e.PropertyName == statDesOpModel.GetPropertyName(() => statDesOpModel.Result) && statDesOpModel.Result != null)
-            {
-                foreach (var decision in ((GetDecisionsResult) statDesOpModel.Result).Decisions)
-                {
-                    _comparisonIdToHypothesisViewModels[decision.ComparisonId].Decision = decision;
-                }
-            }
-        }
-
-        private void StatisticalComparisonOperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
-        {
-            var model = (StatisticalComparisonOperationModel) sender;
-            if (model.StatisticallyComparableOperationModels.Count == 2 && !(e is BrushOperationModelUpdatedEventArgs))
-            {
-                model.ComparisonOrder = _nextComparisonOrder++;
-                _modelToSaveViewModel[model] = new StatisticalComparisonSaveViewModel();
-
-                var filter = "";
-                var filterModels = new List<FilterModel>();
-                filter = FilterModel.GetFilterModelsRecursive(model.StatisticallyComparableOperationModels[0], new List<IFilterProviderOperationModel>(), filterModels, true);
-                _modelToSaveViewModel[model].FilterDist0 = filter;
-
-                filter = "";
-                filterModels = new List<FilterModel>();
-                filter = FilterModel.GetFilterModelsRecursive(model.StatisticallyComparableOperationModels[1], new List<IFilterProviderOperationModel>(), filterModels, true);
-                _modelToSaveViewModel[model].FilterDist1 = filter;
-
-                model.ExecutionId += 1;
-                MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model, false);
-            }
-        }
-
-        public void AddStatisticalComparisonOperationModel(StatisticalComparisonOperationModel model)
-        {
-            model.ModelId = RiskOperationModel.ModelId;
-
-            model.OperationModelUpdated -= StatisticalComparisonOperationModel_OperationModelUpdated;
-            model.PropertyChanged -= StatisticalComparisonOperationModel_PropertyChanged;
-
-            model.OperationModelUpdated += StatisticalComparisonOperationModel_OperationModelUpdated;
-            model.PropertyChanged += StatisticalComparisonOperationModel_PropertyChanged;
-            model.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
-        }
-
-        public void RemoveStatisticalComparisonOperationModel(StatisticalComparisonOperationModel model)
-        {
-            if (model != null)
-            {
-                model.OperationModelUpdated -= StatisticalComparisonOperationModel_OperationModelUpdated;
-                model.PropertyChanged -= StatisticalComparisonOperationModel_PropertyChanged;
-            }
-        }
-
-        public void ClearAllStatisticalComparison()
-        {
-            foreach (var ci in _comparisonIdToHypothesisViewModels.Keys.ToArray())
-            {
-                HypothesesViewModel.HypothesisViewModels.Remove(_comparisonIdToHypothesisViewModels[ci]);
-                _comparisonIdToHypothesisViewModels.Remove(ci);
-            }
-        }
-
-        private void getAllDecisions()
-        {
-            var comparisonIds = _comparisonIdToHypothesisViewModels.Keys.ToList();
-
-            var opModel = new StatisticalComparisonDecisionOperationModel(RiskOperationModel.SchemaModel);
-            opModel.PropertyChanged += StatisticalComparisonDecisionOperationModel_PropertyChanged;
-
-            opModel.ModelId = RiskOperationModel.ModelId;
-            opModel.ComparisonIds = comparisonIds;
-            opModel.RiskControlType = RiskOperationModel.RiskControlType;
-            _mainModel.QueryExecuter.ExecuteOperationModel(opModel, true);
-        }
-
-        private void _riskOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == RiskOperationModel.GetPropertyName(() => RiskOperationModel.Result) && RiskOperationModel.Result != null)
-            {
-                RiskOperationModel.ModelId = ((NewModelOperationResult) RiskOperationModel.Result).ModelId;
-            }
-            else if (e.PropertyName == RiskOperationModel.GetPropertyName(() => RiskOperationModel.RiskControlType))
-            {
-                getAllDecisions();
-            }
-        }
     }
 }

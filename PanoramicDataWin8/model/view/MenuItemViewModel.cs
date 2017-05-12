@@ -29,6 +29,10 @@ namespace PanoramicDataWin8.model.view
 
         private int _row;
 
+        private MenuXAlign _menuXAlign = MenuXAlign.None;
+
+        private MenuYAlign _menuYAlign = MenuYAlign.None;
+
         private int _rowSpan = 1;
 
         private Vec _size = new Vec(50, 50);
@@ -65,6 +69,18 @@ namespace PanoramicDataWin8.model.view
             get { return _row; }
             set { SetProperty(ref _row, value); }
         }
+
+        public MenuXAlign MenuXAlign
+        {
+            get { return _menuXAlign; }
+            set { SetProperty(ref _menuXAlign, value); }
+        }
+        public MenuYAlign MenuYAlign
+        {
+            get { return _menuYAlign; }
+            set { SetProperty(ref _menuYAlign, value); }
+        }
+
 
         public int Column
         {
@@ -138,5 +154,26 @@ namespace PanoramicDataWin8.model.view
         {
             Deleted?.Invoke(this, new EventArgs());
         }
+
+        public Rct Bounds
+        {
+            get { return new Rct(Position, Size); }
+        }
+    }
+
+    [Flags]
+    public enum MenuXAlign
+    {
+        None = 1,
+        WithColumn = 2,
+        Right = 4
+    }
+
+
+    [Flags]
+    public enum MenuYAlign
+    {
+        None = 1,
+        WithRow = 2
     }
 }

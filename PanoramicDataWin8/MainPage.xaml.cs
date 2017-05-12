@@ -293,9 +293,13 @@ namespace PanoramicDataWin8
             hypothesesView.DataContext = HypothesesViewController.Instance.HypothesesViewModel;
             hypothesisGrid.Children.Add(hypothesesView);
 
+            RecommenderViewController.CreateInstance(MainViewController.Instance.MainModel, MainViewController.Instance.OperationViewModels);
+
             AddHandler(PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
             AddHandler(PointerReleasedEvent, new PointerEventHandler(InkableScene_PointerReleased), true);
             AddHandler(PointerMovedEvent, new PointerEventHandler(InkableScene_PointerMoved), true);
+
+            hypothesisButton.DataContext = new BudgetViewModel();
         }
         public bool LastTouchWasMouse = false;
         private void InkableScene_PointerPressed(object sender, PointerRoutedEventArgs e)

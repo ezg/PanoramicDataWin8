@@ -11,11 +11,18 @@ namespace PanoramicDataWin8.model.view
         private Vec _size = new Vec(50, 50);
         private double _percentage = 20;
         private double _startPercentage = 20;
+        private AttachmentViewModel _attachmentViewMode = null;
 
         public Vec Size
         {
             get { return _size; }
             set { SetProperty(ref _size, value); }
+        }
+
+        public AttachmentViewModel AttachmentViewModel
+        {
+            get { return _attachmentViewMode; }
+            set { SetProperty(ref _attachmentViewMode, value); }
         }
 
         public Pt Position

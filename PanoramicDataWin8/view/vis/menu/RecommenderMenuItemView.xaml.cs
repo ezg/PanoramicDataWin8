@@ -39,8 +39,16 @@ namespace PanoramicDataWin8.view.vis.menu
             _mainPointerManager.Moved += mainPointerManager_Moved;
             _mainPointerManager.Removed += mainPointerManager_Removed;
             _mainPointerManager.Attach(this);
+            Loaded += RecommenderMenuItemView_Loaded;
         }
 
+        private void RecommenderMenuItemView_Loaded(object sender, RoutedEventArgs e)
+        {
+            budgetView.DataContext = new BudgetViewModel()
+            {
+                DefaultLabel = "rec"
+            };
+        }
 
         private void mainPointerManager_Added(object sender, PointerManagerEvent e)
         {
@@ -89,6 +97,8 @@ namespace PanoramicDataWin8.view.vis.menu
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
+                (budgetView.DataContext as BudgetViewModel).BudgetToSpend = 0;
+                (_shadow.DataContext as RecommenderHandleViewModel).PropertyChanged -= ShadowModel_PropertyChanged;
                 inkableScene.Remove(_shadow);
                 _shadow = null;
 
@@ -106,9 +116,14 @@ namespace PanoramicDataWin8.view.vis.menu
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
             if (inkableScene != null)
             {
+                var model = ((MenuItemViewModel)this.DataContext).MenuItemComponentViewModel as RecommenderMenuItemViewModel;
                 _shadow = new RecommenderHandleView();
-                var shadowModel = new RecommenderHandleViewModel();
+                var shadowModel = new RecommenderHandleViewModel()
+                {
+                    AttachmentViewModel = model.AttachmentViewModel
+                };
                 _shadow.DataContext = shadowModel;
+                shadowModel.PropertyChanged += ShadowModel_PropertyChanged;
                 
                 shadowModel.Size = new Vec(this.ActualWidth, this.ActualHeight);
                 shadowModel.Position = new Pt(fromInkableScene.X - shadowModel.Size.X / 2.0, fromInkableScene.Y - shadowModel.Size.Y);
@@ -117,6 +132,15 @@ namespace PanoramicDataWin8.view.vis.menu
 
                 inkableScene.Add(_shadow);
                 _shadow.SendToFront();
+            }
+        }
+
+        private void ShadowModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var model = sender as RecommenderHandleViewModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Percentage))
+            {
+                (budgetView.DataContext as BudgetViewModel).BudgetToSpend = model.Percentage / 100.0;
             }
         }
     }

@@ -188,8 +188,8 @@ namespace PanoramicDataWin8.model.view.operation
             var menuViewModel = new MenuViewModel
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = 1,
-                NrRows = 1
+                NrColumns = 4,
+                NrRows = 4
             };
 
             var menuItem = new MenuItemViewModel
@@ -197,17 +197,23 @@ namespace PanoramicDataWin8.model.view.operation
                 MenuViewModel = menuViewModel,
                 Row = 0,
                 ColumnSpan = 1,
-                RowSpan = 1,
+                RowSpan = 4,
                 Column = 0,
                 Size = new Vec(54, 54),
                 Position = histogramOperationViewModel.Position,
                 TargetSize = new Vec(54, 54),
                 IsAlwaysDisplayed = false
             };
-            var attr1 = new RecommenderMenuItemViewModel();
+            var attr1 = new RecommenderMenuItemViewModel()
+            {
+                AttachmentViewModel = attachmentViewModel
+            };
             attr1.CreateRecommendationEvent += (sender, bounds) =>
             {
-                FilterLinkViewController.Instance.CreateFilterLinkViewModel(histogramOperationViewModel, bounds);
+                if (histogramOperationViewModel.RecommenderOperationViewModel == null)
+                {
+                    var rovm = RecommenderViewController.Instance.CreateRecommenderOperationViewModel(histogramOperationViewModel);
+                }
             };
 
             histogramOperationViewModel.OperationViewModelTapped += (sender, args) =>
@@ -219,7 +225,7 @@ namespace PanoramicDataWin8.model.view.operation
 
             attachmentViewModel.MenuViewModel = menuViewModel;
         }
-
+        
         private static void createAxisMenu(HistogramOperationViewModel histogramOperationViewModel, AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
-using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -16,28 +14,25 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using IDEA_common.operations.risk;
 using PanoramicDataWin8.controller.view;
-using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
-using PanoramicDataWin8.utils;
-using PanoramicDataWin8.view.common;
-using PanoramicDataWin8.view.inq;
+using PanoramicDataWin8.view.vis;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
-namespace PanoramicDataWin8.view.vis.menu
+namespace PanoramicDataWin8.view.common
 {
-    public sealed partial class RecommenderHandleView : UserControl
+    public sealed partial class BudgetView : UserControl
     {
-        private RecommenderHandleViewModel _model = null;
-        public RecommenderHandleView()
+        private BudgetViewModel _model = null;
+
+        public BudgetView()
         {
             this.InitializeComponent();
-            this.Loaded += RecommenderHandleView_Loaded;
-            this.DataContextChanged += RecommenderHandleView_DataContextChanged;
+            this.Loaded += BudgetView_Loaded;
         }
 
-        private void RecommenderHandleView_Loaded(object sender, RoutedEventArgs e)
+        private void BudgetView_Loaded(object sender, RoutedEventArgs e)
         {
             if (HypothesesViewController.Instance == null)
             {
@@ -45,60 +40,46 @@ namespace PanoramicDataWin8.view.vis.menu
             }
             else
             {
+                HypothesesViewController.Instance.HypothesesViewModel.PropertyChanged += HypothesesViewModel_PropertyChanged;
                 HypothesesViewController.Instance.RiskOperationModel.PropertyChanged += RiskOperationModel_PropertyChanged;
             }
             updateRendering();
+
+            DataContextChanged += BudgetView_DataContextChanged;
         }
 
-        private void RecommenderHandleView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        private void BudgetView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (_model != null)
             {
                 _model.PropertyChanged -= _model_PropertyChanged;
-                _model = null;
             }
             if (args.NewValue != null)
             {
-                _model = (RecommenderHandleViewModel) args.NewValue;
+                _model = args.NewValue as BudgetViewModel;
                 _model.PropertyChanged += _model_PropertyChanged;
-                updatePercentage();
             }
         }
 
         private void _model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == _model.GetPropertyName(() => _model.Percentage))
-            {
-                updatePercentage();
-            }
-
-            if (e.PropertyName == _model.GetPropertyName(() => _model.Position))
-            {
-                updatePosition();
-            }
-
-            _model.AttachmentViewModel.ActiveStopwatch.Restart();
-        }
-
-        private void updatePosition()
-        {
-            Vec diff = _model.Position - _model.StartPosition;
-            var w = 1.0 - Math.Min(Math.Max(0.01, Math.Pow(Math.Abs(diff.X) / 600.0, 2)), 1.0);
-            var y = Math.Min(Math.Max(0, Math.Pow(Math.Abs(diff.Y) / 300.0, 2)), 1.0) * w * Math.Sign(diff.Y) * 100.0;
-
-            _model.Percentage = Math.Min(100, Math.Max(1, _model.StartPercentage - y));
-            Debug.WriteLine(_model.Percentage);
-        }
-
-        private void updatePercentage()
-        {
-            lblPercentage.Text = _model.Percentage.ToString("F0") + "%";
+            updateRendering();
         }
 
         private void RiskOperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var model = sender as RiskOperationModel;
             if (e.PropertyName == model.GetPropertyName(() => model.RiskControlType))
+            {
+                updateRendering();
+            }
+        }
+
+        private void HypothesesViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var model = sender as HypothesesViewModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Wealth) ||
+                e.PropertyName == model.GetPropertyName(() => model.StartWealth))
             {
                 updateRendering();
             }
@@ -117,6 +98,20 @@ namespace PanoramicDataWin8.view.vis.menu
                 {
                     defaultGrid.Visibility = Visibility.Collapsed;
                     alphaGrid.Visibility = Visibility.Visible;
+
+                    if (HypothesesViewController.Instance.HypothesesViewModel.Wealth != -1 &&
+                        HypothesesViewController.Instance.HypothesesViewModel.StartWealth != -1)
+                    {
+                        var total = Math.Max(HypothesesViewController.Instance.HypothesesViewModel.StartWealth, HypothesesViewController.Instance.HypothesesViewModel.Wealth);
+                        var percentage = HypothesesViewController.Instance.HypothesesViewModel.Wealth / total;
+                        tbPercentage.Text = (percentage * 100.0).ToString("F0") + "%";
+
+                        var percentageToSpend = (DataContext as BudgetViewModel) != null ? (DataContext as BudgetViewModel).BudgetToSpend : 0;
+
+                        bottom.Height = new GridLength(percentage - percentageToSpend, GridUnitType.Star);
+                        middle.Height = new GridLength(percentageToSpend, GridUnitType.Star);
+                        top.Height = new GridLength((total / total) - percentage, GridUnitType.Star);
+                    }
                 }
             }
         }
@@ -124,6 +119,7 @@ namespace PanoramicDataWin8.view.vis.menu
         private void HypothesesViewController_Initialized(object sender, EventArgs e)
         {
             HypothesesViewController.Initialized -= HypothesesViewController_Initialized;
+            HypothesesViewController.Instance.HypothesesViewModel.PropertyChanged += HypothesesViewModel_PropertyChanged;
             HypothesesViewController.Instance.RiskOperationModel.PropertyChanged += RiskOperationModel_PropertyChanged;
         }
     }

@@ -41,7 +41,7 @@ namespace PanoramicDataWin8.controller.view
            
             AttributeTransformationViewModel.AttributeTransformationViewModelDropped += AttributeTransformationViewModelDropped;
             IDisposable disposable = Observable.FromEventPattern<AttributeTransformationViewModelEventArgs>(typeof(AttributeTransformationViewModel), "AttributeTransformationViewModelMoved")
-                .Sample(TimeSpan.FromMilliseconds(80))
+                .Sample(TimeSpan.FromMilliseconds(20))
                 .Subscribe(async arg =>
                 {
                     var dispatcher = MainPage.Dispatcher;
@@ -244,12 +244,11 @@ namespace PanoramicDataWin8.controller.view
                 InkableScene.Add(attachmentView);
             }
         }
-
-
+        
         public void RemoveOperationViewModel(OperationContainerView operationContainerView)
         {
             var operationViewModel = (OperationViewModel) operationContainerView.DataContext;
-            MainModel.QueryExecuter.RemoveJob(operationViewModel.OperationModel);
+            MainModel.QueryExecuter.HaltJob(operationViewModel.OperationModel);
             OperationViewModels.Remove(operationViewModel);
             Instance.InkableScene.Remove(operationContainerView);
 

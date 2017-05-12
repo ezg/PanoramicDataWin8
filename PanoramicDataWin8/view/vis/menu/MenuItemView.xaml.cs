@@ -87,6 +87,16 @@ namespace PanoramicDataWin8.view.vis.menu
                 mainGrid.Children.Clear();
                 mainGrid.Children.Add(new RecommenderMenuItemView());
             }
+            else if (model.MenuItemComponentViewModel is RecommendedHistogramMenuItemViewModel)
+            {
+                mainGrid.Children.Clear();
+                mainGrid.Children.Add(new RecommendedHistogramMenuItemView());
+            }
+            else if (model.MenuItemComponentViewModel is PagingMenuItemViewModel)
+            {
+                mainGrid.Children.Clear();
+                mainGrid.Children.Add(new PagingMenuItemView());
+            }
         }
 
 

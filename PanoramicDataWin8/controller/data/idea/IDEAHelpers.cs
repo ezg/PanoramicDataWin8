@@ -3,10 +3,13 @@ using System.Diagnostics;
 using System.Linq;
 using IDEA_common.aggregates;
 using IDEA_common.binning;
+using IDEA_common.catalog;
 using IDEA_common.operations;
 using IDEA_common.operations.example;
 using IDEA_common.operations.histogram;
+using IDEA_common.operations.recommender;
 using IDEA_common.operations.risk;
+using IDEA_common.range;
 using IDEA_common.util;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
@@ -153,6 +156,17 @@ namespace PanoramicDataWin8.controller.data.progressive
             return parameters;
         }
 
+        public static RecommenderOperationParameters GetRecommenderOperationParameters(RecommenderOperationModel model, int sampleSize)
+        {
+            var psm = model.SchemaModel as IDEASchemaModel;
+            var param = new RecommenderOperationParameters()
+            {
+                AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
+                SampleStreamBlockSize = sampleSize
+
+            };
+            return param;
+        }
 
         public static HistogramOperationParameters GetHistogramOperationParameters(HistogramOperationModel model, int sampleSize)
         {
@@ -347,5 +361,74 @@ namespace PanoramicDataWin8.controller.data.progressive
                 BrushIndex = brushIndex
             };
         }
+
+        public static AttributeModel GetAttributeModelFromAttribute(Attribute attribute)
+        {
+            var attributeModel = new IDEAFieldAttributeModel(
+                attribute.RawName,
+                attribute.DisplayName, attribute.Index,
+                InputDataTypeConstants.FromDataType(attribute.DataType),
+                InputDataTypeConstants.FromDataType(attribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric",
+                attribute.VisualizationHints);
+            return attributeModel;
+        }
+
+        public static List<FilterModel> GetFilterModelsFromSelections(List<Selection> selections)
+        {
+            var ret = new List<FilterModel>();
+            foreach (var selection in selections)
+            {
+                var fm = new FilterModel();
+                foreach (var statement in selection.Statements)
+                {
+                    fm.ValueComparisons.Add(new ValueComparison()
+                    {
+                        AttributeTransformationModel = new AttributeTransformationModel(GetAttributeModelFromAttribute(statement.Attribute)),
+                        Predicate = statement.Predicate,
+                        Value = statement.Value
+                    });
+                }
+                ret.Add(fm);
+            }
+
+            return ret;
+        }
+
+        public static FilterModel GetBinFilterModel(
+            Bin bin, int brushIndex, HistogramResult histogramResult,
+            AttributeTransformationModel xAom, AttributeTransformationModel yAom)
+        {
+            AttributeTransformationModel[] dimensions = new AttributeTransformationModel[] {xAom, yAom};
+            FilterModel filterModel = new FilterModel();
+            
+            for (int i = 0; i < histogramResult.BinRanges.Count; i++)
+            {
+                if (!(histogramResult.BinRanges[i] is AggregateBinRange))
+                {
+                    var dataFrom = histogramResult.BinRanges[i].GetValueFromIndex(bin.BinIndex.Indices[i]);
+                    var dataTo = histogramResult.BinRanges[i].AddStep(dataFrom);
+
+                    if (histogramResult.BinRanges[i] is NominalBinRange)
+                    {
+                        var tt = histogramResult.BinRanges[i].GetLabel(dataFrom);
+
+                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.EQUALS, tt));
+                    }
+                    else if (histogramResult.BinRanges[i] is AlphabeticBinRange)
+                    {
+                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.STARTS_WITH,
+                            histogramResult.BinRanges[i].GetLabel(dataFrom)));
+                    }
+                    else
+                    {
+                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.GREATER_THAN_EQUAL, dataFrom));
+                        filterModel.ValueComparisons.Add(new ValueComparison(dimensions[i], Predicate.LESS_THAN, dataTo));
+                    }
+                }
+            }
+
+            return filterModel;
+        }
+
     }
 }

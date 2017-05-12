@@ -4,5 +4,6 @@ namespace PanoramicDataWin8.model.view
 {
     public abstract class MenuItemComponentViewModel : ExtendedBindableBase
     {
+
     }
 }

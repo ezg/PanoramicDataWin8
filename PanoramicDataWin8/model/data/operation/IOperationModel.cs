@@ -8,6 +8,7 @@ namespace PanoramicDataWin8.model.data.operation
     {
         IResult Result { get; set; }
         int ExecutionId { get; set; }
+        ResultParameters ResultParameters { get; }
 
         IOperationModel ResultCauserClone { get; set; }
 
