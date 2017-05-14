@@ -10,6 +10,14 @@ namespace PanoramicDataWin8.model.view
     {
         public delegate void CreateRecommendationHandler(object sender, Rct bounds);
 
+        private RecommenderOperationViewModel _recommenderOperationViewModel = null;
+
+        public RecommenderOperationViewModel RecommenderOperationViewModel
+        {
+            get { return _recommenderOperationViewModel; }
+            set { SetProperty(ref _recommenderOperationViewModel, value); }
+        }
+
         private AttachmentViewModel _attachmentViewModel;
 
         public AttachmentViewModel AttachmentViewModel
@@ -17,23 +25,6 @@ namespace PanoramicDataWin8.model.view
             get { return _attachmentViewModel; }
             set { SetProperty(ref _attachmentViewModel, value); }
         }
-
-        private ObservableCollection<AttributeModel> _include = new ObservableCollection<AttributeModel>();
-
-        public ObservableCollection<AttributeModel> Include
-        {
-            get { return _include; }
-            set { SetProperty(ref _include, value); }
-        }
-
-        private ObservableCollection<AttributeModel> _exclude = new ObservableCollection<AttributeModel>();
-
-        public ObservableCollection<AttributeModel> Exlude
-        {
-            get { return _exclude; }
-            set { SetProperty(ref _exclude, value); }
-        }
-
 
         public event CreateRecommendationHandler CreateRecommendationEvent;
 

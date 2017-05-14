@@ -163,7 +163,9 @@ namespace PanoramicDataWin8.controller.data.progressive
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
                 SampleStreamBlockSize = sampleSize, 
-                ModelId = model.ModelId
+                ModelId = model.ModelId,
+                ExcludeDimensions = model.Exlude.Select(e => e.Index).ToList(),
+                IncludeDimensions = model.Include.Select(e => e.Index).ToList()
             };
             return param;
         }

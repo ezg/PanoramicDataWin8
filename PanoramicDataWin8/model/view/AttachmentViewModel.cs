@@ -12,6 +12,7 @@ namespace PanoramicDataWin8.model.view
         private MenuViewModel _menuViewModel;
         private OperationViewModel _operationViewModel;
         private bool _showOnAttributeMove;
+        private Vec _ankerOffset = new Vec();
 
         public AttachmentViewModel()
         {
@@ -38,6 +39,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _attachmentOrientation; }
             set { SetProperty(ref _attachmentOrientation, value); }
+        }
+
+        public Vec AnkerOffset
+        {
+            get { return _ankerOffset; }
+            set { SetProperty(ref _ankerOffset, value); }
         }
 
         public Stopwatch ActiveStopwatch

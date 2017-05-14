@@ -1,0 +1,32 @@
+﻿<UserControl
+    x:Class="PanoramicDataWin8.view.vis.menu.IncludeExcludeMenuItemView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PanoramicDataWin8.view.vis.menu"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:view="using:PanoramicDataWin8.model.view"
+    mc:Ignorable="d"
+    d:DesignHeight="50"
+    d:DesignWidth="50"
+    FontFamily="{StaticResource abel}">
+    
+    <Grid Background="{StaticResource lightBrush}">
+        <Viewbox Margin="2">
+            <TextBlock 
+                    Name="txtBlock"
+                    CacheMode="BitmapCache"
+                    RenderTransformOrigin="0.5, 0.5"
+                    VerticalAlignment="Stretch"
+                    HorizontalAlignment="Stretch"
+                    TextAlignment="Center"
+                    Text="as" FontSize="11" 
+                    Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
+        </Viewbox>
+        <Grid Margin="2" HorizontalAlignment="Right" VerticalAlignment="Bottom" Height="8" Width="8">
+            <Rectangle Width="3" Height="8" Fill="{StaticResource darkBrush}" Name="vertical" Visibility="Visible"></Rectangle>
+            <Rectangle Height="3" Width="8"  Fill="{StaticResource darkBrush}"></Rectangle>
+        </Grid>
+    </Grid>
+</UserControl>
+    

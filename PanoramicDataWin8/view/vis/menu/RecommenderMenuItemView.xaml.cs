@@ -139,8 +139,8 @@ namespace PanoramicDataWin8.view.vis.menu
                 {
                     AttachmentViewModel = model.AttachmentViewModel
                 };
-                _shadow.Exclude = model.Exlude;
-                _shadow.Include = model.Include;
+                _shadow.Exclude = model.RecommenderOperationViewModel.RecommenderOperationModel.Exlude;
+                _shadow.Include = model.RecommenderOperationViewModel.RecommenderOperationModel.Include;
                 _shadow.DataContext = shadowModel;
 
                 shadowModel.PropertyChanged += ShadowModel_PropertyChanged;

@@ -242,6 +242,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 foreach (var item in e.OldItems)
                 {
                     var model = (item as MenuItemViewModel);
+                    model.PropertyChanged -= MenuItemViewModel_PropertyChanged;
                     var view = _menuViewItems.FirstOrDefault(v => v.Key == model);
                     _contentCanvas.Children.Remove(view.Value);
                     _menuViewItems.Remove(view.Key);
@@ -257,6 +258,7 @@ namespace PanoramicDataWin8.view.vis.menu
                         DataContext = (item as MenuItemViewModel)
                     };
                     var model = (item as MenuItemViewModel);
+                    model.PropertyChanged += MenuItemViewModel_PropertyChanged;
                     _menuViewItems.Add(model, menuItemView);
                     _contentCanvas.Children.Insert(0, menuItemView);
                     updateRendering();
@@ -264,6 +266,16 @@ namespace PanoramicDataWin8.view.vis.menu
                     var sb = fadeStoryboard(menuItemView.Opacity, 1, menuItemView);
                     sb.Begin();
                 }
+            }
+        }
+
+        private void MenuItemViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            var model = sender as MenuItemViewModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Row) ||
+                e.PropertyName == model.GetPropertyName(() => model.Column))
+            {
+                updateRendering();
             }
         }
 
@@ -293,48 +305,79 @@ namespace PanoramicDataWin8.view.vis.menu
                 }
                 if (model.AttachmentOrientation == AttachmentOrientation.Right)
                 {
-                    for (int col = 0; col < model.NrColumns; col++)
+                    if (model.IsRigid)
                     {
-                        for (int row = 0; row < model.NrRows; row++)
+                        foreach (var mi in model.MenuItemViewModels)
                         {
-                            var itemsInSameCol = model.MenuItemViewModels.Where(mi => mi.Row < row && (mi.Column == col || (mi.Column < col && mi.Column + mi.ColumnSpan - 1 >= col))).ToList();
-                            var itemsInSameRow = model.MenuItemViewModels.Where(mi => mi.Column < col && (mi.Row == row || (mi.Row < row && mi.Row + mi.RowSpan - 1 >= row))).ToList();
-                            double currentY = model.AnkerPosition.Y + itemsInSameCol.Sum(mi => mi.Size.Y) + itemsInSameCol.Count * GAP;
-                            double currentX = model.AnkerPosition.X + itemsInSameRow.Sum(mi => mi.Size.X) + itemsInSameRow.Count() * GAP + GAP;
-
-                            var rowItem = model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
-                            
-                            if (rowItem != null)
+                            double currentY = model.AnkerPosition.Y + mi.Row * GAP + mi.Row * model.RigidSize;
+                            double currentX = model.AnkerPosition.X + mi.Column * GAP + mi.Column * model.RigidSize + GAP;
+                            if (mi.MenuXAlign.HasFlag(MenuXAlign.Right))
                             {
-                                rowItem.TargetPosition = new Pt(currentX, currentY);
+                                currentX += model.RigidSize - mi.Size.X;
+                            }
+                            mi.TargetPosition = new Pt(currentX, currentY);
+                        }
+                    }
+                    else
+                    {
+                        for (int col = 0; col < model.NrColumns; col++)
+                        {
+                            for (int row = 0; row < model.NrRows; row++)
+                            {
+                                var itemsInSameCol = model.MenuItemViewModels
+                                    .Where(mi => mi.Row < row &&
+                                                 (mi.Column == col ||
+                                                  (mi.Column < col && mi.Column + mi.ColumnSpan - 1 >= col))).ToList();
+                                var itemsInSameRow = model.MenuItemViewModels
+                                    .Where(mi => mi.Column < col &&
+                                                 (mi.Row == row || (mi.Row < row && mi.Row + mi.RowSpan - 1 >= row)))
+                                    .ToList();
+                                double currentY = model.AnkerPosition.Y + itemsInSameCol.Sum(mi => mi.Size.Y) +
+                                                  itemsInSameCol.Count * GAP;
+                                double currentX = model.AnkerPosition.X + itemsInSameRow.Sum(mi => mi.Size.X) +
+                                                  itemsInSameRow.Count() * GAP + GAP;
+
+                                var rowItem =
+                                    model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
+
+                                if (rowItem != null)
+                                {
+                                    rowItem.TargetPosition = new Pt(currentX, currentY);
+                                }
                             }
                         }
-                    }
-                    foreach (var rowItem in model.MenuItemViewModels.Where(ri => ri.MenuXAlign.HasFlag(MenuXAlign.WithColumn)))
-                    {
-                        var allInCol = model.MenuItemViewModels.Where(mi => rowItem != mi && mi.Column == rowItem.Column);
-                        if (allInCol.Any())
+                        foreach (var rowItem in model.MenuItemViewModels.Where(
+                            ri => ri.MenuXAlign.HasFlag(MenuXAlign.WithColumn)))
                         {
-                            var maxCol = allInCol.Max(mi => mi.TargetPosition.X);
-                            rowItem.TargetPosition = new Pt(maxCol, rowItem.TargetPosition.Y);
+                            var allInCol =
+                                model.MenuItemViewModels.Where(mi => rowItem != mi && mi.Column == rowItem.Column);
+                            if (allInCol.Any())
+                            {
+                                var maxCol = allInCol.Max(mi => mi.TargetPosition.X);
+                                rowItem.TargetPosition = new Pt(maxCol, rowItem.TargetPosition.Y);
+                            }
                         }
-                    }
-                    foreach (var rowItem in model.MenuItemViewModels.Where(ri => ri.MenuYAlign.HasFlag(MenuYAlign.WithRow)))
-                    {
-                        var allInRow = model.MenuItemViewModels.Where(mi => rowItem != mi && mi.Row < rowItem.Row);
-                        if (allInRow.Any())
+                        foreach (var rowItem in model.MenuItemViewModels.Where(
+                            ri => ri.MenuYAlign.HasFlag(MenuYAlign.WithRow)))
                         {
-                            var maxRow = allInRow.Max(mi => mi.TargetPosition.Y + mi.TargetSize.Y + GAP);
-                            rowItem.TargetPosition = new Pt(rowItem.TargetPosition.X, maxRow);
+                            var allInRow = model.MenuItemViewModels.Where(mi => rowItem != mi && mi.Row < rowItem.Row);
+                            if (allInRow.Any())
+                            {
+                                var maxRow = allInRow.Max(mi => mi.TargetPosition.Y + mi.TargetSize.Y + GAP);
+                                rowItem.TargetPosition = new Pt(rowItem.TargetPosition.X, maxRow);
+                            }
                         }
-                    }
-                    foreach (var rowItem in model.MenuItemViewModels.Where(ri => ri.MenuXAlign.HasFlag(MenuXAlign.Right)))
-                    {
-                        var allInCol = model.MenuItemViewModels.Where(mi => rowItem != mi && mi.Column == rowItem.Column);
-                        if (allInCol.Any())
+                        foreach (var rowItem in model.MenuItemViewModels.Where(
+                            ri => ri.MenuXAlign.HasFlag(MenuXAlign.Right)))
                         {
-                            var maxCol = allInCol.Max(mi => mi.TargetPosition.X + mi.TargetSize.X);
-                            rowItem.TargetPosition = new Pt(maxCol - rowItem.TargetSize.X, rowItem.TargetPosition.Y);
+                            var allInCol =
+                                model.MenuItemViewModels.Where(mi => rowItem != mi && mi.Column == rowItem.Column);
+                            if (allInCol.Any())
+                            {
+                                var maxCol = allInCol.Max(mi => mi.TargetPosition.X + mi.TargetSize.X);
+                                rowItem.TargetPosition =
+                                    new Pt(maxCol - rowItem.TargetSize.X, rowItem.TargetPosition.Y);
+                            }
                         }
                     }
                 }

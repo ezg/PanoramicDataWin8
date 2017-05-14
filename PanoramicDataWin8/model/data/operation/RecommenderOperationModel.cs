@@ -1,6 +1,8 @@
 ﻿using IDEA_common.operations;
 using IDEA_common.operations.risk;
 using Newtonsoft.Json;
+using PanoramicDataWin8.model.data.attribute;
+using System.Collections.ObjectModel;
 
 namespace PanoramicDataWin8.model.data.operation
 {
@@ -15,6 +17,24 @@ namespace PanoramicDataWin8.model.data.operation
         public RecommenderOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
         }
+
+
+        private ObservableCollection<AttributeModel> _include = new ObservableCollection<AttributeModel>();
+
+        public ObservableCollection<AttributeModel> Include
+        {
+            get { return _include; }
+            set { SetProperty(ref _include, value); }
+        }
+
+        private ObservableCollection<AttributeModel> _exclude = new ObservableCollection<AttributeModel>();
+
+        public ObservableCollection<AttributeModel> Exlude
+        {
+            get { return _exclude; }
+            set { SetProperty(ref _exclude, value); }
+        }
+
 
         public ModelId ModelId
         {

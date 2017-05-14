@@ -185,12 +185,16 @@ namespace PanoramicDataWin8.model.view.operation
 
         private static void createRightHistogramMenu(HistogramOperationViewModel histogramOperationViewModel)
         {
+            var rovm = RecommenderViewController.Instance.CreateRecommenderOperationViewModel(histogramOperationViewModel);
+
             var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
             var menuViewModel = new MenuViewModel
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = 4,
-                NrRows = 4
+                NrRows = 4,
+                IsRigid = true,
+                RigidSize = 54
             };
 
             var menuItem = new MenuItemViewModel
@@ -207,45 +211,25 @@ namespace PanoramicDataWin8.model.view.operation
             };
             var attr1 = new RecommenderMenuItemViewModel()
             {
-                AttachmentViewModel = attachmentViewModel
-            };
-            attr1.Exlude.CollectionChanged += (sender, args) =>
-            {
-
-                Debug.WriteLine("---");
-                foreach (var attributeModel in attr1.Include)
-                {
-                    Debug.WriteLine("+ ", attributeModel.DisplayName);
-                }
-                foreach (var attributeModel in attr1.Exlude)
-                {
-                    Debug.WriteLine("- ", attributeModel.DisplayName);
-                }
-            }; attr1.Include.CollectionChanged += (sender, args) =>
-            {
-
-                Debug.WriteLine("---");
-                foreach (var attributeModel in attr1.Include)
-                {
-                    Debug.WriteLine("+ ", attributeModel.DisplayName);
-                }
-                foreach (var attributeModel in attr1.Exlude)
-                {
-                    Debug.WriteLine("- ", attributeModel.DisplayName);
-                }
+                AttachmentViewModel = attachmentViewModel,
+                RecommenderOperationViewModel = rovm
             };
             attr1.CreateRecommendationEvent += (sender, bounds) =>
             {
-                if (histogramOperationViewModel.RecommenderOperationViewModel == null)
+                histogramOperationViewModel.RecommenderOperationViewModel.RecommenderOperationModel.Page = 0;
+                MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(
+                    histogramOperationViewModel.RecommenderOperationViewModel.OperationModel, true);
+
+                menuItem.IsAlwaysDisplayed = true;
+                if (!menuViewModel.MenuItemViewModels.Any(
+                    mi => mi.MenuItemComponentViewModel is RecommenderProgressMenuItemViewModel))
                 {
-                    var rovm = RecommenderViewController.Instance.CreateRecommenderOperationViewModel(histogramOperationViewModel);
-                    menuItem.IsAlwaysDisplayed = true;
                     var subMenuItem = new MenuItemViewModel
                     {
                         MenuViewModel = menuViewModel,
                         Row = 1,
                         ColumnSpan = 1,
-                        RowSpan = 3,
+                        RowSpan = 0,
                         Column = 0,
                         Size = new Vec(54, 54),
                         Position = histogramOperationViewModel.Position,

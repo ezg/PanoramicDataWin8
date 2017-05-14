@@ -20,6 +20,10 @@ namespace PanoramicDataWin8.model.view
 
         private bool _moveOnHide = false;
 
+        private bool _isRigid = false;
+
+        private double _rigidSize = 54;
+
         private ObservableCollection<MenuItemViewModel> _menuItemViewModels = new ObservableCollection<MenuItemViewModel>();
 
         private int _nrColumns;
@@ -70,11 +74,26 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _moveOnHide, value); }
         }
 
+
+        public double RigidSize
+        {
+            get { return _rigidSize; }
+            set { SetProperty(ref _rigidSize, value); }
+        }
+
+        public bool IsRigid
+        {
+            get { return _isRigid; }
+            set { SetProperty(ref _isRigid, value); }
+        }
+
         public AttachmentOrientation AttachmentOrientation
         {
             get { return _attachmentOrientation; }
             set { SetProperty(ref _attachmentOrientation, value); }
         }
+
+
 
         public event EventHandler Updated;
 

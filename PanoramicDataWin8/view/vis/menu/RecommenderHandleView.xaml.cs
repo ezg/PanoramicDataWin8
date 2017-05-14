@@ -149,6 +149,10 @@ namespace PanoramicDataWin8.view.vis.menu
                     }
                     else
                     {
+                        if (Include.Contains(_current))
+                        {
+                            Include.Remove(_current);
+                        }
                         Exclude.Add(_current);
                     }
                 }
@@ -160,6 +164,10 @@ namespace PanoramicDataWin8.view.vis.menu
                     }
                     else
                     {
+                        if (Exclude.Contains(_current))
+                        {
+                            Exclude.Remove(_current);
+                        }
                         Include.Add(_current);
                     }
                 }

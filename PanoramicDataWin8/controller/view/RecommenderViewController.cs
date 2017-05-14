@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -15,6 +16,7 @@ using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.view.vis;
+using System.Diagnostics;
 
 namespace PanoramicDataWin8.controller.view
 {
@@ -28,7 +30,6 @@ namespace PanoramicDataWin8.controller.view
         private RecommenderViewController(MainModel mainModel, ObservableCollection<OperationViewModel> operationViewModel)
         {
             _mainModel = mainModel;
-            //MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model, false);
         }
 
         public static RecommenderViewController Instance { get; private set; }
@@ -41,12 +42,71 @@ namespace PanoramicDataWin8.controller.view
             histogramViewModel.RecommenderOperationViewModel = viewModel;
             _recommenderOperationViewModels.Add(model, viewModel);
             _parentHistogramOperationViewModels.Add(viewModel, histogramViewModel);
-
-
             model.PropertyChanged += Model_PropertyChanged;
             model.OperationModelUpdated += Model_OperationModelUpdated;
-            MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(model, true);
+            var attachmentViewModel = histogramViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+
+
+            model.Exlude.CollectionChanged += (sender, args) =>
+            {
+                updateIncludeExlude(args.OldItems, args.NewItems, attachmentViewModel, histogramViewModel, model, false);
+            };
+            model.Include.CollectionChanged += (sender, args) =>
+            {
+                updateIncludeExlude(args.OldItems, args.NewItems, attachmentViewModel, histogramViewModel, model, true);
+            };
+
             return viewModel;
+        }
+
+        private  void updateIncludeExlude(IList oldItems, IList newItems, AttachmentViewModel attachmentViewModel, 
+            HistogramOperationViewModel histogramViewModel, RecommenderOperationModel model, bool include)
+        {
+            if (oldItems != null)
+            {
+                foreach (var oldItem in oldItems)
+                {
+                    var oldMi = attachmentViewModel.MenuViewModel.MenuItemViewModels
+                        .FirstOrDefault(mi => mi.MenuItemComponentViewModel is IncludeExludeMenuItemViewModel &&
+                                              (mi.MenuItemComponentViewModel as IncludeExludeMenuItemViewModel)
+                                              .IsInclude == include &&
+                                              (mi.MenuItemComponentViewModel as IncludeExludeMenuItemViewModel)
+                                              .AttributeModel == oldItem);
+                    if (oldMi != null)
+                    {
+                        attachmentViewModel.MenuViewModel.MenuItemViewModels.Remove(oldMi);
+                    }
+                }
+            }
+            if (newItems != null)
+            {
+                foreach (var newItem in newItems)
+                {
+                    var oldMi = attachmentViewModel.MenuViewModel.MenuItemViewModels
+                        .FirstOrDefault(mi => mi.MenuItemComponentViewModel is IncludeExludeMenuItemViewModel &&
+                                              (mi.MenuItemComponentViewModel as IncludeExludeMenuItemViewModel)
+                                              .IsInclude == include &&
+                                              (mi.MenuItemComponentViewModel as IncludeExludeMenuItemViewModel)
+                                              .AttributeModel == newItem);
+                    if (oldMi == null)
+                    {
+                        var menuItem = new MenuItemViewModel()
+                        {
+                            Size = new Vec(54, 54),
+                            Position = histogramViewModel.Position,
+                            TargetSize = new Vec(54, 54),
+                            Row = 0,
+                            IsAlwaysDisplayed = true
+                        };
+                        var includeExcludeModel = new IncludeExludeMenuItemViewModel();
+                        includeExcludeModel.AttributeModel = newItem as AttributeModel;
+                        includeExcludeModel.IsInclude = include;
+                        menuItem.MenuItemComponentViewModel = includeExcludeModel;
+                        attachmentViewModel.MenuViewModel.MenuItemViewModels.Add(menuItem);
+                    }
+                }
+            }
+            updateLayout(model, attachmentViewModel.MenuViewModel, histogramViewModel);
         }
 
         private void Model_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
@@ -68,65 +128,124 @@ namespace PanoramicDataWin8.controller.view
                 var menuViewModel = attachmentViewModel.MenuViewModel;
                 menuViewModel.MenuItemViewModels.First().IsAlwaysDisplayed = true;
 
-                int col = 0;
-                int row = 0;
-                
-                foreach (var existingModel in menuViewModel.MenuItemViewModels.Where(mi => mi.MenuItemComponentViewModel is RecommendedHistogramMenuItemViewModel).ToArray())
+                var includeExcludeCount = attachmentViewModel.MenuViewModel.MenuItemViewModels
+                    .Count(mi => mi.MenuItemComponentViewModel is IncludeExludeMenuItemViewModel);
+
+                updateRecommendedHistograms(menuViewModel, result, parent, includeExcludeCount);
+                addPagingControls(menuViewModel, result, model, includeExcludeCount);
+                updateLayout(model, menuViewModel, parent);
+            }
+        }
+
+        private void updateLayout(RecommenderOperationModel recommenderOperationModel, MenuViewModel menuViewModel, HistogramOperationViewModel histogramViewModel)
+        {
+            int row = 0;
+            // inlcude excludes
+            var attachmentViewModel = histogramViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+
+            var newCount = attachmentViewModel.MenuViewModel.MenuItemViewModels
+                .Count(mi => mi.MenuItemComponentViewModel is IncludeExludeMenuItemViewModel);
+
+            foreach (var includeExcludeItem in attachmentViewModel.MenuViewModel.MenuItemViewModels
+                .Where(mi => mi.MenuItemComponentViewModel is IncludeExludeMenuItemViewModel))
+            {
+                includeExcludeItem.Row = row;
+                row++;
+            }
+            int c = -(recommenderOperationModel.Exlude.Count + recommenderOperationModel.Include.Count);
+            attachmentViewModel.AnkerOffset = new Vec(0, c * 54 + c * 4);
+
+            // standard ones
+            var item = menuViewModel.MenuItemViewModels.FirstOrDefault(mi => mi.MenuItemComponentViewModel is RecommenderMenuItemViewModel);
+            if (item != null)
+            {
+                item.Row = row;
+            }
+            item = menuViewModel.MenuItemViewModels.FirstOrDefault(mi => mi.MenuItemComponentViewModel is RecommenderProgressMenuItemViewModel);
+            if (item != null)
+            {
+                item.Row = row+1;
+            }
+
+            // recommended histograms
+            int col = 0;
+            foreach (var existingModel in menuViewModel.MenuItemViewModels.Where(mi => mi.MenuItemComponentViewModel is RecommendedHistogramMenuItemViewModel).ToArray())
+            {
+                //existingModel.Column = col + 1;
+                existingModel.Row = row;
+                col++;
+                if (col == 3)
                 {
-                    if (result.RecommendedHistograms.Any(rh => rh.Id == (existingModel.MenuItemComponentViewModel as RecommendedHistogramMenuItemViewModel).Id))
+                    col = 0;
+                    row += 1;
+                }
+            }
+
+            // paging
+            foreach (var pager in menuViewModel.MenuItemViewModels.Where(mi => (mi.MenuItemComponentViewModel is PagingMenuItemViewModel)))
+            {
+                pager.Row = row;
+            }
+            menuViewModel.NrRows = row + 1;
+        }
+
+        private void updateRecommendedHistograms(MenuViewModel menuViewModel, RecommenderResult result, 
+            HistogramOperationViewModel parent, int rowStart)
+        {
+            int col = 0;
+            int row = rowStart;
+
+            foreach (var existingModel in menuViewModel.MenuItemViewModels.Where(mi => mi.MenuItemComponentViewModel is RecommendedHistogramMenuItemViewModel).ToArray())
+            {
+                if (result.RecommendedHistograms.Any(rh => rh.Id == (existingModel.MenuItemComponentViewModel as RecommendedHistogramMenuItemViewModel).Id))
+                {
+                    existingModel.Column = col + 1;
+                    existingModel.Row = row;
+                    col++;
+                    if (col == 3)
                     {
-                        existingModel.Column = col + 1;
-                        existingModel.Row = row;
-                        existingModel.MenuXAlign = MenuXAlign.WithColumn;
-                        col++;
-                        if (col == 3)
-                        {
-                            col = 0;
-                            row += 1;
-                        }
-                    }
-                    else
-                    {
-                        (existingModel.MenuItemComponentViewModel as RecommendedHistogramMenuItemViewModel).DroppedEvent -= RecHistogramModel_DroppedEvent;
-                        menuViewModel.MenuItemViewModels.Remove(existingModel);
+                        col = 0;
+                        row += 1;
                     }
                 }
-
-                foreach (var recommendedHistogram in result.RecommendedHistograms.ToArray())
+                else
                 {
-                    if (!menuViewModel.MenuItemViewModels.Where(mi => mi.MenuItemComponentViewModel is RecommendedHistogramMenuItemViewModel)
-                        .Any(mi => (mi.MenuItemComponentViewModel as RecommendedHistogramMenuItemViewModel).Id == recommendedHistogram.Id))
-                    {
-                        var newModel = new MenuItemViewModel()
-                        {
-                            Position = menuViewModel.MenuItemViewModels.First().Position,
-                            Size = new Vec(54, 54),
-                            TargetSize = new Vec(54, 54),
-                            IsAlwaysDisplayed = true
-                        };
-                        var recHistogramModel = new RecommendedHistogramMenuItemViewModel
-                        {
-                            Id = recommendedHistogram.Id,
-                            RecommendedHistogram = recommendedHistogram,
-                            HistogramOperationViewModel = parent
-                        };
-                        newModel.MenuItemComponentViewModel = recHistogramModel;
-                        recHistogramModel.DroppedEvent += RecHistogramModel_DroppedEvent;
-
-                        newModel.Column = col + 1;
-                        newModel.Row = row;
-                        newModel.MenuXAlign = MenuXAlign.WithColumn;
-                        col++;
-                        if (col == 3)
-                        {
-                            col = 0;
-                            row += 1;
-                        }
-                        menuViewModel.MenuItemViewModels.Add(newModel);
-                    }
+                    (existingModel.MenuItemComponentViewModel as RecommendedHistogramMenuItemViewModel).DroppedEvent -= RecHistogramModel_DroppedEvent;
+                    menuViewModel.MenuItemViewModels.Remove(existingModel);
                 }
+            }
 
-                addPagingControls(menuViewModel, result, model);
+            foreach (var recommendedHistogram in result.RecommendedHistograms.ToArray())
+            {
+                if (!menuViewModel.MenuItemViewModels.Where(mi => mi.MenuItemComponentViewModel is RecommendedHistogramMenuItemViewModel)
+                    .Any(mi => (mi.MenuItemComponentViewModel as RecommendedHistogramMenuItemViewModel).Id == recommendedHistogram.Id))
+                {
+                    var newModel = new MenuItemViewModel()
+                    {
+                        Position = menuViewModel.MenuItemViewModels.First().Position,
+                        Size = new Vec(54, 54),
+                        TargetSize = new Vec(54, 54),
+                        IsAlwaysDisplayed = true
+                    };
+                    var recHistogramModel = new RecommendedHistogramMenuItemViewModel
+                    {
+                        Id = recommendedHistogram.Id,
+                        RecommendedHistogram = recommendedHistogram,
+                        HistogramOperationViewModel = parent
+                    };
+                    newModel.MenuItemComponentViewModel = recHistogramModel;
+                    recHistogramModel.DroppedEvent += RecHistogramModel_DroppedEvent;
+
+                    newModel.Column = col + 1;
+                    newModel.Row = row;
+                    col++;
+                    if (col == 3)
+                    {
+                        col = 0;
+                        row += 1;
+                    }
+                    menuViewModel.MenuItemViewModels.Add(newModel);
+                }
             }
         }
 
@@ -151,7 +270,8 @@ namespace PanoramicDataWin8.controller.view
 
         }
 
-        private void addPagingControls(MenuViewModel menuViewModel, RecommenderResult result, RecommenderOperationModel model)
+        private void addPagingControls(MenuViewModel menuViewModel, RecommenderResult result, 
+            RecommenderOperationModel model, int rowStart)
         {
             var left = menuViewModel.MenuItemViewModels.FirstOrDefault(mi => (mi.MenuItemComponentViewModel as PagingMenuItemViewModel)?.PagingDirection == PagingDirection.Left);
             var right = menuViewModel.MenuItemViewModels.FirstOrDefault(mi => (mi.MenuItemComponentViewModel as PagingMenuItemViewModel)?.PagingDirection == PagingDirection.Right);
@@ -175,7 +295,8 @@ namespace PanoramicDataWin8.controller.view
                     newModel.MenuItemComponentViewModel = paging;
 
                     newModel.Column = 1;
-                    newModel.Row = 3;
+                    newModel.Row = rowStart + 3;
+                    newModel.MenuYAlign = MenuYAlign.WithRow;
                     menuViewModel.MenuItemViewModels.Add(newModel);
                 }
             }
@@ -203,7 +324,7 @@ namespace PanoramicDataWin8.controller.view
                     newModel.MenuItemComponentViewModel = paging;
 
                     newModel.Column = 3;
-                    newModel.Row = 3;
+                    newModel.Row = rowStart + 3;
                     newModel.MenuXAlign = MenuXAlign.WithColumn | MenuXAlign.Right;
                     newModel.MenuYAlign = MenuYAlign.WithRow;
 

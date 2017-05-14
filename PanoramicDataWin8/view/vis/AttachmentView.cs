@@ -96,9 +96,14 @@ namespace PanoramicDataWin8.view.vis
 
         void OperationViewModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            var visModel = (DataContext as AttachmentViewModel).OperationViewModel;
+            var attach = (DataContext as AttachmentViewModel);
+            var visModel = attach.OperationViewModel;
             if (e.PropertyName == visModel.GetPropertyName(() => visModel.Size) ||
                 e.PropertyName == visModel.GetPropertyName(() => visModel.Position))
+            {
+                setMenuViewModelAnkerPosition();
+            }
+            else if (e.PropertyName == attach.GetPropertyName(() => attach.AnkerOffset))
             {
                 setMenuViewModelAnkerPosition();
             }
@@ -121,33 +126,35 @@ namespace PanoramicDataWin8.view.vis
                 if (model.AttachmentOrientation == AttachmentOrientation.Left)
                 {
                     _menuViewModel.AnkerPosition = new Pt(model.OperationViewModel.Position.X,
-                        model.OperationViewModel.Position.Y);
+                        model.OperationViewModel.Position.Y) + model.AnkerOffset;
                 }
                 else if (model.AttachmentOrientation == AttachmentOrientation.Right)
                 {
                     _menuViewModel.AnkerPosition = new Pt(model.OperationViewModel.Position.X + model.OperationViewModel.Size.X,
-                        model.OperationViewModel.Position.Y);
+                        model.OperationViewModel.Position.Y) + model.AnkerOffset;
                 }
                 else if (model.AttachmentOrientation == AttachmentOrientation.Top)
                 {
                     _menuViewModel.AnkerPosition = new Pt(model.OperationViewModel.Position.X,
-                        model.OperationViewModel.Position.Y);
+                        model.OperationViewModel.Position.Y) + model.AnkerOffset;
                 }
                 else if (model.AttachmentOrientation == AttachmentOrientation.Bottom)
                 {
                     _menuViewModel.AnkerPosition = new Pt(model.OperationViewModel.Position.X,
-                        model.OperationViewModel.Position.Y + model.OperationViewModel.Size.Y);
+                        model.OperationViewModel.Position.Y + model.OperationViewModel.Size.Y) + model.AnkerOffset;
                 }
 
                 foreach (var menuItemViewModel in _menuViewModel.MenuItemViewModels.Where(m => m.IsHeightBoundToParent))
                 {
                     menuItemViewModel.TargetSize =
-                        menuItemViewModel.TargetSize = new Vec(menuItemViewModel.TargetSize.X, model.OperationViewModel.Size.Y);
+                        menuItemViewModel.TargetSize = new Vec(menuItemViewModel.TargetSize.X, model.OperationViewModel.Size.Y)
+                                                       + model.AnkerOffset;
                 }
                 foreach (var menuItemViewModel in _menuViewModel.MenuItemViewModels.Where(m => m.IsWidthBoundToParent))
                 {
                     menuItemViewModel.TargetSize =
-                        menuItemViewModel.TargetSize = new Vec(model.OperationViewModel.Size.X, menuItemViewModel.TargetSize.Y);
+                        menuItemViewModel.TargetSize = new Vec(model.OperationViewModel.Size.X, menuItemViewModel.TargetSize.Y)
+                                                       + model.AnkerOffset;
                 }
             }
         }
