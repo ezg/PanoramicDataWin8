@@ -500,10 +500,14 @@ namespace PanoramicDataWin8.controller.view
                 if (recognizedGesture is ConnectGesture)
                 {
                     var connect = recognizedGesture as ConnectGesture;
+                    bool created = false;
                     if (connect.FilterConsumerOperationViewModel == null)
+                    {
+                        created = true;
                         connect.CreateConsumer(e.InkStroke.Clone());
-                    if (connect.FilterProviderOperationViewModel is FilterOperationModel &&
-                        connect.FilterConsumerOperationViewModel is FilterOperationModel)
+                    }
+                    if (created && connect.FilterProviderOperationViewModel is FilterOperationModel &&
+                        connect.FilterConsumerOperationViewModel is FilterOperationModel )
                     {
                         FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterConsumerOperationViewModel,
                                                                                     connect.FilterProviderOperationViewModel);

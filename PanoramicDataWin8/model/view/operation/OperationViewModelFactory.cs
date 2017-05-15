@@ -46,7 +46,9 @@ namespace PanoramicDataWin8.model.view.operation
                 var newFilterOperationViewModel = CreateDefaultFilterOperationViewModel(operationViewModel.OperationModel.SchemaModel,
                     operationViewModel.Position, controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse);
                 var newOperationModel = (FilterOperationModel)newFilterOperationViewModel.OperationModel;
-                
+                foreach (var fm in oldOperationModel.FilterModels)
+                    (newFilterOperationViewModel.OperationModel as FilterOperationModel).AddFilterModel(fm);
+
                 return newFilterOperationViewModel;
             }
             return null;

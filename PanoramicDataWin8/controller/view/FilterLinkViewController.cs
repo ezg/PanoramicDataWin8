@@ -175,9 +175,12 @@ namespace PanoramicDataWin8.controller.view
 
         public void RemoveFilterLinkViewModel(FilterLinkModel filterLinkModel)
         {
-            if (filterLinkModel is IFilterConsumerOperationModel)  // bcz: if FromOperationModel is a consumer, then remove this from it.
-                (filterLinkModel.FromOperationModel as IFilterConsumerOperationModel).ConsumerLinkModels.Remove(filterLinkModel);
             filterLinkModel.ToOperationModel.ConsumerLinkModels.Remove(filterLinkModel);
+            filterLinkModel.FromOperationModel.ProviderLinkModels.Remove(filterLinkModel);
+            if (filterLinkModel.FromOperationModel is IFilterConsumerOperationModel) 
+                (filterLinkModel.FromOperationModel as IFilterConsumerOperationModel).ConsumerLinkModels.Remove(filterLinkModel);
+            if (filterLinkModel.ToOperationModel is IFilterProviderOperationModel)
+                (filterLinkModel.ToOperationModel as IFilterProviderOperationModel).ProviderLinkModels.Remove(filterLinkModel);
             foreach (var linkViewModel in FilterLinkViewModels.ToArray())
             {
                 if (linkViewModel.FilterLinkModels.Contains(filterLinkModel))

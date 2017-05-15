@@ -45,6 +45,7 @@ namespace PanoramicDataWin8.view.vis.render
         private readonly Gesturizer _gesturizerField = new Gesturizer();
         private readonly Gesturizer _gesturizerScene1 = new Gesturizer();
         private readonly Gesturizer _gesturizerScene2 = new Gesturizer();
+        DispatcherTimer _keyboardTimer = new DispatcherTimer();
 
         public FilterRenderer()
         {
@@ -59,6 +60,15 @@ namespace PanoramicDataWin8.view.vis.render
             _gesturizerScene1.AddGesture(new EraseGesture(inkableScene));
             _gesturizerScene2.AddGesture(new EraseGesture(inkableScene2));
             _gesturizerField.AddGesture(new EraseGesture(inkableField));
+            _keyboardTimer.Interval = new TimeSpan(0, 0, 0, 0, 300);
+            _keyboardTimer.Tick += _keyboardTimer_Tick;
+        }
+        bool _timedUpdateLock = false;
+        void _keyboardTimer_Tick(object sender, object e)
+        {
+            _timedUpdateLock = true;
+            InterpretTextBoxInput();
+            _timedUpdateLock = false;
         }
 
         void FilterRenderer_Loaded(object sender, RoutedEventArgs e)
@@ -67,6 +77,7 @@ namespace PanoramicDataWin8.view.vis.render
             //_filterRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
             //_filterRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
             //dxSurface.ContentProvider = _filterRendererContentProvider;
+            UpdateFilterDisplay();
         }
 
         public override void Dispose()
@@ -459,9 +470,13 @@ namespace PanoramicDataWin8.view.vis.render
             }
             if (attributeTransformationModel == null)
                 filterModel = null;
-            else filterModel.ValueComparisons.Add(new ValueComparison(attributeTransformationModel, p, value));
-            if (!(DataContext as FilterOperationViewModel).FilterOperationModel.FilterModels.Contains(filterModel))
-                (DataContext as FilterOperationViewModel).FilterOperationModel.AddFilterModel(filterModel);
+            else
+            {
+                filterModel.ValueComparisons.Add(new ValueComparison(attributeTransformationModel, p, value));
+
+                if (!(DataContext as FilterOperationViewModel).FilterOperationModel.FilterModels.Contains(filterModel))
+                    (DataContext as FilterOperationViewModel).FilterOperationModel.AddFilterModel(filterModel);
+            }
 
             UpdateFilterDisplay();
             render();
@@ -469,6 +484,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         void UpdateFilterDisplay()
         {
+            if (_timedUpdateLock)
+                return;
             var filterModels = (this.DataContext as FilterOperationViewModel).FilterOperationModel.FilterModels;
             if (filterModels.Count > 0 && filterModels.First().ValueComparisons.Count > 0)
             {
@@ -555,52 +572,60 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (e.Key == Windows.System.VirtualKey.Enter)
             {
-                (DataContext as FilterOperationViewModel).FilterOperationModel.ClearFilterModels();
-
-                var splits = new List<String>();
-                var exprText = ExpressionTextBox.Text;
-                string accum = "";
-                for (int i = 0; i < exprText.Length; i++)
-                {
-                    var token = tokenize(ref accum, exprText[i]);
-                    if (token != "")
-                        splits.Add(token);
-                }
-                if (accum != "")
-                    splits.Add(accum);
-
-                double val = 0;
-                if (splits.Count() > 2)
-                {
-                    var vfield = FieldType(splits.First());
-                    if (vfield != null && vfield == InputDataTypeConstants.NVARCHAR)
-                    {
-                        var p = ToStringPredicate(splits[1]);
-                        AddFilterModel(validField(splits[0]), p, splits[2]);
-                    }
-                    else
-                    {
-                        if (double.TryParse(splits.First(), out val))
-                        {
-                            var p = ToLvalPredicate(splits[1]);
-                            AddFilterModel(validField(splits[2]), p, val);
-                            splits.RemoveAt(0);
-                            splits.RemoveAt(0);
-                        }
-                        if (splits.Count() > 2)
-                        {
-                            var p = ToRvalPredicate(splits[1]);
-                            if (double.TryParse(splits[2], out val))
-                            {
-                                AddFilterModel(validField(splits[0]), p, val);
-                            }
-                        }
-                    }
-                }
+                InterpretTextBoxInput();
                 e.Handled = true;
             }
+            else
+                _keyboardTimer.Start();
         }
-        
+
+        void InterpretTextBoxInput()
+        {
+            (DataContext as FilterOperationViewModel).FilterOperationModel.ClearFilterModels();
+
+            var splits = new List<String>();
+            var exprText = ExpressionTextBox.Text;
+            string accum = "";
+            for (int i = 0; i < exprText.Length; i++)
+            {
+                var token = tokenize(ref accum, exprText[i]);
+                if (token != "")
+                    splits.Add(token);
+            }
+            if (accum != "")
+                splits.Add(accum);
+
+            double val = 0;
+            if (splits.Count() > 2)
+            {
+                var vfield = FieldType(splits.First());
+                if (vfield != null && vfield == InputDataTypeConstants.NVARCHAR)
+                {
+                    var p = ToStringPredicate(splits[1]);
+                    AddFilterModel(validField(splits[0]), p, splits[2]);
+                }
+                else
+                {
+                    if (double.TryParse(splits.First(), out val))
+                    {
+                        var p = ToLvalPredicate(splits[1]);
+                        AddFilterModel(validField(splits[2]), p, val);
+                        splits.RemoveAt(0);
+                        splits.RemoveAt(0);
+                    }
+                    if (splits.Count() > 2)
+                    {
+                        var p = ToRvalPredicate(splits[1]);
+                        if (double.TryParse(splits[2], out val))
+                        {
+                            AddFilterModel(validField(splits[0]), p, val);
+                        }
+                    }
+                }
+            }
+            _keyboardTimer.Stop();
+        }
+
         void ExpressionTextBox_PointerExited(object sender, PointerRoutedEventArgs e)
         {
 
@@ -608,6 +633,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 ExpressionTextBox.IsEnabled = false;
                 MainViewController.Instance.MainPage.FocusSink.Focus(FocusState.Keyboard);
+                InterpretTextBoxInput();
             }
         }
     }

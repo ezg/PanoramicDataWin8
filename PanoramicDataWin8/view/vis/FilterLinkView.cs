@@ -193,7 +193,8 @@ namespace PanoramicDataWin8.view.vis
                                     updateRendering();
                                 });
                             });
-                        _fromDisposables.Add(om, disposable);
+                        if (!_fromDisposables.ContainsKey(om))
+                            _fromDisposables.Add(om, disposable);
                     } 
             }
             updateRendering();

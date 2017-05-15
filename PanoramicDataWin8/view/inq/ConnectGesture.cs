@@ -63,7 +63,7 @@ namespace PanoramicDataWin8.view.inq
                     }
                 }
 
-                if (_filterProviderOperationViewModel != null && (inkStroke.IsPause || _filterConsumerOperationViewModel != null)) // && _filterProviderOperationViewModel is IFilterConsumerOperationModel)
+                if (_filterProviderOperationViewModel != null && (_filterProviderOperationViewModel is FilterOperationModel || inkStroke.IsPause || _filterConsumerOperationViewModel != null)) // && _filterProviderOperationViewModel is IFilterConsumerOperationModel)
                 {
                     return true;
                 }
