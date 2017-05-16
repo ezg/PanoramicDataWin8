@@ -214,12 +214,14 @@ namespace PanoramicDataWin8.model.view.operation
                 AttachmentViewModel = attachmentViewModel,
                 RecommenderOperationViewModel = rovm
             };
-            attr1.CreateRecommendationEvent += (sender, bounds) =>
+            attr1.CreateRecommendationEvent += (sender, bounds, percentage) =>
             {
                 histogramOperationViewModel.RecommenderOperationViewModel.RecommenderOperationModel.Page = 0;
+                histogramOperationViewModel.RecommenderOperationViewModel.RecommenderOperationModel.Budget = 
+                    (percentage / 100.0) * HypothesesViewController.Instance.HypothesesViewModel.StartWealth;
                 MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(
                     histogramOperationViewModel.RecommenderOperationViewModel.OperationModel, true);
-
+                
                 menuItem.IsAlwaysDisplayed = true;
                 if (!menuViewModel.MenuItemViewModels.Any(
                     mi => mi.MenuItemComponentViewModel is RecommenderProgressMenuItemViewModel))

@@ -11,6 +11,7 @@ namespace PanoramicDataWin8.model.data.operation
     {
         private ModelId _modelId;
         private int _page;
+        private double _budget;
 
         private int _pageSize = 9;
 
@@ -18,6 +19,19 @@ namespace PanoramicDataWin8.model.data.operation
         {
         }
 
+        public double Budget
+        {
+            get { return _budget; }
+            set { SetProperty(ref _budget, value); }
+        }
+
+
+        private HistogramOperationModel _target = null;
+        public HistogramOperationModel Target
+        {
+            get { return _target; }
+            set { SetProperty(ref _target, value); }
+        }
 
         private ObservableCollection<AttributeModel> _include = new ObservableCollection<AttributeModel>();
 

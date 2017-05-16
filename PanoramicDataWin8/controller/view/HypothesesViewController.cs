@@ -21,6 +21,9 @@ namespace PanoramicDataWin8.controller.view
 {
     public class HypothesesViewController
     {
+        public static List<RiskControlType> SupportedRiskControlTypes =
+            IDEA_common.util.Extensions.Yield(RiskControlType.PCER, RiskControlType.BetaFarsighted).ToList();
+
         public static event EventHandler Initialized;
 
         private static void fireInitializedEvent()
@@ -121,6 +124,10 @@ namespace PanoramicDataWin8.controller.view
                                 (a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.INT)
                             {
                                 //statModel.TestType = TestType.ttest;
+                            }
+                            else
+                            {
+                                //statModel.TestType = TestType.chi2;
                             }
                             model.StatisticalComparisonOperationModel = statModel;
                             add = true;

@@ -8,7 +8,7 @@ namespace PanoramicDataWin8.model.view
 {
     public class RecommenderMenuItemViewModel : MenuItemComponentViewModel
     {
-        public delegate void CreateRecommendationHandler(object sender, Rct bounds);
+        public delegate void CreateRecommendationHandler(object sender, Rct bounds, double percentage);
 
         private RecommenderOperationViewModel _recommenderOperationViewModel = null;
 
@@ -28,9 +28,9 @@ namespace PanoramicDataWin8.model.view
 
         public event CreateRecommendationHandler CreateRecommendationEvent;
 
-        public void FireCreateRecommendationEvent(Rct bounds)
+        public void FireCreateRecommendationEvent(Rct bounds, double percentage)
         {
-            CreateRecommendationEvent?.Invoke(this, bounds);
+            CreateRecommendationEvent?.Invoke(this, bounds, percentage);
         }
     }
 

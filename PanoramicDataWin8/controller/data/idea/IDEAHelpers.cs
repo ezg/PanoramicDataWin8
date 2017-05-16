@@ -165,8 +165,12 @@ namespace PanoramicDataWin8.controller.data.progressive
                 SampleStreamBlockSize = sampleSize, 
                 ModelId = model.ModelId,
                 ExcludeDimensions = model.Exlude.Select(e => e.Index).ToList(),
-                IncludeDimensions = model.Include.Select(e => e.Index).ToList()
+                IncludeDimensions = model.Include.Select(e => e.Index).ToList(),
+                Target = GetHistogramOperationParameters(model.Target, sampleSize), 
+                RiskControlType = HypothesesViewController.Instance.RiskOperationModel.RiskControlType,
+                Budget = 0.025//model.Budget
             };
+            param.ExcludeDimensions.Add(model.Target.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel.Index);
             return param;
         }
 

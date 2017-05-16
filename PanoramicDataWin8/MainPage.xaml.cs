@@ -496,14 +496,20 @@ namespace PanoramicDataWin8
 
         private void notesButton_Click(object sender, RoutedEventArgs e)
         {
-            if (notesBox.Visibility == Visibility.Collapsed)
+            /*if (notesBox.Visibility == Visibility.Collapsed)
             {
                 notesBox.Visibility = Visibility.Visible;
             }
             else
             {
                 notesBox.Visibility = Visibility.Collapsed;
-            }
+            }*/
+            MainViewController.Instance.MainModel.IsDefaultHypothesisEnabled = !MainViewController.Instance.MainModel.IsDefaultHypothesisEnabled;
+            Debug.WriteLine("IsDefaultHypothesisEnabled : " + MainViewController.Instance.MainModel.IsDefaultHypothesisEnabled);
+
+            msgTextBlock.Text = "IsDefaultHypothesisEnabled : " + MainViewController.Instance.MainModel.IsDefaultHypothesisEnabled;
+            msgTextBlock.Opacity = 1;
+            _messageTimer.Start();
         }
 
 
@@ -514,8 +520,8 @@ namespace PanoramicDataWin8
                 _hypothesisMenuViewModel = new MenuViewModel
                 {
                     AttachmentOrientation = AttachmentOrientation.Left,
-                    NrColumns = 5,
-                    NrRows = 4,
+                    NrColumns = 3,
+                    NrRows = 1,
                     MoveOnHide = true
                 };
 
@@ -560,23 +566,16 @@ namespace PanoramicDataWin8
                 var toggles = new List<ToggleMenuItemComponentViewModel>();
                 var items = new List<MenuItemViewModel>();
 
-                var count = 0;
-                var col = 1;
-                foreach (var riskCtrlType in new[]
-                {
-                    RiskControlType.PCER,
-                    RiskControlType.Bonferroni, RiskControlType.AdaBonferroni, RiskControlType.HolmBonferroni,
-                    RiskControlType.BHFDR, RiskControlType.SeqFDR, RiskControlType.AlphaFDR, RiskControlType.BestFootForward,
-                    RiskControlType.BetaFarsighted, RiskControlType.GammaFixed, RiskControlType.DeltaHopeful, RiskControlType.EpsilonHybrid, RiskControlType.PsiSupport
-                })
+                var count = 1;
+                foreach (var riskCtrlType in HypothesesViewController.SupportedRiskControlTypes)
                 {
                     var toggleMenuItem = new MenuItemViewModel
                     {
                         MenuViewModel = _hypothesisMenuViewModel,
-                        Row = count%4,
+                        Row = 0,
                         RowSpan = 0,
                         Position = new Pt(menuHypothesisGrid.ActualWidth, 0),
-                        Column = col,
+                        Column = count,
                         Size = new Vec(75, 50),
                         TargetSize = new Vec(75, 50)
                     };
@@ -606,10 +605,6 @@ namespace PanoramicDataWin8
                     _hypothesisMenuViewModel.MenuItemViewModels.Add(toggleMenuItem);
                     items.Add(toggleMenuItem);
                     count++;
-                    if (count%4 == 0)
-                    {
-                        col += 1;
-                    }
                 }
 
                 foreach (var mi in items)
@@ -627,7 +622,7 @@ namespace PanoramicDataWin8
                     DataContext = _hypothesisMenuViewModel
                 };
                 _hypothesisMenuViewModel.AnkerPosition = new Pt(menuHypothesisGrid.ActualWidth, -((_hypothesisMenuViewModel.NrRows - 1)*50 + (_hypothesisMenuViewModel.NrRows - 1)*4));
-                _hypothesisMenuViewModel.HidePosition = new Pt(menuHypothesisGrid.ActualWidth, 54);
+                _hypothesisMenuViewModel.HidePosition = new Pt(menuHypothesisGrid.ActualWidth, 0);
                 menuHypothesisGrid.Children.Add(_hypothesisMenuView);
             }
 

@@ -6,7 +6,7 @@ namespace PanoramicDataWin8.model.data.operation
     public class RiskOperationModel : OperationModel
     {
         private double _alpha = 0.05;
-        private RiskControlType _riskControlType = RiskControlType.GammaFixed;
+        private RiskControlType _riskControlType = RiskControlType.BetaFarsighted;
         private ModelId _modelId;
 
         private List<RiskControlType> _riskControlTypes = new List<RiskControlType>

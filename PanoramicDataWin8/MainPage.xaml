@@ -102,7 +102,7 @@
                                     HorizontalAlignment="Center"
                                     TextAlignment="Center"
                                     MaxWidth="50"
-                                    Text="n" FontSize="30" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
+                                    Text="d" FontSize="30" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap" FontWeight="Normal"/>
                         </Grid>
                     </ControlTemplate>
                 </Button.Template>

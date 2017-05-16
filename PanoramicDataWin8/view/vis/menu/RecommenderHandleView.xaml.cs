@@ -92,7 +92,11 @@ namespace PanoramicDataWin8.view.vis.menu
             var w = 1.0 - Math.Min(Math.Max(0.01, Math.Pow(Math.Abs(diff.X) / 600.0, 2)), 1.0);
             var y = Math.Min(Math.Max(0, Math.Pow(Math.Abs(diff.Y) / 300.0, 2)), 1.0) * w * Math.Sign(diff.Y) * 100.0;
 
-            _model.Percentage = Math.Min(100, Math.Max(1, _model.StartPercentage - y));
+            var total = Math.Max(HypothesesViewController.Instance.HypothesesViewModel.StartWealth, HypothesesViewController.Instance.HypothesesViewModel.Wealth);
+            var percentage = (HypothesesViewController.Instance.HypothesesViewModel.Wealth / total) * 100.0;
+
+
+            _model.Percentage = Math.Min(percentage, Math.Max(1, _model.StartPercentage - y));
             
 
             checkHits();

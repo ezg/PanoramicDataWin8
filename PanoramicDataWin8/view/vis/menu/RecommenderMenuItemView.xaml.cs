@@ -117,13 +117,14 @@ namespace PanoramicDataWin8.view.vis.menu
                 (_shadow.DataContext as RecommenderHandleViewModel).PropertyChanged -= ShadowModel_PropertyChanged;
                 _shadow.TerminateInteraction();
                 inkableScene.Remove(_shadow);
+                var percentage = (_shadow.DataContext as RecommenderHandleViewModel).Percentage;
                 _shadow = null;
 
                 var model = ((MenuItemViewModel) this.DataContext).MenuItemComponentViewModel as RecommenderMenuItemViewModel;
                 var dist = (_mainPointerManagerStartPoint.GetVec() - _mainPointerManagerPreviousPoint.GetVec()).Length;
                 if (model != null && dist > 50)
                 {
-                    model.FireCreateRecommendationEvent(bounds);
+                    model.FireCreateRecommendationEvent(bounds, percentage);
                 }
             }
         }
@@ -148,7 +149,10 @@ namespace PanoramicDataWin8.view.vis.menu
                 shadowModel.Size = new Vec(this.ActualWidth, this.ActualHeight);
                 shadowModel.Position = new Pt(fromInkableScene.X - shadowModel.Size.X / 2.0, fromInkableScene.Y - shadowModel.Size.Y);
                 shadowModel.StartPosition = shadowModel.Position;
-                shadowModel.StartPercentage = shadowModel.Percentage = 20;
+                var total = Math.Max(HypothesesViewController.Instance.HypothesesViewModel.StartWealth, HypothesesViewController.Instance.HypothesesViewModel.Wealth);
+                var percentage = HypothesesViewController.Instance.HypothesesViewModel.Wealth / total;
+
+                shadowModel.StartPercentage = shadowModel.Percentage = percentage * 20;
 
                 inkableScene.Add(_shadow);
                 _shadow.SendToFront();
