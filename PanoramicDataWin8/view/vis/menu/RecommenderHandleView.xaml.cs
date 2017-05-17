@@ -145,7 +145,7 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             if (_current != null && Exclude != null && Include != null)
             {
-                if (_stopwatch.ElapsedMilliseconds > 500)
+                /*if (_stopwatch.ElapsedMilliseconds > 500)
                 {
                     if (Exclude.Contains(_current))
                     {
@@ -160,7 +160,7 @@ namespace PanoramicDataWin8.view.vis.menu
                         Exclude.Add(_current);
                     }
                 }
-                else if (_stopwatch.ElapsedMilliseconds > 100)
+                else */if (_stopwatch.ElapsedMilliseconds > 100)
                 {
                     if (Include.Contains(_current))
                     {

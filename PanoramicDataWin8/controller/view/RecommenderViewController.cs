@@ -166,6 +166,10 @@ namespace PanoramicDataWin8.controller.view
                     {
                         menuViewModel.MenuItemViewModels.Remove(mi);
                     }
+
+                    var includeExcludeCount = attachmentViewModel.MenuViewModel.MenuItemViewModels
+                        .Count(mi => mi.MenuItemComponentViewModel is IncludeExludeMenuItemViewModel);
+                    updateLayout(model, menuViewModel, parent);
                 }
             }
         }

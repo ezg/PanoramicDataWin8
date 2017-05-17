@@ -66,7 +66,7 @@ namespace PanoramicDataWin8.view.vis.menu
             {
                 vertical.Visibility = Visibility.Collapsed;
             }
-            txtBlock.Text = _model.AttributeModel.DisplayName;
+            txtBlock.Text = _model.AttributeModel.DisplayName.Replace("_", " ");
         }
     }
 }
