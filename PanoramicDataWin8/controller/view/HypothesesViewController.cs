@@ -123,11 +123,11 @@ namespace PanoramicDataWin8.controller.view
                             if ((a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.FLOAT ||
                                 (a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.INT)
                             {
-                                //statModel.TestType = TestType.ttest;
+                                statModel.TestType = TestType.ttest;
                             }
                             else
                             {
-                                //statModel.TestType = TestType.chi2;
+                                statModel.TestType = TestType.chi2;
                             }
                             model.StatisticalComparisonOperationModel = statModel;
                             add = true;
@@ -136,12 +136,12 @@ namespace PanoramicDataWin8.controller.view
                         {
                             statModel.RemoveStatisticallyComparableOperationModel(m);
                         }
-                        statModel.AddStatisticallyComparableOperationModel(model);
                         statModel.AddStatisticallyComparableOperationModel(
                             OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(
                                     model.SchemaModel,
                                     model.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel, new Pt())
                                 .HistogramOperationModel);
+                        statModel.AddStatisticallyComparableOperationModel(model);
 
 
                         if (add)
@@ -298,7 +298,9 @@ namespace PanoramicDataWin8.controller.view
             }
             else if (e.PropertyName == _riskOperationModel.GetPropertyName(() => _riskOperationModel.RiskControlType))
             {
-                getAllDecisions();
+                _mainModel.QueryExecuter.ExecuteOperationModel(_riskOperationModel, true);
+                //getAllDecisions();
+                ClearAllStatisticalComparison();
             }
         }
 

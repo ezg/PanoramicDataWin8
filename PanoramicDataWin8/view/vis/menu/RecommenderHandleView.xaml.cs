@@ -94,9 +94,9 @@ namespace PanoramicDataWin8.view.vis.menu
 
             var total = Math.Max(HypothesesViewController.Instance.HypothesesViewModel.StartWealth, HypothesesViewController.Instance.HypothesesViewModel.Wealth);
             var percentage = (HypothesesViewController.Instance.HypothesesViewModel.Wealth / total) * 100.0;
+            var toSpend = _model.StartPercentage - y;
 
-
-            _model.Percentage = Math.Min(percentage, Math.Max(1, _model.StartPercentage - y));
+            _model.Percentage = Math.Min(percentage, Math.Max(1, toSpend));
             
 
             checkHits();

@@ -781,7 +781,8 @@ namespace PanoramicDataWin8.view.vis.render
                 aggregateKey.BrushIndex = brush.BrushIndex;
                 foreach (var bin in _histogramResult.Bins.Values)
                 {
-                    if (((DoubleValueAggregateResult) bin.GetAggregateResult(aggregateKey)).Result.HasValue)
+                    var res = ((DoubleValueAggregateResult) bin.GetAggregateResult(aggregateKey)).Result;
+                    if (res != null && res.HasValue)
                     {
                         _minValue = (double) Math.Min(_minValue, ((DoubleValueAggregateResult) bin.GetAggregateResult(aggregateKey)).Result.Value);
                         _maxValue = (double) Math.Max(_maxValue, ((DoubleValueAggregateResult) bin.GetAggregateResult(aggregateKey)).Result.Value);

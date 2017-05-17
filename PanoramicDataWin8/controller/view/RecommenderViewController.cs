@@ -30,6 +30,21 @@ namespace PanoramicDataWin8.controller.view
         private RecommenderViewController(MainModel mainModel, ObservableCollection<OperationViewModel> operationViewModel)
         {
             _mainModel = mainModel;
+            HypothesesViewController.Instance.RiskOperationModel.PropertyChanged += RiskOperationModel_PropertyChanged;
+        }
+
+        private void RiskOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var model = sender as RiskOperationModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.ModelId) ||
+                e.PropertyName == model.GetPropertyName(() => model.RiskControlType))
+            {
+                foreach (var rovm in _recommenderOperationViewModels)
+                {
+                    rovm.Key.Result = null;
+
+                }
+            }
         }
 
         public static RecommenderViewController Instance { get; private set; }
@@ -120,22 +135,38 @@ namespace PanoramicDataWin8.controller.view
         private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             var model = sender as RecommenderOperationModel;
-            if (e.PropertyName == model.GetPropertyName(() => model.Result) && model.Result != null)
+            if (e.PropertyName == model.GetPropertyName(() => model.Result))
             {
-                var result = model.Result as RecommenderResult;
                 var viewModel = _recommenderOperationViewModels[model];
                 var parent = _parentHistogramOperationViewModels[viewModel];
+                var attachmentViewModel =
+                    parent.AttachementViewModels.First(
+                        avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
 
-                var attachmentViewModel = parent.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
                 var menuViewModel = attachmentViewModel.MenuViewModel;
-                menuViewModel.MenuItemViewModels.First().IsAlwaysDisplayed = true;
+                if (model.Result != null)
+                {
+                    var result = model.Result as RecommenderResult;
 
-                var includeExcludeCount = attachmentViewModel.MenuViewModel.MenuItemViewModels
-                    .Count(mi => mi.MenuItemComponentViewModel is IncludeExludeMenuItemViewModel);
+                   
+                    menuViewModel.MenuItemViewModels.First().IsAlwaysDisplayed = true;
 
-                updateRecommendedHistograms(menuViewModel, result, parent, includeExcludeCount);
-                addPagingControls(menuViewModel, result, model, includeExcludeCount);
-                updateLayout(model, menuViewModel, parent);
+                    var includeExcludeCount = attachmentViewModel.MenuViewModel.MenuItemViewModels
+                        .Count(mi => mi.MenuItemComponentViewModel is IncludeExludeMenuItemViewModel);
+
+                    updateRecommendedHistograms(menuViewModel, result, parent, includeExcludeCount);
+                    addPagingControls(menuViewModel, result, model, includeExcludeCount);
+                    updateLayout(model, menuViewModel, parent);
+                }
+                else
+                {
+                    foreach (var mi in menuViewModel.MenuItemViewModels.ToArray()
+                        .Where(mi => !(mi.MenuItemComponentViewModel is RecommenderMenuItemViewModel) &&
+                                     !(mi.MenuItemComponentViewModel is IncludeExludeMenuItemViewModel)))
+                    {
+                        menuViewModel.MenuItemViewModels.Remove(mi);
+                    }
+                }
             }
         }
 
@@ -182,6 +213,11 @@ namespace PanoramicDataWin8.controller.view
                     row += 1;
                 }
             }
+            if (col != 0)
+            {
+                row++;
+            }
+
 
             // paging
             foreach (var pager in menuViewModel.MenuItemViewModels.Where(mi => (mi.MenuItemComponentViewModel is PagingMenuItemViewModel)))

@@ -39,7 +39,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                         {
                             GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
                             GetHistogramOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize)
-                        }
+                        }.OrderBy(h => (h as HistogramOperationParameters).Filter.Length).ToList()
                     }
                 };
             }
@@ -53,7 +53,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                         {
                             GetEmpiricalDistOperationParameters(model.StatisticallyComparableOperationModels[0] as HistogramOperationModel, sampleSize),
                             GetEmpiricalDistOperationParameters(model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize)
-                        }
+                        }.OrderBy(h => (h as EmpiricalDistOperationParameters).Filter.Length).ToList()
                     }
                 };
             }
@@ -68,7 +68,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                             GetEmpiricalDistOperationParameters(
                                 model.StatisticallyComparableOperationModels[0] as HistogramOperationModel,
                                 model.StatisticallyComparableOperationModels[1] as HistogramOperationModel, sampleSize)
-                        }
+                        }.OrderBy(h => (h as EmpiricalDistOperationParameters).Filter.Length).ToList()
                     }
                 };
             }
@@ -168,7 +168,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 IncludeDimensions = model.Include.Select(e => e.Index).ToList(),
                 Target = GetHistogramOperationParameters(model.Target, sampleSize), 
                 RiskControlType = HypothesesViewController.Instance.RiskOperationModel.RiskControlType,
-                Budget = 0.025//model.Budget
+                Budget = model.Budget
             };
             param.ExcludeDimensions.Add(model.Target.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel.Index);
             return param;

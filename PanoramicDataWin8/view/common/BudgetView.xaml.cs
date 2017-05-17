@@ -108,7 +108,7 @@ namespace PanoramicDataWin8.view.common
 
                         var percentageToSpend = (DataContext as BudgetViewModel) != null ? (DataContext as BudgetViewModel).BudgetToSpend : 0;
 
-                        bottom.Height = new GridLength(percentage - percentageToSpend, GridUnitType.Star);
+                        bottom.Height = new GridLength(Math.Max(percentage - percentageToSpend, 0), GridUnitType.Star);
                         middle.Height = new GridLength(percentageToSpend, GridUnitType.Star);
                         top.Height = new GridLength((total / total) - percentage, GridUnitType.Star);
                     }

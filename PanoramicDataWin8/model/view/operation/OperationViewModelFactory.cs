@@ -221,9 +221,11 @@ namespace PanoramicDataWin8.model.view.operation
                 histogramOperationViewModel.RecommenderOperationViewModel.RecommenderOperationModel.Page = 0;
                 histogramOperationViewModel.RecommenderOperationViewModel.RecommenderOperationModel.Budget = 
                     (percentage / 100.0) * HypothesesViewController.Instance.HypothesesViewModel.StartWealth;
+                histogramOperationViewModel.RecommenderOperationViewModel.RecommenderOperationModel.ModelId = HypothesesViewController.Instance.RiskOperationModel.ModelId;
                 MainViewController.Instance.MainModel.QueryExecuter.ExecuteOperationModel(
                     histogramOperationViewModel.RecommenderOperationViewModel.OperationModel, true);
-                
+                histogramOperationViewModel.RecommenderOperationViewModel.RecommenderOperationModel.Result = null;
+
                 menuItem.IsAlwaysDisplayed = true;
                 if (!menuViewModel.MenuItemViewModels.Any(
                     mi => mi.MenuItemComponentViewModel is RecommenderProgressMenuItemViewModel))
