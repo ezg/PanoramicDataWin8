@@ -37,11 +37,14 @@ namespace PanoramicDataWin8.view.vis.render
     public sealed partial class PlotRenderer : Renderer, IScribbable
     {
         private PlotRendererContentProvider _plotRendererContentProvider = new PlotRendererContentProvider();
-        
+        static int count = 0;
+        int MyCount = 0;
 
         public PlotRenderer()
         {
             this.InitializeComponent();
+
+            MyCount = count++;
 
             _plotRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
             _plotRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
@@ -66,7 +69,7 @@ namespace PanoramicDataWin8.view.vis.render
                 dxSurface.Dispose();
             }
         }
-
+        
         void PlotRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (args.NewValue != null)
@@ -113,11 +116,13 @@ namespace PanoramicDataWin8.view.vis.render
                 ((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.ClearFilterModels)
             {
                 _plotRendererContentProvider.UpdateFilterModels(new List<FilterModel>());
+                render();
             }
             if (e is FilterOperationModelUpdatedEventArgs && 
                 ((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.FilterModels)
             {
                 _plotRendererContentProvider.UpdateFilterModels((sender as HistogramOperationModel).FilterModels.ToList());
+                
                 render();
             }
             if (e is VisualOperationModelUpdatedEventArgs)
@@ -187,11 +192,17 @@ namespace PanoramicDataWin8.view.vis.render
 
                 if (hits.Any(h => histogramOperationModel.FilterModels.Contains(h)))
                 {
+                    _plotRendererContentProvider.EverythingSelected = false;
                     histogramOperationModel.RemoveFilterModels(hits);
+                    _plotRendererContentProvider.HistogramOperationModel = histogramOperationModel;
+                    _plotRendererContentProvider.LastUserSelection = new List<FilterModel>(histogramOperationModel.FilterModels.ToArray());
                 }
                 else
                 {
                     histogramOperationModel.AddFilterModels(hits);
+                    _plotRendererContentProvider.HistogramOperationModel = histogramOperationModel;
+                    _plotRendererContentProvider.EverythingSelected = histogramOperationModel.FilterModels.Count == _plotRendererContentProvider.HitTargets.Count;
+                    _plotRendererContentProvider.LastUserSelection = new List<FilterModel>(histogramOperationModel.FilterModels.ToArray());
                 }
                 return true;
             }
@@ -280,12 +291,18 @@ namespace PanoramicDataWin8.view.vis.render
 
                 if (hits.Any(h => histogramOperationModel.FilterModels.Contains(h)))
                 {
+                    _plotRendererContentProvider.EverythingSelected = false;
+                    _plotRendererContentProvider.HistogramOperationModel = histogramOperationModel;
                     histogramOperationModel.RemoveFilterModels(hits);
+                    _plotRendererContentProvider.LastUserSelection = new List<FilterModel>(histogramOperationModel.FilterModels.ToArray());
                 }
                 else
                 {
                     histogramOperationModel.AddFilterModels(hits);
-                }
+                    _plotRendererContentProvider.EverythingSelected = histogramOperationModel.FilterModels.Count == _plotRendererContentProvider.HitTargets.Count;
+                    _plotRendererContentProvider.HistogramOperationModel = histogramOperationModel;
+                    _plotRendererContentProvider.LastUserSelection = new List<FilterModel>(histogramOperationModel.FilterModels.ToArray());
+                 }
             }
             else
             {

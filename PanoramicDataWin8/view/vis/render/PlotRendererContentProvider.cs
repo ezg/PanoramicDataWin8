@@ -47,6 +47,10 @@ namespace PanoramicDataWin8.view.vis.render
         private CanvasCachedGeometry _fillRoundedRectGeom = null;
         private CanvasCachedGeometry _strokeRoundedRectGeom = null;
 
+        public bool EverythingSelected = false;
+        public HistogramOperationModel HistogramOperationModel = null;
+        public List<FilterModel> LastUserSelection = new List<FilterModel>();
+
         public double CompositionScaleX { get; set; } = 1;
         public double CompositionScaleY { get; set; } = 1;
         public Dictionary<IGeometry, FilterModel> HitTargets { get; set; }
@@ -163,6 +167,57 @@ namespace PanoramicDataWin8.view.vis.render
                 var deviceWidth = (double) (canvas.ActualWidth/CompositionScaleX - leftOffset - rightOffset);
                 var deviceHeight = (double)(canvas.ActualHeight / CompositionScaleY - topOffset - bottomtOffset);
                 DrawString(canvasArgs, _textFormat, deviceWidth / 2.0f + leftOffset, deviceHeight / 2.0f + topOffset, "no datapoints", _textColor, true, true, false);
+            }
+            if (EverythingSelected)
+            {
+                if (HitTargets.Where((ht) => !_filterModels.Contains(ht.Value)).Count() > 0)
+                {
+                    var hits = new List<FilterModel>();
+                    foreach (var geom in HitTargets.Keys)
+                    {
+                        hits.Add(HitTargets[geom]);
+                    }
+                    UpdateFilterModels(hits);
+                    HistogramOperationModel.ClearFilterModels();
+                    HistogramOperationModel.AddFilterModels(hits);
+                }
+            }
+            else if (LastUserSelection.Count != 0)
+            {
+                var hits = new List<FilterModel>();
+                foreach (var sel in LastUserSelection.ToArray()) {
+                    bool keepSel = true;
+                    foreach (var htarg in HitTargets.Values)
+                    {
+                        keepSel = true;
+                        FilterModel hitFilter = null;
+                        foreach (var selVc in sel.ValueComparisons)
+                        {
+                            bool keepVc = false;
+                            foreach (var vc in htarg.ValueComparisons)
+                                if ((hitFilter == null || hitFilter == htarg) && selVc.Predicate == vc.Predicate && selVc.Value.GetHashCode() == vc.Value.GetHashCode())
+                                {
+                                    keepVc = true;
+                                    hitFilter = htarg;
+                                }
+                            keepSel &= keepVc;
+                        }
+                        if (hitFilter != null && keepSel)
+                            break;
+                    }
+                    if (!keepSel) { 
+                        LastUserSelection.Remove(sel);
+                        _filterModels.Clear();
+                        HistogramOperationModel.ClearFilterModels();
+                    } else
+                        if (!_filterModels.Contains(sel))
+                            hits.Add(sel);
+                }
+                if (hits.Count > 0)
+                {
+                    UpdateFilterModels(hits);
+                    HistogramOperationModel.AddFilterModels(hits);
+                }
             }
         }
 
@@ -482,7 +537,11 @@ namespace PanoramicDataWin8.view.vis.render
 
         void highlightPrimitiveCollection(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, Color dark, BinPrimitiveCollection binPrimitiveCollection)
         {
+            if (binPrimitiveCollection.BinPrimitives.Count == 0)
+                return;
             var bpc = binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex());
+            if (bpc.DataValue == null)
+                return;
             canvasArgs.DrawingSession.DrawRoundedRectangle(bpc.Rect, _helper.CornerRadius, _helper.CornerRadius, dark, _helper.Small ? 1.0f : 2.0f);
             if (_helper.ChartType == ChartType.HeatMap)
             {
@@ -500,15 +559,15 @@ namespace PanoramicDataWin8.view.vis.render
             double bpcrecttopavg = 0, bpcrectrightavg = 0;
             var tc = Color.FromArgb(255, _textColor.R, _textColor.G, _textColor.B);
             foreach (var binPrimitiveCollection in highlightedBinPrimitiveCollections)
-            {
-                var bpc = binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex());
-                if (bpc.DataValue.HasValue)
-                {
-                    avg += bpc.DataValue.Value / highlightedBinPrimitiveCollections.Count;
-                    bpcrecttopavg += bpc.Rect.Top / highlightedBinPrimitiveCollections.Count;
-                    bpcrectrightavg += bpc.Rect.Right / highlightedBinPrimitiveCollections.Count;
+                if (binPrimitiveCollection.BinPrimitives.Count > 0) {
+                    var bpc = binPrimitiveCollection.BinPrimitives.First(bp => bp.BrushIndex == _histogramResult.AllBrushIndex());
+                    if (bpc.DataValue.HasValue)
+                    {
+                        avg += bpc.DataValue.Value / highlightedBinPrimitiveCollections.Count;
+                        bpcrecttopavg += bpc.Rect.Top / highlightedBinPrimitiveCollections.Count;
+                        bpcrectrightavg += bpc.Rect.Right / highlightedBinPrimitiveCollections.Count;
+                    }
                 }
-            }
             var decimals = Math.IEEERemainder(avg, 1);
             var dplaces = decimals == 0 ? 0 : avg > 1000 ? 0 : avg > 100 ? 1 : avg > 10 ? 2 : 3;
             if (_helper.ChartType == ChartType.VerticalBar)
