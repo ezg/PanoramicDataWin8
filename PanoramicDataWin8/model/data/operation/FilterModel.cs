@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Sanity;
 
 // ReSharper disable All
 
@@ -21,6 +22,36 @@ namespace PanoramicDataWin8.model.data.operation
         public override int GetHashCode()
         {
             return ValueComparisons.Aggregate(0, (current, k) => current ^ k.GetHashCode());
+        }
+        public Range<double> ToRange()
+        {
+            if (ValueComparisons.Count == 2)
+            {
+                double? min = null, max = null;
+                if (ValueComparisons[0].Predicate == IDEA_common.operations.recommender.Predicate.LESS_THAN ||
+                    ValueComparisons[0].Predicate == IDEA_common.operations.recommender.Predicate.LESS_THAN_EQUAL)
+                {
+                    max = (double)ValueComparisons[0].Value;
+                }
+                if (ValueComparisons[0].Predicate == IDEA_common.operations.recommender.Predicate.GREATER_THAN ||
+                    ValueComparisons[0].Predicate == IDEA_common.operations.recommender.Predicate.GREATER_THAN_EQUAL)
+                {
+                    min = (double)ValueComparisons[0].Value;
+                }
+                if (ValueComparisons[1].Predicate == IDEA_common.operations.recommender.Predicate.LESS_THAN ||
+                    ValueComparisons[1].Predicate == IDEA_common.operations.recommender.Predicate.LESS_THAN_EQUAL)
+                {
+                    max = (double)ValueComparisons[1].Value;
+                }
+                if (ValueComparisons[1].Predicate == IDEA_common.operations.recommender.Predicate.GREATER_THAN ||
+                    ValueComparisons[1].Predicate == IDEA_common.operations.recommender.Predicate.GREATER_THAN_EQUAL)
+                {
+                    min = (double)ValueComparisons[1].Value;
+                }
+                if (min != null && max != null)
+                    return new Range<double>((double)min, (double)max);
+            }
+            return null;
         }
 
         public override bool Equals(object obj)

@@ -139,6 +139,7 @@
     <Compile Include="model\data\OperationType.cs" />
     <Compile Include="model\data\OperationTypeModelEventArgs.cs" />
     <Compile Include="model\data\OperationTypeModelEventHandler.cs" />
+    <Compile Include="model\data\operation\Assert.cs" />
     <Compile Include="model\data\operation\AttributeUsage.cs" />
     <Compile Include="model\data\attribute\AttributeFieldModel.cs" />
     <Compile Include="model\data\attribute\AttributeTransformationModel.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventType.cs" />
     <Compile Include="model\data\operation\FilterProviderOperationModelImpl.cs" />
+    <Compile Include="model\data\operation\Range.cs" />
     <Compile Include="model\data\operation\RecommenderOperationModel.cs" />
     <Compile Include="model\data\operation\IBrushableOperationModel.cs" />
     <Compile Include="model\data\operation\IBrusherOperationModel.cs" />

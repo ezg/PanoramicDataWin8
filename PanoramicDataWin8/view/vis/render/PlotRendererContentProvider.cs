@@ -185,33 +185,15 @@ namespace PanoramicDataWin8.view.vis.render
             else if (LastUserSelection.Count != 0)
             {
                 var hits = new List<FilterModel>();
-                foreach (var sel in LastUserSelection.ToArray()) {
-                    bool keepSel = true;
-                    foreach (var htarg in HitTargets.Values)
-                    {
-                        keepSel = true;
-                        FilterModel hitFilter = null;
-                        foreach (var selVc in sel.ValueComparisons)
+                foreach (var selRange in LastUserSelection.ToArray().Select((sel) => sel.ToRange())) {
+                    if (selRange != null)
+                        foreach (var htarg in HitTargets.Values)
                         {
-                            bool keepVc = false;
-                            foreach (var vc in htarg.ValueComparisons)
-                                if ((hitFilter == null || hitFilter == htarg) && selVc.Predicate == vc.Predicate && selVc.Value.GetHashCode() == vc.Value.GetHashCode())
-                                {
-                                    keepVc = true;
-                                    hitFilter = htarg;
-                                }
-                            keepSel &= keepVc;
+                            var hitRange = htarg.ToRange();
+                            if (hitRange != null && selRange.Contains(hitRange)) {
+                                hits.Add(htarg);
+                            }
                         }
-                        if (hitFilter != null && keepSel)
-                            break;
-                    }
-                    if (!keepSel) { 
-                        LastUserSelection.Remove(sel);
-                        _filterModels.Clear();
-                        HistogramOperationModel.ClearFilterModels();
-                    } else
-                        if (!_filterModels.Contains(sel))
-                            hits.Add(sel);
                 }
                 if (hits.Count > 0)
                 {
