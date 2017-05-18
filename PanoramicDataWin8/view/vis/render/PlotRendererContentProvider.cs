@@ -190,7 +190,7 @@ namespace PanoramicDataWin8.view.vis.render
                         foreach (var htarg in HitTargets.Values)
                         {
                             var hitRange = htarg.ToRange();
-                            if (hitRange != null && selRange.Contains(hitRange)) {
+                            if (hitRange != null && selRange.Contains(hitRange) && !HistogramOperationModel.FilterModels.Contains(htarg)) {
                                 hits.Add(htarg);
                             }
                         }
