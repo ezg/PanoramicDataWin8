@@ -27,6 +27,7 @@ using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view;
+using Sanity;
 
 namespace PanoramicDataWin8.view.vis.render
 {
@@ -185,22 +186,51 @@ namespace PanoramicDataWin8.view.vis.render
             else if (LastUserSelection.Count != 0)
             {
                 var hits = new List<FilterModel>();
-                foreach (var selRange in LastUserSelection.ToArray().Select((sel) => sel.ToRange())) {
+                var allHits = new List<FilterModel>();
+                var ranges = new List<Range<double>>();
+                foreach (var selRange in LastUserSelection.ToArray().Select((sel) => sel.ToRange()))
                     if (selRange != null)
+                    {
+                        ranges = addRangeToList(ranges, selRange);
+                    }
+                foreach (var selRange in ranges) {
+                    if (selRange != null)
+                    {
                         foreach (var htarg in HitTargets.Values)
                         {
                             var hitRange = htarg.ToRange();
-                            if (hitRange != null && selRange.Contains(hitRange) && !HistogramOperationModel.FilterModels.Contains(htarg)) {
-                                hits.Add(htarg);
+                            if (hitRange != null && selRange.Contains(hitRange))
+                            {
+                                allHits.Add(htarg);
                             }
                         }
+                    }
                 }
-                if (hits.Count > 0)
+                LastUserSelection = allHits;
+                if (allHits.Count > 0)
                 {
-                    UpdateFilterModels(hits);
-                    HistogramOperationModel.AddFilterModels(hits);
+                    foreach (var fm in allHits)
+                        if (!HistogramOperationModel.FilterModels.Contains(fm))
+                        {
+                            UpdateFilterModels(allHits);
+                            HistogramOperationModel.ClearFilterModels();
+                            HistogramOperationModel.AddFilterModels(allHits);
+                            break;
+                        }
                 }
             }
+        }
+
+        List<Range<double>> addRangeToList(List<Range<double>> ranges, Range<double> range)
+        {
+            foreach (var r in ranges)
+                if (r.Overlaps(range))
+                {
+                    ranges.Remove(r);
+                    return addRangeToList(ranges, r.Union(range));
+                }
+            ranges.Add(range);
+            return ranges;
         }
 
         private void  computeSizesAndRenderLabels(Microsoft.Graphics.Canvas.UI.Xaml.CanvasControl canvas, Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, bool renderLines, Dictionary<int,int> sortedXList, Dictionary<int, int> sortedYList)
