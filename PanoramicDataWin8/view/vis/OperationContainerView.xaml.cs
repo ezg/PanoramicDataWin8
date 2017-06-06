@@ -211,6 +211,11 @@ namespace PanoramicDataWin8.view.vis
                 _renderer = new FilterRenderer();
                 contentGrid.Children.Add(_renderer);
             }
+            else if (operationViewModel.OperationModel is DefinitionOperationModel)
+            {
+                _renderer = new DefinitionRenderer();
+                contentGrid.Children.Add(_renderer);
+            }
         }
 
         public void Pressed(FrameworkElement sender, PointerManagerEvent e)

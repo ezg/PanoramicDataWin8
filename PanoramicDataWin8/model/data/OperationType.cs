@@ -5,6 +5,7 @@
         Group,
         Histogram,
         Example,
-        Filter
+        Filter,
+        Definition
     }
 }
