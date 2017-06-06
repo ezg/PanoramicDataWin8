@@ -10,7 +10,7 @@ namespace PanoramicDataWin8.model.data.operation
 {
     public class BrushableOperationModelImpl : ExtendedBindableBase, IBrushableOperationModel
     {
-        private ObservableCollection<IBrushableOperationModel> _brushOperationModels = new ObservableCollection<IBrushableOperationModel>();
+        private ObservableCollection<IBrusherOperationModel> _brushOperationModels = new ObservableCollection<IBrusherOperationModel>();
         private readonly IOperationModel _host;
 
         public BrushableOperationModelImpl(IOperationModel host)
@@ -19,7 +19,7 @@ namespace PanoramicDataWin8.model.data.operation
             _brushOperationModels.CollectionChanged += BrushOperationModelsCollectionChanged;
         }
         public int ExecutionId { get; set; } = 0;
-        public ObservableCollection<IBrushableOperationModel> BrushOperationModels
+        public ObservableCollection<IBrusherOperationModel> BrushOperationModels
         {
             get { return _brushOperationModels; }
             set { SetProperty(ref _brushOperationModels, value); }

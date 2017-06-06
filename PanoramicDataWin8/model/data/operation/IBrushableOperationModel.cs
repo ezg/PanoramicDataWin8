@@ -6,7 +6,7 @@ namespace PanoramicDataWin8.model.data.operation
 {
     public interface IBrushableOperationModel : IOperationModel
     {
-        ObservableCollection<IBrushableOperationModel> BrushOperationModels { get; set; }
+        ObservableCollection<IBrusherOperationModel> BrushOperationModels { get; set; }
         List<Color> BrushColors { get; set; }
     }
 }

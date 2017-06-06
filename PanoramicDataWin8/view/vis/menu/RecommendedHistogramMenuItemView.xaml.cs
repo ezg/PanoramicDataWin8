@@ -147,7 +147,7 @@ namespace PanoramicDataWin8.view.vis.menu
                     _brushColor = BrushViewModel.ColorScheme1[BrushableViewController.Instance.GetColorIndex(_model.HistogramOperationViewModel)];
                     var toModel = _model.HistogramOperationViewModel.HistogramOperationModel;
                     toModel.BrushColors.Add(_brushColor);
-                    toModel.BrushOperationModels.Add(_brusher.HistogramOperationModel as IBrushableOperationModel);
+                    toModel.BrushOperationModels.Add(_brusher.HistogramOperationModel as IBrusherOperationModel);
 
 
                 }
@@ -198,7 +198,7 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             var toModel = _model.HistogramOperationViewModel.HistogramOperationModel;
             toModel.BrushColors.Remove(_brushColor);
-            toModel.BrushOperationModels.Remove(_brusher.HistogramOperationModel as IBrushableOperationModel);
+            toModel.BrushOperationModels.Remove(_brusher.HistogramOperationModel as IBrusherOperationModel);
             _brusher = null;
         }
 

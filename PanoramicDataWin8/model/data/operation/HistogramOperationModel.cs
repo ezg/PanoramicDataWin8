@@ -79,7 +79,7 @@ namespace PanoramicDataWin8.model.data.operation
             set { SetProperty(ref _visualizationType, value); }
         }
 
-        public ObservableCollection<IBrushableOperationModel> BrushOperationModels
+        public ObservableCollection<IBrusherOperationModel> BrushOperationModels
         {
             get { return _brushableOperationModelImpl.BrushOperationModels; }
             set { _brushableOperationModelImpl.BrushOperationModels = value; }

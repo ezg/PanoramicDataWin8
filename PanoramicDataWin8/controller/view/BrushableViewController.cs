@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.controller.view
             _operationViewMovingTimer.Start();
         }
 
-        public void Remove(IBrushableOperationModel bmodel)
+        public void Remove(IBrusherOperationModel bmodel)
         {
             foreach (var view in BrushViews.ToArray()) {
                 if (view.Key.From.OperationModel == bmodel || view.Key.To.OperationModel == bmodel) {
@@ -110,7 +110,7 @@ namespace PanoramicDataWin8.controller.view
             {
                 foreach (var opViewModel in e.OldItems.OfType<OperationViewModel>())
                 {
-                    if (opViewModel.OperationModel is IBrushableOperationModel)
+                    if (opViewModel.OperationModel is IBrusherOperationModel)
                     {
                         //opViewModel.OperationViewModelTapped -= OpViewModel_OperationViewModelTapped;
                         if (_disposables.ContainsKey(opViewModel))
@@ -119,7 +119,7 @@ namespace PanoramicDataWin8.controller.view
                             _disposables.Remove(opViewModel);
                         }
 
-                        Remove((IBrushableOperationModel)opViewModel.OperationModel);
+                        Remove((IBrusherOperationModel)opViewModel.OperationModel);
                     }
                 }
             }
@@ -127,7 +127,8 @@ namespace PanoramicDataWin8.controller.view
             {
                 foreach (var opViewModel in e.NewItems.OfType<OperationViewModel>())
                 {
-                    if (opViewModel.OperationModel is IBrushableOperationModel)
+                    if (opViewModel.OperationModel is IBrushableOperationModel ||
+                        opViewModel.OperationModel is IBrusherOperationModel)
                     {
                         //opViewModel.OperationViewModelTapped += OpViewModel_OperationViewModelTapped;
                         opViewModel.PropertyChanged += OperationViewModel_PropertyChanged;
@@ -305,17 +306,23 @@ namespace PanoramicDataWin8.controller.view
                 {
                     var current = ((KeyValuePair<BrushViewModel, BrushView>) item).Key;
                     var toModel = (IBrushableOperationModel) current.To.OperationModel;
-                    var index = toModel.BrushOperationModels.IndexOf(current.From.OperationModel as IBrushableOperationModel);
-                    toModel.BrushColors.RemoveAt(index);
-                    toModel.BrushOperationModels.RemoveAt(index);
+                    if (current.From.OperationModel is IBrusherOperationModel)
+                    {
+                        var index = toModel.BrushOperationModels.IndexOf(current.From.OperationModel as IBrusherOperationModel);
+                        toModel.BrushColors.RemoveAt(index);
+                        toModel.BrushOperationModels.RemoveAt(index);
+                    }
                 }
             if (e.NewItems != null)
                 foreach (var item in e.NewItems)
                 {
                     var current = ((KeyValuePair<BrushViewModel, BrushView>) item).Key;
                     var toModel = (IBrushableOperationModel) current.To.OperationModel;
-                    toModel.BrushColors.Add(current.Color);
-                    toModel.BrushOperationModels.Add(current.From.OperationModel as IBrushableOperationModel);
+                    if (current.From.OperationModel is IBrusherOperationModel)
+                    {
+                        toModel.BrushColors.Add(current.Color);
+                        toModel.BrushOperationModels.Add(current.From.OperationModel as IBrusherOperationModel);
+                    }
                 }
         }
     }
