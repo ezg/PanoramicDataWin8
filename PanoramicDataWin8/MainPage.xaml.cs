@@ -252,6 +252,16 @@ namespace PanoramicDataWin8
                     _hypothesisMenuViewModel.IsDisplayed = false;
                 }
             }
+            if (!ancestors.Contains(hypothesisButton) && !ancestors.Contains(addOperationButton) && !ancestors.Contains(addAttributeButton) &&
+                !(e.OriginalSource is TextBlock))
+            {
+                foreach (var a in ancestors)
+                    if (a is TextBox)
+                        return;
+                var f  = FocusManager.GetFocusedElement();
+                addAttributeButton.Focus(FocusState.Pointer);
+                //FocusSink.Focus(FocusState.Keyboard);
+            }
         }
 
         private void MainPage_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)

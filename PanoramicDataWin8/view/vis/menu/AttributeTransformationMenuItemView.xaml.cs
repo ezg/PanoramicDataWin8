@@ -297,5 +297,35 @@ namespace PanoramicDataWin8.view.vis.menu
                 return model?.AttributeTransformationViewModel?.AttributeTransformationModel;
             }
         }
+
+        private void TextInputBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
+            var attr = AttributeTransformationModel.MatchesExistingField(TextInputBox.Text, true);
+            if (attr == null)
+            {
+                var attributeModel = new model.data.idea.IDEAFieldAttributeModel(
+                  TextInputBox.Text,
+                   TextInputBox.Text, -1,
+                   InputDataTypeConstants.FromDataType(IDEA_common.catalog.DataType.String),
+                   "numeric",
+                   new List<IDEA_common.catalog.VisualizationHint>());
+                attr = new AttributeTransformationModel(attributeModel);
+                model.AttributeTransformationViewModel.AttributeTransformationModel = attr;
+                model.Label = attr.AttributeModel.DisplayName;
+            }
+
+            model.Editing = Visibility.Collapsed;
+        }
+
+        private void TextInputBox_KeyUp(object sender, KeyRoutedEventArgs e)
+        {
+            var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
+            var attr = AttributeTransformationModel.MatchesExistingField(TextInputBox.Text, true);
+            if (attr == null)
+            {
+                model.Label = TextInputBox.Text;
+            }
+        }
     }
 }

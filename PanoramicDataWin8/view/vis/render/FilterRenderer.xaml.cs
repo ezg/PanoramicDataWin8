@@ -262,20 +262,6 @@ namespace PanoramicDataWin8.view.vis.render
             return true;
         }
 
-        AttributeTransformationModel validField(string str)
-        {
-            var inputModels = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First()
-                     .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
-            AttributeTransformationModel attributeTransformationModel = null;
-            foreach (var im in inputModels)
-                if (im.RawName.ToLower().StartsWith(str.ToLower()))
-                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeFieldModel);
-            foreach (var im in inputModels)
-                if (im.RawName.ToLower() == str.ToLower())
-                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeFieldModel);
-            return attributeTransformationModel;
-        }
-
         public static string FieldType(string str)
         {
             var inputModels = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First()
@@ -321,9 +307,9 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 var result = await imgr.RecognizeAsync(InkRecognitionTarget.All);
                 recognizedText = result[0].GetTextCandidates().First().Replace(" ", "");
-                attributeTransformationModel = validField(recognizedText);
-                OpField.Text = attributeTransformationModel != null ? attributeTransformationModel.AttributeModel.DisplayName : recognizedText;
-                OpField.Foreground = validField(recognizedText) != null ? new SolidColorBrush(Colors.Black) : new SolidColorBrush(Colors.Red);
+                attributeTransformationModel = AttributeTransformationModel.MatchesExistingField(recognizedText);
+                OpField.Text       = attributeTransformationModel != null ? attributeTransformationModel.AttributeModel.DisplayName : recognizedText;
+                OpField.Foreground = attributeTransformationModel != null ? new SolidColorBrush(Colors.Black) : new SolidColorBrush(Colors.Red);
             }
             if (imgr1.GetStrokes().Count > 0)
             {
@@ -521,7 +507,7 @@ namespace PanoramicDataWin8.view.vis.render
             else Op1Val.Text = value.ToString();
 
             (DataContext as FilterOperationViewModel).FilterOperationModel.ClearFilterModels();
-            AddFilterModel(validField(field), p, value);
+            AddFilterModel(AttributeTransformationModel.MatchesExistingField(field), p, value);
         }
         public void SetFilter(string field, Predicate p, string value)
         {
@@ -529,7 +515,7 @@ namespace PanoramicDataWin8.view.vis.render
             Op2Val.Text = value;
 
             (DataContext as FilterOperationViewModel).FilterOperationModel.ClearFilterModels();
-            AddFilterModel(validField(field), p, value);
+            AddFilterModel(AttributeTransformationModel.MatchesExistingField(field), p, value);
         }
 
         string tokenize(ref string accum, char letter)
@@ -602,14 +588,14 @@ namespace PanoramicDataWin8.view.vis.render
                 if (vfield != null && vfield == InputDataTypeConstants.NVARCHAR)
                 {
                     var p = ToStringPredicate(splits[1]);
-                    AddFilterModel(validField(splits[0]), p, splits[2]);
+                    AddFilterModel(AttributeTransformationModel.MatchesExistingField(splits[0]), p, splits[2]);
                 }
                 else
                 {
                     if (double.TryParse(splits.First(), out val))
                     {
                         var p = ToLvalPredicate(splits[1]);
-                        AddFilterModel(validField(splits[2]), p, val);
+                        AddFilterModel(AttributeTransformationModel.MatchesExistingField(splits[2]), p, val);
                         splits.RemoveAt(0);
                         splits.RemoveAt(0);
                     }
@@ -618,7 +604,7 @@ namespace PanoramicDataWin8.view.vis.render
                         var p = ToRvalPredicate(splits[1]);
                         if (double.TryParse(splits[2], out val))
                         {
-                            AddFilterModel(validField(splits[0]), p, val);
+                            AddFilterModel(AttributeTransformationModel.MatchesExistingField(splits[0]), p, val);
                         }
                     }
                 }
@@ -632,7 +618,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (!ExpressionTextBox.GetBounds().Contains(e.GetCurrentPoint(ExpressionTextBox).Position))
             {
                 ExpressionTextBox.IsEnabled = false;
-                MainViewController.Instance.MainPage.FocusSink.Focus(FocusState.Keyboard);
+                MainViewController.Instance.MainPage.addAttributeButton.Focus(FocusState.Pointer);
                 InterpretTextBoxInput();
             }
         }

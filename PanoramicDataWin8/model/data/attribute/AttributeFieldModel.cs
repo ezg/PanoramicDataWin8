@@ -12,6 +12,7 @@
             {
                 var am = obj as AttributeFieldModel;
                 return
+                    OriginModel != null && 
                     am.OriginModel.Equals(OriginModel) &&
                     am.RawName.Equals(RawName) &&
                     am.InputVisualizationType.Equals(InputVisualizationType) &&
@@ -23,7 +24,8 @@
         public override int GetHashCode()
         {
             var code = 0;
-            code ^= OriginModel.GetHashCode();
+            if (OriginModel != null)
+                code ^= OriginModel.GetHashCode();
             code ^= RawName.GetHashCode();
             code ^= InputVisualizationType.GetHashCode();
             code ^= InputDataType.GetHashCode();
