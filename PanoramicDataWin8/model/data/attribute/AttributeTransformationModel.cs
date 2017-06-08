@@ -1,6 +1,7 @@
 ﻿using Microsoft.Practices.Prism.Mvvm;
 using Newtonsoft.Json;
 using PanoramicDataWin8.model.data.operation;
+using System.Linq;
 
 namespace PanoramicDataWin8.model.data.attribute
 {
@@ -149,6 +150,19 @@ namespace PanoramicDataWin8.model.data.attribute
             code ^= _scaleFunction.GetHashCode();
             //code ^= this._sortMode.GetHashCode();
             return code;
+        }
+        public static AttributeTransformationModel MatchesExistingField(string str, bool exact=false)
+        {
+            var inputModels = (controller.view.MainViewController.Instance.MainPage.DataContext as view.MainModel).SchemaModel.OriginModels.First()
+                     .InputModels.Where(am => am.IsDisplayed);
+            AttributeTransformationModel attributeTransformationModel = null;
+            foreach (var im in inputModels)
+                if (im.RawName.ToLower().StartsWith(str.ToLower()) && !exact)
+                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeFieldModel);
+            foreach (var im in inputModels)
+                if (im.RawName.ToLower() == str.ToLower())
+                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeFieldModel);
+            return attributeTransformationModel;
         }
     }
 }

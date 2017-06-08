@@ -15,13 +15,10 @@
             <Style TargetType="TextBox">
                 <Setter Property="MinWidth" Value="{ThemeResource TextControlThemeMinWidth}"/>
                 <Setter Property="MinHeight" Value="{ThemeResource TextControlThemeMinHeight}"/>
-                <Setter Property="Foreground" Value="{Binding FallbackValue=Yellow}"/>
-                <Setter Property="Background" Value="Transparent"/>
                 <Setter Property="SelectionHighlightColor" Value="{StaticResource highlightBrush}"/>
                 <Setter Property="BorderBrush" Value="{Binding FallbackValue=DarkGray}" />
                 <Setter Property="BorderThickness" Value="0,0,0,1"/>
                 <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
-                <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
                 <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Auto"/>
                 <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto"/>
                 <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Hidden"/>
@@ -120,7 +117,7 @@
                                 <Border x:Name="BorderElement" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" Grid.Row="1" Grid.RowSpan="1"/>
                                 <ContentPresenter x:Name="HeaderContentPresenter" ContentTemplate="{TemplateBinding HeaderTemplate}" Content="{TemplateBinding Header}" Foreground="Green" FontWeight="Normal" Margin="0,0,0,8" Grid.Row="0" Visibility="Collapsed" x:DeferLoadStrategy="Lazy"/>
                                 <ScrollViewer x:Name="ContentElement" AutomationProperties.AccessibilityView="Raw" HorizontalScrollMode="{TemplateBinding ScrollViewer.HorizontalScrollMode}" HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}" IsTabStop="False" IsHorizontalRailEnabled="{TemplateBinding ScrollViewer.IsHorizontalRailEnabled}" IsVerticalRailEnabled="{TemplateBinding ScrollViewer.IsVerticalRailEnabled}" IsDeferredScrollingEnabled="{TemplateBinding ScrollViewer.IsDeferredScrollingEnabled}" Margin="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" Grid.Row="1" VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" VerticalScrollMode="{TemplateBinding ScrollViewer.VerticalScrollMode}" ZoomMode="Disabled"/>
-                                <ContentControl VerticalAlignment="Center" x:Name="PlaceholderTextContentPresenter" Content="{TemplateBinding PlaceholderText}" Foreground="Green" IsHitTestVisible="False" IsTabStop="False" Margin="{TemplateBinding BorderThickness}" Padding="5,0,0,0" Grid.Row="1"/>
+                                <ContentControl VerticalAlignment="Center" x:Name="PlaceholderTextContentPresenter" Content="{TemplateBinding PlaceholderText}" Foreground="Green" IsHitTestVisible="False" IsTabStop="False" Margin="{TemplateBinding BorderThickness}" Padding="55,0,0,0" Grid.Row="1"/>
                             </Grid>
                         </ControlTemplate>
                     </Setter.Value>
@@ -130,8 +127,8 @@
         </Page.Resources>
         <Grid Name="Labels" Background="{StaticResource lightBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid.RowDefinitions>
-                <RowDefinition Height="0.5*"></RowDefinition>
-                <RowDefinition Height="0.5*"></RowDefinition>
+                <RowDefinition Height="0.5*"/>
+                <RowDefinition Height="0.5*"/>
             </Grid.RowDefinitions>
 
         </Grid>

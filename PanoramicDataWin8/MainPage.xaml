@@ -17,7 +17,7 @@
     </Page.Resources>
 
     <Grid Background="{StaticResource backgroundBrush}"  Name="mainGrid">
-        
+
         <Canvas x:Name="layoutRoot" Width="Auto" Height="Auto" Visibility="Visible">
             <inq:InkableScene 
                         x:Name="inkableScene" 
@@ -27,7 +27,6 @@
                     <MatrixTransform Matrix="1 0 0 1 -25000 -25000"/>
                 </inq:InkableScene.RenderTransform>
             </inq:InkableScene>
-            <TextBox x:Name="FocusSink" x:FieldModifier="public" Visibility="Collapsed" Width="1" Height="1"></TextBox>
         </Canvas>
         <Grid Name="menuGrid" Width="100" HorizontalAlignment="Left" Margin="60,0,0,0" Visibility="Visible">
             <Canvas Name="menuCanvas">
@@ -38,7 +37,7 @@
         <Canvas Name="menuHypothesisGrid" Height="60" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" Margin="0,0,60,0" Visibility="Visible">
         </Canvas>
         <StackPanel Orientation="Vertical" VerticalAlignment="Center" Margin="10,0,0,0" >
-            <Button Name="addAttributeButton" Click="addAttributeButton_Click" Margin="0,0,0,4">
+            <Button x:Name="addAttributeButton" x:FieldModifier="public" Click="addAttributeButton_Click" Margin="0,0,0,4">
                 <Button.Template>
                     <ControlTemplate>
                         <Grid Width="50" Height="50" Background="{StaticResource lightBrush}">

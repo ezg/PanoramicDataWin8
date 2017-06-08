@@ -15,6 +15,8 @@ namespace PanoramicDataWin8.model.view
 
         private string _label = "";
 
+        private Windows.UI.Xaml.Visibility _editing = Windows.UI.Xaml.Visibility.Collapsed;
+
         private double _textAngle;
 
         private Brush _textBrush = new SolidColorBrush(Colors.Black);
@@ -43,6 +45,11 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _label; }
             set { SetProperty(ref _label, value); }
+        }
+        public Windows.UI.Xaml.Visibility Editing
+        {
+            get { return _editing; }
+            set { SetProperty(ref _editing, value); }
         }
 
         public AttributeTransformationViewModel AttributeTransformationViewModel

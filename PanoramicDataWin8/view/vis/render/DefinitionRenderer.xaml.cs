@@ -29,11 +29,20 @@ namespace PanoramicDataWin8.view.vis.render
     /// </summary>
     public sealed partial class DefinitionRenderer : Renderer, IScribbable
     {
+        Dictionary<Color, string> _brushNames = new Dictionary<Color, string>();
         public DefinitionRenderer()
         {
+            _brushNames.Add(Colors.Black, "All");
             this.InitializeComponent();
             this.DataContextChanged += DefinitionRenderer_DataContextChanged;
+            this.SizeChanged += DefinitionRenderer_SizeChanged;
         }
+
+        private void DefinitionRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Relayout();
+        }
+
         public override void Dispose()
         {
             base.Dispose();
@@ -70,47 +79,50 @@ namespace PanoramicDataWin8.view.vis.render
             Labels.Children.Clear();
             Labels.RowDefinitions.Clear();
             int numLabels = model.BrushColors.Count + 1;
-            var panel = new Grid();
-            var tb = new TextBox();
-            var rd = new RowDefinition();
             foreach (var c in model.BrushColors)
             {
-                rd = new RowDefinition();
-                rd.Height = new GridLength(0.5, GridUnitType.Star);
-                Labels.RowDefinitions.Add(rd);
-                panel = new Grid();
-                Grid.SetRow(panel, model.BrushColors.IndexOf(c));
-                panel.Height = (ActualHeight - 20 * numLabels) / numLabels;
-                panel.VerticalAlignment = VerticalAlignment.Stretch;
-                panel.HorizontalAlignment = HorizontalAlignment.Stretch;
-                panel.Background = new SolidColorBrush(c);
-                panel.Margin = new Thickness(10);
-
-                tb = new TextBox();
-                tb.HorizontalAlignment = HorizontalAlignment.Stretch;
-                tb.Margin = new Thickness(10, 4, 10, 4);
-                tb.Foreground = new SolidColorBrush(Colors.White);
-                panel.Children.Add(tb);
-                Labels.Children.Add(panel);
+                createBrushLabel(model, numLabels, c);
             }
-            rd = new RowDefinition();
+            createBrushLabel(model, numLabels,  Colors.Black);
+
+        }
+
+        private void createBrushLabel(DefinitionOperationModel model, int numLabels, Color c)
+        {
+            var rd = new RowDefinition();
             rd.Height = new GridLength(0.5, GridUnitType.Star);
             Labels.RowDefinitions.Add(rd);
-            panel = new Grid();
-            Grid.SetRow(panel, model.BrushColors.Count);
-            panel.Height = (ActualHeight - 20 * numLabels) / numLabels;
+            var panelHeight = (ActualHeight - 20 * numLabels) / numLabels;
+            var panel = new Grid();
+            if (model.BrushColors.Contains(c))
+                Grid.SetRow(panel, model.BrushColors.IndexOf(c));
+            else Grid.SetRow(panel, model.BrushColors.Count);
+            panel.Height = panelHeight;
             panel.VerticalAlignment = VerticalAlignment.Stretch;
             panel.HorizontalAlignment = HorizontalAlignment.Stretch;
-            panel.Background = new SolidColorBrush(Colors.Black);
+            panel.Background = new SolidColorBrush(c);
             panel.Margin = new Thickness(10);
 
-            tb = new TextBox();
+            var tb = new TextBox();
+            tb.Tag = c;
+            tb.TextChanged += Tb_TextChanged;
             tb.HorizontalAlignment = HorizontalAlignment.Stretch;
-            tb.Foreground = new SolidColorBrush(Colors.White) ;
-           
             tb.Margin = new Thickness(10, 4, 10, 4);
+            tb.Foreground = new SolidColorBrush(Colors.White);
+            tb.Background = new SolidColorBrush(c);
+            tb.FontSize = panelHeight / 4;
+            if (_brushNames.ContainsKey(c))
+                tb.Text = _brushNames[c];
+            tb.Margin = new Thickness(0);
             panel.Children.Add(tb);
             Labels.Children.Add(panel);
+        }
+
+        private void Tb_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var senderCol = (Color)((sender as TextBox).Tag);
+            _brushNames[senderCol] = (sender as TextBox).Text;
+  
         }
 
         public List<IScribbable> Children

@@ -11,6 +11,7 @@ using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.vis.menu;
+using Windows.UI.Xaml;
 
 namespace PanoramicDataWin8.model.view.operation
 {
@@ -771,7 +772,7 @@ namespace PanoramicDataWin8.model.view.operation
             AttributeTransformationModel attributeTransformationModel = null;
             attributeTransformationModel = new AttributeTransformationModel(inputModels.First() as AttributeFieldModel);
             attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(defintionOperationViewModel, attributeTransformationModel);
-
+            attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
             menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);
             attachmentViewModel.MenuViewModel = menuViewModel;
