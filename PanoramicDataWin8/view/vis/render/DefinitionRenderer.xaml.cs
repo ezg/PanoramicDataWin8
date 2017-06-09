@@ -32,12 +32,23 @@ namespace PanoramicDataWin8.view.vis.render
         Dictionary<Color, string> _brushNames = new Dictionary<Color, string>();
         public DefinitionRenderer()
         {
+            _brushNames.Add(_textBrush.Color, "Rest");
             _brushNames.Add(Colors.Black, "All");
             this.InitializeComponent();
             this.DataContextChanged += DefinitionRenderer_DataContextChanged;
             this.SizeChanged += DefinitionRenderer_SizeChanged;
+            this.PointerExited += DefinitionRenderer_PointerExited;
+        }
+        
+        private void DefinitionRenderer_OperationViewModelTapped(object sender, EventArgs e)
+        {
+            Labels.IsHitTestVisible = true;
         }
 
+        private void DefinitionRenderer_PointerExited(object sender, PointerRoutedEventArgs e)
+        {
+            Labels.IsHitTestVisible = false;
+        }
         private void DefinitionRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             Relayout();
@@ -61,8 +72,10 @@ namespace PanoramicDataWin8.view.vis.render
                 model.PropertyChanged += OperationModel_PropertyChanged;
                 model.OperationModelUpdated += OperationModelUpdated;
             }
+            (DataContext as DefinitionOperationViewModel).OperationViewModelTapped += DefinitionRenderer_OperationViewModelTapped;
         }
-        
+
+
         void OperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             Relayout();
@@ -71,6 +84,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             Relayout();
         }
+        private SolidColorBrush _textBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
         private readonly SolidColorBrush _lightBrush = new SolidColorBrush(Helpers.GetColorFromString("#e6e6e6"));
 
         void Relayout()
@@ -78,25 +92,25 @@ namespace PanoramicDataWin8.view.vis.render
             var model = ((DataContext as DefinitionOperationViewModel).OperationModel as DefinitionOperationModel);
             Labels.Children.Clear();
             Labels.RowDefinitions.Clear();
-            int numLabels = model.BrushColors.Count + 1;
+            int numLabels = model.BrushColors.Count + 1 + (model.BrushColors.Count > 1 ? 1: 0);
             foreach (var c in model.BrushColors)
             {
-                createBrushLabel(model, numLabels, c);
+                createBrushLabel(model, numLabels, c, model.BrushColors.IndexOf(c));
             }
-            createBrushLabel(model, numLabels,  Colors.Black);
+            if (model.BrushColors.Count > 1)
+                createBrushLabel(model, numLabels, Colors.Black, model.BrushColors.Count );
+            createBrushLabel(model, numLabels,  _textBrush.Color, model.BrushColors.Count + 1);
 
         }
 
-        private void createBrushLabel(DefinitionOperationModel model, int numLabels, Color c)
+        private void createBrushLabel(DefinitionOperationModel model, int numLabels, Color c, int rowIndex)
         {
             var rd = new RowDefinition();
             rd.Height = new GridLength(0.5, GridUnitType.Star);
             Labels.RowDefinitions.Add(rd);
             var panelHeight = (ActualHeight - 20 * numLabels) / numLabels;
             var panel = new Grid();
-            if (model.BrushColors.Contains(c))
-                Grid.SetRow(panel, model.BrushColors.IndexOf(c));
-            else Grid.SetRow(panel, model.BrushColors.Count);
+            Grid.SetRow(panel, rowIndex);
             panel.Height = panelHeight;
             panel.VerticalAlignment = VerticalAlignment.Stretch;
             panel.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -110,7 +124,7 @@ namespace PanoramicDataWin8.view.vis.render
             tb.Margin = new Thickness(10, 4, 10, 4);
             tb.Foreground = new SolidColorBrush(Colors.White);
             tb.Background = new SolidColorBrush(c);
-            tb.FontSize = panelHeight / 4;
+            tb.FontSize = panelHeight / 2;
             if (_brushNames.ContainsKey(c))
                 tb.Text = _brushNames[c];
             tb.Margin = new Thickness(0);
