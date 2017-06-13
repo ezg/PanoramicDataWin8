@@ -136,14 +136,13 @@
 
 
     <Grid Name="mainGrid" Background="{StaticResource lightBrush}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
-        <Border Name="border" BorderBrush="{StaticResource backgroundBrush}" BorderThickness="0" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
-            <Viewbox Margin="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
-                <controls:LayoutTransformControl x:Name="transformControl">
-                    <controls:LayoutTransformControl.Transform>
-                        <RotateTransform x:Name="rotateTransform" Angle="{Binding MenuItemComponentViewModel.TextAngle}"/>
-                    </controls:LayoutTransformControl.Transform>
-                    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" RenderTransformOrigin="0.5, 0.5">
-                        <TextBlock
+        <Viewbox Margin="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
+            <controls:LayoutTransformControl x:Name="transformControl">
+                <controls:LayoutTransformControl.Transform>
+                    <RotateTransform x:Name="rotateTransform" Angle="{Binding MenuItemComponentViewModel.TextAngle}"/>
+                </controls:LayoutTransformControl.Transform>
+                <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" RenderTransformOrigin="0.5, 0.5">
+                    <TextBlock
                             Name="txtBlock"
                             CacheMode="BitmapCache"
                             VerticalAlignment="Center"
@@ -151,23 +150,18 @@
                             TextAlignment="Center"
                             Text="{Binding MenuItemComponentViewModel.Label}"
                             Foreground="{Binding MenuItemComponentViewModel.TextBrush}" TextWrapping="Wrap"/>
-                    </Grid>
-                </controls:LayoutTransformControl>
-            </Viewbox>
-        </Border>
-        <Grid  HorizontalAlignment="Stretch"  VerticalAlignment="Stretch" Background="{StaticResource lightBrush}"  Visibility="{Binding MenuItemComponentViewModel.Editing}">
-            <TextBox
-                    Name="TextInputBox"
-                    Width="{Binding ElementName=mainGrid,Path=ActualWidth}"
-                    VerticalAlignment="Center"
-                    HorizontalAlignment="Center"
-                    TextAlignment="Center"
-                    Text="{Binding MenuItemComponentViewModel.Label}"
-                    FontSize="36"
-                    LostFocus="TextInputBox_LostFocus" 
-                    Background="{StaticResource lightBrush}"
-                    Foreground="{Binding MenuItemComponentViewModel.TextBrush}" KeyUp="TextInputBox_KeyUp"  TextWrapping="NoWrap"/>
-        </Grid>
+                    <TextBox
+                        Visibility="{Binding MenuItemComponentViewModel.Editing}"
+                        Name="TextInputBox"
+                        TextAlignment="Center"
+                        Text="{Binding MenuItemComponentViewModel.Label}"
+                        FontSize="36"
+                        LostFocus="TextInputBox_LostFocus" 
+                        Background="{StaticResource lightBrush}"
+                        Foreground="{Binding MenuItemComponentViewModel.TextBrush}" KeyUp="TextInputBox_KeyUp"  TextWrapping="NoWrap"/>
+                </Grid>
+            </controls:LayoutTransformControl>
+        </Viewbox>
     </Grid>
 </UserControl>
 

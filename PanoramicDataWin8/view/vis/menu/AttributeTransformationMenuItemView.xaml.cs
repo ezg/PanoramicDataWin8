@@ -64,14 +64,14 @@ namespace PanoramicDataWin8.view.vis.menu
             var model = sender as MenuItemViewModel;
             if (e.PropertyName == model.GetPropertyName(() => model.Size))
             {
-                if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 270)
-                {
-                    txtBlock.MaxWidth = model.Size.Y;
-                }
-                if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 0)
-                {
-                    txtBlock.MaxWidth = model.Size.X;
-                }
+                //if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 270)
+                //{
+                //    txtBlock.MaxWidth = model.Size.Y;
+                //}
+                //if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 0)
+                //{
+                //    txtBlock.MaxWidth = model.Size.X;
+                //}
             }
         }
 
@@ -88,16 +88,16 @@ namespace PanoramicDataWin8.view.vis.menu
             backgroundAnimation.Duration = TimeSpan.FromMilliseconds(300);
             backgroundAnimation.From = (mainGrid.Background as SolidColorBrush).Color;
 
-            if (isHighlighted)
-            {
-                backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush).Color;
-                txtBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush);
-            }
-            else
-            {
-                backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush).Color;
-                txtBlock.Foreground = model.TextBrush;
-            }
+            //if (isHighlighted)
+            //{
+            //    backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush).Color;
+            //    txtBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush);
+            //}
+            //else
+            //{
+            //    backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush).Color;
+            //    txtBlock.Foreground = model.TextBrush;
+            //}
 
             Storyboard storyboard = new Storyboard();
             storyboard.Children.Add(backgroundAnimation);

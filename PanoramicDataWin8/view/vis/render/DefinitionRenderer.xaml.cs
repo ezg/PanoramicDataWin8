@@ -128,8 +128,14 @@ namespace PanoramicDataWin8.view.vis.render
             if (_brushNames.ContainsKey(c))
                 tb.Text = _brushNames[c];
             tb.Margin = new Thickness(0);
-            panel.Children.Add(tb);
+            var vbox = new Viewbox();
+            vbox.VerticalAlignment = VerticalAlignment.Stretch;
+            vbox.HorizontalAlignment = HorizontalAlignment.Stretch;
+            Grid.SetRow(vbox, rowIndex);
+            vbox.Child = tb;
+            vbox.Margin = new Thickness(10);
             Labels.Children.Add(panel);
+            Labels.Children.Add(vbox);
         }
 
         private void Tb_TextChanged(object sender, TextChangedEventArgs e)
