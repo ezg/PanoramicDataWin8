@@ -108,20 +108,19 @@ namespace PanoramicDataWin8.view.vis.render
             var rd = new RowDefinition();
             rd.Height = new GridLength(0.5, GridUnitType.Star);
             Labels.RowDefinitions.Add(rd);
-            var panelHeight = (ActualHeight - 20 * numLabels) / numLabels;
+            var panelHeight = (ActualHeight - 10 * numLabels) / numLabels;
             var panel = new Grid();
             Grid.SetRow(panel, rowIndex);
             panel.Height = panelHeight;
             panel.VerticalAlignment = VerticalAlignment.Stretch;
             panel.HorizontalAlignment = HorizontalAlignment.Stretch;
             panel.Background = new SolidColorBrush(c);
-            panel.Margin = new Thickness(10);
+            panel.Margin = new Thickness(5, 5, 5, 0);
 
             var tb = new TextBox();
             tb.Tag = c;
             tb.TextChanged += Tb_TextChanged;
             tb.HorizontalAlignment = HorizontalAlignment.Stretch;
-            tb.Margin = new Thickness(10, 4, 10, 4);
             tb.Foreground = new SolidColorBrush(Colors.White);
             tb.Background = new SolidColorBrush(c);
             tb.FontSize = panelHeight / 2;
@@ -133,7 +132,8 @@ namespace PanoramicDataWin8.view.vis.render
             vbox.HorizontalAlignment = HorizontalAlignment.Stretch;
             Grid.SetRow(vbox, rowIndex);
             vbox.Child = tb;
-            vbox.Margin = new Thickness(10);
+            vbox.Height = panelHeight;
+            vbox.Margin = new Thickness(5, 5, 5, 0);
             Labels.Children.Add(panel);
             Labels.Children.Add(vbox);
         }
