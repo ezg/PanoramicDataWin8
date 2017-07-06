@@ -199,6 +199,15 @@ namespace PanoramicDataWin8
                     msgTextBlock.Opacity = 1;
                     _messageTimer.Start();
                 }
+                else if(e.Key == VirtualKey.P)
+                {
+                    MainViewController.Instance.MainModel.PollForDecisions = !MainViewController.Instance.MainModel.PollForDecisions;
+                    Debug.WriteLine("PollForDecisions : " + MainViewController.Instance.MainModel.PollForDecisions);
+
+                    msgTextBlock.Text = "PollForDecisions : " + MainViewController.Instance.MainModel.PollForDecisions;
+                    msgTextBlock.Opacity = 1;
+                    _messageTimer.Start();
+                }
                 if (e.Key == VirtualKey.T)
                 {
                     var q1 = new HistogramOperationModel(MainViewController.Instance.MainModel.SchemaModel);
@@ -214,7 +223,7 @@ namespace PanoramicDataWin8
                 }
                 
 
-                if (e.Key == VirtualKey.P)
+                /*if (e.Key == VirtualKey.P)
                 {
                     Debug.WriteLine("Render Fingers / Pen : " +
                                     MainViewController.Instance.MainModel.RenderFingersAndPen);
@@ -223,7 +232,7 @@ namespace PanoramicDataWin8
                     msgTextBlock.Text = "Fingers / Pen : " + MainViewController.Instance.MainModel.RenderFingersAndPen;
                     msgTextBlock.Opacity = 1;
                     _messageTimer.Start();
-                }
+                }*/
             }
         }
 

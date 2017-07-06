@@ -102,7 +102,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="controller\data\idea\ModelWealthCommand.cs" />
     <Compile Include="controller\data\idea\ExecuteOperationModelEventArgs.cs" />
     <Compile Include="controller\data\idea\RecommenderOperationJob.cs" />
     <Compile Include="controller\data\idea\RiskOperationJob.cs" />
@@ -554,7 +553,6 @@
       <HintPath>..\..\IDEA\src\IDEA-common\bin\Debug\netstandard1.1\IDEA-common.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

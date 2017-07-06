@@ -45,6 +45,8 @@ namespace PanoramicDataWin8.model.view
 
         private double _throttleInMillis = 300.0;
 
+        private bool _pollForDecisions = true;
+
         private bool _verbose;
 
         public ObservableCollection<DatasetConfiguration> DatasetConfigurations { get; } = new ObservableCollection<DatasetConfiguration>();
@@ -137,6 +139,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _verbose; }
             set { SetProperty(ref _verbose, value); }
+        }
+
+        public bool PollForDecisions
+        {
+            get { return _pollForDecisions; }
+            set { SetProperty(ref _pollForDecisions, value); }
         }
 
         public bool RenderFingersAndPen

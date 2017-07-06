@@ -31,16 +31,17 @@ namespace PanoramicDataWin8.controller.view
             Initialized?.Invoke(typeof(HypothesesViewController), EventArgs.Empty);
         }
 
+        private StatisticalComparisonDecisionOperationModel _statisticalComparisonDecisionOperationModel = null;
         private readonly RiskOperationModel _riskOperationModel;
         private readonly Dictionary<ComparisonId, HypothesisViewModel> _comparisonIdToHypothesisViewModels = new Dictionary<ComparisonId, HypothesisViewModel>();
+        private readonly Dictionary<ComparisonId, StatisticalComparisonOperationModel> _allComparisons = new Dictionary<ComparisonId, StatisticalComparisonOperationModel>();
 
         private readonly Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel> _modelToSaveViewModel =
             new Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel>();
 
         private MainModel _mainModel = null;
         private static int _nextComparisonOrder = 0;
-        private readonly ModelWealthCommand _modelWealthCommand = new ModelWealthCommand();
-        private readonly DispatcherTimer _getModelWealthTimer = new DispatcherTimer();
+        private readonly DispatcherTimer _getDecisionTimer = new DispatcherTimer();
 
 
         private HypothesesViewController(MainModel mainModel, ObservableCollection<OperationViewModel> operationViewModel)
@@ -51,8 +52,8 @@ namespace PanoramicDataWin8.controller.view
             _mainModel.PropertyChanged += MainModel_PropertyChanged;
             operationViewModel.CollectionChanged += OperationViewModels_CollectionChanged;
 
-            _getModelWealthTimer.Interval = TimeSpan.FromMilliseconds(200);
-            _getModelWealthTimer.Tick += getModelWealthTimer_tick;
+            _getDecisionTimer.Interval = TimeSpan.FromMilliseconds(200);
+            _getDecisionTimer.Tick += getDecisionTimer_tick;
         }
 
         private void OperationViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -192,8 +193,13 @@ namespace PanoramicDataWin8.controller.view
                         HypothesesViewModel.HypothesisViewModels.Add(vm);
                         _comparisonIdToHypothesisViewModels.Add(res.ComparisonId, vm);
                     }
+                    if (!_allComparisons.ContainsKey(res.ComparisonId))
+                    {
+                        _allComparisons.Add(res.ComparisonId, statOpModel);
+                    }
+                    _allComparisons[res.ComparisonId] = statOpModel;
 
-                    _comparisonIdToHypothesisViewModels[res.ComparisonId].Decision = res.Decision[_riskOperationModel.RiskControlType];
+                    /*_comparisonIdToHypothesisViewModels[res.ComparisonId].Decision = res.Decision[_riskOperationModel.RiskControlType];
                     //Debug.WriteLine(statOpModel.ExecutionId + ", " + statOpModel.ResultExecutionId);
                     if (statOpModel.ExecutionId == statOpModel.ResultExecutionId)
                     {
@@ -205,19 +211,7 @@ namespace PanoramicDataWin8.controller.view
                                 _comparisonIdToHypothesisViewModels[res.ComparisonId].ViewOrdering = HypothesesViewModel.HypothesisViewModels.Max(h => h.ViewOrdering) + 1;
                             }
                         }
-                    }
-                }
-            }
-        }
-
-        private void StatisticalComparisonDecisionOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            var statDesOpModel = (StatisticalComparisonDecisionOperationModel) sender;
-            if (e.PropertyName == statDesOpModel.GetPropertyName(() => statDesOpModel.Result) && statDesOpModel.Result != null)
-            {
-                foreach (var decision in ((GetDecisionsResult) statDesOpModel.Result).Decisions)
-                {
-                    _comparisonIdToHypothesisViewModels[decision.ComparisonId].Decision = decision;
+                    }*/
                 }
             }
         }
@@ -275,26 +269,13 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        private void getAllDecisions()
-        {
-            var comparisonIds = _comparisonIdToHypothesisViewModels.Keys.ToList();
-
-            var opModel = new StatisticalComparisonDecisionOperationModel(_riskOperationModel.SchemaModel);
-            opModel.PropertyChanged += StatisticalComparisonDecisionOperationModel_PropertyChanged;
-
-            opModel.ModelId = _riskOperationModel.ModelId;
-            opModel.ComparisonIds = comparisonIds;
-            opModel.RiskControlType = _riskOperationModel.RiskControlType;
-            _mainModel.QueryExecuter.ExecuteOperationModel(opModel, true);
-        }
-
         private void _riskOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName == _riskOperationModel.GetPropertyName(() => _riskOperationModel.Result) && _riskOperationModel.Result != null)
             {
                 _riskOperationModel.ModelId = ((NewModelOperationResult) _riskOperationModel.Result).ModelId;
-                _getModelWealthTimer.Stop();
-                _getModelWealthTimer.Start();
+                _getDecisionTimer.Stop();
+                _getDecisionTimer.Start();
             }
             else if (e.PropertyName == _riskOperationModel.GetPropertyName(() => _riskOperationModel.RiskControlType))
             {
@@ -304,11 +285,45 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
-        private async void getModelWealthTimer_tick(object sender, object e)
+        private async void getDecisionTimer_tick(object sender, object e)
         {
-            ModelWealthResult modelWealthResult = await _modelWealthCommand.GetModelWealth(_riskOperationModel.ModelId, _riskOperationModel.RiskControlType);
-            HypothesesViewModel.StartWealth = modelWealthResult.StartWealth;
-            HypothesesViewModel.Wealth = modelWealthResult.Wealth;
+            if (MainViewController.Instance.MainModel.PollForDecisions)
+            {
+                var comparisonIds = _allComparisons.Keys.ToList();
+
+                if (_statisticalComparisonDecisionOperationModel == null)
+                {
+                    _statisticalComparisonDecisionOperationModel = new StatisticalComparisonDecisionOperationModel(_riskOperationModel.SchemaModel);
+
+                    _statisticalComparisonDecisionOperationModel.PropertyChanged += StatisticalComparisonDecisionOperationModel_PropertyChanged;
+                }
+
+                _statisticalComparisonDecisionOperationModel.ModelId = _riskOperationModel.ModelId;
+                _statisticalComparisonDecisionOperationModel.ComparisonIds = comparisonIds;
+                _statisticalComparisonDecisionOperationModel.RiskControlType = _riskOperationModel.RiskControlType;
+                _mainModel.QueryExecuter.ExecuteOperationModel(_statisticalComparisonDecisionOperationModel, true);
+            }
         }
+
+        private void StatisticalComparisonDecisionOperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            var statDesOpModel = (StatisticalComparisonDecisionOperationModel)sender;
+            if (e.PropertyName == statDesOpModel.GetPropertyName(() => statDesOpModel.Result) && statDesOpModel.Result != null)
+            {
+                var getModelStateResult = (GetModelStateResult) statDesOpModel.Result;
+                foreach (var decision in getModelStateResult.Decisions)
+                {
+                    _allComparisons[decision.ComparisonId].Decision = decision;
+                    if (_comparisonIdToHypothesisViewModels.ContainsKey(decision.ComparisonId))
+                    {
+                        _comparisonIdToHypothesisViewModels[decision.ComparisonId].Decision = decision;
+                    }
+                }
+
+                HypothesesViewModel.StartWealth = getModelStateResult.StartingWealth;
+                HypothesesViewModel.Wealth = getModelStateResult.CurrentWealth;
+            }
+        }
+
     }
 }

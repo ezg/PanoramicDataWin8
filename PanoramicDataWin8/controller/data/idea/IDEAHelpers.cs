@@ -76,10 +76,10 @@ namespace PanoramicDataWin8.controller.data.progressive
             return addComparison;
         }
 
-        public static GetDecisionsParameters GetDecisionsParameters(StatisticalComparisonDecisionOperationModel model)
+        public static GetModelStateParameters GetModelStateParameters(StatisticalComparisonDecisionOperationModel model)
         {
 
-            var getDecisionsParameters = new GetDecisionsParameters()
+            var getDecisionsParameters = new GetModelStateParameters()
             {
                 ModelId = model.ModelId,
                 ComparisonIds = model.ComparisonIds,
