@@ -15,8 +15,6 @@ namespace PanoramicDataWin8.model.data.idea
         {
         }
 
-        public override AttributeFuncModel FuncModel { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
         public IDEAAttributeGroupModel(string rawName, string displayName)
         {
             _rawName = rawName;

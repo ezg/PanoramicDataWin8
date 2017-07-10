@@ -33,23 +33,24 @@ namespace PanoramicDataWin8.model.data.idea
 
         public override List<OriginModel> OriginModels { get; } = new List<OriginModel>();
 
-        private void recursiveCreateAttributeModels(AttributeGroup attributeGroup, IDEAAttributeGroupModel parentGroupModel)
+        private void recursiveCreateAttributeModels(AttributeGroup attributeGroup, AttributeGroupModel parentGroupModel)
         {
-            var groupModel = new IDEAAttributeGroupModel(attributeGroup.Name, attributeGroup.Name);
+            var groupModel = new AttributeGroupModel(attributeGroup.Name);
             groupModel.OriginModel = this;
-            if (parentGroupModel != null)
-                parentGroupModel.InputModels.Add(groupModel);
-            else
-                InputModels.Add(groupModel);
+            // bcz: Group models no longer inherit from AttributeModels --- is this okay?
+            //if (parentGroupModel != null)
+            //    parentGroupModel.InputModels.Add(groupModel);
+            //else
+            //    InputModels.Add(groupModel);
             foreach (var childGroup in attributeGroup.AttributeGroups)
                 recursiveCreateAttributeModels(childGroup, groupModel);
             foreach (var childAttribute in attributeGroup.Attributes)
                 recursiveCreateAttributeModels(childAttribute, groupModel);
         }
 
-        private void recursiveCreateAttributeModels(Attribute attribute, IDEAAttributeGroupModel parentGroupModel)
+        private void recursiveCreateAttributeModels(Attribute attribute, AttributeGroupModel parentGroupModel)
         {
-            var fieldAttributeModel = new IDEAAttributeFieldModel(attribute.RawName, attribute.DisplayName, attribute.Index,
+            var fieldAttributeModel = new IDEAAttributeIndexedFieldModel(attribute.RawName, attribute.DisplayName, attribute.Index,
                 InputDataTypeConstants.FromDataType(attribute.DataType),
                 InputDataTypeConstants.FromDataType(attribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric", attribute.VisualizationHints);
             fieldAttributeModel.OriginModel = this;

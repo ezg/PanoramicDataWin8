@@ -751,7 +751,7 @@ namespace PanoramicDataWin8
                     new AttributeTransformationModel(inputModel as AttributeFieldModel));
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new InputFieldViewTileMenuContentViewModel
                 {
-                    Name = (inputModel as AttributeFieldModel).RawName,
+                    Name = (inputModel as AttributeFieldModel).DisplayName,
                     AttributeTransformationViewModel = attributeTransformationViewModel
                 };
             }
