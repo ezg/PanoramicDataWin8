@@ -157,6 +157,7 @@ namespace PanoramicDataWin8.controller.view
             other.OperationTypeModels.Add(new OperationTypeModel {Name = "example", OperationType = OperationType.Example});
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "filter", OperationType = OperationType.Filter });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "definition", OperationType = OperationType.Definition });
+            other.OperationTypeModels.Add(new OperationTypeModel { Name = "calculation", OperationType = OperationType.Calculation });
 
             MainModel.OperationTypeModels = parent.OperationTypeModels.ToList();
         }
@@ -190,6 +191,15 @@ namespace PanoramicDataWin8.controller.view
         public HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(AttributeModel attributeModel, Pt position)
         {
             var visModel = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(MainModel.SchemaModel, attributeModel, position);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
+
+        public CalculationOperationViewModel CreateDefaultCalculationOperationViewModel(Pt position)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultCalculationOperationViewModel(MainModel.SchemaModel, position);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -318,6 +328,8 @@ namespace PanoramicDataWin8.controller.view
             }
             else if (operationTypeModel.OperationType == OperationType.Definition)
                 operationViewModel = CreateDefaultDefinitionOperationViewModel(position);
+            else if (operationTypeModel.OperationType == OperationType.Calculation)
+                operationViewModel = CreateDefaultCalculationOperationViewModel(position);
 
             if (operationViewModel != null)
             {

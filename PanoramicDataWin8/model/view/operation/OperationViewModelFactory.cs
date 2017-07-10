@@ -731,6 +731,52 @@ namespace PanoramicDataWin8.model.view.operation
             createLeftExampleMenu(exampleOperationViewModel);
             return exampleOperationViewModel;
         }
+        private static void createCalculationMenu(CalculationOperationViewModel calculationOperationViewModel, AttachmentOrientation attachmentOrientation,
+            AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
+        {
+            var attachmentViewModel =
+                calculationOperationViewModel.AttachementViewModels.First(
+                    avm => avm.AttachmentOrientation == attachmentOrientation);
+
+            var menuViewModel = new MenuViewModel
+            {
+                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
+                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
+                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
+            };
+
+            var menuItem = new MenuItemViewModel
+            {
+                MenuViewModel = menuViewModel,
+                Row = 0,
+                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 1,
+                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 5,
+                Column = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
+                Size = size,
+                Position = calculationOperationViewModel.Position,
+                TargetSize = size,
+                IsAlwaysDisplayed = true,
+                IsWidthBoundToParent = isWidthBoundToParent,
+                IsHeightBoundToParent = isHeightBoundToParent
+            };
+            var attr1 = new AttributeTransformationMenuItemViewModel
+            {
+                TextAngle = textAngle,
+                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                Label = "test"  // bcz: placeholder name for the newly defined field
+            };
+
+            // bcz: placeholder to get an Attribute{Transformation}Model for the newly defined field.
+            var inputModels = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First()
+                     .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
+            AttributeTransformationModel attributeTransformationModel = null;
+            attributeTransformationModel = new AttributeTransformationModel(inputModels.First() as AttributeFieldModel);
+            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(calculationOperationViewModel, attributeTransformationModel);
+            attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
+            menuItem.MenuItemComponentViewModel = attr1;
+            menuViewModel.MenuItemViewModels.Add(menuItem);
+            attachmentViewModel.MenuViewModel = menuViewModel;
+        }
         private static void createDefinitionMenu(DefinitionOperationViewModel defintionOperationViewModel, AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {
@@ -777,6 +823,17 @@ namespace PanoramicDataWin8.model.view.operation
             menuViewModel.MenuItemViewModels.Add(menuItem);
             attachmentViewModel.MenuViewModel = menuViewModel;
         }
+        public static CalculationOperationViewModel CreateDefaultCalculationOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse = false)
+        {
+            var calculationOperationModel = new CalculationOperationModel(schemaModel);
+            var calculationOperationViewModel = new CalculationOperationViewModel(calculationOperationModel, fromMouse);
+            calculationOperationViewModel.Position = position;
+            addAttachmentViewModels(calculationOperationViewModel);
+            createCalculationMenu(calculationOperationViewModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
+
+            return calculationOperationViewModel;
+        }
+        
         public static DefinitionOperationViewModel CreateDefaultDefinitionOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse=false)
         {
             var definitionOperationModel = new DefinitionOperationModel(schemaModel);

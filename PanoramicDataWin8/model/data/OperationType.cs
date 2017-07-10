@@ -6,6 +6,7 @@
         Histogram,
         Example,
         Filter,
-        Definition
+        Definition,
+        Calculation
     }
 }
