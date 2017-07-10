@@ -6,7 +6,7 @@ using PanoramicDataWin8.model.data.attribute;
 namespace PanoramicDataWin8.model.data.idea
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class IDEAFieldAttributeModel : AttributeFieldModel
+    public class IDEAAttributeFieldModel : AttributeFieldModel
     {
         private string _displayName = "";
 
@@ -16,7 +16,7 @@ namespace PanoramicDataWin8.model.data.idea
 
         private List<VisualizationHint> _visualizationHints = new List<VisualizationHint>();
 
-        public IDEAFieldAttributeModel(string rawName, string displayName, int index, string inputDataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
+        public IDEAAttributeFieldModel(string rawName, string displayName, int index, string inputDataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
         {
             _rawName = rawName;
             _displayName = displayName;

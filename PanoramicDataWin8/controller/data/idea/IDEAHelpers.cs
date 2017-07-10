@@ -370,7 +370,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         public static AttributeModel GetAttributeModelFromAttribute(Attribute attribute)
         {
-            var attributeModel = new IDEAFieldAttributeModel(
+            var attributeModel = new IDEAAttributeFieldModel(
                 attribute.RawName,
                 attribute.DisplayName, attribute.Index,
                 InputDataTypeConstants.FromDataType(attribute.DataType),

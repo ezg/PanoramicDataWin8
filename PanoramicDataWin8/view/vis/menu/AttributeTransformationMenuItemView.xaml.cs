@@ -304,7 +304,7 @@ namespace PanoramicDataWin8.view.vis.menu
             var attr = AttributeTransformationModel.MatchesExistingField(TextInputBox.Text, true);
             if (attr == null)
             {
-                var attributeModel = new model.data.idea.IDEAFieldAttributeModel(
+                var attributeModel = new model.data.idea.IDEAAttributeFieldModel(
                   TextInputBox.Text,
                    TextInputBox.Text, -1,
                    InputDataTypeConstants.FromDataType(IDEA_common.catalog.DataType.String),
