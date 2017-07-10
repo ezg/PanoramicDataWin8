@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using IDEA_common.catalog;
 using PanoramicDataWin8.model.data.attribute;
 
@@ -13,6 +14,8 @@ namespace PanoramicDataWin8.model.data.idea
         public IDEAAttributeGroupModel()
         {
         }
+
+        public override AttributeFuncModel FuncModel { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public IDEAAttributeGroupModel(string rawName, string displayName)
         {
@@ -33,7 +36,5 @@ namespace PanoramicDataWin8.model.data.idea
         }
 
         public override List<VisualizationHint> VisualizationHints { get; set; }
-
-        public override int Index { get; set; }
     }
 }

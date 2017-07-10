@@ -935,13 +935,13 @@ namespace PanoramicDataWin8.view.vis.render
                         var kdeAggregateKey = new AggregateKey
                         {
                             AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
-                                a => a is KDEAggregateParameters && (a as KDEAggregateParameters).Dimension == atm.AttributeModel.Index)),
+                                a => a is KDEAggregateParameters && (a as KDEAggregateParameters).Dimension == IDEAHelpers.GetDimension(atm.AttributeModel))),
                             BrushIndex = brush.BrushIndex
                         };
                         var countAggregateKey = new AggregateKey
                         {
                             AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
-                                a => a is CountAggregateParameters && (a as CountAggregateParameters).Dimension == atm.AttributeModel.Index)),
+                                a => a is CountAggregateParameters && (a as CountAggregateParameters).Dimension == IDEAHelpers.GetDimension(atm.AttributeModel))),
                             BrushIndex = brush.BrushIndex
                         };
                         if (_histogramResult.AggregateResults.ContainsKey(countAggregateKey) &&
@@ -1009,7 +1009,7 @@ namespace PanoramicDataWin8.view.vis.render
                     var aggregateKey = new AggregateKey
                     {
                         AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
-                            a => a is AverageAggregateParameters && (a as AverageAggregateParameters).Dimension == iom.AttributeModel.Index)),
+                            a => a is AverageAggregateParameters && (a as AverageAggregateParameters).Dimension == IDEAHelpers.GetDimension(iom.AttributeModel))),
                         BrushIndex = brush.BrushIndex
                     };
                     if (_histogramResult.AggregateResults.ContainsKey(aggregateKey))
@@ -1061,25 +1061,25 @@ namespace PanoramicDataWin8.view.vis.render
                     var xKdeAggregateKey = new AggregateKey
                     {
                         AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
-                            a => a is KDEAggregateParameters && (a as KDEAggregateParameters).Dimension == _xIom.AttributeModel.Index)),
+                            a => a is KDEAggregateParameters && (a as KDEAggregateParameters).Dimension == IDEAHelpers.GetDimension(_xIom.AttributeModel))),
                         BrushIndex = brush.BrushIndex
                     };
                     var xCountAggregateKey = new AggregateKey
                     {
                         AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
-                            a => a is CountAggregateParameters && (a as CountAggregateParameters).Dimension == _xIom.AttributeModel.Index)),
+                            a => a is CountAggregateParameters && (a as CountAggregateParameters).Dimension == IDEAHelpers.GetDimension(_xIom.AttributeModel))),
                         BrushIndex = brush.BrushIndex
                     };
                     var yKdeAggregateKey = new AggregateKey
                     {
                         AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
-                            a => a is KDEAggregateParameters && (a as KDEAggregateParameters).Dimension == _yIom.AttributeModel.Index)),
+                            a => a is KDEAggregateParameters && (a as KDEAggregateParameters).Dimension == IDEAHelpers.GetDimension(_yIom.AttributeModel))),
                         BrushIndex = brush.BrushIndex
                     };
                     var yCountAggregateKey = new AggregateKey
                     {
                         AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(_histogramResult.AggregateParameters.FirstOrDefault(
-                             a => a is CountAggregateParameters && (a as CountAggregateParameters).Dimension == _yIom.AttributeModel.Index)),
+                             a => a is CountAggregateParameters && (a as CountAggregateParameters).Dimension == IDEAHelpers.GetDimension(_yIom.AttributeModel))),
                         BrushIndex = brush.BrushIndex
                     };
 

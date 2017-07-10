@@ -132,6 +132,7 @@
     <Compile Include="model\data\attribute\ScaleFunction.cs" />
     <Compile Include="model\data\attribute\SortMode.cs" />
     <Compile Include="model\data\attribute\TransformationFunction.cs" />
+    <Compile Include="model\data\idea\IDEAAttributeComputedFieldModel.cs" />
     <Compile Include="model\data\InputDataTypeConstants.cs" />
     <Compile Include="model\data\attribute\AttributeGroupModel.cs" />
     <Compile Include="model\data\attribute\AttributeModel.cs" />

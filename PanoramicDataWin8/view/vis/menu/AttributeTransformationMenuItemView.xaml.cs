@@ -304,9 +304,9 @@ namespace PanoramicDataWin8.view.vis.menu
             var attr = AttributeTransformationModel.MatchesExistingField(TextInputBox.Text, true);
             if (attr == null)
             {
-                var attributeModel = new model.data.idea.IDEAAttributeFieldModel(
+                var attributeModel = new model.data.idea.IDEAAttributeComputedFieldModel(
                   TextInputBox.Text,
-                   TextInputBox.Text, -1,
+                   TextInputBox.Text, "C# Code For Boolean Field Goes Here",
                    InputDataTypeConstants.FromDataType(IDEA_common.catalog.DataType.String),
                    "numeric",
                    new List<IDEA_common.catalog.VisualizationHint>());

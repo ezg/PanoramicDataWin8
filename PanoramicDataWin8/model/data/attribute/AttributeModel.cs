@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using IDEA_common.catalog;
 using PanoramicDataWin8.utils;
+using Microsoft.Practices.Prism.Mvvm;
 
 namespace PanoramicDataWin8.model.data.attribute
 {
@@ -24,8 +25,29 @@ namespace PanoramicDataWin8.model.data.attribute
         public abstract string RawName { get; set; }
         public abstract string DisplayName { get; set; }
 
-        public abstract List<VisualizationHint> VisualizationHints { get; set; }
+        public class AttributeFuncModel : BindableBase {
+        };
 
-        public abstract int Index { get; set; }
+        public class AttributeCodeFuncModel : AttributeFuncModel {
+            string _code;
+            public AttributeCodeFuncModel(string code)
+            {
+                _code = code;
+            }
+            public string Code { get => _code; }
+        }
+        public class AttributeIndexFuncModel : AttributeFuncModel
+        {
+            int _index = -1;
+            public AttributeIndexFuncModel(int index)
+            {
+                _index = index;
+            }
+            public int Index { get => _index; }
+        }
+    
+        public abstract AttributeFuncModel FuncModel { get; set;  }
+
+        public abstract List<VisualizationHint> VisualizationHints { get; set; }
     }
 }
