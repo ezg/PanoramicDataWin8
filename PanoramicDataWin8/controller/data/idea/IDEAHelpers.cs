@@ -29,7 +29,6 @@ namespace PanoramicDataWin8.controller.data.progressive
                 {
                     Index = ((AttributeModel.AttributeIndexFuncModel) atm.FuncModel).Index,
                     RawName = atm.RawName,
-                    DataType = atm.DataType,
                     VisualizationHints = atm.VisualizationHints
                 };
             }
@@ -39,7 +38,6 @@ namespace PanoramicDataWin8.controller.data.progressive
                 {
                     Code = ((AttributeModel.AttributeCodeFuncModel) atm.FuncModel).Code,
                     RawName = atm.RawName,
-                    DataType = atm.DataType,
                     VisualizationHints = atm.VisualizationHints
                 };
             }
