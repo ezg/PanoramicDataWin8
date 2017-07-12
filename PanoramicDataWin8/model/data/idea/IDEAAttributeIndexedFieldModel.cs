@@ -16,11 +16,11 @@ namespace PanoramicDataWin8.model.data.idea
 
         private List<VisualizationHint> _visualizationHints = new List<VisualizationHint>();
 
-        public IDEAAttributeIndexedFieldModel(string rawName, string displayName, int index, string inputDataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
+        public IDEAAttributeIndexedFieldModel(string rawName, string displayName, int index, DataType dataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
         {
             _rawName = rawName;
             _displayName = displayName;
-            InputDataType = inputDataType;
+            DataType = dataType;
             InputVisualizationType = inputVisualizationType;
             _index = new AttributeIndexFuncModel(index);
             _visualizationHints = visualizationHints;
@@ -51,6 +51,6 @@ namespace PanoramicDataWin8.model.data.idea
 
         public override string InputVisualizationType { get; } = "";
 
-        public override string InputDataType { get; } = "";
+        public override DataType DataType { get; set; } = DataType.Object;
     }
 }

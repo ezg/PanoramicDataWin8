@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using IDEA_common.catalog;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
@@ -93,8 +94,9 @@ namespace PanoramicDataWin8.controller.view
                                 {
                                     comparisonOperationViewModel.StatisticalComparisonOperationModel.TestType = TestType.corr;
                                 }
-                                else if ((a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.FLOAT ||
-                                         (a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.INT)
+                                else if ((a1.AttributeModel as AttributeFieldModel).DataType == DataType.Float ||
+                                         (a1.AttributeModel as AttributeFieldModel).DataType == DataType.Double ||
+                                         (a1.AttributeModel as AttributeFieldModel).DataType == DataType.Int)
                                 {
                                     comparisonOperationViewModel.StatisticalComparisonOperationModel.TestType = TestType.ttest;
                                 }

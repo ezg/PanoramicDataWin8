@@ -319,8 +319,9 @@ namespace PanoramicDataWin8.model.view.operation
                 var aggregateFunctions = new[] {AggregateFunction.None, AggregateFunction.Count}.ToList();
                 if (aom != null)
                 {
-                    if (((AttributeFieldModel) aom.AttributeModel).InputDataType == InputDataTypeConstants.INT ||
-                        (((AttributeFieldModel) aom.AttributeModel).InputDataType == InputDataTypeConstants.FLOAT))
+                    if (((AttributeFieldModel) aom.AttributeModel).DataType == DataType.Float ||
+                        ((AttributeFieldModel) aom.AttributeModel).DataType == DataType.Double ||
+                        ((AttributeFieldModel) aom.AttributeModel).DataType == DataType.Int)
                     {
                         aggregateFunctions.Add(AggregateFunction.Avg);
                         aggregateFunctions.Add(AggregateFunction.Sum);
@@ -329,7 +330,7 @@ namespace PanoramicDataWin8.model.view.operation
                             aggregateFunctions.Add(AggregateFunction.SumE);
                         }
                     }
-                    
+
                     var toggles = new List<ToggleMenuItemComponentViewModel>();
                     var items = new List<MenuItemViewModel>();
 

@@ -1,10 +1,10 @@
-﻿namespace PanoramicDataWin8.model.data.attribute
+﻿using IDEA_common.catalog;
+
+namespace PanoramicDataWin8.model.data.attribute
 {
     public abstract class AttributeFieldModel : AttributeModel
     {
         public abstract string InputVisualizationType { get; }
-
-        public abstract string InputDataType { get; }
 
         public override bool Equals(object obj)
         {
@@ -16,7 +16,7 @@
                     am.OriginModel.Equals(OriginModel) &&
                     am.RawName.Equals(RawName) &&
                     am.InputVisualizationType.Equals(InputVisualizationType) &&
-                    am.InputDataType.Equals(InputDataType);
+                    am.DataType.Equals(DataType);
             }
             return false;
         }
@@ -28,7 +28,7 @@
                 code ^= OriginModel.GetHashCode();
             code ^= RawName.GetHashCode();
             code ^= InputVisualizationType.GetHashCode();
-            code ^= InputDataType.GetHashCode();
+            code ^= DataType.GetHashCode();
             return code;
         }
     }

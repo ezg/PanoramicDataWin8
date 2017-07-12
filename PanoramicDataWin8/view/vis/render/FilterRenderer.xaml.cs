@@ -34,6 +34,7 @@ using PanoramicDataWin8.model.data.attribute;
 using System.Globalization;
 using Windows.UI;
 using System.Runtime.InteropServices;
+using IDEA_common.catalog;
 using IDEA_common.operations.recommender;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
@@ -262,7 +263,7 @@ namespace PanoramicDataWin8.view.vis.render
             return true;
         }
 
-        public static string FieldType(string str)
+        public static DataType FieldType(string str)
         {
             var inputModels = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First()
                      .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
@@ -273,7 +274,7 @@ namespace PanoramicDataWin8.view.vis.render
             foreach (var im in inputModels)
                 if (im.RawName.ToLower() == str.ToLower())
                     fieldModel = im as AttributeFieldModel; 
-            return fieldModel != null ? fieldModel.InputDataType : null;
+            return fieldModel != null ? fieldModel.DataType : DataType.Object;
         }
 
         InkManager AddStrokesToInkManager(InkableScene scene)
@@ -585,7 +586,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (splits.Count() > 2)
             {
                 var vfield = FieldType(splits.First());
-                if (vfield != null && vfield == InputDataTypeConstants.NVARCHAR)
+                if (vfield != null && vfield == DataType.String)
                 {
                     var p = ToStringPredicate(splits[1]);
                     AddFilterModel(AttributeTransformationModel.MatchesExistingField(splits[0]), p, splits[2]);

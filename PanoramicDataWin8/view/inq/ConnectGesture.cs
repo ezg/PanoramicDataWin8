@@ -5,6 +5,7 @@ using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.vis;
 using System;
+using IDEA_common.catalog;
 using IDEA_common.operations.recommender;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data;
@@ -124,7 +125,7 @@ namespace PanoramicDataWin8.view.inq
                                     operationContainerView.DataContext = filterOperationViewModel;
                                     controller.view.MainViewController.Instance.InkableScene.Add(operationContainerView);
                                     if (FilterRenderer.FieldType((menuItemViewModel.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.RawName) == 
-                                        InputDataTypeConstants.NVARCHAR)
+                                        DataType.String)
                                         (operationContainerView.Renderer as FilterRenderer).SetFilter(name, Predicate.EQUALS, "a");
                                     else (operationContainerView.Renderer as FilterRenderer).SetFilter(name, Predicate.LESS_THAN, 0);
                                     FilterLinkViewController.Instance.CreateFilterLinkViewModel(filterOperationViewModel.OperationModel,

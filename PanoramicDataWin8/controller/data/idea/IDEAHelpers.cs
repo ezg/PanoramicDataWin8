@@ -21,18 +21,35 @@ namespace PanoramicDataWin8.controller.data.progressive
 {
     public static class IDEAHelpers
     {
-        // bcz: this function needs to return a union of int/code when the backend is updated 
-        public static int GetDimension(AttributeModel atm)
+        public static AttributeParameters GetAttributeParameters(AttributeModel atm)
         {
-            return atm.FuncModel is AttributeFieldModel.AttributeIndexFuncModel ? (atm.FuncModel as AttributeFieldModel.AttributeIndexFuncModel).Index : -1;
+            if (atm.FuncModel is AttributeFieldModel.AttributeIndexFuncModel)
+            {
+                return new AttributeIndexParameters()
+                {
+                    Index = ((AttributeModel.AttributeIndexFuncModel) atm.FuncModel).Index,
+                    RawName = atm.RawName,
+                    DataType = atm.DataType,
+                    VisualizationHints = atm.VisualizationHints
+                };
+            }
+            else
+            {
+                return new AttributeCodeParameters()
+                {
+                    Code = ((AttributeModel.AttributeCodeFuncModel) atm.FuncModel).Code,
+                    RawName = atm.RawName,
+                    DataType = atm.DataType,
+                    VisualizationHints = atm.VisualizationHints
+                };
+            }
         }
-        // bcz: this function needs to return a union of int/code when the backend is updated 
-        public static List<int> GetDimensions(IEnumerable<AttributeModel> models)
+        
+        public static List<AttributeParameters> GetAttributeParameters(IEnumerable<AttributeModel> models)
         {
-            return models.Where(am => am.FuncModel is AttributeFieldModel.AttributeIndexFuncModel).Select(am => GetDimension(am)).ToList();
-            // bcz: use this line instead of above when backend has been updated
-            // return models.Select(am => GetDimension(am)).ToList();
+            return models.Select(am => GetAttributeParameters(am)).ToList();
         }
+
         public static AddComparisonParameters GetAddComparisonOperationParameters(StatisticalComparisonOperationModel model, int sampleSize)
         {
             var addComparison = new AddComparisonParameters
@@ -111,7 +128,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
                 Filter = filter,
-                Dimensions = GetDimensions(model.AttributeUsageTransformationModels.Select(atm => atm.AttributeModel)),
+                AttributeParameters = GetAttributeParameters(model.AttributeUsageTransformationModels.Select(atm => atm.AttributeModel)),
                 DummyValue = model.DummyValue,
                 ExampleType = model.ExampleOperationType.ToString(),
                 SampleStreamBlockSize = sampleSize
@@ -134,7 +151,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
                 Filter = filter,
-                Attrs = new[] { xIom, yIom }.Select(a => a.AttributeModel.RawName).Distinct().ToList(),
+                AttributeParameters = new[] { xIom, yIom }.Select(a => GetAttributeParameters(a.AttributeModel)).Distinct().ToList(),
                 SampleStreamBlockSize = sampleSize,
                 KeepSamples = false
             };
@@ -161,7 +178,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
                 Filter = FilterModel.And(filter1, filter2),
-                Attrs = new[] { m1Iom, m2Iom }.Select(a => a.AttributeModel.RawName).ToList(),
+                AttributeParameters = new[] { m1Iom, m2Iom }.Select(a => GetAttributeParameters(a.AttributeModel)).ToList(),
                 SampleStreamBlockSize = sampleSize,
                 KeepSamples = false
             };
@@ -176,13 +193,13 @@ namespace PanoramicDataWin8.controller.data.progressive
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
                 SampleStreamBlockSize = sampleSize, 
                 ModelId = model.ModelId,
-                ExcludeDimensions = GetDimensions(model.Exlude),
-                IncludeDimensions = GetDimensions(model.Include),
+                ExcludeAttributeParameters = GetAttributeParameters(model.Exlude),
+                IncludeAttributeParameters = GetAttributeParameters(model.Include),
                 Target = GetHistogramOperationParameters(model.Target, sampleSize), 
                 RiskControlType = HypothesesViewController.Instance.RiskOperationModel.RiskControlType,
                 Budget = model.Budget
             };
-            param.ExcludeDimensions.Add(GetDimensions(model.Target.GetAttributeUsageTransformationModel(AttributeUsage.X).Select(atm => atm.AttributeModel)).First());
+            param.ExcludeAttributeParameters.Add(GetAttributeParameters(model.Target.GetAttributeUsageTransformationModel(AttributeUsage.X).Select(atm => atm.AttributeModel)).First());
             return param;
         }
 
@@ -230,24 +247,24 @@ namespace PanoramicDataWin8.controller.data.progressive
             var xBinning = xIom.AggregateFunction == AggregateFunction.None
                 ? new EquiWidthBinningParameters
                 {
-                    Dimension = GetDimension( xIom.AttributeModel ),
+                    AttributeParameters = GetAttributeParameters( xIom.AttributeModel ),
                     RequestedNrOfBins = MainViewController.Instance.MainModel.NrOfXBins, 
                 }
                 : (BinningParameters) new SingleBinBinningParameters
                 {
-                    Dimension = GetDimension(xIom.AttributeModel),
+                    AttributeParameters = GetAttributeParameters(xIom.AttributeModel),
                 };
 
 
             var yBinning = yIom.AggregateFunction == AggregateFunction.None
                 ? new EquiWidthBinningParameters
                 {
-                    Dimension = GetDimension(yIom.AttributeModel),
+                    AttributeParameters = GetAttributeParameters(yIom.AttributeModel),
                     RequestedNrOfBins = MainViewController.Instance.MainModel.NrOfYBins
                 }
                 : (BinningParameters) new SingleBinBinningParameters
                 {
-                    Dimension = GetDimension(yIom.AttributeModel)
+                    AttributeParameters = GetAttributeParameters(yIom.AttributeModel)
                 };
 
             AggregateParameters sortAggregateParam = null;
@@ -259,32 +276,32 @@ namespace PanoramicDataWin8.controller.data.progressive
                 {
                     aggParam = new AverageAggregateParameters
                     {
-                        Dimension = GetDimension(agg.AttributeModel),
-                        DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
+                        AttributeParameters = GetAttributeParameters(agg.AttributeModel),
+                        DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters
                     };
                 }
                 else if (agg.AggregateFunction == AggregateFunction.Count)
                 {
                     aggParam = new CountAggregateParameters
                     {
-                        Dimension = GetDimension(agg.AttributeModel),
-                        DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
+                        AttributeParameters = GetAttributeParameters(agg.AttributeModel),
+                        DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters
                     };
                 }
                 else if (agg.AggregateFunction == AggregateFunction.Sum)
                 {
                     aggParam = new SumAggregateParameters()
                     {
-                        Dimension = GetDimension(agg.AttributeModel),
-                        DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
+                        AttributeParameters = GetAttributeParameters(agg.AttributeModel),
+                        DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters
                     };
                 }
                 else if (agg.AggregateFunction == AggregateFunction.SumE)
                 {
                     aggParam = new SumEstimationAggregateParameters()
                     {
-                        Dimension = GetDimension(agg.AttributeModel),
-                        DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension
+                        AttributeParameters = GetAttributeParameters(agg.AttributeModel),
+                        DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters
                     };
                 }
                 aggregateParameters.Add(aggParam);
@@ -294,15 +311,15 @@ namespace PanoramicDataWin8.controller.data.progressive
 
                 aggregateParameters.Add(new MarginAggregateParameters
                 {
-                    Dimension = GetDimension(agg.AttributeModel),
-                    DistinctDimension = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctDimension,
+                    AttributeParameters = GetAttributeParameters(agg.AttributeModel),
+                    DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters,
                     AggregateFunction = agg.AggregateFunction.ToString()
                 });
             }
 
-            var numericDataTypes = new[] {InputDataTypeConstants.INT, InputDataTypeConstants.FLOAT}.ToList();
+            var numericDataTypes = new[] {DataType.Int, DataType.Double, DataType.Float}.ToList();
             var globalAggregates = new List<AggregateParameters>();
-            foreach (var index in new[] {xIom, yIom}.Where(a => numericDataTypes.Contains((a.AttributeModel as AttributeFieldModel).InputDataType)).Select(a => GetDimension(a.AttributeModel)).Distinct())
+            foreach (var index in new[] {xIom, yIom}.Where(a => numericDataTypes.Contains((a.AttributeModel as AttributeFieldModel).DataType)).Select(a => GetAttributeParameters(a.AttributeModel)).Distinct())
             {
                 /*globalAggregates.Add(new KDEAggregateParameters
                 {
@@ -317,11 +334,11 @@ namespace PanoramicDataWin8.controller.data.progressive
                 });*/
             }
 
-            foreach (var iom in new[] {xIom, yIom}.Where(i => i.AggregateFunction == AggregateFunction.None && numericDataTypes.Contains((i.AttributeModel as AttributeFieldModel).InputDataType)))
+            foreach (var iom in new[] {xIom, yIom}.Where(i => i.AggregateFunction == AggregateFunction.None && numericDataTypes.Contains((i.AttributeModel as AttributeFieldModel).DataType)))
             {
                 globalAggregates.Add(new AverageAggregateParameters()
                 {
-                    Dimension = GetDimension(iom.AttributeModel)
+                    AttributeParameters = GetAttributeParameters(iom.AttributeModel)
                 });
             }
 
@@ -343,19 +360,19 @@ namespace PanoramicDataWin8.controller.data.progressive
         private static AggregateParameters createAggregateParameters(AttributeTransformationModel iom)
         {
             if (iom.AggregateFunction == AggregateFunction.Count)
-                return new CountAggregateParameters {Dimension = GetDimension(iom.AttributeModel) };
+                return new CountAggregateParameters { AttributeParameters = GetAttributeParameters(iom.AttributeModel) };
             if (iom.AggregateFunction == AggregateFunction.Avg)
-                return new AverageAggregateParameters {Dimension = GetDimension(iom.AttributeModel) };
+                return new AverageAggregateParameters { AttributeParameters = GetAttributeParameters(iom.AttributeModel) };
             if (iom.AggregateFunction == AggregateFunction.Max)
-                return new MaxAggregateParameters {Dimension = GetDimension(iom.AttributeModel) };
+                return new MaxAggregateParameters { AttributeParameters = GetAttributeParameters(iom.AttributeModel) };
             if (iom.AggregateFunction == AggregateFunction.Min)
-                return new MinAggregateParameters {Dimension = GetDimension(iom.AttributeModel) };
+                return new MinAggregateParameters { AttributeParameters = GetAttributeParameters(iom.AttributeModel) };
             if (iom.AggregateFunction == AggregateFunction.Sum)
-                return new SumAggregateParameters {Dimension = GetDimension(iom.AttributeModel) };
+                return new SumAggregateParameters { AttributeParameters = GetAttributeParameters(iom.AttributeModel) };
             if (iom.AggregateFunction == AggregateFunction.Count)
-                return new CountAggregateParameters {Dimension = GetDimension(iom.AttributeModel) };
+                return new CountAggregateParameters { AttributeParameters = GetAttributeParameters(iom.AttributeModel) };
             if (iom.AggregateFunction == AggregateFunction.SumE)
-                return new SumEstimationAggregateParameters() { Dimension = GetDimension(iom.AttributeModel) };
+                return new SumEstimationAggregateParameters() { AttributeParameters = GetAttributeParameters(iom.AttributeModel) };
             return null;
         }
 
@@ -372,7 +389,7 @@ namespace PanoramicDataWin8.controller.data.progressive
         public static AggregateKey CreateAggregateKey(AttributeTransformationModel iom,
             SingleDimensionAggregateParameters aggParameters, HistogramResult histogramResult, int brushIndex)
         {
-            aggParameters.Dimension = GetDimension(iom.AttributeModel);
+            aggParameters.AttributeParameters = GetAttributeParameters(iom.AttributeModel);
             return new AggregateKey
             {
                 AggregateParameterIndex = histogramResult.GetAggregateParametersIndex(aggParameters),
@@ -385,8 +402,8 @@ namespace PanoramicDataWin8.controller.data.progressive
             var attributeModel = new IDEAAttributeIndexedFieldModel(
                 attribute.RawName,
                 attribute.DisplayName, attribute.Index,
-                InputDataTypeConstants.FromDataType(attribute.DataType),
-                InputDataTypeConstants.FromDataType(attribute.DataType) == InputDataTypeConstants.NVARCHAR ? "enum" : "numeric",
+                attribute.DataType,
+                attribute.DataType == DataType.String ? "enum" : "numeric",
                 attribute.VisualizationHints);
             return attributeModel;
         }

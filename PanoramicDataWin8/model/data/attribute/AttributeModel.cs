@@ -23,6 +23,7 @@ namespace PanoramicDataWin8.model.data.attribute
         }
 
         public abstract string RawName { get; set; }
+        public abstract DataType DataType { get; set; }
         public abstract string DisplayName { get; set; }
 
         public class AttributeFuncModel : BindableBase {

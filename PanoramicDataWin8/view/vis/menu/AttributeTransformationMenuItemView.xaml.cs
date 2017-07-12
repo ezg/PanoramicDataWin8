@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using GeoAPI.Geometries;
+using IDEA_common.catalog;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
@@ -307,8 +308,8 @@ namespace PanoramicDataWin8.view.vis.menu
                 var attributeModel = new model.data.idea.IDEAAttributeComputedFieldModel(
                   TextInputBox.Text,
                    TextInputBox.Text, "C# Code For Boolean Field Goes Here",
-                   InputDataTypeConstants.FromDataType(IDEA_common.catalog.DataType.String),
-                   "numeric",
+                   DataType.String, 
+                   "enum",
                    new List<IDEA_common.catalog.VisualizationHint>());
                 attr = new AttributeTransformationModel(attributeModel);
                 model.AttributeTransformationViewModel.AttributeTransformationModel = attr;

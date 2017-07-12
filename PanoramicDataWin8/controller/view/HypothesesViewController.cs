@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using Windows.UI.Xaml;
+using IDEA_common.catalog;
 using IDEA_common.operations.risk;
 using IDEA_common.util;
 using Newtonsoft.Json;
@@ -121,8 +122,9 @@ namespace PanoramicDataWin8.controller.view
                         {
                             statModel = new StatisticalComparisonOperationModel(model.SchemaModel);
                             var a1 = model.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
-                            if ((a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.FLOAT ||
-                                (a1.AttributeModel as AttributeFieldModel).InputDataType == InputDataTypeConstants.INT)
+                            if ((a1.AttributeModel as AttributeFieldModel).DataType == DataType.Float ||
+                                (a1.AttributeModel as AttributeFieldModel).DataType == DataType.Double ||
+                                (a1.AttributeModel as AttributeFieldModel).DataType == DataType.Int)
                             {
                                 statModel.TestType = TestType.ttest;
                             }

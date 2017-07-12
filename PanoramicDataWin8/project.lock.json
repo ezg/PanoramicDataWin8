@@ -23721,14 +23721,14 @@
     "UAP,Version=v10.0": []
   },
   "packageFolders": {
-    "C:\\Users\\bcz\\.nuget\\packages\\": {}
+    "C:\\Users\\ez\\.nuget\\packages\\": {}
   },
   "project": {
     "restore": {
-      "projectUniqueName": "C:\\gitstuff\\GitCode\\PanoramicDataWin8\\PanoramicDataWin8\\PanoramicDataWin8.csproj",
+      "projectUniqueName": "C:\\ez_projects\\PanoramicDataWin8\\PanoramicDataWin8\\PanoramicDataWin8.csproj",
       "projectName": "PanoramicDataWin8",
-      "projectPath": "C:\\gitstuff\\GitCode\\PanoramicDataWin8\\PanoramicDataWin8\\PanoramicDataWin8.csproj",
-      "projectJsonPath": "C:\\gitstuff\\GitCode\\PanoramicDataWin8\\PanoramicDataWin8\\project.json",
+      "projectPath": "C:\\ez_projects\\PanoramicDataWin8\\PanoramicDataWin8\\PanoramicDataWin8.csproj",
+      "projectJsonPath": "C:\\ez_projects\\PanoramicDataWin8\\PanoramicDataWin8\\project.json",
       "projectStyle": "ProjectJson"
     },
     "dependencies": {
