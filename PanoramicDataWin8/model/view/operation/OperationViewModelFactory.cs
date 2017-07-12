@@ -770,8 +770,7 @@ namespace PanoramicDataWin8.model.view.operation
             // bcz: placeholder to get an Attribute{Transformation}Model for the newly defined field.
             var inputModels = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First()
                      .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
-            AttributeTransformationModel attributeTransformationModel = null;
-            attributeTransformationModel = new AttributeTransformationModel(inputModels.First() as AttributeFieldModel);
+            var attributeTransformationModel = new AttributeTransformationModel((calculationOperationViewModel.OperationModel as CalculationOperationModel).Code);
             attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(calculationOperationViewModel, attributeTransformationModel);
             attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
             menuItem.MenuItemComponentViewModel = attr1;

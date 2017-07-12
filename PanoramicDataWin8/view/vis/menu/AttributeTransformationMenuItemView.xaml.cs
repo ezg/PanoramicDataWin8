@@ -26,6 +26,7 @@ using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.view.inq;
+using PanoramicDataWin8.model.data.operation;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -303,20 +304,11 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
             var attr = AttributeTransformationModel.MatchesExistingField(TextInputBox.Text, true);
-            if (attr == null)
+            // if attribute label doesn't match any known attribute and this is a calculation operation, 
+            // then set the name of the Calculation operation to the attribute label
+            if (attr == null && model.AttributeTransformationViewModel.OperationViewModel.OperationModel is CalculationOperationModel)
             {
-                var attTransModel = ((DataContext as MenuItemViewModel).MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).AttributeTransformationViewModel.OperationViewModel;
-                var calcModel = attTransModel.OperationModel as model.data.operation.CalculationOperationModel;
-                var attributeModel = new model.data.idea.IDEAAttributeComputedFieldModel(
-                  TextInputBox.Text,
-                   TextInputBox.Text, 
-                   calcModel.Code == null ? "" : calcModel.Code,// "C# Code For Boolean Field Goes Here",
-                   DataType.Double, 
-                   "numeric",
-                   new List<IDEA_common.catalog.VisualizationHint>());
-                attr = new AttributeTransformationModel(attributeModel);
-                model.AttributeTransformationViewModel.AttributeTransformationModel = attr;
-                model.Label = attr.AttributeModel.DisplayName;
+                (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as CalculationOperationModel).SetRawName(model.Label);
             }
 
             model.Editing = Visibility.Collapsed;
