@@ -127,8 +127,7 @@
         </Page.Resources>
         <Grid Background="{StaticResource lightBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid Name="Labels" IsHitTestVisible="False" Background="{StaticResource lightBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <TextBox x:Name="CodeBox" Background="{StaticResource lightBrush}" Foreground="Black" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
-
+                <TextBox x:Name="CodeBox" Background="{StaticResource lightBrush}" Foreground="Black" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextChanged="Tb_TextChanged"/>
             </Grid>
 
         </Grid>

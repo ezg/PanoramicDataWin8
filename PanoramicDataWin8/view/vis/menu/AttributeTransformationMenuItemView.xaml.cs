@@ -305,11 +305,14 @@ namespace PanoramicDataWin8.view.vis.menu
             var attr = AttributeTransformationModel.MatchesExistingField(TextInputBox.Text, true);
             if (attr == null)
             {
+                var attTransModel = ((DataContext as MenuItemViewModel).MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).AttributeTransformationViewModel.OperationViewModel;
+                var calcModel = attTransModel.OperationModel as model.data.operation.CalculationOperationModel;
                 var attributeModel = new model.data.idea.IDEAAttributeComputedFieldModel(
                   TextInputBox.Text,
-                   TextInputBox.Text, "C# Code For Boolean Field Goes Here",
-                   DataType.String, 
-                   "enum",
+                   TextInputBox.Text, 
+                   calcModel.Code == null ? "" : calcModel.Code,// "C# Code For Boolean Field Goes Here",
+                   DataType.Double, 
+                   "numeric",
                    new List<IDEA_common.catalog.VisualizationHint>());
                 attr = new AttributeTransformationModel(attributeModel);
                 model.AttributeTransformationViewModel.AttributeTransformationModel = attr;

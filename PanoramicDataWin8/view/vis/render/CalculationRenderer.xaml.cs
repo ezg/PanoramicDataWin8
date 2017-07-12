@@ -19,6 +19,8 @@ using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.model.data.operation;
 using System.ComponentModel;
 using Windows.UI;
+using PanoramicDataWin8.model.view;
+using PanoramicDataWin8.model.data.attribute;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -90,6 +92,25 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void Tb_TextChanged(object sender, TextChangedEventArgs e)
         {
+            foreach (var att in (this.DataContext as CalculationOperationViewModel).AttachementViewModels)
+                if (att.MenuViewModel != null)
+                    foreach (var menuItem in att.MenuViewModel.MenuItemViewModels)
+                    {
+                        var model = menuItem.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel;
+                        if (model != null)
+                        {
+                            var attTransModel = (menuItem.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).AttributeTransformationViewModel.OperationViewModel;
+                             var attributeModel = new model.data.idea.IDEAAttributeComputedFieldModel(
+                               model.AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.RawName,
+                               model.AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.DisplayName,
+                               CodeBox.Text == null ? "" : CodeBox.Text,// "C# Code For Boolean Field Goes Here",
+                               IDEA_common.catalog.DataType.Double,
+                               "numeric",
+                               new List<IDEA_common.catalog.VisualizationHint>());
+                            var attr = new AttributeTransformationModel(attributeModel);
+                            model.AttributeTransformationViewModel.AttributeTransformationModel = attr;
+                        }
+                    }
         }
 
         public List<IScribbable> Children

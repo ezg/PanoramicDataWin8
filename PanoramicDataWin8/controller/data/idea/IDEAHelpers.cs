@@ -343,6 +343,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             }
 
 
+
             var parameters = new HistogramOperationParameters
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
@@ -352,7 +353,9 @@ namespace PanoramicDataWin8.controller.data.progressive
                 SampleStreamBlockSize = sampleSize,
                 PerBinAggregateParameters = aggregateParameters,
                 SortPerBinAggregateParameter = sortAggregateParam,
-                GlobalAggregateParameters = globalAggregates
+                GlobalAggregateParameters = globalAggregates,
+                AttributeCodeParameters = aggregates.Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeCodeFuncModel).
+                         Select((agg) => GetAttributeParameters(agg.AttributeModel) as AttributeCodeParameters).Distinct().ToList()
             };
             return parameters;
         }

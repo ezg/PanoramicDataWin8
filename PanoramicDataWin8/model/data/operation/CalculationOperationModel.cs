@@ -10,5 +10,6 @@ namespace PanoramicDataWin8.model.data.operation
         public CalculationOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
         }
+        public string Code { get; set; }
     }
 }
