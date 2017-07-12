@@ -92,6 +92,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void Tb_TextChanged(object sender, TextChangedEventArgs e)
         {
+            ((DataContext as CalculationOperationViewModel).OperationModel as CalculationOperationModel).Code = CodeBox.Text;
             foreach (var att in (this.DataContext as CalculationOperationViewModel).AttachementViewModels)
                 if (att.MenuViewModel != null)
                     foreach (var menuItem in att.MenuViewModel.MenuItemViewModels)
@@ -100,7 +101,8 @@ namespace PanoramicDataWin8.view.vis.render
                         if (model != null)
                         {
                             var attTransModel = (menuItem.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).AttributeTransformationViewModel.OperationViewModel;
-                             var attributeModel = new model.data.idea.IDEAAttributeComputedFieldModel(
+
+                            var attributeModel = new model.data.idea.IDEAAttributeComputedFieldModel(
                                model.AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.RawName,
                                model.AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.DisplayName,
                                CodeBox.Text == null ? "" : CodeBox.Text,// "C# Code For Boolean Field Goes Here",
