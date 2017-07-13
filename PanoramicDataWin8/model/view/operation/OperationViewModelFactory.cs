@@ -735,6 +735,7 @@ namespace PanoramicDataWin8.model.view.operation
         private static void createCalculationMenu(CalculationOperationViewModel calculationOperationViewModel, AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {
+            var calculationOperationModel = calculationOperationViewModel.OperationModel as CalculationOperationModel;
             var attachmentViewModel =
                 calculationOperationViewModel.AttachementViewModels.First(
                     avm => avm.AttachmentOrientation == attachmentOrientation);
@@ -766,13 +767,9 @@ namespace PanoramicDataWin8.model.view.operation
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
                 Label = "test"  // bcz: placeholder name for the newly defined field
             };
-
-            // bcz: placeholder to get an Attribute{Transformation}Model for the newly defined field.
-            var inputModels = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First()
-                     .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
-            AttributeTransformationModel attributeTransformationModel = null;
-            attributeTransformationModel = new AttributeTransformationModel(inputModels.First() as AttributeFieldModel);
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(calculationOperationViewModel, attributeTransformationModel);
+            
+            calculationOperationModel.SetRawName(attr1.Label);
+            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(calculationOperationViewModel, new AttributeTransformationModel(calculationOperationModel.Code));
             attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
             menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);
