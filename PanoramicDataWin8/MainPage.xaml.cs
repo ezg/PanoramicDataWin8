@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Windows.Devices.Input;
 using Windows.Foundation;
 using Windows.System;
@@ -13,7 +14,10 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
+using IDEA_common.catalog;
+using IDEA_common.operations;
 using IDEA_common.operations.risk;
+using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
@@ -65,7 +69,7 @@ namespace PanoramicDataWin8
             _messageTimer.Stop();
         }
 
-        private void MainPage_KeyDown(object sender, KeyRoutedEventArgs e)
+        private async void MainPage_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
             if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
@@ -208,7 +212,7 @@ namespace PanoramicDataWin8
                     msgTextBlock.Opacity = 1;
                     _messageTimer.Start();
                 }
-                if (e.Key == VirtualKey.T)
+                else if (e.Key == VirtualKey.T)
                 {
                     var q1 = new HistogramOperationModel(MainViewController.Instance.MainModel.SchemaModel);
                     var q2 = new HistogramOperationModel(MainViewController.Instance.MainModel.SchemaModel);
@@ -221,7 +225,23 @@ namespace PanoramicDataWin8
 
                     var tt = q1.Clone();
                 }
-                
+                else if (e.Key == VirtualKey.M)
+                {
+                    var code = "mpg + 40";
+
+                    var map = new Dictionary<string, DataType>();
+                    map.Add("mpg", DataType.Double);
+                    map.Add("hp", DataType.Double);
+
+                    CodeParameters cp = new CodeParameters()
+                    {
+                        Code = "mpg + a",
+                        RawNameToDataTypes = map
+                    };
+                    CodeCommand cmd= new CodeCommand();
+                    var res = await cmd.CompileCode(cp);
+                }
+
 
                 /*if (e.Key == VirtualKey.P)
                 {
@@ -233,7 +253,7 @@ namespace PanoramicDataWin8
                     msgTextBlock.Opacity = 1;
                     _messageTimer.Start();
                 }*/
-            }
+                }
         }
 
         private void MainPage_PointerPressed(object sender, PointerRoutedEventArgs e)

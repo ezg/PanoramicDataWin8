@@ -332,7 +332,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                 });*/
             }
 
-            foreach (var iom in new[] {xIom, yIom}.Where(i => i.AggregateFunction == AggregateFunction.None && numericDataTypes.Contains((i.AttributeModel as AttributeFieldModel).DataType)))
+            foreach (var iom in new[] {xIom, yIom}.Where(i => i.AggregateFunction == AggregateFunction.None && 
+                numericDataTypes.Contains((i.AttributeModel as AttributeFieldModel).DataType)))
             {
                 globalAggregates.Add(new AverageAggregateParameters()
                 {

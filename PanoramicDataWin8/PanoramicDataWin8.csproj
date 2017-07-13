@@ -104,6 +104,7 @@
     </Compile>
     <Compile Include="controller\data\idea\ExecuteOperationModelEventArgs.cs" />
     <Compile Include="controller\data\idea\RecommenderOperationJob.cs" />
+    <Compile Include="controller\data\idea\CodeCommand.cs" />
     <Compile Include="controller\data\idea\RiskOperationJob.cs" />
     <Compile Include="controller\data\idea\StatisticalComparisonDecisionOperationJob.cs" />
     <Compile Include="controller\data\JobEventArgs.cs" />
