@@ -106,7 +106,7 @@ namespace PanoramicDataWin8.view.vis.render
                                model.AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.RawName,
                                model.AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.DisplayName,
                                CodeBox.Text == null ? "" : CodeBox.Text,// "C# Code For Boolean Field Goes Here",
-                               IDEA_common.catalog.DataType.Double,
+                               IDEA_common.catalog.DataType.String,
                                "numeric",
                                new List<IDEA_common.catalog.VisualizationHint>());
                             var attr = new AttributeTransformationModel(attributeModel);

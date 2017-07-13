@@ -311,7 +311,7 @@ namespace PanoramicDataWin8.view.vis.menu
                   TextInputBox.Text,
                    TextInputBox.Text, 
                    calcModel.Code == null ? "" : calcModel.Code,// "C# Code For Boolean Field Goes Here",
-                   DataType.Double, 
+                   DataType.String, 
                    "numeric",
                    new List<IDEA_common.catalog.VisualizationHint>());
                 attr = new AttributeTransformationModel(attributeModel);
