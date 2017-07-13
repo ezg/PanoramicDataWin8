@@ -6,13 +6,13 @@ namespace PanoramicDataWin8.controller.data.progressive
 {
     public class CodeCommand
     {
-        public async Task<CodeResult> CompileCode(CodeParameters codeParameters)
+        public async Task<CompileResults> CompileCode(CodeParameters codeParameters)
         {
             var ser = JsonConvert.SerializeObject(codeParameters, IDEAGateway.JsonSerializerSettings);
-            var response = await IDEAGateway.Request(ser, "code");
+            var response = await IDEAGateway.Request(ser, "compile");
             if (response != "null")
             {
-                var result = JsonConvert.DeserializeObject<CodeResult>(response, IDEAGateway.JsonSerializerSettings);
+                var result = JsonConvert.DeserializeObject<CompileResults>(response, IDEAGateway.JsonSerializerSettings);
                 return result;
             }
             return null;

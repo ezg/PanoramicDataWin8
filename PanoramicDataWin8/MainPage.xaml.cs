@@ -227,16 +227,31 @@ namespace PanoramicDataWin8
                 }
                 else if (e.Key == VirtualKey.M)
                 {
-                    var code = "mpg + 40";
-
-                    var map = new Dictionary<string, DataType>();
-                    map.Add("mpg", DataType.Double);
-                    map.Add("hp", DataType.Double);
+                    var attr1 = new AttributeCodeParameters()
+                    {
+                        Code = "mpg + 40",
+                        RawName = "calc_1"
+                    };
+                    var attr2 = new AttributeCodeParameters()
+                    {
+                        Code = "hp + 40",
+                        RawName = "calc_2"
+                    };
+                    var attr3 = new AttributeCodeParameters()
+                    {
+                        Code = "calc_1 + calc_2",
+                        RawName = "calc_3"
+                    };
+                    var attr4 = new AttributeCodeParameters()
+                    {
+                        Code = "foo + 50",
+                        RawName = "calc_4"
+                    };
 
                     CodeParameters cp = new CodeParameters()
                     {
-                        Code = "mpg + a",
-                        RawNameToDataTypes = map
+                        AttributeCodeParameters = new[] {attr1, attr2, attr3, attr4}.ToList(),
+                        AdapterName = "cars"
                     };
                     CodeCommand cmd= new CodeCommand();
                     var res = await cmd.CompileCode(cp);
