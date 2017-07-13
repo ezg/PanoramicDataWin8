@@ -778,6 +778,7 @@ namespace PanoramicDataWin8.model.view.operation
         private static void createDefinitionMenu(DefinitionOperationViewModel defintionOperationViewModel, AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {
+            var definitionOperationModel = defintionOperationViewModel.OperationModel as DefinitionOperationModel;
             var attachmentViewModel =
                 defintionOperationViewModel.AttachementViewModels.First(
                     avm => avm.AttachmentOrientation == attachmentOrientation);
@@ -810,12 +811,8 @@ namespace PanoramicDataWin8.model.view.operation
                 Label = "test"  // bcz: placeholder name for the newly defined field
             };
 
-            // bcz: placeholder to get an Attribute{Transformation}Model for the newly defined field.
-            var inputModels = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First()
-                     .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
-            AttributeTransformationModel attributeTransformationModel = null;
-            attributeTransformationModel = new AttributeTransformationModel(inputModels.First() as AttributeFieldModel);
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(defintionOperationViewModel, attributeTransformationModel);
+            definitionOperationModel.SetRawName(attr1.Label);
+            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(defintionOperationViewModel, new AttributeTransformationModel(definitionOperationModel.Code));
             attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
             menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);

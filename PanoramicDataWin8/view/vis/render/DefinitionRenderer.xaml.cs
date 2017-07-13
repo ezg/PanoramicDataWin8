@@ -29,11 +29,8 @@ namespace PanoramicDataWin8.view.vis.render
     /// </summary>
     public sealed partial class DefinitionRenderer : Renderer, IScribbable
     {
-        Dictionary<Color, string> _brushNames = new Dictionary<Color, string>();
         public DefinitionRenderer()
         {
-            _brushNames.Add(_textBrush.Color, "Rest");
-            _brushNames.Add(Colors.Black, "All");
             this.InitializeComponent();
             this.DataContextChanged += DefinitionRenderer_DataContextChanged;
             this.SizeChanged += DefinitionRenderer_SizeChanged;
@@ -65,6 +62,11 @@ namespace PanoramicDataWin8.view.vis.render
         private void DefinitionRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             var model = ((DataContext as DefinitionOperationViewModel).OperationModel as DefinitionOperationModel);
+
+            if (model.GetDescriptorFromColor(_textBrush.Color) == null)
+                model.SetDescriptorForColor(_textBrush.Color, new DefinitionOperationModel.BrushDescriptor(_textBrush.Color, "Rest"));
+            if (model.GetDescriptorFromColor(Colors.Black) == null)
+                model.SetDescriptorForColor(Colors.Black,     new DefinitionOperationModel.BrushDescriptor(Colors.Black, "Overlap"));
             model.PropertyChanged -= OperationModel_PropertyChanged;
             model.OperationModelUpdated -= OperationModelUpdated;
             if (args.NewValue != null)
@@ -92,18 +94,20 @@ namespace PanoramicDataWin8.view.vis.render
             var model = ((DataContext as DefinitionOperationViewModel).OperationModel as DefinitionOperationModel);
             Labels.Children.Clear();
             Labels.RowDefinitions.Clear();
-            int numLabels = model.BrushColors.Count + 1 + (model.BrushColors.Count > 1 ? 1: 0);
+            int numLabels = model.BrushColors.Count + 1 + (model.BrushColors.Count > 1 ? 1 : 0);
             foreach (var c in model.BrushColors)
             {
-                createBrushLabel(model, numLabels, c, model.BrushColors.IndexOf(c));
+                if (model.GetDescriptorFromColor(c) == null)
+                    model.SetDescriptorForColor(c, new DefinitionOperationModel.BrushDescriptor(c, "<name>"));
+                createBrushLabel(model, numLabels, model.GetDescriptorFromColor(c), model.BrushColors.IndexOf(c));
             }
             if (model.BrushColors.Count > 1)
-                createBrushLabel(model, numLabels, Colors.Black, model.BrushColors.Count );
-            createBrushLabel(model, numLabels,  _textBrush.Color, model.BrushColors.Count + 1);
-
+                createBrushLabel(model, numLabels, model.GetDescriptorFromColor(Colors.Black), model.BrushColors.Count);
+            createBrushLabel(model, numLabels, model.GetDescriptorFromColor(_textBrush.Color), model.BrushColors.Count + 1);
+            model.UpdateCode();
         }
 
-        private void createBrushLabel(DefinitionOperationModel model, int numLabels, Color c, int rowIndex)
+        private void createBrushLabel(DefinitionOperationModel model, int numLabels, DefinitionOperationModel.BrushDescriptor d, int rowIndex)
         {
             var rd = new RowDefinition();
             rd.Height = new GridLength(0.5, GridUnitType.Star);
@@ -114,18 +118,17 @@ namespace PanoramicDataWin8.view.vis.render
             panel.Height = panelHeight;
             panel.VerticalAlignment = VerticalAlignment.Stretch;
             panel.HorizontalAlignment = HorizontalAlignment.Stretch;
-            panel.Background = new SolidColorBrush(c);
+            panel.Background = new SolidColorBrush(d.Color);
             panel.Margin = new Thickness(5, 5, 5, 0);
 
             var tb = new TextBox();
-            tb.Tag = c;
+            tb.Tag = d.Color;
             tb.TextChanged += Tb_TextChanged;
             tb.HorizontalAlignment = HorizontalAlignment.Stretch;
             tb.Foreground = new SolidColorBrush(Colors.White);
-            tb.Background = new SolidColorBrush(c);
+            tb.Background = new SolidColorBrush(d.Color);
             tb.FontSize = panelHeight / 2;
-            if (_brushNames.ContainsKey(c))
-                tb.Text = _brushNames[c];
+            tb.Text = d.Name;
             tb.Margin = new Thickness(0);
             var vbox = new Viewbox();
             vbox.VerticalAlignment = VerticalAlignment.Stretch;
@@ -140,9 +143,11 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void Tb_TextChanged(object sender, TextChangedEventArgs e)
         {
+            var model = ((DataContext as DefinitionOperationViewModel).OperationModel as DefinitionOperationModel);
             var senderCol = (Color)((sender as TextBox).Tag);
-            _brushNames[senderCol] = (sender as TextBox).Text;
-  
+            model.SetDescriptorForColor(senderCol, new DefinitionOperationModel.BrushDescriptor(senderCol, (sender as TextBox).Text));
+            
+            model.UpdateCode();
         }
 
         public List<IScribbable> Children

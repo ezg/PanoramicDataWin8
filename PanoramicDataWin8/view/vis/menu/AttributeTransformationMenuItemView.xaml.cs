@@ -310,6 +310,10 @@ namespace PanoramicDataWin8.view.vis.menu
             {
                 (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as CalculationOperationModel).SetRawName(model.Label);
             }
+            else if (attr == null && model.AttributeTransformationViewModel.OperationViewModel.OperationModel is DefinitionOperationModel)
+            {
+                (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as DefinitionOperationModel).SetRawName(model.Label);
+            }
 
             model.Editing = Visibility.Collapsed;
         }
