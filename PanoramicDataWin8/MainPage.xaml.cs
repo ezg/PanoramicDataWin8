@@ -247,10 +247,19 @@ namespace PanoramicDataWin8
                         Code = "foo + 50",
                         RawName = "calc_4"
                     };
-
+                    var attr5 = new AttributeCodeParameters()
+                    {
+                        Code = "\"a\"",
+                        RawName = "calc_5"
+                    };
+                    var attr6 = new AttributeCodeParameters()
+                    {
+                        Code = "\"a\" + \"b\"",
+                        RawName = "calc_6"
+                    };
                     CodeParameters cp = new CodeParameters()
                     {
-                        AttributeCodeParameters = new[] {attr1, attr2, attr3, attr4}.ToList(),
+                        AttributeCodeParameters = new[] {attr1, attr2, attr3, attr4, attr5, attr6 }.ToList(),
                         AdapterName = "cars"
                     };
                     CodeCommand cmd= new CodeCommand();
