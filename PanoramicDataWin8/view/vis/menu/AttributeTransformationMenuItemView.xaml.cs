@@ -66,14 +66,14 @@ namespace PanoramicDataWin8.view.vis.menu
             var model = sender as MenuItemViewModel;
             if (e.PropertyName == model.GetPropertyName(() => model.Size))
             {
-                //if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 270)
-                //{
-                //    txtBlock.MaxWidth = model.Size.Y;
-                //}
-                //if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 0)
-                //{
-                //    txtBlock.MaxWidth = model.Size.X;
-                //}
+                if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 270)
+                {
+                    txtBlock.MaxWidth = model.Size.Y;
+                }
+                if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 0)
+                {
+                    txtBlock.MaxWidth = model.Size.X;
+                }
             }
         }
 
