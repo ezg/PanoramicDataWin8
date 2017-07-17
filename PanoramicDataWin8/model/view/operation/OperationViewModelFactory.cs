@@ -554,6 +554,11 @@ namespace PanoramicDataWin8.model.view.operation
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
 
+            exampleOperationViewModel.OperationViewModelTapped += (sender, args) =>
+            {
+                attachmentViewModel.ActiveStopwatch.Restart();
+            };
+
             sliderItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(sliderItem);
             attachmentViewModel.MenuViewModel = menuViewModel;
@@ -660,6 +665,13 @@ namespace PanoramicDataWin8.model.view.operation
                 attachmentViewModel.ActiveStopwatch.Restart();
                 menuViewModel.FireUpdate();
             };
+
+
+            exampleOperationViewModel.OperationViewModelTapped += (sender, args) =>
+            {
+                attachmentViewModel.ActiveStopwatch.Restart();
+            };
+
         }
 
         private static void createLeftExampleMenu(ExampleOperationViewModel exampleOperationViewModel)
@@ -719,6 +731,13 @@ namespace PanoramicDataWin8.model.view.operation
 
             foreach (var mi in items)
                 (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
+
+
+            exampleOperationViewModel.OperationViewModelTapped += (sender, args) =>
+            {
+                attachmentViewModel.ActiveStopwatch.Restart();
+            };
+
         }
 
         public static ExampleOperationViewModel CreateDefaultExampleOperationViewModel(SchemaModel schemaModel, Pt position)
@@ -732,6 +751,7 @@ namespace PanoramicDataWin8.model.view.operation
             createLeftExampleMenu(exampleOperationViewModel);
             return exampleOperationViewModel;
         }
+
         private static void createCalculationMenu(CalculationOperationViewModel calculationOperationViewModel, AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {
