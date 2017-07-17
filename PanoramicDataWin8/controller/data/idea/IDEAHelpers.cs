@@ -203,11 +203,16 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         public static HistogramOperationParameters GetHistogramOperationParameters(HistogramOperationModel model, int sampleSize)
         {
+            var attributeCodeParameters = new List<AttributeCodeParameters>();
             var psm = model.SchemaModel as IDEASchemaModel;
             var filter = "";
             var filterModels = new List<FilterModel>();
             filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
-
+            attributeCodeParameters.AddRange(
+                filterModels.SelectMany(fm => fm.ValueComparisons)
+                    .Select(vc => vc.AttributeTransformationModel)
+                    .Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeCodeFuncModel)
+                    .Select((agg) => GetAttributeParameters(agg.AttributeModel) as AttributeCodeParameters).Distinct());
             var brushes = new List<string>();
 
             foreach (var brushOperationModel in model.BrushOperationModels)
@@ -217,9 +222,15 @@ namespace PanoramicDataWin8.controller.data.progressive
                 if ((brushOperationModel as IFilterProviderOperationModel).FilterModels.Any())
                 {
                     brush = FilterModel.GetFilterModelsRecursive(brushOperationModel, new List<IFilterProviderOperationModel>(), filterModels, false);
+                    attributeCodeParameters.AddRange(
+                        filterModels.SelectMany(fm => fm.ValueComparisons)
+                            .Select(vc => vc.AttributeTransformationModel)
+                            .Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeCodeFuncModel)
+                            .Select((agg) => GetAttributeParameters(agg.AttributeModel) as AttributeCodeParameters).Distinct());
                 }
                 brushes.Add(brush);
             }
+
 
             var nrOfBins = new List<double>();
 
@@ -238,6 +249,10 @@ namespace PanoramicDataWin8.controller.data.progressive
                 model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).Concat(
                 model.GetAttributeUsageTransformationModel(AttributeUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
                 model.GetAttributeUsageTransformationModel(AttributeUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
+
+            attributeCodeParameters.AddRange(aggregates.Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeCodeFuncModel)
+                .Select((agg) => GetAttributeParameters(agg.AttributeModel) as AttributeCodeParameters).Distinct().ToList());
+            attributeCodeParameters = attributeCodeParameters.Distinct().ToList();
 
             var xIom = model.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
             var yIom = model.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
@@ -353,8 +368,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 PerBinAggregateParameters = aggregateParameters,
                 SortPerBinAggregateParameter = sortAggregateParam,
                 GlobalAggregateParameters = globalAggregates,
-                AttributeCodeParameters = aggregates.Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeCodeFuncModel).
-                         Select((agg) => GetAttributeParameters(agg.AttributeModel) as AttributeCodeParameters).Distinct().ToList()
+                AttributeCodeParameters = attributeCodeParameters
             };
             return parameters;
         }
