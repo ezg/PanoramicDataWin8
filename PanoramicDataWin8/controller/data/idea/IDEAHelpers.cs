@@ -214,6 +214,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                     };
                     attributeCodeParameters.Add(attr);
                 }
+            return attributeCodeParameters.Distinct().ToList();
         }
 
         public static string GetHistogramRawOperationParameters(HistogramOperationModel model, out List<AttributeCodeParameters> attributeCodeParameters, out List<string> brushes, out List<AttributeTransformationModel> aggregates)
