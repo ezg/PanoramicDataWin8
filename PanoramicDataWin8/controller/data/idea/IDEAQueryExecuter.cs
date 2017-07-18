@@ -25,6 +25,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                     await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         var operationModel = arg.EventArgs.OperationModel;
+                        if (operationModel.ResultCauserClone != null)
+                            operationModel.ResultCauserClone.Cleanup();
                         operationModel.ResultCauserClone = operationModel.Clone();
                         operationModel.Result = null;
 
@@ -161,7 +163,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             var operationJob = (OperationJob) sender;
             var operationModel = operationJob.OperationModel;
             operationModel.ResultExecutionId = jobEventArgs.ResultExecutionId;
-            operationModel.Result = jobEventArgs.Result;
+            operationModel.Result = jobEventArgs.Result; // setting this causes the OperationModel's PropertyChanged handler to fire to update the display
         }
     }
 }

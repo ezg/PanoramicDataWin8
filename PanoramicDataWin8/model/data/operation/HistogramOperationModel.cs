@@ -7,6 +7,10 @@ using System.Linq;
 using Windows.UI;
 using Newtonsoft.Json;
 using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.data.idea;
+using PanoramicDataWin8.controller.data.progressive;
+using IDEA_common.operations;
+using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 
 namespace PanoramicDataWin8.model.data.operation
 {
@@ -43,6 +47,28 @@ namespace PanoramicDataWin8.model.data.operation
                 _attributeUsageTransformationModels[attributeUsage].CollectionChanged +=
                     _attributeUsageTransformationModels_CollectionChanged;
             }
+            CalculationOperationModel.CodeDefinitionChangedEvent += IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent;
+        }
+
+        public override void Cleanup()
+        {
+            CalculationOperationModel.CodeDefinitionChangedEvent -= IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent;
+        }
+
+        private void IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent(object sender)
+        {
+            // bcz: test to see if this code has an effect on our operation...
+            List<AttributeCodeParameters> attributeCodeParameters;
+            List<string> brushes;
+            List<AttributeTransformationModel> aggregates;
+            IDEAHelpers.GetHistogramRawOperationParameters(this, out attributeCodeParameters, out brushes, out aggregates);
+
+            foreach (var attr in attributeCodeParameters)
+                if (attr.RawName == (sender as CalculationOperationModel).Code.RawName)
+                {
+                    FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+                    break;
+                }
         }
 
         public Dictionary<AttributeUsage, ObservableCollection<AttributeTransformationModel>>

@@ -23,6 +23,8 @@ namespace PanoramicDataWin8.model.data.operation
             throw new NotImplementedException();
         }
 
+        public void Cleanup() { }
+
         public IResult Result { get; set; }
         public int ExecutionId { get; set; } = 0;
         public ResultParameters ResultParameters { get; }

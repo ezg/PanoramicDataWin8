@@ -785,10 +785,11 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 TextAngle = textAngle,
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = "test"  // bcz: placeholder name for the newly defined field
+                Label = "test" + new Random().Next()  // bcz: placeholder name for the newly defined field
             };
             
             calculationOperationModel.SetRawName(attr1.Label);
+            calculationOperationModel.SetCode("0");
             attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(calculationOperationViewModel, new AttributeTransformationModel(calculationOperationModel.Code));
             attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
             menuItem.MenuItemComponentViewModel = attr1;
@@ -828,7 +829,7 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 TextAngle = textAngle,
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = "test"  // bcz: placeholder name for the newly defined field
+                Label = "test" + new Random().Next().ToString()  // bcz: placeholder name for the newly defined field
             };
 
             definitionOperationModel.SetRawName(attr1.Label);

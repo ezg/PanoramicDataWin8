@@ -15,6 +15,8 @@ namespace PanoramicDataWin8.model.data.operation
 
         private model.data.idea.IDEAAttributeComputedFieldModel _code;
 
+        public void Cleanup() { }
+
         public BrushableOperationModelImpl(IOperationModel host)
         {
             _code = new idea.IDEAAttributeComputedFieldModel("", "", "", IDEA_common.catalog.DataType.String, "numeric",

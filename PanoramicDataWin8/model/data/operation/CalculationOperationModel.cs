@@ -14,9 +14,16 @@ namespace PanoramicDataWin8.model.data.operation
             _code = new idea.IDEAAttributeComputedFieldModel("", "", "", IDEA_common.catalog.DataType.String, "numeric",
                    new List<IDEA_common.catalog.VisualizationHint>());
         }
+
+        public delegate void CodeDefinitionChangedHandler(object sender);
+        static public event CodeDefinitionChangedHandler CodeDefinitionChangedEvent;
+
         public void SetCode(string code)
         {
+            System.Diagnostics.Debug.WriteLine(_code.RawName + " = " + code);
             (_code.FuncModel as AttributeCodeFuncModel).Code = code;
+            if (CodeDefinitionChangedEvent != null)
+                CodeDefinitionChangedEvent(this);
         }
         public void SetRawName(string name)
         {

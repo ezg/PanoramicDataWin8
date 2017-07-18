@@ -18,6 +18,8 @@ namespace PanoramicDataWin8.model.data.operation
             _host = host;
         }
 
+        public void Cleanup() { }
+
         public ObservableCollection<FilterModel> FilterModels { get; } = new ObservableCollection<FilterModel>();
         public ObservableCollection<FilterLinkModel> ProviderLinkModels
         {

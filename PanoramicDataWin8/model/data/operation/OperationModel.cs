@@ -43,6 +43,11 @@ namespace PanoramicDataWin8.model.data.operation
             set { SetProperty(ref _schemaModel, value); }
         }
 
+        public virtual void Cleanup()
+        {
+
+        }
+
         public OperationModel Clone()
         {
             var serializedQueryModel = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings

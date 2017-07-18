@@ -19,6 +19,8 @@ namespace PanoramicDataWin8.model.data.operation
             _host = host;
         }
 
+        public void Cleanup() { }
+
         public FilteringOperation FilteringOperation
         {
             get { return _filteringOperation; }

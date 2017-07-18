@@ -26,7 +26,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 try
                 {
                     if (MainViewController.Instance.MainModel.Verbose)
-                        Debug.WriteLine(data.ToString());
+                        ; // Debug.WriteLine(data.ToString());
                     var sw = new Stopwatch();
                     sw.Start();
                     var httpClient = new HttpClient();
@@ -41,12 +41,12 @@ namespace PanoramicDataWin8.controller.data.progressive
                     else
                         httpResponseMessage = await httpClient.GetAsync(MainViewController.Instance.MainModel.Ip + "/" + endpoint);
                     if (MainViewController.Instance.MainModel.Verbose)
-                        Debug.WriteLine("TuppleWare Roundtrip Time: " + sw.ElapsedMilliseconds);
+                        ;// Debug.WriteLine("TuppleWare Roundtrip Time: " + sw.ElapsedMilliseconds);
                     sw.Restart();
 
                     var stringContent = await httpResponseMessage.Content.ReadAsStringAsync();
                     if (MainViewController.Instance.MainModel.Verbose)
-                        Debug.WriteLine("TuppleWare Read Content Time: " + sw.ElapsedMilliseconds);
+                        ; // Debug.WriteLine("TuppleWare Read Content Time: " + sw.ElapsedMilliseconds);
                     sw.Restart();
 
                     return stringContent;

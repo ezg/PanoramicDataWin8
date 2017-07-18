@@ -16,6 +16,7 @@ using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.model.data.operation;
+using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 
 namespace PanoramicDataWin8.controller.data.progressive
 {
@@ -201,40 +202,66 @@ namespace PanoramicDataWin8.controller.data.progressive
             return param;
         }
 
-        public static HistogramOperationParameters GetHistogramOperationParameters(HistogramOperationModel model, int sampleSize)
+        public static List<AttributeCodeParameters> GetAllCodeParameters(CalculationOperationModel exclude = null)
         {
             var attributeCodeParameters = new List<AttributeCodeParameters>();
-            var psm = model.SchemaModel as IDEASchemaModel;
-            var filter = "";
+            foreach (CalculationOperationModel func in MainViewController.Instance.OperationViewModels.Where((f) => f.OperationModel is CalculationOperationModel).Select((f)=>f.OperationModel))
+                if (func != exclude && (func.Code.FuncModel as AttributeCodeFuncModel).Code.TrimStart(' ').TrimEnd(' ') != "") {
+                    var attr = new AttributeCodeParameters()
+                    {
+                        Code    = (func.Code.FuncModel as AttributeCodeFuncModel).Code,
+                        RawName = func.Code.RawName
+                    };
+                    attributeCodeParameters.Add(attr);
+                }
+        }
+
+        public static string GetHistogramRawOperationParameters(HistogramOperationModel model, out List<AttributeCodeParameters> attributeCodeParameters, out List<string> brushes, out List<AttributeTransformationModel> aggregates)
+        {
+            attributeCodeParameters = new List<AttributeCodeParameters>();
+            brushes                 = new List<string>();
+
             var filterModels = new List<FilterModel>();
-            filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
+            var filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
+            foreach (var brushOperationModel in model.BrushOperationModels)
+            {
+                var brush = "";
+                if ((brushOperationModel as IFilterProviderOperationModel).FilterModels.Any())
+                {
+                    var brushFilterModels = new List<FilterModel>();
+                    brush = FilterModel.GetFilterModelsRecursive(brushOperationModel, new List<IFilterProviderOperationModel>(), brushFilterModels, false);
+                    filterModels.AddRange(brushFilterModels);
+                }
+                brushes.Add(brush);
+            }
+
+            aggregates = model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(
+                model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).Concat(
+                model.GetAttributeUsageTransformationModel(AttributeUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
+                model.GetAttributeUsageTransformationModel(AttributeUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
+
             attributeCodeParameters.AddRange(
                 filterModels.SelectMany(fm => fm.ValueComparisons)
                     .Select(vc => vc.AttributeTransformationModel)
                     .Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeCodeFuncModel)
                     .Select((agg) => GetAttributeParameters(agg.AttributeModel) as AttributeCodeParameters).Distinct());
-            var brushes = new List<string>();
+            attributeCodeParameters.AddRange(aggregates.Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeCodeFuncModel)
+                .Select((agg) => GetAttributeParameters(agg.AttributeModel) as AttributeCodeParameters).Distinct().ToList());
+            attributeCodeParameters = attributeCodeParameters.Distinct().ToList();
+            return filter;
+        }
 
-            foreach (var brushOperationModel in model.BrushOperationModels)
-            {
-                filterModels = new List<FilterModel>();
-                var brush = "";
-                if ((brushOperationModel as IFilterProviderOperationModel).FilterModels.Any())
-                {
-                    brush = FilterModel.GetFilterModelsRecursive(brushOperationModel, new List<IFilterProviderOperationModel>(), filterModels, false);
-                    attributeCodeParameters.AddRange(
-                        filterModels.SelectMany(fm => fm.ValueComparisons)
-                            .Select(vc => vc.AttributeTransformationModel)
-                            .Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeCodeFuncModel)
-                            .Select((agg) => GetAttributeParameters(agg.AttributeModel) as AttributeCodeParameters).Distinct());
-                }
-                brushes.Add(brush);
-            }
-
+        public static HistogramOperationParameters GetHistogramOperationParameters(HistogramOperationModel model, int sampleSize)
+        {
+            List<AttributeCodeParameters>      attributeCodeParameters;
+            List<string>                       brushes;
+            List<AttributeTransformationModel> aggregates;
+            var filter = GetHistogramRawOperationParameters(model, out attributeCodeParameters, out brushes, out aggregates);
+            attributeCodeParameters = GetAllCodeParameters(); // bcz: remove when dependencies are filled in
 
             var nrOfBins = new List<double>();
 
-            nrOfBins = new[] {MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins}.Concat(
+            nrOfBins = new[] { MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins }.Concat(
                 model.GetAttributeUsageTransformationModel(AttributeUsage.Group).Select(qom => MainViewController.Instance.MainModel.NrOfGroupBins)).ToList();
 
             if ((model.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel.RawName == "long") ||
@@ -244,15 +271,6 @@ namespace PanoramicDataWin8.controller.data.progressive
             if ((model.GetAttributeUsageTransformationModel(AttributeUsage.Y).First().AttributeModel.RawName == "long") ||
                 (model.GetAttributeUsageTransformationModel(AttributeUsage.Y).First().AttributeModel.RawName == "lat"))
                 nrOfBins[0] = 20;
-
-            var aggregates = model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(
-                model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).Concat(
-                model.GetAttributeUsageTransformationModel(AttributeUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
-                model.GetAttributeUsageTransformationModel(AttributeUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
-
-            attributeCodeParameters.AddRange(aggregates.Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeCodeFuncModel)
-                .Select((agg) => GetAttributeParameters(agg.AttributeModel) as AttributeCodeParameters).Distinct().ToList());
-            attributeCodeParameters = attributeCodeParameters.Distinct().ToList();
 
             var xIom = model.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
             var yIom = model.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
@@ -280,6 +298,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                     AttributeParameters = GetAttributeParameters(yIom.AttributeModel)
                 };
 
+            var psm = model.SchemaModel as IDEASchemaModel;
             AggregateParameters sortAggregateParam = null;
             var aggregateParameters = new List<AggregateParameters>();
             foreach (var agg in aggregates)

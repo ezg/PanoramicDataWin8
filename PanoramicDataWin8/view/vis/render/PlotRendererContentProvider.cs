@@ -793,7 +793,7 @@ namespace PanoramicDataWin8.view.vis.render
                 aggregateKey.BrushIndex = brush.BrushIndex;
                 foreach (var bin in _histogramResult.Bins.Values)
                 {
-                    var res = ((DoubleValueAggregateResult) bin.GetAggregateResult(aggregateKey)).Result;
+                    var res = ((DoubleValueAggregateResult) bin.GetAggregateResult(aggregateKey))?.Result;
                     if (res != null && res.HasValue)
                     {
                         _minValue = (double) Math.Min(_minValue, ((DoubleValueAggregateResult) bin.GetAggregateResult(aggregateKey)).Result.Value);
@@ -976,7 +976,8 @@ namespace PanoramicDataWin8.view.vis.render
                     aggregateKey.BrushIndex = brush.BrushIndex;
                     foreach (var bin in _histogramResult.Bins.Values)
                     {
-                        if (((DoubleValueAggregateResult) bin.GetAggregateResult(aggregateKey)).Result.HasValue)
+                        var res = ((DoubleValueAggregateResult)bin.GetAggregateResult(aggregateKey))?.Result;
+                        if (res.HasValue)
                         {
                             minValue = (double) Math.Min(minValue, ((DoubleValueAggregateResult) bin.GetAggregateResult(aggregateKey)).Result.Value);
                             maxValue = (double) Math.Max(maxValue, ((DoubleValueAggregateResult) bin.GetAggregateResult(aggregateKey)).Result.Value);
@@ -989,7 +990,9 @@ namespace PanoramicDataWin8.view.vis.render
                     factor = 0.1;
                     factor *= minValue < 0 ? -1f : 1f;
                 }
-                visualBinRange = QuantitativeBinRange.Initialize(minValue*(1.0 - factor), maxValue*(1.0 + factor), 10, false);
+                var minv = minValue == double.MaxValue ? 0 : minValue * (1 - factor);
+                var maxv = minValue == double.MaxValue ? 0 : maxValue * (1 + factor);
+                visualBinRange = QuantitativeBinRange.Initialize(minv, maxv, 10, false);
                 if (_chartType == ChartType.HorizontalBar || _chartType == ChartType.VerticalBar)
                 {
                     visualBinRange = QuantitativeBinRange.Initialize(Math.Min(0, minValue), Math.Max(0, (double)visualBinRange.MaxValue), 10, false);
@@ -1128,17 +1131,17 @@ namespace PanoramicDataWin8.view.vis.render
                     {
                         var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, _histogramResult.AllBrushIndex());
                         valueAggregateKey.BrushIndex = _histogramResult.AllBrushIndex();
-                        theValue = ((DoubleValueAggregateResult) bin.GetAggregateResult(valueAggregateKey)).Result;
+                        theValue = ((DoubleValueAggregateResult) bin?.GetAggregateResult(valueAggregateKey))?.Result;
                     }
                     else if (_chartType == ChartType.HorizontalBar)
                     {
                         var xAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);
-                        theValue = ((DoubleValueAggregateResult) bin.GetAggregateResult(xAggregateKey)).Result;
+                        theValue = ((DoubleValueAggregateResult) bin?.GetAggregateResult(xAggregateKey))?.Result;
                     }
                     else if (_chartType == ChartType.VerticalBar)
                     {
                         var yAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex);
-                        theValue = ((DoubleValueAggregateResult) bin.GetAggregateResult(yAggregateKey)).Result;
+                        theValue = ((DoubleValueAggregateResult) bin?.GetAggregateResult(yAggregateKey))?.Result;
                     }
                     return theValue;
                 }
@@ -1175,8 +1178,9 @@ namespace PanoramicDataWin8.view.vis.render
             foreach (var brush in orderedBrushes)
             {
                 var valueAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, _histogramResult, brush.BrushIndex);
-                var unNormalizedvalue = ((DoubleValueAggregateResult) bin.GetAggregateResult(valueAggregateKey)).Result;
-
+                var unNormalizedvalue = ((DoubleValueAggregateResult) bin.GetAggregateResult(valueAggregateKey))?.Result;
+                if (unNormalizedvalue == null)
+                    continue;
                 // read out value depinding on chart type
                 if (_chartType == ChartType.HeatMap)
                 {

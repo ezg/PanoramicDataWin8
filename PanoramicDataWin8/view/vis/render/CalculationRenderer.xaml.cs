@@ -21,6 +21,10 @@ using System.ComponentModel;
 using Windows.UI;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.controller.data.progressive;
+using IDEA_common.operations;
+using PanoramicDataWin8.model.data.idea;
+using PanoramicDataWin8.controller.view;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -90,9 +94,24 @@ namespace PanoramicDataWin8.view.vis.render
 
         }
 
-        private void Tb_TextChanged(object sender, TextChangedEventArgs e)
+        private async void Tb_TextChanged(object sender, TextChangedEventArgs e)
         {
-            ((DataContext as CalculationOperationViewModel).OperationModel as CalculationOperationModel).SetCode(CodeBox.Text); 
+            var calcOpModel = ((DataContext as CalculationOperationViewModel).OperationModel as CalculationOperationModel);
+            var attributeCodeParameters = IDEAHelpers.GetAllCodeParameters(calcOpModel);
+            
+            var newAttr = new AttributeCodeParameters() { Code = CodeBox.Text, RawName = calcOpModel.Code.RawName };
+            if (!attributeCodeParameters.Contains(newAttr)) {
+                attributeCodeParameters.Add(newAttr);
+                
+                var cp = new CodeParameters()
+                {
+                    AttributeCodeParameters = attributeCodeParameters,
+                    AdapterName = ((IDEASchemaModel)MainViewController.Instance.MainModel.SchemaModel).RootOriginModel.Name
+                };
+                var res = await new CodeCommand().CompileCode(cp);
+                if (res.RawNameToCompileResult.Where((r) => !r.Value.CompileSuccess).Count() == 0)
+                    calcOpModel.SetCode(newAttr.Code);
+            }
         }
 
         public List<IScribbable> Children
