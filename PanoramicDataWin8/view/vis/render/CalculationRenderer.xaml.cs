@@ -109,9 +109,21 @@ namespace PanoramicDataWin8.view.vis.render
                 AttributeCodeParameters = attributeCodeParameters,
                 AdapterName = ((IDEASchemaModel)MainViewController.Instance.MainModel.SchemaModel).RootOriginModel.Name
             };
+
             var res = await new CodeCommand().CompileCode(cp);
             if (res.RawNameToCompileResult.Where((r) => !r.Value.CompileSuccess).Count() == 0)
+            {
                 calcOpModel.SetCode(newAttr.Code);
+                CodeBoxFeedback.Text = "";
+                CodeBox.Foreground = new SolidColorBrush(Colors.Black);
+            }
+            else
+            {
+                foreach (var r in res.RawNameToCompileResult)
+                    if (r.Key == newAttr.RawName)
+                        CodeBoxFeedback.Text = r.Value.CompileMessage;
+                CodeBox.Foreground = new SolidColorBrush(Colors.DarkRed);
+            }
         }
 
         public List<IScribbable> Children
@@ -138,6 +150,12 @@ namespace PanoramicDataWin8.view.vis.render
         public bool Consume(InkStroke inkStroke)
         {
             return false;
+        }
+
+        private void CodeBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (CodeBoxFeedback.Text != "" && CodeBox.IsInVisualTree())
+                FlyoutBase.ShowAttachedFlyout(CodeBox);
         }
     }
 }
