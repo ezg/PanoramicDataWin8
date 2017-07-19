@@ -202,21 +202,6 @@ namespace PanoramicDataWin8.controller.data.progressive
             return param;
         }
 
-        public static List<AttributeCodeParameters> GetAllCodeParameters(CalculationOperationModel exclude = null)
-        {
-            var attributeCodeParameters = new List<AttributeCodeParameters>();
-            foreach (CalculationOperationModel func in MainViewController.Instance.OperationViewModels.Where((f) => f.OperationModel is CalculationOperationModel).Select((f)=>f.OperationModel))
-                if (func != exclude && (func.Code.FuncModel as AttributeCodeFuncModel).Code.TrimStart(' ').TrimEnd(' ') != "") {
-                    var attr = new AttributeCodeParameters()
-                    {
-                        Code    = (func.Code.FuncModel as AttributeCodeFuncModel).Code,
-                        RawName = func.Code.RawName
-                    };
-                    attributeCodeParameters.Add(attr);
-                }
-            return attributeCodeParameters.Distinct().ToList();
-        }
-
         public static string GetHistogramRawOperationParameters(HistogramOperationModel model, out List<AttributeCodeParameters> attributeCodeParameters, out List<string> brushes, out List<AttributeTransformationModel> aggregates)
         {
             attributeCodeParameters = new List<AttributeCodeParameters>();
@@ -258,7 +243,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             List<string>                       brushes;
             List<AttributeTransformationModel> aggregates;
             var filter = GetHistogramRawOperationParameters(model, out attributeCodeParameters, out brushes, out aggregates);
-            attributeCodeParameters = GetAllCodeParameters(); // bcz: remove when dependencies are filled in
+            attributeCodeParameters = IDEAAttributeComputedFieldModel.GetAllCode();
 
             var nrOfBins = new List<double>();
 

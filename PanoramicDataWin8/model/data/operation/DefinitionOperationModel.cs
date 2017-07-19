@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PanoramicDataWin8.model.data.idea;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Windows.UI;
@@ -9,12 +10,16 @@ namespace PanoramicDataWin8.model.data.operation
     public class DefinitionOperationModel : OperationModel, IBrushableOperationModel
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
-        private model.data.idea.IDEAAttributeComputedFieldModel _code;
+        string _rawName;
 
-        public DefinitionOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        public DefinitionOperationModel(SchemaModel schemaModel, string rawName, string displayName=null) : base(schemaModel)
         {
-            _code = new idea.IDEAAttributeComputedFieldModel("", "", "", IDEA_common.catalog.DataType.String, "numeric",
-                   new List<IDEA_common.catalog.VisualizationHint>());
+            _rawName = rawName;
+            if (rawName != null && !IDEAAttributeComputedFieldModel.NameExists(rawName))
+            {
+                IDEAAttributeComputedFieldModel.Add(rawName, displayName == null ? rawName : displayName, "0", IDEA_common.catalog.DataType.String, "numeric",
+                               new List<IDEA_common.catalog.VisualizationHint>());
+            }
             _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
         }
         public class BrushDescriptor
@@ -55,44 +60,75 @@ namespace PanoramicDataWin8.model.data.operation
             get { return _brushableOperationModelImpl.BrushOperationModels; }
             set { _brushableOperationModelImpl.BrushOperationModels = value; }
         }
-        public model.data.idea.IDEAAttributeComputedFieldModel Code
+        public IDEAAttributeComputedFieldModel GetCode()
         {
-            get
-            {
-                return _code;
-            }
-            set
-            {
-                _code = value;
-            }
+            return IDEAAttributeComputedFieldModel.Function(_rawName);
         }
         public void SetRawName(string name)
         {
-            _code.RawName = name;
-            _code.DisplayName = name;
+            GetCode().RawName = name;
+            _rawName = name;
+            GetCode().DisplayName = name;
         }
         public void UpdateCode()
         {
-            string code = "";
-            int index = 0;
+            var expressions = new List<string>();
             foreach (var opModel in BrushOperationModels)
             {
+                string code = "(";
+                bool first = true;
                 foreach (var filt in opModel.FilterModels)
                 {
-                    code += "(";
+                    if (first)
+                    {
+                        code += "(";
+                        first = false;
+                    } else
+                        code += "|| (";
                     foreach (var vc in filt.ValueComparisons)
                         code += vc.ToPythonString() + " && ";
                     code = code.Substring(0, code.Length - 4);
                     code += ")";
-                    var name = "\""+(index < BrushColors.Count ? GetDescriptorFromColor(BrushColors[index]) : index == BrushColors.Count ? BrushDescriptors[0] : BrushDescriptors[1]).Name + "\"";
-                    code += "? " + name + ": ";
                 }
-                    index++;
+                code += ")";
+                expressions.Add(code);
             }
-            code += "\"" + BrushDescriptors[0].Name + "\"";
-            Code.VisualizationHints = new List<IDEA_common.catalog.VisualizationHint>(new IDEA_common.catalog.VisualizationHint[] { IDEA_common.catalog.VisualizationHint.TreatAsEnumeration});
 
-            (Code.FuncModel as AttributeCodeFuncModel).Code = code;
+            string expression = "";
+            string ORseparator = " || ";
+            if (expressions.Count > 0) 
+            {
+                if (expressions.Count > 1)
+                {
+                    expression = "(";
+                    for (int cind = 0; cind < expressions.Count-1; cind++)
+                    {
+                        var c = expressions[cind];
+                        expression += "(" +  c + " && ";
+                        var unions = "(";
+                        for (int oind = cind+1; oind < expressions.Count; oind++)
+                        {
+                            var o = expressions[oind];
+                            unions += o + ORseparator;
+                        }
+                        unions = unions.Substring(0, unions.Length - ORseparator.Length) + ")";
+                        expression += unions + ")"+ ORseparator;
+                    }
+                    expression = expression.Substring(0, expression.Length - ORseparator.Length) +  ") ? \"" + BrushDescriptors[1].Name + "\" : ";
+                }
+
+                int index = 0;
+                foreach (var c in expressions)
+                {
+                    var name = "\"" + GetDescriptorFromColor(BrushColors[index]).Name + "\"";
+                    expression += c + "? " + name + " :";
+                    index++;
+                }
+            }
+            expression += "\"" + BrushDescriptors[0].Name + "\"";
+            GetCode().VisualizationHints = new List<IDEA_common.catalog.VisualizationHint>(new IDEA_common.catalog.VisualizationHint[] { IDEA_common.catalog.VisualizationHint.TreatAsEnumeration});
+
+            GetCode().SetCode(expression);
         }
     }
 }

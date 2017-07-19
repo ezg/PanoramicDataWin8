@@ -13,14 +13,10 @@ namespace PanoramicDataWin8.model.data.operation
         private ObservableCollection<IBrusherOperationModel> _brushOperationModels = new ObservableCollection<IBrusherOperationModel>();
         private readonly IOperationModel _host;
 
-        private model.data.idea.IDEAAttributeComputedFieldModel _code;
-
         public void Cleanup() { }
 
         public BrushableOperationModelImpl(IOperationModel host)
         {
-            _code = new idea.IDEAAttributeComputedFieldModel("", "", "", IDEA_common.catalog.DataType.String, "numeric",
-                   new List<IDEA_common.catalog.VisualizationHint>());
             _host = host;
             _brushOperationModels.CollectionChanged += BrushOperationModelsCollectionChanged;
         }

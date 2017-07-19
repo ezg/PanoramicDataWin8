@@ -96,22 +96,22 @@ namespace PanoramicDataWin8.view.vis.render
 
         private async void Tb_TextChanged(object sender, TextChangedEventArgs e)
         {
+            var attributeCodeParameters = IDEAAttributeComputedFieldModel.GetAllCode();
+
             var calcOpModel = ((DataContext as CalculationOperationViewModel).OperationModel as CalculationOperationModel);
-            var attributeCodeParameters = IDEAHelpers.GetAllCodeParameters(calcOpModel);
-            
-            var newAttr = new AttributeCodeParameters() { Code = CodeBox.Text, RawName = calcOpModel.Code.RawName };
-            if (!attributeCodeParameters.Contains(newAttr)) {
-                attributeCodeParameters.Add(newAttr);
-                
-                var cp = new CodeParameters()
-                {
-                    AttributeCodeParameters = attributeCodeParameters,
-                    AdapterName = ((IDEASchemaModel)MainViewController.Instance.MainModel.SchemaModel).RootOriginModel.Name
-                };
-                var res = await new CodeCommand().CompileCode(cp);
-                if (res.RawNameToCompileResult.Where((r) => !r.Value.CompileSuccess).Count() == 0)
-                    calcOpModel.SetCode(newAttr.Code);
-            }
+            var newAttr = new AttributeCodeParameters() { Code = CodeBox.Text, RawName = calcOpModel.GetCode().RawName };
+            if (attributeCodeParameters.Contains(newAttr))
+                attributeCodeParameters.Remove(newAttr);
+            attributeCodeParameters.Add(newAttr);
+                 
+            var cp = new CodeParameters()
+            {
+                AttributeCodeParameters = attributeCodeParameters,
+                AdapterName = ((IDEASchemaModel)MainViewController.Instance.MainModel.SchemaModel).RootOriginModel.Name
+            };
+            var res = await new CodeCommand().CompileCode(cp);
+            if (res.RawNameToCompileResult.Where((r) => !r.Value.CompileSuccess).Count() == 0)
+                calcOpModel.SetCode(newAttr.Code);
         }
 
         public List<IScribbable> Children

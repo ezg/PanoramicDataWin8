@@ -309,6 +309,10 @@ namespace PanoramicDataWin8.model.view.operation
                     {
                         attr1.Label = (sender2 as AttributeTransformationModel).GetLabel();
                     };
+                    attributeTransformationModel.AttributeModel.PropertyChanged += (sender2, arg2) =>
+                    {
+                        attr1.Label = attributeTransformationModel.GetLabel();
+                    };
                 }
 
                 // remove old ones first
@@ -785,12 +789,11 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 TextAngle = textAngle,
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = "test" + new Random().Next()  // bcz: placeholder name for the newly defined field
+                Label = calculationOperationModel.GetCode().DisplayName
             };
+
             
-            calculationOperationModel.SetRawName(attr1.Label);
-            calculationOperationModel.SetCode("0");
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(calculationOperationViewModel, new AttributeTransformationModel(calculationOperationModel.Code));
+            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(calculationOperationViewModel, new AttributeTransformationModel(calculationOperationModel.GetCode()));
             attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
             menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);
@@ -829,11 +832,11 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 TextAngle = textAngle,
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = "test" + new Random().Next().ToString()  // bcz: placeholder name for the newly defined field
+                Label = definitionOperationModel.GetCode().DisplayName
             };
 
             definitionOperationModel.SetRawName(attr1.Label);
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(defintionOperationViewModel, new AttributeTransformationModel(definitionOperationModel.Code));
+            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(defintionOperationViewModel, new AttributeTransformationModel(definitionOperationModel.GetCode()));
             attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
             menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);
@@ -841,7 +844,7 @@ namespace PanoramicDataWin8.model.view.operation
         }
         public static CalculationOperationViewModel CreateDefaultCalculationOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse = false)
         {
-            var calculationOperationModel = new CalculationOperationModel(schemaModel);
+            var calculationOperationModel = new CalculationOperationModel(schemaModel, "Calc"+new Random().Next());
             var calculationOperationViewModel = new CalculationOperationViewModel(calculationOperationModel, fromMouse);
             calculationOperationViewModel.Position = position;
             addAttachmentViewModels(calculationOperationViewModel);
@@ -852,7 +855,7 @@ namespace PanoramicDataWin8.model.view.operation
         
         public static DefinitionOperationViewModel CreateDefaultDefinitionOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse=false)
         {
-            var definitionOperationModel = new DefinitionOperationModel(schemaModel);
+            var definitionOperationModel = new DefinitionOperationModel(schemaModel, "Def"+new Random().Next());
             var definitionOperationViewModel = new DefinitionOperationViewModel(definitionOperationModel, fromMouse);
             definitionOperationViewModel.Position = position;
             addAttachmentViewModels(definitionOperationViewModel);

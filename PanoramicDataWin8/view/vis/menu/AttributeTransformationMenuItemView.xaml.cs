@@ -27,6 +27,7 @@ using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.model.data.operation;
+using PanoramicDataWin8.model.data.idea;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -302,17 +303,22 @@ namespace PanoramicDataWin8.view.vis.menu
 
         private void TextInputBox_LostFocus(object sender, RoutedEventArgs e)
         {
+            var newName = TextInputBox.Text;
             var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
-            var attr = AttributeTransformationModel.MatchesExistingField(TextInputBox.Text, true);
+            var attr = AttributeTransformationModel.MatchesExistingField(newName, true);
             // if attribute label doesn't match any known attribute and this is a calculation operation, 
             // then set the name of the Calculation operation to the attribute label 
             if (attr == null && model.AttributeTransformationViewModel.OperationViewModel.OperationModel is CalculationOperationModel)
             {
-                (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as CalculationOperationModel).SetRawName(model.Label);
+                if (IDEAAttributeComputedFieldModel.NameExists(newName))
+                    model.Label = (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as CalculationOperationModel).GetCode().RawName;
+                else (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as CalculationOperationModel).SetRawName(model.Label);
             }
             else if (attr == null && model.AttributeTransformationViewModel.OperationViewModel.OperationModel is DefinitionOperationModel)
             {
-                (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as DefinitionOperationModel).SetRawName(model.Label);
+                if (IDEAAttributeComputedFieldModel.NameExists(newName))
+                    model.Label = (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as DefinitionOperationModel).GetCode().RawName;
+                else (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as DefinitionOperationModel).SetRawName(model.Label);
             }
 
             model.Editing = Visibility.Collapsed;
