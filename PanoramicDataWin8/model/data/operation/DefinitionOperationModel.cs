@@ -1,4 +1,5 @@
-﻿using PanoramicDataWin8.model.data.idea;
+﻿using IDEA_common.catalog;
+using PanoramicDataWin8.model.data.idea;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,8 +18,8 @@ namespace PanoramicDataWin8.model.data.operation
             _rawName = rawName;
             if (rawName != null && !IDEAAttributeComputedFieldModel.NameExists(rawName))
             {
-                IDEAAttributeComputedFieldModel.Add(rawName, displayName == null ? rawName : displayName, "0", IDEA_common.catalog.DataType.String, "numeric",
-                               new List<IDEA_common.catalog.VisualizationHint>());
+                IDEAAttributeComputedFieldModel.Add(rawName, displayName == null ? rawName : displayName, "0", DataType.Double, "numeric",
+                               new List<VisualizationHint>());
             }
             _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
         }

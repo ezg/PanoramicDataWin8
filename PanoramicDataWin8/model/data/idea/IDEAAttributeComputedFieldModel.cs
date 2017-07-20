@@ -20,6 +20,11 @@ namespace PanoramicDataWin8.model.data.idea
             _calculatedFieldAttributeModels.Add(new IDEAAttributeComputedFieldModel(rawName, displayName, code, dataType, inputVisualizationType, visualizationHints));
         }
 
+        static public List<AttributeModel> GetAllCalculatedAttributeModels()
+        {
+            return new List<AttributeModel>(_calculatedFieldAttributeModels);
+        }
+
         static public List<AttributeCodeParameters>  GetAllCode()
         {
             var attrList = new List<AttributeCodeParameters>();

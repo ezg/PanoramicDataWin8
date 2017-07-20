@@ -126,7 +126,7 @@ namespace PanoramicDataWin8.view.inq
                                     controller.view.MainViewController.Instance.InkableScene.Add(operationContainerView);
                                     if (FilterRenderer.FieldType((menuItemViewModel.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.RawName) == 
                                         DataType.String)
-                                        (operationContainerView.Renderer as FilterRenderer).SetFilter(name, Predicate.EQUALS, "a");
+                                        (operationContainerView.Renderer as FilterRenderer).SetFilter(name, Predicate.LESS_THAN, "a");
                                     else (operationContainerView.Renderer as FilterRenderer).SetFilter(name, Predicate.LESS_THAN, 0);
                                     FilterLinkViewController.Instance.CreateFilterLinkViewModel(filterOperationViewModel.OperationModel,
                                         (OperationModel)operationViewModel.OperationModel);

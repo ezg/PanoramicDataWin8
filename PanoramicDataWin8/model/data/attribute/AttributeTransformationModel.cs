@@ -1,5 +1,6 @@
 ﻿using Microsoft.Practices.Prism.Mvvm;
 using Newtonsoft.Json;
+using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.model.data.operation;
 using System.Linq;
 
@@ -154,7 +155,8 @@ namespace PanoramicDataWin8.model.data.attribute
         public static AttributeTransformationModel MatchesExistingField(string str, bool exact=false)
         {
             var inputModels = (controller.view.MainViewController.Instance.MainPage.DataContext as view.MainModel).SchemaModel.OriginModels.First()
-                     .InputModels.Where(am => am.IsDisplayed);
+                     .InputModels.Where(am => am.IsDisplayed).ToList();
+            inputModels.AddRange(IDEAAttributeComputedFieldModel.GetAllCalculatedAttributeModels());
             AttributeTransformationModel attributeTransformationModel = null;
             foreach (var im in inputModels)
                 if (im.RawName.ToLower().StartsWith(str.ToLower()) && !exact)
