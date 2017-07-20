@@ -133,7 +133,7 @@ namespace PanoramicDataWin8.model.data.operation
             expression += "\"" + BrushDescriptors[0].Name + "\"";
             GetCode().VisualizationHints = new List<IDEA_common.catalog.VisualizationHint>(new IDEA_common.catalog.VisualizationHint[] { IDEA_common.catalog.VisualizationHint.TreatAsEnumeration});
 
-            GetCode().SetCode(expression);
+            GetCode().SetCode(expression, DataType.String);
         }
     }
 }

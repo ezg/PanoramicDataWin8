@@ -113,7 +113,9 @@ namespace PanoramicDataWin8.view.vis.render
             var res = await new CodeCommand().CompileCode(cp);
             if (res.RawNameToCompileResult.Where((r) => !r.Value.CompileSuccess).Count() == 0)
             {
-                calcOpModel.SetCode(newAttr.Code);
+                foreach (var r in res.RawNameToCompileResult)
+                    if (r.Key == newAttr.RawName)
+                        calcOpModel.SetCode(newAttr.Code, r.Value.DataType);
                 CodeBoxFeedback.Text = "";
                 CodeBox.Foreground = new SolidColorBrush(Colors.Black);
             }

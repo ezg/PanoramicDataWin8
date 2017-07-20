@@ -21,10 +21,10 @@ namespace PanoramicDataWin8.model.data.operation
             }
         }
 
-        public void SetCode(string code)
+        public void SetCode(string code, DataType dataType)
         {
             System.Diagnostics.Debug.WriteLine(_rawName + " = " + code);
-            GetCode().SetCode(code);
+            GetCode().SetCode(code, dataType);
         }
         public void SetRawName(string name)
         {

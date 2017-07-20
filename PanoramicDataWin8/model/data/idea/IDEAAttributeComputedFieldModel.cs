@@ -68,13 +68,14 @@ namespace PanoramicDataWin8.model.data.idea
             _visualizationHints = visualizationHints;
         }
 
-        public void SetCode(string code)
+        public void SetCode(string code, DataType dataType)
         {
             if (FuncModel is AttributeCodeFuncModel) {
                 var oldCode = (FuncModel as AttributeCodeFuncModel).Code;
                 if (oldCode != code)
                 {
                     (FuncModel as AttributeCodeFuncModel).Code = code;
+                    this.DataType = dataType;
                     if (CodeDefinitionChangedEvent != null)
                         CodeDefinitionChangedEvent(this);
                 }
