@@ -75,23 +75,27 @@ namespace PanoramicDataWin8.model.data.operation
             var expressions = new List<string>();
             foreach (var opModel in BrushOperationModels)
             {
-                string code = "(";
-                bool first = true;
-                foreach (var filt in opModel.FilterModels)
+                if (opModel.FilterModels.Count > 0)
                 {
-                    if (first)
+                    string code = "(";
+                    bool first = true;
+                    foreach (var filt in opModel.FilterModels)
                     {
-                        code += "(";
-                        first = false;
-                    } else
-                        code += "|| (";
-                    foreach (var vc in filt.ValueComparisons)
-                        code += vc.ToPythonString() + " && ";
-                    code = code.Substring(0, code.Length - 4);
+                        if (first)
+                        {
+                            code += "(";
+                            first = false;
+                        }
+                        else
+                            code += "|| (";
+                        foreach (var vc in filt.ValueComparisons)
+                            code += vc.ToPythonString() + " && ";
+                        code = code.Substring(0, code.Length - 4);
+                        code += ")";
+                    }
                     code += ")";
+                    expressions.Add(code);
                 }
-                code += ")";
-                expressions.Add(code);
             }
 
             string expression = "";

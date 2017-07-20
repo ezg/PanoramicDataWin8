@@ -65,10 +65,15 @@ namespace PanoramicDataWin8.model.data.idea
 
         public void SetCode(string code)
         {
-            if (FuncModel is AttributeCodeFuncModel)
-                (FuncModel as AttributeCodeFuncModel).Code = code;
-            if (CodeDefinitionChangedEvent != null)
-                CodeDefinitionChangedEvent(this);
+            if (FuncModel is AttributeCodeFuncModel) {
+                var oldCode = (FuncModel as AttributeCodeFuncModel).Code;
+                if (oldCode != code)
+                {
+                    (FuncModel as AttributeCodeFuncModel).Code = code;
+                    if (CodeDefinitionChangedEvent != null)
+                        CodeDefinitionChangedEvent(this);
+                }
+            }
         }
 
         public override string DisplayName
