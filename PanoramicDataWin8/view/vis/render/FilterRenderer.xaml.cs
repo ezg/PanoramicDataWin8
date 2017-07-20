@@ -586,7 +586,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (splits.Count() > 2)
             {
                 var vfield = FieldType(splits.First());
-                if (vfield != null && vfield == DataType.String)
+                if (vfield == DataType.String)
                 {
                     var p = ToStringPredicate(splits[1]);
                     AddFilterModel(AttributeTransformationModel.MatchesExistingField(splits[0]), p, splits[2]);

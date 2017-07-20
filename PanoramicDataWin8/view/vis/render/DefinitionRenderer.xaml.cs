@@ -145,7 +145,10 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var model = ((DataContext as DefinitionOperationViewModel).OperationModel as DefinitionOperationModel);
             var senderCol = (Color)((sender as TextBox).Tag);
-            model.SetDescriptorForColor(senderCol, new DefinitionOperationModel.BrushDescriptor(senderCol, (sender as TextBox).Text));
+            (sender as TextBox).FontStyle = Windows.UI.Text.FontStyle.Normal;
+            if (PanoramicDataWin8.model.data.attribute.AttributeTransformationModel.MatchesExistingField((sender as TextBox).Text, true) == null)
+                model.SetDescriptorForColor(senderCol, new DefinitionOperationModel.BrushDescriptor(senderCol, (sender as TextBox).Text));
+            else (sender as TextBox).FontStyle = Windows.UI.Text.FontStyle.Italic;
             
             model.UpdateCode();
         }
