@@ -741,6 +741,23 @@ namespace PanoramicDataWin8
                     }
                 }
 
+                foreach (var attributeGroupOperationModel in MainViewController.Instance.OperationViewModels.Select((opv) => opv.OperationModel as AttributeGroupOperationModel))
+                    if (attributeGroupOperationModel != null)
+                    {
+                        var tileMenuItemViewModel = recursiveCreateTileMenu(attributeGroupOperationModel.AttributeGroupModel, parentModel);
+                        tileMenuItemViewModel.Row = count;
+                        tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
+                                                       (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
+                        tileMenuItemViewModel.RowSpan = 1;
+                        tileMenuItemViewModel.ColumnSpan = 1;
+
+                        count++;
+                        if (count == 10.0)
+                        {
+                            count = 0;
+                        }
+                    }
+
                 _attributeMenu = new TileMenuItemView {MenuCanvas = menuCanvas, DataContext = parentModel};
                 menuCanvas.Children.Add(_attributeMenu);
 
@@ -909,7 +926,7 @@ namespace PanoramicDataWin8
             codeGrid.Visibility = Visibility.Collapsed;
         }
 
-        private void clearAndDisposeMenus()
+        public void clearAndDisposeMenus()
         {
             if (_operationMenu != null)
             {

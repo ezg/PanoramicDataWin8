@@ -140,6 +140,7 @@
     <Compile Include="model\data\OperationTypeModelEventArgs.cs" />
     <Compile Include="model\data\OperationTypeModelEventHandler.cs" />
     <Compile Include="model\data\operation\Assert.cs" />
+    <Compile Include="model\data\operation\AttributeGroupOperationModel.cs" />
     <Compile Include="model\data\operation\AttributeUsage.cs" />
     <Compile Include="model\data\attribute\AttributeFieldModel.cs" />
     <Compile Include="model\data\attribute\AttributeTransformationModel.cs" />
@@ -197,6 +198,7 @@
     <Compile Include="model\view\BrushableOperationViewModelState.cs" />
     <Compile Include="model\view\IncludeExludeMenuItemViewModel.cs" />
     <Compile Include="model\view\BudgetViewModel.cs" />
+    <Compile Include="model\view\operation\AttributeGroupOperationViewModel.cs" />
     <Compile Include="model\view\operation\CalculationOperationViewModel.cs" />
     <Compile Include="model\view\operation\DefinitionOperationViewModel.cs" />
     <Compile Include="model\view\operation\RecommenderOperationViewModel.cs" />
@@ -337,6 +339,9 @@
     </Compile>
     <Compile Include="view\vis\menu\ToggleMenuItemView.xaml.cs">
       <DependentUpon>ToggleMenuItemView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\render\AttributeGroupRenderer.xaml.cs">
+      <DependentUpon>AttributeGroupRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\CalculationRenderer.xaml.cs">
       <DependentUpon>CalculationRenderer.xaml</DependentUpon>
@@ -523,6 +528,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\vis\menu\ToggleMenuItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\AttributeGroupRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

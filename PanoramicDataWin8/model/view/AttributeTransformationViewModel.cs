@@ -11,7 +11,7 @@ using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
 {
-    public class AttributeTransformationViewModel : BindableBase
+    public class AttributeTransformationViewModel : ExtendedBindableBase
     {
         private AttachmentOrientation _attachmentOrientation;
 
