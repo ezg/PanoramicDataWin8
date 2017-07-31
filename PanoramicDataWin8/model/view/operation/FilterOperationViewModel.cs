@@ -7,6 +7,7 @@ namespace PanoramicDataWin8.model.view.operation
         public FilterOperationViewModel(FilterOperationModel filterOperationModel, bool useTypingUI) : base(filterOperationModel)
         {
             UseTypingUI = useTypingUI;
+            addAttachmentViewModels();
         }
 
         public bool UseTypingUI { get; set; }

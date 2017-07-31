@@ -157,6 +157,7 @@
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventType.cs" />
     <Compile Include="model\data\operation\FilterProviderOperationModelImpl.cs" />
+    <Compile Include="model\data\operation\FunctionOperationModel.cs" />
     <Compile Include="model\data\operation\Range.cs" />
     <Compile Include="model\data\operation\RecommenderOperationModel.cs" />
     <Compile Include="model\data\operation\IBrushableOperationModel.cs" />
@@ -201,6 +202,7 @@
     <Compile Include="model\view\operation\AttributeGroupOperationViewModel.cs" />
     <Compile Include="model\view\operation\CalculationOperationViewModel.cs" />
     <Compile Include="model\view\operation\DefinitionOperationViewModel.cs" />
+    <Compile Include="model\view\operation\FunctionOperationViewModel.cs" />
     <Compile Include="model\view\operation\RecommenderOperationViewModel.cs" />
     <Compile Include="model\view\RecommenderHandleViewModel.cs" />
     <Compile Include="model\view\RecommendedHistogramMenuItemViewModel.cs" />
@@ -356,6 +358,9 @@
       <DependentUpon>ExampleRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\ExampleRendererContentProvider.cs" />
+    <Compile Include="view\vis\render\FunctionRenderer.xaml.cs">
+      <DependentUpon>FunctionRenderer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\render\PlotRenderer.xaml.cs">
       <DependentUpon>PlotRenderer.xaml</DependentUpon>
     </Compile>
@@ -550,6 +555,10 @@
     <Page Include="view\vis\render\ExampleRenderer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="view\vis\render\FunctionRenderer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\vis\render\PlotRenderer.xaml">
       <Generator>MSBuild:Compile</Generator>

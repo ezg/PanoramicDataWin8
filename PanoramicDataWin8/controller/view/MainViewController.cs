@@ -152,13 +152,17 @@ namespace PanoramicDataWin8.controller.view
             parent.OperationTypeModels.Add(vis);
             vis.OperationTypeModels.Add(new OperationTypeModel {Name = "hist", OperationType = OperationType.Histogram});
 
-            var other = new OperationTypeGroupModel {Name = "other", OperationType = OperationType.Group};
+            var other = new OperationTypeGroupModel {Name = "create", OperationType = OperationType.Group};
             parent.OperationTypeModels.Add(other);
-            other.OperationTypeModels.Add(new OperationTypeModel {Name = "example", OperationType = OperationType.Example});
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "attribute Group", OperationType = OperationType.AttributeGroup });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "filter", OperationType = OperationType.Filter });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "definition", OperationType = OperationType.Definition });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "calculation", OperationType = OperationType.Calculation });
+            other.OperationTypeModels.Add(new OperationTypeModel { Name = "example", OperationType = OperationType.Example });
+
+            var funcs = new OperationTypeGroupModel { Name = "functions", OperationType = OperationType.Group };
+            parent.OperationTypeModels.Add(funcs);
+            funcs.OperationTypeModels.Add(new OperationTypeModel { Name = "MinMaxScale", OperationType = OperationType.Function, FunctionType= new MinMaxScaleFunctionSubtypeModel() });
 
             MainModel.OperationTypeModels = parent.OperationTypeModels.ToList();
         }
@@ -192,6 +196,14 @@ namespace PanoramicDataWin8.controller.view
         public HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(AttributeModel attributeModel, Pt position)
         {
             var visModel = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(MainModel.SchemaModel, attributeModel, position);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
+        public FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(Pt position, FunctionSubtypeModel functionSubtypeModel)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultFunctionOperationViewModel(MainModel.SchemaModel, position, functionSubtypeModel);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -345,7 +357,12 @@ namespace PanoramicDataWin8.controller.view
                 operationViewModel = CreateDefaultDefinitionOperationViewModel(position);
             else if (operationTypeModel.OperationType == OperationType.Calculation)
                 operationViewModel = CreateDefaultCalculationOperationViewModel(position);
-
+            else if (operationTypeModel.OperationType == OperationType.Function)
+            {
+                operationViewModel = CreateDefaultFunctionOperationViewModel(position, operationTypeModel.FunctionType);
+                height = 50;
+                size = new Vec(width, height);
+            }
             if (operationViewModel != null)
             {
                 var operationContainerView = new OperationContainerView();

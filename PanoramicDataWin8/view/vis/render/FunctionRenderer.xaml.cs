@@ -1,35 +1,34 @@
 ﻿using GeoAPI.Geometries;
-using IDEA_common.catalog;
-using IDEA_common.operations.recommender;
 using PanoramicDataWin8.controller.view;
-using PanoramicDataWin8.model.data.attribute;
-using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.inq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
-using Windows.UI;
-using Windows.UI.Input.Inking;
+using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Controls.Primitives;
+using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using InkStroke = PanoramicDataWin8.view.inq.InkStroke;
+using Windows.UI.Xaml.Navigation;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public sealed partial class AttributeGroupRenderer : Renderer, IScribbable
+    public sealed partial class FunctionRenderer : Renderer, IScribbable
     {
         DispatcherTimer _keyboardTimer = new DispatcherTimer();
-        public AttributeGroupRenderer()
+        public FunctionRenderer()
         {
+            this.InitializeComponent();
             this.DataContextChanged += dataContextChanged;
             this.InitializeComponent();
         }
@@ -43,7 +42,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             get
             {
-                var model = this.DataContext as AttributeGroupOperationViewModel;
+                var model = this.DataContext as FunctionOperationViewModel;
 
                 Rct bounds = new Rct(model.Position, model.Size);
                 return bounds.GetPolygon();
@@ -54,24 +53,23 @@ namespace PanoramicDataWin8.view.vis.render
             MinHeight = OperationViewModel.MIN_HEIGHT / 2;
             if (args.NewValue != null)
             {
-                var attributeGroupOperationViewModel = DataContext as AttributeGroupOperationViewModel;
-                NameTextBox.Text = attributeGroupOperationViewModel.AttributeGroupOperationModel.AttributeGroupModel.DisplayName;
-                attributeGroupOperationViewModel.OperationModel.OperationModelUpdated -= OperationModelUpdated;
-                attributeGroupOperationViewModel.OperationModel.OperationModelUpdated += OperationModelUpdated;
-                attributeGroupOperationViewModel.OperationModel.PropertyChanged -= OperationModelPropertyChanged;
-                attributeGroupOperationViewModel.OperationModel.PropertyChanged += OperationModelPropertyChanged;
 
-                attributeGroupOperationViewModel.OperationViewModelTapped += AttributeGroupRenderer_OperationViewModelTapped;
-                MainViewController.Instance.MainPage.clearAndDisposeMenus();
+                var model = this.DataContext as FunctionOperationViewModel;
+                NameTextBox.Text = model.FunctionOperationModel.DisplayName;
+                model.OperationModel.OperationModelUpdated -= OperationModelUpdated;
+                model.OperationModel.OperationModelUpdated += OperationModelUpdated;
+                model.OperationModel.PropertyChanged -= OperationModelPropertyChanged;
+                model.OperationModel.PropertyChanged += OperationModelPropertyChanged;
+
+                model.OperationViewModelTapped += OperationViewModelTapped;
             }
         }
 
-        private void AttributeGroupRenderer_OperationViewModelTapped(object sender, EventArgs e)
+        private void OperationViewModelTapped(object sender, EventArgs e)
         {
             NameTextBox.IsEnabled = true;
             NameTextBox.Focus(FocusState.Keyboard);
         }
-
         private void OperationModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
         }
@@ -80,14 +78,15 @@ namespace PanoramicDataWin8.view.vis.render
         {
         }
 
-        public List<IScribbable> Children {
+        public List<IScribbable> Children
+        {
             get { return new List<IScribbable>(); }
         }
         public bool Consume(InkStroke inkStroke)
         {
             return false;
         }
-        
+
 
         private void NameTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
@@ -105,9 +104,9 @@ namespace PanoramicDataWin8.view.vis.render
 
             if (!NameTextBox.GetBounds().Contains(e.GetCurrentPoint(NameTextBox).Position))
             {
-                var model = (this.DataContext as AttributeGroupOperationViewModel).OperationModel as AttributeGroupOperationModel;
+                var model = (this.DataContext as FunctionOperationViewModel).OperationModel as FunctionOperationModel;
                 NameTextBox.IsEnabled = false;
-                model.AttributeGroupModel.DisplayName = NameTextBox.Text;
+                model.DisplayName = NameTextBox.Text;
                 MainViewController.Instance.MainPage.addAttributeButton.Focus(FocusState.Pointer);
                 MainViewController.Instance.MainPage.clearAndDisposeMenus();
             }

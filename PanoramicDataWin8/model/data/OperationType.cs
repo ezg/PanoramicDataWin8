@@ -8,6 +8,8 @@
         Filter,
         Definition,
         Calculation,
-        AttributeGroup
+        AttributeGroup,
+        Function
     }
+    
 }

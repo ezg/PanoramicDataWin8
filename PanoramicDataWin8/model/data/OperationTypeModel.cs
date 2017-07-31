@@ -1,5 +1,6 @@
 ﻿using System;
 using PanoramicDataWin8.utils;
+using PanoramicDataWin8.model.data.operation;
 
 namespace PanoramicDataWin8.model.data
 {
@@ -10,6 +11,8 @@ namespace PanoramicDataWin8.model.data
         private string _name;
 
         private OperationType _operationType;
+
+        private FunctionSubtypeModel _functionSubtypeModel;
 
         private Vec _size = new Vec(50, 50);
 
@@ -29,6 +32,12 @@ namespace PanoramicDataWin8.model.data
         {
             get { return _operationType; }
             set { SetProperty(ref _operationType, value); }
+        }
+
+        public FunctionSubtypeModel FunctionType
+        {
+            get { return _functionSubtypeModel; }
+            set { SetProperty(ref _functionSubtypeModel, value); }
         }
 
         public Vec Size
