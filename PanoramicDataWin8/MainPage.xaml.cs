@@ -709,6 +709,8 @@ namespace PanoramicDataWin8
                 var inputModels =
                     mainModel.SchemaModel.OriginModels.First()
                         .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
+                var groupModels = MainViewController.Instance.OperationViewModels.Select((opv) => 
+                            opv.OperationModel as AttributeGroupOperationModel);
 
                 if (_attributeMenu != null)
                 {
@@ -718,9 +720,10 @@ namespace PanoramicDataWin8
                     menuCanvas.Children.Remove(_attributeMenu);
                 }
 
+                var allModels = inputModels.Count() + groupModels.Count();
                 var parentModel = new TileMenuItemViewModel(null);
-                parentModel.ChildrenNrColumns = (int) Math.Ceiling(inputModels.Count()/10.0);
-                parentModel.ChildrenNrRows = (int) Math.Min(10.0, inputModels.Count());
+                parentModel.ChildrenNrColumns = (int) Math.Ceiling(allModels / 10.0);
+                parentModel.ChildrenNrRows = (int) Math.Min(10.0, allModels);
                 parentModel.Alignment = Alignment.Center;
                 parentModel.AttachPosition = AttachPosition.Right;
 
@@ -741,7 +744,7 @@ namespace PanoramicDataWin8
                     }
                 }
 
-                foreach (var attributeGroupOperationModel in MainViewController.Instance.OperationViewModels.Select((opv) => opv.OperationModel as AttributeGroupOperationModel))
+                foreach (var attributeGroupOperationModel in groupModels)
                     if (attributeGroupOperationModel != null)
                     {
                         var tileMenuItemViewModel = recursiveCreateTileMenu(attributeGroupOperationModel.AttributeGroupModel, parentModel);
