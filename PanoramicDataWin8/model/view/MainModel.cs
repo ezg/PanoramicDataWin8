@@ -45,7 +45,7 @@ namespace PanoramicDataWin8.model.view
 
         private double _throttleInMillis = 300.0;
 
-        private bool _pollForDecisions = true;
+        private bool _pollForDecisions = false;
 
         private bool _verbose;
 
