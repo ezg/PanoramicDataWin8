@@ -7,6 +7,9 @@
         Example,
         Filter,
         Definition,
-        Calculation
+        Calculation,
+        AttributeGroup,
+        Function
     }
+    
 }

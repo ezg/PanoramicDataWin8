@@ -58,6 +58,15 @@ namespace PanoramicDataWin8.model.view.operation
 
         private Vec _size = new Vec(180, 100);
 
+        protected void addAttachmentViewModels()
+        {
+            foreach (var attachmentOrientation in Enum.GetValues(typeof(AttachmentOrientation)).Cast<AttachmentOrientation>())
+                AttachementViewModels.Add(new AttachmentViewModel
+                {
+                    AttachmentOrientation = attachmentOrientation,
+                    OperationViewModel = this
+                });
+        }
         public OperationViewModel(OperationModel operationModel)
         {
             _operationModel = operationModel;

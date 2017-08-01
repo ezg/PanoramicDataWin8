@@ -152,12 +152,17 @@ namespace PanoramicDataWin8.controller.view
             parent.OperationTypeModels.Add(vis);
             vis.OperationTypeModels.Add(new OperationTypeModel {Name = "hist", OperationType = OperationType.Histogram});
 
-            var other = new OperationTypeGroupModel {Name = "other", OperationType = OperationType.Group};
+            var other = new OperationTypeGroupModel {Name = "create", OperationType = OperationType.Group};
             parent.OperationTypeModels.Add(other);
-            other.OperationTypeModels.Add(new OperationTypeModel {Name = "example", OperationType = OperationType.Example});
+            other.OperationTypeModels.Add(new OperationTypeModel { Name = "attribute Group", OperationType = OperationType.AttributeGroup });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "filter", OperationType = OperationType.Filter });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "definition", OperationType = OperationType.Definition });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "calculation", OperationType = OperationType.Calculation });
+            other.OperationTypeModels.Add(new OperationTypeModel { Name = "example", OperationType = OperationType.Example });
+
+            var funcs = new OperationTypeGroupModel { Name = "functions", OperationType = OperationType.Group };
+            parent.OperationTypeModels.Add(funcs);
+            funcs.OperationTypeModels.Add(new OperationTypeModel { Name = "MinMaxScale", OperationType = OperationType.Function, FunctionType= new MinMaxScaleFunctionSubtypeModel() });
 
             MainModel.OperationTypeModels = parent.OperationTypeModels.ToList();
         }
@@ -196,6 +201,14 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.Add(visModel);
             return visModel;
         }
+        public FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(Pt position, FunctionSubtypeModel functionSubtypeModel)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultFunctionOperationViewModel(MainModel.SchemaModel, position, functionSubtypeModel);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
 
         public CalculationOperationViewModel CreateDefaultCalculationOperationViewModel(Pt position)
         {
@@ -217,6 +230,14 @@ namespace PanoramicDataWin8.controller.view
         public ExampleOperationViewModel CreateDefaultExampleOperationViewModel(Pt position)
         {
             var visModel = OperationViewModelFactory.CreateDefaultExampleOperationViewModel(MainModel.SchemaModel, position);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
+        public AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(Pt position)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultAttributeGroupOperationViewModel(MainModel.SchemaModel, position);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -320,6 +341,12 @@ namespace PanoramicDataWin8.controller.view
             {
                 operationViewModel = CreateDefaultExampleOperationViewModel(position);
             }
+            else if (operationTypeModel.OperationType == OperationType.AttributeGroup)
+            {
+                operationViewModel = CreateDefaultAttributeGroupOperationViewModel(position);
+                height = 50;
+                size = new Vec(width, height);
+            }
             else if (operationTypeModel.OperationType == OperationType.Filter)
             {
                 operationViewModel = CreateDefaultFilterOperationViewModel(position, controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse);
@@ -330,7 +357,12 @@ namespace PanoramicDataWin8.controller.view
                 operationViewModel = CreateDefaultDefinitionOperationViewModel(position);
             else if (operationTypeModel.OperationType == OperationType.Calculation)
                 operationViewModel = CreateDefaultCalculationOperationViewModel(position);
-
+            else if (operationTypeModel.OperationType == OperationType.Function)
+            {
+                operationViewModel = CreateDefaultFunctionOperationViewModel(position, operationTypeModel.FunctionType);
+                height = 50;
+                size = new Vec(width, height);
+            }
             if (operationViewModel != null)
             {
                 var operationContainerView = new OperationContainerView();
@@ -399,11 +431,11 @@ namespace PanoramicDataWin8.controller.view
                 }
             }
 
-            /*var ops = InkableScene.GetDescendants().OfType<OperationContainerView>().ToList();
+            var ops = InkableScene.GetDescendants().OfType<OperationContainerView>().ToList();
             foreach (var element in OperationViewModels)
             {
                 var geom = element.Bounds.GetPolygon();
-                if ((geom != null) && (mainPageBounds.Distance(geom) < 100))
+                if ((geom != null) && (mainPageBounds.Overlaps(geom)))
                 {
                     foreach (var a in element.AttachementViewModels)
                     {
@@ -413,7 +445,7 @@ namespace PanoramicDataWin8.controller.view
                         }
                     }
                 }
-            }*/
+            }
 
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
 

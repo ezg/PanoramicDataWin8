@@ -5,15 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
 namespace PanoramicDataWin8.model.view.operation
 {
-    public class ExampleOperationViewModel : OperationViewModel
+    public class FunctionOperationViewModel : OperationViewModel
     {
-        private void createRightExampleMenu()
+        private void createDummyParameterMenu()
         {
-            var attachmentViewModel = AttachementViewModels.First( avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
 
             var menuViewModel = new MenuViewModel
             {
@@ -37,10 +40,11 @@ namespace PanoramicDataWin8.model.view.operation
                 IsHeightBoundToParent = false
             };
 
+            var subtype = this.FunctionOperationModel.FunctionSubtypeModel as MinMaxScaleFunctionSubtypeModel;
             var attr1 = new SliderMenuItemComponentViewModel
             {
                 Label = "dummy slider",
-                Value = ExampleOperationModel.DummyValue,
+                Value = subtype.DummyValue,
                 MinValue = 1,
                 MaxValue = 100
             };
@@ -48,7 +52,7 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 var model = sender as SliderMenuItemComponentViewModel;
                 if (args.PropertyName == model.GetPropertyName(() => model.FinalValue))
-                    ExampleOperationModel.DummyValue = model.FinalValue;
+                    subtype.DummyValue = model.FinalValue;
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
 
@@ -62,9 +66,10 @@ namespace PanoramicDataWin8.model.view.operation
             attachmentViewModel.MenuViewModel = menuViewModel;
         }
 
-        private void createBottomExampleMenu()
+        private void createBottomInputsExpandingMenu()
         {
-            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Bottom);
+            var attachmentViewModel = AttachementViewModels.First(
+                    avm => avm.AttachmentOrientation == AttachmentOrientation.Bottom);
             attachmentViewModel.ShowOnAttributeMove = true;
 
             var menuViewModel = new MenuViewModel
@@ -95,13 +100,19 @@ namespace PanoramicDataWin8.model.view.operation
                 CanDrag = false,
                 CanDrop = true
             };
-            attr1.DroppedTriggered = attributeTransformationModel => { ExampleOperationModel.AttributeUsageTransformationModels.Add(attributeTransformationModel); };
+            attr1.DroppedTriggered = attributeTransformationModel => {
+                if (!FunctionOperationModel.AttributeUsageTransformationModels.Contains(attributeTransformationModel))
+                    FunctionOperationModel.AttributeUsageTransformationModels.Add(attributeTransformationModel);
+            };
 
+            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(FunctionOperationModel.GetCode()));
+            attr1.TappedTriggered = (() =>
+            attr1.Editing = Visibility.Visible);
             addMenuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(addMenuItem);
             attachmentViewModel.MenuViewModel = menuViewModel;
 
-            ExampleOperationModel.AttributeUsageTransformationModels.CollectionChanged += (sender, args) =>
+            FunctionOperationModel.AttributeUsageTransformationModels.CollectionChanged += (sender, args) =>
             {
                 var coll = sender as ObservableCollection<AttributeTransformationModel>;
 
@@ -145,7 +156,7 @@ namespace PanoramicDataWin8.model.view.operation
                         {
                             var atm =
                                 ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeTransformationViewModel.AttributeTransformationModel;
-                            ExampleOperationModel.AttributeUsageTransformationModels.Remove(atm);
+                            FunctionOperationModel.AttributeUsageTransformationModels.Remove(atm);
                         };
                         newMenuItem.MenuItemComponentViewModel = newAttr;
                         menuViewModel.MenuItemViewModels.Add(newMenuItem);
@@ -170,77 +181,17 @@ namespace PanoramicDataWin8.model.view.operation
 
         }
 
-        private  void createLeftExampleMenu()
-        {
-            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Left);
-
-            var menuViewModel = new MenuViewModel
-            {
-                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = 1,
-                NrRows = 3
-            };
-            attachmentViewModel.MenuViewModel = menuViewModel;
-
-            var toggles = new List<ToggleMenuItemComponentViewModel>();
-            var items = new List<MenuItemViewModel>();
-
-            var count = 0;
-            foreach (var exampleOperationType in new[] { ExampleOperationType.A, ExampleOperationType.B, ExampleOperationType.C })
-            {
-                var toggleMenuItem = new MenuItemViewModel
-                {
-                    MenuViewModel = menuViewModel,
-                    Row = count,
-                    RowSpan = 0,
-                    Column = 0,
-                    Position = Position,
-                    Size = new Vec(50, 32),
-                    TargetSize = new Vec(50, 32)
-                };
-
-                var toggle = new ToggleMenuItemComponentViewModel
-                {
-                    Label = exampleOperationType.ToString().ToLower(),
-                    IsChecked = ExampleOperationModel.ExampleOperationType == exampleOperationType
-                };
-                toggles.Add(toggle);
-                toggleMenuItem.MenuItemComponentViewModel = toggle;
-                toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender2, args2) =>
-                {
-                    var model = sender2 as ToggleMenuItemComponentViewModel;
-                    if (args2.PropertyName == model.GetPropertyName(() => model.IsChecked))
-                        if (model.IsChecked)
-                        {
-                            attachmentViewModel.ActiveStopwatch.Restart();
-                            ExampleOperationModel.ExampleOperationType = exampleOperationType;
-                            foreach (var tg in model.OtherToggles)
-                                tg.IsChecked = false;
-                        }
-                };
-                menuViewModel.MenuItemViewModels.Add(toggleMenuItem);
-                items.Add(toggleMenuItem);
-                count++;
-            }
-
-            foreach (var mi in items)
-                (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
-
-
-            OperationViewModelTapped += (sender, args) =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-
-        }
-        public ExampleOperationViewModel(ExampleOperationModel exampleOperationModel) : base(exampleOperationModel)
+        public FunctionOperationViewModel(FunctionOperationModel functionOperationModel, bool fromMouse = false) : base(functionOperationModel)
         {
             addAttachmentViewModels();
-            createBottomExampleMenu();
-            createRightExampleMenu();
-            createLeftExampleMenu();
+
+            // fill-in UI specific to function's subtype
+            if (FunctionOperationModel.FunctionSubtypeModel is MinMaxScaleFunctionSubtypeModel)
+                createDummyParameterMenu();
+
+            createBottomInputsExpandingMenu();
         }
 
-        public ExampleOperationModel ExampleOperationModel => (ExampleOperationModel) OperationModel;
+        public FunctionOperationModel FunctionOperationModel => (FunctionOperationModel)OperationModel;
     }
 }
