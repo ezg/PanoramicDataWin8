@@ -25,7 +25,7 @@ namespace PanoramicDataWin8.model.data.operation
         }
         public DataType DataType {  get { return DataType.Double;  } }
         public string Name { get; }
-        public string InputVisualizationType { get { return "numeric"; } }
+        public string InputVisualizationType { get { return InputVisualizationTypeConstants.NUMERIC; } }
 
         public double DummyValue { get; set;  }
 
@@ -37,11 +37,12 @@ namespace PanoramicDataWin8.model.data.operation
                     code += (p.Key + ":" + (p.Value as AttributeTransformationModel).AttributeModel.RawName) + ",";
 
             code = code.TrimEnd(',') + ")";
+            return "0";
             return code;
         }
     }
 
-    public class FunctionOperationModel : OperationModel
+    public class FunctionOperationModel : AttributeUsageOperationModel
     {
 
         public FunctionSubtypeModel FunctionSubtypeModel;
@@ -60,9 +61,7 @@ namespace PanoramicDataWin8.model.data.operation
         }
 
         public string DisplayName { get; set; }
-
-        public ObservableCollection<AttributeTransformationModel> AttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
-
+        
         public void SetParameters(Dictionary<string,object> parameters)
         {
             GetCode().SetCode(FunctionSubtypeModel.Code(parameters), FunctionSubtypeModel.DataType);

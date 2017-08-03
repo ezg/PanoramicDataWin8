@@ -1,16 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using IDEA_common.catalog;
+using PanoramicDataWin8.model.data.idea;
 
 namespace PanoramicDataWin8.model.data.attribute
 {
-    public class AttributeGroupModel : utils.ExtendedBindableBase
+    public class AttributeGroupModel : AttributeModel
     {
         private List<AttributeModel> _inputModels = new List<AttributeModel>();
-        private OriginModel _originModel;
 
         public AttributeGroupModel(string name)
         {
-            DisplayName = name;
+            RawName = DisplayName = name;
         }
 
         public List<AttributeModel> InputModels
@@ -19,33 +21,19 @@ namespace PanoramicDataWin8.model.data.attribute
             set { SetProperty(ref _inputModels, value); }
         }
 
-        public string DisplayName { get; set; }
-
-        public OriginModel OriginModel
+        string _rawName, _displayName;
+        public override string RawName
         {
-            get { return _originModel; }
-            set { SetProperty(ref _originModel, value); }
+            get { return _rawName; }
+            set { SetProperty(ref _rawName, value); }
         }
-
-        public override bool Equals(object obj)
+        public override string DisplayName
         {
-            if (obj is AttributeGroupModel)
-            {
-                var am = obj as AttributeGroupModel;
-                return
-                    am.OriginModel.Equals(OriginModel) &&
-                    am.DisplayName.Equals(DisplayName) &&
-                    InputModels.SequenceEqual(am.InputModels);
-            }
-            return false;
+            get { return _displayName; }
+            set { SetProperty(ref _displayName, value); }
         }
-
-        public override int GetHashCode()
-        {
-            var code = 0;
-            code ^= OriginModel.GetHashCode();
-            code ^= DisplayName.GetHashCode();
-            return InputModels.Aggregate(code, (current, inputModel) => current ^ inputModel.GetHashCode());
-        }
+        public override DataType DataType { get; set; }
+        public override AttributeFuncModel FuncModel { get; set; }
+        public override List<VisualizationHint> VisualizationHints { get; set; }
     }
 }

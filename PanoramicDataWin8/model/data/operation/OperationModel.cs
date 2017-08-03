@@ -1,6 +1,8 @@
 ﻿using IDEA_common.operations;
 using Newtonsoft.Json;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.utils;
+using System.Collections.ObjectModel;
 
 namespace PanoramicDataWin8.model.data.operation
 {
@@ -34,7 +36,6 @@ namespace PanoramicDataWin8.model.data.operation
             get { return _id; }
             set { SetProperty(ref _id, value); }
         }
-
         public virtual bool ResetFilterModelWhenInputLinksChange {  get { return true;  } }
 
         public SchemaModel SchemaModel
@@ -109,4 +110,12 @@ namespace PanoramicDataWin8.model.data.operation
             return code;
         }
     }
+
+    public class AttributeUsageOperationModel : OperationModel {
+        
+        public AttributeUsageOperationModel(SchemaModel schemaModel):base(schemaModel) { }
+        public ObservableCollection<AttributeTransformationModel> AttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
+
+    }
+
 }

@@ -24,6 +24,10 @@ namespace PanoramicDataWin8.controller.data.progressive
     {
         public static AttributeParameters GetAttributeParameters(AttributeModel atm)
         {
+            if (atm.FuncModel == null)
+            {
+                return new AttributeCodeParameters();
+            } else
             if (atm.FuncModel is AttributeFieldModel.AttributeIndexFuncModel)
             {
                 return new AttributeIndexParameters()
@@ -337,7 +341,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 
             var numericDataTypes = new[] {DataType.Int, DataType.Double, DataType.Float}.ToList();
             var globalAggregates = new List<AggregateParameters>();
-            foreach (var index in new[] {xIom, yIom}.Where(a => numericDataTypes.Contains((a.AttributeModel as AttributeFieldModel).DataType)).Select(a => GetAttributeParameters(a.AttributeModel)).Distinct())
+            foreach (var index in new[] {xIom, yIom}.Where(a => a.AttributeModel is AttributeFieldModel && numericDataTypes.Contains((a.AttributeModel as AttributeFieldModel).DataType)).Select(a => GetAttributeParameters(a.AttributeModel)).Distinct())
             {
                 /*globalAggregates.Add(new KDEAggregateParameters
                 {
@@ -352,7 +356,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 });*/
             }
 
-            foreach (var iom in new[] {xIom, yIom}.Where(i => i.AggregateFunction == AggregateFunction.None && 
+            foreach (var iom in new[] {xIom, yIom}.Where(i => i.AttributeModel is AttributeFieldModel && i.AggregateFunction == AggregateFunction.None && 
                 numericDataTypes.Contains((i.AttributeModel as AttributeFieldModel).DataType)))
             {
                 globalAggregates.Add(new AverageAggregateParameters()

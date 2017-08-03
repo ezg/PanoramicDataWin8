@@ -278,7 +278,7 @@ namespace PanoramicDataWin8.model.view.operation
 
                 var aom = attr1.AttributeTransformationViewModel.AttributeTransformationModel;
                 var aggregateFunctions = new[] { AggregateFunction.None, AggregateFunction.Count }.ToList();
-                if (aom != null)
+                if (aom != null && aom.AttributeModel is AttributeFieldModel)
                 {
                     if (((AttributeFieldModel)aom.AttributeModel).DataType == DataType.Float ||
                         ((AttributeFieldModel)aom.AttributeModel).DataType == DataType.Double ||
@@ -340,6 +340,8 @@ namespace PanoramicDataWin8.model.view.operation
             attr1.TappedTriggered = () => { attachmentViewModel.ActiveStopwatch.Restart(); };
             attr1.DroppedTriggered = attributeTransformationModel =>
             {
+                if (!(attributeTransformationModel.AttributeModel is AttributeFieldModel))
+                    return;
                 var otherAxis = axis == AttributeUsage.X ? AttributeUsage.Y : AttributeUsage.X;
                 var existingModel = HistogramOperationModel.GetAttributeUsageTransformationModel(axis).Any() ?
                       HistogramOperationModel.GetAttributeUsageTransformationModel(axis).First() : null;

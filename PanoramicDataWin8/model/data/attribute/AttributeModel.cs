@@ -46,7 +46,7 @@ namespace PanoramicDataWin8.model.data.attribute
             }
             public int Index { get => _index; }
         }
-    
+
         public abstract AttributeFuncModel FuncModel { get; set;  }
 
         public abstract List<VisualizationHint> VisualizationHints { get; set; }
