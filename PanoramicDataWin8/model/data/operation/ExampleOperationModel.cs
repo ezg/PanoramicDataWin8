@@ -4,7 +4,7 @@ using PanoramicDataWin8.model.data.attribute;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public class ExampleOperationModel : OperationModel, IFilterConsumerOperationModel
+    public class ExampleOperationModel : AttributeUsageOperationModel, IFilterConsumerOperationModel
     {
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
@@ -17,9 +17,7 @@ namespace PanoramicDataWin8.model.data.operation
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
-
-        public ObservableCollection<AttributeTransformationModel> AttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
-
+        
         public double DummyValue
         {
             get { return _dummyValue; }

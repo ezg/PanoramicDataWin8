@@ -2,10 +2,13 @@
 using System.Collections.Specialized;
 using PanoramicDataWin8.model.data.attribute;
 using System;
+using PanoramicDataWin8.model.data.idea;
+using System.Collections.Generic;
+using IDEA_common.catalog;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public class AttributeGroupOperationModel : OperationModel, IFilterConsumerOperationModel
+    public class AttributeGroupOperationModel : AttributeUsageOperationModel, IFilterConsumerOperationModel
     {
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
@@ -18,8 +21,6 @@ namespace PanoramicDataWin8.model.data.operation
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
-
-        public ObservableCollection<AttributeTransformationModel> AttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
 
         public FilteringOperation FilteringOperation
         {
