@@ -128,7 +128,6 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="model\data\attribute\AggregateFunction.cs" />
     <Compile Include="model\data\attribute\ErrorHandler.cs" />
     <Compile Include="model\data\attribute\ScaleFunction.cs" />
     <Compile Include="model\data\attribute\SortMode.cs" />

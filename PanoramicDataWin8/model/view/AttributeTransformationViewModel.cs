@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Windows.UI.Xaml;
+using IDEA_common.aggregates;
 using Microsoft.Practices.Prism.Mvvm;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;

@@ -221,10 +221,11 @@ namespace PanoramicDataWin8.controller.data.progressive
                 brushes.Add(brush);
             }
 
-            aggregates = model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(
+             aggregates = model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(
                 model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).Concat(
                 model.GetAttributeUsageTransformationModel(AttributeUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
-                model.GetAttributeUsageTransformationModel(AttributeUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Distinct().ToList();
+                model.GetAttributeUsageTransformationModel(AttributeUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).ToList();
+            aggregates = aggregates.Distinct().ToList();
 
             attributeCodeParameters.AddRange(
                 filterModels.SelectMany(fm => fm.ValueComparisons)
@@ -331,7 +332,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 {
                     AttributeParameters = GetAttributeParameters(agg.AttributeModel),
                     DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters,
-                    AggregateFunction = agg.AggregateFunction.ToString()
+                    AggregateFunction = agg.AggregateFunction
                 });
             }
 

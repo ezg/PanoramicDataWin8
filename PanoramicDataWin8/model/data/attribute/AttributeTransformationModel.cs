@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.model.data.operation;
 using System.Linq;
+using IDEA_common.aggregates;
 
 namespace PanoramicDataWin8.model.data.attribute
 {

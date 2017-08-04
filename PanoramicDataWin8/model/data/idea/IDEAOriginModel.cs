@@ -53,7 +53,6 @@ namespace PanoramicDataWin8.model.data.idea
             var fieldAttributeModel = new IDEAAttributeIndexedFieldModel(attribute.RawName, attribute.DisplayName, attribute.Index,
                 attribute.DataType,
                 attribute.DataType == DataType.String ? "enum" : "numeric", attribute.VisualizationHints);
-            fieldAttributeModel.OriginModel = this;
 
             if (parentGroupModel != null)
                 parentGroupModel.InputModels.Add(fieldAttributeModel);

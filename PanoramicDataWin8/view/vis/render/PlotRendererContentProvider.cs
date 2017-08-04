@@ -1256,8 +1256,8 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var xAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);
             var yAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex);
-            var xMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, new MarginAggregateParameters() { AggregateFunction = _xIom.AggregateFunction.ToString() }, _histogramResult, brush.BrushIndex);
-            var yMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, new MarginAggregateParameters() { AggregateFunction = _yIom.AggregateFunction.ToString() }, _histogramResult, brush.BrushIndex);
+            var xMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, new MarginAggregateParameters() { AggregateFunction = _xIom.AggregateFunction }, _histogramResult, brush.BrushIndex);
+            var yMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, new MarginAggregateParameters() { AggregateFunction = _yIom.AggregateFunction }, _histogramResult, brush.BrushIndex);
             Rect marginRect = Rect.Empty;
             double marginPercentage = 0.0;
             var xValue = ((DoubleValueAggregateResult)bin.GetAggregateResult(xAggregateKey)).Result;
@@ -1286,7 +1286,7 @@ namespace PanoramicDataWin8.view.vis.render
             double binBrushMaxAxis, Brush brush, double? unNormalizedvalue, int mappedXBinIndex)
         {
             var yAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, _histogramResult, brush.BrushIndex);
-            var yMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, new MarginAggregateParameters() { AggregateFunction = _yIom.AggregateFunction.ToString() }, _histogramResult, brush.BrushIndex);
+            var yMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, new MarginAggregateParameters() { AggregateFunction = _yIom.AggregateFunction }, _histogramResult, brush.BrushIndex);
             double marginPercentage = 0.0;
             var dataValue = ((DoubleValueAggregateResult)bin.GetAggregateResult(yAggregateKey)).Result;
 
@@ -1332,7 +1332,7 @@ namespace PanoramicDataWin8.view.vis.render
             double binBrushMaxAxis, Brush brush, double? unNormalizedvalue, int mappedYBinIndex)
         {
             var xAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, _histogramResult, brush.BrushIndex);
-            var xMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, new MarginAggregateParameters() { AggregateFunction = _xIom.AggregateFunction.ToString() }, _histogramResult, brush.BrushIndex);
+            var xMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_xIom, new MarginAggregateParameters() { AggregateFunction = _xIom.AggregateFunction }, _histogramResult, brush.BrushIndex);
             double marginPercentage = 0.0;
             var dataValue = ((DoubleValueAggregateResult)bin.GetAggregateResult(xAggregateKey)).Result;
 
@@ -1406,7 +1406,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             var marginAggregateKey = IDEAHelpers.CreateAggregateKey(_valueIom, new MarginAggregateParameters()
-            { AggregateFunction = _valueIom.AggregateFunction.ToString() }, _histogramResult, _histogramResult.AllBrushIndex());
+            { AggregateFunction = _valueIom.AggregateFunction }, _histogramResult, _histogramResult.AllBrushIndex());
             var valueMargin = (MarginAggregateResult)bin.GetAggregateResult(marginAggregateKey);
             marginPercentage = valueMargin.Margin;
 
