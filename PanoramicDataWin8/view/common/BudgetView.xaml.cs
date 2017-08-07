@@ -93,6 +93,7 @@ namespace PanoramicDataWin8.view.common
                 {
                     defaultGrid.Visibility = Visibility.Visible;
                     alphaGrid.Visibility = Visibility.Collapsed;
+                    defaultGridTB.Text = _model.DefaultLabel;
                 }
                 else
                 {

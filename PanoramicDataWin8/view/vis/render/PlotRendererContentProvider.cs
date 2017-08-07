@@ -407,7 +407,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 for (int yi = 0; yi < _histogramResult.BinRanges[1].GetBins().Count; yi++)
                 {
-                    BinIndex binIndex = new BinIndex(xi, yi);
+                    BinIndex binIndex = new BinIndex(new int[] {xi, yi});
 
                     if (_histogramResult.Bins.ContainsKey(binIndex))
                     {
@@ -605,7 +605,7 @@ namespace PanoramicDataWin8.view.vis.render
                 double maxaxis = double.MinValue;
                 for (int yi = 0; yi < _histogramResult.BinRanges[sortAxis ? 1 : 0].GetBins().Count; yi++)
                 {
-                    var binIndex = sortAxis ? new BinIndex(xi, yi) : new BinIndex(yi, xi);
+                    var binIndex = sortAxis ? new BinIndex(new int[] { xi, yi}) : new BinIndex(new int[] { yi, xi});
                     if (_histogramResult.Bins.ContainsKey(binIndex)) {
                         double? sortValue = _helper.GetBinValue(_histogramResult.Bins[binIndex]);
                         if (sortValue.HasValue)
@@ -629,7 +629,7 @@ namespace PanoramicDataWin8.view.vis.render
                 double axisSize = 0;
                 for (int yi = 0; yi < _histogramResult.BinRanges[sortAxis ? 1 : 0].GetBins().Count; yi++)
                 {
-                    var binIndex = sortAxis ? new BinIndex(xi, yi) : new BinIndex(yi, xi);
+                    var binIndex = sortAxis ? new BinIndex(new int[] {xi, yi}) : new BinIndex(new int[] {yi, xi});
                     if (_histogramResult.Bins.ContainsKey(binIndex))
                     {
                         double? sortValue = _helper.GetBinValue(_histogramResult.Bins[binIndex]);
@@ -667,7 +667,7 @@ namespace PanoramicDataWin8.view.vis.render
                     newYi = newXi;
                     newXi = sortBinIndex;
                 }
-                double? sortValue = sortBinIndex == -1 ? binValue : _helper.GetBinValue(_histogramResult.Bins[new BinIndex(newXi, newYi)]);
+                double? sortValue = sortBinIndex == -1 ? binValue : _helper.GetBinValue(_histogramResult.Bins[new BinIndex(new int[] { newXi, newYi})]);
                 if (sortValue.HasValue)
                 {
                     while (sortedIndexList.ContainsKey(sortValue.Value))
@@ -944,11 +944,10 @@ namespace PanoramicDataWin8.view.vis.render
                                 a => a is CountAggregateParameters && (a as CountAggregateParameters).AttributeParameters.Equals(IDEAHelpers.GetAttributeParameters(atm.AttributeModel)))),
                             BrushIndex = brush.BrushIndex
                         };
-                        if (_histogramResult.AggregateResults.ContainsKey(countAggregateKey) &&
-                            _histogramResult.AggregateResults.ContainsKey(kdeAggregateKey))
+                        var count = (DoubleValueAggregateResult)_histogramResult.GetAggregateResult(countAggregateKey);
+                        var points = (PointsAggregateResult)_histogramResult.GetAggregateResult(kdeAggregateKey);
+                        if (count != null && points != null)
                         {
-                            var count = (DoubleValueAggregateResult) _histogramResult.AggregateResults[countAggregateKey];
-                            PointsAggregateResult points = (PointsAggregateResult) _histogramResult.AggregateResults[kdeAggregateKey];
                             if (points.Points.Any())
                             {
                                 maxDistX = Math.Max(maxDistX, (double) points.Points.Max(p => p.X));
@@ -1016,9 +1015,9 @@ namespace PanoramicDataWin8.view.vis.render
                         AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(aggParam),
                         BrushIndex = brush.BrushIndex
                     };
-                    if (_histogramResult.AggregateResults.ContainsKey(aggregateKey))
+                    var average = ((DoubleValueAggregateResult) _histogramResult.GetAggregateResult(aggregateKey))?.Result;
+                    if (average != null)
                     {
-                        var average = ((DoubleValueAggregateResult) _histogramResult.AggregateResults[aggregateKey]).Result;
                         if (average.HasValue && iom.AggregateFunction == AggregateFunction.None)
                         {
                             var ap = new AveragePrimitive
@@ -1090,8 +1089,8 @@ namespace PanoramicDataWin8.view.vis.render
                     if (_chartType == ChartType.HorizontalBar)
                     {
                         List<Vector2> dist = new List<Vector2>();
-                        var count = (DoubleValueAggregateResult)_histogramResult.AggregateResults[yCountAggregateKey];
-                        PointsAggregateResult points = (PointsAggregateResult)_histogramResult.AggregateResults[yKdeAggregateKey];
+                        var count = (DoubleValueAggregateResult)_histogramResult.GetAggregateResult(yCountAggregateKey);
+                        PointsAggregateResult points = (PointsAggregateResult)_histogramResult.GetAggregateResult(yKdeAggregateKey);
                         dist =
                             points.Points.Select(
                                 p =>
@@ -1105,8 +1104,8 @@ namespace PanoramicDataWin8.view.vis.render
                     else if (_chartType == ChartType.VerticalBar)
                     {
                         List<Vector2> dist = new List<Vector2>();
-                        var count = (DoubleValueAggregateResult)_histogramResult.AggregateResults[xCountAggregateKey];
-                        PointsAggregateResult points = (PointsAggregateResult)_histogramResult.AggregateResults[xKdeAggregateKey];
+                        var count = (DoubleValueAggregateResult)_histogramResult.GetAggregateResult(xCountAggregateKey);
+                        PointsAggregateResult points = (PointsAggregateResult)_histogramResult.GetAggregateResult(xKdeAggregateKey);
                         dist =
                             points.Points.Select(
                                 p =>

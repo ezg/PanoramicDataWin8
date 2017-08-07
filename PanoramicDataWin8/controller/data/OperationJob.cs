@@ -11,6 +11,7 @@ using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
+using WinRTXamlToolkit.IO.Serialization;
 
 namespace PanoramicDataWin8.controller.data
 {
@@ -50,6 +51,8 @@ namespace PanoramicDataWin8.controller.data
         {
             try
             {
+                Stopwatch sw = new Stopwatch();
+                sw.Start();
                 var response = await IDEAGateway.Request(JsonConvert.SerializeObject(OperationParameters, IDEAGateway.JsonSerializerSettings), "operation");
                 OperationReference = JsonConvert.DeserializeObject<OperationReference>(response, IDEAGateway.JsonSerializerSettings);
 
@@ -69,6 +72,7 @@ namespace PanoramicDataWin8.controller.data
                         {
                             _isRunning = false;
                             FireJobCompleted(new JobEventArgs {Result = result, ResultExecutionId = _executionId });
+                            Debug.WriteLine("job completed in " + sw.ElapsedMilliseconds);
                         }
                     }
                     await Task.Delay(_throttle);
