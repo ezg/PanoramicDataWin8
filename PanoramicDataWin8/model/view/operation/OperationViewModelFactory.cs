@@ -66,6 +66,14 @@ namespace PanoramicDataWin8.model.view.operation
             return new ExampleOperationViewModel(new ExampleOperationModel(schemaModel)) { Position = position };
         }
 
+        public static RegresserOperationViewModel CreateDefaultRegresserOperationViewModel(SchemaModel schemaModel, Pt position)
+        {
+            return new RegresserOperationViewModel(new RegresserOperationModel(schemaModel)) { Position = position };
+        }
+        public static ClassifierOperationViewModel CreateDefaultClassifierOperationViewModel(SchemaModel schemaModel, Pt position)
+        {
+            return new ClassifierOperationViewModel(new ClassifierOperationModel(schemaModel)) { Position = position };
+        }
         public static AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(SchemaModel schemaModel, Pt position)
         {
             return new AttributeGroupOperationViewModel(new AttributeGroupOperationModel(schemaModel)) { Position = position };

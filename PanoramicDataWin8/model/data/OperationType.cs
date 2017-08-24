@@ -5,6 +5,8 @@
         Group,
         Histogram,
         Example,
+        Classifier,
+        Regresser,
         Filter,
         Definition,
         Calculation,

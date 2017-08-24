@@ -158,6 +158,8 @@ namespace PanoramicDataWin8.controller.view
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "filter", OperationType = OperationType.Filter });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "definition", OperationType = OperationType.Definition });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "calculation", OperationType = OperationType.Calculation });
+            other.OperationTypeModels.Add(new OperationTypeModel { Name = "classifier", OperationType = OperationType.Classifier });
+            other.OperationTypeModels.Add(new OperationTypeModel { Name = "regresser", OperationType = OperationType.Regresser });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "example", OperationType = OperationType.Example });
 
             var funcs = new OperationTypeGroupModel { Name = "functions", OperationType = OperationType.Group };
@@ -222,6 +224,22 @@ namespace PanoramicDataWin8.controller.view
         public DefinitionOperationViewModel CreateDefaultDefinitionOperationViewModel(Pt position)
         {
             var visModel = OperationViewModelFactory.CreateDefaultDefinitionOperationViewModel(MainModel.SchemaModel, position);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
+        public ClassifierOperationViewModel CreateDefaultClassifierOperationViewModel(Pt position)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultClassifierOperationViewModel(MainModel.SchemaModel, position);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
+        public RegresserOperationViewModel CreateDefaultRegresserOperationViewModel(Pt position)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultRegresserOperationViewModel(MainModel.SchemaModel, position);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -336,6 +354,14 @@ namespace PanoramicDataWin8.controller.view
             if (operationTypeModel.OperationType == OperationType.Histogram)
             {
                 operationViewModel = CreateDefaultHistogramOperationViewModel(null, position);
+            }
+            else if (operationTypeModel.OperationType == OperationType.Classifier)
+            {
+                operationViewModel = CreateDefaultClassifierOperationViewModel(position);
+            }
+            else if (operationTypeModel.OperationType == OperationType.Regresser)
+            {
+                operationViewModel = CreateDefaultRegresserOperationViewModel(position);
             }
             else if (operationTypeModel.OperationType == OperationType.Example)
             {

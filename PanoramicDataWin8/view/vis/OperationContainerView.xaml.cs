@@ -201,6 +201,16 @@ namespace PanoramicDataWin8.view.vis
                     contentGrid.Children.Add(_renderer);
                 }
             }
+            else if (operationViewModel.OperationModel is RegresserOperationModel)
+            {
+                _renderer = new RegresserRenderer();
+                contentGrid.Children.Add(_renderer);
+            }
+            else if (operationViewModel.OperationModel is ClassifierOperationModel)
+            {
+                _renderer = new ClassifierRenderer();
+                contentGrid.Children.Add(_renderer);
+            }
             else if (operationViewModel.OperationModel is ExampleOperationModel)
             {
                 _renderer = new ExampleRenderer();

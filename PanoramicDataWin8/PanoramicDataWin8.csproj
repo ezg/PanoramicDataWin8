@@ -145,6 +145,7 @@
     <Compile Include="model\data\attribute\AttributeTransformationModel.cs" />
     <Compile Include="model\data\operation\BrushOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\operation\CalculationOperationModel.cs" />
+    <Compile Include="model\data\operation\ClassifierOperationModel.cs" />
     <Compile Include="model\data\operation\DefinitionOperationModel.cs" />
     <Compile Include="model\data\operation\ExampleOperationModel.cs" />
     <Compile Include="model\data\operation\ExampleOperationType.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="model\data\operation\FilterConsumerOperationModelImpl.cs" />
     <Compile Include="model\data\operation\OperationModel.cs" />
     <Compile Include="model\data\operation\OperationModelUpdatedEventArgs.cs" />
+    <Compile Include="model\data\operation\RegresserOperationModel.cs" />
     <Compile Include="model\data\operation\RiskOperationModel.cs" />
     <Compile Include="model\data\operation\StatistalComparisonType.cs" />
     <Compile Include="model\data\operation\StatisticallyComparableOperationModelImpl.cs" />
@@ -200,9 +202,11 @@
     <Compile Include="model\view\BudgetViewModel.cs" />
     <Compile Include="model\view\operation\AttributeGroupOperationViewModel.cs" />
     <Compile Include="model\view\operation\CalculationOperationViewModel.cs" />
+    <Compile Include="model\view\operation\ClassifierOperationViewModel.cs" />
     <Compile Include="model\view\operation\DefinitionOperationViewModel.cs" />
     <Compile Include="model\view\operation\FunctionOperationViewModel.cs" />
     <Compile Include="model\view\operation\RecommenderOperationViewModel.cs" />
+    <Compile Include="model\view\operation\RegresserOperationViewModel.cs" />
     <Compile Include="model\view\RecommenderHandleViewModel.cs" />
     <Compile Include="model\view\RecommendedHistogramMenuItemViewModel.cs" />
     <Compile Include="model\view\PagingMenuItemViewModel.cs" />
@@ -347,6 +351,9 @@
     <Compile Include="view\vis\render\CalculationRenderer.xaml.cs">
       <DependentUpon>CalculationRenderer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\vis\render\ClassifierRenderer.xaml.cs">
+      <DependentUpon>ClassifierRenderer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\render\DefinitionRenderer.xaml.cs">
       <DependentUpon>DefinitionRenderer.xaml</DependentUpon>
     </Compile>
@@ -364,6 +371,9 @@
       <DependentUpon>PlotRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\PlotRendererContentProvider.cs" />
+    <Compile Include="view\vis\render\RegresserRenderer.xaml.cs">
+      <DependentUpon>RegresserRenderer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\render\Renderer.cs" />
     <Compile Include="view\vis\OperationContainerView.xaml.cs">
       <DependentUpon>OperationContainerView.xaml</DependentUpon>
@@ -543,6 +553,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="view\vis\render\ClassifierRenderer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="view\vis\render\DefinitionRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -564,6 +578,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\OperationContainerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\RegresserRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
