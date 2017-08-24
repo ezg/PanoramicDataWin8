@@ -7,6 +7,7 @@ using Windows.UI.Xaml.Media;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.model.data.attribute;
+using System.Collections.Generic;
 
 namespace PanoramicDataWin8.model.view.operation
 {
@@ -154,6 +155,23 @@ namespace PanoramicDataWin8.model.view.operation
 
         }
         public AttributeUsageOperationModel AttributeUsageOperationModel => (AttributeUsageOperationModel)OperationModel;
+
+        List<AttributeGroupModel> findAllNestedGroups(AttributeGroupModel attributeGroupModel)
+        {
+            var models = new List<AttributeGroupModel>();
+            if (attributeGroupModel != null)
+            {
+                models.Add(attributeGroupModel);
+                foreach (var at in attributeGroupModel.InputModels)
+                    if (at is AttributeGroupModel)
+                        models.AddRange(findAllNestedGroups(at as AttributeGroupModel));
+            }
+            return models;
+        }
+        bool attributeTransformationModelContainsAttributeModel(AttributeModel testAttributeModel, AttributeTransformationModel newAttributeTransformationModel)
+        {
+            return findAllNestedGroups(newAttributeTransformationModel.AttributeModel as AttributeGroupModel).Contains(testAttributeModel);
+        }
         protected void createTopInputsExpandingMenu()
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Top);
@@ -188,7 +206,8 @@ namespace PanoramicDataWin8.model.view.operation
                 CanDrop = true
             };
             attr1.DroppedTriggered = attributeTransformationModel => {
-                if (!AttributeUsageOperationModel.AttributeUsageTransformationModels.Contains(attributeTransformationModel))
+                if (!AttributeUsageOperationModel.AttributeUsageTransformationModels.Contains(attributeTransformationModel) &&
+                    !attributeTransformationModelContainsAttributeModel((AttributeUsageOperationModel as AttributeGroupOperationModel)?.AttributeGroupModel, attributeTransformationModel))
                     AttributeUsageOperationModel.AttributeUsageTransformationModels.Add(attributeTransformationModel);
             };
 
