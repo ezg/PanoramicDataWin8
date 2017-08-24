@@ -30,14 +30,8 @@ namespace PanoramicDataWin8.model.data.attribute
             }
             public string Code { get => _code; set => _code = value; }
         }
-        public class AttributeIndexFuncModel : AttributeFuncModel
+        public class AttributeColumnFuncModel : AttributeFuncModel
         {
-            int _index = -1;
-            public AttributeIndexFuncModel(int index)
-            {
-                _index = index;
-            }
-            public int Index { get => _index; }
         }
 
         public abstract AttributeFuncModel FuncModel { get; set;  }

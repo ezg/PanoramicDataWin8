@@ -6,23 +6,23 @@ using PanoramicDataWin8.model.data.attribute;
 namespace PanoramicDataWin8.model.data.idea
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class IDEAAttributeIndexedFieldModel : AttributeFieldModel
+    public class IDEAAttributeColumnFieldModel : AttributeFieldModel
     {
         private string _displayName = "";
 
-        private AttributeIndexFuncModel _index = null;
+        private AttributeColumnFuncModel _column = null;
 
         private string _rawName = "";
 
         private List<VisualizationHint> _visualizationHints = new List<VisualizationHint>();
 
-        public IDEAAttributeIndexedFieldModel(string rawName, string displayName, int index, DataType dataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
+        public IDEAAttributeColumnFieldModel(string rawName, string displayName, DataType dataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
         {
             _rawName = rawName;
             _displayName = displayName;
             DataType = dataType;
             InputVisualizationType = inputVisualizationType;
-            _index = new AttributeIndexFuncModel(index);
+            _column = new AttributeColumnFuncModel();
             _visualizationHints = visualizationHints;
         }
 
@@ -39,8 +39,8 @@ namespace PanoramicDataWin8.model.data.idea
         }
         public override AttributeFuncModel FuncModel
         {
-            get { return _index; }
-            set { SetProperty(ref _index, value as AttributeIndexFuncModel); }
+            get { return _column; }
+            set { SetProperty(ref _column, value as AttributeColumnFuncModel); }
         }
 
         public override string RawName

@@ -178,7 +178,7 @@
     <Compile Include="model\data\operation\VisualizationType.cs" />
     <Compile Include="model\data\operation\VisualOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\OriginModel.cs" />
-    <Compile Include="model\data\idea\IDEAAttributeIndexedFieldModel.cs" />
+    <Compile Include="model\data\idea\IDEAAttributeColumnFieldModel.cs" />
     <Compile Include="model\data\idea\IDEAOriginModel.cs" />
     <Compile Include="model\data\idea\IDEASchemaModel.cs" />
     <Compile Include="model\data\operation\HistogramOperationModel.cs" />

@@ -28,11 +28,10 @@ namespace PanoramicDataWin8.controller.data.progressive
             {
                 return new AttributeCodeParameters();
             } else
-            if (atm.FuncModel is AttributeFieldModel.AttributeIndexFuncModel)
+            if (atm.FuncModel is AttributeFieldModel.AttributeColumnFuncModel)
             {
-                return new AttributeIndexParameters()
+                return new AttributeColumnParameters()
                 {
-                    Index = ((AttributeModel.AttributeIndexFuncModel) atm.FuncModel).Index,
                     RawName = atm.RawName,
                     VisualizationHints = atm.VisualizationHints
                 };
@@ -425,9 +424,9 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         public static AttributeModel GetAttributeModelFromAttribute(Attribute attribute)
         {
-            var attributeModel = new IDEAAttributeIndexedFieldModel(
+            var attributeModel = new IDEAAttributeColumnFieldModel(
                 attribute.RawName,
-                attribute.DisplayName, attribute.Index,
+                attribute.DisplayName, 
                 attribute.DataType,
                 attribute.DataType == DataType.String ? "enum" : "numeric",
                 attribute.VisualizationHints);

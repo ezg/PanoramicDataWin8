@@ -49,7 +49,7 @@ namespace PanoramicDataWin8.model.data.idea
 
         private void recursiveCreateAttributeModels(Attribute attribute, AttributeGroupModel parentGroupModel)
         {
-            var fieldAttributeModel = new IDEAAttributeIndexedFieldModel(attribute.RawName, attribute.DisplayName, attribute.Index,
+            var fieldAttributeModel = new IDEAAttributeColumnFieldModel(attribute.RawName, attribute.DisplayName,
                 attribute.DataType,
                 attribute.DataType == DataType.String ? "enum" : "numeric", attribute.VisualizationHints);
 
