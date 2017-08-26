@@ -103,6 +103,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="controller\data\idea\ExecuteOperationModelEventArgs.cs" />
+    <Compile Include="controller\data\idea\ClassifierOperationJob.cs" />
     <Compile Include="controller\data\idea\RecommenderOperationJob.cs" />
     <Compile Include="controller\data\idea\CodeCommand.cs" />
     <Compile Include="controller\data\idea\RiskOperationJob.cs" />
@@ -357,6 +358,7 @@
     <Compile Include="view\vis\render\DefinitionRenderer.xaml.cs">
       <DependentUpon>DefinitionRenderer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\vis\render\ClassifierRendererContentProvider.cs" />
     <Compile Include="view\vis\render\FilterRenderer.xaml.cs">
       <DependentUpon>FilterRenderer.xaml</DependentUpon>
     </Compile>

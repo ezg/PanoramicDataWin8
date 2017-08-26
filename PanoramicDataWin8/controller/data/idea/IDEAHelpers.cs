@@ -7,6 +7,7 @@ using IDEA_common.catalog;
 using IDEA_common.operations;
 using IDEA_common.operations.example;
 using IDEA_common.operations.histogram;
+using IDEA_common.operations.ml.optimizer;
 using IDEA_common.operations.recommender;
 using IDEA_common.operations.risk;
 using IDEA_common.range;
@@ -185,6 +186,27 @@ namespace PanoramicDataWin8.controller.data.progressive
                 KeepSamples = false
             };
             return parameters;
+        }
+
+        public static OptimizerOperationParameters GetOptimizerOperationParameters(ClassifierOperationModel model, int sampleSize)
+        {
+            var filterModels = new List<FilterModel>();
+            var filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
+
+            var psm = model.SchemaModel as IDEASchemaModel;
+            var param = new OptimizerOperationParameters()
+            {
+                AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
+                Filter = filter,
+                LabelAttribute = GetAttributeParameters(model.ClassifierAttributeUsageTransformationModel.AttributeModel),
+                ProblemType = ProblemType.Classification,
+                SampleStreamBlockSize = sampleSize,
+                FeatureAttributes = psm.RootOriginModel.InputModels
+                    .Where(im => im.DataType != DataType.String && im != model.ClassifierAttributeUsageTransformationModel.AttributeModel)
+                    .Select(im => GetAttributeParameters(im)).ToList()
+            };
+            
+            return param;
         }
 
         public static RecommenderOperationParameters GetRecommenderOperationParameters(RecommenderOperationModel model, int sampleSize)

@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.view.vis.render
 {
     public sealed partial class ClassifierRenderer : Renderer, IScribbable
     {
-       // private ExampleRendererContentProvider _exampleRendererContentProvider = new ExampleRendererContentProvider();
+        private ClassifierRendererContentProvider _classifierRendererContentProvider = new ClassifierRendererContentProvider();
 
 
         public ClassifierRenderer()
@@ -49,9 +49,9 @@ namespace PanoramicDataWin8.view.vis.render
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
 
-            //_exampleRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
-            //_exampleRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
-            //dxSurface.ContentProvider = _exampleRendererContentProvider;
+            _classifierRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
+            _classifierRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
+            dxSurface.ContentProvider = _classifierRendererContentProvider;
         }
 
         public override void Dispose()
@@ -115,9 +115,9 @@ namespace PanoramicDataWin8.view.vis.render
         void loadResult(IResult result)
         {
             ClassifierOperationViewModel model = (DataContext as ClassifierOperationViewModel);
-            //_exampleRendererContentProvider.UpdateData(result,
-            //    (ExampleOperationModel)model.OperationModel,
-            //    (ExampleOperationModel)model.OperationModel.ResultCauserClone);
+            _classifierRendererContentProvider.UpdateData(result,
+                (ClassifierOperationModel)model.OperationModel,
+                (ClassifierOperationModel)model.OperationModel.ResultCauserClone);
         }
 
 

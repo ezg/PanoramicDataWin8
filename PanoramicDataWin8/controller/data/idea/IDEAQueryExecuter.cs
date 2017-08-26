@@ -93,6 +93,16 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 recommenderOperationModel,
                                 TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
                         }
+                        else if (operationModel is ClassifierOperationModel)
+                        {
+                            var classifierOperationModel = (ClassifierOperationModel)operationModel;
+                            if (classifierOperationModel.ClassifierAttributeUsageTransformationModel != null)
+                            {
+                                newJob = new RecommenderOperationJob(
+                                    classifierOperationModel,
+                                    TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
+                            }
+                        }
 
 
                         if (newJob != null)

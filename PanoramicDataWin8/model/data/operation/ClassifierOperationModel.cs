@@ -8,25 +8,13 @@ namespace PanoramicDataWin8.model.data.operation
     {
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
-        private double _dummyValue = 50;
-
         public ClassifierOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
         public AttributeTransformationModel ClassifierAttributeUsageTransformationModel { get; set; }
-
-        public double DummyValue
-        {
-            get { return _dummyValue; }
-            set
-            {
-                SetProperty(ref _dummyValue, value);
-                FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
-            }
-        }
-
+        
         public FilteringOperation FilteringOperation
         {
             get { return _filterConsumerOperationModelImpl.FilteringOperation; }
