@@ -20,7 +20,7 @@
                     VerticalAlignment="Stretch"
                     HorizontalAlignment="Stretch"
                     TextAlignment="Center"  
-                    MaxWidth="{Binding Size.X}"  FontSize="14" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
+                   FontSize="14" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
             </Viewbox>
         </Border>
     </Grid>

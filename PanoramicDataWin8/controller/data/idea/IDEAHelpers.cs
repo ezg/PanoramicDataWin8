@@ -203,8 +203,11 @@ namespace PanoramicDataWin8.controller.data.progressive
                 SampleStreamBlockSize = sampleSize,
                 FeatureAttributes = psm.RootOriginModel.InputModels
                     .Where(im => im.DataType != DataType.String && im != model.ClassifierAttributeUsageTransformationModel.AttributeModel)
-                    .Select(im => GetAttributeParameters(im)).ToList()
-            };
+                    .Select(im => GetAttributeParameters(im)).ToList(),
+                NrOfBanditRuns = 100,
+                NrOfCrossValidations = 1,
+                AttributeCodeParameters = IDEAAttributeComputedFieldModel.GetAllCode()
+        };
             
             return param;
         }

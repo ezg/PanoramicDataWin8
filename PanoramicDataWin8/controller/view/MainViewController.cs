@@ -154,7 +154,7 @@ namespace PanoramicDataWin8.controller.view
 
             var other = new OperationTypeGroupModel {Name = "create", OperationType = OperationType.Group};
             parent.OperationTypeModels.Add(other);
-            other.OperationTypeModels.Add(new OperationTypeModel { Name = "attribute Group", OperationType = OperationType.AttributeGroup });
+            other.OperationTypeModels.Add(new OperationTypeModel { Name = "attribute\ngroup", OperationType = OperationType.AttributeGroup });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "filter", OperationType = OperationType.Filter });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "definition", OperationType = OperationType.Definition });
             other.OperationTypeModels.Add(new OperationTypeModel { Name = "calculation", OperationType = OperationType.Calculation });
