@@ -35,6 +35,7 @@ namespace PanoramicDataWin8.view.vis.render
             this.DataContextChanged += DefinitionRenderer_DataContextChanged;
             this.SizeChanged += DefinitionRenderer_SizeChanged;
             this.PointerExited += DefinitionRenderer_PointerExited;
+            this.Tapped += DefinitionRenderer_Tapped;
         }
         
         private void DefinitionRenderer_OperationViewModelTapped(object sender, EventArgs e)
@@ -64,9 +65,9 @@ namespace PanoramicDataWin8.view.vis.render
             var model = ((DataContext as DefinitionOperationViewModel).OperationModel as DefinitionOperationModel);
 
             if (model.GetDescriptorFromColor(_textBrush.Color) == null)
-                model.SetDescriptorForColor(_textBrush.Color, new DefinitionOperationModel.BrushDescriptor(_textBrush.Color, "Rest"));
+                model.SetDescriptorForColor(_textBrush.Color, new BrushDescriptor(_textBrush.Color, "Rest"));
             if (model.GetDescriptorFromColor(Colors.Black) == null)
-                model.SetDescriptorForColor(Colors.Black,     new DefinitionOperationModel.BrushDescriptor(Colors.Black, "Overlap"));
+                model.SetDescriptorForColor(Colors.Black,     new BrushDescriptor(Colors.Black, "Overlap"));
             model.PropertyChanged -= OperationModel_PropertyChanged;
             model.OperationModelUpdated -= OperationModelUpdated;
             if (args.NewValue != null)
@@ -98,7 +99,7 @@ namespace PanoramicDataWin8.view.vis.render
             foreach (var c in model.BrushColors)
             {
                 if (model.GetDescriptorFromColor(c) == null)
-                    model.SetDescriptorForColor(c, new DefinitionOperationModel.BrushDescriptor(c, "<name>"));
+                    model.SetDescriptorForColor(c, new BrushDescriptor(c, "<name>"));
                 createBrushLabel(model, numLabels, model.GetDescriptorFromColor(c), model.BrushColors.IndexOf(c));
             }
             if (model.BrushColors.Count > 1)
@@ -106,51 +107,26 @@ namespace PanoramicDataWin8.view.vis.render
             createBrushLabel(model, numLabels, model.GetDescriptorFromColor(_textBrush.Color), model.BrushColors.Count + 1);
             model.UpdateCode();
         }
-
-        private void createBrushLabel(DefinitionOperationModel model, int numLabels, DefinitionOperationModel.BrushDescriptor d, int rowIndex)
+        private void createBrushLabel(DefinitionOperationModel model, int numLabels, BrushDescriptor d, int rowIndex)
         {
-            var rd = new RowDefinition();
-            rd.Height = new GridLength(0.5, GridUnitType.Star);
+            var rd = new RowDefinition() { Height = new GridLength(0.5, GridUnitType.Star) };
             Labels.RowDefinitions.Add(rd);
-            var panelHeight = (ActualHeight - 10 * numLabels) / numLabels;
-            var panel = new Grid();
-            Grid.SetRow(panel, rowIndex);
-            panel.Height = panelHeight;
-            panel.VerticalAlignment = VerticalAlignment.Stretch;
-            panel.HorizontalAlignment = HorizontalAlignment.Stretch;
-            panel.Background = new SolidColorBrush(d.Color);
-            panel.Margin = new Thickness(5, 5, 5, 0);
 
-            var tb = new TextBox();
-            tb.Tag = d.Color;
-            tb.TextChanged += Tb_TextChanged;
-            tb.HorizontalAlignment = HorizontalAlignment.Stretch;
-            tb.Foreground = new SolidColorBrush(Colors.White);
-            tb.Background = new SolidColorBrush(d.Color);
-            tb.FontSize = panelHeight / 2;
-            tb.Text = d.Name;
-            tb.Margin = new Thickness(0);
-            var vbox = new Viewbox();
-            vbox.VerticalAlignment = VerticalAlignment.Stretch;
-            vbox.HorizontalAlignment = HorizontalAlignment.Stretch;
-            Grid.SetRow(vbox, rowIndex);
-            vbox.Child = tb;
-            vbox.Height = panelHeight;
-            vbox.Margin = new Thickness(5, 5, 5, 0);
-            Labels.Children.Add(panel);
-            Labels.Children.Add(vbox);
+            var textGrid = new DefinitionLabel() { DataContext = d, DefinitionOperationModel = model };
+            textGrid.Background = new SolidColorBrush(d.Color);
+            textGrid.HorizontalAlignment = HorizontalAlignment.Stretch;
+            textGrid.Height = (ActualHeight - 5 * numLabels) / numLabels;
+
+            Grid.SetRow(textGrid, rowIndex);
+            Labels.Children.Add(textGrid);
         }
 
-        private void Tb_TextChanged(object sender, TextChangedEventArgs e)
+        private void DefinitionRenderer_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            var model = ((DataContext as DefinitionOperationViewModel).OperationModel as DefinitionOperationModel);
-            var senderCol = (Color)((sender as TextBox).Tag);
-            (sender as TextBox).FontStyle = Windows.UI.Text.FontStyle.Normal;
-            if (PanoramicDataWin8.model.data.attribute.AttributeTransformationModel.MatchesExistingField((sender as TextBox).Text, true) == null)
-                model.SetDescriptorForColor(senderCol, new DefinitionOperationModel.BrushDescriptor(senderCol, (sender as TextBox).Text));
-            else (sender as TextBox).FontStyle = Windows.UI.Text.FontStyle.Italic;
-            
-            model.UpdateCode();
+            var elementStack =
+              VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), null);
+            foreach (var label in elementStack.Where((el) => el is DefinitionLabel).Select((vb) => vb as DefinitionLabel))
+                label.Activate();
         }
 
         public List<IScribbable> Children

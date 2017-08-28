@@ -354,6 +354,9 @@
     <Compile Include="view\vis\render\ClassifierRenderer.xaml.cs">
       <DependentUpon>ClassifierRenderer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\vis\render\DefinitionLabel.xaml.cs">
+      <DependentUpon>DefinitionLabel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\render\DefinitionRenderer.xaml.cs">
       <DependentUpon>DefinitionRenderer.xaml</DependentUpon>
     </Compile>
@@ -554,6 +557,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\vis\render\ClassifierRenderer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\DefinitionLabel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

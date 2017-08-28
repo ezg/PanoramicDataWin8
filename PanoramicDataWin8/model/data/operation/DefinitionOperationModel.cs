@@ -1,13 +1,40 @@
 ﻿using IDEA_common.catalog;
 using PanoramicDataWin8.model.data.idea;
+using PanoramicDataWin8.utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Windows.UI;
+using Windows.UI.Xaml;
 using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 
 namespace PanoramicDataWin8.model.data.operation
 {
+    public class BrushDescriptor : ExtendedBindableBase
+    {
+        string _name;
+        public BrushDescriptor()
+        {
+
+        }
+        public BrushDescriptor(Color color, string name)
+        {
+            Color = color;
+            Name = name;
+        }
+        public string Name
+        {
+            get
+            {
+                return _name;
+            }
+            set
+            {
+                SetProperty(ref _name, value);
+            }
+        }
+        public Color Color { get; set; }
+    }
     public class DefinitionOperationModel : OperationModel, IBrushableOperationModel
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
@@ -22,20 +49,6 @@ namespace PanoramicDataWin8.model.data.operation
                                new List<VisualizationHint>());
             }
             _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
-        }
-        public class BrushDescriptor
-        {
-            public BrushDescriptor()
-            {
-
-            }
-            public BrushDescriptor(Color color, string name)
-            {
-                Color = color;
-                Name = name;
-            }
-            public string Name { get; set; }
-            public Color Color { get; set; }
         }
         public List<BrushDescriptor> BrushDescriptors { get; set; } = new List<BrushDescriptor>();
 
