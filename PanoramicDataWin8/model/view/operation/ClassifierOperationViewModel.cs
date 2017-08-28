@@ -30,8 +30,8 @@ namespace PanoramicDataWin8.model.view.operation
                 ColumnSpan = 1,
                 RowSpan = 1,
                 Column = 0,
-                Size = new Vec(25, 25),
-                TargetSize = new Vec(25, 25),
+                Size = new Vec(50, 25),
+                TargetSize = new Vec(50, 25),
                 IsAlwaysDisplayed = false,
                 IsWidthBoundToParent = false,
                 IsHeightBoundToParent = false,
@@ -39,7 +39,7 @@ namespace PanoramicDataWin8.model.view.operation
             };
             var attr1 = new AttributeTransformationMenuItemViewModel
             {
-                Label = "x",
+                Label = "label",
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
                 CanDrag = false,
                 CanDrop = true
@@ -82,6 +82,8 @@ namespace PanoramicDataWin8.model.view.operation
                 };
                 newMenuItem.MenuItemComponentViewModel = newAttr;
                 menuViewModel.MenuItemViewModels.Add(newMenuItem);
+
+                ClassifierOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
             };
 
 
