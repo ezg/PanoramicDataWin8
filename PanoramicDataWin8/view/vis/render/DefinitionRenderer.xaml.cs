@@ -109,13 +109,13 @@ namespace PanoramicDataWin8.view.vis.render
         }
         private void createBrushLabel(DefinitionOperationModel model, int numLabels, BrushDescriptor d, int rowIndex)
         {
-            var rd = new RowDefinition() { Height = new GridLength(0.5, GridUnitType.Star) };
+            var rd = new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) };
             Labels.RowDefinitions.Add(rd);
 
             var textGrid = new DefinitionLabel() { DataContext = d, DefinitionOperationModel = model };
             textGrid.Background = new SolidColorBrush(d.Color);
             textGrid.HorizontalAlignment = HorizontalAlignment.Stretch;
-            textGrid.Height = (ActualHeight - 5 * numLabels) / numLabels;
+            textGrid.Height = textGrid.FontSize = (ActualHeight - 5 * numLabels) / numLabels;
 
             Grid.SetRow(textGrid, rowIndex);
             Labels.Children.Add(textGrid);
