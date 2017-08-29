@@ -306,10 +306,18 @@ namespace PanoramicDataWin8
                     _hypothesisMenuViewModel.IsDisplayed = false;
                 }
             }
-            
-            if (!VisualTreeHelper.FindElementsInHostCoordinates(e.GetCurrentPoint(null).Position, null).
-                Contains(FocusManager.GetFocusedElement()))
-                addAttributeButton.Focus(FocusState.Pointer);
+
+            var fe = FocusManager.GetFocusedElement() as FrameworkElement;
+            if (fe != null)
+            {
+                var bounds = fe.GetBounds();
+                var p = e.GetCurrentPoint(fe).Position;
+                if (!bounds.Contains(p))
+                {
+                    addAttributeButton.Focus(FocusState.Pointer);
+                }
+
+            }
         }
 
         private void MainPage_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
