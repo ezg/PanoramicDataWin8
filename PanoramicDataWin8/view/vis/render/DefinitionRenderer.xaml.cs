@@ -51,6 +51,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void DefinitionRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
+            args.Handled = true;
             var viewModel = (DataContext as DefinitionOperationViewModel);
             if (viewModel != null)
             {
