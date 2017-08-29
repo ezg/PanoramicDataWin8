@@ -74,17 +74,6 @@ namespace PanoramicDataWin8.utils
 
         void frameworkElement_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            var fe = FocusManager.GetFocusedElement() as FrameworkElement;
-            if (fe is TextBox)
-            {
-                var bounds = fe.GetBounds();
-                var p = e.GetCurrentPoint(fe).Position;
-                if (bounds.Contains(p))
-                {
-                    return;
-                }
-
-            }
             if (Convert.ToBoolean(_supportedContacts.TouchPresent) && (_numActiveContacts > _supportedContacts.Contacts))
             {
                 Debug.WriteLine("Number of contacts exceeds the number supported by the device.");
