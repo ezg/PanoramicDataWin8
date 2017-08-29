@@ -58,11 +58,17 @@ namespace PanoramicDataWin8.model.data.operation
                 GetDescriptorFromColor(c).Name = d.Name;
             else BrushDescriptors.Add(d);
         }
-        public BrushDescriptor GetDescriptorFromColor(Color c)
+        public BrushDescriptor GetDescriptorFromColor(Color c, string nameIfNull=null)
         {
             foreach (var d in BrushDescriptors)
                 if (d.Color == c)
                     return d;
+            if (nameIfNull != null)
+            {
+                var newBrush = new BrushDescriptor(c, nameIfNull);
+                SetDescriptorForColor(c, newBrush);
+                return newBrush;
+            }
             return null;
         }
 

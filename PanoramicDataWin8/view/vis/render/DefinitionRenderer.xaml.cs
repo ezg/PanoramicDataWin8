@@ -98,9 +98,7 @@ namespace PanoramicDataWin8.view.vis.render
             int numLabels = model.BrushColors.Count + 1 + (model.BrushColors.Count > 1 ? 1 : 0);
             foreach (var c in model.BrushColors)
             {
-                if (model.GetDescriptorFromColor(c) == null)
-                    model.SetDescriptorForColor(c, new BrushDescriptor(c, "<name>"));
-                createBrushLabel(model, numLabels, model.GetDescriptorFromColor(c), model.BrushColors.IndexOf(c));
+                createBrushLabel(model, numLabels, model.GetDescriptorFromColor(c, "<name>"), model.BrushColors.IndexOf(c));
             }
             if (model.BrushColors.Count > 1)
                 createBrushLabel(model, numLabels, model.GetDescriptorFromColor(Colors.Black), model.BrushColors.Count);
@@ -112,11 +110,11 @@ namespace PanoramicDataWin8.view.vis.render
             var rd = new RowDefinition() { Height = new GridLength(1, GridUnitType.Star) };
             Labels.RowDefinitions.Add(rd);
 
-            var textGrid = new DefinitionLabel() { DataContext = d, DefinitionOperationModel = model };
-            textGrid.Background = new SolidColorBrush(d.Color);
-            textGrid.HorizontalAlignment = HorizontalAlignment.Stretch;
-            textGrid.Height = textGrid.FontSize = (ActualHeight - 5 * numLabels) / numLabels;
-
+            var textGrid = new DefinitionLabel() {
+                DataContext = d,
+                DefinitionOperationModel = model,
+                Height = FontSize = (ActualHeight - 5 * numLabels) / numLabels
+            };
             Grid.SetRow(textGrid, rowIndex);
             Labels.Children.Add(textGrid);
         }
