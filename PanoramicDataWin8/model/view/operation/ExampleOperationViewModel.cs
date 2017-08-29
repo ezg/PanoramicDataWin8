@@ -52,7 +52,7 @@ namespace PanoramicDataWin8.model.view.operation
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
 
-            OperationViewModelTapped += (sender, args) =>
+            OperationViewModelTapped += (args) =>
             {
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
@@ -163,7 +163,7 @@ namespace PanoramicDataWin8.model.view.operation
             };
 
 
-            OperationViewModelTapped += (sender, args) =>
+            OperationViewModelTapped += (args) =>
             {
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
@@ -227,7 +227,7 @@ namespace PanoramicDataWin8.model.view.operation
                 (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
 
 
-            OperationViewModelTapped += (sender, args) =>
+            OperationViewModelTapped += (args) =>
             {
                 attachmentViewModel.ActiveStopwatch.Restart();
             };

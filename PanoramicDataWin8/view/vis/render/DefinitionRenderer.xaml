@@ -126,7 +126,7 @@
 
         </Page.Resources>
         <Grid Background="{StaticResource lightBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-            <Grid Name="Labels" IsHitTestVisible="False" Background="{StaticResource lightBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid Name="Labels" Background="{StaticResource lightBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="0.5*"/>
                     <RowDefinition Height="0.5*"/>

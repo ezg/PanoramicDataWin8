@@ -13,6 +13,7 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class DefinitionOperationViewModel : OperationViewModel
     {
+        public DefinitionOperationModel DefinitionOperationModel {  get { return OperationModel as DefinitionOperationModel;  } }
         private void createDefinitionMenu(AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {

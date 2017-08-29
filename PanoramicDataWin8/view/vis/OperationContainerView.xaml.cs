@@ -116,9 +116,11 @@ namespace PanoramicDataWin8.view.vis
 
         void operationContainerView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
+            args.Handled = true;
             if (args.NewValue != null)
             {
                 OperationViewModel model = ((OperationViewModel) args.NewValue);
+                model.OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
                 model.OperationModel.PropertyChanged += OperationModel_PropertyChanged;
                 operationTypeUpdated();
             }
@@ -366,7 +368,7 @@ namespace PanoramicDataWin8.view.vis
 
                 if (!used)
                 {
-                    ((OperationViewModel)DataContext).FireOperationViewModelTapped();
+                    ((OperationViewModel)DataContext).FireOperationViewModelTapped(e);
                     foreach (var avm in model.AttachementViewModels)
                     {
                         //avm.ActiveStopwatch.Restart();

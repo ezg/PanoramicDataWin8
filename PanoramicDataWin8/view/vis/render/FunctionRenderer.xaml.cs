@@ -65,7 +65,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        private void OperationViewModelTapped(object sender, EventArgs e)
+        private void OperationViewModelTapped(PointerRoutedEventArgs e)
         {
             NameTextBox.IsEnabled = true;
             NameTextBox.Focus(FocusState.Keyboard);

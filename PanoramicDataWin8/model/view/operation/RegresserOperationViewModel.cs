@@ -85,7 +85,7 @@ namespace PanoramicDataWin8.model.view.operation
             };
 
 
-            OperationViewModelTapped += (sender, args) =>
+            OperationViewModelTapped += (args) =>
             {
                 attachmentViewModel.ActiveStopwatch.Restart();
             };

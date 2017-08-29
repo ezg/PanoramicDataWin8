@@ -13,6 +13,7 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class CalculationOperationViewModel : OperationViewModel
     {
+        public CalculationOperationModel CalculationOperationModel {  get { return OperationModel as CalculationOperationModel;  } }
         private void createCalculationMenu(AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {

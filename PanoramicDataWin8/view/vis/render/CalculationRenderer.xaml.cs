@@ -38,61 +38,22 @@ namespace PanoramicDataWin8.view.vis.render
         public CalculationRenderer()
         {
             this.InitializeComponent();
-            this.DataContextChanged += CalculationRenderer_DataContextChanged;
-            this.SizeChanged += CalculationRenderer_SizeChanged;
-            this.PointerExited += CalculationRenderer_PointerExited;
+            this.CodeBox.LostFocus += (sender, e) => Labels.IsHitTestVisible = false;
         }
-        private void CalculationRenderer_OperationViewModelTapped(object sender, EventArgs e)
+        public override void StartSelection(Point point)
         {
-            Labels.IsHitTestVisible = true;
-        }
-
-        private void CalculationRenderer_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            Labels.IsHitTestVisible = false;
-        }
-        private void CalculationRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Relayout();
-        }
-
-        public override void Dispose()
-        {
-            base.Dispose();
-            (DataContext as CalculationOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
-            (DataContext as CalculationOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
-
-        }
-
-        private void CalculationRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-        {
-            var model = ((DataContext as CalculationOperationViewModel).OperationModel as CalculationOperationModel);
-            model.PropertyChanged -= OperationModel_PropertyChanged;
-            model.OperationModelUpdated -= OperationModelUpdated;
-            if (args.NewValue != null)
+            var bounds = CodeBox.GetBoundingRect(MainViewController.Instance.InkableScene);
+            if (bounds.Contains(point))
             {
-                model.PropertyChanged += OperationModel_PropertyChanged;
-                model.OperationModelUpdated += OperationModelUpdated;
+                CodeBox.Focus(FocusState.Keyboard);
+                CodeBox.Focus(FocusState.Pointer);
+                Labels.IsHitTestVisible = true;
             }
-            (DataContext as CalculationOperationViewModel).OperationViewModelTapped += CalculationRenderer_OperationViewModelTapped;
         }
-
-
-        void OperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            Relayout();
-        }
-        void OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
-        {
-            Relayout();
-        }
+        
         private SolidColorBrush _textBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
         private readonly SolidColorBrush _lightBrush = new SolidColorBrush(Helpers.GetColorFromString("#e6e6e6"));
-
-        void Relayout()
-        {
-
-        }
+        
 
         private async void Tb_TextChanged(object sender, TextChangedEventArgs e)
         {

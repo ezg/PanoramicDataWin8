@@ -8,6 +8,7 @@ using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.model.data.attribute;
 using System.Collections.Generic;
+using Windows.UI.Xaml.Input;
 
 namespace PanoramicDataWin8.model.view.operation
 {
@@ -134,11 +135,12 @@ namespace PanoramicDataWin8.model.view.operation
             get { return new Rct(Position, Size); }
         }
 
-        public event EventHandler OperationViewModelTapped;
+        public delegate void PointerEventHandler(PointerRoutedEventArgs e);
+        public event PointerEventHandler OperationViewModelTapped;
 
-        public void FireOperationViewModelTapped()
+        public void FireOperationViewModelTapped(PointerRoutedEventArgs e)
         {
-            OperationViewModelTapped?.Invoke(this, new EventArgs());
+            OperationViewModelTapped?.Invoke(e);
         }
 
         private void selectColor()
@@ -290,7 +292,7 @@ namespace PanoramicDataWin8.model.view.operation
             };
 
 
-            OperationViewModelTapped += (sender, args) =>
+            OperationViewModelTapped += (args) =>
             {
                 attachmentViewModel.ActiveStopwatch.Restart();
             };

@@ -19,6 +19,7 @@ using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.model.data.operation;
 using System.ComponentModel;
 using Windows.UI;
+using PanoramicDataWin8.controller.view;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -29,66 +30,40 @@ namespace PanoramicDataWin8.view.vis.render
     /// </summary>
     public sealed partial class DefinitionRenderer : Renderer, IScribbable
     {
+        private SolidColorBrush _textBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
+        private readonly SolidColorBrush _lightBrush = new SolidColorBrush(Helpers.GetColorFromString("#e6e6e6"));
         public DefinitionRenderer()
         {
             this.InitializeComponent();
             this.DataContextChanged += DefinitionRenderer_DataContextChanged;
-            this.SizeChanged += DefinitionRenderer_SizeChanged;
-            this.PointerExited += DefinitionRenderer_PointerExited;
-            this.Tapped += DefinitionRenderer_Tapped;
-        }
-        
-        private void DefinitionRenderer_OperationViewModelTapped(object sender, EventArgs e)
-        {
-            Labels.IsHitTestVisible = true;
-        }
-
-        private void DefinitionRenderer_PointerExited(object sender, PointerRoutedEventArgs e)
-        {
-            Labels.IsHitTestVisible = false;
-        }
-        private void DefinitionRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Relayout();
-        }
-
-        public override void Dispose()
-        {
-            base.Dispose();
-            (DataContext as DefinitionOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
-            (DataContext as DefinitionOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
+            this.SizeChanged += (sender, e) => Relayout();
            
+        }
+        public override void StartSelection(Point point)
+        {
+            foreach (var label in Labels.Children.Select((c) => c as DefinitionLabel))
+            {
+                var bounds = label.GetBoundingRect(MainViewController.Instance.InkableScene);
+                if (bounds.Contains(point))
+                    label.Activate();
+            }
         }
 
         private void DefinitionRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            var model = ((DataContext as DefinitionOperationViewModel).OperationModel as DefinitionOperationModel);
-
-            if (model.GetDescriptorFromColor(_textBrush.Color) == null)
-                model.SetDescriptorForColor(_textBrush.Color, new BrushDescriptor(_textBrush.Color, "Rest"));
-            if (model.GetDescriptorFromColor(Colors.Black) == null)
-                model.SetDescriptorForColor(Colors.Black,     new BrushDescriptor(Colors.Black, "Overlap"));
-            model.PropertyChanged -= OperationModel_PropertyChanged;
-            model.OperationModelUpdated -= OperationModelUpdated;
-            if (args.NewValue != null)
+            var viewModel = (DataContext as DefinitionOperationViewModel);
+            if (viewModel != null)
             {
-                model.PropertyChanged += OperationModel_PropertyChanged;
-                model.OperationModelUpdated += OperationModelUpdated;
+                if (viewModel.DefinitionOperationModel?.GetDescriptorFromColor(_textBrush.Color) == null)
+                    viewModel.DefinitionOperationModel.SetDescriptorForColor(_textBrush.Color, new BrushDescriptor(_textBrush.Color, "Rest"));
+                if (viewModel.DefinitionOperationModel?.GetDescriptorFromColor(Colors.Black) == null)
+                    viewModel.DefinitionOperationModel.SetDescriptorForColor(Colors.Black, new BrushDescriptor(Colors.Black, "Overlap"));
+                viewModel.DefinitionOperationModel.PropertyChanged -= (s, e) => Relayout();
+                viewModel.DefinitionOperationModel.OperationModelUpdated -= (s, e) => Relayout();
+                viewModel.DefinitionOperationModel.PropertyChanged += (s, e) => Relayout();
+                viewModel.DefinitionOperationModel.OperationModelUpdated += (s, e) => Relayout();
             }
-            (DataContext as DefinitionOperationViewModel).OperationViewModelTapped += DefinitionRenderer_OperationViewModelTapped;
         }
-
-
-        void OperationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            Relayout();
-        }
-        void OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
-        {
-            Relayout();
-        }
-        private SolidColorBrush _textBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
-        private readonly SolidColorBrush _lightBrush = new SolidColorBrush(Helpers.GetColorFromString("#e6e6e6"));
 
         void Relayout()
         {
@@ -117,17 +92,6 @@ namespace PanoramicDataWin8.view.vis.render
             };
             Grid.SetRow(textGrid, rowIndex);
             Labels.Children.Add(textGrid);
-        }
-
-        private void DefinitionRenderer_Tapped(object sender, TappedRoutedEventArgs e)
-        {
-            var elementStack =
-              VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), null);
-            foreach (var label in elementStack.Where((el) => el is DefinitionLabel).Select((vb) => vb as DefinitionLabel))
-            {
-                label.Activate();
-                e.Handled = true;
-            }
         }
 
         public List<IScribbable> Children

@@ -56,7 +56,7 @@ namespace PanoramicDataWin8.model.view.operation
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
 
-            OperationViewModelTapped += (sender, args) =>
+            OperationViewModelTapped += (args) =>
             {
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
@@ -99,7 +99,7 @@ namespace PanoramicDataWin8.model.view.operation
                 Label = "Apply"
             };
 
-            OperationViewModelTapped += (sender, args) =>
+            OperationViewModelTapped += (args) =>
             {
                 attachmentViewModel.ActiveStopwatch.Restart();
             };

@@ -283,6 +283,18 @@ namespace PanoramicDataWin8
 
         private void MainPage_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+
+            var fe = FocusManager.GetFocusedElement() as FrameworkElement;
+            if (fe is TextBox)
+            {
+                var bounds = fe.GetBounds();
+                var p = e.GetCurrentPoint(fe).Position;
+                if (!bounds.Contains(p))
+                {
+                    addAttributeButton.Focus(FocusState.Pointer);
+                }
+                return;
+            }
             var ancestors = (e.OriginalSource as FrameworkElement).GetAncestors();
             if (!ancestors.Contains(addAttributeButton) && !ancestors.Contains(menuGrid))
             {
@@ -305,18 +317,6 @@ namespace PanoramicDataWin8
                 {
                     _hypothesisMenuViewModel.IsDisplayed = false;
                 }
-            }
-
-            var fe = FocusManager.GetFocusedElement() as FrameworkElement;
-            if (fe is TextBox)
-            {
-                var bounds = fe.GetBounds();
-                var p = e.GetCurrentPoint(fe).Position;
-                if (!bounds.Contains(p))
-                {
-                    addAttributeButton.Focus(FocusState.Pointer);
-                }
-
             }
         }
 

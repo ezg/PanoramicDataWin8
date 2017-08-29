@@ -215,7 +215,7 @@ namespace PanoramicDataWin8.model.view.operation
             menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);
 
-            OperationViewModelTapped += (sender, args) =>
+            OperationViewModelTapped += (args) =>
             {
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
