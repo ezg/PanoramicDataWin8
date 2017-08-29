@@ -391,9 +391,8 @@ namespace PanoramicDataWin8.controller.view
             }
             if (operationViewModel != null)
             {
-                var operationContainerView = new OperationContainerView();
                 operationViewModel.Size = size;
-                operationContainerView.DataContext = operationViewModel;
+                var operationContainerView = new OperationContainerView() { DataContext = operationViewModel };
                 InkableScene.Add(operationContainerView);
             }
         }
