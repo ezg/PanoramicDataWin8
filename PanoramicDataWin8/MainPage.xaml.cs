@@ -308,7 +308,7 @@ namespace PanoramicDataWin8
             }
 
             var fe = FocusManager.GetFocusedElement() as FrameworkElement;
-            if (fe != null)
+            if (fe is TextBox)
             {
                 var bounds = fe.GetBounds();
                 var p = e.GetCurrentPoint(fe).Position;

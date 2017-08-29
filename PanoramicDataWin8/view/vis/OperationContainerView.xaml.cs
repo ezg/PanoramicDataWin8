@@ -308,6 +308,17 @@ namespace PanoramicDataWin8.view.vis
 
         void OperationContainerView_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
+            var fe = FocusManager.GetFocusedElement() as FrameworkElement;
+            if (fe is TextBox)
+            {
+                var bounds = fe.GetBounds();
+                var p = e.GetCurrentPoint(fe).Position;
+                if (bounds.Contains(p))
+                {
+                    return;
+                }
+
+            }
             var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
             if (e.Pointer.PointerDeviceType == PointerDeviceType.Pen ||
                 (state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
