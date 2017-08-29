@@ -34,6 +34,7 @@ namespace PanoramicDataWin8.view.vis.render
             Background = new SolidColorBrush(color);
             if (color == Colors.Black)
                 color = Colors.Gray;
+            TextInputBox.SelectionHighlightColor = new SolidColorBrush(Color.FromArgb(0xff, (byte)(color.R * .7), (byte)(color.G * .7), (byte)(color.B * .7)));
             TextInputBox.Background = new SolidColorBrush(Color.FromArgb(0xff, (byte)(color.R * .9), (byte)(color.G * .9), (byte)(color.B * .9)));
         }
 
@@ -43,12 +44,8 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 TextInputBox.Visibility = Visibility.Visible;
                 TextInputBox.Focus(FocusState.Keyboard);
+                TextInputBox.Focus(FocusState.Pointer);
             }
-        }
-
-        public void SetSelectionHighlightColor(Color c)
-        {
-
         }
         public DefinitionOperationModel DefinitionOperationModel { get; set; }
 

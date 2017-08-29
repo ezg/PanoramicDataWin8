@@ -124,7 +124,10 @@ namespace PanoramicDataWin8.view.vis.render
             var elementStack =
               VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), null);
             foreach (var label in elementStack.Where((el) => el is DefinitionLabel).Select((vb) => vb as DefinitionLabel))
+            {
                 label.Activate();
+                e.Handled = true;
+            }
         }
 
         public List<IScribbable> Children

@@ -29,6 +29,7 @@ using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.view.vis;
 using PanoramicDataWin8.view.vis.menu;
+using PanoramicDataWin8.view.vis.render;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -305,16 +306,10 @@ namespace PanoramicDataWin8
                     _hypothesisMenuViewModel.IsDisplayed = false;
                 }
             }
-            if (!ancestors.Contains(hypothesisButton) && !ancestors.Contains(addOperationButton) && !ancestors.Contains(addAttributeButton) &&
-                !(e.OriginalSource is TextBlock))
-            {
-                foreach (var a in ancestors)
-                    if (a is TextBox)
-                        return;
-                var f  = FocusManager.GetFocusedElement();
+            
+            if (!VisualTreeHelper.FindElementsInHostCoordinates(e.GetCurrentPoint(null).Position, null).
+                Contains(FocusManager.GetFocusedElement()))
                 addAttributeButton.Focus(FocusState.Pointer);
-                //FocusSink.Focus(FocusState.Keyboard);
-            }
         }
 
         private void MainPage_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
