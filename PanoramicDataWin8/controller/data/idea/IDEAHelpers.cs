@@ -206,9 +206,11 @@ namespace PanoramicDataWin8.controller.data.progressive
                     .Select(im => GetAttributeParameters(im)).ToList(),
                 NrOfBanditRuns = 100,
                 NrOfCrossValidations = 1,
-                AttributeCodeParameters = IDEAAttributeComputedFieldModel.GetAllCode()
-        };
+                AttributeCalculatedParameters = IDEAAttributeComputedFieldModel.GetAllCode().OfType<AttributeCaclculatedParameters>().ToList()
+            };
             
+            var aa = new AttributeCodeParameters();
+            var bb = (AttributeCaclculatedParameters) aa;
             return param;
         }
 
@@ -402,7 +404,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 PerBinAggregateParameters = aggregateParameters,
                 SortPerBinAggregateParameter = sortAggregateParam,
                 GlobalAggregateParameters = globalAggregates,
-                AttributeCodeParameters = attributeCodeParameters
+                AttributeCalculatedParameters = attributeCodeParameters.OfType<AttributeCaclculatedParameters>().ToList()
             };
             return parameters;
         }
