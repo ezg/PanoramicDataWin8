@@ -55,7 +55,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (args.NewValue != null)
             {
                 var attributeGroupOperationViewModel = DataContext as AttributeGroupOperationViewModel;
-                NameTextBox.Text = attributeGroupOperationViewModel.AttributeGroupOperationModel.AttributeGroupModel.DisplayName;
+                NameTextBox.Text = attributeGroupOperationViewModel.AttributeGroupOperationModel.AttributeGroupModel.DisplayName ?? "";
                 attributeGroupOperationViewModel.OperationModel.OperationModelUpdated -= OperationModelUpdated;
                 attributeGroupOperationViewModel.OperationModel.OperationModelUpdated += OperationModelUpdated;
                 attributeGroupOperationViewModel.OperationModel.PropertyChanged -= OperationModelPropertyChanged;
@@ -74,6 +74,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void OperationModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
+            var attributeGroupOperationViewModel = DataContext as AttributeGroupOperationViewModel;
+            NameTextBox.Text = attributeGroupOperationViewModel.AttributeGroupOperationModel.AttributeGroupModel.DisplayName ?? "";
         }
 
         private void OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)

@@ -222,7 +222,7 @@ namespace PanoramicDataWin8.model.view
                 if (!HideAggregationFunction)
                 {
                     mainLabel = addDetailToLabel(mainLabel);
-                    MainLabel = mainLabel.Replace("_", " ");
+                    MainLabel = mainLabel?.Replace("_", " ");
                 }
                 else
                 {

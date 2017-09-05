@@ -103,7 +103,7 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="controller\data\idea\ExecuteOperationModelEventArgs.cs" />
-    <Compile Include="controller\data\idea\ClassifierOperationJob.cs" />
+    <Compile Include="controller\data\idea\PredictorOperationJob.cs" />
     <Compile Include="controller\data\idea\RecommenderOperationJob.cs" />
     <Compile Include="controller\data\idea\CodeCommand.cs" />
     <Compile Include="controller\data\idea\RiskOperationJob.cs" />
@@ -146,7 +146,7 @@
     <Compile Include="model\data\attribute\AttributeTransformationModel.cs" />
     <Compile Include="model\data\operation\BrushOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\operation\CalculationOperationModel.cs" />
-    <Compile Include="model\data\operation\ClassifierOperationModel.cs" />
+    <Compile Include="model\data\operation\PredictorOperationModel.cs" />
     <Compile Include="model\data\operation\DefinitionOperationModel.cs" />
     <Compile Include="model\data\operation\ExampleOperationModel.cs" />
     <Compile Include="model\data\operation\ExampleOperationType.cs" />
@@ -203,7 +203,7 @@
     <Compile Include="model\view\BudgetViewModel.cs" />
     <Compile Include="model\view\operation\AttributeGroupOperationViewModel.cs" />
     <Compile Include="model\view\operation\CalculationOperationViewModel.cs" />
-    <Compile Include="model\view\operation\ClassifierOperationViewModel.cs" />
+    <Compile Include="model\view\operation\PredictorOperationViewModel.cs" />
     <Compile Include="model\view\operation\DefinitionOperationViewModel.cs" />
     <Compile Include="model\view\operation\FunctionOperationViewModel.cs" />
     <Compile Include="model\view\operation\RecommenderOperationViewModel.cs" />
@@ -352,8 +352,8 @@
     <Compile Include="view\vis\render\CalculationRenderer.xaml.cs">
       <DependentUpon>CalculationRenderer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="view\vis\render\ClassifierRenderer.xaml.cs">
-      <DependentUpon>ClassifierRenderer.xaml</DependentUpon>
+    <Compile Include="view\vis\render\PredictorRenderer.xaml.cs">
+      <DependentUpon>PredictorRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\DefinitionLabel.xaml.cs">
       <DependentUpon>DefinitionLabel.xaml</DependentUpon>
@@ -361,7 +361,7 @@
     <Compile Include="view\vis\render\DefinitionRenderer.xaml.cs">
       <DependentUpon>DefinitionRenderer.xaml</DependentUpon>
     </Compile>
-    <Compile Include="view\vis\render\ClassifierRendererContentProvider.cs" />
+    <Compile Include="view\vis\render\PredictorRendererContentProvider.cs" />
     <Compile Include="view\vis\render\FilterRenderer.xaml.cs">
       <DependentUpon>FilterRenderer.xaml</DependentUpon>
     </Compile>
@@ -558,7 +558,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="view\vis\render\ClassifierRenderer.xaml">
+    <Page Include="view\vis\render\PredictorRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

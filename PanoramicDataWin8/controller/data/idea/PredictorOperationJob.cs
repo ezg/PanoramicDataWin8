@@ -4,9 +4,9 @@ using PanoramicDataWin8.model.data.operation;
 
 namespace PanoramicDataWin8.controller.data.progressive
 {
-    public class ClassifierOperationJob : OperationJob
+    public class PredictorOperationJob : OperationJob
     {
-        public ClassifierOperationJob(OperationModel operationModel,
+        public PredictorOperationJob(OperationModel operationModel,
             TimeSpan throttle, int sampleSize) : base(operationModel, throttle)
         {
             OperationParameters = IDEAHelpers.GetRecommenderOperationParameters((RecommenderOperationModel)operationModel, sampleSize);

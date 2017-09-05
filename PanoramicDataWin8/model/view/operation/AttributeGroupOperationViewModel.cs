@@ -4,6 +4,7 @@ using PanoramicDataWin8.utils;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
@@ -60,6 +61,16 @@ namespace PanoramicDataWin8.model.view.operation
             addAttachmentViewModels();
             createTopInputsExpandingMenu();
             createFunctionMenu(AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
+
+            TopInputAdded += (sender) =>
+            {
+                var str = "(";
+                foreach (var g in AttributeGroupOperationModel.AttributeUsageTransformationModels)
+                    str += g.AttributeModel.DisplayName + ",";
+                str = str.TrimEnd(',') + ")";
+                var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(AttributeGroupOperationModel.AttributeGroupModel.DisplayName, str);
+                AttributeGroupOperationModel.SetName(newName);
+            };
         }
 
         public AttributeGroupOperationModel AttributeGroupOperationModel => (AttributeGroupOperationModel)OperationModel;

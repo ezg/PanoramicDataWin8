@@ -33,32 +33,38 @@ using PanoramicDataWin8.view.inq;
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public sealed partial class ClassifierRenderer : Renderer, IScribbable
+    public sealed partial class PredictorRenderer : Renderer, IScribbable
     {
-        private ClassifierRendererContentProvider _classifierRendererContentProvider = new ClassifierRendererContentProvider();
+        private PredictorRendererContentProvider _predictorRendererContentProvider = new PredictorRendererContentProvider();
 
 
-        public ClassifierRenderer()
+        public PredictorRenderer()
         {
             this.InitializeComponent();
 
             this.DataContextChanged += PlotRenderer_DataContextChanged;
-            this.Loaded += PlotRenderer_Loaded;
+            this.Loaded += Renderer_Loaded;
+            this.SizeChanged += (sender, e) => Relayout();
         }
 
-        void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
+        void Relayout()
+        {
+            var model = ((DataContext as PredictorOperationViewModel).OperationModel as PredictorOperationModel);
+            model.UpdateCode();
+        }
+        void Renderer_Loaded(object sender, RoutedEventArgs e)
         {
 
-            _classifierRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
-            _classifierRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
-            dxSurface.ContentProvider = _classifierRendererContentProvider;
+            _predictorRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
+            _predictorRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
+            dxSurface.ContentProvider = _predictorRendererContentProvider;
         }
 
         public override void Dispose()
         {
             base.Dispose();
-            (DataContext as ClassifierOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
-            (DataContext as ClassifierOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
+            (DataContext as PredictorOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
+            (DataContext as PredictorOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
             if (dxSurface != null)
             {
                 dxSurface.Dispose();
@@ -69,12 +75,12 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (args.NewValue != null)
             {
-                (DataContext as ClassifierOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
-                (DataContext as ClassifierOperationViewModel).OperationModel.OperationModelUpdated += OperationModelUpdated;
-                (DataContext as ClassifierOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
-                (DataContext as ClassifierOperationViewModel).OperationModel.PropertyChanged += OperationModel_PropertyChanged;
+                (DataContext as PredictorOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
+                (DataContext as PredictorOperationViewModel).OperationModel.OperationModelUpdated += OperationModelUpdated;
+                (DataContext as PredictorOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
+                (DataContext as PredictorOperationViewModel).OperationModel.PropertyChanged += OperationModel_PropertyChanged;
 
-                var result = (DataContext as ClassifierOperationViewModel).OperationModel.Result;
+                var result = (DataContext as PredictorOperationViewModel).OperationModel.Result;
                 if (result != null)
                 {
                     loadResult(result);
@@ -82,7 +88,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 else
                 {
-                    ClassifierOperationModel operationModel = (ClassifierOperationModel)((OperationViewModel)DataContext).OperationModel;
+                    PredictorOperationModel operationModel = (PredictorOperationModel)((OperationViewModel)DataContext).OperationModel;
                     if (!operationModel.AttributeUsageTransformationModels.Any())
                     {
                         viewBox.Visibility = Visibility.Visible;
@@ -92,10 +98,10 @@ namespace PanoramicDataWin8.view.vis.render
         }
         void OperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            ClassifierOperationModel operationModel = (ClassifierOperationModel)((OperationViewModel)DataContext).OperationModel;
+            PredictorOperationModel operationModel = (PredictorOperationModel)((OperationViewModel)DataContext).OperationModel;
             if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.Result))
             {
-                var result = (DataContext as ClassifierOperationViewModel).OperationModel.Result;
+                var result = (DataContext as PredictorOperationViewModel).OperationModel.Result;
                 if (result != null)
                 {
                     loadResult(result);
@@ -114,10 +120,10 @@ namespace PanoramicDataWin8.view.vis.render
 
         void loadResult(IResult result)
         {
-            ClassifierOperationViewModel model = (DataContext as ClassifierOperationViewModel);
-            _classifierRendererContentProvider.UpdateData(result,
-                (ClassifierOperationModel)model.OperationModel,
-                (ClassifierOperationModel)model.OperationModel.ResultCauserClone);
+            PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
+            _predictorRendererContentProvider.UpdateData(result,
+                (PredictorOperationModel)model.OperationModel,
+                (PredictorOperationModel)model.OperationModel.ResultCauserClone);
         }
 
 
@@ -159,7 +165,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             get
             {
-                ClassifierOperationViewModel model = this.DataContext as ClassifierOperationViewModel;
+                PredictorOperationViewModel model = this.DataContext as PredictorOperationViewModel;
 
                 Rct bounds = new Rct(model.Position, model.Size);
                 return bounds.GetPolygon();

@@ -12,16 +12,24 @@ namespace PanoramicDataWin8.model.data.operation
     {
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
-        AttributeGroupModel attributeGroupModel = new AttributeGroupModel("Group" + new Random().Next());
+        AttributeGroupModel attributeGroupModel;
 
         public AttributeGroupModel AttributeGroupModel {  get { return attributeGroupModel;  } }
 
-        public AttributeGroupOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        public AttributeGroupOperationModel(SchemaModel schemaModel, string rawName) : base(schemaModel)
         {
+            attributeGroupModel = new AttributeGroupModel();
+            AttributeGroupModel.SetName(rawName);
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
+        private string _name;
 
+        public void SetName(string name)
+        {
+            attributeGroupModel.RawName = attributeGroupModel.DisplayName = name;
+            SetProperty<string>(ref _name, name);
+        }
         public FilteringOperation FilteringOperation
         {
             get { return _filterConsumerOperationModelImpl.FilteringOperation; }

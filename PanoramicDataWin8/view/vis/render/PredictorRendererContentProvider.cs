@@ -17,11 +17,11 @@ using PanoramicDataWin8.view.common;
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public class ClassifierRendererContentProvider : DXSurfaceContentProvider
+    public class PredictorRendererContentProvider : DXSurfaceContentProvider
     {
-        private ClassifierOperationModel _classifierOperationModel;
+        private PredictorOperationModel _predictorOperationModel;
 
-        private ClassifierOperationModel _classifierOperationModelClone;
+        private PredictorOperationModel _predictorOperationModelClone;
 
         private OptimizerResult _optimizerResult;
         private bool _isResultEmpty;
@@ -33,11 +33,11 @@ namespace PanoramicDataWin8.view.vis.render
         public float CompositionScaleX { get; set; }
         public float CompositionScaleY { get; set; }
         
-        public void UpdateData(IResult result, ClassifierOperationModel classifierOperationModel, ClassifierOperationModel classifierOperationModelClone)
+        public void UpdateData(IResult result, PredictorOperationModel predictorOperationModel, PredictorOperationModel predictorOperationModelClone)
         {
             _optimizerResult = (OptimizerResult) result;
-            _classifierOperationModelClone = classifierOperationModelClone;
-            _classifierOperationModel = classifierOperationModel;
+            _predictorOperationModelClone = predictorOperationModelClone;
+            _predictorOperationModel = predictorOperationModel;
 
             if (_optimizerResult != null)
                 _isResultEmpty = false;

@@ -65,18 +65,15 @@ namespace PanoramicDataWin8.model.view.operation
         {
             return new ExampleOperationViewModel(new ExampleOperationModel(schemaModel)) { Position = position };
         }
-
-        public static RegresserOperationViewModel CreateDefaultRegresserOperationViewModel(SchemaModel schemaModel, Pt position)
+        static int predictorCount = 0;
+        public static PredictorOperationViewModel CreateDefaultPredictorOperationViewModel(SchemaModel schemaModel, Pt position)
         {
-            return new RegresserOperationViewModel(new RegresserOperationModel(schemaModel)) { Position = position };
+            return new PredictorOperationViewModel(new PredictorOperationModel(schemaModel, "P"+(predictorCount++)+"()")) { Position = position };
         }
-        public static ClassifierOperationViewModel CreateDefaultClassifierOperationViewModel(SchemaModel schemaModel, Pt position)
-        {
-            return new ClassifierOperationViewModel(new ClassifierOperationModel(schemaModel)) { Position = position };
-        }
+        static int groupCount = 0;
         public static AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(SchemaModel schemaModel, Pt position)
         {
-            return new AttributeGroupOperationViewModel(new AttributeGroupOperationModel(schemaModel)) { Position = position };
+            return new AttributeGroupOperationViewModel(new AttributeGroupOperationModel(schemaModel, "G("+ (groupCount++) +")")) { Position = position };
         }
         public static FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(SchemaModel schemaModel, Pt position, FunctionSubtypeModel functionSubtypeModel, bool fromMouse = false)
         {

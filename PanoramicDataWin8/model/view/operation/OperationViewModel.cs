@@ -158,7 +158,7 @@ namespace PanoramicDataWin8.model.view.operation
         }
         public AttributeUsageOperationModel AttributeUsageOperationModel => (AttributeUsageOperationModel)OperationModel;
 
-        List<AttributeGroupModel> findAllNestedGroups(AttributeGroupModel attributeGroupModel)
+        static List<AttributeGroupModel> findAllNestedGroups(AttributeGroupModel attributeGroupModel)
         {
             var models = new List<AttributeGroupModel>();
             if (attributeGroupModel != null)
@@ -170,10 +170,12 @@ namespace PanoramicDataWin8.model.view.operation
             }
             return models;
         }
-        bool attributeTransformationModelContainsAttributeModel(AttributeModel testAttributeModel, AttributeTransformationModel newAttributeTransformationModel)
+        static public bool attributeTransformationModelContainsAttributeModel(AttributeModel testAttributeModel, AttributeTransformationModel newAttributeTransformationModel)
         {
             return findAllNestedGroups(newAttributeTransformationModel.AttributeModel as AttributeGroupModel).Contains(testAttributeModel);
         }
+        public delegate void InputAddedHandler(object sender);
+        public event InputAddedHandler TopInputAdded;
         protected void createTopInputsExpandingMenu()
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Top);
@@ -210,7 +212,10 @@ namespace PanoramicDataWin8.model.view.operation
             attr1.DroppedTriggered = attributeTransformationModel => {
                 if (!AttributeUsageOperationModel.AttributeUsageTransformationModels.Contains(attributeTransformationModel) &&
                     !attributeTransformationModelContainsAttributeModel((AttributeUsageOperationModel as AttributeGroupOperationModel)?.AttributeGroupModel, attributeTransformationModel))
+                {
                     AttributeUsageOperationModel.AttributeUsageTransformationModels.Add(attributeTransformationModel);
+                    TopInputAdded(this);
+                }
             };
 
             addMenuItem.MenuItemComponentViewModel = attr1;

@@ -1,4 +1,5 @@
-﻿using PanoramicDataWin8.model.data.operation;
+﻿using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view.operation;
 using System;
 using System.Collections.Generic;
@@ -26,6 +27,14 @@ namespace PanoramicDataWin8.view.vis.render
         {
             this.InitializeComponent();
             DataContextChanged += DefinitionLabel_DataContextChanged;
+            MainViewController.Instance.MainPage.AddHandler(PointerPressedEvent, new PointerEventHandler(PointerPressedHandler), true);
+        }
+
+        void PointerPressedHandler(object sender, PointerRoutedEventArgs args)
+        {
+            var boolme = VisualTreeHelper.FindElementsInHostCoordinates(args.GetCurrentPoint(null).Position, null).Contains(TextInputBox);
+            if (FocusManager.GetFocusedElement() == TextInputBox && TextInputBox.Visibility == Visibility.Visible && !boolme)
+                MainViewController.Instance.MainPage.addAttributeButton.Focus(FocusState.Pointer);
         }
 
         private void DefinitionLabel_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
