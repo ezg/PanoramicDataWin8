@@ -10,9 +10,8 @@ namespace PanoramicDataWin8.model.data.attribute
     {
         private List<AttributeModel> _inputModels = new List<AttributeModel>();
 
-        public AttributeGroupModel(string name)
+        public AttributeGroupModel()
         {
-            RawName = DisplayName = name;
         }
 
         public List<AttributeModel> InputModels
@@ -22,6 +21,11 @@ namespace PanoramicDataWin8.model.data.attribute
         }
 
         string _rawName, _displayName;
+        
+        public void SetName(string name)
+        {
+            RawName = DisplayName = name;
+        }
         public override string RawName
         {
             get { return _rawName; }

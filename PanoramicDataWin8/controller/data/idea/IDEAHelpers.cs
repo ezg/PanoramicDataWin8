@@ -188,7 +188,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             return parameters;
         }
 
-        public static OptimizerOperationParameters GetOptimizerOperationParameters(ClassifierOperationModel model, int sampleSize)
+        public static OptimizerOperationParameters GetOptimizerOperationParameters(PredictorOperationModel model, int sampleSize)
         {
             var filterModels = new List<FilterModel>();
             var filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
@@ -198,11 +198,11 @@ namespace PanoramicDataWin8.controller.data.progressive
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
                 Filter = filter,
-                LabelAttribute = GetAttributeParameters(model.ClassifierAttributeUsageTransformationModel.AttributeModel),
+                LabelAttribute = GetAttributeParameters(model.TargetAttributeUsageTransformationModel.AttributeModel),
                 ProblemType = ProblemType.Classification,
                 SampleStreamBlockSize = sampleSize,
                 FeatureAttributes = psm.RootOriginModel.InputModels
-                    .Where(im => im.DataType != DataType.String && im != model.ClassifierAttributeUsageTransformationModel.AttributeModel)
+                    .Where(im => im.DataType != DataType.String && im != model.TargetAttributeUsageTransformationModel.AttributeModel)
                     .Select(im => GetAttributeParameters(im)).ToList(),
                 NrOfBanditRuns = 100,
                 NrOfCrossValidations = 1,

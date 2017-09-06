@@ -731,6 +731,16 @@ namespace PanoramicDataWin8
                 parentModel.AttachPosition = AttachPosition.Right;
 
                 var count = 0;
+                {
+                    var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "+", OperationType = OperationType.AttributeGroup }, parentModel);
+                    tileMenuItemViewModel.Row = count;
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
+                                                   (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
+                    tileMenuItemViewModel.RowSpan = 1;
+                    tileMenuItemViewModel.ColumnSpan = 1;
+
+                    count++;
+                }
                 foreach (var inputModel in inputModels)
                 {
                     var tileMenuItemViewModel = recursiveCreateTileMenu(inputModel, parentModel);
@@ -777,6 +787,7 @@ namespace PanoramicDataWin8
         private TileMenuItemViewModel recursiveCreateTileMenu(object inputModel, TileMenuItemViewModel parent)
         {
             TileMenuItemViewModel currentTileMenuItemViewModel = null;
+
             if (inputModel is AttributeModel)
             {
                 currentTileMenuItemViewModel = new TileMenuItemViewModel(parent);

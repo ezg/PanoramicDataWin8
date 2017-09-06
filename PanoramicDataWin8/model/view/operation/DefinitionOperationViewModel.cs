@@ -17,7 +17,6 @@ namespace PanoramicDataWin8.model.view.operation
         private void createDefinitionMenu(AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {
-            var definitionOperationModel = OperationModel as DefinitionOperationModel;
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
 
             var menuViewModel = new MenuViewModel
@@ -45,11 +44,11 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 TextAngle = textAngle,
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = definitionOperationModel.GetCode().DisplayName
+                Label = DefinitionOperationModel.GetCode().DisplayName
             };
 
-            definitionOperationModel.SetRawName(attr1.Label);
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(definitionOperationModel.GetCode()));
+            DefinitionOperationModel.SetRawName(attr1.Label);
+            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(DefinitionOperationModel.GetCode()));
             attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
             menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);
