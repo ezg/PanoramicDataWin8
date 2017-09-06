@@ -170,8 +170,7 @@ namespace PanoramicDataWin8.model.view.operation
                 CanDrop = true
             };
             attr1.DroppedTriggered = attributeTransformationModel => {
-                if (!PredictorOperationModel.IgnoredAttributeUsageTransformationModels.Contains(attributeTransformationModel) &&
-                    !attributeTransformationModelContainsAttributeModel((AttributeUsageOperationModel as AttributeGroupOperationModel)?.AttributeModel, attributeTransformationModel))
+                if (!PredictorOperationModel.IgnoredAttributeUsageTransformationModels.Contains(attributeTransformationModel))
                     PredictorOperationModel.IgnoredAttributeUsageTransformationModels.Add(attributeTransformationModel);
             };
 
