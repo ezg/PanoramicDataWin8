@@ -65,7 +65,7 @@ namespace PanoramicDataWin8.view.vis.render
                     topOffset + 30,
                     deviceWidth,
                     deviceHeight - 30,
-                    (float)_optimizerResult.AccuraciesForSampleSize.Last().Value,
+                    (float)_optimizerResult.MetricsPerSampleSize[_optimizerResult.MetricsPerSampleSize.Keys.Max()].AverageAccuracy,
                     "accuracy\n(" + _optimizerResult.TotalModelsAnalyzed + " models tested)");
             }
             if (_isResultEmpty)
