@@ -6,6 +6,8 @@
 *.user
 *.userosscache
 *.sln.docstates
+.vs/*
+PanoramicDataWin8/project.lock.json
 
 # Build results
 [Dd]ebug/
