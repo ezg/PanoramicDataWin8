@@ -9,6 +9,8 @@ using PanoramicDataWin8.utils;
 using PanoramicDataWin8.model.data.attribute;
 using System.Collections.Generic;
 using Windows.UI.Xaml.Input;
+using PanoramicDataWin8.model.data.idea;
+using Windows.UI.Xaml;
 
 namespace PanoramicDataWin8.model.view.operation
 {
@@ -158,21 +160,22 @@ namespace PanoramicDataWin8.model.view.operation
         }
         public AttributeUsageOperationModel AttributeUsageOperationModel => (AttributeUsageOperationModel)OperationModel;
 
-        static List<AttributeGroupModel> findAllNestedGroups(AttributeGroupModel attributeGroupModel)
+        static List<AttributeModel> findAllNestedGroups(AttributeModel attributeGroupModel)
         {
-            var models = new List<AttributeGroupModel>();
+            var models = new List<AttributeModel>();
             if (attributeGroupModel != null)
             {
                 models.Add(attributeGroupModel);
-                foreach (var at in attributeGroupModel.InputModels)
-                    if (at is AttributeGroupModel)
-                        models.AddRange(findAllNestedGroups(at as AttributeGroupModel));
+                var inputModels = (attributeGroupModel.FuncModel as AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)?.InputModels;
+                if (inputModels != null)
+                    foreach (var at in inputModels)
+                        models.AddRange(findAllNestedGroups(at));
             }
             return models;
         }
         static public bool attributeTransformationModelContainsAttributeModel(AttributeModel testAttributeModel, AttributeTransformationModel newAttributeTransformationModel)
         {
-            return findAllNestedGroups(newAttributeTransformationModel.AttributeModel as AttributeGroupModel).Contains(testAttributeModel);
+            return findAllNestedGroups(newAttributeTransformationModel.AttributeModel).Contains(testAttributeModel);
         }
         public delegate void InputAddedHandler(object sender);
         public event InputAddedHandler TopInputAdded;
@@ -211,10 +214,11 @@ namespace PanoramicDataWin8.model.view.operation
             };
             attr1.DroppedTriggered = attributeTransformationModel => {
                 if (!AttributeUsageOperationModel.AttributeUsageTransformationModels.Contains(attributeTransformationModel) &&
-                    !attributeTransformationModelContainsAttributeModel((AttributeUsageOperationModel as AttributeGroupOperationModel)?.AttributeGroupModel, attributeTransformationModel))
+                    !attributeTransformationModelContainsAttributeModel((AttributeUsageOperationModel as AttributeGroupOperationModel)?.AttributeModel, attributeTransformationModel))
                 {
                     AttributeUsageOperationModel.AttributeUsageTransformationModels.Add(attributeTransformationModel);
-                    TopInputAdded(this);
+                    if (TopInputAdded != null)
+                        TopInputAdded(this);
                 }
             };
 
@@ -301,6 +305,50 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
+        }
+        protected void createLabelMenu(AttachmentOrientation attachmentOrientation, IDEAAttributeModel code,
+            AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
+        {
+            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
+
+            var menuViewModel = new MenuViewModel
+            {
+                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
+                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
+                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
+            };
+
+            var menuItem = new MenuItemViewModel
+            {
+                MenuViewModel = menuViewModel,
+                Row = 0,
+                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 1,
+                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 5,
+                Column = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
+                Size = size,
+                Position = Position,
+                TargetSize = size,
+                IsAlwaysDisplayed = true,
+                IsWidthBoundToParent = isWidthBoundToParent,
+                IsHeightBoundToParent = isHeightBoundToParent
+            };
+            var attr1 = new AttributeTransformationMenuItemViewModel
+            {
+                TextAngle = textAngle,
+                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                Label = code.DisplayName
+            };
+
+            code.PropertyChanged += (sender, args) => {
+                if (args.PropertyName == "DisplayName")
+                    attr1.Label = code.DisplayName;
+            };
+
+            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(code));
+            attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
+            menuItem.MenuItemComponentViewModel = attr1;
+            menuViewModel.MenuItemViewModels.Add(menuItem);
+            attachmentViewModel.MenuViewModel = menuViewModel;
         }
     }
 

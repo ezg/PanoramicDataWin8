@@ -33,10 +33,9 @@ namespace PanoramicDataWin8.model.data.idea
 
         public override List<OriginModel> OriginModels { get; } = new List<OriginModel>();
 
-        private void recursiveCreateAttributeModels(AttributeGroup attributeGroup, AttributeGroupModel parentGroupModel)
+        private void recursiveCreateAttributeModels(AttributeGroup attributeGroup, AttributeModel parentGroupModel)
         {
-            var groupModel = new AttributeGroupModel();
-            groupModel.RawName = attributeGroup.Name;
+            var groupModel = IDEAAttributeModel.AddGroupField(attributeGroup.Name, attributeGroup.Name);
             // bcz: Group models no longer inherit from AttributeModels --- is this okay?
             //if (parentGroupModel != null)
             //    parentGroupModel.InputModels.Add(groupModel);
@@ -48,14 +47,14 @@ namespace PanoramicDataWin8.model.data.idea
                 recursiveCreateAttributeModels(childAttribute, groupModel);
         }
 
-        private void recursiveCreateAttributeModels(Attribute attribute, AttributeGroupModel parentGroupModel)
+        private void recursiveCreateAttributeModels(Attribute attribute, AttributeModel parentGroupModel)
         {
-            var fieldAttributeModel = new IDEAAttributeColumnFieldModel(attribute.RawName, attribute.DisplayName,
+            var fieldAttributeModel = IDEAAttributeModel.AddColumnField(attribute.RawName, attribute.DisplayName,
                 attribute.DataType,
                 attribute.DataType == DataType.String ? "enum" : "numeric", attribute.VisualizationHints);
 
-            if (parentGroupModel != null)
-                parentGroupModel.InputModels.Add(fieldAttributeModel);
+            if (parentGroupModel != null && parentGroupModel.FuncModel is AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)
+                (parentGroupModel.FuncModel as AttributeModel.AttributeFuncModel.AttributeGroupFuncModel).InputModels.Add(fieldAttributeModel);
             else
                 InputModels.Add(fieldAttributeModel);
         }

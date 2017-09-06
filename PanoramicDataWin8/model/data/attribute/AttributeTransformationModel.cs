@@ -157,14 +157,14 @@ namespace PanoramicDataWin8.model.data.attribute
         {
             var inputModels = (controller.view.MainViewController.Instance.MainPage.DataContext as view.MainModel).SchemaModel.OriginModels.First()
                      .InputModels.Where(am => am.IsDisplayed).ToList();
-            inputModels.AddRange(IDEAAttributeComputedFieldModel.GetAllCalculatedAttributeModels());
+            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels());
             AttributeTransformationModel attributeTransformationModel = null;
             foreach (var im in inputModels)
                 if (im.RawName.ToLower().StartsWith(str.ToLower()) && !exact)
-                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeFieldModel);
+                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeModel);
             foreach (var im in inputModels)
                 if (im.RawName.ToLower() == str.ToLower())
-                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeFieldModel);
+                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeModel);
             return attributeTransformationModel;
         }
     }

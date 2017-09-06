@@ -51,9 +51,6 @@ namespace PanoramicDataWin8.controller.view
                     });
                 });
 
-            InputGroupViewModel.InputGroupViewModelDropped += InputGroupViewModelDropped;
-            InputGroupViewModel.InputGroupViewModelMoved += InputGroupViewModelMoved;
-
             OperationTypeModel.OperationTypeModelDropped += OperationTypeModelDropped;
             OperationTypeModel.OperationTypeModelMoved += OperationTypeModelMoved;
 
@@ -381,51 +378,7 @@ namespace PanoramicDataWin8.controller.view
                 InkableScene.Add(operationContainerView);
             }
         }
-
-        private void InputGroupViewModelMoved(object sender, InputGroupViewModelEventArgs e)
-        {
-            /*IGeometry mainPageBounds = e.Bounds.GetPolygon();
-            List<InputGroupViewModelEventHandler> hits = new List<InputGroupViewModelEventHandler>();
-            foreach (var element in InkableScene.GetDescendants().Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
-            {
-                var geom = element.BoundsGeometry;
-                if (geom != null && mainPageBounds.Intersects(geom))
-                {
-                    hits.Add(element);
-                }
-            }
-            var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
-
-            foreach (var element in InkableScene.GetDescendants().Where(ele => ele is InputGroupViewModelEventHandler).Select(ele => ele as InputGroupViewModelEventHandler))
-            {
-                element.InputGroupViewModelMoved(
-                        sender as InputGroupViewModel, e,
-                        hits.Count() > 0 ? orderderHits[0] == element : false);
-            }*/
-        }
-
-
-        private void InputGroupViewModelDropped(object sender, InputGroupViewModelEventArgs e)
-        {
-            /*IGeometry mainPageBounds = e.Bounds.GetPolygon();
-             List<InputGroupViewModelEventHandler> hits = new List<InputGroupViewModelEventHandler>();
-             foreach (var element in InkableScene.GetDescendants().OfType<InputGroupViewModelEventHandler>())
-             {
-                 var geom = element.BoundsGeometry;
-                 if (geom != null && mainPageBounds.Intersects(geom))
-                 {
-                     hits.Add(element);
-                 }
-             }
- 
-             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
-             foreach (var element in InkableScene.GetDescendants().OfType<InputGroupViewModelEventHandler>())
-             {
-                 element.InputGroupViewModelDropped(
-                         sender as InputGroupViewModel, e,
-                         hits.Count() > 0 && orderderHits[0] == element);
-             }*/
-        }
+        
 
         private void AttributeTransformationViewModelMoved(object sender, AttributeTransformationViewModelEventArgs e)
         {

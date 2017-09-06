@@ -251,14 +251,14 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var inputModels = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First()
                      .InputModels.Where(am => am.IsDisplayed).ToList() /*.OrderBy(am => am.RawName)*/;
-            inputModels.AddRange(IDEAAttributeComputedFieldModel.GetAllCalculatedAttributeModels());
-            AttributeFieldModel fieldModel = null;
+            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels());
+            AttributeModel fieldModel = null;
             foreach (var im in inputModels)
                 if (im.RawName.ToLower().StartsWith(str.ToLower()))
-                    fieldModel = im as AttributeFieldModel;
+                    fieldModel = im as AttributeModel;
             foreach (var im in inputModels)
                 if (im.RawName.ToLower() == str.ToLower())
-                    fieldModel = im as AttributeFieldModel; 
+                    fieldModel = im as AttributeModel; 
             return fieldModel != null ? fieldModel.DataType : DataType.Object;
         }
 

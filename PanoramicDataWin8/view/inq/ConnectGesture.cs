@@ -143,10 +143,10 @@ namespace PanoramicDataWin8.view.inq
         {
             var schemaModel = (controller.view.MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel;
             var inputModels = schemaModel.OriginModels.First().InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
-            var attributeTransformationModel = new AttributeTransformationModel(inputModels.First() as AttributeFieldModel);
+            var attributeTransformationModel = new AttributeTransformationModel(inputModels.First() as AttributeModel);
             foreach (var im in inputModels)
                 if (im.RawName.ToLower() == field)
-                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeFieldModel);
+                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeModel);
             
             var filterModel = new FilterModel();
             filterModel.ValueComparisons.Add(new ValueComparison(attributeTransformationModel, pred, value));

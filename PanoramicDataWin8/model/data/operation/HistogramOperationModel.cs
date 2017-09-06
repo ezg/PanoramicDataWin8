@@ -47,12 +47,12 @@ namespace PanoramicDataWin8.model.data.operation
                 _attributeUsageTransformationModels[attributeUsage].CollectionChanged +=
                     _attributeUsageTransformationModels_CollectionChanged;
             }
-            IDEAAttributeComputedFieldModel.CodeDefinitionChangedEvent += IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent;
+            IDEAAttributeModel.CodeDefinitionChangedEvent += IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent;
         }
 
         public override void Cleanup()
         {
-            IDEAAttributeComputedFieldModel.CodeDefinitionChangedEvent -= IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent;
+            IDEAAttributeModel.CodeDefinitionChangedEvent -= IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent;
         }
 
         private void IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent(object sender)
@@ -64,8 +64,8 @@ namespace PanoramicDataWin8.model.data.operation
             IDEAHelpers.GetHistogramRawOperationParameters(this, out attributeCodeParameters, out brushes, out aggregates);
 
             foreach (var attr in attributeCodeParameters)
-                if (attr.RawName == (sender as IDEAAttributeComputedFieldModel).RawName ||
-                    attr.Code.Contains((sender as IDEAAttributeComputedFieldModel).RawName))
+                if (attr.RawName == (sender as IDEAAttributeModel).RawName ||
+                    attr.Code.Contains((sender as IDEAAttributeModel).RawName))
                 {
                     FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                     break;

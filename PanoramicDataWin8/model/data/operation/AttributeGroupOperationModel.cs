@@ -12,14 +12,21 @@ namespace PanoramicDataWin8.model.data.operation
     {
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
-        AttributeGroupModel attributeGroupModel;
+        AttributeModel attributeGroupModel;
 
-        public AttributeGroupModel AttributeGroupModel {  get { return attributeGroupModel;  } }
+        public AttributeModel AttributeModel {  get { return attributeGroupModel;  } }
+
+        public AttributeModel.AttributeFuncModel.AttributeGroupFuncModel GroupFuncModel
+        {
+            get
+            {
+                return AttributeModel.FuncModel as AttributeModel.AttributeFuncModel.AttributeGroupFuncModel;
+            }
+        }
 
         public AttributeGroupOperationModel(SchemaModel schemaModel, string rawName) : base(schemaModel)
         {
-            attributeGroupModel = new AttributeGroupModel();
-            AttributeGroupModel.SetName(rawName);
+            attributeGroupModel = IDEAAttributeModel.AddGroupField(rawName, rawName);
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
@@ -27,7 +34,8 @@ namespace PanoramicDataWin8.model.data.operation
 
         public void SetName(string name)
         {
-            attributeGroupModel.RawName = attributeGroupModel.DisplayName = name;
+            attributeGroupModel.RawName = name;
+            attributeGroupModel.DisplayName = name;
             SetProperty<string>(ref _name, name);
         }
         public FilteringOperation FilteringOperation
@@ -45,7 +53,7 @@ namespace PanoramicDataWin8.model.data.operation
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             foreach (var attributeUsageTransformationModel in AttributeUsageTransformationModels)
-                attributeGroupModel.InputModels.Add(attributeUsageTransformationModel.AttributeModel);
+                GroupFuncModel.InputModels.Add(attributeUsageTransformationModel.AttributeModel);
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
     }

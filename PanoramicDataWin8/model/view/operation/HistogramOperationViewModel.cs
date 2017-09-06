@@ -279,11 +279,11 @@ namespace PanoramicDataWin8.model.view.operation
 
                 var aom = attr1.AttributeTransformationViewModel.AttributeTransformationModel;
                 var aggregateFunctions = new[] { AggregateFunction.None, AggregateFunction.Count }.ToList();
-                if (aom != null && aom.AttributeModel is AttributeFieldModel)
+                if (aom != null)
                 {
-                    if (((AttributeFieldModel)aom.AttributeModel).DataType == DataType.Float ||
-                        ((AttributeFieldModel)aom.AttributeModel).DataType == DataType.Double ||
-                        ((AttributeFieldModel)aom.AttributeModel).DataType == DataType.Int)
+                    if (aom.AttributeModel.DataType == DataType.Float ||
+                        aom.AttributeModel.DataType == DataType.Double ||
+                        aom.AttributeModel.DataType == DataType.Int)
                     {
                         aggregateFunctions.Add(AggregateFunction.Avg);
                         aggregateFunctions.Add(AggregateFunction.Sum);
@@ -341,7 +341,7 @@ namespace PanoramicDataWin8.model.view.operation
             attr1.TappedTriggered = () => { attachmentViewModel.ActiveStopwatch.Restart(); };
             attr1.DroppedTriggered = attributeTransformationModel =>
             {
-                if (!(attributeTransformationModel.AttributeModel is AttributeFieldModel))
+                if (attributeTransformationModel.AttributeModel.DataType == DataType.Undefined)
                     return;
                 var otherAxis = axis == AttributeUsage.X ? AttributeUsage.Y : AttributeUsage.X;
                 var existingModel = HistogramOperationModel.GetAttributeUsageTransformationModel(axis).Any() ?
@@ -390,29 +390,28 @@ namespace PanoramicDataWin8.model.view.operation
             createRightHistogramMenu();
             createTopHistogramMenu();
 
-            if ((attributeModel != null) && attributeModel is AttributeFieldModel)
+            if (attributeModel != null)
             {
-                var inputFieldModel = attributeModel as AttributeFieldModel;
-                if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.ENUM ||
-                    inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
+                if (attributeModel.InputVisualizationType == InputVisualizationTypeConstants.ENUM ||
+                    attributeModel.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
                 {
                     histogramOperationModel.VisualizationType = VisualizationType.plot;
 
-                    var x     = new AttributeTransformationModel(inputFieldModel) { AggregateFunction = AggregateFunction.None };
-                    var y     = new AttributeTransformationModel(inputFieldModel) { AggregateFunction = AggregateFunction.Count };
-                    var value = new AttributeTransformationModel(inputFieldModel) { AggregateFunction = AggregateFunction.Count };
+                    var x     = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.None };
+                    var y     = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.Count };
+                    var value = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.Count };
                     var flipAxis = attributeModel.VisualizationHints.Contains(VisualizationHint.DefaultFlipAxis);
                     histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X,            flipAxis ? y : x);
                     histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.Y,            flipAxis ? x: y);
                     histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
                 }
-                else if (inputFieldModel.InputVisualizationType == InputVisualizationTypeConstants.GEOGRAPHY)
+                else if (attributeModel.InputVisualizationType == InputVisualizationTypeConstants.GEOGRAPHY)
                 {
                 }
                 else
                 {
                     histogramOperationModel.VisualizationType = VisualizationType.table;
-                    var x = new AttributeTransformationModel(inputFieldModel);
+                    var x = new AttributeTransformationModel(attributeModel);
                     histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
                 }
             }

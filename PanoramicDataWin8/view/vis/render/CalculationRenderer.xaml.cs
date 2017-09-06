@@ -57,7 +57,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private async void Tb_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var attributeCodeParameters = IDEAAttributeComputedFieldModel.GetAllCode();
+            var attributeCodeParameters = IDEAAttributeModel.GetAllCode();
 
             var calcOpModel = ((DataContext as CalculationOperationViewModel).OperationModel as CalculationOperationModel);
             var newAttr = new AttributeCodeParameters() { Code = CodeBox.Text, RawName = calcOpModel.GetCode().RawName };

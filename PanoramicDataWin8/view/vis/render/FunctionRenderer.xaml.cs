@@ -55,7 +55,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
 
                 var model = this.DataContext as FunctionOperationViewModel;
-                NameTextBox.Text = model.FunctionOperationModel.DisplayName;
+                NameTextBox.Text = model.FunctionOperationModel.GetCode().DisplayName;
                 model.OperationModel.OperationModelUpdated -= OperationModelUpdated;
                 model.OperationModel.OperationModelUpdated += OperationModelUpdated;
                 model.OperationModel.PropertyChanged -= OperationModelPropertyChanged;
@@ -106,7 +106,6 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 var model = (this.DataContext as FunctionOperationViewModel).OperationModel as FunctionOperationModel;
                 NameTextBox.IsEnabled = false;
-                model.DisplayName = NameTextBox.Text;
                 model.SetRawName(NameTextBox.Text);
                 MainViewController.Instance.MainPage.addAttributeButton.Focus(FocusState.Pointer);
                 MainViewController.Instance.MainPage.clearAndDisposeMenus();

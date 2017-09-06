@@ -73,20 +73,22 @@ namespace PanoramicDataWin8.model.view.operation
         static int groupCount = 0;
         public static AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(SchemaModel schemaModel, Pt position)
         {
-            return new AttributeGroupOperationViewModel(new AttributeGroupOperationModel(schemaModel, "G("+ (groupCount++) +")")) { Position = position };
+            return new AttributeGroupOperationViewModel(new AttributeGroupOperationModel(schemaModel, "G" + (calcCount++) + "()")) { Position = position };
         }
         public static FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(SchemaModel schemaModel, Pt position, FunctionSubtypeModel functionSubtypeModel, bool fromMouse = false)
         {
             return new FunctionOperationViewModel(new FunctionOperationModel(schemaModel, functionSubtypeModel), fromMouse) { Position = position }; ;
         }
+        static int calcCount = 0;
         public static CalculationOperationViewModel CreateDefaultCalculationOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse = false)
         {
-            return new CalculationOperationViewModel(new CalculationOperationModel(schemaModel, "Calc" + new Random().Next()), fromMouse) { Position = position };
+            return new CalculationOperationViewModel(new CalculationOperationModel(schemaModel, "Calc" + (calcCount++) + "()"), fromMouse) { Position = position };
         }
-        
+
+        static int defCount = 0;
         public static DefinitionOperationViewModel CreateDefaultDefinitionOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse=false)
         {
-            return new DefinitionOperationViewModel(new DefinitionOperationModel(schemaModel, "Def" + new Random().Next()), fromMouse) { Position = position };
+            return new DefinitionOperationViewModel(new DefinitionOperationModel(schemaModel, "Def" + (defCount++) + "()"), fromMouse) { Position = position };
         }
         public static FilterOperationViewModel CreateDefaultFilterOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse)
         {

@@ -29,7 +29,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             {
                 return new AttributeCodeParameters();
             } else
-            if (atm.FuncModel is AttributeFieldModel.AttributeColumnFuncModel)
+            if (atm.FuncModel is AttributeModel.AttributeFuncModel.AttributeColumnFuncModel)
             {
                 return new AttributeColumnParameters()
                 {
@@ -37,11 +37,15 @@ namespace PanoramicDataWin8.controller.data.progressive
                     VisualizationHints = atm.VisualizationHints
                 };
             }
-            else
+            else if(atm.FuncModel is AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)
             {
+                return new AttributeCodeParameters();
+            }
+            else
+            { 
                 return new AttributeCodeParameters()
                 {
-                    Code = ((AttributeModel.AttributeCodeFuncModel) atm.FuncModel).Code,
+                    Code = ((AttributeModel.AttributeFuncModel.AttributeCodeFuncModel) atm.FuncModel).Code,
                     RawName = atm.RawName,
                     VisualizationHints = atm.VisualizationHints
                 };
@@ -206,7 +210,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                     .Select(im => GetAttributeParameters(im)).ToList(),
                 NrOfBanditRuns = 100,
                 NrOfCrossValidations = 1,
-                AttributeCalculatedParameters = IDEAAttributeComputedFieldModel.GetAllCode().OfType<AttributeCaclculatedParameters>().ToList()
+                AttributeCalculatedParameters = IDEAAttributeModel.GetAllCode().OfType<AttributeCaclculatedParameters>().ToList()
             };
             
             var aa = new AttributeCodeParameters();
@@ -260,9 +264,9 @@ namespace PanoramicDataWin8.controller.data.progressive
             attributeCodeParameters.AddRange(
                 filterModels.SelectMany(fm => fm.ValueComparisons)
                     .Select(vc => vc.AttributeTransformationModel)
-                    .Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeCodeFuncModel)
+                    .Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeFuncModel.AttributeCodeFuncModel)
                     .Select((agg) => GetAttributeParameters(agg.AttributeModel) as AttributeCodeParameters).Distinct());
-            attributeCodeParameters.AddRange(aggregates.Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeCodeFuncModel)
+            attributeCodeParameters.AddRange(aggregates.Where((agg) => agg.AttributeModel.FuncModel is AttributeModel.AttributeFuncModel.AttributeCodeFuncModel)
                 .Select((agg) => GetAttributeParameters(agg.AttributeModel) as AttributeCodeParameters).Distinct().ToList());
             attributeCodeParameters = attributeCodeParameters.Distinct().ToList();
             return filter;
@@ -274,7 +278,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             List<string>                       brushes;
             List<AttributeTransformationModel> aggregates;
             var filter = GetHistogramRawOperationParameters(model, out attributeCodeParameters, out brushes, out aggregates);
-            attributeCodeParameters = IDEAAttributeComputedFieldModel.GetAllCode();
+            attributeCodeParameters = IDEAAttributeModel.GetAllCode();
 
             var nrOfBins = new List<double>();
 
@@ -368,7 +372,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 
             var numericDataTypes = new[] {DataType.Int, DataType.Double, DataType.Float}.ToList();
             var globalAggregates = new List<AggregateParameters>();
-            foreach (var index in new[] {xIom, yIom}.Where(a => a.AttributeModel is AttributeFieldModel && numericDataTypes.Contains((a.AttributeModel as AttributeFieldModel).DataType)).Select(a => GetAttributeParameters(a.AttributeModel)).Distinct())
+            foreach (var index in new[] {xIom, yIom}.Where(a => numericDataTypes.Contains(a.AttributeModel.DataType)).Select(a => GetAttributeParameters(a.AttributeModel)).Distinct())
             {
                 /*globalAggregates.Add(new KDEAggregateParameters
                 {
@@ -383,8 +387,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                 });*/
             }
 
-            foreach (var iom in new[] {xIom, yIom}.Where(i => i.AttributeModel is AttributeFieldModel && i.AggregateFunction == AggregateFunction.None && 
-                numericDataTypes.Contains((i.AttributeModel as AttributeFieldModel).DataType)))
+            foreach (var iom in new[] {xIom, yIom}.Where(i => i.AggregateFunction == AggregateFunction.None && 
+                numericDataTypes.Contains(i.AttributeModel.DataType)))
             {
                 globalAggregates.Add(new AverageAggregateParameters()
                 {
@@ -451,7 +455,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         public static AttributeModel GetAttributeModelFromAttribute(Attribute attribute)
         {
-            var attributeModel = new IDEAAttributeColumnFieldModel(
+            var attributeModel = IDEAAttributeModel.AddColumnField(
                 attribute.RawName,
                 attribute.DisplayName, 
                 attribute.DataType,

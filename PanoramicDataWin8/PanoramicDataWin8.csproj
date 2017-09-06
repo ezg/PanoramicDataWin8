@@ -133,21 +133,20 @@
     <Compile Include="model\data\attribute\ScaleFunction.cs" />
     <Compile Include="model\data\attribute\SortMode.cs" />
     <Compile Include="model\data\attribute\TransformationFunction.cs" />
-    <Compile Include="model\data\idea\IDEAAttributeComputedFieldModel.cs" />
-    <Compile Include="model\data\attribute\AttributeGroupModel.cs" />
     <Compile Include="model\data\attribute\AttributeModel.cs" />
+    <Compile Include="model\data\idea\IDEAAttributeModel.cs" />
     <Compile Include="model\data\OperationType.cs" />
     <Compile Include="model\data\OperationTypeModelEventArgs.cs" />
     <Compile Include="model\data\OperationTypeModelEventHandler.cs" />
     <Compile Include="model\data\operation\Assert.cs" />
     <Compile Include="model\data\operation\AttributeGroupOperationModel.cs" />
     <Compile Include="model\data\operation\AttributeUsage.cs" />
-    <Compile Include="model\data\attribute\AttributeFieldModel.cs" />
     <Compile Include="model\data\attribute\AttributeTransformationModel.cs" />
     <Compile Include="model\data\operation\BrushOperationModelUpdatedEventArgs.cs" />
-    <Compile Include="model\data\operation\CalculationOperationModel.cs" />
-    <Compile Include="model\data\operation\PredictorOperationModel.cs" />
-    <Compile Include="model\data\operation\DefinitionOperationModel.cs" />
+    <Compile Include="model\data\operation\computational\CalculationOperationModel.cs" />
+    <Compile Include="model\data\operation\computational\ComputationalOperationModel.cs" />
+    <Compile Include="model\data\operation\computational\PredictorOperationModel.cs" />
+    <Compile Include="model\data\operation\computational\DefinitionOperationModel.cs" />
     <Compile Include="model\data\operation\ExampleOperationModel.cs" />
     <Compile Include="model\data\operation\ExampleOperationType.cs" />
     <Compile Include="model\data\operation\FilteringOperation.cs" />
@@ -158,7 +157,7 @@
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventType.cs" />
     <Compile Include="model\data\operation\FilterProviderOperationModelImpl.cs" />
-    <Compile Include="model\data\operation\FunctionOperationModel.cs" />
+    <Compile Include="model\data\operation\computational\FunctionOperationModel.cs" />
     <Compile Include="model\data\operation\Range.cs" />
     <Compile Include="model\data\operation\RecommenderOperationModel.cs" />
     <Compile Include="model\data\operation\IBrushableOperationModel.cs" />
@@ -172,7 +171,6 @@
     <Compile Include="model\data\operation\FilterConsumerOperationModelImpl.cs" />
     <Compile Include="model\data\operation\OperationModel.cs" />
     <Compile Include="model\data\operation\OperationModelUpdatedEventArgs.cs" />
-    <Compile Include="model\data\operation\RegresserOperationModel.cs" />
     <Compile Include="model\data\operation\RiskOperationModel.cs" />
     <Compile Include="model\data\operation\StatistalComparisonType.cs" />
     <Compile Include="model\data\operation\StatisticallyComparableOperationModelImpl.cs" />
@@ -181,7 +179,6 @@
     <Compile Include="model\data\operation\VisualizationType.cs" />
     <Compile Include="model\data\operation\VisualOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\OriginModel.cs" />
-    <Compile Include="model\data\idea\IDEAAttributeColumnFieldModel.cs" />
     <Compile Include="model\data\idea\IDEAOriginModel.cs" />
     <Compile Include="model\data\idea\IDEASchemaModel.cs" />
     <Compile Include="model\data\operation\HistogramOperationModel.cs" />
@@ -207,7 +204,6 @@
     <Compile Include="model\view\operation\DefinitionOperationViewModel.cs" />
     <Compile Include="model\view\operation\FunctionOperationViewModel.cs" />
     <Compile Include="model\view\operation\RecommenderOperationViewModel.cs" />
-    <Compile Include="model\view\operation\RegresserOperationViewModel.cs" />
     <Compile Include="model\view\RecommenderHandleViewModel.cs" />
     <Compile Include="model\view\RecommendedHistogramMenuItemViewModel.cs" />
     <Compile Include="model\view\PagingMenuItemViewModel.cs" />
@@ -215,14 +211,11 @@
     <Compile Include="model\view\GraphRenderOptions.cs" />
     <Compile Include="model\view\HypothesisViewModel.cs" />
     <Compile Include="model\view\HypothesesViewModel.cs" />
-    <Compile Include="model\view\InputGroupViewModelEventArgs.cs" />
-    <Compile Include="model\view\InputGroupViewModelEventHandler.cs" />
     <Compile Include="model\view\MenuItemComponentViewModel.cs" />
     <Compile Include="model\view\operation\ComparisonViewModelState.cs" />
     <Compile Include="model\view\operation\ExampleOperationViewModel.cs" />
     <Compile Include="model\view\operation\FilterOperationViewModel.cs" />
     <Compile Include="model\view\operation\StatisticalComparisonOperationViewModel.cs" />
-    <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="model\view\operation\OperationViewModel.cs" />
     <Compile Include="model\view\SliderMenuItemComponentViewModel.cs" />
     <Compile Include="model\view\CreateLinkMenuItemViewModel.cs" />
@@ -230,7 +223,6 @@
     <Compile Include="model\view\tilemenu\Alignment.cs" />
     <Compile Include="model\view\tilemenu\AttachPosition.cs" />
     <Compile Include="model\view\tilemenu\InputFieldViewTileMenuContentViewModel.cs" />
-    <Compile Include="model\view\tilemenu\InputGroupViewTileMenuContentViewModel.cs" />
     <Compile Include="model\view\tilemenu\OperationTypeGroupTileMenuContentViewModel.cs" />
     <Compile Include="model\view\tilemenu\OperationTypeTileMenuContentViewModel.cs" />
     <Compile Include="model\view\ToggleMenuItemComponentViewModel.cs" />
@@ -278,9 +270,6 @@
     </Compile>
     <Compile Include="view\common\GatewayErrorDialog.xaml.cs">
       <DependentUpon>GatewayErrorDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="view\common\AttributeGroupView.xaml.cs">
-      <DependentUpon>AttributeGroupView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\common\OperationTypeView.xaml.cs">
       <DependentUpon>OperationTypeView.xaml</DependentUpon>
@@ -376,9 +365,6 @@
       <DependentUpon>PlotRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\PlotRendererContentProvider.cs" />
-    <Compile Include="view\vis\render\RegresserRenderer.xaml.cs">
-      <DependentUpon>RegresserRenderer.xaml</DependentUpon>
-    </Compile>
     <Compile Include="view\vis\render\Renderer.cs" />
     <Compile Include="view\vis\OperationContainerView.xaml.cs">
       <DependentUpon>OperationContainerView.xaml</DependentUpon>
@@ -474,10 +460,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\common\GatewayErrorDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="view\common\AttributeGroupView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -587,10 +569,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\OperationContainerView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="view\vis\render\RegresserRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

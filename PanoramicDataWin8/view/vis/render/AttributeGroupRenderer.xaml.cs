@@ -55,7 +55,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (args.NewValue != null)
             {
                 var attributeGroupOperationViewModel = DataContext as AttributeGroupOperationViewModel;
-                NameTextBox.Text = attributeGroupOperationViewModel.AttributeGroupOperationModel.AttributeGroupModel.DisplayName ?? "";
+                NameTextBox.Text = attributeGroupOperationViewModel.AttributeGroupOperationModel.AttributeModel.DisplayName ?? "";
                 attributeGroupOperationViewModel.OperationModel.OperationModelUpdated -= OperationModelUpdated;
                 attributeGroupOperationViewModel.OperationModel.OperationModelUpdated += OperationModelUpdated;
                 attributeGroupOperationViewModel.OperationModel.PropertyChanged -= OperationModelPropertyChanged;
@@ -75,7 +75,7 @@ namespace PanoramicDataWin8.view.vis.render
         private void OperationModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var attributeGroupOperationViewModel = DataContext as AttributeGroupOperationViewModel;
-            NameTextBox.Text = attributeGroupOperationViewModel.AttributeGroupOperationModel.AttributeGroupModel.DisplayName ?? "";
+            NameTextBox.Text = attributeGroupOperationViewModel.AttributeGroupOperationModel.AttributeModel.DisplayName ?? "";
         }
 
         private void OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
@@ -109,7 +109,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 var model = (this.DataContext as AttributeGroupOperationViewModel).OperationModel as AttributeGroupOperationModel;
                 NameTextBox.IsEnabled = false;
-                model.AttributeGroupModel.DisplayName = NameTextBox.Text;
+                model.AttributeModel.DisplayName = NameTextBox.Text;
                 MainViewController.Instance.MainPage.addAttributeButton.Focus(FocusState.Pointer);
                 MainViewController.Instance.MainPage.clearAndDisposeMenus();
             }

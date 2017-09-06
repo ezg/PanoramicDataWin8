@@ -7,19 +7,12 @@ using System.Collections.Generic;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public class PredictorOperationModel : AttributeUsageOperationModel, IFilterConsumerOperationModel
+    public class PredictorOperationModel : ComputationalOperationModel, IFilterConsumerOperationModel
     {
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
-        string _rawName;
         
-        public PredictorOperationModel(SchemaModel schemaModel, string rawName, string displayName = null) : base(schemaModel)
+        public PredictorOperationModel(SchemaModel schemaModel, string rawName, string displayName = null) : base(schemaModel, "0", DataType.String, "numeric", rawName, displayName)
         {
-            _rawName = rawName;
-            if (rawName != null && !IDEAAttributeComputedFieldModel.NameExists(rawName))
-            {
-                IDEAAttributeComputedFieldModel.Add(rawName, displayName == null ? rawName : displayName, "0", DataType.String, "numeric",
-                               new List<VisualizationHint>());
-            }
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
@@ -43,16 +36,6 @@ namespace PanoramicDataWin8.model.data.operation
         {
             get { return _filterConsumerOperationModelImpl.ConsumerLinkModels; }
             set { _filterConsumerOperationModelImpl.ConsumerLinkModels = value; }
-        }
-        public void SetRawName(string name)
-        {
-            GetCode().RawName = name;
-            _rawName = name;
-            GetCode().DisplayName = name;
-        }
-        public IDEAAttributeComputedFieldModel GetCode()
-        {
-            return IDEAAttributeComputedFieldModel.Function(_rawName);
         }
 
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

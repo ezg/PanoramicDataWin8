@@ -1,8 +1,13 @@
-﻿using IDEA_common.operations;
+﻿using IDEA_common.catalog;
+using IDEA_common.operations;
 using Newtonsoft.Json;
 using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.utils;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
+using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 
 namespace PanoramicDataWin8.model.data.operation
 {
@@ -112,10 +117,10 @@ namespace PanoramicDataWin8.model.data.operation
     }
 
     public class AttributeUsageOperationModel : OperationModel {
-        
-        public AttributeUsageOperationModel(SchemaModel schemaModel):base(schemaModel) { }
-        public ObservableCollection<AttributeTransformationModel> AttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
 
+        public AttributeUsageOperationModel(SchemaModel schemaModel) : base(schemaModel) { }
+
+        public ObservableCollection<AttributeTransformationModel> AttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
     }
 
 }

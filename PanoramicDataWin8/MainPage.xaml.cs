@@ -760,7 +760,7 @@ namespace PanoramicDataWin8
                 foreach (var attributeGroupOperationModel in groupModels)
                     if (attributeGroupOperationModel != null)
                     {
-                        var tileMenuItemViewModel = recursiveCreateTileMenu(attributeGroupOperationModel.AttributeGroupModel, parentModel);
+                        var tileMenuItemViewModel = recursiveCreateTileMenu(attributeGroupOperationModel.AttributeModel, parentModel);
                         tileMenuItemViewModel.Row = count;
                         tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
                                                        (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;

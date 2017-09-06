@@ -142,15 +142,6 @@ namespace PanoramicDataWin8.view.common
                             ((OperationTypeGroupTileMenuContentViewModel)model.TileMenuContentViewModel).OperationTypeGroupModel
                     });
                 }
-                else if (model.TileMenuContentViewModel is InputGroupViewTileMenuContentViewModel)
-                {
-                    mainGrid.Children.Clear();
-                    mainGrid.Children.Add(new AttributeGroupView()
-                    {
-                        DataContext =
-                            ((InputGroupViewTileMenuContentViewModel)model.TileMenuContentViewModel).InputGroupViewModel
-                    });
-                }
             }
         }
 

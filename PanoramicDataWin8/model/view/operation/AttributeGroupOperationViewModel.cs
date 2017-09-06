@@ -50,7 +50,7 @@ namespace PanoramicDataWin8.model.view.operation
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
 
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(AttributeGroupOperationModel.AttributeGroupModel));
+            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(AttributeGroupOperationModel.AttributeModel));
             attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
             menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);
@@ -68,7 +68,7 @@ namespace PanoramicDataWin8.model.view.operation
                 foreach (var g in AttributeGroupOperationModel.AttributeUsageTransformationModels)
                     str += g.AttributeModel.DisplayName + ",";
                 str = str.TrimEnd(',') + ")";
-                var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(AttributeGroupOperationModel.AttributeGroupModel.DisplayName, str);
+                var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(AttributeGroupOperationModel.AttributeModel.DisplayName, str);
                 AttributeGroupOperationModel.SetName(newName);
             };
         }

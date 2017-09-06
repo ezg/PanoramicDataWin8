@@ -1,9 +1,11 @@
 ﻿using IDEA_common.catalog;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using Windows.UI;
 using Windows.UI.Xaml;
 using static PanoramicDataWin8.model.data.attribute.AttributeModel;
@@ -13,10 +15,7 @@ namespace PanoramicDataWin8.model.data.operation
     public class BrushDescriptor : ExtendedBindableBase
     {
         string _name;
-        public BrushDescriptor()
-        {
-
-        }
+        public BrushDescriptor() { }
         public BrushDescriptor(Color color, string name)
         {
             Color = color;
@@ -24,32 +23,43 @@ namespace PanoramicDataWin8.model.data.operation
         }
         public string Name
         {
-            get
-            {
-                return _name;
-            }
-            set
-            {
-                SetProperty(ref _name, value);
-            }
+            get { return _name; }
+            set { SetProperty(ref _name, value); }
         }
         public Color Color { get; set; }
     }
-    public class DefinitionOperationModel : OperationModel, IBrushableOperationModel
+    public class DefinitionOperationModel : ComputationalOperationModel, IBrushableOperationModel
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
-        string _rawName;
 
-        public DefinitionOperationModel(SchemaModel schemaModel, string rawName, string displayName=null) : base(schemaModel)
+        protected override void updateName()
         {
-            _rawName = rawName;
-            if (rawName != null && !IDEAAttributeComputedFieldModel.NameExists(rawName))
-            {
-                IDEAAttributeComputedFieldModel.Add(rawName, displayName == null ? rawName : displayName, "0", DataType.String, "numeric",
-                               new List<VisualizationHint>());
-            }
-            _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
+            var str = "(";
+            var code = (GetCode().FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Code;
+            var terms = new Regex("\\b", RegexOptions.Compiled).Split(code);
+            List<string> used = new List<string>();
+            foreach (var n in terms)
+                if (n != null && !used.Contains(n) && AttributeTransformationModel.MatchesExistingField(n, true) != null)
+                {
+                    str += n + ",";
+                    used.Add(n);
+                }
+            str = str.TrimEnd(',') + ")";
+            var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(GetCode().RawName, str);
+            GetCode().DisplayName = newName;
         }
+
+        public DefinitionOperationModel(SchemaModel schemaModel, string rawName, string displayName=null) : base(schemaModel, "0", DataType.String, "numeric", rawName, displayName)
+        {
+            _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
+            BrushOperationModels.CollectionChanged += BrushOperationModels_CollectionChanged;
+        }
+
+        private void BrushOperationModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (GetCode() != null) updateName();
+        }
+
         public List<BrushDescriptor> BrushDescriptors { get; set; } = new List<BrushDescriptor>();
 
         public void SetDescriptorForColor(Color c, BrushDescriptor d)
@@ -73,22 +83,11 @@ namespace PanoramicDataWin8.model.data.operation
         }
 
         public List<Color> BrushColors { get; set; } = new List<Color>();
-
-
+        
         public ObservableCollection<IBrusherOperationModel> BrushOperationModels
         {
             get { return _brushableOperationModelImpl.BrushOperationModels; }
-            set { _brushableOperationModelImpl.BrushOperationModels = value; }
-        }
-        public IDEAAttributeComputedFieldModel GetCode()
-        {
-            return IDEAAttributeComputedFieldModel.Function(_rawName);
-        }
-        public void SetRawName(string name)
-        {
-            GetCode().RawName = name;
-            _rawName = name;
-            GetCode().DisplayName = name;
+            set { _brushableOperationModelImpl.BrushOperationModels = value;   }
         }
         public void UpdateCode()
         {
@@ -153,6 +152,7 @@ namespace PanoramicDataWin8.model.data.operation
             GetCode().VisualizationHints = new List<IDEA_common.catalog.VisualizationHint>(new IDEA_common.catalog.VisualizationHint[] { IDEA_common.catalog.VisualizationHint.TreatAsEnumeration});
 
             GetCode().SetCode(expression, DataType.String);
+            updateName();
         }
     }
 }

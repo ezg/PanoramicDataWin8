@@ -68,7 +68,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         void Relayout()
         {
-            var model = ((DataContext as DefinitionOperationViewModel).OperationModel as DefinitionOperationModel);
+            var model = (DataContext as DefinitionOperationViewModel).DefinitionOperationModel;
             Labels.Children.Clear();
             Labels.RowDefinitions.Clear();
             int numLabels = model.BrushColors.Count + 1 + (model.BrushColors.Count > 1 ? 1 : 0);

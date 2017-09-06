@@ -94,9 +94,9 @@ namespace PanoramicDataWin8.controller.view
                                 {
                                     comparisonOperationViewModel.StatisticalComparisonOperationModel.TestType = TestType.corr;
                                 }
-                                else if ((a1.AttributeModel as AttributeFieldModel).DataType == DataType.Float ||
-                                         (a1.AttributeModel as AttributeFieldModel).DataType == DataType.Double ||
-                                         (a1.AttributeModel as AttributeFieldModel).DataType == DataType.Int)
+                                else if (a1.AttributeModel.DataType == DataType.Float ||
+                                         a1.AttributeModel.DataType == DataType.Double ||
+                                         a1.AttributeModel.DataType == DataType.Int)
                                 {
                                     comparisonOperationViewModel.StatisticalComparisonOperationModel.TestType = TestType.ttest;
                                 }

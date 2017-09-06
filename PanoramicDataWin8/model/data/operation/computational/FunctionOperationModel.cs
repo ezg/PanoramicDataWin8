@@ -42,39 +42,22 @@ namespace PanoramicDataWin8.model.data.operation
         }
     }
 
-    public class FunctionOperationModel : AttributeUsageOperationModel
+    public class FunctionOperationModel : ComputationalOperationModel
     {
 
         public FunctionSubtypeModel FunctionSubtypeModel;
-        string       _rawName;
-        public FunctionOperationModel(SchemaModel schemaModel, FunctionSubtypeModel functionSubtypeModel, string displayName = null) : base(schemaModel)
+        public FunctionOperationModel(SchemaModel schemaModel, FunctionSubtypeModel functionSubtypeModel, string displayName = null) : 
+            base(schemaModel, "0", functionSubtypeModel.DataType, functionSubtypeModel.InputVisualizationType,
+                 functionSubtypeModel.Name + new Random().Next(), displayName == null ? functionSubtypeModel.Name : displayName)
+
         {
             FunctionSubtypeModel = functionSubtypeModel;
-            _rawName = FunctionSubtypeModel.Name + new Random().Next();
-            DisplayName = DisplayName == null ? FunctionSubtypeModel.Name : displayName;
-            if (_rawName != null && !IDEAAttributeComputedFieldModel.NameExists(_rawName))
-            {
-                IDEAAttributeComputedFieldModel.Add(_rawName, DisplayName, FunctionSubtypeModel.Code(null), FunctionSubtypeModel.DataType, FunctionSubtypeModel.InputVisualizationType,
-                               new List<VisualizationHint>());
-            }
             AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
-
-        public string DisplayName { get; set; }
         
         public void SetParameters(Dictionary<string,object> parameters)
         {
             GetCode().SetCode(FunctionSubtypeModel.Code(parameters), FunctionSubtypeModel.DataType);
-        }
-        public void SetRawName(string name)
-        {
-            GetCode().RawName = name;
-            _rawName = name;
-            GetCode().DisplayName = name;
-        }
-        public IDEAAttributeComputedFieldModel GetCode()
-        {
-            return IDEAAttributeComputedFieldModel.Function(_rawName);
         }
 
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

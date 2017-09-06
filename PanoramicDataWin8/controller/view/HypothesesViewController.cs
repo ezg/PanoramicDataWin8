@@ -122,9 +122,9 @@ namespace PanoramicDataWin8.controller.view
                         {
                             statModel = new StatisticalComparisonOperationModel(model.SchemaModel);
                             var a1 = model.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
-                            if ((a1.AttributeModel as AttributeFieldModel).DataType == DataType.Float ||
-                                (a1.AttributeModel as AttributeFieldModel).DataType == DataType.Double ||
-                                (a1.AttributeModel as AttributeFieldModel).DataType == DataType.Int)
+                            if (a1.AttributeModel.DataType == DataType.Float ||
+                                a1.AttributeModel.DataType == DataType.Double ||
+                                a1.AttributeModel.DataType == DataType.Int)
                             {
                                 statModel.TestType = TestType.ttest;
                             }

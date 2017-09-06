@@ -308,10 +308,9 @@ namespace PanoramicDataWin8.view.vis.menu
             var attr = AttributeTransformationModel.MatchesExistingField(newName, true);
             // if attribute label doesn't match any known attribute and this is a calculation operation, 
             // then set the name of the Calculation operation to the attribute label 
-            if (attr == null && !IDEAAttributeComputedFieldModel.NameExists(newName)) {
-                (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as CalculationOperationModel)?.SetRawName(model.Label);
-                (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as DefinitionOperationModel)?.SetRawName(model.Label);
-                (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as PredictorOperationModel)?.SetRawName(model.Label);
+            if (attr == null && !IDEAAttributeModel.NameExists(newName))
+            {
+                (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as ComputationalOperationModel)?.SetRawName(model.Label);
             }
 
             model.Editing = Visibility.Collapsed;
