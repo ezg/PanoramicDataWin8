@@ -33,7 +33,7 @@ namespace PanoramicDataWin8.model.data.idea
         }
         static public AttributeModel AddGroupField(string rawName, string displayName)
         {
-            var fieldModel = new IDEAAttributeModel(rawName, displayName, new AttributeFuncModel.AttributeGroupFuncModel(), DataType.Undefined, InputVisualizationTypeConstants.NUMERIC, new List<VisualizationHint>());
+            var fieldModel = new IDEAAttributeModel(rawName, displayName, new AttributeFuncModel.AttributeGroupFuncModel(), DataType.Undefined, InputVisualizationTypeConstants.VECTOR, new List<VisualizationHint>());
             _allFieldAttributeModels.Add(fieldModel);
             return fieldModel;
         }

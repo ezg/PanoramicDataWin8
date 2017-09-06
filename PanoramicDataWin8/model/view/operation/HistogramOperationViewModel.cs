@@ -389,35 +389,32 @@ namespace PanoramicDataWin8.model.view.operation
             createAxisMenu(AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
             createRightHistogramMenu();
             createTopHistogramMenu();
-
-            if (attributeModel != null)
+            
+            if (attributeModel.InputVisualizationType == InputVisualizationTypeConstants.ENUM ||
+                attributeModel.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
             {
-                if (attributeModel.InputVisualizationType == InputVisualizationTypeConstants.ENUM ||
-                    attributeModel.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
-                {
-                    histogramOperationModel.VisualizationType = VisualizationType.plot;
+                histogramOperationModel.VisualizationType = VisualizationType.plot;
 
-                    var x     = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.None };
-                    var y     = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.Count };
-                    var value = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.Count };
-                    var flipAxis = attributeModel.VisualizationHints.Contains(VisualizationHint.DefaultFlipAxis);
-                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X,            flipAxis ? y : x);
-                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.Y,            flipAxis ? x: y);
-                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
-                }
-                else if (attributeModel.InputVisualizationType == InputVisualizationTypeConstants.GEOGRAPHY)
-                {
-                }
-                else
-                {
-                    histogramOperationModel.VisualizationType = VisualizationType.table;
-                    var x = new AttributeTransformationModel(attributeModel);
-                    histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
-                }
+                var x     = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.None };
+                var y     = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.Count };
+                var value = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.Count };
+                var flipAxis = attributeModel.VisualizationHints.Contains(VisualizationHint.DefaultFlipAxis);
+                histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X,            flipAxis ? y : x);
+                histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.Y,            flipAxis ? x: y);
+                histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
+            }
+            else if (attributeModel.InputVisualizationType == InputVisualizationTypeConstants.GEOGRAPHY)
+            {
+            }
+            else if (attributeModel.InputVisualizationType == InputVisualizationTypeConstants.VECTOR)
+            {
+                histogramOperationModel.VisualizationType = VisualizationType.plot;
             }
             else
             {
-                histogramOperationModel.VisualizationType = VisualizationType.plot;
+                histogramOperationModel.VisualizationType = VisualizationType.table;
+                var x = new AttributeTransformationModel(attributeModel);
+                histogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
             }
         }
 
