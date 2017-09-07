@@ -25,7 +25,8 @@ namespace PanoramicDataWin8.model.data.operation
                     str += n + ",";
             str = str.TrimEnd(',') + ")";
             var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(GetCode().RawName, str);
-            GetCode().DisplayName = newName;
+            //GetCode().DisplayName = newName;
+            SetRawName(newName);
         }
         public ComputationalOperationModel(SchemaModel schemaModel, string code, DataType dataType, string visualizationType, string rawName, string displayName = null) : base(schemaModel)
         {
