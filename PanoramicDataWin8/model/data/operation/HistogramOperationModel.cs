@@ -58,18 +58,20 @@ namespace PanoramicDataWin8.model.data.operation
         private void IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent(object sender)
         {
             // bcz: test to see if this code has an effect on our operation...
-            List<AttributeCodeParameters> attributeCodeParameters;
+            List<AttributeCaclculatedParameters> attributeCodeParameters;
             List<string> brushes;
             List<AttributeTransformationModel> aggregates;
             IDEAHelpers.GetHistogramRawOperationParameters(this, out attributeCodeParameters, out brushes, out aggregates);
 
-            foreach (var attr in attributeCodeParameters)
+            foreach (var attr in attributeCodeParameters.OfType<AttributeCodeParameters>())
+            {
                 if (attr.RawName == (sender as IDEAAttributeModel).RawName ||
                     attr.Code.Contains((sender as IDEAAttributeModel).RawName))
                 {
                     FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                     break;
                 }
+            }
         }
 
         public Dictionary<AttributeUsage, ObservableCollection<AttributeTransformationModel>>

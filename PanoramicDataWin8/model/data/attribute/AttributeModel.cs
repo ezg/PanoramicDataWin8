@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using IDEA_common.catalog;
 using PanoramicDataWin8.utils;
 using Microsoft.Practices.Prism.Mvvm;
@@ -90,6 +91,15 @@ namespace PanoramicDataWin8.model.data.attribute
                     _code = code;
                 }
                 public string Code { get => _code; set => _code = value; }
+            }
+            public class AttributeBackendFuncModel : AttributeFuncModel
+            {
+                Guid? _id;
+                public AttributeBackendFuncModel(Guid? id)
+                {
+                    _id = id;
+                }
+                public Guid? Id { get => _id; set => _id = value; }
             }
             public class AttributeColumnFuncModel : AttributeFuncModel
             {

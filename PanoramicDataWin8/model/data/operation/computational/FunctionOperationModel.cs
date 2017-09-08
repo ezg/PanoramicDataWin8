@@ -57,7 +57,7 @@ namespace PanoramicDataWin8.model.data.operation
         
         public void SetParameters(Dictionary<string,object> parameters)
         {
-            GetCode().SetCode(FunctionSubtypeModel.Code(parameters), FunctionSubtypeModel.DataType);
+            GetAttributeModel().SetCode(FunctionSubtypeModel.Code(parameters), FunctionSubtypeModel.DataType);
         }
 
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

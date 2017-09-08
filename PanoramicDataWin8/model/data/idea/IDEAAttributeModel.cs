@@ -25,6 +25,12 @@ namespace PanoramicDataWin8.model.data.idea
             _allFieldAttributeModels.Add(fieldModel);
             return fieldModel;
         }
+        static public AttributeModel AddBackendField(string rawName, string displayName, Guid? backendOperatorId, DataType dataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
+        {
+            var fieldModel = new IDEAAttributeModel(rawName, displayName, new AttributeFuncModel.AttributeBackendFuncModel(backendOperatorId), dataType, inputVisualizationType, visualizationHints);
+            _allFieldAttributeModels.Add(fieldModel);
+            return fieldModel;
+        }
         static public AttributeModel AddColumnField(string rawName, string displayName, DataType dataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
         {
             var fieldModel = new IDEAAttributeModel(rawName, displayName, new AttributeFuncModel.AttributeColumnFuncModel(), dataType, inputVisualizationType, visualizationHints);
@@ -40,21 +46,11 @@ namespace PanoramicDataWin8.model.data.idea
 
         static public IEnumerable<IDEAAttributeModel> GetAllCalculatedAttributeModels()
         {
-            return _allFieldAttributeModels.Where((fm) => fm.FuncModel is AttributeFuncModel.AttributeCodeFuncModel);
+            return _allFieldAttributeModels.Where((fm) =>
+                fm.FuncModel is AttributeFuncModel.AttributeCodeFuncModel ||
+                fm.FuncModel is AttributeFuncModel.AttributeBackendFuncModel);
         }
-
-        static public List<AttributeCodeParameters>  GetAllCode()
-        {
-            var attrList = new List<AttributeCodeParameters>();
-            foreach (var func in GetAllCalculatedAttributeModels())
-                attrList.Add(new AttributeCodeParameters()
-                {
-                    Code = (func.FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Code,
-                    RawName = func.RawName
-                });
-            return attrList;
-        }
-
+        
         public delegate void CodeDefinitionChangedHandler(object sender);
         static public event CodeDefinitionChangedHandler CodeDefinitionChangedEvent;
 

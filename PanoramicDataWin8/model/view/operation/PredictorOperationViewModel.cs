@@ -107,7 +107,6 @@ namespace PanoramicDataWin8.model.view.operation
                 NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
                 NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
             };
-
             var menuItem = new MenuItemViewModel
             {
                 MenuViewModel = menuViewModel,
@@ -126,14 +125,31 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 TextAngle = textAngle,
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = PredictorOperationModel.GetCode().DisplayName
+                Label = PredictorOperationModel.GetAttributeModel().DisplayName
             };
             PredictorOperationModel.SetRawName(PredictorNameMenuItemViewModel.Label);
-            PredictorNameMenuItemViewModel.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(PredictorOperationModel.GetCode()));
+            PredictorNameMenuItemViewModel.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, 
+                new AttributeTransformationModel(PredictorOperationModel.GetAttributeModel()));
             PredictorNameMenuItemViewModel.TappedTriggered = (() => PredictorNameMenuItemViewModel.Editing = Windows.UI.Xaml.Visibility.Visible);
             menuItem.MenuItemComponentViewModel = PredictorNameMenuItemViewModel;
-            menuViewModel.MenuItemViewModels.Add(menuItem);
+            
             attachmentViewModel.MenuViewModel = menuViewModel;
+
+            PredictorOperationModel.PropertyChanged += (sender, args) =>
+            {
+                var model = PredictorOperationModel;
+                if (args.PropertyName == model.GetPropertyName(() => model.Result))
+                {
+                    if (model.Result == null)
+                    {
+                        menuViewModel.MenuItemViewModels.Remove(menuItem);
+                    }
+                    else if (!menuViewModel.MenuItemViewModels.Contains(menuItem))
+                    {
+                        menuViewModel.MenuItemViewModels.Add(menuItem);
+                    }
+                }
+            };
         }
 
         protected void createLeftInputsExpandingMenu()

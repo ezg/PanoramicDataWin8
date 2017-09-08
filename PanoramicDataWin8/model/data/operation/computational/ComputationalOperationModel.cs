@@ -18,14 +18,14 @@ namespace PanoramicDataWin8.model.data.operation
         protected virtual void updateName()
         {
             var str = "(";
-            var code = (GetCode().FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Code;
+            var code = (GetAttributeModel().FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Code;
             var terms = new Regex("\\b", RegexOptions.Compiled).Split(code);
             foreach (var n in terms)
                 if (n != null && AttributeTransformationModel.MatchesExistingField(n, true) != null)
                     str += n + ",";
             str = str.TrimEnd(',') + ")";
-            var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(GetCode().RawName, str);
-            //GetCode().DisplayName = newName;
+            var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(GetAttributeModel().RawName, str);
+            //GetAttributeModel().DisplayName = newName;
             SetRawName(newName);
         }
         public ComputationalOperationModel(SchemaModel schemaModel, string code, DataType dataType, string visualizationType, string rawName, string displayName = null) : base(schemaModel)
@@ -38,16 +38,16 @@ namespace PanoramicDataWin8.model.data.operation
         }
         public void SetRawName(string name)
         {
-            var code = GetCode();
+            var code = GetAttributeModel();
             code.DisplayName = code.RawName = _rawName = name;
         }
-        public IDEAAttributeModel GetCode()
+        public IDEAAttributeModel GetAttributeModel()
         {
             return IDEAAttributeModel.Function(_rawName);
         }
         public void SetCode(string code, DataType dataType)
         {
-            GetCode().SetCode(code, dataType);
+            GetAttributeModel().SetCode(code, dataType);
             updateName();
         }
     }

@@ -55,7 +55,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
 
                 var model = this.DataContext as FunctionOperationViewModel;
-                NameTextBox.Text = model.FunctionOperationModel.GetCode().DisplayName;
+                NameTextBox.Text = model.FunctionOperationModel.GetAttributeModel().DisplayName;
                 model.OperationModel.OperationModelUpdated -= OperationModelUpdated;
                 model.OperationModel.OperationModelUpdated += OperationModelUpdated;
                 model.OperationModel.PropertyChanged -= OperationModelPropertyChanged;

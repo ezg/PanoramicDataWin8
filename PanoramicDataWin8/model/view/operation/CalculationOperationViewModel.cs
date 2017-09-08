@@ -18,7 +18,7 @@ namespace PanoramicDataWin8.model.view.operation
         public CalculationOperationViewModel(CalculationOperationModel operationModel, bool fromMouse = false) : base(operationModel)
         {
             addAttachmentViewModels();
-            createLabelMenu(AttachmentOrientation.Bottom, CalculationOperationModel.GetCode(), AttributeUsage.X, new Vec(200, 50), 0, true, false);
+            createLabelMenu(AttachmentOrientation.Bottom, CalculationOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false);
         }
     }
 }

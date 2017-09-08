@@ -17,7 +17,7 @@ namespace PanoramicDataWin8.model.view.operation
         public DefinitionOperationViewModel(DefinitionOperationModel histogramOperationModel, bool fromMouse=false) : base(histogramOperationModel)
         {
             addAttachmentViewModels();
-            createLabelMenu(AttachmentOrientation.Bottom, DefinitionOperationModel.GetCode(), AttributeUsage.X, new Vec(200, 50), 0, true, false);
+            createLabelMenu(AttachmentOrientation.Bottom, DefinitionOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false);
         }
     }
 }

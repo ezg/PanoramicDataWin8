@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.model.data.operation
         protected override void updateName()
         {
             var str = "(";
-            var code = (GetCode().FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Code;
+            var code = (GetAttributeModel().FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Code;
             var terms = new Regex("\\b", RegexOptions.Compiled).Split(code);
             List<string> used = new List<string>();
             foreach (var n in terms)
@@ -45,8 +45,8 @@ namespace PanoramicDataWin8.model.data.operation
                     used.Add(n);
                 }
             str = str.TrimEnd(',') + ")";
-            var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(GetCode().RawName, str);
-            GetCode().DisplayName = newName;
+            var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(GetAttributeModel().RawName, str);
+            GetAttributeModel().DisplayName = newName;
         }
 
         public DefinitionOperationModel(SchemaModel schemaModel, string rawName, string displayName=null) : base(schemaModel, "0", DataType.String, "numeric", rawName, displayName)
@@ -57,7 +57,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         private void BrushOperationModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (GetCode() != null) updateName();
+            if (GetAttributeModel() != null) updateName();
         }
 
         public List<BrushDescriptor> BrushDescriptors { get; set; } = new List<BrushDescriptor>();
@@ -149,9 +149,9 @@ namespace PanoramicDataWin8.model.data.operation
                 }
             }
             expression += "\"" + BrushDescriptors[0].Name + "\"";
-            GetCode().VisualizationHints = new List<IDEA_common.catalog.VisualizationHint>(new IDEA_common.catalog.VisualizationHint[] { IDEA_common.catalog.VisualizationHint.TreatAsEnumeration});
+            GetAttributeModel().VisualizationHints = new List<IDEA_common.catalog.VisualizationHint>(new IDEA_common.catalog.VisualizationHint[] { IDEA_common.catalog.VisualizationHint.TreatAsEnumeration});
 
-            GetCode().SetCode(expression, DataType.String);
+            GetAttributeModel().SetCode(expression, DataType.String);
             updateName();
         }
     }

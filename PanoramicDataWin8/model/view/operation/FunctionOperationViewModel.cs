@@ -104,7 +104,7 @@ namespace PanoramicDataWin8.model.view.operation
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
 
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(FunctionOperationModel.GetCode()));
+            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(FunctionOperationModel.GetAttributeModel()));
             attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
             menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);

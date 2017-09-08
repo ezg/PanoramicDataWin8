@@ -28,7 +28,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             if (atm.FuncModel == null)
             {
                 return new AttributeCodeParameters();
-            } else
+            }
             if (atm.FuncModel is AttributeModel.AttributeFuncModel.AttributeColumnFuncModel)
             {
                 return new AttributeColumnParameters()
@@ -37,21 +37,28 @@ namespace PanoramicDataWin8.controller.data.progressive
                     VisualizationHints = atm.VisualizationHints
                 };
             }
-            else if(atm.FuncModel is AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)
+            if (atm.FuncModel is AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)
             {
                 return new AttributeCodeParameters();
             }
-            else
-            { 
-                return new AttributeCodeParameters()
+            if (atm.FuncModel is AttributeModel.AttributeFuncModel.AttributeBackendFuncModel)
+            {
+                return new AttributeBackendParameters()
                 {
-                    Code = ((AttributeModel.AttributeFuncModel.AttributeCodeFuncModel) atm.FuncModel).Code,
                     RawName = atm.RawName,
-                    VisualizationHints = atm.VisualizationHints
+                    VisualizationHints = atm.VisualizationHints,
+                    Id = ((AttributeModel.AttributeFuncModel.AttributeBackendFuncModel)atm.FuncModel).Id
                 };
             }
+
+            return new AttributeCodeParameters()
+            {
+                Code = ((AttributeModel.AttributeFuncModel.AttributeCodeFuncModel) atm.FuncModel).Code,
+                RawName = atm.RawName,
+                VisualizationHints = atm.VisualizationHints
+            };
         }
-        
+
         public static List<AttributeParameters> GetAttributeParameters(IEnumerable<AttributeModel> models)
         {
             return models.Select(am => GetAttributeParameters(am)).ToList();
@@ -203,14 +210,14 @@ namespace PanoramicDataWin8.controller.data.progressive
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
                 Filter = filter,
                 LabelAttribute = GetAttributeParameters(model.TargetAttributeUsageTransformationModel.AttributeModel),
-                ProblemType = ProblemType.Classification,
+                ProblemType = ProblemType.Undefined,
                 SampleStreamBlockSize = sampleSize,
                 FeatureAttributes = psm.RootOriginModel.InputModels
                     .Where(im => im.DataType != DataType.String && im != model.TargetAttributeUsageTransformationModel.AttributeModel)
                     .Select(im => GetAttributeParameters(im)).ToList(),
                 NrOfBanditRuns = 100,
                 NrOfCrossValidations = 1,
-                AttributeCalculatedParameters = IDEAAttributeModel.GetAllCode().OfType<AttributeCaclculatedParameters>().ToList()
+                AttributeCalculatedParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels().Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList()
             };
             
             var aa = new AttributeCodeParameters();
@@ -236,9 +243,9 @@ namespace PanoramicDataWin8.controller.data.progressive
             return param;
         }
 
-        public static string GetHistogramRawOperationParameters(HistogramOperationModel model, out List<AttributeCodeParameters> attributeCodeParameters, out List<string> brushes, out List<AttributeTransformationModel> aggregates)
+        public static string GetHistogramRawOperationParameters(HistogramOperationModel model, out List<AttributeCaclculatedParameters> attributeCodeParameters, out List<string> brushes, out List<AttributeTransformationModel> aggregates)
         {
-            attributeCodeParameters = new List<AttributeCodeParameters>();
+            attributeCodeParameters = new List<AttributeCaclculatedParameters>();
             brushes                 = new List<string>();
 
             var filterModels = new List<FilterModel>();
@@ -274,11 +281,11 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         public static HistogramOperationParameters GetHistogramOperationParameters(HistogramOperationModel model, int sampleSize)
         {
-            List<AttributeCodeParameters>      attributeCodeParameters;
+            List<AttributeCaclculatedParameters>      attributeCodeParameters;
             List<string>                       brushes;
             List<AttributeTransformationModel> aggregates;
             var filter = GetHistogramRawOperationParameters(model, out attributeCodeParameters, out brushes, out aggregates);
-            attributeCodeParameters = IDEAAttributeModel.GetAllCode();
+            attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels().Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
 
             var nrOfBins = new List<double>();
 

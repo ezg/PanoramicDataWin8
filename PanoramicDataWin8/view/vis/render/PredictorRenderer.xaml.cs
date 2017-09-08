@@ -22,6 +22,7 @@ using Windows.UI.Input;
 using System.Diagnostics;
 using GeoAPI.Geometries;
 using IDEA_common.operations;
+using IDEA_common.operations.ml.optimizer;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
@@ -50,7 +51,6 @@ namespace PanoramicDataWin8.view.vis.render
         void Relayout()
         {
             var model = ((DataContext as PredictorOperationViewModel).OperationModel as PredictorOperationModel);
-            model.UpdateCode();
         }
         void Renderer_Loaded(object sender, RoutedEventArgs e)
         {
@@ -121,6 +121,9 @@ namespace PanoramicDataWin8.view.vis.render
         void loadResult(IResult result)
         {
             PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
+            var operationModel = (PredictorOperationModel) model.OperationModel;
+            operationModel.UpdateBackendOperatorId((result as OptimizerResult).ParentOperationId);
+
             _predictorRendererContentProvider.UpdateData(result,
                 (PredictorOperationModel)model.OperationModel,
                 (PredictorOperationModel)model.OperationModel.ResultCauserClone);

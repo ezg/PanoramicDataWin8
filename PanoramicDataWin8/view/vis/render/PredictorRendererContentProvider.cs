@@ -60,13 +60,29 @@ namespace PanoramicDataWin8.view.vis.render
                 var deviceWidth = (float) (canvas.ActualWidth/CompositionScaleX - leftOffset - rightOffset);
                 var deviceHeight = (float) (canvas.ActualHeight/CompositionScaleY - topOffset - bottomtOffset);
 
-                renderGauge(canvas, canvasArgs,
-                    leftOffset,
-                    topOffset + 30,
-                    deviceWidth,
-                    deviceHeight - 30,
-                    (float)_optimizerResult.MetricsPerSampleSize[_optimizerResult.MetricsPerSampleSize.Keys.Max()].AverageAccuracy,
-                    "accuracy\n(" + _optimizerResult.TotalModelsAnalyzed + " models tested)");
+                var metric = _optimizerResult.MetricsPerSampleSize[_optimizerResult.MetricsPerSampleSize.Keys.Max()];
+
+
+                if (metric.AverageAccuracy.HasValue)
+                {
+                    renderGauge(canvas, canvasArgs,
+                        leftOffset,
+                        topOffset + 30,
+                        deviceWidth,
+                        deviceHeight - 30,
+                        (float) metric.AverageAccuracy.Value,
+                        "accuracy\n(" + _optimizerResult.TotalModelsAnalyzed + " models tested)");
+                }
+                else if (metric.AverageRSquared.HasValue)
+                {
+                    renderGauge(canvas, canvasArgs,
+                        leftOffset,
+                        topOffset + 30,
+                        deviceWidth,
+                        deviceHeight - 30,
+                        (float)metric.AverageRSquared.Value,
+                        "r squared\n(" + _optimizerResult.TotalModelsAnalyzed + " models tested)");
+                }
             }
             if (_isResultEmpty)
             {
