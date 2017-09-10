@@ -723,7 +723,7 @@ namespace PanoramicDataWin8
                     menuCanvas.Children.Remove(_attributeMenu);
                 }
 
-                var allModels = inputModels.Count() + groupModels.Count();
+                var allModels = inputModels.Count() + groupModels.Count() + 1; // + 1 for the (+) attribute group model
                 var parentModel = new TileMenuItemViewModel(null);
                 parentModel.ChildrenNrColumns = (int) Math.Ceiling(allModels / 10.0);
                 parentModel.ChildrenNrRows = (int) Math.Min(10.0, allModels);
