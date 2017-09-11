@@ -6,6 +6,7 @@
     "Microsoft.ApplicationInsights.PersistenceChannel": "1.2.3",
     "Microsoft.ApplicationInsights.WindowsApps": "1.1.1",
     "Microsoft.NETCore.UniversalWindowsPlatform": "5.2.1",
+    "Microsoft.Xaml.Behaviors.Uwp.Managed": "2.0.0",
     "NetTopologySuite": "1.14.0",
     "Newtonsoft.Json": "10.0.3",
     "Prism.Mvvm": "1.1.1",
@@ -14,7 +15,7 @@
     "WinRTXamlToolkit.UWP": "1.9.4"
   },
   "frameworks": {
-    "uap10.0": {}
+    "uap10.0.10240": {}
   },
   "runtimes": {
     "win10-arm": {},
