@@ -5,8 +5,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 {
     public class StatisticalComparisonDecisionOperationJob : OperationJob
     {
-        public StatisticalComparisonDecisionOperationJob(OperationModel operationModel,
-            TimeSpan throttle) : base(operationModel, throttle)
+        public StatisticalComparisonDecisionOperationJob(OperationModel operationModel) : base(operationModel)
         {
             var model = (StatisticalComparisonDecisionOperationModel)operationModel.ResultCauserClone;
             OperationParameters = IDEAHelpers.GetModelStateParameters(model);

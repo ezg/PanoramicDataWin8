@@ -122,7 +122,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
             var operationModel = (PredictorOperationModel) model.OperationModel;
-            operationModel.UpdateBackendOperatorId((result as OptimizerResult).ParentOperationId);
+            operationModel.UpdateBackendOperatorId((result as OptimizerResult).PipelineId);
 
             _predictorRendererContentProvider.UpdateData(result,
                 (PredictorOperationModel)model.OperationModel,

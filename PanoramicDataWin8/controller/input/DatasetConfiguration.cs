@@ -41,18 +41,6 @@ namespace PanoramicDataWin8.controller.input
             set { SetProperty(ref _nrOfRecords, value); }
         }
 
-        public double ThrottleInMillis
-        {
-            get { return _throttleInMillis; }
-            set { SetProperty(ref _throttleInMillis, value); }
-        }
-
-        public string Backend
-        {
-            get { return _backend; }
-            set { SetProperty(ref _backend, value); }
-        }
-
         public List<string> InputFieldNames
         {
             get { return _inputFieldNames; }

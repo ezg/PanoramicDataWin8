@@ -6,7 +6,7 @@ namespace PanoramicDataWin8.controller.data.progressive
     public class ExampleOperationJob : OperationJob
     {
         public ExampleOperationJob(OperationModel operationModel,
-            TimeSpan throttle, int sampleSize) : base(operationModel, throttle)
+             int sampleSize) : base(operationModel)
         {
             OperationParameters = IDEAHelpers.GetExampleOperationParameters((ExampleOperationModel) operationModel, sampleSize);
         }

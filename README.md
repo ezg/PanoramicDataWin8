@@ -8,3 +8,6 @@ CTRL-E or CTRL-D : increase, decrease nr of x bins
 CTRL-R or CTRL-F : increase, decrease nr of y bins
 
 CTRL-P: show pen and fingers
+
+Localhost issues when app is installed:
+CheckNetIsolation.exe LoopbackExempt -a -n=vizdom_rcvekz89kevb4

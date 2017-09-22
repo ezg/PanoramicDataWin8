@@ -60,10 +60,10 @@ namespace PanoramicDataWin8.view.vis.render
                 var deviceWidth = (float) (canvas.ActualWidth/CompositionScaleX - leftOffset - rightOffset);
                 var deviceHeight = (float) (canvas.ActualHeight/CompositionScaleY - topOffset - bottomtOffset);
 
-                var metric = _optimizerResult.MetricsPerSampleSize[_optimizerResult.MetricsPerSampleSize.Keys.Max()];
+                var metric = _optimizerResult.Metrics;
 
 
-                if (metric.AverageAccuracy.HasValue)
+                if (metric.AverageAccuracy.HasValue && metric.AverageRSquared.Value != 0)
                 {
                     renderGauge(canvas, canvasArgs,
                         leftOffset,
@@ -71,7 +71,7 @@ namespace PanoramicDataWin8.view.vis.render
                         deviceWidth,
                         deviceHeight - 30,
                         (float) metric.AverageAccuracy.Value,
-                        "accuracy\n(" + _optimizerResult.TotalModelsAnalyzed + " models tested)");
+                        "accuracy");
                 }
                 else if (metric.AverageRSquared.HasValue)
                 {
@@ -81,7 +81,7 @@ namespace PanoramicDataWin8.view.vis.render
                         deviceWidth,
                         deviceHeight - 30,
                         (float)metric.AverageRSquared.Value,
-                        "r squared\n(" + _optimizerResult.TotalModelsAnalyzed + " models tested)");
+                        "r squared");
                 }
             }
             if (_isResultEmpty)

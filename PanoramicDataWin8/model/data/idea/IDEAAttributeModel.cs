@@ -25,7 +25,7 @@ namespace PanoramicDataWin8.model.data.idea
             _allFieldAttributeModels.Add(fieldModel);
             return fieldModel;
         }
-        static public AttributeModel AddBackendField(string rawName, string displayName, Guid? backendOperatorId, DataType dataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
+        static public AttributeModel AddBackendField(string rawName, string displayName, string backendOperatorId, DataType dataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
         {
             var fieldModel = new IDEAAttributeModel(rawName, displayName, new AttributeFuncModel.AttributeBackendFuncModel(backendOperatorId), dataType, inputVisualizationType, visualizationHints);
             _allFieldAttributeModels.Add(fieldModel);

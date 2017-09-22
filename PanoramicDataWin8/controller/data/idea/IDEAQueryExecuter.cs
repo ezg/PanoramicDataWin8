@@ -52,7 +52,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                             {
                                 newJob = new HistogramOperationJob(
                                     histogramOperationModel,
-                                    TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
+                                    (int) MainViewController.Instance.MainModel.SampleSize);
                             }
                         }
                         else if (operationModel is StatisticalComparisonOperationModel)
@@ -60,14 +60,14 @@ namespace PanoramicDataWin8.controller.data.progressive
                             var statisticalComparisonOperationModel = (StatisticalComparisonOperationModel) operationModel;
                             newJob = new StatisticalComparisonOperationJob(
                                 statisticalComparisonOperationModel,
-                                TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
+                                (int) MainViewController.Instance.MainModel.SampleSize);
                         }
                         else if (operationModel is ExampleOperationModel)
                         {
                             var exampleOperationModel = (ExampleOperationModel) operationModel;
                             newJob = new ExampleOperationJob(
                                 exampleOperationModel,
-                                TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
+                                (int) MainViewController.Instance.MainModel.SampleSize);
                         }
                         else if (operationModel is AttributeGroupOperationModel)
                         {
@@ -76,22 +76,19 @@ namespace PanoramicDataWin8.controller.data.progressive
                         {
                             var riskOperationModel = (RiskOperationModel)operationModel;
                             newJob = new RiskOperationJob(
-                                riskOperationModel,
-                                TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis));
+                                riskOperationModel);
                         }
                         else if (operationModel is StatisticalComparisonDecisionOperationModel)
                         {
                             var riskOperationModel = (StatisticalComparisonDecisionOperationModel)operationModel;
-                            newJob = new StatisticalComparisonDecisionOperationJob(
-                                riskOperationModel,
-                                TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis));
+                            newJob = new StatisticalComparisonDecisionOperationJob(riskOperationModel);
                         }
                         else if (operationModel is RecommenderOperationModel)
                         {
                             var recommenderOperationModel = (RecommenderOperationModel)operationModel;
                             newJob = new RecommenderOperationJob(
                                 recommenderOperationModel,
-                                TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int)MainViewController.Instance.MainModel.SampleSize);
+                                (int)MainViewController.Instance.MainModel.SampleSize);
                         }
                         else if (operationModel is PredictorOperationModel)
                         {
@@ -100,7 +97,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                             {
                                 newJob = new RecommenderOperationJob(
                                     predictorOperationModel,
-                                    TimeSpan.FromMilliseconds(MainViewController.Instance.MainModel.ThrottleInMillis), (int) MainViewController.Instance.MainModel.SampleSize);
+                                    (int) MainViewController.Instance.MainModel.SampleSize);
                             }
                         }
 

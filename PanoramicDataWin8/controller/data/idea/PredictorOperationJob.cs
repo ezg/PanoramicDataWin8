@@ -7,7 +7,7 @@ namespace PanoramicDataWin8.controller.data.progressive
     public class PredictorOperationJob : OperationJob
     {
         public PredictorOperationJob(OperationModel operationModel,
-            TimeSpan throttle, int sampleSize) : base(operationModel, throttle)
+             int sampleSize) : base(operationModel)
         {
             OperationParameters = IDEAHelpers.GetRecommenderOperationParameters((RecommenderOperationModel)operationModel, sampleSize);
         }

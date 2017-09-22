@@ -105,12 +105,6 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _nrOfGroupBins, value); }
         }
 
-        public double ThrottleInMillis
-        {
-            get { return _throttleInMillis; }
-            set { SetProperty(ref _throttleInMillis, value); }
-        }
-
         public bool IsDefaultHypothesisEnabled
         {
             get { return _isDefaultHypothesisEnabled; }
@@ -128,13 +122,7 @@ namespace PanoramicDataWin8.model.view
             get { return _startDataset; }
             set { SetProperty(ref _startDataset, value); }
         }
-
-        public string Backend
-        {
-            get { return _backend; }
-            set { SetProperty(ref _backend, value); }
-        }
-
+        
         public bool Verbose
         {
             get { return _verbose; }
@@ -157,18 +145,6 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _showCodeGen; }
             set { SetProperty(ref _showCodeGen, value); }
-        }
-
-        public bool RenderShadingIn1DHistograms
-        {
-            get { return _renderShadingIn1DHistograms; }
-            set { SetProperty(ref _renderShadingIn1DHistograms, value); }
-        }
-
-        public GraphRenderOptions GraphRenderOption
-        {
-            get { return _graphRenderOption; }
-            set { SetProperty(ref _graphRenderOption, value); }
         }
     }
 }

@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
 using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.UI.Core;
 using GeoAPI.Geometries;
+using Newtonsoft.Json;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.model.data;
@@ -76,39 +78,34 @@ namespace PanoramicDataWin8.controller.view
         public async void LoadConfig()
         {
             var installedLoc = Package.Current.InstalledLocation;
-            var mainConifgContent = await installedLoc.GetFileAsync(@"Assets\data\main.ini").AsTask().ContinueWith(t => FileIO.ReadTextAsync(t.Result)).Result;
-            MainModel.Backend = mainConifgContent.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
-                .First(l => l.ToLower().StartsWith("backend"))
-                .Split(new[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
-            MainModel.StartDataset = mainConifgContent.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
-                .First(l => l.ToLower().StartsWith("startdataset"))
-                .Split(new[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
-            MainModel.ThrottleInMillis = double.Parse(mainConifgContent.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
-                .First(l => l.ToLower().StartsWith("throttle"))
-                .Split(new[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-            MainModel.SampleSize = double.Parse(mainConifgContent.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
-                .First(l => l.ToLower().StartsWith("samplesize"))
-                .Split(new[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-
+            ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
+            var configContent = await installedLoc.GetFileAsync(@"Assets\data\config.json").AsTask().ContinueWith(t => FileIO.ReadTextAsync(t.Result)).Result;
+            dynamic config = JsonConvert.DeserializeObject(configContent);
+            
             MainModel.DatasetConfigurations.Clear();
-            if (MainModel.Backend.ToLower() == "progressive")
+
+            MainModel.StartDataset = config.StartDataset;
+            MainModel.SampleSize = config.SampleSize;
+            if (localSettings.Values.ContainsKey("Ip"))
             {
-                try
-                {
-                    MainModel.Ip = mainConifgContent.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
-                        .First(l => l.ToLower().StartsWith("ip"))
-                        .Split(new[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim();
-
-                    MainModel.RenderShadingIn1DHistograms = bool.Parse(mainConifgContent.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries)
-                        .First(l => l.ToLower().StartsWith("rendershadingin1dhistograms"))
-                        .Split(new[] {"="}, StringSplitOptions.RemoveEmptyEntries)[1].Trim());
-
-                    LoadCatalog();
-                }
-                catch (Exception exc)
-                {
-                    ErrorHandler.HandleError(exc.Message);
-                }
+                MainModel.Ip = localSettings.Values["Ip"].ToString();
+            }
+            else
+            {
+                MainModel.Ip = config.Ip;
+                localSettings.Values["Ip"] = MainModel.Ip;
+            }
+#if DEBUG
+            MainModel.Ip = config.Ip;
+            localSettings.Values["Ip"] = MainModel.Ip;
+#endif
+            try
+            {
+                LoadCatalog();
+            }
+            catch (Exception exc)
+            {
+                ErrorHandler.HandleError(exc.Message);
             }
         }
 
@@ -123,8 +120,6 @@ namespace PanoramicDataWin8.controller.view
                 var dataSetConfig = new DatasetConfiguration
                 {
                     Schema = schema,
-                    Backend = "progressive",
-                    ThrottleInMillis = MainModel.ThrottleInMillis,
                     SampleSize = MainModel.SampleSize
                 };
                 MainModel.DatasetConfigurations.Add(dataSetConfig);
@@ -170,16 +165,12 @@ namespace PanoramicDataWin8.controller.view
                 MainModel.QueryExecuter.HaltAllJobs();
             }
 
-            if (datasetConfiguration.Backend.ToLower() == "progressive")
-            {
-                MainModel.SchemaModel = new IDEASchemaModel();
-                MainModel.ThrottleInMillis = datasetConfiguration.ThrottleInMillis;
-                MainModel.SampleSize = datasetConfiguration.SampleSize;
-                MainModel.QueryExecuter = new IDEAQueryExecuter();
-                HypothesesViewController.Instance.ClearAllStatisticalComparison();
-                ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel = new IDEAOriginModel(datasetConfiguration);
-                ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel.LoadInputFields();
-            }
+            MainModel.SchemaModel = new IDEASchemaModel();
+            MainModel.SampleSize = datasetConfiguration.SampleSize;
+            MainModel.QueryExecuter = new IDEAQueryExecuter();
+            HypothesesViewController.Instance.ClearAllStatisticalComparison();
+            ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel = new IDEAOriginModel(datasetConfiguration);
+            ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel.LoadInputFields();
         }
 
 

@@ -1,0 +1,5 @@
+﻿{
+  "Ip": "http://localhost:1234/api",
+  "StartDataset": "facts.csv",
+  "SampleSize": 100000
+}

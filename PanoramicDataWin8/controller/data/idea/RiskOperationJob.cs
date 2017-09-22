@@ -9,8 +9,7 @@ namespace PanoramicDataWin8.controller.data.progressive
 {
     public class RiskOperationJob : OperationJob
     {
-        public RiskOperationJob(OperationModel operationModel,
-            TimeSpan throttle) : base(operationModel, throttle)
+        public RiskOperationJob(OperationModel operationModel) : base(operationModel)
         {
             OperationParameters = new NewModelOperationParameters()
             {

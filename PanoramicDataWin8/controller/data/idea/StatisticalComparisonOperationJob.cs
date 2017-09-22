@@ -7,7 +7,7 @@ namespace PanoramicDataWin8.controller.data.progressive
     public class StatisticalComparisonOperationJob : OperationJob
     {
         public StatisticalComparisonOperationJob(OperationModel operationModel,
-            TimeSpan throttle, int sampleSize) : base(operationModel, throttle)
+             int sampleSize) : base(operationModel)
         {
             var model = (StatisticalComparisonOperationModel) operationModel.ResultCauserClone;
             if (model.StatistalComparisonType == StatistalComparisonType.distribution)

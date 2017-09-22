@@ -30,7 +30,7 @@ namespace PanoramicDataWin8.model.data.operation
         public AttributeTransformationModel TargetAttributeUsageTransformationModel { get; set; }
         public ObservableCollection<AttributeTransformationModel> IgnoredAttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
 
-        public void UpdateBackendOperatorId(Guid backendOperatorId)
+        public void UpdateBackendOperatorId(string backendOperatorId)
         {
             IDEAAttributeModel attributeModel = GetAttributeModel();
             var funcModel = attributeModel.FuncModel as AttributeModel.AttributeFuncModel.AttributeBackendFuncModel;

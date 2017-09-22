@@ -153,10 +153,7 @@ namespace PanoramicDataWin8.view.vis.render
 
             if (_histogramResult != null && _histogramResult.Bins != null)
             {
-                if (MainViewController.Instance.MainModel.GraphRenderOption == GraphRenderOptions.Cell)
-                {
-                    renderPlot(canvas, canvasArgs);
-                }
+                 renderPlot(canvas, canvasArgs);
             }
             if (_isResultEmpty)
             {

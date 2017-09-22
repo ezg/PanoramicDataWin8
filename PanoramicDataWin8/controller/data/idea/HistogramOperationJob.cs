@@ -6,7 +6,7 @@ namespace PanoramicDataWin8.controller.data.progressive
     public class HistogramOperationJob : OperationJob
     {
         public HistogramOperationJob(OperationModel operationModel,
-            TimeSpan throttle, int sampleSize) : base(operationModel, throttle)
+             int sampleSize) : base(operationModel)
         {
             OperationParameters = IDEAHelpers.GetHistogramOperationParameters((HistogramOperationModel) operationModel, sampleSize);
         }

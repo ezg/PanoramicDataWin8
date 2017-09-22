@@ -19,14 +19,12 @@ namespace PanoramicDataWin8.controller.data
     {
         private readonly object _lock = new object();
         private readonly Stopwatch _stopWatch = new Stopwatch();
-        private readonly TimeSpan _throttle;
         private bool _isRunning;
         private int _executionId = -1;
 
-        protected OperationJob(OperationModel operationModel, TimeSpan throttle)
+        protected OperationJob(OperationModel operationModel)
         {
             OperationModel = operationModel;
-            _throttle = throttle;
             _executionId = operationModel.ResultCauserClone.ExecutionId;
         }
 
@@ -75,7 +73,6 @@ namespace PanoramicDataWin8.controller.data
                             Debug.WriteLine("job completed in " + sw.ElapsedMilliseconds);
                         }
                     }
-                    await Task.Delay(_throttle);
                 }
             }
             catch (Exception exc)

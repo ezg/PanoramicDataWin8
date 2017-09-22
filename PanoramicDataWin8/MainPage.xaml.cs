@@ -4,8 +4,11 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Windows.ApplicationModel;
 using Windows.Devices.Input;
 using Windows.Foundation;
+using Windows.Media.Core;
+using Windows.Storage;
 using Windows.System;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
@@ -17,6 +20,7 @@ using Windows.UI.Xaml.Shapes;
 using IDEA_common.catalog;
 using IDEA_common.operations;
 using IDEA_common.operations.risk;
+using Newtonsoft.Json;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.controller.view;
@@ -95,26 +99,6 @@ namespace PanoramicDataWin8
                     msgTextBlock.Opacity = 1;
                     _messageTimer.Start();
                 }
-                if (e.Key == VirtualKey.W)
-                {
-                    MainViewController.Instance.MainModel.ThrottleInMillis =
-                        MainViewController.Instance.MainModel.ThrottleInMillis + 300.0;
-                    Debug.WriteLine("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis);
-
-                    msgTextBlock.Text = "Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis;
-                    msgTextBlock.Opacity = 1;
-                    _messageTimer.Start();
-                }
-                else if (e.Key == VirtualKey.S)
-                {
-                    MainViewController.Instance.MainModel.ThrottleInMillis =
-                        Math.Max(MainViewController.Instance.MainModel.ThrottleInMillis - 300.0, 0.0);
-                    Debug.WriteLine("Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis);
-
-                    msgTextBlock.Text = "Throttle : " + MainViewController.Instance.MainModel.ThrottleInMillis;
-                    msgTextBlock.Opacity = 1;
-                    _messageTimer.Start();
-                }
                 if (e.Key == VirtualKey.E)
                 {
                     MainViewController.Instance.MainModel.NrOfXBins = MainViewController.Instance.MainModel.NrOfXBins +
@@ -158,24 +142,6 @@ namespace PanoramicDataWin8
                 else if (e.Key == VirtualKey.L)
                 {
                     MainViewController.Instance.LoadCatalog();
-                }
-                if (e.Key == VirtualKey.Number1)
-                {
-                    MainViewController.Instance.MainModel.GraphRenderOption = GraphRenderOptions.Grid;
-                    Debug.WriteLine("GraphRenderOption : " + MainViewController.Instance.MainModel.GraphRenderOption);
-
-                    msgTextBlock.Text = "GraphRenderOption : " + MainViewController.Instance.MainModel.GraphRenderOption;
-                    msgTextBlock.Opacity = 1;
-                    _messageTimer.Start();
-                }
-                if (e.Key == VirtualKey.Number2)
-                {
-                    MainViewController.Instance.MainModel.GraphRenderOption = GraphRenderOptions.Cell;
-                    Debug.WriteLine("GraphRenderOption : " + MainViewController.Instance.MainModel.GraphRenderOption);
-
-                    msgTextBlock.Text = "GraphRenderOption : " + MainViewController.Instance.MainModel.GraphRenderOption;
-                    msgTextBlock.Opacity = 1;
-                    _messageTimer.Start();
                 }
                 if (e.Key == VirtualKey.V)
                 {
@@ -332,15 +298,18 @@ namespace PanoramicDataWin8
         private void DatasetConfigurations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             commandBar.SecondaryCommands.Clear();
-            foreach (var datasetConfiguration in (DataContext as MainModel).DatasetConfigurations)
+            if (DataContext != null)
             {
-                var b = new AppBarButton();
-                b.Style = Application.Current.Resources.MergedDictionaries[0]["AppBarButtonStyle1"] as Style;
-                b.Label = datasetConfiguration.Schema.DisplayName;
-                b.Icon = new SymbolIcon(Symbol.Library);
-                b.DataContext = datasetConfiguration;
-                b.Click += appBarButton_Click;
-                commandBar.SecondaryCommands.Add(b);
+                foreach (var datasetConfiguration in ((MainModel) DataContext).DatasetConfigurations)
+                {
+                    var b = new AppBarButton();
+                    b.Style = Application.Current.Resources.MergedDictionaries[0]["AppBarButtonStyle1"] as Style;
+                    b.Label = datasetConfiguration.Schema.DisplayName;
+                    b.Icon = new SymbolIcon(Symbol.Library);
+                    b.DataContext = datasetConfiguration;
+                    b.Click += appBarButton_Click;
+                    commandBar.SecondaryCommands.Add(b);
+                }
             }
         }
 
@@ -906,7 +875,7 @@ namespace PanoramicDataWin8
 
         private void CloseButton_OnPointerPressed(object sender, PointerRoutedEventArgs e)
         {
-            codeGrid.Visibility = Visibility.Collapsed;
+            tutorialGrid.Visibility = Visibility.Collapsed;
         }
 
         public void clearAndDisposeMenus()
@@ -934,5 +903,43 @@ namespace PanoramicDataWin8
             clearAndDisposeMenus();
             MainViewController.Instance.LoadConfig();
         }
+
+        private async void HelpButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            tutorialGrid.Visibility = Visibility.Visible;
+
+            if (videoList.ItemsSource == null)
+            {
+                var installedLoc = Package.Current.InstalledLocation;
+                var tutorialContent = await installedLoc.GetFileAsync(@"Assets\data\tutorials.json").AsTask()
+                    .ContinueWith(t => FileIO.ReadTextAsync(t.Result)).Result;
+                var videos = JsonConvert.DeserializeObject<List<VideoVO>>(tutorialContent);
+
+                videoList.ItemsSource = videos;
+                videoList.SelectedIndex = 0;
+            }
+        }   
+
+        private void VideoList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count > 0)
+            {
+                LoadMediaFromString((e.AddedItems.First() as VideoVO).Video);
+            }
+        }
+
+        private async void LoadMediaFromString(string path)
+        {
+            mediaPlayer.TransportControls.IsFullWindowButtonVisible = false;
+            var installedLoc = Package.Current.InstalledLocation;
+            var storageFile = await installedLoc.GetFileAsync(path);
+            mediaPlayer.Source = MediaSource.CreateFromStorageFile(storageFile);
+        }
+    }
+
+    public class VideoVO
+    {
+        public string Description { get; set; }
+        public string Video { get; set; }
     }
 }

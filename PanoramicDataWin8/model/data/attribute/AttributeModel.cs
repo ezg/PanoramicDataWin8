@@ -94,12 +94,12 @@ namespace PanoramicDataWin8.model.data.attribute
             }
             public class AttributeBackendFuncModel : AttributeFuncModel
             {
-                Guid? _id;
-                public AttributeBackendFuncModel(Guid? id)
+                string _id;
+                public AttributeBackendFuncModel(string id)
                 {
                     _id = id;
                 }
-                public Guid? Id { get => _id; set => _id = value; }
+                public string Id { get => _id; set => _id = value; }
             }
             public class AttributeColumnFuncModel : AttributeFuncModel
             {
