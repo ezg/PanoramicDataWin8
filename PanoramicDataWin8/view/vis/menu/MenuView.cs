@@ -421,6 +421,52 @@ namespace PanoramicDataWin8.view.vis.menu
                         }
                     }
                 }
+                else if (model.AttachmentOrientation == AttachmentOrientation.TopRight)
+                {
+
+                    if (model.IsRigid)
+                    {
+                        foreach (var mi in model.MenuItemViewModels)
+                        {
+                            double currentY = model.AnkerPosition.Y + mi.Row * GAP + mi.Row * model.RigidSize;
+                            double currentX = model.AnkerPosition.X + mi.Column * GAP + mi.Column * model.RigidSize + GAP;
+                            if (mi.MenuXAlign.HasFlag(MenuXAlign.Right))
+                            {
+                                currentX += model.RigidSize - mi.Size.X;
+                            }
+                            mi.TargetPosition = new Pt(currentX -30, currentY -30);
+                        }
+                    }
+                    else
+                    {
+                        for (int col = 0; col < model.NrColumns; col++)
+                        {
+                            for (int row = 0; row < model.NrRows; row++)
+                            {
+                                var itemsInSameCol = model.MenuItemViewModels
+                                    .Where(mi => mi.Row < row &&
+                                                 (mi.Column == col ||
+                                                  (mi.Column < col && mi.Column + mi.ColumnSpan - 1 >= col))).ToList();
+                                var itemsInSameRow = model.MenuItemViewModels
+                                    .Where(mi => mi.Column < col &&
+                                                 (mi.Row == row || (mi.Row < row && mi.Row + mi.RowSpan - 1 >= row)))
+                                    .ToList();
+                                double currentY = model.AnkerPosition.Y + itemsInSameCol.Sum(mi => mi.Size.Y) +
+                                                  itemsInSameCol.Count * GAP;
+                                double currentX = model.AnkerPosition.X - itemsInSameRow.Sum(mi => mi.Size.X) -
+                                                  itemsInSameRow.Count() * GAP;
+
+                                var rowItem =
+                                    model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
+
+                                if (rowItem != null)
+                                {
+                                    rowItem.TargetPosition = new Pt(currentX - rowItem.Size.X, currentY-30);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
         

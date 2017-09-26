@@ -12,8 +12,9 @@
 
     <Grid Width="{Binding Size.X}" Height="{Binding Size.Y}" Background="{StaticResource lightBrush}">
         <Grid Column="0" Name="backgroundGrid" Margin="4">
-            <Rectangle Width="4" Fill="{StaticResource backgroundBrush}"></Rectangle>
-            <Rectangle Height="4" Fill="{StaticResource backgroundBrush}"></Rectangle>
+            <Ellipse Fill="{StaticResource backgroundBrush}"></Ellipse>
+            <Ellipse Fill="{StaticResource lightBrush}" Margin="4"></Ellipse>
+            <Ellipse Fill="{StaticResource backgroundBrush}" Margin="6"></Ellipse>
         </Grid>
     </Grid>
 </UserControl>

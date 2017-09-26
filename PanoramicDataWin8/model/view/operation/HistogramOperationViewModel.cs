@@ -18,37 +18,7 @@ namespace PanoramicDataWin8.model.view.operation
 
         private void createTopHistogramMenu()
         {
-            /*var attachmentViewModel = histogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Top);
-            var menuViewModel = new MenuViewModel
-            {
-                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = 1,
-                NrRows = 1
-            };
-
-            var menuItem = new MenuItemViewModel
-            {
-                MenuViewModel = menuViewModel,
-                Row = 0,
-                ColumnSpan = 1,
-                RowSpan = 1,
-                Column = 0,
-                Size = new Vec(25, 25),
-                Position = histogramOperationViewModel.Position,
-                TargetSize = new Vec(25, 25),
-                IsAlwaysDisplayed = true
-            };
-            var attr1 = new CreateLinkMenuItemViewModel();
-            attr1.CreateRecommendationEvent += (sender, bounds) =>
-            {
-                FilterLinkViewController.Instance.CreateFilterLinkViewModel(histogramOperationViewModel, bounds);
-            };
-
-            menuItem.MenuItemComponentViewModel = attr1;
-            menuViewModel.MenuItemViewModels.Add(menuItem);
-
-            attachmentViewModel.MenuViewModel = menuViewModel;*/
-
+            
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Top);
             var menuViewModel = new MenuViewModel
             {
@@ -56,6 +26,7 @@ namespace PanoramicDataWin8.model.view.operation
                 NrColumns = 2,
                 NrRows = 2
             };
+
 
             HistogramOperationModel.PropertyChanged += (sender, args) =>
             {
@@ -145,6 +116,50 @@ namespace PanoramicDataWin8.model.view.operation
             };
 
             attachmentViewModel.MenuViewModel = menuViewModel;
+
+
+
+            AttachementViewModels.Add(new AttachmentViewModel
+            {
+                AttachmentOrientation = AttachmentOrientation.TopRight,
+                OperationViewModel = this
+            });
+            var attachmentRightViewModel = AttachementViewModels.Last();
+            var menuViewModelDrag = new MenuViewModel
+            {
+                AttachmentOrientation = attachmentRightViewModel.AttachmentOrientation,
+                NrColumns = 1,
+                NrRows = 1
+            };
+
+            var menuItemDrag = new MenuItemViewModel
+            {
+                MenuViewModel = menuViewModelDrag,
+                Row = 0,
+                ColumnSpan = 1,
+                RowSpan = 1,
+                Column = 0,
+                Size = new Vec(25, 25),
+                Position = this.Position,
+                TargetSize = new Vec(25, 25),
+                IsAlwaysDisplayed = false
+            };
+            var attrDrag = new CreateLinkMenuItemViewModel();
+            attrDrag.CreateLinkEvent += (sender, bounds) =>
+            {
+                FilterLinkViewController.Instance.CreateFilterLinkViewModel(this, bounds);
+            };
+
+
+            OperationViewModelTapped += (args) =>
+            {
+                attachmentRightViewModel.ActiveStopwatch.Restart();
+            };
+
+            menuItemDrag.MenuItemComponentViewModel = attrDrag;
+            menuViewModelDrag.MenuItemViewModels.Add(menuItemDrag);
+            attachmentRightViewModel.MenuViewModel = menuViewModelDrag;
+
         }
 
         private void createRightHistogramMenu()
