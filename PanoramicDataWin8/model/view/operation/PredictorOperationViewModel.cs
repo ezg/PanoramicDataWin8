@@ -134,8 +134,7 @@ namespace PanoramicDataWin8.model.view.operation
             menuItem.MenuItemComponentViewModel = PredictorNameMenuItemViewModel;
             
             attachmentViewModel.MenuViewModel = menuViewModel;
-
-            menuViewModel.MenuItemViewModels.Add(menuItem);
+            
             PredictorOperationModel.PropertyChanged += (sender, args) =>
             {
                 var model = PredictorOperationModel;
