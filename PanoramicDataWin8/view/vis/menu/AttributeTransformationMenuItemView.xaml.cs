@@ -320,9 +320,9 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
             var attr = AttributeTransformationModel.MatchesExistingField(TextInputBox.Text, true);
-            if (attr == null)
+            if (attr == null && !IDEAAttributeModel.NameExists(TextInputBox.Text))
             {
-                model.Label = TextInputBox.Text;
+                (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as ComputationalOperationModel)?.SetRawName(TextInputBox.Text);
             }
         }
     }
