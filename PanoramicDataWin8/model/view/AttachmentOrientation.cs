@@ -5,6 +5,7 @@
         Left,
         Top,
         Bottom,
-        Right
+        Right,
+        TopRight
     }
 }

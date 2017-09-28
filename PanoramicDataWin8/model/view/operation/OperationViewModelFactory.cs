@@ -19,13 +19,14 @@ namespace PanoramicDataWin8.model.view.operation
     {
         public static OperationViewModel CopyOperationViewModel(OperationViewModel operationViewModel)
         {
-            if (operationViewModel is HistogramOperationViewModel)
+            var histogramOperationViewModel = operationViewModel as HistogramOperationViewModel;
+            if (histogramOperationViewModel != null)
             {
-                var oldOperationViewModel = (HistogramOperationViewModel) operationViewModel;
-                var oldOperationModel = (HistogramOperationModel) oldOperationViewModel.OperationModel;
-
+                var oldOperationViewModel = histogramOperationViewModel;
+                var oldOperationModel = histogramOperationViewModel.HistogramOperationModel;
+                var attributeModel = histogramOperationViewModel.HistogramOperationModel.AttributeUsageTransformationModels[AttributeUsage.X].First().AttributeModel;
                 var newHistogramOperationViewModel = CreateDefaultHistogramOperationViewModel(operationViewModel.OperationModel.SchemaModel,
-                    null, operationViewModel.Position);
+                    attributeModel, operationViewModel.Position);
                 var newOperationModel = (HistogramOperationModel) newHistogramOperationViewModel.OperationModel;
                 newOperationModel.VisualizationType = VisualizationType.plot;
 
