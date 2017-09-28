@@ -20,6 +20,8 @@ namespace PanoramicDataWin8.model.data.operation
 
         private long _id;
 
+        private ExecutionState _executionState = ExecutionState.Stopped;
+
         private IResult _result;
 
         private SchemaModel _schemaModel;
@@ -32,6 +34,12 @@ namespace PanoramicDataWin8.model.data.operation
         }
 
         public int ExecutionId { get; set; } = 0;
+
+        public ExecutionState ExecutionState
+        {
+            get { return _executionState; }
+            set { SetProperty(ref _executionState, value); }
+        }
 
         [JsonIgnore]
         public int ResultExecutionId { get; set; } = 0;
@@ -114,6 +122,12 @@ namespace PanoramicDataWin8.model.data.operation
             code ^= Id.GetHashCode();
             return code;
         }
+    }
+
+    public enum ExecutionState
+    {
+        Running,
+        Stopped
     }
 
     public class AttributeUsageOperationModel : OperationModel {

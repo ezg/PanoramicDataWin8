@@ -63,7 +63,7 @@ namespace PanoramicDataWin8.view.vis.render
                 var metric = _optimizerResult.Metrics;
 
 
-                if (metric.AverageAccuracy.HasValue && metric.AverageRSquared.Value != 0)
+                if (metric.AverageAccuracy.HasValue && metric.AverageAccuracy.Value != 0)
                 {
                     renderGauge(canvas, canvasArgs,
                         leftOffset,

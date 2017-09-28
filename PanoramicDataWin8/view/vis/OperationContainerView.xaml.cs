@@ -19,6 +19,7 @@ using Windows.UI.Xaml.Navigation;
 using Windows.UI.Core;
 using Windows.System;
 using Windows.UI.Input;
+using Windows.UI.Xaml.Media.Animation;
 using IDEA_common.operations;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
@@ -138,15 +139,24 @@ namespace PanoramicDataWin8.view.vis
                     operationTypeUpdated();
                 }
             }
-            if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.Result))
+            if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.Result) ||
+                e.PropertyName == operationModel.GetPropertyName(() => operationModel.ExecutionState))
             {
                 updateProgressAndNullVisualization();
             }
         }
 
+        private Storyboard _rotateStoryboard = null;
         private void updateProgressAndNullVisualization()
         {
             IResult resultModel = ((OperationViewModel)DataContext).OperationModel.Result;
+
+            if (_rotateStoryboard != null)
+            {
+                _rotateStoryboard.Stop();
+                _rotateStoryboard = null;
+                progressGridTransform.Angle = 0;
+            }
 
             if (resultModel != null)
             {
@@ -180,7 +190,25 @@ namespace PanoramicDataWin8.view.vis
             }
             else
             {
-                progressGrid.Visibility = Visibility.Collapsed;
+                if (((OperationViewModel) DataContext).OperationModel.ExecutionState == ExecutionState.Running)
+                {
+                    progressGrid.Visibility = Visibility.Visible;
+
+                    _rotateStoryboard = new Storyboard();
+                    var doubleAnimation = new DoubleAnimation();
+                    doubleAnimation.Duration = TimeSpan.FromMilliseconds(2000);
+                    doubleAnimation.EnableDependentAnimation = true;
+                    doubleAnimation.RepeatBehavior = RepeatBehavior.Forever;
+                    doubleAnimation.To = 360;
+                    Storyboard.SetTargetProperty(doubleAnimation, "Angle");
+                    Storyboard.SetTarget(doubleAnimation, progressGridTransform);
+                    _rotateStoryboard.Children.Add(doubleAnimation);
+                    _rotateStoryboard.Begin();
+                }
+                else
+                {
+                    progressGrid.Visibility = Visibility.Collapsed;
+                }
             }
         }
 

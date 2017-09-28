@@ -20,7 +20,10 @@
                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="4">
                         <StackPanel>
                             <Grid>
-                                <Grid x:Name="progressGrid" Width="14" Height="14" Opacity="1">
+                                <Grid x:Name="progressGrid" Width="14" Height="14" Opacity="1" RenderTransformOrigin="0.5,0.5">
+                                    <Grid.RenderTransform>
+                                        <RotateTransform x:Name="progressGridTransform"/>
+                                    </Grid.RenderTransform>
                                     <Grid>
                                         <Ellipse Width="14" Height="14" Stroke="{StaticResource backgroundBrush}" StrokeThickness="2"/>
                                         <Path x:Name="path1" Stroke="{StaticResource highlightBrush}" StrokeThickness="2">

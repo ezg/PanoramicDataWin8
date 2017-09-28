@@ -60,6 +60,7 @@ namespace PanoramicDataWin8.controller.data
                 while (_isRunning)
                 {
                     var resultParams = OperationModel.ResultParameters;
+                    FireExecutionStateChanged(ExecutionState.Running);
                     resultParams.OperationReference = OperationReference;
                     var result = await resultCommand.GetResult(resultParams);
                     if (result != null)
@@ -68,11 +69,13 @@ namespace PanoramicDataWin8.controller.data
 
                         if (result.Progress >= 1.0)
                         {
+                            FireExecutionStateChanged(ExecutionState.Stopped);
                             _isRunning = false;
                             FireJobCompleted(new JobEventArgs {Result = result, ResultExecutionId = _executionId });
                             Debug.WriteLine("job completed in " + sw.ElapsedMilliseconds);
                         }
                     }
+                    await Task.Delay(200);
                 }
             }
             catch (Exception exc)
@@ -87,7 +90,17 @@ namespace PanoramicDataWin8.controller.data
             {
                 IDEAGateway.Request(JsonConvert.SerializeObject(OperationReference, IDEAGateway.JsonSerializerSettings), "pause");
                 _isRunning = false;
+                FireExecutionStateChanged(ExecutionState.Stopped);
             }
+        }
+
+        protected async void FireExecutionStateChanged(ExecutionState state)
+        {
+            var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+            await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
+            {
+                OperationModel.ExecutionState = state;
+            });
         }
 
         protected async void FireJobUpdated(JobEventArgs jobEventArgs)

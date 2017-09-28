@@ -376,7 +376,7 @@ namespace PanoramicDataWin8.model.view.operation
             };
 
             menuItem.MenuItemComponentViewModel = attr1;
-            menuViewModel.MenuItemViewModels.Add(menuItem);
+            menuViewModel.MenuItemViewModels.Add(menuItem); 
             attachmentViewModel.MenuViewModel = menuViewModel;
         }
 
