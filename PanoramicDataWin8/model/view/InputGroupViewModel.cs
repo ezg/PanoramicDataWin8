@@ -10,7 +10,7 @@ namespace PanoramicDataWin8.model.view
     {
         private HistogramOperationViewModel _histogramOperationViewModel;
 
-        private AttributeGroupModel _inpuGroupModel;
+        private AttributeModel _inpuGroupModel;
 
         private bool _isShadow;
 
@@ -22,7 +22,7 @@ namespace PanoramicDataWin8.model.view
         {
         }
 
-        public InputGroupViewModel(HistogramOperationViewModel histogramOperationViewModel, AttributeGroupModel attributeGroupModel)
+        public InputGroupViewModel(HistogramOperationViewModel histogramOperationViewModel, AttributeModel attributeGroupModel)
         {
             HistogramOperationViewModel = histogramOperationViewModel;
             AttributeOperationModel = attributeGroupModel;
@@ -40,7 +40,7 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _histogramOperationViewModel, value); }
         }
 
-        public AttributeGroupModel AttributeOperationModel
+        public AttributeModel AttributeOperationModel
         {
             get { return _inpuGroupModel; }
             set
@@ -67,13 +67,13 @@ namespace PanoramicDataWin8.model.view
         public static event EventHandler<InputGroupViewModelEventArgs> InputGroupViewModelDropped;
 
 
-        public void FireMoved(Rct bounds, AttributeGroupModel attributeGroupModel)
+        public void FireMoved(Rct bounds, AttributeModel attributeGroupModel)
         {
             if (InputGroupViewModelMoved != null)
                 InputGroupViewModelMoved(this, new InputGroupViewModelEventArgs(bounds, attributeGroupModel));
         }
 
-        public void FireDropped(Rct bounds, AttributeGroupModel attributeGroupModel)
+        public void FireDropped(Rct bounds, AttributeModel attributeGroupModel)
         {
             if (InputGroupViewModelDropped != null)
                 InputGroupViewModelDropped(this, new InputGroupViewModelEventArgs(bounds, attributeGroupModel));

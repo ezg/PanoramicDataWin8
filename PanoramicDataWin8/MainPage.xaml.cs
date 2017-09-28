@@ -755,65 +755,80 @@ namespace PanoramicDataWin8
 
         private TileMenuItemViewModel recursiveCreateTileMenu(object inputModel, TileMenuItemViewModel parent)
         {
-            TileMenuItemViewModel currentTileMenuItemViewModel = null;
+            TileMenuItemViewModel currentTileMenuItemViewModel = new TileMenuItemViewModel(parent);
 
-            if (inputModel is AttributeModel)
+            var attributeModel = inputModel as AttributeModel;
+            var taskGroupModel = inputModel as OperationTypeGroupModel;
+            var operationModel = inputModel as OperationTypeModel;
+            var inputGroupModel = attributeModel?.FuncModel as AttributeModel.AttributeFuncModel.AttributeGroupFuncModel;
+            if (inputGroupModel != null)
             {
-                currentTileMenuItemViewModel = new TileMenuItemViewModel(parent);
-                var attributeTransformationViewModel = new AttributeTransformationViewModel(null,
-                    new AttributeTransformationModel(inputModel as AttributeModel));
-                currentTileMenuItemViewModel.TileMenuContentViewModel = new InputFieldViewTileMenuContentViewModel
-                    {
-                        Name = (inputModel as AttributeModel).DisplayName,
-                        AttributeTransformationViewModel = attributeTransformationViewModel
-                    };
+                currentTileMenuItemViewModel.TileMenuContentViewModel = new InputGroupViewTileMenuContentViewModel
+                {
+                    Name = attributeModel.DisplayName,
+                    InputGroupViewModel = new InputGroupViewModel(null, attributeModel)
+                };
+                    
+                BuildTileSubmenu(currentTileMenuItemViewModel, inputGroupModel.InputModels.Select((im) => (object)im).ToList());
             }
-            else if (inputModel is OperationTypeGroupModel)
+            else if (attributeModel != null)
             {
-                var taskGroupModel = inputModel as OperationTypeGroupModel;
-                currentTileMenuItemViewModel = new TileMenuItemViewModel(parent);
+                currentTileMenuItemViewModel.TileMenuContentViewModel = new InputFieldViewTileMenuContentViewModel
+                {
+                    Name = attributeModel.DisplayName,
+                    AttributeTransformationViewModel = new AttributeTransformationViewModel(null,
+                                                                new AttributeTransformationModel(inputModel as AttributeModel))
+                };
+            }
+            else if (taskGroupModel != null)
+            {
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new OperationTypeGroupTileMenuContentViewModel
                 {
                     Name = taskGroupModel.Name,
                     OperationTypeGroupModel = taskGroupModel
                 };
 
-                currentTileMenuItemViewModel.ChildrenNrColumns =
-                    (int) Math.Ceiling(taskGroupModel.OperationTypeModels.Count()/10.0);
-                currentTileMenuItemViewModel.ChildrenNrRows = (int) Math.Min(10.0, taskGroupModel.OperationTypeModels.Count());
-                currentTileMenuItemViewModel.Alignment = Alignment.Center;
-                currentTileMenuItemViewModel.AttachPosition = AttachPosition.Right;
-
-                var count = 0;
-                foreach (var childInputModel in taskGroupModel.OperationTypeModels /*.OrderBy(am => am.RawName)*/)
-                {
-                    var childTileMenu = recursiveCreateTileMenu(childInputModel, currentTileMenuItemViewModel);
-                    childTileMenu.Row = count; // TileMenuItemViewModel.Children.Count;
-                    childTileMenu.Column = currentTileMenuItemViewModel.ChildrenNrColumns - 1 -
-                                           (int) Math.Floor((currentTileMenuItemViewModel.Children.Count - 1)/10.0);
-                    childTileMenu.RowSpan = 1;
-                    childTileMenu.ColumnSpan = 1;
-                    //currentTileMenuItemViewModel.Children.Add(childTileMenu);
-                    count++;
-                    if (count == 10.0)
-                    {
-                        count = 0;
-                    }
-                }
+                BuildTileSubmenu(currentTileMenuItemViewModel, taskGroupModel.OperationTypeModels.Select((im) => (object)im).ToList());
             }
-            else if (inputModel is OperationTypeModel)
+            else if (operationModel != null)
             {
-                currentTileMenuItemViewModel = new TileMenuItemViewModel(parent);
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new OperationTypeTileMenuContentViewModel
                 {
-                    Name = (inputModel as OperationTypeModel).Name,
-                    OperationTypeModel = inputModel as OperationTypeModel
+                    Name = operationModel.Name,
+                    OperationTypeModel = operationModel
                 };
             }
+            else
+                currentTileMenuItemViewModel = null;
             parent.Children.Add(currentTileMenuItemViewModel);
             currentTileMenuItemViewModel.Alignment = Alignment.Center;
             currentTileMenuItemViewModel.AttachPosition = AttachPosition.Right;
             return currentTileMenuItemViewModel;
+        }
+
+        private void BuildTileSubmenu(TileMenuItemViewModel currentTileMenuItemViewModel, List<object> inputModels)
+        {
+            currentTileMenuItemViewModel.ChildrenNrColumns = (int)Math.Ceiling(inputModels.Count() / 10.0);
+            currentTileMenuItemViewModel.ChildrenNrRows = (int)Math.Min(10.0, inputModels.Count());
+            currentTileMenuItemViewModel.Alignment = Alignment.Center;
+            currentTileMenuItemViewModel.AttachPosition = AttachPosition.Right;
+
+            var count = 0;
+            foreach (var childInputModel in inputModels /*.OrderBy(am => am.RawName)*/)
+            {
+                var childTileMenu = recursiveCreateTileMenu(childInputModel, currentTileMenuItemViewModel);
+                childTileMenu.Row = count; // TileMenuItemViewModel.Children.Count;
+                childTileMenu.Column = currentTileMenuItemViewModel.ChildrenNrColumns - 1 -
+                                       (int)Math.Floor((currentTileMenuItemViewModel.Children.Count - 1) / 10.0);
+                childTileMenu.RowSpan = 1;
+                childTileMenu.ColumnSpan = 1;
+                //currentTileMenuItemViewModel.Children.Add(childTileMenu);
+                count++;
+                if (count == 10.0)
+                {
+                    count = 0;
+                }
+            }
         }
 
         private void addOperationButton_Click(object sender, RoutedEventArgs e)

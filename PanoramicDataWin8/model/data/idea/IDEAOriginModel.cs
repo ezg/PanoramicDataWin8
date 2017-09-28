@@ -40,7 +40,8 @@ namespace PanoramicDataWin8.model.data.idea
             //if (parentGroupModel != null)
             //    parentGroupModel.InputModels.Add(groupModel);
             //else
-            //    InputModels.Add(groupModel);
+            //    InputModels.Add(groupModel); 
+            this.InputModels.Add(groupModel);
             foreach (var childGroup in attributeGroup.AttributeGroups)
                 recursiveCreateAttributeModels(childGroup, groupModel);
             foreach (var childAttribute in attributeGroup.Attributes)

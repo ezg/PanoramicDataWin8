@@ -198,6 +198,8 @@
     <Compile Include="model\view\BrushableOperationViewModelState.cs" />
     <Compile Include="model\view\IncludeExludeMenuItemViewModel.cs" />
     <Compile Include="model\view\BudgetViewModel.cs" />
+    <Compile Include="model\view\InputGroupViewModel.cs" />
+    <Compile Include="model\view\InputGroupViewModelEventArgs.cs" />
     <Compile Include="model\view\operation\AttributeGroupOperationViewModel.cs" />
     <Compile Include="model\view\operation\CalculationOperationViewModel.cs" />
     <Compile Include="model\view\operation\PredictorOperationViewModel.cs" />
@@ -223,6 +225,7 @@
     <Compile Include="model\view\tilemenu\Alignment.cs" />
     <Compile Include="model\view\tilemenu\AttachPosition.cs" />
     <Compile Include="model\view\tilemenu\InputFieldViewTileMenuContentViewModel.cs" />
+    <Compile Include="model\view\tilemenu\InputGroupViewTileMenuContentViewModel.cs" />
     <Compile Include="model\view\tilemenu\OperationTypeGroupTileMenuContentViewModel.cs" />
     <Compile Include="model\view\tilemenu\OperationTypeTileMenuContentViewModel.cs" />
     <Compile Include="model\view\ToggleMenuItemComponentViewModel.cs" />

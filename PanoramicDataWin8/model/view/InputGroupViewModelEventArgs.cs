@@ -6,13 +6,13 @@ namespace PanoramicDataWin8.model.view
 {
     public class InputGroupViewModelEventArgs : EventArgs
     {
-        public InputGroupViewModelEventArgs(Rct bounds, AttributeGroupModel attributeGroupModel)
+        public InputGroupViewModelEventArgs(Rct bounds, AttributeModel attributeGroupModel)
         {
             Bounds = bounds;
             AttributeGroupModel = attributeGroupModel;
         }
 
-        public AttributeGroupModel AttributeGroupModel { get; set; }
+        public AttributeModel AttributeGroupModel { get; set; }
         public Rct Bounds { get; set; }
     }
 }
