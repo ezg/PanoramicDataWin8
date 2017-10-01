@@ -87,7 +87,10 @@ namespace PanoramicDataWin8.view.common
         {
             if (_contentProvider != null)
             {
+                //Stopwatch sw = new Stopwatch();
+                //sw.Start();
                 _contentProvider.Draw(sender, args);
+                //Debug.WriteLine("render time " + sw.ElapsedMilliseconds);
             }
         }
 

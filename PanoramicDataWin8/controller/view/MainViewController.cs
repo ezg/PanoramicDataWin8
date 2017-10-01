@@ -127,7 +127,7 @@ namespace PanoramicDataWin8.controller.view
 
             if (MainModel.DatasetConfigurations.Any(ds => ds.Schema.DisplayName.ToLower().Contains(MainModel.StartDataset)))
             {
-                LoadData(MainModel.DatasetConfigurations.First(ds => ds.Schema.DisplayName.ToLower().Contains(MainModel.StartDataset)));
+                LoadData(MainModel.DatasetConfigurations.First(ds => ds.Schema.DisplayName.ToLower() == MainModel.StartDataset.ToLower()));
             }
             else
             {

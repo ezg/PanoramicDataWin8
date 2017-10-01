@@ -768,7 +768,6 @@ namespace PanoramicDataWin8
                     Name = attributeModel.DisplayName,
                     InputGroupViewModel = new InputGroupViewModel(null, attributeModel)
                 };
-                    
                 BuildTileSubmenu(currentTileMenuItemViewModel, inputGroupModel.InputModels.Select((im) => (object)im).ToList());
             }
             else if (attributeModel != null)
@@ -921,6 +920,17 @@ namespace PanoramicDataWin8
 
         private async void HelpButton_OnClick(object sender, RoutedEventArgs e)
         {
+            var dialog = new HelpDialog()
+            {
+                Problem = "asdf sadf"
+            };
+
+            dialog.MinWidth = this.ActualWidth;
+            dialog.MaxWidth = this.ActualWidth;
+            var result = await dialog.ShowAsync();
+            
+
+            /*
             tutorialGrid.Visibility = Visibility.Visible;
 
             if (videoList.ItemsSource == null)
@@ -932,7 +942,7 @@ namespace PanoramicDataWin8
 
                 videoList.ItemsSource = videos;
                 videoList.SelectedIndex = 0;
-            }
+            }*/
         }   
 
         private void VideoList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)

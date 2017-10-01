@@ -53,9 +53,10 @@ namespace PanoramicDataWin8.controller.data
                 sw.Start();
                 var response = await IDEAGateway.Request(JsonConvert.SerializeObject(OperationParameters, IDEAGateway.JsonSerializerSettings), "operation");
                 OperationReference = JsonConvert.DeserializeObject<OperationReference>(response, IDEAGateway.JsonSerializerSettings);
+                await Task.Delay(100);
 
                 var resultCommand = new ResultCommand();
-
+                bool first = true;
                 // starting looping for updates
                 while (_isRunning)
                 {
@@ -65,6 +66,11 @@ namespace PanoramicDataWin8.controller.data
                     var result = await resultCommand.GetResult(resultParams);
                     if (result != null)
                     {
+                        if (first)
+                        {
+                            Debug.WriteLine("first update in " + sw.ElapsedMilliseconds + " " + result.Progress);
+                            first = false;
+                        }
                         FireJobUpdated(new JobEventArgs {Result = result, ResultExecutionId = _executionId });
 
                         if (result.Progress >= 1.0)
@@ -75,7 +81,7 @@ namespace PanoramicDataWin8.controller.data
                             Debug.WriteLine("job completed in " + sw.ElapsedMilliseconds);
                         }
                     }
-                    await Task.Delay(200);
+                    await Task.Delay(150);
                 }
             }
             catch (Exception exc)
