@@ -25,6 +25,7 @@ namespace PanoramicDataWin8.model.data.operation
             }
 
             AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
+            IgnoredAttributeUsageTransformationModels.CollectionChanged += _ignoredAttributeUsageTransformationModels_CollectionChanged;
         }
 
         public AttributeTransformationModel TargetAttributeUsageTransformationModel { get; set; }
@@ -53,6 +54,13 @@ namespace PanoramicDataWin8.model.data.operation
         {
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
+
+        private void _ignoredAttributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+        }
+
+
         public IDEAAttributeModel GetAttributeModel()
         {
             return IDEAAttributeModel.Function(_rawName);

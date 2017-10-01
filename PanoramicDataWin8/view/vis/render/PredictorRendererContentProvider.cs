@@ -4,6 +4,7 @@ using System.Linq;
 using System.Numerics;
 using Windows.Foundation;
 using Windows.UI;
+using GeoAPI.Geometries;
 using IDEA_common.operations;
 using IDEA_common.operations.example;
 using IDEA_common.operations.ml.optimizer;
@@ -13,6 +14,7 @@ using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
+using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
 
 namespace PanoramicDataWin8.view.vis.render
@@ -28,11 +30,14 @@ namespace PanoramicDataWin8.view.vis.render
 
         private Color _textColor;
         private CanvasTextFormat _textFormatBig;
+        private CanvasTextFormat _textFormatSubmit;
         private CanvasTextFormat _textFormatSmall;
 
         public float CompositionScaleX { get; set; }
         public float CompositionScaleY { get; set; }
-        
+
+        public IGeometry SubmitHitTarget { get; set; }
+
         public void UpdateData(IResult result, PredictorOperationModel predictorOperationModel, PredictorOperationModel predictorOperationModelClone)
         {
             _optimizerResult = (OptimizerResult) result;
@@ -61,6 +66,14 @@ namespace PanoramicDataWin8.view.vis.render
                 var deviceHeight = (float) (canvas.ActualHeight/CompositionScaleY - topOffset - bottomtOffset);
 
                 var metric = _optimizerResult.Metrics;
+                var blue = Color.FromArgb(255, 41, 170, 213);
+                DrawString(canvasArgs, _textFormatSubmit, deviceWidth, topOffset, "submit?", blue, false, false, false);
+
+                var layout = new CanvasTextLayout(canvas, "submit?", _textFormatSubmit, 1000f, 1000f);
+                var layoutBounds = layout.DrawBounds;
+                layout.Dispose();
+                var rct = new Rct(new Pt(deviceWidth - layoutBounds.Width - 5, topOffset), new Vec(layoutBounds.Width + 10, layoutBounds.Height + 10));
+                SubmitHitTarget =rct.GetPolygon();
 
 
                 if (metric.AverageAccuracy.HasValue && metric.AverageAccuracy.Value != 0)
@@ -73,7 +86,7 @@ namespace PanoramicDataWin8.view.vis.render
                         (float) metric.AverageAccuracy.Value,
                         "accuracy");
                 }
-                else if (metric.AverageRSquared.HasValue)
+                else if (metric.AverageRSquared.HasValue && metric.AverageRSquared.Value != 0)
                 {
                     renderGauge(canvas, canvasArgs,
                         leftOffset,
@@ -148,6 +161,11 @@ namespace PanoramicDataWin8.view.vis.render
             _textFormatBig = new CanvasTextFormat
             {
                 FontSize = 13,
+                FontFamily = "/Assets/font/Abel-Regular.ttf#Abel"
+            };
+            _textFormatSubmit = new CanvasTextFormat
+            {
+                FontSize = 18,
                 FontFamily = "/Assets/font/Abel-Regular.ttf#Abel"
             };
             _textFormatSmall = new CanvasTextFormat

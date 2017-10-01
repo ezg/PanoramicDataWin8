@@ -23,6 +23,7 @@ using System.Diagnostics;
 using GeoAPI.Geometries;
 using IDEA_common.operations;
 using IDEA_common.operations.ml.optimizer;
+using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
@@ -129,19 +130,37 @@ namespace PanoramicDataWin8.view.vis.render
                 (PredictorOperationModel)model.OperationModel.ResultCauserClone);
         }
 
-
+        private List<Windows.Foundation.Point> _selectionPoints = new List<Windows.Foundation.Point>();
         public override void StartSelection(Windows.Foundation.Point point)
         {
-
+            GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
+            _selectionPoints = new List<Windows.Foundation.Point> { gt.TransformPoint(point) };
         }
 
         public override void MoveSelection(Windows.Foundation.Point point)
         {
+            GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
+            _selectionPoints.Add(gt.TransformPoint(point));
         }
 
         public override bool EndSelection()
         {
+         
+            if (_predictorRendererContentProvider.SubmitHitTarget != null &&
+                _predictorRendererContentProvider.SubmitHitTarget.Contains(_selectionPoints.First().GetPoint()))
+            {
+                submitProblem();
+            }
             return false;
+        }
+
+        async void submitProblem()
+        {
+            PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
+            var operationModel = (PredictorOperationModel)model.OperationModel;
+
+            var catalogCommand = new SubmitProblemCommand();
+            await catalogCommand.SumbitResult(operationModel);
         }
 
 
