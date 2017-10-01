@@ -380,8 +380,12 @@ namespace PanoramicDataWin8.view.vis.render
             var yAxisRanges = GetAxisRanges(false);
             var xLabelOrderings = SortBinsByValue(false);
             var yLabelOrderings = SortBinsByValue(true);
-           
-            computeSizesAndRenderLabels(canvas, canvasArgs, true, xLabelOrderings, yLabelOrderings);
+
+
+            var c1 = _histogramResult.BinRanges[0].GetBins().Count;
+            var c2 = _histogramResult.BinRanges[1].GetBins().Count;
+
+            computeSizesAndRenderLabels(canvas, canvasArgs, c1 * c2 < 200, xLabelOrderings, yLabelOrderings);
           
 
             if (_helper.DeviceHeight < 0 || _helper.DeviceWidth < 0)
@@ -399,8 +403,6 @@ namespace PanoramicDataWin8.view.vis.render
 
             var highlightedBinPrimitiveCollections = new List<BinPrimitiveCollection>();
             HitTargets.Clear();
-            var c1 = _histogramResult.BinRanges[0].GetBins().Count;
-            var c2 = _histogramResult.BinRanges[1].GetBins().Count;
             for (int xi = 0; xi < _histogramResult.BinRanges[0].GetBins().Count; xi++)
             {
                 for (int yi = 0; yi < _histogramResult.BinRanges[1].GetBins().Count; yi++)
