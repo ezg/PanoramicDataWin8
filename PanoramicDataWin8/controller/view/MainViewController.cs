@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.UI.Core;
@@ -74,7 +75,7 @@ namespace PanoramicDataWin8.controller.view
 
         public MainPage MainPage { get; }
 
-        public async void LoadConfig()
+        public async Task LoadConfig()
         {
             var installedLoc = Package.Current.InstalledLocation;
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
@@ -153,11 +154,13 @@ namespace PanoramicDataWin8.controller.view
                     Name = "calculation",
                     OperationType = OperationType.Calculation
                 });
+                parent.OperationTypeModels.Add(new OperationTypeModel { Name = "raw data", OperationType = OperationType.RawData });
             }
             parent.OperationTypeModels.Add(new OperationTypeModel { Name = "predictor", OperationType = OperationType.Predictor });
+
             if (!MainModel.IsDarpaSubmissionMode)
             {
-                var funcs = new OperationTypeGroupModel {Name = "functions", OperationType = OperationType.Group};
+                var funcs = new OperationTypeGroupModel { Name = "functions", OperationType = OperationType.Group };
                 parent.OperationTypeModels.Add(funcs);
                 funcs.OperationTypeModels.Add(new OperationTypeModel
                 {
@@ -193,12 +196,20 @@ namespace PanoramicDataWin8.controller.view
         }
 
 
-        public static void CreateInstance(InkableScene root, MainPage mainPage)
+        public static async void CreateInstance(InkableScene root, MainPage mainPage)
         {
             Instance = new MainViewController(root, mainPage);
-            Instance.LoadConfig();
+            await Instance.LoadConfig();
         }
 
+        public RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(AttributeModel attributeModel, Pt position)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultRawDataOperationViewModel(MainModel.SchemaModel, attributeModel, position);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
         public HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(AttributeModel attributeModel, Pt position)
         {
             var visModel = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(MainModel.SchemaModel, attributeModel, position);
@@ -350,6 +361,10 @@ namespace PanoramicDataWin8.controller.view
             if (operationTypeModel.OperationType == OperationType.Histogram)
             {
                 operationViewModel = CreateDefaultHistogramOperationViewModel(null, position);
+            }
+            else if (operationTypeModel.OperationType == OperationType.RawData)
+            {
+                operationViewModel = CreateDefaultRawDataOperationViewModel(null, position);
             }
             else if (operationTypeModel.OperationType == OperationType.Predictor)
             {

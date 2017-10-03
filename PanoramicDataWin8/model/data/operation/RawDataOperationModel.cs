@@ -15,8 +15,8 @@ using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 namespace PanoramicDataWin8.model.data.operation
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class HistogramOperationModel : BaseVisualizationOperationModel
+    public class RawDataOperationModel : BaseVisualizationOperationModel
     {
-        public HistogramOperationModel(SchemaModel schemaModel) : base(schemaModel) { }
+        public RawDataOperationModel(SchemaModel schemaModel) : base(schemaModel) { }
     }
 }

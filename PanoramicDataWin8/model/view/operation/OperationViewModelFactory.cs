@@ -40,6 +40,27 @@ namespace PanoramicDataWin8.model.view.operation
                 newHistogramOperationViewModel.Size = operationViewModel.Size;
                 return newHistogramOperationViewModel;
             }
+            var rawDataOperationViewModel = operationViewModel as RawDataOperationViewModel;
+            if (rawDataOperationViewModel != null)
+            {
+                var oldOperationViewModel = rawDataOperationViewModel;
+                var oldOperationModel = rawDataOperationViewModel.RawDataOperationModel;
+                var attributeModel = rawDataOperationViewModel.RawDataOperationModel.AttributeUsageTransformationModels[AttributeUsage.X].First().AttributeModel;
+                var newRawDataOperationViewModel = CreateDefaultRawDataOperationViewModel(operationViewModel.OperationModel.SchemaModel,
+                    attributeModel, operationViewModel.Position);
+                var newOperationModel = (RawDataOperationModel)newRawDataOperationViewModel.OperationModel;
+                newOperationModel.VisualizationType = VisualizationType.plot;
+
+                foreach (var usage in oldOperationModel.AttributeUsageTransformationModels.Keys.ToArray())
+                    foreach (var atm in oldOperationModel.AttributeUsageTransformationModels[usage].ToArray())
+                        newOperationModel.AddAttributeUsageTransformationModel(usage,
+                            new AttributeTransformationModel(atm.AttributeModel)
+                            {
+                                AggregateFunction = atm.AggregateFunction
+                            });
+                newRawDataOperationViewModel.Size = operationViewModel.Size;
+                return newRawDataOperationViewModel;
+            }
             if (operationViewModel is FilterOperationViewModel)
             {
                 var oldOperationViewModel = (FilterOperationViewModel)operationViewModel;
@@ -56,7 +77,12 @@ namespace PanoramicDataWin8.model.view.operation
             return null;
         }
 
-      
+
+        public static RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(SchemaModel schemaModel, AttributeModel attributeModel, Pt position)
+        {
+            return new RawDataOperationViewModel(new RawDataOperationModel(schemaModel), attributeModel) { Position = position };
+        }
+
         public static HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(SchemaModel schemaModel, AttributeModel attributeModel, Pt position)
         {
             return new HistogramOperationViewModel(new HistogramOperationModel(schemaModel), attributeModel) { Position = position };

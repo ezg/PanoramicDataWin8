@@ -72,6 +72,49 @@ namespace PanoramicDataWin8.model.view.operation
                     OperationViewModel = this
                 });
         }
+        protected void createTopRightFilterDragMenu()
+        {
+            AttachementViewModels.Add(new AttachmentViewModel
+            {
+                AttachmentOrientation = AttachmentOrientation.TopRight,
+                OperationViewModel = this
+            });
+            var attachmentRightViewModel = AttachementViewModels.Last();
+            var menuViewModelDrag = new MenuViewModel
+            {
+                AttachmentOrientation = attachmentRightViewModel.AttachmentOrientation,
+                NrColumns = 1,
+                NrRows = 1
+            };
+
+            var menuItemDrag = new MenuItemViewModel
+            {
+                MenuViewModel = menuViewModelDrag,
+                Row = 0,
+                ColumnSpan = 1,
+                RowSpan = 1,
+                Column = 0,
+                Size = new Vec(25, 25),
+                Position = this.Position,
+                TargetSize = new Vec(25, 25),
+                IsAlwaysDisplayed = false
+            };
+            var attrDrag = new CreateLinkMenuItemViewModel();
+            attrDrag.CreateLinkEvent += (sender, bounds) =>
+            {
+                controller.view.FilterLinkViewController.Instance.CreateFilterLinkViewModel(this, bounds);
+            };
+
+
+            OperationViewModelTapped += (args) =>
+            {
+                attachmentRightViewModel.ActiveStopwatch.Restart();
+            };
+
+            menuItemDrag.MenuItemComponentViewModel = attrDrag;
+            menuViewModelDrag.MenuItemViewModels.Add(menuItemDrag);
+            attachmentRightViewModel.MenuViewModel = menuViewModelDrag;
+        }
 
         public OperationViewModel(OperationModel operationModel)
         {

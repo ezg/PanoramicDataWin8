@@ -234,6 +234,10 @@ namespace PanoramicDataWin8.view.vis
                     _renderer = new PlotRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
+            } else if(operationViewModel.OperationModel is RawDataOperationModel)
+            {
+                _renderer = new RawDataRenderer();
+                contentGrid.Children.Add(_renderer);
             }
             else if (operationViewModel.OperationModel is PredictorOperationModel)
             {

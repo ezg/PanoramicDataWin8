@@ -4,6 +4,7 @@
     {
         Group,
         Histogram,
+        RawData,
         Example,
         Predictor,
         Filter,
