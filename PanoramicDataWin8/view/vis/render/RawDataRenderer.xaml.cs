@@ -17,6 +17,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI;
 using PanoramicDataWin8.utils;
 using Windows.UI.Xaml.Controls.Primitives;
+using IDEA_common.operations.rawdata;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -27,15 +28,15 @@ namespace PanoramicDataWin8.view.vis.render
         object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
         {
             var g = new Grid();
-            if (value is string)
+            if (value != null)
             {
                 var tb = new TextBlock();
                 tb.FontFamily = FontFamily.XamlAutoFontFamily;
                 tb.FontSize = 14;
                 tb.Foreground = new SolidColorBrush(Colors.Black);
-                tb.Text = value as string;
-                tb.Width = 100;
+                tb.Text = value.ToString();
                 tb.Height = 25;
+                tb.MinWidth = 100;
                 g.Children.Add(tb);
                 g.Background = new SolidColorBrush(Colors.LightGray);
             }
@@ -50,7 +51,7 @@ namespace PanoramicDataWin8.view.vis.render
     public sealed partial class RawDataRenderer : Renderer, IScribbable
     {
 
-        public ObservableCollection<string> Records { get; set; } = new ObservableCollection<string>();
+        public ObservableCollection<object> Records { get; set; } = new ObservableCollection<object>();
         public RawDataRenderer()
         {
             this.InitializeComponent();
@@ -158,42 +159,10 @@ namespace PanoramicDataWin8.view.vis.render
             //    model.HistogramOperationModel.BrushColors,
             //    xIom, yIom, valueIom, 30);
 
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
-            Records.Add("Hello");
-            Records.Add("I Must");
-            Records.Add("Be Going");
+            Records.Clear();
+            if ((result as RawDataResult)?.Samples != null)
+                foreach (var val in (result as RawDataResult).Samples)
+                    Records.Add(val);
         }
         void render(bool sizeChanged = false)
         {

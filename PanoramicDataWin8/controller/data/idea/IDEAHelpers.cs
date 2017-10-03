@@ -18,6 +18,7 @@ using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.model.data.operation;
 using static PanoramicDataWin8.model.data.attribute.AttributeModel;
+using IDEA_common.operations.rawdata;
 
 namespace PanoramicDataWin8.controller.data.progressive
 {
@@ -421,15 +422,12 @@ namespace PanoramicDataWin8.controller.data.progressive
             return parameters;
         }
 
-        public static HistogramOperationParameters GetRawDataOperationParameters(BaseVisualizationOperationModel model, int sampleSize)
+        public static RawDataOperationParameters GetRawDataOperationParameters(BaseVisualizationOperationModel model, int sampleSize)
         {
             List<AttributeCaclculatedParameters> attributeCodeParameters;
             List<AttributeTransformationModel> aggregates;
-            aggregates = model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(
-               model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).Concat(
-               model.GetAttributeUsageTransformationModel(AttributeUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
-               model.GetAttributeUsageTransformationModel(AttributeUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).ToList();
-            aggregates = aggregates.Distinct().ToList();
+            List<string> brushes;
+            var filter = GetHistogramRawOperationParameters(model, out attributeCodeParameters, out brushes, out aggregates);
             attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels().Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
 
             var nrOfBins = new List<double>();
@@ -483,16 +481,13 @@ namespace PanoramicDataWin8.controller.data.progressive
                 });
             }
 
-            var parameters = new HistogramOperationParameters
+            var parameters = new RawDataOperationParameters
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
-                Filter = "",
+                Filter = filter,
                 Brushes = new List<string>(),
                 BinningParameters = Extensions.Yield(xBinning, xBinning).ToList(),
                 SampleStreamBlockSize = sampleSize,
-                PerBinAggregateParameters = aggregateParameters,
-                SortPerBinAggregateParameter = sortAggregateParam,
-                GlobalAggregateParameters = globalAggregates,
                 AttributeCalculatedParameters = attributeCodeParameters.OfType<AttributeCaclculatedParameters>().ToList()
             };
             return parameters;
