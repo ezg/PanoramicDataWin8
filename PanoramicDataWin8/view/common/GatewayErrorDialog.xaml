@@ -6,16 +6,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Title="Connection Problems"
-    PrimaryButtonText="Retry"
-    SecondaryButtonText="Exit"
-    PrimaryButtonClick="ContentDialog_PrimaryButtonClick"
-    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+    Title=""
+    PrimaryButtonText="OK"
+    PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
 
     <StackPanel Orientation="Vertical">
         <TextBlock Name="tbError"></TextBlock>
         <TextBox Name="tbIp"></TextBox>
-        <ScrollViewer Height="100" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Height="100" VerticalScrollBarVisibility="Auto" Name="scrollViewer">
             <TextBox x:Name="tbStackTrace" AcceptsReturn="True" TextWrapping="Wrap"/>
         </ScrollViewer>
     </StackPanel>

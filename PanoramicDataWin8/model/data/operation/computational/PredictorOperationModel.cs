@@ -5,6 +5,7 @@ using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.idea;
 using IDEA_common.catalog;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PanoramicDataWin8.model.data.operation
 {
@@ -19,9 +20,10 @@ namespace PanoramicDataWin8.model.data.operation
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
 
             _rawName = rawName;
-            if (rawName != null && !IDEAAttributeModel.NameExists(rawName))
+            if (rawName != null && !IDEAAttributeModel.NameExists(rawName, schemaModel.OriginModels.First()))
             {
-                IDEAAttributeModel.AddBackendField(rawName, displayName == null ? rawName : displayName, null, DataType.Double, "numeric", new List<VisualizationHint>());
+                IDEAAttributeModel.AddBackendField(rawName, displayName == null ? rawName : displayName, null, 
+                    DataType.Double, "numeric", new List<VisualizationHint>(), schemaModel.OriginModels.First());
             }
 
             AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
@@ -36,6 +38,9 @@ namespace PanoramicDataWin8.model.data.operation
             IDEAAttributeModel attributeModel = GetAttributeModel();
             var funcModel = attributeModel.FuncModel as AttributeModel.AttributeFuncModel.AttributeBackendFuncModel;
             funcModel.Id = backendOperatorId;
+
+            attributeModel.DataType = TargetAttributeUsageTransformationModel.AttributeModel.DataType;
+            attributeModel.InputVisualizationType = TargetAttributeUsageTransformationModel.AttributeModel.InputVisualizationType;
         }
 
         public FilteringOperation FilteringOperation
@@ -63,7 +68,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         public IDEAAttributeModel GetAttributeModel()
         {
-            return IDEAAttributeModel.Function(_rawName);
+            return IDEAAttributeModel.Function(_rawName, SchemaModel.OriginModels.First());
         }
 
         public void SetRawName(string name)

@@ -19,6 +19,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using PanoramicDataWin8.model.data;
 using InkStroke = PanoramicDataWin8.view.inq.InkStroke;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
@@ -249,9 +250,11 @@ namespace PanoramicDataWin8.view.vis.render
 
         public static DataType FieldType(string str)
         {
-            var inputModels = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First()
+            var originModel = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels
+                .First();
+            var inputModels = originModel
                      .InputModels.Where(am => am.IsDisplayed).ToList() /*.OrderBy(am => am.RawName)*/;
-            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels());
+            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels(originModel));
             AttributeModel fieldModel = null;
             foreach (var im in inputModels)
                 if (im.RawName.ToLower().StartsWith(str.ToLower()))

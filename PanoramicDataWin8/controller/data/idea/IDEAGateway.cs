@@ -34,12 +34,16 @@ namespace PanoramicDataWin8.controller.data.progressive
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     HttpResponseMessage httpResponseMessage = null;
                     if (data != null)
-                        httpResponseMessage = await httpClient.PostAsync(MainViewController.Instance.MainModel.Ip + "/" + endpoint, new StringContent(
+                        httpResponseMessage = await httpClient.PostAsync(
+                            MainViewController.Instance.MainModel.Hostname +
+                            MainViewController.Instance.MainModel.APIPath + "/" + endpoint, new StringContent(
                             data.ToString(),
                             Encoding.UTF8,
                             "application/json"));
                     else
-                        httpResponseMessage = await httpClient.GetAsync(MainViewController.Instance.MainModel.Ip + "/" + endpoint);
+                        httpResponseMessage = await httpClient.GetAsync(
+                            MainViewController.Instance.MainModel.Hostname +
+                            MainViewController.Instance.MainModel.APIPath + "/" + endpoint);
                     if (MainViewController.Instance.MainModel.Verbose)
                         ;// Debug.WriteLine("TuppleWare Roundtrip Time: " + sw.ElapsedMilliseconds);
                     sw.Restart();
@@ -53,19 +57,23 @@ namespace PanoramicDataWin8.controller.data.progressive
                 }
                 catch (Exception e)
                 {
+                    var darpa = MainViewController.Instance.MainModel.IsDarpaSubmissionMode;
                     var dialog = new GatewayErrorDialog
                     {
-                        Ip = MainViewController.Instance.MainModel.Ip,
-                        Content = e.Message,
-                        StackTrace = (MainViewController.Instance.MainModel.Ip + "/" + endpoint) + "\n\n" + e.InnerException + "\n\n" + e.StackTrace
+                        Ip = MainViewController.Instance.MainModel.Hostname,
+                        Content = darpa ? 
+                            "Enter the connection URLs that was provided by the evaluator."
+                            : e.Message,
+                        StackTrace = (MainViewController.Instance.MainModel.Hostname + "/" + endpoint) + "\n\n" + e.InnerException + "\n\n" + e.StackTrace
                     };
+                    dialog.Title = darpa ? "Please enter connection URL" : "Connection Problems";
 
                     var result = await dialog.ShowAsync();
 
                     if (result == ContentDialogResult.Secondary)
                         CoreApplication.Exit();
                     else
-                        MainViewController.Instance.MainModel.Ip = dialog.Ip;
+                        MainViewController.Instance.MainModel.Hostname = dialog.Ip;
                 }
         }
     }

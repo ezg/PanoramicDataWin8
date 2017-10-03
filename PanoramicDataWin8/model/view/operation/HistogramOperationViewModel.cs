@@ -402,7 +402,10 @@ namespace PanoramicDataWin8.model.view.operation
             // axis attachment view models
             createAxisMenu(AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
             createAxisMenu(AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
-            createRightHistogramMenu();
+            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
+            {
+                createRightHistogramMenu();
+            }
             createTopHistogramMenu();
             
             if (attributeModel.InputVisualizationType == InputVisualizationTypeConstants.ENUM ||

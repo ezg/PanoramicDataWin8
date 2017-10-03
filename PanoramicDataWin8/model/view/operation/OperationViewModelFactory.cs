@@ -74,7 +74,8 @@ namespace PanoramicDataWin8.model.view.operation
         static int groupCount = 0;
         public static AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(SchemaModel schemaModel, Pt position)
         {
-            return new AttributeGroupOperationViewModel(new AttributeGroupOperationModel(schemaModel, "G" + (calcCount++) + "()")) { Position = position };
+            return new AttributeGroupOperationViewModel(
+                new AttributeGroupOperationModel(schemaModel, "G" + (calcCount++) + "()")) { Position = position };
         }
         public static FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(SchemaModel schemaModel, Pt position, FunctionSubtypeModel functionSubtypeModel, bool fromMouse = false)
         {

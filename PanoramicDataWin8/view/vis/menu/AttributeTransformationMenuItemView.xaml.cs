@@ -308,7 +308,8 @@ namespace PanoramicDataWin8.view.vis.menu
             var attr = AttributeTransformationModel.MatchesExistingField(newName, true);
             // if attribute label doesn't match any known attribute and this is a calculation operation, 
             // then set the name of the Calculation operation to the attribute label 
-            if (attr == null && !IDEAAttributeModel.NameExists(newName))
+            if (attr == null && !IDEAAttributeModel.NameExists(newName, 
+                    model.AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.OriginModel))
             {
                 (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as ComputationalOperationModel)?.SetRawName(model.Label);
             }
@@ -320,7 +321,7 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
             var attr = AttributeTransformationModel.MatchesExistingField(TextInputBox.Text, true);
-            if (attr == null && !IDEAAttributeModel.NameExists(TextInputBox.Text))
+            if (attr == null && !IDEAAttributeModel.NameExists(TextInputBox.Text, model.AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.OriginModel))
             {
                 (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as ComputationalOperationModel)?.SetRawName(TextInputBox.Text);
             }

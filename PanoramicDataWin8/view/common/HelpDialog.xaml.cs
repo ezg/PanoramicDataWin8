@@ -21,9 +21,10 @@ using Newtonsoft.Json;
 
 namespace PanoramicDataWin8.view.common
 {
-    public sealed partial class HelpDialog : ContentDialog
+    public sealed partial class HelpDialog : UserControl
     {
-       
+        public event EventHandler<EventArgs> CloseEvent;
+
         private string _problem = "";
         public string Problem
         {
@@ -42,37 +43,40 @@ namespace PanoramicDataWin8.view.common
         {
             this.InitializeComponent();
             Loaded += HelpDialog_Loaded;
+            playerGrid.SizeChanged += PlayerGrid_SizeChanged;
         }
-
+        
         private async void HelpDialog_Loaded(object sender, RoutedEventArgs e)
         {
             var installedLoc = Package.Current.InstalledLocation;
             var tutorialContent = await installedLoc.GetFileAsync(@"Assets\data\tutorials.json").AsTask()
                 .ContinueWith(t => FileIO.ReadTextAsync(t.Result)).Result;
             var videos = JsonConvert.DeserializeObject<List<VideoVO>>(tutorialContent);
-
-            this.PointerEntered += HelpDialog_PointerEntered;
-
+            
             videoList.ItemsSource = videos;
             videoList.SelectedIndex = 0;
         }
-
-        private void HelpDialog_PointerEntered(object sender, PointerRoutedEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
-
-        private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
-        }
-
-
+        
         private void VideoList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (e.AddedItems.Count > 0)
             {
                 LoadMediaFromString((e.AddedItems.First() as VideoVO).Video);
+                mediaPlayer.TransportControls.IsCompact = true;
+                mediaPlayer.Stretch = Stretch.Uniform;
+                mediaPlayer.HorizontalAlignment = HorizontalAlignment.Right;
+                mediaPlayer.VerticalAlignment = VerticalAlignment.Top;
+                //var d = 400;
+                
+                
+               // ScrollViewer.Height = 190;
             }
+        }
+
+        private void PlayerGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var h = playerGrid.ActualHeight;
+            mediaPlayer.Height = h ;
         }
 
         private async void LoadMediaFromString(string path)
@@ -80,7 +84,13 @@ namespace PanoramicDataWin8.view.common
             mediaPlayer.TransportControls.IsFullWindowButtonVisible = false;
             var installedLoc = Package.Current.InstalledLocation;
             var storageFile = await installedLoc.GetFileAsync(path);
-            mediaPlayer.Source = MediaSource.CreateFromStorageFile(storageFile);
+            var stream = await storageFile.OpenReadAsync();
+            mediaPlayer.SetSource(stream, stream.ContentType);
+        }
+
+        private void CloseButtonClick(object sender, RoutedEventArgs e)
+        {
+            CloseEvent?.Invoke(this, null);
         }
     }
 }

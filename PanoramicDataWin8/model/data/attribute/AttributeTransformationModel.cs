@@ -155,9 +155,11 @@ namespace PanoramicDataWin8.model.data.attribute
         }
         public static AttributeTransformationModel MatchesExistingField(string str, bool exact=false)
         {
-            var inputModels = (controller.view.MainViewController.Instance.MainPage.DataContext as view.MainModel).SchemaModel.OriginModels.First()
+            var originModel = (controller.view.MainViewController.Instance.MainPage.DataContext as view.MainModel)
+                .SchemaModel.OriginModels.First();
+            var inputModels = originModel
                      .InputModels.Where(am => am.IsDisplayed).ToList();
-            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels());
+            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels(originModel));
             AttributeTransformationModel attributeTransformationModel = null;
             foreach (var im in inputModels)
                 if (im.RawName.ToLower().StartsWith(str.ToLower()) && !exact)

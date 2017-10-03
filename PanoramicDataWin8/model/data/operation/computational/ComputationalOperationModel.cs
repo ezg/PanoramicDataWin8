@@ -6,6 +6,7 @@ using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.utils;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text.RegularExpressions;
 using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 
@@ -31,9 +32,9 @@ namespace PanoramicDataWin8.model.data.operation
         public ComputationalOperationModel(SchemaModel schemaModel, string code, DataType dataType, string visualizationType, string rawName, string displayName = null) : base(schemaModel)
         {
             _rawName = rawName;
-            if (rawName != null && !IDEAAttributeModel.NameExists(rawName))
+            if (rawName != null && !IDEAAttributeModel.NameExists(rawName, schemaModel.OriginModels.First()))
             {
-                IDEAAttributeModel.AddCodeField(rawName, displayName == null ? rawName : displayName, code, dataType, visualizationType, new List<VisualizationHint>());
+                IDEAAttributeModel.AddCodeField(rawName, displayName == null ? rawName : displayName, code, dataType, visualizationType, new List<VisualizationHint>(), schemaModel.OriginModels.First());
             }
         }
         public void SetRawName(string name)
@@ -43,7 +44,7 @@ namespace PanoramicDataWin8.model.data.operation
         }
         public IDEAAttributeModel GetAttributeModel()
         {
-            return IDEAAttributeModel.Function(_rawName);
+            return IDEAAttributeModel.Function(_rawName, SchemaModel.OriginModels.First());
         }
         public void SetCode(string code, DataType dataType)
         {

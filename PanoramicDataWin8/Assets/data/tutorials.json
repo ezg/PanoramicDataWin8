@@ -1,18 +1,10 @@
 ﻿[
   {
-    "Description": "Random Bunny Test",
-    "Video": "Assets\\mp4\\big_buck_bunny.mp4"
+    "Description": "Visualizations",
+    "Video": "Assets\\mp4\\visualizations.mp4"
   },
   {
-    "Description": "Second Bunny Test",
-    "Video": "Assets\\mp4\\big_buck_bunny.mp4"
-  },
-  {
-    "Description": "Third Bunny Test",
-    "Video": "Assets\\mp4\\big_buck_bunny.mp4"
-  },
-  {
-    "Description": "Third Bunny Test",
-    "Video": "Assets\\mp4\\big_buck_bunny.mp4"
+    "Description": "Predictions",
+    "Video": "Assets\\mp4\\predictions.mp4"
   }
 ]

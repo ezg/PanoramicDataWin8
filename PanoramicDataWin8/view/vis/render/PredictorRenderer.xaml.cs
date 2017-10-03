@@ -156,11 +156,24 @@ namespace PanoramicDataWin8.view.vis.render
 
         async void submitProblem()
         {
-            PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
-            var operationModel = (PredictorOperationModel)model.OperationModel;
+            ContentDialog locationPromptDialog = new ContentDialog
+            {
+                Title = "Submit this prediction as a solution?",
+                Content = "The application will exit after you submit a solution.",
+                SecondaryButtonText = "Cancel",
+                PrimaryButtonText = "OK"
+            };
 
-            var catalogCommand = new SubmitProblemCommand();
-            await catalogCommand.SumbitResult(operationModel);
+            ContentDialogResult result = await locationPromptDialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
+                var operationModel = (PredictorOperationModel) model.OperationModel;
+
+                var catalogCommand = new SubmitProblemCommand();
+                await catalogCommand.SumbitResult(operationModel);
+                Application.Current.Exit();
+            }
         }
 
 

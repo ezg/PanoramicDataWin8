@@ -20,6 +20,7 @@ using PanoramicDataWin8.utils;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.view.vis.menu;
 using System.Diagnostics;
+using Windows.UI.Xaml.Documents;
 using Windows.UI.Xaml.Media.Animation;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
@@ -71,6 +72,19 @@ namespace PanoramicDataWin8.view.common
         void updateRendering()
         {
             AttributeTransformationViewModel model = DataContext as AttributeTransformationViewModel;
+            txtBlock.Inlines.Clear();
+            Run r = new Run { Text = model.MainLabel };
+            if (model.AttributeTransformationModel.AttributeModel.IsTarget)
+            {
+                Underline ul = new Underline();
+                ul.Inlines.Add(r);
+                txtBlock.Inlines.Add(ul);
+            }
+            else
+            {
+                txtBlock.Inlines.Add(r);
+            }
+
 
             if (model.IsShadow)
             {

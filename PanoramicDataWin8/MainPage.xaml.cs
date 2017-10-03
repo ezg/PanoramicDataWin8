@@ -4,13 +4,16 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
+using Windows.ApplicationModel.Core;
 using Windows.Devices.Input;
 using Windows.Foundation;
 using Windows.Media.Core;
 using Windows.Storage;
 using Windows.System;
 using Windows.UI.Core;
+using Windows.UI.ViewManagement;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
@@ -26,6 +29,7 @@ using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.tilemenu;
@@ -297,19 +301,28 @@ namespace PanoramicDataWin8
 
         private void DatasetConfigurations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            commandBar.SecondaryCommands.Clear();
-            if (DataContext != null)
+            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode ||
+                ((MainModel)DataContext).DatasetConfigurations.Count > 1)
             {
-                foreach (var datasetConfiguration in ((MainModel) DataContext).DatasetConfigurations)
+                commandBar.SecondaryCommands.Clear();
+                if (DataContext != null)
                 {
-                    var b = new AppBarButton();
-                    b.Style = Application.Current.Resources.MergedDictionaries[0]["AppBarButtonStyle1"] as Style;
-                    b.Label = datasetConfiguration.Schema.DisplayName;
-                    b.Icon = new SymbolIcon(Symbol.Library);
-                    b.DataContext = datasetConfiguration;
-                    b.Click += appBarButton_Click;
-                    commandBar.SecondaryCommands.Add(b);
+                    foreach (var datasetConfiguration in ((MainModel) DataContext).DatasetConfigurations)
+                    {
+                        var b = new AppBarButton();
+                       // b.Style = Application.Current.Resources.MergedDictionaries[0]["AppBarButtonStyle1"] as Style;
+                        b.Label = datasetConfiguration.Schema.DisplayName;
+                        b.Icon = new SymbolIcon(Symbol.Library);
+                        b.DataContext = datasetConfiguration;
+                        b.Click += appBarButton_Click;
+                        commandBar.SecondaryCommands.Add(b);
+                    }
+                    commandBar.Visibility = Visibility.Visible;
                 }
+            }
+            else
+            {
+                commandBar.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -323,13 +336,21 @@ namespace PanoramicDataWin8
             _mainPointerManager.Removed += mainPointerManager_Removed;
             _mainPointerManager.Attach(MainViewController.Instance.InkableScene);
 
-            HypothesesViewController.CreateInstance(MainViewController.Instance.MainModel, MainViewController.Instance.OperationViewModels);
-            var hypothesesView = new HypothesesView();
-            hypothesesView.DataContext = HypothesesViewController.Instance.HypothesesViewModel;
-            hypothesisGrid.Children.Add(hypothesesView);
-
-            RecommenderViewController.CreateInstance(MainViewController.Instance.MainModel, MainViewController.Instance.OperationViewModels);
-
+            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
+            {
+                HypothesesViewController.CreateInstance(MainViewController.Instance.MainModel,
+                    MainViewController.Instance.OperationViewModels);
+                var hypothesesView = new HypothesesView();
+                hypothesesView.DataContext = HypothesesViewController.Instance.HypothesesViewModel;
+                hypothesisGrid.Children.Add(hypothesesView);
+                RecommenderViewController.CreateInstance(MainViewController.Instance.MainModel,
+                    MainViewController.Instance.OperationViewModels);
+            }
+            else
+            {
+                hypothesisButton.Visibility = Visibility.Collapsed;
+                hypothesisGrid.Visibility = Visibility.Collapsed;
+            }
             AddHandler(PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
             AddHandler(PointerReleasedEvent, new PointerEventHandler(InkableScene_PointerReleased), true);
             AddHandler(PointerMovedEvent, new PointerEventHandler(InkableScene_PointerMoved), true);
@@ -886,11 +907,7 @@ namespace PanoramicDataWin8
                 parentModel.AreChildrenExpanded = true;
             }
         }
-
-        private void CloseButton_OnPointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            tutorialGrid.Visibility = Visibility.Collapsed;
-        }
+        
 
         public void clearAndDisposeMenus()
         {
@@ -920,45 +937,47 @@ namespace PanoramicDataWin8
 
         private async void HelpButton_OnClick(object sender, RoutedEventArgs e)
         {
-            var dialog = new HelpDialog()
-            {
-                Problem = "asdf sadf"
-            };
-
-            dialog.MinWidth = this.ActualWidth;
-            dialog.MaxWidth = this.ActualWidth;
-            var result = await dialog.ShowAsync();
-            
-
-            /*
-            tutorialGrid.Visibility = Visibility.Visible;
-
-            if (videoList.ItemsSource == null)
-            {
-                var installedLoc = Package.Current.InstalledLocation;
-                var tutorialContent = await installedLoc.GetFileAsync(@"Assets\data\tutorials.json").AsTask()
-                    .ContinueWith(t => FileIO.ReadTextAsync(t.Result)).Result;
-                var videos = JsonConvert.DeserializeObject<List<VideoVO>>(tutorialContent);
-
-                videoList.ItemsSource = videos;
-                videoList.SelectedIndex = 0;
-            }*/
-        }   
-
-        private void VideoList_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+            ShowHelp();
+        }
+        public static async Task<bool> TryShowNewWindow<TView>(bool switchToView)
         {
-            if (e.AddedItems.Count > 0)
+            var newView = CoreApplication.CreateNewView();
+            int newViewId = 0;
+            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                LoadMediaFromString((e.AddedItems.First() as VideoVO).Video);
+                var frame = new Frame();
+                frame.Navigate(typeof(TView), null);
+                Window.Current.Content = frame;
+
+                newViewId = ApplicationView.GetForCurrentView().Id;
+            });
+            var viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+            if (switchToView && viewShown)
+            {
+                // Switch to new view
+                await ApplicationViewSwitcher.SwitchAsync(newViewId);
             }
+            return viewShown;
         }
 
-        private async void LoadMediaFromString(string path)
+        public async void ShowHelp()
         {
-            mediaPlayer.TransportControls.IsFullWindowButtonVisible = false;
-            var installedLoc = Package.Current.InstalledLocation;
-            var storageFile = await installedLoc.GetFileAsync(path);
-            mediaPlayer.Source = MediaSource.CreateFromStorageFile(storageFile);
+            var schema = (((MainModel) DataContext)?.SchemaModel as IDEASchemaModel)?.RootOriginModel.DatasetConfiguration.Schema;
+
+            //var dataset = ((MainModel)DataContext)?.DatasetConfigurations.FirstOrDefault();
+
+            var dialog = new HelpDialog()
+            {
+                Problem = schema?.ProblemDescription
+            };
+            helpGrid.Visibility = Visibility.Visible;
+            //dialog.MaxWidth = this.ActualWidth;
+            helpGrid.Children.Add(dialog);
+            dialog.CloseEvent += (sender, args) =>
+            {
+                helpGrid.Children.Clear();
+                helpGrid.Visibility = Visibility.Collapsed;
+            };
         }
     }
 

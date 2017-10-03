@@ -1,5 +1,7 @@
 ﻿{
-  "Ip": "http://localhost:1234/api",
+  "Hostname": "http://localhost:1234",
+  "APIPath": "/api",
   "StartDataset": "cars",
-  "SampleSize": 100000
+  "SampleSize": 100000,
+  "IsDarpaSubmissionMode": true
 }

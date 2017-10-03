@@ -16,7 +16,9 @@ namespace PanoramicDataWin8.model.view
 
         private GraphRenderOptions _graphRenderOption = GraphRenderOptions.Cell;
 
-        private string _ip;
+        private string _hostname;
+
+        private string _apiPath;
 
         private double _nrOfGroupBins = 10.0;
 
@@ -34,6 +36,8 @@ namespace PanoramicDataWin8.model.view
         private SchemaModel _schemaModel;
 
         private bool _showCodeGen;
+
+        private bool _isDarpaSubmissionMode;
 
         private bool _isDefaultHypothesisEnabled = false;
 
@@ -63,10 +67,16 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _errorMessage, value); }
         }
 
-        public string Ip
+        public string Hostname
         {
-            get { return _ip; }
-            set { SetProperty(ref _ip, value); }
+            get { return _hostname; }
+            set { SetProperty(ref _hostname, value); }
+        }
+
+        public string APIPath
+        {
+            get { return _apiPath; }
+            set { SetProperty(ref _apiPath, value); }
         }
 
         public QueryExecuter QueryExecuter
@@ -85,6 +95,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _sampleSize; }
             set { SetProperty(ref _sampleSize, value); }
+        }
+
+        public bool IsDarpaSubmissionMode
+        {
+            get { return _isDarpaSubmissionMode; }
+            set { SetProperty(ref _isDarpaSubmissionMode, value); }
         }
 
         public double NrOfXBins
