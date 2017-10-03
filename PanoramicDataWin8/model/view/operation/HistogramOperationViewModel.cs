@@ -26,8 +26,7 @@ namespace PanoramicDataWin8.model.view.operation
                 NrColumns = 2,
                 NrRows = 2
             };
-
-
+            
             HistogramOperationModel.PropertyChanged += (sender, args) =>
             {
                 var model = HistogramOperationModel;
@@ -116,50 +115,6 @@ namespace PanoramicDataWin8.model.view.operation
             };
 
             attachmentViewModel.MenuViewModel = menuViewModel;
-
-
-
-            AttachementViewModels.Add(new AttachmentViewModel
-            {
-                AttachmentOrientation = AttachmentOrientation.TopRight,
-                OperationViewModel = this
-            });
-            var attachmentRightViewModel = AttachementViewModels.Last();
-            var menuViewModelDrag = new MenuViewModel
-            {
-                AttachmentOrientation = attachmentRightViewModel.AttachmentOrientation,
-                NrColumns = 1,
-                NrRows = 1
-            };
-
-            var menuItemDrag = new MenuItemViewModel
-            {
-                MenuViewModel = menuViewModelDrag,
-                Row = 0,
-                ColumnSpan = 1,
-                RowSpan = 1,
-                Column = 0,
-                Size = new Vec(25, 25),
-                Position = this.Position,
-                TargetSize = new Vec(25, 25),
-                IsAlwaysDisplayed = false
-            };
-            var attrDrag = new CreateLinkMenuItemViewModel();
-            attrDrag.CreateLinkEvent += (sender, bounds) =>
-            {
-                FilterLinkViewController.Instance.CreateFilterLinkViewModel(this, bounds);
-            };
-
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentRightViewModel.ActiveStopwatch.Restart();
-            };
-
-            menuItemDrag.MenuItemComponentViewModel = attrDrag;
-            menuViewModelDrag.MenuItemViewModels.Add(menuItemDrag);
-            attachmentRightViewModel.MenuViewModel = menuViewModelDrag;
-
         }
 
         private void createRightHistogramMenu()
@@ -404,7 +359,8 @@ namespace PanoramicDataWin8.model.view.operation
             createAxisMenu(AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
             createRightHistogramMenu();
             createTopHistogramMenu();
-            
+            createTopRightFilterDragMenu();
+
             if (attributeModel.InputVisualizationType == InputVisualizationTypeConstants.ENUM ||
                 attributeModel.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
             {

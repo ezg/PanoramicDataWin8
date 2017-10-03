@@ -105,6 +105,7 @@
     <Compile Include="controller\data\idea\SubmitProblemCommand.cs" />
     <Compile Include="controller\data\idea\ExecuteOperationModelEventArgs.cs" />
     <Compile Include="controller\data\idea\PredictorOperationJob.cs" />
+    <Compile Include="controller\data\idea\RawDataOperationJob.cs" />
     <Compile Include="controller\data\idea\RecommenderOperationJob.cs" />
     <Compile Include="controller\data\idea\CodeCommand.cs" />
     <Compile Include="controller\data\idea\RiskOperationJob.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="model\BaseVisualizationOperationModel.cs" />
     <Compile Include="model\data\attribute\ErrorHandler.cs" />
     <Compile Include="model\data\attribute\ScaleFunction.cs" />
     <Compile Include="model\data\attribute\SortMode.cs" />
@@ -160,6 +162,7 @@
     <Compile Include="model\data\operation\FilterProviderOperationModelImpl.cs" />
     <Compile Include="model\data\operation\computational\FunctionOperationModel.cs" />
     <Compile Include="model\data\operation\Range.cs" />
+    <Compile Include="model\data\operation\RawDataOperationModel.cs" />
     <Compile Include="model\data\operation\RecommenderOperationModel.cs" />
     <Compile Include="model\data\operation\IBrushableOperationModel.cs" />
     <Compile Include="model\data\operation\IBrusherOperationModel.cs" />
@@ -207,6 +210,7 @@
     <Compile Include="model\view\operation\DefinitionOperationViewModel.cs" />
     <Compile Include="model\view\operation\FunctionOperationViewModel.cs" />
     <Compile Include="model\view\operation\RecommenderOperationViewModel.cs" />
+    <Compile Include="model\view\RawDataOperationViewModel.cs" />
     <Compile Include="model\view\RecommenderHandleViewModel.cs" />
     <Compile Include="model\view\RecommendedHistogramMenuItemViewModel.cs" />
     <Compile Include="model\view\PagingMenuItemViewModel.cs" />
@@ -375,6 +379,9 @@
       <DependentUpon>PlotRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\PlotRendererContentProvider.cs" />
+    <Compile Include="view\vis\render\RawDataRenderer.xaml.cs">
+      <DependentUpon>RawDataRenderer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\render\Renderer.cs" />
     <Compile Include="view\vis\OperationContainerView.xaml.cs">
       <DependentUpon>OperationContainerView.xaml</DependentUpon>
@@ -593,6 +600,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\OperationContainerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\RawDataRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

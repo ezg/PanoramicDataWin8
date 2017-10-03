@@ -150,6 +150,7 @@ namespace PanoramicDataWin8.controller.view
             parent.OperationTypeModels.Add(new OperationTypeModel { Name = "definition", OperationType = OperationType.Definition });
             parent.OperationTypeModels.Add(new OperationTypeModel { Name = "calculation", OperationType = OperationType.Calculation });
             parent.OperationTypeModels.Add(new OperationTypeModel { Name = "predictor", OperationType = OperationType.Predictor });
+            parent.OperationTypeModels.Add(new OperationTypeModel { Name = "raw data", OperationType = OperationType.RawData });
 
             var funcs = new OperationTypeGroupModel { Name = "functions", OperationType = OperationType.Group };
             parent.OperationTypeModels.Add(funcs);
@@ -180,6 +181,14 @@ namespace PanoramicDataWin8.controller.view
             Instance.LoadConfig();
         }
 
+        public RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(AttributeModel attributeModel, Pt position)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultRawDataOperationViewModel(MainModel.SchemaModel, attributeModel, position);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
         public HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(AttributeModel attributeModel, Pt position)
         {
             var visModel = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(MainModel.SchemaModel, attributeModel, position);
@@ -331,6 +340,10 @@ namespace PanoramicDataWin8.controller.view
             if (operationTypeModel.OperationType == OperationType.Histogram)
             {
                 operationViewModel = CreateDefaultHistogramOperationViewModel(null, position);
+            }
+            else if (operationTypeModel.OperationType == OperationType.RawData)
+            {
+                operationViewModel = CreateDefaultRawDataOperationViewModel(null, position);
             }
             else if (operationTypeModel.OperationType == OperationType.Predictor)
             {

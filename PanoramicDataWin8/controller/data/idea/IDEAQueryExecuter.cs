@@ -55,6 +55,16 @@ namespace PanoramicDataWin8.controller.data.progressive
                                     (int) MainViewController.Instance.MainModel.SampleSize);
                             }
                         }
+                        else if (operationModel is RawDataOperationModel)
+                        {
+                            var rawDataOperationModel = (RawDataOperationModel)operationModel;
+                            if (rawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any())
+                            {
+                                newJob = new RawDataOperationJob(
+                                    rawDataOperationModel,
+                                    (int)MainViewController.Instance.MainModel.SampleSize);
+                            }
+                        }
                         else if (operationModel is StatisticalComparisonOperationModel)
                         {
                             var statisticalComparisonOperationModel = (StatisticalComparisonOperationModel) operationModel;
