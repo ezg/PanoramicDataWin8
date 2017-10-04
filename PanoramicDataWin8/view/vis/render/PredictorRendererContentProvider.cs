@@ -67,12 +67,13 @@ namespace PanoramicDataWin8.view.vis.render
                 var deviceHeight = (float) (canvas.ActualHeight/CompositionScaleY - topOffset - bottomtOffset);
 
                 var metric = _optimizerResult.Metrics;
-                var blue = Color.FromArgb(255, 41, 170, 213);
-                DrawString(canvasArgs, _textFormatSubmit, deviceWidth, topOffset, "submit?", blue, false, false, false);
 
-                SubmitHitTarget = null;
                 if (MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
                 {
+                    var blue = Color.FromArgb(255, 41, 170, 213);
+                    DrawString(canvasArgs, _textFormatSubmit, deviceWidth, topOffset, "submit?", blue, false, false, false);
+                    SubmitHitTarget = null;
+
                     var layout = new CanvasTextLayout(canvas, "submit?", _textFormatSubmit, 1000f, 1000f);
                     var layoutBounds = layout.DrawBounds;
                     layout.Dispose();

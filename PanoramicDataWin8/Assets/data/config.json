@@ -3,5 +3,5 @@
   "APIPath": "/api",
   "StartDataset": "cars",
   "SampleSize": 100000,
-  "IsDarpaSubmissionMode": false
+  "IsDarpaSubmissionMode": true
 }
