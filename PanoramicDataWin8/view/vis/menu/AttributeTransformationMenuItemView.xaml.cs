@@ -10,6 +10,7 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI;
 using Windows.UI.Core;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -117,6 +118,15 @@ namespace PanoramicDataWin8.view.vis.menu
             var model = ((AttributeTransformationMenuItemViewModel) ((MenuItemViewModel) DataContext).MenuItemComponentViewModel);
             if (!model.CanDrag)
             {
+                if (e.TriggeringPointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
+                {
+                    var properties = e.StartContacts[e.TriggeringPointer.PointerId].Properties;
+                    if (properties.PointerUpdateKind == PointerUpdateKind.RightButtonPressed)
+                    {
+                        ((MenuItemViewModel)DataContext).FireDeleted();
+                        return;
+                    }
+                }
                 return;
             }
 

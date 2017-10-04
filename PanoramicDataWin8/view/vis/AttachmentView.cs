@@ -45,7 +45,7 @@ namespace PanoramicDataWin8.view.vis
             var model = ((AttachmentViewModel) DataContext);
             if (_menuViewModel != null)
             {
-                if (model.ActiveStopwatch.Elapsed > TimeSpan.FromSeconds(2.5) && _menuViewModel.IsDisplayed)
+                if (model.ActiveStopwatch.Elapsed > TimeSpan.FromSeconds(4) && _menuViewModel.IsDisplayed)
                 {
                     _menuViewModel.IsDisplayed = false;
                 }
