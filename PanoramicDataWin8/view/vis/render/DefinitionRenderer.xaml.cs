@@ -20,6 +20,7 @@ using PanoramicDataWin8.model.data.operation;
 using System.ComponentModel;
 using Windows.UI;
 using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.data.idea;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -37,8 +38,19 @@ namespace PanoramicDataWin8.view.vis.render
             this.InitializeComponent();
             this.DataContextChanged += DefinitionRenderer_DataContextChanged;
             this.SizeChanged += (sender, e) => Relayout();
-           
+
+            IDEAAttributeModel.CodeDefinitionChangedEvent += IDEAAttributeModel_CodeDefinitionChangedEvent;
         }
+
+        private void IDEAAttributeModel_CodeDefinitionChangedEvent(object sender)
+        {
+            var defOpModel = ((DataContext as DefinitionOperationViewModel)?.OperationModel as DefinitionOperationModel);
+            if (defOpModel?.GetAttributeModel() == sender)
+            {
+                defOpModel.UpdateName();
+            }
+        }
+
         public override void StartSelection(Point point)
         {
             foreach (var label in Labels.Children.Select((c) => c as DefinitionLabel))

@@ -4,6 +4,7 @@ using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.model.data.operation;
 using System.Linq;
 using IDEA_common.aggregates;
+using System.Collections.Generic;
 
 namespace PanoramicDataWin8.model.data.attribute
 {
@@ -166,6 +167,16 @@ namespace PanoramicDataWin8.model.data.attribute
                 if (im.RawName.ToLower() == str.ToLower())
                     attributeTransformationModel = new AttributeTransformationModel(im as AttributeModel);
             return attributeTransformationModel;
+        }
+        public static IEnumerable<string> ExistingFieldList()
+        {
+            var inputModels = (controller.view.MainViewController.Instance.MainPage.DataContext as view.MainModel).SchemaModel.OriginModels.First()
+                     .InputModels.Where(am => am.IsDisplayed).ToList();
+            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels());
+            List<string> existingFields = new List<string>();
+            foreach (var im in inputModels)
+                existingFields.Add(im.RawName);
+            return existingFields;
         }
     }
 }

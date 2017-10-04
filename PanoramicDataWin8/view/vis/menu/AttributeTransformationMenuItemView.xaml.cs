@@ -303,6 +303,16 @@ namespace PanoramicDataWin8.view.vis.menu
 
         private void TextInputBox_LostFocus(object sender, RoutedEventArgs e)
         {
+            var model = ChangeCodeRawName();
+            model.Editing = Visibility.Collapsed;
+        }
+        
+        private void TextInputBox_KeyUp(object sender, KeyRoutedEventArgs e)
+        {
+            ChangeCodeRawName();
+        }
+        AttributeTransformationMenuItemViewModel ChangeCodeRawName()
+        {
             var newName = TextInputBox.Text;
             var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
             var attr = AttributeTransformationModel.MatchesExistingField(newName, true);
@@ -310,20 +320,11 @@ namespace PanoramicDataWin8.view.vis.menu
             // then set the name of the Calculation operation to the attribute label 
             if (attr == null && !IDEAAttributeModel.NameExists(newName))
             {
-                (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as ComputationalOperationModel)?.SetRawName(model.Label);
+                var compModel = model.AttributeTransformationViewModel.OperationViewModel.OperationModel as ComputationalOperationModel;
+                compModel.RefactorFunctionName(newName);
             }
 
-            model.Editing = Visibility.Collapsed;
-        }
-
-        private void TextInputBox_KeyUp(object sender, KeyRoutedEventArgs e)
-        {
-            var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
-            var attr = AttributeTransformationModel.MatchesExistingField(TextInputBox.Text, true);
-            if (attr == null && !IDEAAttributeModel.NameExists(TextInputBox.Text))
-            {
-                (model.AttributeTransformationViewModel.OperationViewModel.OperationModel as ComputationalOperationModel)?.SetRawName(TextInputBox.Text);
-            }
+            return model;
         }
     }
 }

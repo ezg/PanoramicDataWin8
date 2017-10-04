@@ -31,23 +31,7 @@ namespace PanoramicDataWin8.model.data.operation
     public class DefinitionOperationModel : ComputationalOperationModel, IBrushableOperationModel
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
-
-        protected override void updateName()
-        {
-            var str = "(";
-            var code = (GetAttributeModel().FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Code;
-            var terms = new Regex("\\b", RegexOptions.Compiled).Split(code);
-            List<string> used = new List<string>();
-            foreach (var n in terms)
-                if (n != null && !used.Contains(n) && AttributeTransformationModel.MatchesExistingField(n, true) != null)
-                {
-                    str += n + ",";
-                    used.Add(n);
-                }
-            str = str.TrimEnd(',') + ")";
-            var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(GetAttributeModel().RawName, str);
-            GetAttributeModel().DisplayName = newName;
-        }
+        
 
         public DefinitionOperationModel(SchemaModel schemaModel, string rawName, string displayName=null) : base(schemaModel, "0", DataType.String, "numeric", rawName, displayName)
         {
@@ -57,7 +41,8 @@ namespace PanoramicDataWin8.model.data.operation
 
         private void BrushOperationModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (GetAttributeModel() != null) updateName();
+            if (GetAttributeModel() != null)
+                UpdateName();
         }
 
         public List<BrushDescriptor> BrushDescriptors { get; set; } = new List<BrushDescriptor>();
@@ -152,7 +137,7 @@ namespace PanoramicDataWin8.model.data.operation
             GetAttributeModel().VisualizationHints = new List<IDEA_common.catalog.VisualizationHint>(new IDEA_common.catalog.VisualizationHint[] { IDEA_common.catalog.VisualizationHint.TreatAsEnumeration});
 
             GetAttributeModel().SetCode(expression, DataType.String);
-            updateName();
+            UpdateName();
         }
     }
 }

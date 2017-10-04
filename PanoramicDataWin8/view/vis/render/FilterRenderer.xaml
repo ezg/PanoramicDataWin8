@@ -167,7 +167,7 @@
                 </Grid>
             </Grid>
             <Grid x:Name="TypingPanel" HorizontalAlignment="Stretch">
-                <TextBox  x:Name="ExpressionTextBox" IsEnabled="False" Text="" IsSpellCheckEnabled="False" FontSize="30" TextAlignment="Center" KeyDown="ExpressionTextBox_KeyDown"  PointerExited="ExpressionTextBox_PointerExited"   />
+                <TextBox  x:Name="ExpressionTextBox"  x:FieldModifier="public" IsEnabled="False" Text="" IsSpellCheckEnabled="False" FontSize="30" TextAlignment="Center" KeyDown="ExpressionTextBox_KeyDown"  PointerExited="ExpressionTextBox_PointerExited"   />
             </Grid>
         </Grid>
     </Page>

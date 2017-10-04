@@ -151,7 +151,7 @@ namespace PanoramicDataWin8.view.vis.render
             var mat = Matrix3x2.CreateScale(CommonExtensions.ToVector2(CompositionScaleX, CompositionScaleY));
             canvasArgs.DrawingSession.Transform = mat;
 
-            if (_histogramResult != null && _histogramResult.Bins != null)
+            if (_histogramResult != null && _histogramResult?.Bins?.Count > 0)
             {
                  renderPlot(canvas, canvasArgs);
             }
@@ -382,8 +382,8 @@ namespace PanoramicDataWin8.view.vis.render
             var yLabelOrderings = SortBinsByValue(true);
 
 
-            var c1 = _histogramResult.BinRanges[0].GetBins().Count;
-            var c2 = _histogramResult.BinRanges[1].GetBins().Count;
+            var c1 = _histogramResult.BinRanges[0]?.GetBins().Count;
+            var c2 = _histogramResult.BinRanges[1]?.GetBins().Count;
 
             computeSizesAndRenderLabels(canvas, canvasArgs, c1 * c2 < 200, xLabelOrderings, yLabelOrderings);
           
@@ -403,7 +403,7 @@ namespace PanoramicDataWin8.view.vis.render
 
             var highlightedBinPrimitiveCollections = new List<BinPrimitiveCollection>();
             HitTargets.Clear();
-            for (int xi = 0; xi < _histogramResult.BinRanges[0].GetBins().Count; xi++)
+            for (int xi = 0; xi < _histogramResult.BinRanges[0]?.GetBins().Count; xi++)
             {
                 for (int yi = 0; yi < _histogramResult.BinRanges[1].GetBins().Count; yi++)
                 {
@@ -599,7 +599,7 @@ namespace PanoramicDataWin8.view.vis.render
         List<Tuple<double,double>> GetAxisRanges(bool sortAxis)
         {
             var axisSizes = new List<Tuple<double, double>>();
-            for (int xi = 0; xi < _histogramResult.BinRanges[sortAxis ? 0 : 1].GetBins().Count; xi++)
+            for (int xi = 0; xi < _histogramResult.BinRanges[sortAxis ? 0 : 1]?.GetBins().Count; xi++)
             {
                 double minaxis = double.MaxValue;
                 double maxaxis = double.MinValue;
@@ -624,7 +624,7 @@ namespace PanoramicDataWin8.view.vis.render
         List<double> GetAxisSizes(bool sortAxis)
         {
             var axisSizes = new List<double>();
-            for (int xi = 0; xi < _histogramResult.BinRanges[sortAxis ? 0 : 1].GetBins().Count; xi++)
+            for (int xi = 0; xi < _histogramResult.BinRanges[sortAxis ? 0 : 1]?.GetBins().Count; xi++)
             {
                 double axisSize = 0;
                 for (int yi = 0; yi < _histogramResult.BinRanges[sortAxis ? 1 : 0].GetBins().Count; yi++)
@@ -657,7 +657,7 @@ namespace PanoramicDataWin8.view.vis.render
                         sortBinIndex = 0;// bcz: used to sort HeatMaps by row/col:  _histogramResult.BinRanges[!sortAxis ? 1 : 0].GetIndexFromScaleValue(fm.Value);
                     }
 
-            for (int binIndex = 0; binIndex < _histogramResult.BinRanges[sortAxis ? 1 :0].GetBins().Count; binIndex++)
+            for (int binIndex = 0; binIndex < _histogramResult.BinRanges[sortAxis ? 1 :0]?.GetBins().Count; binIndex++)
             {
                 var binValue = _helper.VisualBinRanges[sortAxis ? 1 : 0].GetValueFromIndex(binIndex); 
                 var newXi = _histogramResult.BinRanges[sortAxis ? 1 : 0].GetIndexFromScaleValue(_helper.VisualBinRanges[sortAxis ? 1 : 0].GetLabels()[binIndex].Value);
@@ -676,7 +676,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
             }
             var list = reverse ? new List<int>(sortedIndexList.Values.Reverse()) : sortedIndexList.Values;
-            for (int binIndex = 0; binIndex < _histogramResult.BinRanges[sortAxis ? 1 : 0].GetBins().Count; binIndex++)
+            for (int binIndex = 0; binIndex < _histogramResult.BinRanges[sortAxis ? 1 : 0]?.GetBins().Count; binIndex++)
             {
                 binIndexDict.Add(binIndex, list.IndexOf(binIndex));
             }
@@ -859,8 +859,10 @@ namespace PanoramicDataWin8.view.vis.render
             Small = false;
             CornerRadius = 4; 
 
-            var xLabels = VisualBinRanges[0].GetLabels();
-            var yLabels = VisualBinRanges[1].GetLabels();
+            var xLabels = VisualBinRanges[0]?.GetLabels();
+            var yLabels = VisualBinRanges[1]?.GetLabels();
+            if (xLabels == null || yLabels == null)
+                return;
             var maxXLabelLength = xLabels.Max(b => b.Label.Length);
             var maxXLabel = xLabels.First(b => b.Label.Length == maxXLabelLength);
             var maxYLabelLength = yLabels.Max(b => b.Label.Length);
@@ -1015,7 +1017,7 @@ namespace PanoramicDataWin8.view.vis.render
                         AggregateParameterIndex = _histogramResult.GetAggregateParametersIndex(aggParam),
                         BrushIndex = brush.BrushIndex
                     };
-                    var doubleRes = (DoubleValueAggregateResult) _histogramResult.GetAggregateResult(aggregateKey);
+                    var doubleRes = (DoubleValueAggregateResult) _histogramResult?.GetAggregateResult(aggregateKey);
                     if (doubleRes != null && doubleRes.HasResult)
                     {
                         var average = doubleRes.Result;

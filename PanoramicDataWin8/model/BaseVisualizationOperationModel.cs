@@ -47,17 +47,18 @@ namespace PanoramicDataWin8.model.data.operation
                 _attributeUsageTransformationModels[attributeUsage].CollectionChanged +=
                     _attributeUsageTransformationModels_CollectionChanged;
             }
-            IDEAAttributeModel.CodeDefinitionChangedEvent += IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent;
+            IDEAAttributeModel.CodeDefinitionChangedEvent    += (sender) => TestForRefresh(sender as IDEAAttributeModel);
+            ComputationalOperationModel.CodeNameChangedEvent += (sender, oldName, newName) => TestForRefresh((sender as ComputationalOperationModel).GetAttributeModel());
         }
+
 
         public override void Cleanup()
         {
-            IDEAAttributeModel.CodeDefinitionChangedEvent -= IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent;
+            IDEAAttributeModel.CodeDefinitionChangedEvent -= (sender) => TestForRefresh(sender as IDEAAttributeModel);
         }
-
-        private void IDEAAttributeComputedFieldModel_CodeDefinitionChangedEvent(object sender)
+        private void TestForRefresh(IDEAAttributeModel attributeChanged)
         {
-            // bcz: test to see if this code has an effect on our operation...
+            // bcz: if the changedAttribute is one of this Histogram's code parameters, then we need to fire a model update so that it will be redrawn
             List<AttributeCaclculatedParameters> attributeCodeParameters;
             List<string> brushes;
             List<AttributeTransformationModel> aggregates;
@@ -65,8 +66,7 @@ namespace PanoramicDataWin8.model.data.operation
 
             foreach (var attr in attributeCodeParameters.OfType<AttributeCodeParameters>())
             {
-                if (attr.RawName == (sender as IDEAAttributeModel).RawName ||
-                    attr.Code.Contains((sender as IDEAAttributeModel).RawName))
+                if (attr.RawName == attributeChanged.RawName || attr.Code.Contains(attributeChanged.RawName))
                 {
                     FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                     break;

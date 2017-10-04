@@ -5,6 +5,12 @@ using Newtonsoft.Json;
 using PanoramicDataWin8.model.data.attribute;
 using IDEA_common.operations;
 using System.Linq;
+using PanoramicDataWin8.model.data.operation;
+using System.Text.RegularExpressions;
+using PanoramicDataWin8.model.view.operation;
+using Windows.UI.Xaml.Controls;
+using PanoramicDataWin8.view.vis;
+using PanoramicDataWin8.view.vis.render;
 
 namespace PanoramicDataWin8.model.data.idea
 {
@@ -50,7 +56,23 @@ namespace PanoramicDataWin8.model.data.idea
                 fm.FuncModel is AttributeFuncModel.AttributeCodeFuncModel ||
                 fm.FuncModel is AttributeFuncModel.AttributeBackendFuncModel);
         }
-        
+        static public void RefactorFunctionName(string oldName, string newName)
+        {
+            foreach (var am in _allFieldAttributeModels.Where((fm) =>
+                fm.FuncModel is AttributeFuncModel.AttributeCodeFuncModel))
+            {
+                var cfm = am.FuncModel as AttributeFuncModel.AttributeCodeFuncModel;
+                am.SetCode(cfm.RefactorVariable(oldName,newName), am.DataType);
+            }
+            var x = (controller.view.MainViewController.Instance.InkableScene.Elements).Where((e) => e is OperationContainerView && (e as OperationContainerView)?.Children?.First() is FilterRenderer);
+            foreach (var fm in x)
+            {
+                var frend = (fm as OperationContainerView).Children.First() as FilterRenderer;
+                var newFilterCode = AttributeFuncModel.AttributeCodeFuncModel.TransformCode(frend.ExpressionTextBox.Text, oldName, newName).Item1;
+                frend.ExpressionTextBox.Text = newFilterCode;
+            }
+        }
+
         public delegate void CodeDefinitionChangedHandler(object sender);
         static public event CodeDefinitionChangedHandler CodeDefinitionChangedEvent;
 
@@ -78,11 +100,20 @@ namespace PanoramicDataWin8.model.data.idea
                 {
                     codeFuncModel.Code = code;
                     this.DataType = dataType;
-                    if (CodeDefinitionChangedEvent != null)
+                     if (CodeDefinitionChangedEvent != null)
                         CodeDefinitionChangedEvent(this);
                 }
             }
         }
 
+        public string GetCode()
+        {
+            var codeFuncModel = FuncModel as AttributeFuncModel.AttributeCodeFuncModel;
+            if (codeFuncModel != null)
+            {
+                return codeFuncModel.Code;
+            }
+            return "";
+        }
     }
 }
