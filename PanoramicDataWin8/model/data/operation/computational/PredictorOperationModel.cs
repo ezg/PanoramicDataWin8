@@ -5,6 +5,7 @@ using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.idea;
 using IDEA_common.catalog;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PanoramicDataWin8.model.data.operation
 {
@@ -28,6 +29,9 @@ namespace PanoramicDataWin8.model.data.operation
             IDEAAttributeModel attributeModel = GetAttributeModel();
             var funcModel = attributeModel.FuncModel as AttributeModel.AttributeFuncModel.AttributeBackendFuncModel;
             funcModel.Id = backendOperatorId;
+
+            attributeModel.DataType = TargetAttributeUsageTransformationModel.AttributeModel.DataType;
+            attributeModel.InputVisualizationType = TargetAttributeUsageTransformationModel.AttributeModel.InputVisualizationType;
         }
 
         public FilteringOperation FilteringOperation

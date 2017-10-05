@@ -13,7 +13,7 @@ namespace PanoramicDataWin8.model.data.operation
         void Cleanup();
 
         IOperationModel ResultCauserClone { get; set; }
-
+        
         SchemaModel SchemaModel { get; set; }
         event OperationModel.OperationModelUpdatedHandler OperationModelUpdated;
         void FireOperationModelUpdated(OperationModelUpdatedEventArgs args);

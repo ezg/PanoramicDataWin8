@@ -129,59 +129,18 @@
 
         <TextBlock Name="msgTextBlock" Text="" HorizontalAlignment="Left" VerticalAlignment="Bottom" Foreground="{StaticResource darkBrush}" Margin="10" Opacity="0"/>
 
-        <Grid Name="tutorialGrid" Visibility="Collapsed" Background="#ffffffff">
-            <Grid Name="tutorialContentGrid" Margin="10, 50, 5, 10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"></ColumnDefinition>
-                    <ColumnDefinition Width="*"></ColumnDefinition>
-                </Grid.ColumnDefinitions>
-
-                <ListView x:Name="videoList"
-                          Grid.Column="0"
-                          Margin="5"
-                          SelectionMode="Single"
-                          SelectionChanged="VideoList_OnSelectionChanged">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock Text="{Binding Description}" 
-                                           Margin="5"
-                                           TextWrapping="Wrap"
-                                           FontSize="24" 
-                                           Foreground="{StaticResource highlightBrush}" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-                <Grid Grid.Column="1">
-                     <MediaPlayerElement 
-                        Name="mediaPlayer"
-                        AreTransportControlsEnabled="True"
-                        AutoPlay="False"/>
-                </Grid>
-            </Grid>
-            <Grid Name="closeButton" HorizontalAlignment="Right"
-                  Background="#ffffff"
-                  VerticalAlignment="Top" Margin="10" PointerPressed="CloseButton_OnPointerPressed">
-                <Path StrokeThickness="4" Stroke="{StaticResource highlightBrush}" HorizontalAlignment="Right" VerticalAlignment="Top">
-                    <Path.Data>
-                        <GeometryGroup>
-                            <LineGeometry StartPoint="0,0" EndPoint="30,30" />
-                            <LineGeometry StartPoint="30,0" EndPoint="0,30" />
-                        </GeometryGroup>
-                    </Path.Data>
-                </Path>
-            </Grid>
-        </Grid>
 
         <Canvas Name="fingerAndPenCanvas"></Canvas>
         <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5"  
                    Visibility="Collapsed"
                    Text="Build 1.005" Foreground="{StaticResource darkBrush}" FontSize="10"></TextBlock>
+
+        <Grid Name="helpGrid" Visibility="Collapsed">
+        </Grid>
     </Grid>
 
     <Page.BottomAppBar >
-        <CommandBar Name="commandBar" IsSticky="False" Background="Transparent">
+        <CommandBar Name="commandBar" IsSticky="False" Background="#88ffffff">
             <CommandBar.SecondaryCommands >
             </CommandBar.SecondaryCommands>
         </CommandBar>

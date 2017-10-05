@@ -14,17 +14,22 @@ namespace PanoramicDataWin8.model.data.attribute
         private List<VisualizationHint> _visualizationHints = new List<VisualizationHint>();
         private string  _displayName = "";
         private string  _rawName = "";
+        private bool    _isTarget = false;
         private bool    _isDisplayed = true;
+        private OriginModel        _originModel = null;
         private AttributeFuncModel _funcModel = null;
 
         public AttributeModel() { }
-        public AttributeModel(string rawName, string displayName, AttributeFuncModel funcModel, DataType dataType, string inputVisualizationType, List<VisualizationHint> visualizationHints)
+        public AttributeModel(string rawName, string displayName, AttributeFuncModel funcModel, DataType dataType, string inputVisualizationType,
+            List<VisualizationHint> visualizationHints, OriginModel originModel, bool isTarget)
         {
             _rawName = rawName;
             _displayName = displayName;
             _funcModel = funcModel;
             _visualizationHints = visualizationHints;
+            _originModel = originModel;
             InputVisualizationType = inputVisualizationType;
+            _isTarget = isTarget;
             DataType = dataType;
         }
 
@@ -33,7 +38,17 @@ namespace PanoramicDataWin8.model.data.attribute
             get { return _isDisplayed; }
             set { SetProperty(ref _isDisplayed, value); }
         }
-        
+        public bool IsTarget
+        {
+            get { return _isTarget; }
+            set { SetProperty(ref _isTarget, value); }
+        }
+        public OriginModel OriginModel
+        {
+            get { return _originModel; }
+            set { SetProperty(ref _originModel, value); }
+        }
+
         public string DisplayName
         {
             get { return _displayName; }
@@ -57,7 +72,7 @@ namespace PanoramicDataWin8.model.data.attribute
             set { SetProperty(ref _visualizationHints, value); }
         }
 
-        public string InputVisualizationType { get; } = "";
+        public string InputVisualizationType { get; set; } = "";
 
         public override bool Equals(object obj)
         {

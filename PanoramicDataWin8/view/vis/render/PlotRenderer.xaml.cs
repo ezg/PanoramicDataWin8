@@ -29,6 +29,7 @@ using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.view.inq;
+using IDEA_common.operations.histogram;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -131,28 +132,32 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
+        HistogramOperationModel ResultHistogramOperationModel;
+        HistogramResult _lastResult;
         void loadResult(IResult result)
         {
-            HistogramOperationViewModel model = (DataContext as HistogramOperationViewModel);
-            var clone = (HistogramOperationModel) model.OperationModel.ResultCauserClone;
-            AttributeTransformationModel xIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
-            AttributeTransformationModel yIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
+            _lastResult = result as HistogramResult;
+            var model = (DataContext as HistogramOperationViewModel);
+            _plotRendererContentProvider.UpdateFilterModels(model.HistogramOperationModel.FilterModels.ToList());
+
+            ResultHistogramOperationModel = (HistogramOperationModel)model.OperationModel.ResultCauserClone;
+            AttributeTransformationModel xIom = ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+            AttributeTransformationModel yIom = ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
             AttributeTransformationModel valueIom = null;
 
-            if (clone.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
+            if (ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
             {
-                valueIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.Value).First();
+                valueIom = ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Value).First();
             }
-            else if (clone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
+            else if (ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
             {
-                valueIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
+                valueIom = ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
             }
-            _plotRendererContentProvider.UpdateFilterModels(model.HistogramOperationModel.FilterModels.ToList());
             _plotRendererContentProvider.UpdateData(result, model.HistogramOperationModel.IncludeDistribution, 
                 model.HistogramOperationModel.BrushColors,
                 xIom, yIom, valueIom, 30);
         }
-
+        
 
         private List<Windows.Foundation.Point> _selectionPoints = new List<Windows.Foundation.Point>();
         public override void StartSelection(Windows.Foundation.Point point)
@@ -172,23 +177,37 @@ namespace PanoramicDataWin8.view.vis.render
             IList<Vec> convexHull = Convexhull.convexhull(_selectionPoints);
             IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon();
 
+            HistogramOperationModel histogramOperationModel = (HistogramOperationModel)((HistogramOperationViewModel)DataContext).OperationModel;
+
             List<FilterModel> hits = new List<FilterModel>();
             foreach (var geom in _plotRendererContentProvider.HitTargets.Keys)
             {
                 if (convexHullPoly.Intersects(geom))
                 {
-                    hits.Add(_plotRendererContentProvider.HitTargets[geom]);
+                    var fm = _plotRendererContentProvider.HitTargets[geom];
+                    bool found = true;
+                    foreach (var vc in fm.ValueComparisons)
+                    {
+                        bool valFound = false;
+                        foreach (var at in histogramOperationModel.AttributeTransformationModels)
+                            if (at.AttributeModel.RawName == vc.AttributeTransformationModel.AttributeModel.RawName)
+                            {
+                                vc.AttributeTransformationModel = at;
+                                valFound = true;
+                                break;
+                            }
+                        if (!valFound)
+                        {
+                            found = false;
+                            break;
+                        }
+                    }
+                    if (found)
+                        hits.Add(fm);
                 }
             }
             if (hits.Count > 0)
             {
-                foreach (var valueComparison in hits[0].ValueComparisons)
-                {
-                    Debug.WriteLine((valueComparison.AttributeTransformationModel.AttributeModel.RawName + " " +
-                                     valueComparison.Value));
-                }
-
-                HistogramOperationModel histogramOperationModel = (HistogramOperationModel) ((HistogramOperationViewModel) DataContext).OperationModel;
 
                 if (hits.Any(h => histogramOperationModel.FilterModels.Contains(h)))
                 {

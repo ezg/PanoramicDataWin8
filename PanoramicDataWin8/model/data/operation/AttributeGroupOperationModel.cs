@@ -4,6 +4,7 @@ using PanoramicDataWin8.model.data.attribute;
 using System;
 using PanoramicDataWin8.model.data.idea;
 using System.Collections.Generic;
+using System.Linq;
 using IDEA_common.catalog;
 
 namespace PanoramicDataWin8.model.data.operation
@@ -26,7 +27,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         public AttributeGroupOperationModel(SchemaModel schemaModel, string rawName) : base(schemaModel)
         {
-            attributeGroupModel = IDEAAttributeModel.AddGroupField(rawName, rawName);
+            attributeGroupModel = IDEAAttributeModel.AddGroupField(rawName, rawName, schemaModel.OriginModels.First());
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }

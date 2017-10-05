@@ -38,17 +38,6 @@ namespace PanoramicDataWin8.view.vis.render
             this.InitializeComponent();
             this.DataContextChanged += DefinitionRenderer_DataContextChanged;
             this.SizeChanged += (sender, e) => Relayout();
-
-            IDEAAttributeModel.CodeDefinitionChangedEvent += IDEAAttributeModel_CodeDefinitionChangedEvent;
-        }
-
-        private void IDEAAttributeModel_CodeDefinitionChangedEvent(object sender)
-        {
-            var defOpModel = ((DataContext as DefinitionOperationViewModel)?.OperationModel as DefinitionOperationModel);
-            if (defOpModel?.GetAttributeModel() == sender)
-            {
-                defOpModel.UpdateName();
-            }
         }
 
         public override void StartSelection(Point point)
@@ -76,6 +65,12 @@ namespace PanoramicDataWin8.view.vis.render
                 viewModel.DefinitionOperationModel.PropertyChanged += (s, e) => Relayout();
                 viewModel.DefinitionOperationModel.OperationModelUpdated += (s, e) => Relayout();
             }
+        }
+
+        public override void Refactor(string oldName, string newName)
+        {
+            var model = (DataContext as DefinitionOperationViewModel).DefinitionOperationModel;
+            model.UpdateCode(true);
         }
 
         void Relayout()

@@ -12,6 +12,7 @@ using Microsoft.Graphics.Canvas.Geometry;
 using Microsoft.Graphics.Canvas.Text;
 using Microsoft.Graphics.Canvas.UI;
 using Microsoft.Graphics.Canvas.UI.Xaml;
+using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.utils;
@@ -66,14 +67,21 @@ namespace PanoramicDataWin8.view.vis.render
                 var deviceHeight = (float) (canvas.ActualHeight/CompositionScaleY - topOffset - bottomtOffset);
 
                 var metric = _optimizerResult.Metrics;
-                var blue = Color.FromArgb(255, 41, 170, 213);
-                DrawString(canvasArgs, _textFormatSubmit, deviceWidth, topOffset, "submit?", blue, false, false, false);
 
-                var layout = new CanvasTextLayout(canvas, "submit?", _textFormatSubmit, 1000f, 1000f);
-                var layoutBounds = layout.DrawBounds;
-                layout.Dispose();
-                var rct = new Rct(new Pt(deviceWidth - layoutBounds.Width - 5, topOffset), new Vec(layoutBounds.Width + 10, layoutBounds.Height + 10));
-                SubmitHitTarget =rct.GetPolygon();
+                if (MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
+                {
+                    var blue = Color.FromArgb(255, 41, 170, 213);
+                    DrawString(canvasArgs, _textFormatSubmit, deviceWidth, topOffset, "submit?", blue, false, false, false);
+                    SubmitHitTarget = null;
+
+                    var layout = new CanvasTextLayout(canvas, "submit?", _textFormatSubmit, 1000f, 1000f);
+                    var layoutBounds = layout.DrawBounds;
+                    layout.Dispose();
+                    var rct = new Rct(new Pt(deviceWidth - layoutBounds.Width - 5, topOffset),
+                        new Vec(layoutBounds.Width + 10, layoutBounds.Height + 10));
+                    SubmitHitTarget = rct.GetPolygon();
+                }
+
 
 
                 if (metric.AverageAccuracy.HasValue && metric.AverageAccuracy.Value != 0)

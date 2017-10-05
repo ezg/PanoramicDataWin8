@@ -39,12 +39,6 @@ namespace PanoramicDataWin8.view.vis.render
         {
             this.InitializeComponent();
             this.CodeBox.LostFocus += (sender, e) => Labels.IsHitTestVisible = false;
-            IDEAAttributeModel.CodeDefinitionChangedEvent += (sender) =>
-            {
-                // whenever the code for this object changes indirectly (e.g., a refactoring), update the CodeBox's Text
-                if (CalculationOperationModel?.GetAttributeModel() == sender && FocusManager.GetFocusedElement() != CodeBox)
-                    CodeBox.Text = CalculationOperationModel.GetAttributeModel().GetCode();
-            };
         }
         
         public CalculationOperationModel CalculationOperationModel {  get { return (DataContext as CalculationOperationViewModel)?.OperationModel as CalculationOperationModel; } }
@@ -62,12 +56,17 @@ namespace PanoramicDataWin8.view.vis.render
         
         private SolidColorBrush _textBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
         private readonly SolidColorBrush _lightBrush = new SolidColorBrush(Helpers.GetColorFromString("#e6e6e6"));
-        
+
+        public override void Refactor(string oldName, string newName)
+        {
+            CodeBox.Text = CalculationOperationModel.GetAttributeModel().GetCode();
+        }
         private async void Tb_TextChanged(object sender, TextChangedEventArgs e)
         {
             var newAttr = new AttributeCodeParameters() { Code = CodeBox.Text, RawName = CalculationOperationModel?.GetAttributeModel().RawName };
 
-            var attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels().Select(a => IDEAHelpers.GetAttributeParameters(a)).OfType<AttributeCodeParameters>().ToList();
+            var originModel = CalculationOperationModel.SchemaModel.OriginModels.First();
+            var attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(originModel).Select(a => IDEAHelpers.GetAttributeParameters(a)).OfType<AttributeCodeParameters>().ToList();
             if (attributeCodeParameters.Contains(newAttr))
                 attributeCodeParameters.Remove(newAttr);
             attributeCodeParameters.Add(newAttr);

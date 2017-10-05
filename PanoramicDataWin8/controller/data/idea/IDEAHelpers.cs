@@ -218,7 +218,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                     .Select(im => GetAttributeParameters(im)).ToList(),
                 NrOfBanditRuns = 100,
                 NrOfCrossValidations = 1,
-                AttributeCalculatedParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels().Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList()
+                AttributeCalculatedParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(psm.OriginModels.First()).Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList()
             };
             
             var aa = new AttributeCodeParameters();
@@ -286,7 +286,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             List<string>                       brushes;
             List<AttributeTransformationModel> aggregates;
             var filter = GetHistogramRawOperationParameters(model, out attributeCodeParameters, out brushes, out aggregates);
-            attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels().Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
+            attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(model.SchemaModel.OriginModels.First()).Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
 
             var nrOfBins = new List<double>();
 
@@ -428,7 +428,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             List<AttributeTransformationModel> aggregates;
             List<string> brushes;
             var filter = GetHistogramRawOperationParameters(model, out attributeCodeParameters, out brushes, out aggregates);
-            attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels().Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
+            attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(model.SchemaModel.OriginModels.First()).Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
 
             var nrOfBins = new List<double>();
 
@@ -533,18 +533,20 @@ namespace PanoramicDataWin8.controller.data.progressive
             };
         }
 
-        public static AttributeModel GetAttributeModelFromAttribute(Attribute attribute)
+        public static AttributeModel GetAttributeModelFromAttribute(Attribute attribute, OriginModel originModel)
         {
             var attributeModel = IDEAAttributeModel.AddColumnField(
                 attribute.RawName,
                 attribute.DisplayName, 
                 attribute.DataType,
                 attribute.DataType == DataType.String ? "enum" : "numeric",
-                attribute.VisualizationHints);
+                attribute.VisualizationHints,
+                originModel,
+                attribute.IsTarget);
             return attributeModel;
         }
 
-        public static List<FilterModel> GetFilterModelsFromSelections(List<Selection> selections)
+        public static List<FilterModel> GetFilterModelsFromSelections(List<Selection> selections, OriginModel originModel)
         {
             var ret = new List<FilterModel>();
             foreach (var selection in selections)
@@ -554,7 +556,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 {
                     fm.ValueComparisons.Add(new ValueComparison()
                     {
-                        AttributeTransformationModel = new AttributeTransformationModel(GetAttributeModelFromAttribute(statement.Attribute)),
+                        AttributeTransformationModel = new AttributeTransformationModel(GetAttributeModelFromAttribute(statement.Attribute, originModel)),
                         Predicate = statement.Predicate,
                         Value = statement.Value
                     });

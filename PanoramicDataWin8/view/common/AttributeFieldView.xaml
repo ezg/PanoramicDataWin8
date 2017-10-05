@@ -14,19 +14,6 @@
     Width="{Binding Size.X}" Height="{Binding Size.Y}"
     FontFamily="{StaticResource abel}">
 
-    <d:DesignProperties.DataContext>
-        <view:AttributeTransformationViewModel>
-            <view:AttributeTransformationViewModel.IsNoChrome>False</view:AttributeTransformationViewModel.IsNoChrome>
-            <view:AttributeTransformationViewModel.MainLabel>Count(blood)</view:AttributeTransformationViewModel.MainLabel>
-            <view:AttributeTransformationViewModel.SubLabel>Test dsafdsa</view:AttributeTransformationViewModel.SubLabel>
-            <view:AttributeTransformationViewModel.IsShadow>False</view:AttributeTransformationViewModel.IsShadow>
-            <view:AttributeTransformationViewModel.TextAngle>270</view:AttributeTransformationViewModel.TextAngle>
-            <view:AttributeTransformationViewModel.Size>
-                <utils:Vec X="54" Y="200"/>
-            </view:AttributeTransformationViewModel.Size>
-        </view:AttributeTransformationViewModel>
-    </d:DesignProperties.DataContext>
-
     <Grid Name="mainGrid" Background="{StaticResource lightBrush}">
         <Border Name="border" BorderBrush="{StaticResource backgroundBrush}" BorderThickness="4">
             <Viewbox Margin="2">
@@ -43,7 +30,9 @@
                         HorizontalAlignment="Stretch"
                         TextAlignment="Center"
                         MaxWidth="{Binding Size.X}"
-                        Text="{Binding MainLabel}" FontSize="10" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
+                        FontSize="10" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap">
+                        this wor<Underline >asdff</Underline> is misspelt
+                    </TextBlock>
                 </transform:LayoutTransformControl>
             </Viewbox>
         </Border>

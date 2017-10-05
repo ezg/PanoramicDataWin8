@@ -93,15 +93,18 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             if (recommendedHistogram.HistogramResult != null)
             {
-                var xIom = new AttributeTransformationModel(IDEAHelpers.GetAttributeModelFromAttribute(recommendedHistogram.XAttribute));
-                var yIom = new AttributeTransformationModel(IDEAHelpers.GetAttributeModelFromAttribute(recommendedHistogram.YAttribute))
+                var xIom = new AttributeTransformationModel(IDEAHelpers.GetAttributeModelFromAttribute(
+                    recommendedHistogram.XAttribute, _model.HistogramOperationViewModel.HistogramOperationModel.SchemaModel.OriginModels.First()));
+                var yIom = new AttributeTransformationModel(IDEAHelpers.GetAttributeModelFromAttribute(
+                    recommendedHistogram.YAttribute, _model.HistogramOperationViewModel.HistogramOperationModel.SchemaModel.OriginModels.First()))
                 {
                     AggregateFunction = AggregateFunction.Count
                 };
 
                 txtBlock.Text = xIom.GetLabel();
 
-                var filterModels = IDEAHelpers.GetFilterModelsFromSelections(_model.RecommendedHistogram.Selections);
+                var filterModels = IDEAHelpers.GetFilterModelsFromSelections(_model.RecommendedHistogram.Selections,
+                        _model.HistogramOperationViewModel.HistogramOperationModel.SchemaModel.OriginModels.First());
                 _plotRendererContentProvider.UpdateFilterModels(filterModels);
 
                 _plotRendererContentProvider.UpdateData(recommendedHistogram.HistogramResult, 
@@ -135,14 +138,16 @@ namespace PanoramicDataWin8.view.vis.menu
                 {
                     Debug.WriteLine("create Brush " + currentPoint);
 
-                    var attributeModel = IDEAHelpers.GetAttributeModelFromAttribute(_model.RecommendedHistogram.XAttribute);
+                    var attributeModel = IDEAHelpers.GetAttributeModelFromAttribute(_model.RecommendedHistogram.XAttribute, 
+                        _model.HistogramOperationViewModel.HistogramOperationModel.SchemaModel.OriginModels.First());
 
 
                     _brusher = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(
                         MainViewController.Instance.MainModel.SchemaModel,
                         attributeModel,
                         new Pt());
-                    var filterModels = IDEAHelpers.GetFilterModelsFromSelections(_model.RecommendedHistogram.Selections);
+                    var filterModels = IDEAHelpers.GetFilterModelsFromSelections(_model.RecommendedHistogram.Selections,
+                         _model.HistogramOperationViewModel.HistogramOperationModel.SchemaModel.OriginModels.First());
                     _brusher.HistogramOperationModel.AddFilterModels(filterModels);
 
                     _brushColor = BrushViewModel.ColorScheme1[BrushableViewController.Instance.GetColorIndex(_model.HistogramOperationViewModel)];

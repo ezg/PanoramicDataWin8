@@ -298,8 +298,10 @@ namespace PanoramicDataWin8.controller.view
             var height = OperationViewModel.HEIGHT;
 
             var model = sender as RecommendedHistogramMenuItemViewModel;
-            var attr = IDEAHelpers.GetAttributeModelFromAttribute(model.RecommendedHistogram.XAttribute);
-            var filterModels = IDEAHelpers.GetFilterModelsFromSelections(model.RecommendedHistogram.Selections);
+            var attr = IDEAHelpers.GetAttributeModelFromAttribute(model.RecommendedHistogram.XAttribute,
+                model.HistogramOperationViewModel.HistogramOperationModel.SchemaModel.OriginModels.First());
+            var filterModels = IDEAHelpers.GetFilterModelsFromSelections(model.RecommendedHistogram.Selections,
+                model.HistogramOperationViewModel.HistogramOperationModel.SchemaModel.OriginModels.First());
             var operationViewModel = MainViewController.Instance.CreateDefaultHistogramOperationViewModel(attr, bounds.Center - new Vec(width / 2.0, height / 2.0));
             operationViewModel.HistogramOperationModel.AddFilterModels(filterModels);
             FilterLinkViewController.Instance.CreateFilterLinkViewModel(operationViewModel.OperationModel, model.HistogramOperationViewModel.OperationModel);

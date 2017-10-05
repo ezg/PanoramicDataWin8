@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.model.data.idea
 
         private void recursiveCreateAttributeModels(AttributeGroup attributeGroup, AttributeModel parentGroupModel)
         {
-            var groupModel = IDEAAttributeModel.AddGroupField(attributeGroup.Name, attributeGroup.Name);
+            var groupModel = IDEAAttributeModel.AddGroupField(attributeGroup.Name, attributeGroup.Name, this);
             // bcz: Group models no longer inherit from AttributeModels --- is this okay?
             if (parentGroupModel != null)
                (parentGroupModel.FuncModel as  AttributeModel.AttributeFuncModel.AttributeGroupFuncModel).InputModels.Add(groupModel);
@@ -51,7 +51,8 @@ namespace PanoramicDataWin8.model.data.idea
         {
             var fieldAttributeModel = IDEAAttributeModel.AddColumnField(attribute.RawName, attribute.DisplayName,
                 attribute.DataType,
-                attribute.DataType == DataType.String ? "enum" : "numeric", attribute.VisualizationHints);
+                attribute.DataType == DataType.String ? "enum" : "numeric", attribute.VisualizationHints, this,
+                attribute.IsTarget);
 
             if (parentGroupModel != null && parentGroupModel.FuncModel is AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)
                 (parentGroupModel.FuncModel as AttributeModel.AttributeFuncModel.AttributeGroupFuncModel).InputModels.Add(fieldAttributeModel);

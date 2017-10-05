@@ -12,6 +12,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using PanoramicDataWin8.controller.view;
 
 // The Content Dialog item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -67,15 +68,16 @@ namespace PanoramicDataWin8.view.common
         public GatewayErrorDialog()
         {
             this.InitializeComponent();
+
+            if (MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
+            {
+                scrollViewer.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             _ip = tbIp.Text.Trim();
-        }
-
-        private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
-        {
         }
     }
 }

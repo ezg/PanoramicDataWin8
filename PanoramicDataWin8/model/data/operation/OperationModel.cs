@@ -62,6 +62,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         }
 
+        public bool isClone = false;
         public OperationModel Clone()
         {
             var serializedQueryModel = JsonConvert.SerializeObject(this, Formatting.Indented, new JsonSerializerSettings
@@ -76,6 +77,7 @@ namespace PanoramicDataWin8.model.data.operation
                 PreserveReferencesHandling = PreserveReferencesHandling.Objects,
                 TypeNameHandling = TypeNameHandling.Auto
             });
+            deserializeObject.isClone = true;
             return deserializeObject;
         }
 

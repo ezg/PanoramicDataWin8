@@ -47,18 +47,22 @@ namespace PanoramicDataWin8.model.data.operation
                 _attributeUsageTransformationModels[attributeUsage].CollectionChanged +=
                     _attributeUsageTransformationModels_CollectionChanged;
             }
-            IDEAAttributeModel.CodeDefinitionChangedEvent    += (sender) => TestForRefresh(sender as IDEAAttributeModel);
-            ComputationalOperationModel.CodeNameChangedEvent += (sender, oldName, newName) => TestForRefresh((sender as ComputationalOperationModel).GetAttributeModel());
+            IDEAAttributeModel.CodeDefinitionChangedEvent += TestForRefresh;
         }
-
 
         public override void Cleanup()
         {
-            IDEAAttributeModel.CodeDefinitionChangedEvent -= (sender) => TestForRefresh(sender as IDEAAttributeModel);
+           // IDEAAttributeModel.CodeDefinitionChangedEvent -= TestForRefresh;
         }
-        private void TestForRefresh(IDEAAttributeModel attributeChanged)
+        /// <summary>
+        /// Called when one of the code attributes has changed.  If that code attribute is used for
+        /// the calculation of this Histogram, then we fire a model changed event so that the histogram
+        /// and any dependent brushed views will be updated.
+        /// </summary>
+        /// <param name="sender"></param>
+        private void TestForRefresh(object sender)
         {
-            // bcz: if the changedAttribute is one of this Histogram's code parameters, then we need to fire a model update so that it will be redrawn
+            var attributeChanged = sender as IDEAAttributeModel;
             List<AttributeCaclculatedParameters> attributeCodeParameters;
             List<string> brushes;
             List<AttributeTransformationModel> aggregates;

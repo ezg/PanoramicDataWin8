@@ -6,11 +6,13 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reactive.Linq;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.Storage;
 using Windows.UI.Core;
 using GeoAPI.Geometries;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.model.data;
@@ -34,10 +36,8 @@ namespace PanoramicDataWin8.controller.view
         {
             InkableScene = inkableScene;
             MainPage = mainPage;
-
-            // disable for cidr demo
+            
             BrushableViewController.CreateInstance(OperationViewModels);
-            ComparisonViewController.CreateInstance(OperationViewModels);
 
             MainModel = new MainModel();
            
@@ -75,30 +75,21 @@ namespace PanoramicDataWin8.controller.view
 
         public MainPage MainPage { get; }
 
-        public async void LoadConfig()
+        public async Task LoadConfig()
         {
             var installedLoc = Package.Current.InstalledLocation;
             ApplicationDataContainer localSettings = ApplicationData.Current.LocalSettings;
             var configContent = await installedLoc.GetFileAsync(@"Assets\data\config.json").AsTask().ContinueWith(t => FileIO.ReadTextAsync(t.Result)).Result;
-            dynamic config = JsonConvert.DeserializeObject(configContent);
+            var config =(JObject) JsonConvert.DeserializeObject(configContent);
             
             MainModel.DatasetConfigurations.Clear();
 
-            MainModel.StartDataset = config.StartDataset;
-            MainModel.SampleSize = config.SampleSize;
-            if (localSettings.Values.ContainsKey("Ip"))
-            {
-                MainModel.Ip = localSettings.Values["Ip"].ToString();
-            }
-            else
-            {
-                MainModel.Ip = config.Ip;
-                localSettings.Values["Ip"] = MainModel.Ip;
-            }
-#if DEBUG
-            MainModel.Ip = config.Ip;
-            localSettings.Values["Ip"] = MainModel.Ip;
-#endif
+            MainModel.StartDataset = config["StartDataset"].ToString();
+            MainModel.SampleSize = double.Parse(config["SampleSize"].ToString());
+            MainModel.IsDarpaSubmissionMode = bool.Parse(config["IsDarpaSubmissionMode"].ToString());
+            MainModel.APIPath = config["APIPath"].ToString();
+            MainModel.Hostname = config["Hostname"].ToString();
+
             try
             {
                 LoadCatalog();
@@ -125,7 +116,7 @@ namespace PanoramicDataWin8.controller.view
                 MainModel.DatasetConfigurations.Add(dataSetConfig);
             }
 
-            if (MainModel.DatasetConfigurations.Any(ds => ds.Schema.DisplayName.ToLower().Contains(MainModel.StartDataset)))
+            if (MainModel.DatasetConfigurations.Any(ds => ds.Schema.DisplayName.ToLower() == MainModel.StartDataset.ToLower()))
             {
                 LoadData(MainModel.DatasetConfigurations.First(ds => ds.Schema.DisplayName.ToLower() == MainModel.StartDataset.ToLower()));
             }
@@ -146,16 +137,38 @@ namespace PanoramicDataWin8.controller.view
 
             //var other = new OperationTypeGroupModel {Name = "create", OperationType = OperationType.Group};
             //parent.OperationTypeModels.Add(other);
-            parent.OperationTypeModels.Add(new OperationTypeModel { Name = "filter", OperationType = OperationType.Filter });
-            parent.OperationTypeModels.Add(new OperationTypeModel { Name = "definition", OperationType = OperationType.Definition });
-            parent.OperationTypeModels.Add(new OperationTypeModel { Name = "calculation", OperationType = OperationType.Calculation });
+            if (!MainModel.IsDarpaSubmissionMode)
+            {
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "filter",
+                    OperationType = OperationType.Filter
+                });
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "definition",
+                    OperationType = OperationType.Definition
+                });
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "calculation",
+                    OperationType = OperationType.Calculation
+                });
+                parent.OperationTypeModels.Add(new OperationTypeModel { Name = "raw data", OperationType = OperationType.RawData });
+            }
             parent.OperationTypeModels.Add(new OperationTypeModel { Name = "predictor", OperationType = OperationType.Predictor });
-            parent.OperationTypeModels.Add(new OperationTypeModel { Name = "raw data", OperationType = OperationType.RawData });
 
-            var funcs = new OperationTypeGroupModel { Name = "functions", OperationType = OperationType.Group };
-            parent.OperationTypeModels.Add(funcs);
-            funcs.OperationTypeModels.Add(new OperationTypeModel { Name = "MinMaxScale", OperationType = OperationType.Function, FunctionType= new MinMaxScaleFunctionSubtypeModel() });
-
+            if (!MainModel.IsDarpaSubmissionMode)
+            {
+                var funcs = new OperationTypeGroupModel { Name = "functions", OperationType = OperationType.Group };
+                parent.OperationTypeModels.Add(funcs);
+                funcs.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "MinMaxScale",
+                    OperationType = OperationType.Function,
+                    FunctionType = new MinMaxScaleFunctionSubtypeModel()
+                });
+            }
             MainModel.OperationTypeModels = parent.OperationTypeModels.ToList();
         }
 
@@ -165,20 +178,28 @@ namespace PanoramicDataWin8.controller.view
             {
                 MainModel.QueryExecuter.HaltAllJobs();
             }
-
             MainModel.SchemaModel = new IDEASchemaModel();
             MainModel.SampleSize = datasetConfiguration.SampleSize;
             MainModel.QueryExecuter = new IDEAQueryExecuter();
-            HypothesesViewController.Instance.ClearAllStatisticalComparison();
+            if (!MainModel.IsDarpaSubmissionMode)
+            {
+                ComparisonViewController.CreateInstance(OperationViewModels);
+                HypothesesViewController.Instance.ClearAllStatisticalComparison();
+            }
             ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel = new IDEAOriginModel(datasetConfiguration);
             ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel.LoadInputFields();
+
+            if (MainModel.IsDarpaSubmissionMode)
+            {
+                MainPage.ShowHelp();
+            }
         }
 
 
-        public static void CreateInstance(InkableScene root, MainPage mainPage)
+        public static async void CreateInstance(InkableScene root, MainPage mainPage)
         {
             Instance = new MainViewController(root, mainPage);
-            Instance.LoadConfig();
+            await Instance.LoadConfig();
         }
 
         public RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(AttributeModel attributeModel, Pt position)

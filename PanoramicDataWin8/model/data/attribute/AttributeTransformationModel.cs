@@ -5,12 +5,15 @@ using PanoramicDataWin8.model.data.operation;
 using System.Linq;
 using IDEA_common.aggregates;
 using System.Collections.Generic;
+using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.view;
 
 namespace PanoramicDataWin8.model.data.attribute
 {
     [JsonObject(MemberSerialization.OptOut)]
     public class AttributeTransformationModel : BindableBase
     {
+        public bool IsCLone = false;
         private AggregateFunction _aggregateFunction = AggregateFunction.None;
 
         private AttributeModel _attributeModel;
@@ -156,9 +159,9 @@ namespace PanoramicDataWin8.model.data.attribute
         }
         public static AttributeTransformationModel MatchesExistingField(string str, bool exact=false)
         {
-            var inputModels = (controller.view.MainViewController.Instance.MainPage.DataContext as view.MainModel).SchemaModel.OriginModels.First()
-                     .InputModels.Where(am => am.IsDisplayed).ToList();
-            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels());
+            var originModel = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First();
+            var inputModels = originModel.InputModels.Where(am => am.IsDisplayed).ToList();
+            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels(originModel));
             AttributeTransformationModel attributeTransformationModel = null;
             foreach (var im in inputModels)
                 if (im.RawName.ToLower().StartsWith(str.ToLower()) && !exact)
@@ -170,10 +173,10 @@ namespace PanoramicDataWin8.model.data.attribute
         }
         public static IEnumerable<string> ExistingFieldList()
         {
-            var inputModels = (controller.view.MainViewController.Instance.MainPage.DataContext as view.MainModel).SchemaModel.OriginModels.First()
-                     .InputModels.Where(am => am.IsDisplayed).ToList();
-            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels());
-            List<string> existingFields = new List<string>();
+            var originModel = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First();
+            var inputModels = originModel.InputModels.Where(am => am.IsDisplayed).ToList();
+            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels(originModel));
+            var existingFields = new List<string>();
             foreach (var im in inputModels)
                 existingFields.Add(im.RawName);
             return existingFields;

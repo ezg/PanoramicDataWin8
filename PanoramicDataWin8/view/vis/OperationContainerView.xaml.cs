@@ -146,6 +146,33 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
+        private void setProgressPercentage(double progress)
+        { // progress
+            double size = 14;
+            double thickness = 2;
+            
+            tbPercentage1.Text = (progress * 100).ToString("F1") + "%";
+            double percentage = Math.Min(progress, 0.999999);
+            if (percentage > 0.5)
+            {
+                arcSegement1.IsLargeArc = true;
+            }
+            else
+            {
+                arcSegement1.IsLargeArc = false;
+            }
+            double angle = 2 * Math.PI * percentage - Math.PI / 2.0;
+            double x = size / 2.0;
+            double y = size / 2.0;
+
+            Windows.Foundation.Point p = new Windows.Foundation.Point(Math.Cos(angle) * (size / 2.0 - thickness / 2.0) + x, Math.Sin(angle) * (size / 2.0 - thickness / 2.0) + y);
+            arcSegement1.Point = p;
+            if ((size / 2.0 - thickness / 2.0) > 0.0)
+            {
+                arcSegement1.Size = new Size((size / 2.0 - thickness / 2.0), (size / 2.0 - thickness / 2.0));
+            }
+        }
+
         private Storyboard _rotateStoryboard = null;
         private void updateProgressAndNullVisualization()
         {
@@ -161,37 +188,14 @@ namespace PanoramicDataWin8.view.vis
             if (resultModel != null)
             {
                 progressGrid.Visibility = Visibility.Visible;
-                // progress
-                double size = 14;
-                double thickness = 2;
-
                 double progress = resultModel?.Progress ?? 0;
-
-                tbPercentage1.Text = (progress*100).ToString("F1") + "%";
-                double percentage = Math.Min(progress, 0.999999);
-                if (percentage > 0.5)
-                {
-                    arcSegement1.IsLargeArc = true;
-                }
-                else
-                {
-                    arcSegement1.IsLargeArc = false;
-                }
-                double angle = 2*Math.PI*percentage - Math.PI/2.0;
-                double x = size/2.0;
-                double y = size/2.0;
-
-                Windows.Foundation.Point p = new Windows.Foundation.Point(Math.Cos(angle)*(size/2.0 - thickness/2.0) + x, Math.Sin(angle)*(size/2.0 - thickness/2.0) + y);
-                arcSegement1.Point = p;
-                if ((size/2.0 - thickness/2.0) > 0.0)
-                {
-                    arcSegement1.Size = new Size((size/2.0 - thickness/2.0), (size/2.0 - thickness/2.0));
-                }
+                setProgressPercentage(progress);
             }
             else
             {
                 if (((OperationViewModel) DataContext).OperationModel.ExecutionState == ExecutionState.Running)
                 {
+                    setProgressPercentage(0.15);
                     progressGrid.Visibility = Visibility.Visible;
 
                     _rotateStoryboard = new Storyboard();
