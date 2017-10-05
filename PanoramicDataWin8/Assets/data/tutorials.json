@@ -1,10 +1,18 @@
 ﻿[
   {
-    "Description": "Visualizations",
-    "Video": "Assets\\mp4\\visualizations.mp4"
+    "Description": "Creating a Prediction",
+    "Video": "Assets\\mp4\\prediction.mp4"
   },
   {
-    "Description": "Predictions",
-    "Video": "Assets\\mp4\\predictions.mp4"
+    "Description": "Submitting a Prediction",
+    "Video": "Assets\\mp4\\submitting.mp4"
+  },
+  {
+    "Description": "Advanced Predictions",
+    "Video": "Assets\\mp4\\prediction_advanced.mp4"
+  },
+  {
+    "Description": "Exploring with Visualizations",
+    "Video": "Assets\\mp4\\visualizations.mp4"
   }
 ]

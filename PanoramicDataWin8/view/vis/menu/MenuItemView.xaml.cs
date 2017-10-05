@@ -4,8 +4,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.Devices.Input;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.System;
+using Windows.UI.Core;
+using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -14,6 +18,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using GeoAPI.Geometries;
+using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.inq;
 
@@ -27,13 +32,8 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             this.InitializeComponent();
             DataContextChanged += MenuItemView_DataContextChanged;
-            this.PointerPressed += MenuItemView_PointerPressed;
         }
-
-        private void MenuItemView_PointerPressed(object sender, PointerRoutedEventArgs e)
-        {
-            
-        }
+        
 
         void MenuItemView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {

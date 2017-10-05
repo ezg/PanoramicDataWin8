@@ -13,7 +13,6 @@ namespace PanoramicDataWin8.model.data.attribute
     [JsonObject(MemberSerialization.OptOut)]
     public class AttributeTransformationModel : BindableBase
     {
-        public bool IsCLone = false;
         private AggregateFunction _aggregateFunction = AggregateFunction.None;
 
         private AttributeModel _attributeModel;

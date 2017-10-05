@@ -206,6 +206,26 @@ namespace PanoramicDataWin8.controller.data.progressive
             var filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
 
             var psm = model.SchemaModel as IDEASchemaModel;
+
+            var includes = model.AttributeUsageTransformationModels.Select(a => GetAttributeParameters(a.AttributeModel)).ToList();
+            var excludes = model.IgnoredAttributeUsageTransformationModels.Select(a => GetAttributeParameters(a.AttributeModel)).ToList();
+            var all = psm.RootOriginModel.InputModels
+                .Where(im => im != model.TargetAttributeUsageTransformationModel.AttributeModel)
+                .Select(im => GetAttributeParameters(im)).ToList();
+            var used = all;
+            if (excludes.Any())
+            {
+                used = used.Except(excludes).ToList();
+            }
+            if (includes.Any())
+            {
+                //used = all.Concat(includes).
+            }
+
+            var calculated = IDEAAttributeModel.GetAllCalculatedAttributeModels(psm.OriginModels.First())
+                .Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
+            used = used.Except(calculated).ToList();
+
             var param = new OptimizerOperationParameters()
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
@@ -213,12 +233,10 @@ namespace PanoramicDataWin8.controller.data.progressive
                 LabelAttribute = GetAttributeParameters(model.TargetAttributeUsageTransformationModel.AttributeModel),
                 ProblemType = ProblemType.Undefined,
                 SampleStreamBlockSize = sampleSize,
-                FeatureAttributes = psm.RootOriginModel.InputModels
-                    .Where(im => im.DataType != DataType.String && im != model.TargetAttributeUsageTransformationModel.AttributeModel)
-                    .Select(im => GetAttributeParameters(im)).ToList(),
+                FeatureAttributes = used,
                 NrOfBanditRuns = 100,
                 NrOfCrossValidations = 1,
-                AttributeCalculatedParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(psm.OriginModels.First()).Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList()
+                AttributeCalculatedParameters = new List<AttributeCaclculatedParameters>()
             };
             
             var aa = new AttributeCodeParameters();

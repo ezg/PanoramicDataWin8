@@ -24,6 +24,7 @@ using IDEA_common.catalog;
 using IDEA_common.operations;
 using IDEA_common.operations.risk;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.input;
 using PanoramicDataWin8.controller.view;
@@ -721,6 +722,7 @@ namespace PanoramicDataWin8
                 parentModel.AttachPosition = AttachPosition.Right;
 
                 var count = 0;
+                if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
                 {
                     var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "+", OperationType = OperationType.AttributeGroup }, parentModel);
                     tileMenuItemViewModel.Row = count;
@@ -966,9 +968,26 @@ namespace PanoramicDataWin8
 
             //var dataset = ((MainModel)DataContext)?.DatasetConfigurations.FirstOrDefault();
 
+            var problemHelpText = "";
+            if (schema != null && !string.IsNullOrEmpty(schema.ProblemDescription))
+            {
+                var json = (JObject)JsonConvert.DeserializeObject(schema.ProblemDescription);
+
+                var fieldName = json["target"]["field"].ToString();
+
+                problemHelpText =
+                    "Hi, thanks for participating in this study!\n\n" +
+                    "Your task is to create and submit a predictor that predicts the \"" + fieldName +
+                    "\" attribute of this dataset. \"" + fieldName + "\" is what we call the target attribute of this task.\n\n" +
+                    "Please watch the following videos that will show you how to use this system. " +
+                    "You can always come back to this help screen by clicking the \"?\" button in the top right corner.\n" +
+                    "We encourage you to explore all the features of this system.\n\n" +
+                    "Thanks!";
+            }
+
             var dialog = new HelpDialog()
             {
-                Problem = schema?.ProblemDescription
+                Problem = problemHelpText
             };
             helpGrid.Visibility = Visibility.Visible;
             //dialog.MaxWidth = this.ActualWidth;
