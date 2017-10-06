@@ -32,16 +32,10 @@ namespace PanoramicDataWin8.model.data.operation
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
         
-
         public DefinitionOperationModel(SchemaModel schemaModel, string rawName, string displayName=null) : base(schemaModel, "0", DataType.String, "numeric", rawName, displayName)
         {
             _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
-            BrushOperationModels.CollectionChanged += BrushOperationModels_CollectionChanged;
-        }
-        private void BrushOperationModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (GetAttributeModel() != null)
-                UpdateName();
+            IDEAAttributeModel.CodeDefinitionChangedEvent += (sender) => UpdateName();
         }
 
         public List<BrushDescriptor> BrushDescriptors { get; set; } = new List<BrushDescriptor>();
@@ -134,8 +128,6 @@ namespace PanoramicDataWin8.model.data.operation
             }
             expression += "\"" + BrushDescriptors[0].Name + "\"";
             GetAttributeModel().VisualizationHints = new List<IDEA_common.catalog.VisualizationHint>(new IDEA_common.catalog.VisualizationHint[] { IDEA_common.catalog.VisualizationHint.TreatAsEnumeration});
-
-
             GetAttributeModel().SetCode(expression, DataType.String, refactoring);
         }
     }

@@ -74,6 +74,11 @@ namespace PanoramicDataWin8.model.data.operation
         public void SetRawName(string name)
         {
             var code = GetAttributeModel();
+            if (code == null)
+            {
+                _rawName = name;
+                code = GetAttributeModel();
+            }
             var oldName = code.RawName;
             code.DisplayName = code.RawName = _rawName = name;
             if (CodeNameChangedEvent != null)

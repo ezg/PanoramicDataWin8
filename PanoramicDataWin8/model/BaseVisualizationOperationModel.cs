@@ -52,7 +52,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         public override void Cleanup()
         {
-           // IDEAAttributeModel.CodeDefinitionChangedEvent -= TestForRefresh;
+            IDEAAttributeModel.CodeDefinitionChangedEvent -= TestForRefresh;
         }
         /// <summary>
         /// Called when one of the code attributes has changed.  If that code attribute is used for

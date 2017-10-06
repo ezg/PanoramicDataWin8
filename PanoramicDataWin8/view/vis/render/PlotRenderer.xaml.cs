@@ -177,15 +177,17 @@ namespace PanoramicDataWin8.view.vis.render
             IList<Vec> convexHull = Convexhull.convexhull(_selectionPoints);
             IGeometry convexHullPoly = convexHull.Select(vec => new Windows.Foundation.Point(vec.X, vec.Y)).ToList().GetPolygon();
 
-            HistogramOperationModel histogramOperationModel = (HistogramOperationModel)((HistogramOperationViewModel)DataContext).OperationModel;
+            var histogramOperationModel = (HistogramOperationModel)((HistogramOperationViewModel)DataContext).OperationModel;
 
-            List<FilterModel> hits = new List<FilterModel>();
+            var hits = new List<FilterModel>();
             foreach (var geom in _plotRendererContentProvider.HitTargets.Keys)
             {
                 if (convexHullPoly.Intersects(geom))
                 {
                     var fm = _plotRendererContentProvider.HitTargets[geom];
                     bool found = true;
+                    // need to convert all FilterModel references to cloned (stale) AttributeModels into current (fresh) references
+                    // wherever we can find a correspondence.
                     foreach (var vc in fm.ValueComparisons)
                     {
                         bool valFound = false;
@@ -241,6 +243,23 @@ namespace PanoramicDataWin8.view.vis.render
             return false;
         }
 
+        public override void Refactor(string oldName, string newName)
+        {
+            var histogramOperationModel = (HistogramOperationModel)((HistogramOperationViewModel)DataContext).OperationModel;
+
+            // update the names of all AttributeModels based on this refactoring -- can't actually switch the AttributeModels
+            // because they are used as part of an indexing scheme with Aggregate parameters.
+            foreach (var am in ResultHistogramOperationModel.AttributeTransformationModels.Select((atm) => atm.AttributeModel))
+            {
+                if (am?.RawName == oldName)
+                    am.RawName = newName;
+            }
+            // also, update all the result Aggregate parameters based on this refactoring
+            foreach (var ar in _lastResult.AggregateParameters)
+                foreach (var ap in ar.GetAllAttributeParameters())
+                    if (ap?.RawName == oldName)
+                        ap.RawName = newName;
+        }
 
         void render(bool sizeChanged = false)
         {
