@@ -35,7 +35,8 @@ namespace PanoramicDataWin8.model.data.operation
         public DefinitionOperationModel(SchemaModel schemaModel, string rawName, string displayName=null) : base(schemaModel, "0", DataType.String, "numeric", rawName, displayName)
         {
             _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
-            IDEAAttributeModel.CodeDefinitionChangedEvent += (sender) => UpdateName();
+            IDEAAttributeModel.CodeDefinitionChangedEvent += (sender) => { UpdateCode(); UpdateName(); };
+            ComputationalOperationModel.CodeNameChangedEvent += (sender, oldname, newname) => { UpdateCode(); UpdateName(); };
         }
 
         public List<BrushDescriptor> BrushDescriptors { get; set; } = new List<BrushDescriptor>();
@@ -69,6 +70,8 @@ namespace PanoramicDataWin8.model.data.operation
         }
         public void UpdateCode(bool refactoring=false)
         {
+            if (GetAttributeModel() == null)
+                return;
             var expressions = new List<string>();
             foreach (var opModel in BrushOperationModels)
             {

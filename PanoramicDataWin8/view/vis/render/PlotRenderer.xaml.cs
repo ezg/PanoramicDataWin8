@@ -184,28 +184,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 if (convexHullPoly.Intersects(geom))
                 {
-                    var fm = _plotRendererContentProvider.HitTargets[geom];
-                    bool found = true;
-                    // need to convert all FilterModel references to cloned (stale) AttributeModels into current (fresh) references
-                    // wherever we can find a correspondence.
-                    foreach (var vc in fm.ValueComparisons)
-                    {
-                        bool valFound = false;
-                        foreach (var at in histogramOperationModel.AttributeTransformationModels)
-                            if (at.AttributeModel.RawName == vc.AttributeTransformationModel.AttributeModel.RawName)
-                            {
-                                vc.AttributeTransformationModel = at;
-                                valFound = true;
-                                break;
-                            }
-                        if (!valFound)
-                        {
-                            found = false;
-                            break;
-                        }
-                    }
-                    if (found)
-                        hits.Add(fm);
+                    hits.Add(_plotRendererContentProvider.HitTargets[geom]);
                 }
             }
             if (hits.Count > 0)
@@ -245,16 +224,13 @@ namespace PanoramicDataWin8.view.vis.render
 
         public override void Refactor(string oldName, string newName)
         {
-            var histogramOperationModel = (HistogramOperationModel)((HistogramOperationViewModel)DataContext).OperationModel;
-
-            // update the names of all AttributeModels based on this refactoring -- can't actually switch the AttributeModels
-            // because they are used as part of an indexing scheme with Aggregate parameters.
-            foreach (var am in ResultHistogramOperationModel.AttributeTransformationModels.Select((atm) => atm.AttributeModel))
+            // find the old AttributeModel and refactor its name
+            foreach (var atm in ResultHistogramOperationModel.AttributeTransformationModels)
             {
-                if (am?.RawName == oldName)
-                    am.RawName = newName;
+                if (atm.AttributeModel?.RawName == oldName)
+                    atm.AttributeModel.RawName = newName;
             }
-            // also, update all the result Aggregate parameters based on this refactoring
+            // also, refactor the names of all AggregateParameters in the results collection
             foreach (var ar in _lastResult.AggregateParameters)
                 foreach (var ap in ar.GetAllAttributeParameters())
                     if (ap?.RawName == oldName)
