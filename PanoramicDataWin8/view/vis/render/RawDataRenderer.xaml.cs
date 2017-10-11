@@ -18,6 +18,11 @@ using Windows.UI;
 using PanoramicDataWin8.utils;
 using Windows.UI.Xaml.Controls.Primitives;
 using IDEA_common.operations.rawdata;
+using Windows.UI.Xaml.Media.Imaging;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -25,20 +30,43 @@ namespace PanoramicDataWin8.view.vis.render
 {
     public class ObjectToFrameworkElementConverter : IValueConverter
     {
+        static public Grid LastHit = null;
         object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
         {
             var g = new Grid();
             if (value != null)
             {
-                var tb = new TextBlock();
-                tb.FontFamily = FontFamily.XamlAutoFontFamily;
-                tb.FontSize = 14;
-                tb.Foreground = new SolidColorBrush(Colors.Black);
-                tb.Text = value.ToString();
-                tb.Height = 25;
-                tb.MinWidth = 100;
-                g.Children.Add(tb);
-                g.Background = new SolidColorBrush(Colors.LightGray);
+                if (false) // data is an image
+                {
+                    var ib = new Image();
+                    ib.Source = new BitmapImage(new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
+                    ib.Width = ib.Height = 200;
+                    g.Children.Add(ib);
+                    g.CanDrag = false;
+                    g.PointerPressed += (sender, e) =>
+                    {
+                        if (LastHit != g && LastHit != null)
+                            LastHit.CanDrag = false;
+                        LastHit = g;
+                    };
+                    g.DragStarting += (UIElement sender, DragStartingEventArgs args) =>
+                    {
+                        args.Data.RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
+                        args.Data.Properties.Add("MYFORMAT", new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
+                    };
+                }
+                else
+                {
+                    var tb = new TextBlock();
+                    tb.FontFamily = FontFamily.XamlAutoFontFamily;
+                    tb.FontSize = 14;
+                    tb.Foreground = new SolidColorBrush(Colors.Black);
+                    tb.Text = value.ToString();
+                    tb.Height = 25;
+                    tb.MinWidth = 200;
+                    tb.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    g.Children.Add(tb);
+                }
             }
             return g;
         }
@@ -55,12 +83,51 @@ namespace PanoramicDataWin8.view.vis.render
         public RawDataRenderer()
         {
             this.InitializeComponent();
-
-            // dxSurface.ContentProvider = _plotRendererContentProvider;
+            
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
-            xRawDataView.ItemsSource = Records;
+           // xRawDataView.ItemsSource = Records;
+            xRawDataGridView.ItemsSource = Records;
+            this.SizeChanged += RawDataRenderer_SizeChanged;
+            this.Tapped += RawDataRenderer_Tapped;
         }
+
+        private void RawDataRenderer_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            xRawDataGridView.IsHitTestVisible = true;
+            var res = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), this);
+            xRawDataGridView.IsHitTestVisible = false;
+            foreach (var r in res)
+                if (r is Image)
+                {
+                    var img = r as Image;
+                    if (img.Tag != null)
+                        (xRawDataGridView.Parent as Panel).Children.Remove(img.Parent as Panel);
+                    else
+                    {
+                        var ib = new Image();
+                        ib.Source = img.Source;
+                        ib.Tag = "FullSize";
+                        var g = new Grid();
+                        g.Background = new SolidColorBrush(Colors.LightGray);
+                        g.HorizontalAlignment = HorizontalAlignment.Stretch;
+                        g.VerticalAlignment = VerticalAlignment.Stretch;
+                        g.Children.Add(ib);
+                        (xRawDataGridView.Parent as Panel).Children.Add(g);
+                    }
+                    break;
+                }
+        }
+
+        private void RawDataRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var b = new Binding();
+            b.Source = this;
+            b.Path = new PropertyPath("ActualWidth");
+            this.xRawDataGridView.ItemsPanelRoot.SetBinding(WidthProperty, b);
+        }
+        
+
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
             var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollBar>(this);
@@ -154,15 +221,29 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 valueIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
             }
-            //_plotRendererContentProvider.UpdateFilterModels(model.HistogramOperationModel.FilterModels.ToList());
-            //_plotRendererContentProvider.UpdateData(result, model.HistogramOperationModel.IncludeDistribution,
-            //    model.HistogramOperationModel.BrushColors,
-            //    xIom, yIom, valueIom, 30);
 
             Records.Clear();
             if ((result as RawDataResult)?.Samples != null)
-                foreach (var val in (result as RawDataResult).Samples)
-                    Records.Add(val);
+                loadRecordsAsync((result as RawDataResult).Samples);
+        }
+
+        void loadRecordsAsync(List<object> records)
+        {
+            
+            var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+#pragma warning disable CS4014
+            dispatcher.RunAsync(
+                CoreDispatcherPriority.Low,
+                async () =>
+                {
+                    foreach (var val in records)
+                    {
+                        Records.Add(val);
+                        await Task.Delay(5);
+                    }
+                });
+#pragma warning restore CS4014
+
         }
         void render(bool sizeChanged = false)
         {

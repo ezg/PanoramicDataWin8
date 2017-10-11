@@ -9,16 +9,18 @@
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400"
+    AllowDrop="True"
     FontFamily="{StaticResource abel}">
     <Grid  Background="{StaticResource lightBrush}">
         <common:DXSurface x:Name="dxSurface" Visibility="Collapsed"/>
-        <ListView x:Name="xRawDataView" Margin="20"
+        <!--ListView x:Name="xRawDataView" Margin="20"
                   VirtualizingStackPanel.VirtualizationMode="Recycling" 
                   SelectionMode="None"
                       HorizontalAlignment="Left"
                       VerticalAlignment="Stretch"
                   ManipulationMode="TranslateRailsY"
                   ShowsScrollingPlaceholders="True"
+                  DragStarting="xRawDataView_DragStarting"  
                   CanDragItems="False"  >
             <ListView.Resources>
                 <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter"></local:ObjectToFrameworkElementConverter>
@@ -38,6 +40,31 @@
                     <Border Child="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
-        </ListView>
+        </ListView-->
+        <GridView x:Name="xRawDataGridView" Margin="20" IsHitTestVisible="False"
+                  VirtualizingStackPanel.VirtualizationMode="Recycling" 
+                  SelectionMode="None"
+                  ManipulationMode="TranslateRailsY"
+                  ShowsScrollingPlaceholders="True"
+                  CanDragItems="False">
+            <GridView.Resources>
+                <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter" />
+            </GridView.Resources>
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                    <Setter Property="VerticalContentAlignment"   Value="Center" />
+                    <Setter Property="Margin" Value="0,0,0,0" />
+                    <Setter Property="Padding" Value="0,0,0,0" />
+                    <Setter Property="MinHeight" Value="25" />
+                    <Setter Property="MinWidth" Value="0" />
+                </Style>
+            </GridView.ItemContainerStyle>
+            <GridView.ItemTemplate>
+                <DataTemplate>
+                    <Border Child="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}"  />
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
     </Grid>
 </local:Renderer>
