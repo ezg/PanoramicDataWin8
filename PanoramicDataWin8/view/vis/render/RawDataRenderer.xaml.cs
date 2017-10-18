@@ -23,6 +23,7 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
+using Windows.UI.Xaml.Input;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -90,13 +91,21 @@ namespace PanoramicDataWin8.view.vis.render
             xRawDataGridView.ItemsSource = Records;
             this.SizeChanged += RawDataRenderer_SizeChanged;
             this.Tapped += RawDataRenderer_Tapped;
+            MainViewController.Instance.MainPage.AddHandler(PointerPressedEvent, new PointerEventHandler(RawDataRenderer_PointerPressed), true);
         }
+
+        private void RawDataRenderer_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            var res = VisualTreeHelper.FindElementsInHostCoordinates(e.GetCurrentPoint(null).Position, this);
+            if (res.Count() == 0)
+                xRawDataGridView.IsHitTestVisible = false;
+        }
+        
 
         private void RawDataRenderer_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             xRawDataGridView.IsHitTestVisible = true;
             var res = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), this);
-            xRawDataGridView.IsHitTestVisible = false;
             foreach (var r in res)
                 if (r is Image)
                 {
@@ -117,6 +126,7 @@ namespace PanoramicDataWin8.view.vis.render
                     }
                     break;
                 }
+            e.Handled = true;
         }
 
         private void RawDataRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -239,7 +249,6 @@ namespace PanoramicDataWin8.view.vis.render
                     foreach (var val in records)
                     {
                         Records.Add(val);
-                        await Task.Delay(5);
                     }
                 });
 #pragma warning restore CS4014

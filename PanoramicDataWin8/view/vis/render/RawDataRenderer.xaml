@@ -41,12 +41,11 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView-->
-        <GridView x:Name="xRawDataGridView" Margin="20" IsHitTestVisible="False"
-                  VirtualizingStackPanel.VirtualizationMode="Recycling" 
+        <GridView x:Name="xRawDataGridView" 
+                  IsHitTestVisible="False"
+                  Margin="20" 
                   SelectionMode="None"
-                  ManipulationMode="TranslateRailsY"
-                  ShowsScrollingPlaceholders="True"
-                  CanDragItems="False">
+                  ShowsScrollingPlaceholders="True">
             <GridView.Resources>
                 <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter" />
             </GridView.Resources>
@@ -62,7 +61,7 @@
             </GridView.ItemContainerStyle>
             <GridView.ItemTemplate>
                 <DataTemplate>
-                    <Border Child="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}"  />
+                    <Border Child="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}" />
                 </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>
