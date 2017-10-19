@@ -387,6 +387,41 @@
     <Compile Include="view\vis\OperationContainerView.xaml.cs">
       <DependentUpon>OperationContainerView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\WordCloud\ComponentFactory.cs" />
+    <Compile Include="view\WordCloud\Geometry\BaseLayout.cs" />
+    <Compile Include="view\WordCloud\Geometry\DataStructures\QuadTree.cs" />
+    <Compile Include="view\WordCloud\Geometry\DataStructures\QuadTreeNode.cs" />
+    <Compile Include="view\WordCloud\Geometry\GeomExtensions.cs" />
+    <Compile Include="view\WordCloud\Geometry\IGraphicEgine.cs" />
+    <Compile Include="view\WordCloud\Geometry\ILayout.cs" />
+    <Compile Include="view\WordCloud\Geometry\LayoutItem.cs" />
+    <Compile Include="view\WordCloud\Geometry\SpiralLayout.cs" />
+    <Compile Include="view\WordCloud\Geometry\TypewriterLayout.cs" />
+    <Compile Include="view\WordCloud\GraphicEngine.cs" />
+    <Compile Include="view\WordCloud\InputType.cs" />
+    <Compile Include="view\WordCloud\LayoutFactory.cs" />
+    <Compile Include="view\WordCloud\LayoutType.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Blacklist\CommonBlacklist.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Blacklist\En\CommonWords.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Blacklist\IBlacklist.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Blacklist\NullBlacklist.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Extractors\BaseExtractor.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Extractors\FileExtractor.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Extractors\IProgressIndicator.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Extractors\StringExtractor.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Extractors\UriExtractor.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Processing\IWord.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Processing\Word.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Processing\WordExtensions.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Processing\WordGroup.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Stemmers\En\PorterStem.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Stemmers\En\PorterStemmer.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Stemmers\IWordStemmer.cs" />
+    <Compile Include="view\WordCloud\TextAnalyses\Stemmers\NullStemmer.cs" />
+    <Compile Include="view\WordCloud\VisualTreeHelperExtensions.cs" />
+    <Compile Include="view\WordCloud\WordCloud.xaml.cs">
+      <DependentUpon>WordCloud.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -616,6 +651,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="view\WordCloud\WordCloud.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="IDEA-common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -664,6 +703,7 @@
       <Version>1.9.4</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

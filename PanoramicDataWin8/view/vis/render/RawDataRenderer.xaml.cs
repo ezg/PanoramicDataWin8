@@ -104,6 +104,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void RawDataRenderer_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
+            var model = (DataContext as RawDataOperationViewModel);
             xRawDataGridView.IsHitTestVisible = true;
             var res = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), this);
             foreach (var r in res)
@@ -125,6 +126,16 @@ namespace PanoramicDataWin8.view.vis.render
                         (xRawDataGridView.Parent as Panel).Children.Add(g);
                     }
                     break;
+                }
+                else if (r is TextBlock)
+                {
+                    var tb = r as TextBlock;
+                    tb.FontStyle = tb.FontStyle == Windows.UI.Text.FontStyle.Italic ? Windows.UI.Text.FontStyle.Normal : Windows.UI.Text.FontStyle.Italic;
+                    var fm = new FilterModel();
+                    var xIom = model.RawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+                    var vc = new ValueComparison(xIom, IDEA_common.operations.recommender.Predicate.CONTAINS, tb.Text);
+                    fm.ValueComparisons.Add(vc);
+                    model.RawDataOperationModel.AddFilterModel(fm);
                 }
             e.Handled = true;
         }
@@ -220,7 +231,6 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var model = (DataContext as RawDataOperationViewModel);
             var clone = (RawDataOperationModel)model.OperationModel.ResultCauserClone;
-            var xIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
             AttributeTransformationModel valueIom = null;
 
             if (clone.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
@@ -233,26 +243,30 @@ namespace PanoramicDataWin8.view.vis.render
             }
 
             Records.Clear();
-            if ((result as RawDataResult)?.Samples != null)
-                loadRecordsAsync((result as RawDataResult).Samples);
+            xWordCloud.TheText = "";
+            loadRecordsAsync((result as RawDataResult).Samples);
         }
 
         void loadRecordsAsync(List<object> records)
         {
-            
-            var dispatcher = CoreApplication.MainView.CoreWindow.Dispatcher;
+            if (records != null)
 #pragma warning disable CS4014
-            dispatcher.RunAsync(
+                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
                 CoreDispatcherPriority.Low,
                 async () =>
                 {
+                    var wordCloudText = "";
                     foreach (var val in records)
                     {
-                        Records.Add(val);
+                        if (val is IDEA_common.range.PreProcessedString)
+                            wordCloudText += " "+((IDEA_common.range.PreProcessedString)val).Value;
+                        else Records.Add(val);
                     }
+                    if (wordCloudText != "")
+                        xWordCloud.TheText = wordCloudText;
+                    else xWordCloud.Visibility = Visibility.Collapsed;
                 });
 #pragma warning restore CS4014
-
         }
         void render(bool sizeChanged = false)
         {
