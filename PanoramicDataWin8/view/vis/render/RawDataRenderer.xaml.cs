@@ -64,7 +64,7 @@ namespace PanoramicDataWin8.view.vis.render
                     tb.Foreground = new SolidColorBrush(Colors.Black);
                     tb.Text = value.ToString();
                     tb.Height = 25;
-                    tb.MinWidth = 200;
+                    tb.MinWidth = value is string ? 200 : 50;
                     tb.HorizontalAlignment = HorizontalAlignment.Stretch;
                     g.Children.Add(tb);
                 }
@@ -130,14 +130,61 @@ namespace PanoramicDataWin8.view.vis.render
                 else if (r is TextBlock)
                 {
                     var tb = r as TextBlock;
-                    tb.FontStyle = tb.FontStyle == Windows.UI.Text.FontStyle.Italic ? Windows.UI.Text.FontStyle.Normal : Windows.UI.Text.FontStyle.Italic;
-                    var fm = new FilterModel();
-                    var xIom = model.RawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
-                    var vc = new ValueComparison(xIom, IDEA_common.operations.recommender.Predicate.CONTAINS, tb.Text);
-                    fm.ValueComparisons.Add(vc);
-                    model.RawDataOperationModel.AddFilterModel(fm);
+                    if (tb.Tag != null)
+                    {
+                        model.RawDataOperationModel.RemoveFilterModel(tb.Tag as FilterModel);
+                        tb.FontStyle = Windows.UI.Text.FontStyle.Normal;
+                        tb.Tag = null;
+                    }
+                    else
+                    {
+                        tb.FontStyle = Windows.UI.Text.FontStyle.Italic;
+                        var fm = new FilterModel();
+                        var xIom = model.RawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+                        var vc = xIom.AttributeModel.DataType == IDEA_common.catalog.DataType.String ?
+                            new ValueComparison(xIom, IDEA_common.operations.recommender.Predicate.CONTAINS, tb.Text) :
+                            new ValueComparison(xIom, IDEA_common.operations.recommender.Predicate.EQUALS, ToObject(xIom.AttributeModel, tb.Text));
+
+                        fm.ValueComparisons.Add(vc);
+                        model.RawDataOperationModel.AddFilterModel(fm);
+                        tb.Tag = fm;
+                    }
                 }
             e.Handled = true;
+        }
+
+        object ToObject(AttributeModel model, string text)
+        {
+            switch (model.DataType)
+            {
+                case IDEA_common.catalog.DataType.String: return text;
+                case IDEA_common.catalog.DataType.Float:
+                    {
+                        float f;
+                        float.TryParse(text, out f);
+                        return f;
+                    }
+                case IDEA_common.catalog.DataType.Double:
+                    {
+                        double d;
+                        double.TryParse(text, out d);
+                        return d;
+                    }
+                case IDEA_common.catalog.DataType.Int:
+                    {
+                        int i;
+                        int.TryParse(text, out i);
+                        return i;
+                    }
+                case IDEA_common.catalog.DataType.DateTime:
+                    {
+                        DateTime d;
+                        DateTime.TryParse(text, out d);
+                        return d;
+                    }
+                default:
+                    return text;
+            }
         }
 
         private void RawDataRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -244,6 +291,7 @@ namespace PanoramicDataWin8.view.vis.render
 
             Records.Clear();
             xWordCloud.TheText = "";
+            model.RawDataOperationModel.ClearFilterModels();
             loadRecordsAsync((result as RawDataResult).Samples);
         }
 
