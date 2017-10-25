@@ -83,15 +83,15 @@ namespace NewControls
                     var blacklist = ComponentFactory.CreateBlacklist(ExcludeEnglishCommonWords); 
                     var customBlacklist = CommonBlacklist.CreateFromTextFile(""); //  s_BlacklistTxtFileName);
 
-                   // var inputType = ComponentFactory.DetectInputType(text);
+                    // var inputType = ComponentFactory.DetectInputType(text);
                     // var progress = ComponentFactory.CreateProgressBar(inputType, progressBar);
-                    var terms = new StringExtractor(text, new NullProgressIndicator()); //  ComponentFactory.CreateExtractor(inputType, text, new NullProgressIndicator());
-                    var stemmer = ComponentFactory.CreateWordStemmer(m_wordStemmer);  
-                    var words = terms.Filter(blacklist).Filter(customBlacklist).CountOccurences();
-    #pragma warning disable CS4014
-                    MainViewController.Instance.MainPage.Dispatcher.RunIdleAsync((args) =>
-                        WeightedWords = words.GroupByStem(stemmer).SortByOccurences().Cast<IWord>());
-    #pragma warning disable CS4014
+                    var terms    = new StringExtractor(text); //  ComponentFactory.CreateExtractor(inputType, text, new NullProgressIndicator());
+                    var stemmer  = ComponentFactory.CreateWordStemmer(m_wordStemmer);  
+                    var words    = terms.Filter(blacklist).Filter(customBlacklist).CountOccurences();
+                    var weighted = words.GroupByStem(stemmer).SortByOccurences().Cast<IWord>();
+#pragma warning disable CS4014
+                    MainViewController.Instance.MainPage.Dispatcher.RunIdleAsync((args) => WeightedWords = weighted);
+#pragma warning disable CS4014
                 });
         }
         void WordCloud_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -184,10 +184,12 @@ namespace NewControls
             get { return m_Words; }
             set
             {
+                if (this.IsInVisualTree())
+                    m_MaxFontSize = Math.Max(1, ((int)Math.Min(ActualWidth, ActualHeight)) / 8);
                 m_Words = value;
                 if (value == null) { return; }
 
-                var first = m_Words?.First();
+                var first = m_Words?.FirstOrDefault();
                 if (first != null)
                 {
                     m_MaxWordWeight = first.Occurrences;

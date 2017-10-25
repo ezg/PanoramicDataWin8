@@ -401,23 +401,6 @@
     <Compile Include="view\WordCloud\InputType.cs" />
     <Compile Include="view\WordCloud\LayoutFactory.cs" />
     <Compile Include="view\WordCloud\LayoutType.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Blacklist\CommonBlacklist.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Blacklist\En\CommonWords.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Blacklist\IBlacklist.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Blacklist\NullBlacklist.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Extractors\BaseExtractor.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Extractors\FileExtractor.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Extractors\IProgressIndicator.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Extractors\StringExtractor.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Extractors\UriExtractor.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Processing\IWord.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Processing\Word.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Processing\WordExtensions.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Processing\WordGroup.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Stemmers\En\PorterStem.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Stemmers\En\PorterStemmer.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Stemmers\IWordStemmer.cs" />
-    <Compile Include="view\WordCloud\TextAnalyses\Stemmers\NullStemmer.cs" />
     <Compile Include="view\WordCloud\VisualTreeHelperExtensions.cs" />
     <Compile Include="view\WordCloud\WordCloud.xaml.cs">
       <DependentUpon>WordCloud.xaml</DependentUpon>

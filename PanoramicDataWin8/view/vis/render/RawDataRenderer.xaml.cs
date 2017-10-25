@@ -292,7 +292,16 @@ namespace PanoramicDataWin8.view.vis.render
             Records.Clear();
             xWordCloud.TheText = "";
             model.RawDataOperationModel.ClearFilterModels();
-            loadRecordsAsync((result as RawDataResult).Samples);
+            if ((result as RawDataResult).WeightedWords.Count > 0)
+            {
+                xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords;
+                xWordCloud.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                xWordCloud.Visibility = Visibility.Collapsed;
+                loadRecordsAsync((result as RawDataResult).Samples);
+            }
         }
 
         void loadRecordsAsync(List<object> records)
@@ -301,18 +310,12 @@ namespace PanoramicDataWin8.view.vis.render
 #pragma warning disable CS4014
                 CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
                 CoreDispatcherPriority.Low,
-                async () =>
+                () =>
                 {
-                    var wordCloudText = "";
                     foreach (var val in records)
                     {
-                        if (val is IDEA_common.range.PreProcessedString)
-                            wordCloudText += " "+((IDEA_common.range.PreProcessedString)val).Value;
-                        else Records.Add(val);
+                        Records.Add(val);
                     }
-                    if (wordCloudText != "")
-                        xWordCloud.TheText = wordCloudText;
-                    else xWordCloud.Visibility = Visibility.Collapsed;
                 });
 #pragma warning restore CS4014
         }
