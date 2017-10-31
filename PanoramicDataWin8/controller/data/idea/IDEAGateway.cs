@@ -64,16 +64,26 @@ namespace PanoramicDataWin8.controller.data.progressive
                         Content = darpa ? 
                             "Enter the connection URLs that was provided by the evaluator."
                             : e.Message,
-                        StackTrace = (MainViewController.Instance.MainModel.Hostname + "/" + endpoint) + "\n\n" + e.InnerException + "\n\n" + e.StackTrace
+                        StackTrace = (MainViewController.Instance.MainModel.Hostname + "/" + endpoint) + "\n" + e.InnerException + "\n" + e.StackTrace
                     };
                     dialog.Title = darpa ? "Please enter connection URL" : "Connection Problems";
 
                     var result = await dialog.ShowAsync();
 
                     if (result == ContentDialogResult.Secondary)
+                    {
                         CoreApplication.Exit();
+                    }
                     else
-                        MainViewController.Instance.MainModel.Hostname = dialog.Ip;
+                    {
+                        string newIp = dialog.Ip;
+                        if (!newIp.StartsWith("http://") &&
+                            !newIp.StartsWith("https://"))
+                        {
+                            newIp = "http://" + newIp;
+                        }
+                        MainViewController.Instance.MainModel.Hostname = newIp;
+                    }
                 }
         }
     }

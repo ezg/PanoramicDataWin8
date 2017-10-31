@@ -327,7 +327,7 @@ namespace PanoramicDataWin8
             }
         }
 
-        private void MainPage_Loaded(object sender, RoutedEventArgs e)
+        private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
             MainViewController.CreateInstance(inkableScene, this);
             DataContext = MainViewController.Instance.MainModel;
@@ -337,7 +337,9 @@ namespace PanoramicDataWin8
             _mainPointerManager.Removed += mainPointerManager_Removed;
             _mainPointerManager.Attach(MainViewController.Instance.InkableScene);
 
-            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
+            //await Task.Delay(500);
+            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode &&
+                !MainViewController.Instance.MainModel.IsIGTMode)
             {
                 HypothesesViewController.CreateInstance(MainViewController.Instance.MainModel,
                     MainViewController.Instance.OperationViewModels);
@@ -352,6 +354,11 @@ namespace PanoramicDataWin8
                 hypothesisButton.Visibility = Visibility.Collapsed;
                 hypothesisGrid.Visibility = Visibility.Collapsed;
             }
+            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
+            {
+                helpButton.Visibility = Visibility.Collapsed;
+            }
+
             AddHandler(PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
             AddHandler(PointerReleasedEvent, new PointerEventHandler(InkableScene_PointerReleased), true);
             AddHandler(PointerMovedEvent, new PointerEventHandler(InkableScene_PointerMoved), true);
