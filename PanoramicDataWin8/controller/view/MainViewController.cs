@@ -183,7 +183,14 @@ namespace PanoramicDataWin8.controller.view
             MainModel.QueryExecuter = new IDEAQueryExecuter();
             if (!MainModel.IsDarpaSubmissionMode)
             {
-                ComparisonViewController.CreateInstance(OperationViewModels);
+                if (ComparisonViewController.Instance != null)
+                {
+                    ComparisonViewController.Instance.StatisticalComparisonViews.Clear();
+                }
+                else
+                {
+                    ComparisonViewController.CreateInstance(OperationViewModels);
+                }
                 HypothesesViewController.Instance.ClearAllStatisticalComparison();
             }
             ((IDEASchemaModel) MainModel.SchemaModel).RootOriginModel = new IDEAOriginModel(datasetConfiguration);
