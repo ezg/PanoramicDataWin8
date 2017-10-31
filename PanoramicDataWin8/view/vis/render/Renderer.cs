@@ -19,6 +19,11 @@ namespace PanoramicDataWin8.view.vis.render
         {
             return false;
         }
+
+        public virtual void Refactor(string oldName, string newName)
+        {
+
+        }
         public Renderer()
         {
             MinWidth  = OperationViewModel.MIN_WIDTH;

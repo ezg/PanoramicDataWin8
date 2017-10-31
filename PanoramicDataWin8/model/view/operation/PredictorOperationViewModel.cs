@@ -134,7 +134,8 @@ namespace PanoramicDataWin8.model.view.operation
             menuItem.MenuItemComponentViewModel = PredictorNameMenuItemViewModel;
             
             attachmentViewModel.MenuViewModel = menuViewModel;
-            
+            menuViewModel.MenuItemViewModels.Add(menuItem);
+
             PredictorOperationModel.PropertyChanged += (sender, args) =>
             {
                 var model = PredictorOperationModel;
@@ -278,7 +279,8 @@ namespace PanoramicDataWin8.model.view.operation
         {
             addAttachmentViewModels();
 
-            createAxisMenu(AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
+            createAxisMenu(AttachmentOrientation.Bottom, AttributeUsage.X,  
+                 new Vec(200, 50), 0, true, false);
             createRightTargetMenu();
             createTopInputsExpandingMenu();
             createLeftInputsExpandingMenu();

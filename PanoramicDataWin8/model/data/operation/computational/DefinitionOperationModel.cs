@@ -31,33 +31,12 @@ namespace PanoramicDataWin8.model.data.operation
     public class DefinitionOperationModel : ComputationalOperationModel, IBrushableOperationModel
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
-
-        protected override void updateName()
-        {
-            var str = "(";
-            var code = (GetAttributeModel().FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Code;
-            var terms = new Regex("\\b", RegexOptions.Compiled).Split(code);
-            List<string> used = new List<string>();
-            foreach (var n in terms)
-                if (n != null && !used.Contains(n) && AttributeTransformationModel.MatchesExistingField(n, true) != null)
-                {
-                    str += n + ",";
-                    used.Add(n);
-                }
-            str = str.TrimEnd(',') + ")";
-            var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(GetAttributeModel().RawName, str);
-            GetAttributeModel().DisplayName = newName;
-        }
-
+        
         public DefinitionOperationModel(SchemaModel schemaModel, string rawName, string displayName=null) : base(schemaModel, "0", DataType.String, "numeric", rawName, displayName)
         {
             _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
-            BrushOperationModels.CollectionChanged += BrushOperationModels_CollectionChanged;
-        }
-
-        private void BrushOperationModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            if (GetAttributeModel() != null) updateName();
+            IDEAAttributeModel.CodeDefinitionChangedEvent += (sender) => { UpdateCode(); UpdateName(); };
+            ComputationalOperationModel.CodeNameChangedEvent += (sender, oldname, newname) => { UpdateCode(); UpdateName(); };
         }
 
         public List<BrushDescriptor> BrushDescriptors { get; set; } = new List<BrushDescriptor>();
@@ -89,8 +68,10 @@ namespace PanoramicDataWin8.model.data.operation
             get { return _brushableOperationModelImpl.BrushOperationModels; }
             set { _brushableOperationModelImpl.BrushOperationModels = value;   }
         }
-        public void UpdateCode()
+        public void UpdateCode(bool refactoring=false)
         {
+            if (GetAttributeModel() == null)
+                return;
             var expressions = new List<string>();
             foreach (var opModel in BrushOperationModels)
             {
@@ -150,9 +131,7 @@ namespace PanoramicDataWin8.model.data.operation
             }
             expression += "\"" + BrushDescriptors[0].Name + "\"";
             GetAttributeModel().VisualizationHints = new List<IDEA_common.catalog.VisualizationHint>(new IDEA_common.catalog.VisualizationHint[] { IDEA_common.catalog.VisualizationHint.TreatAsEnumeration});
-
-            GetAttributeModel().SetCode(expression, DataType.String);
-            updateName();
+            GetAttributeModel().SetCode(expression, DataType.String, refactoring);
         }
     }
 }

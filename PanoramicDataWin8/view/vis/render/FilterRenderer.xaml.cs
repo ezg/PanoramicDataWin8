@@ -21,6 +21,7 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using PanoramicDataWin8.model.data;
 using InkStroke = PanoramicDataWin8.view.inq.InkStroke;
+using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -403,6 +404,11 @@ namespace PanoramicDataWin8.view.vis.render
             return Predicate.STARTS_WITH;
         }
 
+        public override void Refactor(string oldName, string newName)
+        {
+            var newFilterCode = AttributeFuncModel.AttributeCodeFuncModel.TransformCode(ExpressionTextBox.Text, oldName, newName).Item1;
+            ExpressionTextBox.Text = newFilterCode;
+        }
 
         void AddFilterModel(AttributeTransformationModel attributeTransformationModel, Predicate p, string value)
         {

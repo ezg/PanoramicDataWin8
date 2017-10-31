@@ -139,6 +139,7 @@ namespace PanoramicDataWin8.controller.view
             if (!(filterLinkModel.FromOperationModel is IFilterConsumerOperationModel)) // bcz: if source is a filter not a histogram then we can add it
                 return true;
             var linkModels = ((IFilterConsumerOperationModel)filterLinkModel.FromOperationModel).ConsumerLinkModels.Where(lm => lm.FromOperationModel == filterLinkModel.FromOperationModel).ToList();
+            //linkModels.AddRange(((IFilterProviderOperationModel)filterLinkModel.ToOperationModel).ProviderLinkModels.Where(lm => lm.FromOperationModel == filterLinkModel.ToOperationModel).ToList());
             linkModels.Add(filterLinkModel);
             var chain = new HashSet<IFilterConsumerOperationModel>();
             recursiveCheckForCiruclarLinking(linkModels, chain);
@@ -169,6 +170,11 @@ namespace PanoramicDataWin8.controller.view
             {
                 chain.Add(link.ToOperationModel);
                 recursiveCheckForCiruclarLinking(link.ToOperationModel.ConsumerLinkModels.Where(lm => lm.FromOperationModel == link.ToOperationModel).ToList(), chain);
+                if (link.ToOperationModel is IFilterProviderOperationModel)
+                {
+                    recursiveCheckForCiruclarLinking((link.ToOperationModel as IFilterProviderOperationModel).ProviderLinkModels.Where(lm => lm.FromOperationModel == link.ToOperationModel).ToList(), chain);
+                }
+
             }
         }
 

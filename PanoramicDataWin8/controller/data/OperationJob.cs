@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using IDEA_common.operations;
+using IDEA_common.operations.histogram;
 using IDEA_common.operations.risk;
 using Newtonsoft.Json;
 using PanoramicDataWin8.controller.data.progressive;
@@ -66,7 +67,7 @@ namespace PanoramicDataWin8.controller.data
                     var result = await resultCommand.GetResult(resultParams);
                     if (result != null)
                     {
-                        if (first)
+                        if (first && OperationParameters is HistogramOperationParameters)
                         {
                             Debug.WriteLine("first update in " + sw.ElapsedMilliseconds + " " + result.Progress);
                             first = false;
@@ -78,7 +79,10 @@ namespace PanoramicDataWin8.controller.data
                             FireExecutionStateChanged(ExecutionState.Stopped);
                             _isRunning = false;
                             FireJobCompleted(new JobEventArgs {Result = result, ResultExecutionId = _executionId });
-                            Debug.WriteLine("job completed in " + sw.ElapsedMilliseconds);
+                            if (OperationParameters is HistogramOperationParameters)
+                            {
+                                Debug.WriteLine("job completed in " + sw.ElapsedMilliseconds);
+                            }
                         }
                     }
                     await Task.Delay(150);

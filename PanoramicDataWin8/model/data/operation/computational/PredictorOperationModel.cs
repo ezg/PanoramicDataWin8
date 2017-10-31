@@ -9,23 +9,14 @@ using System.Linq;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public class PredictorOperationModel : AttributeUsageOperationModel, IFilterConsumerOperationModel
+    public class PredictorOperationModel : ComputationalOperationModel, IFilterConsumerOperationModel
     {
-        string _rawName;
-
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
-        public PredictorOperationModel(SchemaModel schemaModel, string rawName, string displayName = null) : base(schemaModel)
+        public PredictorOperationModel(SchemaModel schemaModel, string rawName, string displayName = null) : base(schemaModel, DataType.Double, "numeric", rawName, displayName)
         {
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
-
-            _rawName = rawName;
-            if (rawName != null && !IDEAAttributeModel.NameExists(rawName, schemaModel.OriginModels.First()))
-            {
-                IDEAAttributeModel.AddBackendField(rawName, displayName == null ? rawName : displayName, null, 
-                    DataType.Double, "numeric", new List<VisualizationHint>(), schemaModel.OriginModels.First());
-            }
-
+            
             AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
             IgnoredAttributeUsageTransformationModels.CollectionChanged += _ignoredAttributeUsageTransformationModels_CollectionChanged;
         }
@@ -64,18 +55,5 @@ namespace PanoramicDataWin8.model.data.operation
         {
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
-
-
-        public IDEAAttributeModel GetAttributeModel()
-        {
-            return IDEAAttributeModel.Function(_rawName, SchemaModel.OriginModels.First());
-        }
-
-        public void SetRawName(string name)
-        {
-            var code = GetAttributeModel();
-            code.DisplayName = code.RawName = _rawName = name;
-        }
-
     }
 }

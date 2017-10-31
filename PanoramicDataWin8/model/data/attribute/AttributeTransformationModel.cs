@@ -4,6 +4,9 @@ using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.model.data.operation;
 using System.Linq;
 using IDEA_common.aggregates;
+using System.Collections.Generic;
+using PanoramicDataWin8.controller.view;
+using PanoramicDataWin8.model.view;
 
 namespace PanoramicDataWin8.model.data.attribute
 {
@@ -155,10 +158,8 @@ namespace PanoramicDataWin8.model.data.attribute
         }
         public static AttributeTransformationModel MatchesExistingField(string str, bool exact=false)
         {
-            var originModel = (controller.view.MainViewController.Instance.MainPage.DataContext as view.MainModel)
-                .SchemaModel.OriginModels.First();
-            var inputModels = originModel
-                     .InputModels.Where(am => am.IsDisplayed).ToList();
+            var originModel = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First();
+            var inputModels = originModel.InputModels.Where(am => am.IsDisplayed).ToList();
             inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels(originModel));
             AttributeTransformationModel attributeTransformationModel = null;
             foreach (var im in inputModels)
@@ -168,6 +169,16 @@ namespace PanoramicDataWin8.model.data.attribute
                 if (im.RawName.ToLower() == str.ToLower())
                     attributeTransformationModel = new AttributeTransformationModel(im as AttributeModel);
             return attributeTransformationModel;
+        }
+        public static IEnumerable<string> ExistingFieldList()
+        {
+            var originModel = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First();
+            var inputModels = originModel.InputModels.Where(am => am.IsDisplayed).ToList();
+            inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels(originModel));
+            var existingFields = new List<string>();
+            foreach (var im in inputModels)
+                existingFields.Add(im.RawName);
+            return existingFields;
         }
     }
 }

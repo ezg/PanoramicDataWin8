@@ -40,6 +40,9 @@ namespace PanoramicDataWin8.view.vis.render
             this.InitializeComponent();
             this.CodeBox.LostFocus += (sender, e) => Labels.IsHitTestVisible = false;
         }
+        
+        public CalculationOperationModel CalculationOperationModel {  get { return (DataContext as CalculationOperationViewModel)?.OperationModel as CalculationOperationModel; } }
+        
         public override void StartSelection(Point point)
         {
             var bounds = CodeBox.GetBoundingRect(MainViewController.Instance.InkableScene);
@@ -53,31 +56,32 @@ namespace PanoramicDataWin8.view.vis.render
         
         private SolidColorBrush _textBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
         private readonly SolidColorBrush _lightBrush = new SolidColorBrush(Helpers.GetColorFromString("#e6e6e6"));
-        
 
+        public override void Refactor(string oldName, string newName)
+        {
+            CodeBox.Text = CalculationOperationModel.GetAttributeModel().GetCode();
+        }
         private async void Tb_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var calcOpModel = ((DataContext as CalculationOperationViewModel).OperationModel as CalculationOperationModel);
+            var newAttr = new AttributeCodeParameters() { Code = CodeBox.Text, RawName = CalculationOperationModel?.GetAttributeModel().RawName };
 
-            var attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(calcOpModel.SchemaModel.OriginModels.First()).Select(a => IDEAHelpers.GetAttributeParameters(a)).OfType<AttributeCodeParameters>().ToList();
-
-            var newAttr = new AttributeCodeParameters() { Code = CodeBox.Text, RawName = calcOpModel.GetAttributeModel().RawName };
+            var originModel = CalculationOperationModel.SchemaModel.OriginModels.First();
+            var attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(originModel).Select(a => IDEAHelpers.GetAttributeParameters(a)).OfType<AttributeCodeParameters>().ToList();
             if (attributeCodeParameters.Contains(newAttr))
                 attributeCodeParameters.Remove(newAttr);
             attributeCodeParameters.Add(newAttr);
                  
-            var cp = new CodeParameters()
-            {
-                AttributeCodeParameters = attributeCodeParameters,
-                AdapterName = ((IDEASchemaModel)MainViewController.Instance.MainModel.SchemaModel).RootOriginModel.Name
-            };
+            var res = await new CodeCommand().CompileCode(
+                new CodeParameters() {
+                    AttributeCodeParameters = attributeCodeParameters,
+                    AdapterName = ((IDEASchemaModel)MainViewController.Instance.MainModel.SchemaModel).RootOriginModel.Name
+                });
 
-            var res = await new CodeCommand().CompileCode(cp);
             if (res.RawNameToCompileResult.Where((r) => !r.Value.CompileSuccess).Count() == 0)
             {
                 foreach (var r in res.RawNameToCompileResult)
                     if (r.Key == newAttr.RawName)
-                        calcOpModel.SetCode(newAttr.Code, r.Value.DataType);
+                        CalculationOperationModel.SetCode(newAttr.Code, r.Value.DataType);
                 CodeBoxFeedback.Text = "";
                 CodeBox.Foreground = new SolidColorBrush(Colors.Black);
             }

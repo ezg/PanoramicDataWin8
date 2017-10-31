@@ -3,22 +3,25 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:PanoramicDataWin8.view.vis.render"
+    xmlns:NewControls="using:NewControls"
     xmlns:common="using:PanoramicDataWin8.view.common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400"
+    AllowDrop="True"
     FontFamily="{StaticResource abel}">
     <Grid  Background="{StaticResource lightBrush}">
         <common:DXSurface x:Name="dxSurface" Visibility="Collapsed"/>
-        <ListView x:Name="xRawDataView" Margin="20"
+        <!--ListView x:Name="xRawDataView" Margin="20"
                   VirtualizingStackPanel.VirtualizationMode="Recycling" 
                   SelectionMode="None"
                       HorizontalAlignment="Left"
                       VerticalAlignment="Stretch"
                   ManipulationMode="TranslateRailsY"
                   ShowsScrollingPlaceholders="True"
+                  DragStarting="xRawDataView_DragStarting"  
                   CanDragItems="False"  >
             <ListView.Resources>
                 <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter"></local:ObjectToFrameworkElementConverter>
@@ -38,6 +41,33 @@
                     <Border Child="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
-        </ListView>
+        </ListView-->
+        <GridView x:Name="xRawDataGridView" 
+                  IsHitTestVisible="False"
+                  Margin="20" 
+                  SelectionMode="None"
+                  ShowsScrollingPlaceholders="True">
+            <GridView.Resources>
+                <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter" />
+            </GridView.Resources>
+            <GridView.ItemContainerStyle>
+                <Style TargetType="GridViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                    <Setter Property="VerticalContentAlignment"   Value="Center" />
+                    <Setter Property="Margin" Value="0,0,0,0" />
+                    <Setter Property="Padding" Value="0,0,0,0" />
+                    <Setter Property="MinHeight" Value="25" />
+                    <Setter Property="MinWidth" Value="0" />
+                </Style>
+            </GridView.ItemContainerStyle>
+            <GridView.ItemTemplate>
+                <DataTemplate>
+                    <Border Child="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}" />
+                </DataTemplate>
+            </GridView.ItemTemplate>
+        </GridView>
+        <NewControls:WordCloud x:Name="xWordCloud">
+
+        </NewControls:WordCloud>
     </Grid>
 </local:Renderer>

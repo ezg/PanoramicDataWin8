@@ -360,7 +360,8 @@ namespace PanoramicDataWin8.model.view.operation
             if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode &&
                 !MainViewController.Instance.MainModel.IsIGTMode)
             {
-                createRightHistogramMenu();
+                // commented for demo
+                //createRightHistogramMenu();
             }
             createTopHistogramMenu();
             createTopRightFilterDragMenu();

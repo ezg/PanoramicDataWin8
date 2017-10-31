@@ -3,5 +3,5 @@
   "APIPath": "/api",
   "StartDataset": "o_185_dataset",
   "SampleSize": 100000,
-  "IsDarpaSubmissionMode": true
+  "IsDarpaSubmissionMode": false
 }

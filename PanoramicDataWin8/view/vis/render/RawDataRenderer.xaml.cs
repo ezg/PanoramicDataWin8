@@ -18,6 +18,12 @@ using Windows.UI;
 using PanoramicDataWin8.utils;
 using Windows.UI.Xaml.Controls.Primitives;
 using IDEA_common.operations.rawdata;
+using Windows.UI.Xaml.Media.Imaging;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
+using Windows.UI.Xaml.Input;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -25,20 +31,43 @@ namespace PanoramicDataWin8.view.vis.render
 {
     public class ObjectToFrameworkElementConverter : IValueConverter
     {
+        static public Grid LastHit = null;
         object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
         {
             var g = new Grid();
             if (value != null)
             {
-                var tb = new TextBlock();
-                tb.FontFamily = FontFamily.XamlAutoFontFamily;
-                tb.FontSize = 14;
-                tb.Foreground = new SolidColorBrush(Colors.Black);
-                tb.Text = value.ToString();
-                tb.Height = 25;
-                tb.MinWidth = 100;
-                g.Children.Add(tb);
-                g.Background = new SolidColorBrush(Colors.LightGray);
+                if (false) // data is an image
+                {
+                    var ib = new Image();
+                    ib.Source = new BitmapImage(new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
+                    ib.Width = ib.Height = 200;
+                    g.Children.Add(ib);
+                    g.CanDrag = false;
+                    g.PointerPressed += (sender, e) =>
+                    {
+                        if (LastHit != g && LastHit != null)
+                            LastHit.CanDrag = false;
+                        LastHit = g;
+                    };
+                    g.DragStarting += (UIElement sender, DragStartingEventArgs args) =>
+                    {
+                        args.Data.RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
+                        args.Data.Properties.Add("MYFORMAT", new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
+                    };
+                }
+                else
+                {
+                    var tb = new TextBlock();
+                    tb.FontFamily = FontFamily.XamlAutoFontFamily;
+                    tb.FontSize = 14;
+                    tb.Foreground = new SolidColorBrush(Colors.Black);
+                    tb.Text = value.ToString();
+                    tb.Height = 25;
+                    tb.MinWidth = value is string ? 200 : 50;
+                    tb.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    g.Children.Add(tb);
+                }
             }
             return g;
         }
@@ -55,12 +84,118 @@ namespace PanoramicDataWin8.view.vis.render
         public RawDataRenderer()
         {
             this.InitializeComponent();
-
-            // dxSurface.ContentProvider = _plotRendererContentProvider;
+            
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
-            xRawDataView.ItemsSource = Records;
+           // xRawDataView.ItemsSource = Records;
+            xRawDataGridView.ItemsSource = Records;
+            this.SizeChanged += RawDataRenderer_SizeChanged;
+            this.Tapped += RawDataRenderer_Tapped;
+            MainViewController.Instance.MainPage.AddHandler(PointerPressedEvent, new PointerEventHandler(RawDataRenderer_PointerPressed), true);
         }
+
+        private void RawDataRenderer_PointerPressed(object sender, PointerRoutedEventArgs e)
+        {
+            var res = VisualTreeHelper.FindElementsInHostCoordinates(e.GetCurrentPoint(null).Position, this);
+            if (res.Count() == 0)
+                xRawDataGridView.IsHitTestVisible = false;
+        }
+        
+
+        private void RawDataRenderer_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            var model = (DataContext as RawDataOperationViewModel);
+            xRawDataGridView.IsHitTestVisible = true;
+            var res = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), this);
+            foreach (var r in res)
+                if (r is Image)
+                {
+                    var img = r as Image;
+                    if (img.Tag != null)
+                        (xRawDataGridView.Parent as Panel).Children.Remove(img.Parent as Panel);
+                    else
+                    {
+                        var ib = new Image();
+                        ib.Source = img.Source;
+                        ib.Tag = "FullSize";
+                        var g = new Grid();
+                        g.Background = new SolidColorBrush(Colors.LightGray);
+                        g.HorizontalAlignment = HorizontalAlignment.Stretch;
+                        g.VerticalAlignment = VerticalAlignment.Stretch;
+                        g.Children.Add(ib);
+                        (xRawDataGridView.Parent as Panel).Children.Add(g);
+                    }
+                    break;
+                }
+                else if (r is TextBlock)
+                {
+                    var tb = r as TextBlock;
+                    if (tb.Tag != null)
+                    {
+                        model.RawDataOperationModel.RemoveFilterModel(tb.Tag as FilterModel);
+                        tb.FontStyle = Windows.UI.Text.FontStyle.Normal;
+                        tb.Tag = null;
+                    }
+                    else
+                    {
+                        tb.FontStyle = Windows.UI.Text.FontStyle.Italic;
+                        var fm = new FilterModel();
+                        var xIom = model.RawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+                        var vc = xIom.AttributeModel.DataType == IDEA_common.catalog.DataType.String ?
+                            new ValueComparison(xIom, IDEA_common.operations.recommender.Predicate.CONTAINS, tb.Text) :
+                            new ValueComparison(xIom, IDEA_common.operations.recommender.Predicate.EQUALS, ToObject(xIom.AttributeModel, tb.Text));
+
+                        fm.ValueComparisons.Add(vc);
+                        model.RawDataOperationModel.AddFilterModel(fm);
+                        tb.Tag = fm;
+                    }
+                }
+            e.Handled = true;
+        }
+
+        object ToObject(AttributeModel model, string text)
+        {
+            switch (model.DataType)
+            {
+                case IDEA_common.catalog.DataType.String: return text;
+                case IDEA_common.catalog.DataType.Float:
+                    {
+                        float f;
+                        float.TryParse(text, out f);
+                        return f;
+                    }
+                case IDEA_common.catalog.DataType.Double:
+                    {
+                        double d;
+                        double.TryParse(text, out d);
+                        return d;
+                    }
+                case IDEA_common.catalog.DataType.Int:
+                    {
+                        int i;
+                        int.TryParse(text, out i);
+                        return i;
+                    }
+                case IDEA_common.catalog.DataType.DateTime:
+                    {
+                        DateTime d;
+                        DateTime.TryParse(text, out d);
+                        return d;
+                    }
+                default:
+                    return text;
+            }
+        }
+
+        private void RawDataRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            var b = new Binding();
+            b.Source = this;
+            b.Path = new PropertyPath("ActualWidth");
+            this.xRawDataGridView.ItemsPanelRoot.SetBinding(WidthProperty, b);
+        }
+        
+
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
             var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollBar>(this);
@@ -143,7 +278,6 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var model = (DataContext as RawDataOperationViewModel);
             var clone = (RawDataOperationModel)model.OperationModel.ResultCauserClone;
-            var xIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
             AttributeTransformationModel valueIom = null;
 
             if (clone.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
@@ -154,15 +288,36 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 valueIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
             }
-            //_plotRendererContentProvider.UpdateFilterModels(model.HistogramOperationModel.FilterModels.ToList());
-            //_plotRendererContentProvider.UpdateData(result, model.HistogramOperationModel.IncludeDistribution,
-            //    model.HistogramOperationModel.BrushColors,
-            //    xIom, yIom, valueIom, 30);
 
             Records.Clear();
-            if ((result as RawDataResult)?.Samples != null)
-                foreach (var val in (result as RawDataResult).Samples)
-                    Records.Add(val);
+            xWordCloud.TheText = "";
+            model.RawDataOperationModel.ClearFilterModels();
+            if ((result as RawDataResult).WeightedWords.Count > 0)
+            {
+                xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords;
+                xWordCloud.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                xWordCloud.Visibility = Visibility.Collapsed;
+                loadRecordsAsync((result as RawDataResult).Samples);
+            }
+        }
+
+        void loadRecordsAsync(List<object> records)
+        {
+            if (records != null)
+#pragma warning disable CS4014
+                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                CoreDispatcherPriority.Low,
+                () =>
+                {
+                    foreach (var val in records)
+                    {
+                        Records.Add(val);
+                    }
+                });
+#pragma warning restore CS4014
         }
         void render(bool sizeChanged = false)
         {
