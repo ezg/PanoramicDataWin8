@@ -39,6 +39,8 @@ namespace PanoramicDataWin8.model.view
 
         private bool _isDarpaSubmissionMode;
 
+        private bool _isIGTMode;
+
         private bool _isDefaultHypothesisEnabled = false;
 
         private bool _isUnknownUnknownEnabled = false;
@@ -101,6 +103,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _isDarpaSubmissionMode; }
             set { SetProperty(ref _isDarpaSubmissionMode, value); }
+        }
+
+        public bool IsIGTMode
+        {
+            get { return _isIGTMode; }
+            set { SetProperty(ref _isIGTMode, value); }
         }
 
         public double NrOfXBins

@@ -87,6 +87,7 @@ namespace PanoramicDataWin8.controller.view
             MainModel.StartDataset = config["StartDataset"].ToString();
             MainModel.SampleSize = double.Parse(config["SampleSize"].ToString());
             MainModel.IsDarpaSubmissionMode = bool.Parse(config["IsDarpaSubmissionMode"].ToString());
+            MainModel.IsIGTMode = bool.Parse(config["IsIGTMode"].ToString());
             MainModel.APIPath = config["APIPath"].ToString();
             MainModel.Hostname = config["Hostname"].ToString();
 
@@ -137,7 +138,15 @@ namespace PanoramicDataWin8.controller.view
 
             //var other = new OperationTypeGroupModel {Name = "create", OperationType = OperationType.Group};
             //parent.OperationTypeModels.Add(other);
-            if (!MainModel.IsDarpaSubmissionMode)
+            if (MainModel.IsDarpaSubmissionMode)
+            {
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "predictor",
+                    OperationType = OperationType.Predictor
+                });
+            }
+            else if (MainModel.IsIGTMode)
             {
                 parent.OperationTypeModels.Add(new OperationTypeModel
                 {
@@ -154,12 +163,36 @@ namespace PanoramicDataWin8.controller.view
                     Name = "calculation",
                     OperationType = OperationType.Calculation
                 });
-                parent.OperationTypeModels.Add(new OperationTypeModel { Name = "raw data", OperationType = OperationType.RawData });
             }
-            parent.OperationTypeModels.Add(new OperationTypeModel { Name = "predictor", OperationType = OperationType.Predictor });
-
-            if (!MainModel.IsDarpaSubmissionMode)
+            else
             {
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "filter",
+                    OperationType = OperationType.Filter
+                });
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "definition",
+                    OperationType = OperationType.Definition
+                });
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "calculation",
+                    OperationType = OperationType.Calculation
+                });
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "raw data",
+                    OperationType = OperationType.RawData
+                });
+
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "predictor",
+                    OperationType = OperationType.Predictor
+                });
+
                 var funcs = new OperationTypeGroupModel { Name = "functions", OperationType = OperationType.Group };
                 parent.OperationTypeModels.Add(funcs);
                 funcs.OperationTypeModels.Add(new OperationTypeModel
@@ -181,7 +214,7 @@ namespace PanoramicDataWin8.controller.view
             MainModel.SchemaModel = new IDEASchemaModel();
             MainModel.SampleSize = datasetConfiguration.SampleSize;
             MainModel.QueryExecuter = new IDEAQueryExecuter();
-            if (!MainModel.IsDarpaSubmissionMode)
+            if (!MainModel.IsDarpaSubmissionMode && !MainModel.IsIGTMode)
             {
                 if (ComparisonViewController.Instance != null)
                 {

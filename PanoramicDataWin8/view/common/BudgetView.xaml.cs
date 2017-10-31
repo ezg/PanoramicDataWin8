@@ -57,7 +57,10 @@ namespace PanoramicDataWin8.view.common
             if (args.NewValue != null)
             {
                 _model = args.NewValue as BudgetViewModel;
-                _model.PropertyChanged += _model_PropertyChanged;
+                if (_model != null)
+                {
+                    _model.PropertyChanged += _model_PropertyChanged;
+                }
             }
         }
 
