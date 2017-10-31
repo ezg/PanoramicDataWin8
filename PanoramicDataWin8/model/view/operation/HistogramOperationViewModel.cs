@@ -359,7 +359,8 @@ namespace PanoramicDataWin8.model.view.operation
             createAxisMenu(AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
             if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
             {
-                createRightHistogramMenu();
+                // commented for demo
+                //createRightHistogramMenu();
             }
             createTopHistogramMenu();
             createTopRightFilterDragMenu();

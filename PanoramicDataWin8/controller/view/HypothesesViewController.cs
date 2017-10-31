@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.controller.view
         private StatisticalComparisonDecisionOperationModel _statisticalComparisonDecisionOperationModel = null;
         private readonly RiskOperationModel _riskOperationModel;
         private readonly Dictionary<ComparisonId, HypothesisViewModel> _comparisonIdToHypothesisViewModels = new Dictionary<ComparisonId, HypothesisViewModel>();
-        private readonly Dictionary<ComparisonId, StatisticalComparisonOperationModel> _allComparisons = new Dictionary<ComparisonId, StatisticalComparisonOperationModel>();
+        private readonly Dictionary<ComparisonId, StatisticalComparisonOperationModel> _visibleOnVisualizationComparisons = new Dictionary<ComparisonId, StatisticalComparisonOperationModel>();
 
         private readonly Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel> _modelToSaveViewModel =
             new Dictionary<StatisticalComparisonOperationModel, StatisticalComparisonSaveViewModel>();
@@ -195,17 +195,23 @@ namespace PanoramicDataWin8.controller.view
                         HypothesesViewModel.HypothesisViewModels.Add(vm);
                         _comparisonIdToHypothesisViewModels.Add(res.ComparisonId, vm);
                     }
-                    if (!_allComparisons.ContainsKey(res.ComparisonId))
-                    {
-                        _allComparisons.Add(res.ComparisonId, statOpModel);
-                    }
-                    _allComparisons[res.ComparisonId] = statOpModel;
 
-                    /*_comparisonIdToHypothesisViewModels[res.ComparisonId].Decision = res.Decision[_riskOperationModel.RiskControlType];
-                    //Debug.WriteLine(statOpModel.ExecutionId + ", " + statOpModel.ResultExecutionId);
-                    if (statOpModel.ExecutionId == statOpModel.ResultExecutionId)
+                    var oldStatOpModelsKeys = _visibleOnVisualizationComparisons.Where(kvp => kvp.Value == statOpModel).Select(kvp => kvp.Key).ToList();
+                    foreach (var oldStatOpModel in oldStatOpModelsKeys)
                     {
-                        statOpModel.Decision = res.Decision[_riskOperationModel.RiskControlType];
+                        _visibleOnVisualizationComparisons.Remove(oldStatOpModel);
+                    }
+                    if (!_visibleOnVisualizationComparisons.ContainsKey(res.ComparisonId))
+                    {
+                        _visibleOnVisualizationComparisons.Add(res.ComparisonId, statOpModel);
+                    }
+                    _visibleOnVisualizationComparisons[res.ComparisonId] = statOpModel;
+
+                    //_comparisonIdToHypothesisViewModels[res.ComparisonId].Decision = res.Decision[_riskOperationModel.RiskControlType];
+                    //Debug.WriteLine(statOpModel.ExecutionId + ", " + statOpModel.ResultExecutionId);
+                    /*if (statOpModel.ExecutionId == statOpModel.ResultExecutionId)
+                    {
+                        //statOpModel.Decision = res.Decision[_riskOperationModel.RiskControlType];
                         if (HypothesesViewModel.HypothesisViewModels.Any())
                         {
                             if (HypothesesViewModel.HypothesisViewModels.Max(h => h.ViewOrdering) >= _comparisonIdToHypothesisViewModels[res.ComparisonId].ViewOrdering)
@@ -291,7 +297,7 @@ namespace PanoramicDataWin8.controller.view
         {
             if (MainViewController.Instance.MainModel.PollForDecisions)
             {
-                var comparisonIds = _allComparisons.Keys.ToList();
+                var comparisonIds = _comparisonIdToHypothesisViewModels.Keys.ToList();
 
                 if (_statisticalComparisonDecisionOperationModel == null)
                 {
@@ -315,7 +321,10 @@ namespace PanoramicDataWin8.controller.view
                 var getModelStateResult = (GetModelStateResult) statDesOpModel.Result;
                 foreach (var decision in getModelStateResult.Decisions)
                 {
-                    _allComparisons[decision.ComparisonId].Decision = decision;
+                    if (_visibleOnVisualizationComparisons.ContainsKey(decision.ComparisonId))
+                    {
+                        _visibleOnVisualizationComparisons[decision.ComparisonId].Decision = decision;
+                    }
                     if (_comparisonIdToHypothesisViewModels.ContainsKey(decision.ComparisonId))
                     {
                         _comparisonIdToHypothesisViewModels[decision.ComparisonId].Decision = decision;

@@ -279,7 +279,8 @@ namespace PanoramicDataWin8.model.view.operation
         {
             addAttachmentViewModels();
 
-            createLabelMenu(AttachmentOrientation.Bottom, PredictorOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false);
+            createAxisMenu(AttachmentOrientation.Bottom, AttributeUsage.X,  
+                 new Vec(200, 50), 0, true, false);
             createRightTargetMenu();
             createTopInputsExpandingMenu();
             createLeftInputsExpandingMenu();

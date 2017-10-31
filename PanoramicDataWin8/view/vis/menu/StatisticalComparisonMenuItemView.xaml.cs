@@ -39,6 +39,10 @@ namespace PanoramicDataWin8.view.vis.menu
             if (_model != null)
             {
                 _model.PropertyChanged -= _model_PropertyChanged;
+                if (_statModel != null)
+                {
+                    _statModel.PropertyChanged -= _statModel_PropertyChanged;
+                }
             }
             if (args.NewValue is MenuItemViewModel)
             {
