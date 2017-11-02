@@ -29,6 +29,7 @@ using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.idea;
+using PanoramicDataWin8.controller.data.progressive;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -313,17 +314,21 @@ namespace PanoramicDataWin8.view.vis.menu
 
         private void TextInputBox_LostFocus(object sender, RoutedEventArgs e)
         {
-            var model = ChangeCodeRawName();
+            if (TextInputBox.Text != "")
+            {
+                ChangeCodeRawName(TextInputBox.Text);
+            }
+            var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
             model.Editing = Visibility.Collapsed;
         }
         
         private void TextInputBox_KeyUp(object sender, KeyRoutedEventArgs e)
         {
-            ChangeCodeRawName();
+            if (TextInputBox.Text != "" && e.Key == Windows.System.VirtualKey.Enter)
+                ChangeCodeRawName(TextInputBox.Text);
         }
-        AttributeTransformationMenuItemViewModel ChangeCodeRawName()
+        AttributeTransformationMenuItemViewModel ChangeCodeRawName(string newName)
         {
-            var newName = TextInputBox.Text;
             var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
             var attr = AttributeTransformationModel.MatchesExistingField(newName, true);
             // if attribute label doesn't match any known attribute and this is a calculation operation, 
@@ -335,7 +340,6 @@ namespace PanoramicDataWin8.view.vis.menu
             }
             
             return model;
-         //   model.Editing = Visibility.Collapsed;
         }
     }
 }
