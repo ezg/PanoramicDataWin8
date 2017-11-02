@@ -25,6 +25,7 @@ using PanoramicDataWin8.controller.data.progressive;
 using IDEA_common.operations;
 using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.controller.view;
+using System.Diagnostics;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -61,18 +62,21 @@ namespace PanoramicDataWin8.view.vis.render
         {
             CodeBox.Text = CalculationOperationModel.GetAttributeModel().GetCode();
         }
-        private async void Tb_TextChanged(object sender, TextChangedEventArgs e)
+
+        void CodeBox_KeyUp(object sender, KeyRoutedEventArgs e)
         {
-            var newAttr = new AttributeCodeParameters() { Code = CodeBox.Text, RawName = CalculationOperationModel?.GetAttributeModel().RawName };
+            var codeText = CodeBox.Text;
+            var newAttr = new AttributeCodeParameters() { Code = codeText, RawName = CalculationOperationModel?.GetAttributeModel().RawName };
 
             var originModel = CalculationOperationModel.SchemaModel.OriginModels.First();
             var attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(originModel).Select(a => IDEAHelpers.GetAttributeParameters(a)).OfType<AttributeCodeParameters>().ToList();
             if (attributeCodeParameters.Contains(newAttr))
                 attributeCodeParameters.Remove(newAttr);
             attributeCodeParameters.Add(newAttr);
-                 
+            
             var res = await new CodeCommand().CompileCode(
-                new CodeParameters() {
+                new CodeParameters()
+                {
                     AttributeCodeParameters = attributeCodeParameters,
                     AdapterName = ((IDEASchemaModel)MainViewController.Instance.MainModel.SchemaModel).RootOriginModel.Name
                 });

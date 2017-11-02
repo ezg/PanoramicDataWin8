@@ -94,7 +94,7 @@
         </Page.Resources>
         <Grid Background="{StaticResource lightBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <Grid Name="Labels" IsHitTestVisible="False" Background="{StaticResource lightBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                <TextBox x:Name="CodeBox" x:FieldModifier="public" Background="{StaticResource lightBrush}" Foreground="black" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextChanged="Tb_TextChanged" LostFocus="CodeBox_LostFocus"  >
+                <TextBox x:Name="CodeBox" x:FieldModifier="public" Background="{StaticResource lightBrush}" Foreground="black" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" KeyUp="CodeBox_KeyUp" LostFocus="CodeBox_LostFocus"  >
                     <FlyoutBase.AttachedFlyout>
                         <Flyout>
                             <TextBlock x:Name="CodeBoxFeedback" Width="400" Height="50" Foreground="Black" TextWrapping="Wrap" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>

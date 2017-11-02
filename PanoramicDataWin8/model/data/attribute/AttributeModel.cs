@@ -158,7 +158,7 @@ namespace PanoramicDataWin8.model.data.attribute
                     if (rawNameIndex < sortedRawNames.Count)
                     {
                         string rawName = sortedRawNames[rawNameIndex];
-                        var pattern = rawName.Replace("(", "\\(").Replace(")", "\\)");
+                        var pattern = rawName.Replace("(", "\\(").Replace(")", "\\)").Replace("?", "\\?").Replace(".","\\.");
                         var strings = Regex.Split(expression, pattern);
 
                         if (strings.Length > 1)
