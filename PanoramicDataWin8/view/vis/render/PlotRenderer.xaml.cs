@@ -40,6 +40,7 @@ namespace PanoramicDataWin8.view.vis.render
         private PlotRendererContentProvider _plotRendererContentProvider = new PlotRendererContentProvider();
         static int count = 0;
         int MyCount = 0;
+        private readonly DispatcherTimer _operationViewMovingTimer = new DispatcherTimer();
 
         public PlotRenderer()
         {
@@ -52,6 +53,21 @@ namespace PanoramicDataWin8.view.vis.render
             dxSurface.ContentProvider = _plotRendererContentProvider;
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
+
+            _operationViewMovingTimer.Interval = TimeSpan.FromMilliseconds(200);
+            _operationViewMovingTimer.Tick += _operationViewMovingTimer_Tick;
+            _operationViewMovingTimer.Start();
+        }
+
+        private void _operationViewMovingTimer_Tick(object sender, object e)
+        {
+            var result = (DataContext as HistogramOperationViewModel)?.OperationModel?.Result;
+            if (result != null && ifNotLoadedYet)
+            {
+                loadResult(result);
+                render();
+                _operationViewMovingTimer.Stop();
+            }
         }
 
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
@@ -134,8 +150,10 @@ namespace PanoramicDataWin8.view.vis.render
 
         HistogramOperationModel ResultHistogramOperationModel;
         HistogramResult _lastResult;
+        private bool ifNotLoadedYet = true;
         void loadResult(IResult result)
         {
+            ifNotLoadedYet = false;
             _lastResult = result as HistogramResult;
             var model = (DataContext as HistogramOperationViewModel);
             _plotRendererContentProvider.UpdateFilterModels(model.HistogramOperationModel.FilterModels.ToList());
