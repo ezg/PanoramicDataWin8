@@ -63,7 +63,7 @@ namespace PanoramicDataWin8.view.vis.render
             CodeBox.Text = CalculationOperationModel.GetAttributeModel().GetCode();
         }
 
-        void CodeBox_KeyUp(object sender, KeyRoutedEventArgs e)
+        async void CodeBox_KeyUp(object sender, KeyRoutedEventArgs e)
         {
             var codeText = CodeBox.Text;
             var newAttr = new AttributeCodeParameters() { Code = codeText, RawName = CalculationOperationModel?.GetAttributeModel().RawName };
