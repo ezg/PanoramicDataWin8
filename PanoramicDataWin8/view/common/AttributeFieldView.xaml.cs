@@ -57,11 +57,18 @@ namespace PanoramicDataWin8.view.common
 
         void InputFieldView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (args.NewValue != null && args.NewValue is AttributeTransformationViewModel)
+            if (args.NewValue != null)
             {
-                (args.NewValue as AttributeTransformationViewModel).PropertyChanged += InputFieldView_PropertyChanged;
-                updateRendering();
+                if (args.NewValue is AttributeViewModel)
+                {
+                    (args.NewValue as AttributeViewModel).PropertyChanged += InputFieldView_PropertyChanged;
+                }
+                if (args.NewValue is AttributeTransformationViewModel)
+                {
+                    (args.NewValue as AttributeTransformationViewModel).PropertyChanged += InputFieldView_PropertyChanged;
+                }
             }
+            updateRendering();
         }
 
         void InputFieldView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -71,10 +78,10 @@ namespace PanoramicDataWin8.view.common
 
         void updateRendering()
         {
-            AttributeTransformationViewModel model = DataContext as AttributeTransformationViewModel;
+            var model = DataContext as AttributeViewModel;
             txtBlock.Inlines.Clear();
             Run r = new Run { Text = model.MainLabel };
-            if (model.AttributeTransformationModel.AttributeModel.IsTarget)
+            if (model.AttributeModel.IsTarget)
             {
                 Underline ul = new Underline();
                 ul.Inlines.Add(r);
@@ -112,7 +119,7 @@ namespace PanoramicDataWin8.view.common
 
         void toggleHighlighted(bool isHighlighted)
         {
-            AttributeTransformationViewModel model = DataContext as AttributeTransformationViewModel;
+            AttributeViewModel model = DataContext as AttributeViewModel;
 
             ExponentialEase easingFunction = new ExponentialEase();
             easingFunction.EasingMode = EasingMode.EaseInOut;
@@ -178,8 +185,7 @@ namespace PanoramicDataWin8.view.common
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        (DataContext as AttributeTransformationViewModel).FireMoved(bounds,
-                            new AttributeTransformationModel((DataContext as AttributeTransformationViewModel).AttributeTransformationModel.AttributeModel));
+                        (DataContext as AttributeViewModel).FireMoved(bounds, (DataContext as AttributeViewModel).AttributeModel);
                     }
                 }
 
@@ -204,11 +210,13 @@ namespace PanoramicDataWin8.view.common
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as AttributeTransformationViewModel).FireDropped(bounds,
-                    new AttributeTransformationModel((DataContext as AttributeTransformationViewModel).AttributeTransformationModel.AttributeModel)
-                    {
-                        AggregateFunction = (DataContext as AttributeTransformationViewModel).AttributeTransformationModel.AggregateFunction
-                    });
+                if (DataContext is AttributeTransformationViewModel)
+                    (DataContext as AttributeTransformationViewModel).FireDropped(bounds, // (DataContext as AttributeTransformationViewModel).AttributeTransformationModel
+                        new AttributeTransformationModel((DataContext as AttributeTransformationViewModel).AttributeModel)
+                        {
+                            AggregateFunction = (DataContext as AttributeTransformationViewModel).AttributeTransformationModel.AggregateFunction
+                        });
+                else (DataContext as AttributeViewModel).FireDropped(bounds, (DataContext as AttributeViewModel).AttributeModel);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -220,21 +228,19 @@ namespace PanoramicDataWin8.view.common
         public void createShadow(Point fromInkableScene)
         {
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
-            if (inkableScene != null && DataContext != null && (DataContext as AttributeTransformationViewModel).AttributeTransformationModel != null)
+            if (inkableScene != null && DataContext != null && (DataContext as AttributeViewModel).AttributeModel != null)
             {
                 _currentFromInkableScene = fromInkableScene;
                 _shadow = new AttributeFieldView();
-                _shadow.DataContext = new AttributeTransformationViewModel(null, (DataContext as AttributeTransformationViewModel).AttributeTransformationModel)
-                {
-                    IsNoChrome = false,
-                    IsMenuEnabled = true,
-                    IsShadow = true
-                };
-
+                var shadowAttributeViewModel = (DataContext as AttributeViewModel).Clone();
+                shadowAttributeViewModel.IsNoChrome = false;
+                shadowAttributeViewModel.IsMenuEnabled = true;
+                shadowAttributeViewModel.IsShadow = true;
+                _shadow.DataContext = shadowAttributeViewModel;
                 _shadow.Measure(new Size(double.PositiveInfinity,
                                          double.PositiveInfinity));
 
-                double add = (DataContext as AttributeTransformationViewModel).IsNoChrome ? 30 : 0;
+                double add = (DataContext as AttributeViewModel).IsNoChrome ? 30 : 0;
                 //_shadow.Width = this.ActualWidth + add;
                 //_shadow.Height = _shadow.DesiredSize.Height;
 
@@ -249,8 +255,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow.SendToFront();
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as AttributeTransformationViewModel).FireMoved(bounds,
-                    new AttributeTransformationModel((DataContext as AttributeTransformationViewModel).AttributeTransformationModel.AttributeModel));
+                (DataContext as AttributeViewModel).FireMoved(bounds, (DataContext as AttributeViewModel).AttributeModel);
             }
         }
     }

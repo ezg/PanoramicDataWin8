@@ -204,6 +204,7 @@ namespace PanoramicDataWin8.model.view.operation
                 NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
                 NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
             };
+            attachmentViewModel.MenuViewModel = menuViewModel;
 
             var menuItem = new MenuItemViewModel
             {
@@ -219,11 +220,16 @@ namespace PanoramicDataWin8.model.view.operation
                 IsWidthBoundToParent = isWidthBoundToParent,
                 IsHeightBoundToParent = isHeightBoundToParent
             };
+            menuViewModel.MenuItemViewModels.Add(menuItem);
+
             var attr1 = new AttributeTransformationMenuItemViewModel
             {
                 TextAngle = textAngle,
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"))
             };
+            attr1.TappedTriggered = () => { attachmentViewModel.ActiveStopwatch.Restart(); };
+            menuItem.MenuItemComponentViewModel = attr1;
+
             HistogramOperationModel.GetAttributeUsageTransformationModel(axis).CollectionChanged += (sender, args) =>
             {
                 var coll = sender as ObservableCollection<AttributeTransformationModel>;
@@ -308,9 +314,11 @@ namespace PanoramicDataWin8.model.view.operation
                 }
 
             };
-            attr1.TappedTriggered = () => { attachmentViewModel.ActiveStopwatch.Restart(); };
-            attr1.DroppedTriggered = attributeTransformationModel =>
+            attr1.DroppedTriggered = attributeViewModel =>
             {
+                var attributeTransformationModel = 
+                    (attributeViewModel is AttributeViewModel) ? new AttributeTransformationModel((attributeViewModel as AttributeViewModel).AttributeModel) :
+                    (attributeViewModel as AttributeTransformationViewModel)?.AttributeTransformationModel;
                 if (attributeTransformationModel.AttributeModel.DataType == DataType.Undefined)
                     return;
                 var otherAxis = axis == AttributeUsage.X ? AttributeUsage.Y : AttributeUsage.X;
@@ -344,10 +352,6 @@ namespace PanoramicDataWin8.model.view.operation
 
                 }
             };
-
-            menuItem.MenuItemComponentViewModel = attr1;
-            menuViewModel.MenuItemViewModels.Add(menuItem); 
-            attachmentViewModel.MenuViewModel = menuViewModel;
         }
 
         public HistogramOperationViewModel(HistogramOperationModel histogramOperationModel, AttributeModel attributeModel) : base(histogramOperationModel)

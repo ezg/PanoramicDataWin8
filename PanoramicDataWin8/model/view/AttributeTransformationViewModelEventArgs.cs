@@ -4,15 +4,23 @@ using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
 {
-    public class AttributeTransformationViewModelEventArgs : EventArgs
+    public class AttributeViewModelEventArgs : EventArgs
     {
-        public AttributeTransformationViewModelEventArgs(AttributeTransformationModel attributeTransformationModel, Rct bounds)
+        public AttributeViewModelEventArgs(AttributeModel attributeModel, Rct bounds)
         {
+            AttributeModel = attributeModel;
+            Bounds = bounds;
+        }
+        public AttributeViewModelEventArgs(AttributeTransformationModel attributeTransformationModel, Rct bounds)
+        {
+            AttributeModel = attributeTransformationModel.AttributeModel;
             AttributeTransformationModel = attributeTransformationModel;
             Bounds = bounds;
         }
 
         public Rct Bounds { get; set; }
+        public AttributeModel AttributeModel { get; set; }
+
         public AttributeTransformationModel AttributeTransformationModel { get; set; }
     }
 }

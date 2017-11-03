@@ -25,7 +25,7 @@ namespace PanoramicDataWin8.model.data.operation
         private IResult _result;
 
         private SchemaModel _schemaModel;
-        public ObservableCollection<AttributeTransformationModel> AttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
+        public ObservableCollection<AttributeModel> AttributeUsageModels { get; } = new ObservableCollection<AttributeModel>();
 
 
         public OperationModel(SchemaModel schemaModel)

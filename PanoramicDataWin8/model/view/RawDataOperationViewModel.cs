@@ -25,6 +25,7 @@ namespace PanoramicDataWin8.model.view.operation
                 NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
                 NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
             };
+            attachmentViewModel.MenuViewModel = menuViewModel;
 
             var menuItem = new MenuItemViewModel
             {
@@ -40,7 +41,7 @@ namespace PanoramicDataWin8.model.view.operation
                 IsWidthBoundToParent = isWidthBoundToParent,
                 IsHeightBoundToParent = isHeightBoundToParent
             };
-            var attr1 = new AttributeTransformationMenuItemViewModel
+            var attr1 = new AttributeMenuItemViewModel
             {
                 TextAngle = textAngle,
                 TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"))
@@ -50,100 +51,37 @@ namespace PanoramicDataWin8.model.view.operation
                 var coll = sender as ObservableCollection<AttributeTransformationModel>;
                 var attributeTransformationModel = coll.FirstOrDefault();
                 attr1.Label = attributeTransformationModel == null ? "" : attributeTransformationModel.GetLabel();
-                attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, coll.FirstOrDefault());
 
                 if (attributeTransformationModel != null)
                 {
-                    attributeTransformationModel.PropertyChanged += (sender2, args2) =>
-                    {
-                        attr1.Label = (sender2 as AttributeTransformationModel).GetLabel();
-                    };
-                    attributeTransformationModel.AttributeModel.PropertyChanged += (sender2, arg2) =>
-                    {
-                        attr1.Label = attributeTransformationModel.GetLabel();
-                    };
+                    attr1.AttributeViewModel = new AttributeViewModel(this, coll.FirstOrDefault().AttributeModel);
+                    attributeTransformationModel.PropertyChanged += (sender2, args2) => attr1.Label = (sender2 as AttributeTransformationModel).GetLabel();
+                    attributeTransformationModel.AttributeModel.PropertyChanged += (sender2, arg2) => attr1.Label = attributeTransformationModel.GetLabel();
                 }
+                else
+                    attr1.AttributeViewModel = null;
 
                 // remove old ones first
                 foreach (var mvm in menuViewModel.MenuItemViewModels.Where(mvm => mvm.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel).ToArray())
                     menuViewModel.MenuItemViewModels.Remove(mvm);
-
-                var aom = attr1.AttributeTransformationViewModel.AttributeTransformationModel;
-                var aggregateFunctions = new[] { AggregateFunction.None, AggregateFunction.Count }.ToList();
-                if (aom != null)
-                {
-                    if (aom.AttributeModel.DataType == DataType.Float ||
-                        aom.AttributeModel.DataType == DataType.Double ||
-                        aom.AttributeModel.DataType == DataType.Int)
-                    {
-                        aggregateFunctions.Add(AggregateFunction.Avg);
-                        aggregateFunctions.Add(AggregateFunction.Sum);
-                        if (MainViewController.Instance.MainModel.IsUnknownUnknownEnabled)
-                        {
-                            aggregateFunctions.Add(AggregateFunction.SumE);
-                        }
-                    }
-
-                    var toggles = new List<ToggleMenuItemComponentViewModel>();
-                    var items = new List<MenuItemViewModel>();
-
-                    var count = 0;
-                    foreach (var aggregationFunction in aggregateFunctions)
-                    {
-                        var toggleMenuItem = new MenuItemViewModel
-                        {
-                            MenuViewModel = menuViewModel,
-                            Row = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : count,
-                            RowSpan = 0,
-                            Position = Position,
-                            Column = attachmentOrientation == AttachmentOrientation.Bottom ? count : 0,
-                            Size = new Vec(32, 32),
-                            TargetSize = new Vec(32, 32)
-                        };
-                        //toggleMenuItem.Position = attachmentItemViewModel.Position;
-                        var toggle = new ToggleMenuItemComponentViewModel
-                        {
-                            Label = aggregationFunction.ToString(),
-                            IsChecked = aom.AggregateFunction == aggregationFunction
-                        };
-                        toggles.Add(toggle);
-                        toggleMenuItem.MenuItemComponentViewModel = toggle;
-                        toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender2, args2) =>
-                        {
-                            var model = sender2 as ToggleMenuItemComponentViewModel;
-                            if (args2.PropertyName == model.GetPropertyName(() => model.IsChecked))
-                                if (model.IsChecked)
-                                {
-                                    aom.AggregateFunction = aggregationFunction;
-                                    foreach (var tg in model.OtherToggles)
-                                        tg.IsChecked = false;
-                                }
-                        };
-                        menuViewModel.MenuItemViewModels.Add(toggleMenuItem);
-                        items.Add(toggleMenuItem);
-                        count++;
-                    }
-
-                    foreach (var mi in items)
-                        (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
-                }
-
             };
             attr1.TappedTriggered = () => { attachmentViewModel.ActiveStopwatch.Restart(); };
-            attr1.DroppedTriggered = attributeTransformationModel =>
+            attr1.DroppedTriggered = attributeViewModel =>
             {
-                if (attributeTransformationModel.AttributeModel.DataType == DataType.Undefined)
+                var attributeModel = (attributeViewModel is AttributeViewModel) ? (attributeViewModel as AttributeViewModel).AttributeModel :
+                                     (attributeViewModel as AttributeTransformationViewModel)?.AttributeTransformationModel.AttributeModel;
+                if (attributeModel.DataType == DataType.Undefined)
                     return;
+
                 var existingModel = RawDataOperationModel.GetAttributeUsageTransformationModel(axis).Any() ?
                       RawDataOperationModel.GetAttributeUsageTransformationModel(axis).First() : null;
-
                 if (existingModel != null)
                     RawDataOperationModel.RemoveAttributeUsageTransformationModel(axis, existingModel);
+
+                var attributeTransformationModel = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.None };
                 if (!RawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
                 {
-                    var value = new AttributeTransformationModel(attributeTransformationModel.AttributeModel);
-                    value.AggregateFunction = AggregateFunction.None;
-                    RawDataOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
+                    RawDataOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, attributeTransformationModel);
                 }
                 RawDataOperationModel.AddAttributeUsageTransformationModel(axis, attributeTransformationModel);
                 attachmentViewModel.ActiveStopwatch.Restart();
@@ -151,7 +89,6 @@ namespace PanoramicDataWin8.model.view.operation
 
             menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);
-            attachmentViewModel.MenuViewModel = menuViewModel;
         }
 
         public RawDataOperationViewModel(RawDataOperationModel rawDataOperationModel, AttributeModel attributeModel) : base(rawDataOperationModel)

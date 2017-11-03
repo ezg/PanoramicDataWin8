@@ -16,6 +16,7 @@ namespace PanoramicDataWin8.model.view.operation
               AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
+            OperationViewModelTapped += (args) => attachmentViewModel.ActiveStopwatch.Restart();
 
             var menuViewModel = new MenuViewModel
             {
@@ -23,6 +24,7 @@ namespace PanoramicDataWin8.model.view.operation
                 NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
                 NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
             };
+            attachmentViewModel.MenuViewModel = menuViewModel;
 
             var menuItem = new MenuItemViewModel
             {
@@ -36,25 +38,17 @@ namespace PanoramicDataWin8.model.view.operation
                 TargetSize = size,
                 IsAlwaysDisplayed = false,
                 IsWidthBoundToParent = isWidthBoundToParent,
-                IsHeightBoundToParent = isHeightBoundToParent
+                IsHeightBoundToParent = isHeightBoundToParent,
+                MenuItemComponentViewModel = new AttributeMenuItemViewModel
+                {
+                    TextAngle = textAngle,
+                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                    Label = "Apply",
+                    AttributeViewModel = new AttributeViewModel(this, AttributeGroupOperationModel.AttributeModel),
+                    DisplayOnTap = true
+                }
             };
-            var attr1 = new AttributeTransformationMenuItemViewModel
-            {
-                TextAngle = textAngle,
-                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = "Apply"
-            };
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(AttributeGroupOperationModel.AttributeModel));
-            attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
-            menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);
-            attachmentViewModel.MenuViewModel = menuViewModel;
         }
         public AttributeGroupOperationViewModel(AttributeGroupOperationModel attributeGroupOperationModel) : base(attributeGroupOperationModel)
         {
@@ -65,8 +59,8 @@ namespace PanoramicDataWin8.model.view.operation
             TopInputAdded += (sender) =>
             {
                 var str = "(";
-                foreach (var g in AttributeGroupOperationModel.AttributeUsageTransformationModels)
-                    str += g.AttributeModel.DisplayName + ",";
+                foreach (var g in AttributeGroupOperationModel.AttributeUsageModels)
+                    str += g.DisplayName + ",";
                 str = str.TrimEnd(',') + ")";
                 var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(AttributeGroupOperationModel.AttributeModel.DisplayName, str);
                 AttributeGroupOperationModel.SetName(newName);

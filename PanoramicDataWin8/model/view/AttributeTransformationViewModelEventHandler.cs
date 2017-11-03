@@ -3,11 +3,11 @@ using PanoramicDataWin8.model.data.attribute;
 
 namespace PanoramicDataWin8.model.view
 {
-    public interface AttributeTransformationViewModelEventHandler
+    public interface AttributeViewModelEventHandler
     {
         IGeometry BoundsGeometry { get; }
-        void AttributeTransformationViewModelMoved(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement);
-        void AttributeTransformationViewModelDropped(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement);
-        AttributeTransformationModel CurrentAttributeTransformationModel { get; }
+        void AttributeViewModelMoved(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement);
+        void AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement);
+        AttributeModel CurrentAttributeModel { get; }
     }
 }

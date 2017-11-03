@@ -112,8 +112,8 @@ namespace PanoramicDataWin8.view.vis.menu
         private void checkHits()
         {
             IGeometry mainPageBounds = _model.Bounds.GetPolygon();
-            var hits = new List<AttributeTransformationViewModelEventHandler>();
-            var attTransDescendants = MainViewController.Instance.InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>().ToList();
+            var hits = new List<AttributeViewModelEventHandler>();
+            var attTransDescendants = MainViewController.Instance.InkableScene.GetDescendants().OfType<AttributeViewModelEventHandler>().ToList();
             foreach (var element in attTransDescendants)
             {
                 var geom = element.BoundsGeometry;
@@ -126,7 +126,7 @@ namespace PanoramicDataWin8.view.vis.menu
             var firstHit = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - _model.Bounds.Center.GetVec()).LengthSquared).FirstOrDefault();
             if (firstHit != null)
             {
-                var attribute = firstHit.CurrentAttributeTransformationModel.AttributeModel;
+                var attribute = firstHit.CurrentAttributeModel;
                 if (_current != attribute)
                 {
                     _stopwatch = new Stopwatch();

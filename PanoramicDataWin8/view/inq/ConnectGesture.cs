@@ -111,23 +111,20 @@ namespace PanoramicDataWin8.view.inq
                         if (attachmentViewModel.MenuViewModel != null)
                             foreach (var menuItemViewModel in attachmentViewModel.MenuViewModel.MenuItemViewModels)
                             {
-                                if (menuItemViewModel.MenuItemComponentViewModel is AttributeTransformationMenuItemViewModel &&
+                                if (menuItemViewModel.MenuItemComponentViewModel is AttributeMenuItemViewModel &&
                                     new Rct(menuItemViewModel.Position, menuItemViewModel.Size).Contains(inkStroke.Points[0]))
                                 {
-                                    var attr = (menuItemViewModel.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).AttributeTransformationViewModel.AttributeTransformationModel;
-                                    var name = attr.AttributeModel.RawName;
-                                    var filterOperationViewModel = AddFilterModel(name, Predicate.GREATER_THAN, 0, inkStroke.Points.Last(), controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse);
-                                    var width = OperationViewModel.WIDTH;
-                                    var height = controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse ? 50 : OperationViewModel.HEIGHT;
-                                    var size = new Vec(width, height);
+                                    var attr = (menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel).AttributeViewModel.AttributeModel;
+                                    var filterOperationViewModel = AddFilterModel(attr.RawName, Predicate.GREATER_THAN, 0, inkStroke.Points.Last(), controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse);
+                                    var size = new Vec(OperationViewModel.WIDTH, MainViewController.Instance.MainPage.LastTouchWasMouse ? 50 : OperationViewModel.HEIGHT);
                                     var operationContainerView = new OperationContainerView();
                                     filterOperationViewModel.Size = size;
                                     operationContainerView.DataContext = filterOperationViewModel;
-                                    controller.view.MainViewController.Instance.InkableScene.Add(operationContainerView);
-                                    if (FilterRenderer.FieldType((menuItemViewModel.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.RawName) == 
-                                        DataType.String)
-                                        (operationContainerView.Renderer as FilterRenderer).SetFilter(name, Predicate.LESS_THAN, "a");
-                                    else (operationContainerView.Renderer as FilterRenderer).SetFilter(name, Predicate.LESS_THAN, 0);
+                                    MainViewController.Instance.InkableScene.Add(operationContainerView);
+                                    if (FilterRenderer.FieldType(attr.RawName) ==   DataType.String)
+                                        (operationContainerView.Renderer as FilterRenderer).SetFilter(attr.RawName, Predicate.LESS_THAN, "a");
+                                    else
+                                        (operationContainerView.Renderer as FilterRenderer).SetFilter(attr.RawName, Predicate.LESS_THAN, 0);
                                     FilterLinkViewController.Instance.CreateFilterLinkViewModel(filterOperationViewModel.OperationModel,
                                         (OperationModel)operationViewModel.OperationModel);
 

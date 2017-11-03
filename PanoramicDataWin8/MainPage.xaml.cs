@@ -790,23 +790,22 @@ namespace PanoramicDataWin8
             var attributeModel = inputModel as AttributeModel;
             var taskGroupModel = inputModel as OperationTypeGroupModel;
             var operationModel = inputModel as OperationTypeModel;
-            var inputGroupModel = attributeModel?.FuncModel as AttributeModel.AttributeFuncModel.AttributeGroupFuncModel;
-            if (inputGroupModel != null)
+            var attributeGroupModel = attributeModel?.FuncModel as AttributeModel.AttributeFuncModel.AttributeGroupFuncModel;
+            if (attributeGroupModel != null)
             {
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new InputGroupViewTileMenuContentViewModel
                 {
                     Name = attributeModel.DisplayName,
-                    InputGroupViewModel = new InputGroupViewModel(null, attributeModel)
+                    InputGroupViewModel = new AttributeGroupViewModel(null, attributeModel)
                 };
-                BuildTileSubmenu(currentTileMenuItemViewModel, inputGroupModel.InputModels.Select((im) => (object)im).ToList());
+                BuildTileSubmenu(currentTileMenuItemViewModel, attributeGroupModel.InputModels.Select((im) => (object)im).ToList());
             }
             else if (attributeModel != null)
             {
                 currentTileMenuItemViewModel.TileMenuContentViewModel = new InputFieldViewTileMenuContentViewModel
                 {
                     Name = attributeModel.DisplayName,
-                    AttributeTransformationViewModel = new AttributeTransformationViewModel(null,
-                                                                new AttributeTransformationModel(inputModel as AttributeModel))
+                    AttributeViewModel = new AttributeViewModel(null,inputModel as AttributeModel)
                 };
             }
             else if (taskGroupModel != null)

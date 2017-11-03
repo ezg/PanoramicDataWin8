@@ -103,7 +103,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                         else if (operationModel is PredictorOperationModel)
                         {
                             var predictorOperationModel = (PredictorOperationModel)operationModel;
-                            if (predictorOperationModel.TargetAttributeUsageTransformationModel != null)
+                            if (predictorOperationModel.TargetAttributeUsageModel != null)
                             {
                                 newJob = new RecommenderOperationJob(
                                     predictorOperationModel,

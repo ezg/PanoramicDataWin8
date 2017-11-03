@@ -13,15 +13,13 @@ using Windows.UI.Xaml.Media;
 
 namespace PanoramicDataWin8.model.view
 {
-    public class AttributeTransformationViewModel : MenuItemViewModel
+    public class AttributeViewModel : MenuItemViewModel
     {
         private AttachmentOrientation _attachmentOrientation;
 
-        private AttributeTransformationModel _attributeTransformationModel;
+        private AttributeModel _attributeModel;
 
         private Thickness _borderThicknes;
-
-        private bool _hideAggregationFunction;
 
         private bool _isFiltered;
 
@@ -36,7 +34,7 @@ namespace PanoramicDataWin8.model.view
         private bool _isRemoveEnabled;
 
         private bool _isScaleFunctionEnabled = true;
-        
+
         private bool _isShadow;
 
         private string _mainLabel;
@@ -47,17 +45,21 @@ namespace PanoramicDataWin8.model.view
 
         private string _sublabel;
 
-
         private double _textAngle;
 
-        public AttributeTransformationViewModel()
+        public AttributeViewModel()
         {
         }
 
-        public AttributeTransformationViewModel(OperationViewModel operationViewModel, AttributeTransformationModel attributeTransformationModel)
+        public AttributeViewModel(OperationViewModel operationViewModel, AttributeModel attributeModel)
         {
             OperationViewModel = operationViewModel;
-            AttributeTransformationModel = attributeTransformationModel;
+            AttributeModel = attributeModel;
+        }
+
+        public virtual AttributeViewModel Clone()
+        {
+            return new AttributeViewModel(OperationViewModel, AttributeModel);
         }
 
         public AttachmentOrientation AttachmentOrientation
@@ -76,16 +78,6 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _textAngle, value); }
         }
 
-        public bool HideAggregationFunction
-        {
-            get { return _hideAggregationFunction; }
-            set
-            {
-                SetProperty(ref _hideAggregationFunction, value);
-                updateLabels();
-            }
-        }
-
         public bool IsShadow
         {
             get { return _isShadow; }
@@ -97,7 +89,7 @@ namespace PanoramicDataWin8.model.view
             get { return _borderThicknes; }
             set { SetProperty(ref _borderThicknes, value); }
         }
-        
+
         public bool IsNoChrome
         {
             get { return _isNoChrome; }
@@ -164,85 +156,110 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _operationViewModel, value); }
         }
 
+        public AttributeModel AttributeModel
+        {
+            get { return _attributeModel; }
+            set
+            {
+                if (_attributeModel != null)
+                    _attributeModel.PropertyChanged -= (sender, e) => updateLabels();
+                SetProperty(ref _attributeModel, value);
+                if (_attributeModel != null)
+                {
+                    _attributeModel.PropertyChanged += (sender, e) => updateLabels();
+                    updateLabels();
+                }
+            }
+        }
+
+        public static event EventHandler<AttributeViewModelEventArgs> AttributeViewModelMoved;
+        public static event EventHandler<AttributeViewModelEventArgs> AttributeViewModelDropped;
+
+        public void FireMoved(Rct bounds, AttributeModel attributeModel)
+        {
+            AttributeViewModelMoved?.Invoke(this, new AttributeViewModelEventArgs(attributeModel, bounds));
+        }
+
+        public void FireDropped(Rct bounds, AttributeModel attributeModel)
+        {
+            AttributeViewModelDropped?.Invoke(this, new AttributeViewModelEventArgs(attributeModel, bounds));
+        }
+        public void FireMoved(Rct bounds, AttributeTransformationModel attributeModel)
+        {
+            AttributeViewModelMoved?.Invoke(this, new AttributeViewModelEventArgs(attributeModel, bounds));
+        }
+
+        public void FireDropped(Rct bounds, AttributeTransformationModel attributeModel)
+        {
+            AttributeViewModelDropped?.Invoke(this, new AttributeViewModelEventArgs(attributeModel, bounds));
+        }
+
+        protected virtual void updateLabels()
+        {
+            if (_attributeModel != null)
+            {
+                MainLabel = _attributeModel.DisplayName; 
+
+            }
+        }
+    }
+    public class AttributeTransformationViewModel : AttributeViewModel
+    {
+        private AttributeTransformationModel _attributeTransformationModel;
+        public AttributeTransformationViewModel(OperationViewModel operationViewModel, AttributeTransformationModel attributeTransformationModel)
+            : base(operationViewModel, attributeTransformationModel?.AttributeModel)
+        {
+            AttributeTransformationModel = attributeTransformationModel;
+        }
         public AttributeTransformationModel AttributeTransformationModel
         {
             get { return _attributeTransformationModel; }
             set
             {
                 if (_attributeTransformationModel != null)
-                    _attributeTransformationModel.PropertyChanged -= AttributeTransformationModelPropertyChanged;
+                    _attributeTransformationModel.PropertyChanged -= (sender, e) => updateLabels();
                 SetProperty(ref _attributeTransformationModel, value);
                 if (_attributeTransformationModel != null)
                 {
-                    _attributeTransformationModel.PropertyChanged += AttributeTransformationModelPropertyChanged;
+                    _attributeTransformationModel.PropertyChanged += (sender, e) => updateLabels();
                     updateLabels();
                 }
             }
         }
 
-        public static event EventHandler<AttributeTransformationViewModelEventArgs> AttributeTransformationViewModelMoved;
-        public static event EventHandler<AttributeTransformationViewModelEventArgs> AttributeTransformationViewModelDropped;
-
-        public void FireMoved(Rct bounds, AttributeTransformationModel attributeTransformationModel)
+        protected override void updateLabels()
         {
-            AttributeTransformationViewModelMoved?.Invoke(this, new AttributeTransformationViewModelEventArgs(attributeTransformationModel, bounds));
-        }
-
-        public void FireDropped(Rct bounds, AttributeTransformationModel attributeTransformationModel)
-        {
-            AttributeTransformationViewModelDropped?.Invoke(this, new AttributeTransformationViewModelEventArgs(attributeTransformationModel, bounds));
-        }
-
-        private void AttributeTransformationModelPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            updateLabels();
-        }
-
-        private void updateLabels()
-        {
-            if (_attributeTransformationModel != null)
+            base.updateLabels();
+            if (AttributeTransformationModel != null)
             {
-                MainLabel = _attributeTransformationModel.AttributeModel.DisplayName; //columnDescriptor.GetLabels(out mainLabel, out subLabel);
-
-                var mainLabel = _attributeTransformationModel.AttributeModel.DisplayName;
-                var subLabel = "";
-
-                if (!HideAggregationFunction)
-                {
-                    mainLabel = addDetailToLabel(mainLabel);
-                    MainLabel = mainLabel?.Replace("_", " ");
-                }
-                SubLabel = subLabel;
+                MainLabel = AttributeTransformationModel.GetLabel();
             }
         }
 
-        private string addDetailToLabel(string name)
-        {
-            if (AttributeTransformationModel.AggregateFunction == AggregateFunction.Avg)
-                name = "avg(" + name + ")";
-            else if (AttributeTransformationModel.AggregateFunction == AggregateFunction.Count)
-                name = "count";
-            else if (AttributeTransformationModel.AggregateFunction == AggregateFunction.Max)
-                name = "max(" + name + ")";
-            else if (AttributeTransformationModel.AggregateFunction == AggregateFunction.Min)
-                name = "min(" + name + ")";
-            else if (AttributeTransformationModel.AggregateFunction == AggregateFunction.Sum)
-                name = "sum(" + name + ")";
-            /*else if (AttributeTransformationViewModel.AggregateFunction == AggregateFunction.Bin)
-            {
-                name = "Bin Range(" + name + ")";
-            }*/
 
-            if (AttributeTransformationModel.ScaleFunction != ScaleFunction.None)
-                if (AttributeTransformationModel.ScaleFunction == ScaleFunction.Log)
-                    name += " [Log]";
-                else if (AttributeTransformationModel.ScaleFunction == ScaleFunction.Normalize)
-                    name += " [Normalize]";
-                else if (AttributeTransformationModel.ScaleFunction == ScaleFunction.RunningTotal)
-                    name += " [RT]";
-                else if (AttributeTransformationModel.ScaleFunction == ScaleFunction.RunningTotalNormalized)
-                    name += " [RT Norm]";
-            return name;
+        public override AttributeViewModel Clone()
+        {
+            return new AttributeTransformationViewModel(OperationViewModel, AttributeTransformationModel);
+        }
+    }
+    public class AttributeGroupViewModel : AttributeViewModel
+    {
+        public AttributeGroupViewModel()
+        {
+        }
+
+        public AttributeGroupViewModel(OperationViewModel operationViewModel, AttributeModel attributeGroupModel) :
+            base(operationViewModel, attributeGroupModel)
+        {
+        }
+
+        public override Brush HighlightBrush => Application.Current.Resources.MergedDictionaries[0]["darkBrush"] as SolidColorBrush;
+
+        public override Brush NormalBrush => Application.Current.Resources.MergedDictionaries[0]["darkBrush"] as SolidColorBrush;
+
+        public override AttributeViewModel Clone()
+        {
+            return new AttributeGroupViewModel(OperationViewModel, AttributeModel);
         }
     }
 }

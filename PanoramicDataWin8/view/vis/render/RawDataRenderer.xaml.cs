@@ -292,7 +292,7 @@ namespace PanoramicDataWin8.view.vis.render
             Records.Clear();
             xWordCloud.TheText = "";
             model.RawDataOperationModel.ClearFilterModels();
-            if ((result as RawDataResult).WeightedWords.Count > 0)
+            if ((result as RawDataResult).WeightedWords?.Count > 0)
             {
                 xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords;
                 xWordCloud.Visibility = Visibility.Visible;

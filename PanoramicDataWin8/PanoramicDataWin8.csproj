@@ -308,6 +308,9 @@
     </Compile>
     <Compile Include="view\style\TwoFingerScrollBehavior.cs" />
     <Compile Include="view\vis\HypothesesView.cs" />
+    <Compile Include="view\vis\menu\AttributeMenuItemView.xaml.cs">
+      <DependentUpon>AttributeMenuItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\menu\IncludeExcludeMenuItemView.xaml.cs">
       <DependentUpon>IncludeExcludeMenuItemView.xaml</DependentUpon>
     </Compile>
@@ -334,9 +337,6 @@
     </Compile>
     <Compile Include="view\vis\menu\SliderMenuItemView.xaml.cs">
       <DependentUpon>SliderMenuItemView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="view\vis\menu\AttributeTransformationMenuItemView.xaml.cs">
-      <DependentUpon>AttributeTransformationMenuItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\menu\CreateLinkMenuItemView.xaml.cs">
       <DependentUpon>CreateLinkMenuItemView.xaml</DependentUpon>
@@ -535,6 +535,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="view\vis\menu\AttributeMenuItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="view\vis\menu\IncludeExcludeMenuItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -564,10 +568,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\vis\menu\SliderMenuItemView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="view\vis\menu\AttributeTransformationMenuItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

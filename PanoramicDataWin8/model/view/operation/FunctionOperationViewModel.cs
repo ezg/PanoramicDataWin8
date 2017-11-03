@@ -70,6 +70,7 @@ namespace PanoramicDataWin8.model.view.operation
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
+            OperationViewModelTapped += (args) => attachmentViewModel.ActiveStopwatch.Restart();
 
             var menuViewModel = new MenuViewModel
             {
@@ -77,6 +78,7 @@ namespace PanoramicDataWin8.model.view.operation
                 NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
                 NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
             };
+            attachmentViewModel.MenuViewModel = menuViewModel;
 
             var menuItem = new MenuItemViewModel
             {
@@ -90,25 +92,17 @@ namespace PanoramicDataWin8.model.view.operation
                 TargetSize = size,
                 IsAlwaysDisplayed = false,
                 IsWidthBoundToParent = isWidthBoundToParent,
-                IsHeightBoundToParent = isHeightBoundToParent
+                IsHeightBoundToParent = isHeightBoundToParent,
+                MenuItemComponentViewModel = new AttributeMenuItemViewModel
+                {
+                    TextAngle = textAngle,
+                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                    Label = "Apply",
+                    DisplayOnTap = true,
+                    AttributeViewModel = new AttributeViewModel(this, FunctionOperationModel.GetAttributeModel())
+                }
             };
-            var attr1 = new AttributeTransformationMenuItemViewModel
-            {
-                TextAngle = textAngle,
-                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = "Apply"
-            };
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(FunctionOperationModel.GetAttributeModel()));
-            attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
-            menuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(menuItem);
-            attachmentViewModel.MenuViewModel = menuViewModel;
         }
 
         public FunctionOperationViewModel(FunctionOperationModel functionOperationModel, bool fromMouse = false) : base(functionOperationModel)

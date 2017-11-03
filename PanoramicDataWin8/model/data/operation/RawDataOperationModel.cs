@@ -19,11 +19,11 @@ namespace PanoramicDataWin8.model.data.operation
     {
         public RawDataOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
-            ColumnHeaderAttributeUsageTransformationModels.CollectionChanged += columnHeaderAttributeUsageTransformationModels_CollectionChanged;
+            ColumnHeaderAttributeUsageModels.CollectionChanged += columnHeaderAttributeUsageModels_CollectionChanged;
         }
-        public ObservableCollection<AttributeTransformationModel> ColumnHeaderAttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
+        public ObservableCollection<AttributeModel> ColumnHeaderAttributeUsageModels { get; } = new ObservableCollection<AttributeModel>();
         
-        private void columnHeaderAttributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void columnHeaderAttributeUsageModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }

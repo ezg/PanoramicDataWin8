@@ -90,7 +90,7 @@ namespace PanoramicDataWin8.view.vis.render
                 else
                 {
                     PredictorOperationModel operationModel = (PredictorOperationModel)((OperationViewModel)DataContext).OperationModel;
-                    if (!operationModel.AttributeUsageTransformationModels.Any())
+                    if (!operationModel.AttributeUsageModels.Any())
                     {
                         viewBox.Visibility = Visibility.Visible;
                     }

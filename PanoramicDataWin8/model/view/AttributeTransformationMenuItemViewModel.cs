@@ -2,12 +2,13 @@
 using Windows.UI;
 using Windows.UI.Xaml.Media;
 using PanoramicDataWin8.model.data.attribute;
+using Windows.UI.Xaml;
 
 namespace PanoramicDataWin8.model.view
 {
-    public class AttributeTransformationMenuItemViewModel : MenuItemComponentViewModel
+    public class AttributeMenuItemViewModel : MenuItemComponentViewModel
     {
-        private AttributeTransformationViewModel _attributeTransformationViewModel;
+        private AttributeViewModel _attributeViewModel;
 
         private bool _canDrag = true;
 
@@ -15,12 +16,14 @@ namespace PanoramicDataWin8.model.view
 
         private string _label = "";
 
+        private bool _displayOnTap;
+
         private Windows.UI.Xaml.Visibility _editing = Windows.UI.Xaml.Visibility.Collapsed;
 
         private double _textAngle;
 
         private Brush _textBrush = new SolidColorBrush(Colors.Black);
-        public Action<AttributeTransformationModel> DroppedTriggered { get; set; }
+        public Action<AttributeViewModel> DroppedTriggered { get; set; }
         public Action TappedTriggered { get; set; }
 
         public bool CanDrag
@@ -52,16 +55,38 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _editing, value); }
         }
 
-        public AttributeTransformationViewModel AttributeTransformationViewModel
+        public AttributeViewModel AttributeViewModel
         {
-            get { return _attributeTransformationViewModel; }
-            set { SetProperty(ref _attributeTransformationViewModel, value); }
+            get { return _attributeViewModel; }
+            set { SetProperty(ref _attributeViewModel, value); }
         }
 
         public double TextAngle
         {
             get { return _textAngle; }
             set { SetProperty(ref _textAngle, value); }
+        }
+        public bool DisplayOnTap 
+        {
+            get { return _displayOnTap; }
+            set {
+                TappedTriggered -= (() => Editing = Visibility.Visible);
+                SetProperty(ref _displayOnTap, value);
+                if (value)
+                    TappedTriggered += (() => Editing = Visibility.Visible);
+            }
+        }
+    }
+    public class AttributeTransformationMenuItemViewModel : AttributeMenuItemViewModel
+    {
+        private AttributeTransformationViewModel _attributeTransformationViewModel;
+        
+        public AttributeTransformationViewModel AttributeTransformationViewModel
+        {
+            get { return _attributeTransformationViewModel; }
+            set { SetProperty(ref _attributeTransformationViewModel, value);
+                AttributeViewModel = value == null ? null : new AttributeViewModel(value.OperationViewModel, value.AttributeModel);
+            }
         }
     }
 }

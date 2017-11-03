@@ -143,7 +143,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
                 Filter = filter,
-                AttributeParameters = GetAttributeParameters(model.AttributeUsageTransformationModels.Select(atm => atm.AttributeModel)),
+                AttributeParameters = GetAttributeParameters(model.AttributeUsageModels),
                 DummyValue = model.DummyValue,
                 ExampleType = model.ExampleOperationType.ToString(),
                 SampleStreamBlockSize = sampleSize
@@ -207,10 +207,10 @@ namespace PanoramicDataWin8.controller.data.progressive
 
             var psm = model.SchemaModel as IDEASchemaModel;
 
-            var includes = model.AttributeUsageTransformationModels.Select(a => GetAttributeParameters(a.AttributeModel)).ToList();
-            var excludes = model.IgnoredAttributeUsageTransformationModels.Select(a => GetAttributeParameters(a.AttributeModel)).ToList();
+            var includes = model.AttributeUsageModels.Select(a => GetAttributeParameters(a)).ToList();
+            var excludes = model.IgnoredAttributeUsageModels.Select(a => GetAttributeParameters(a)).ToList();
             var all = psm.RootOriginModel.InputModels
-                .Where(im => im != model.TargetAttributeUsageTransformationModel.AttributeModel)
+                .Where(im => im != model.TargetAttributeUsageModel)
                 .Select(im => GetAttributeParameters(im)).ToList();
             var used = all;
             if (excludes.Any())
@@ -230,7 +230,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             {
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
                 Filter = filter,
-                LabelAttribute = GetAttributeParameters(model.TargetAttributeUsageTransformationModel.AttributeModel),
+                LabelAttribute = GetAttributeParameters(model.TargetAttributeUsageModel),
                 ProblemType = ProblemType.Undefined,
                 SampleStreamBlockSize = sampleSize,
                 FeatureAttributes = used,

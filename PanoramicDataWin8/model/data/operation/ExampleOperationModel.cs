@@ -15,7 +15,7 @@ namespace PanoramicDataWin8.model.data.operation
         public ExampleOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
-            AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
+            AttributeUsageModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
         
         public double DummyValue

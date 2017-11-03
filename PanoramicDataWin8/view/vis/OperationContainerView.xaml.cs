@@ -34,7 +34,7 @@ using PanoramicDataWin8.view.style;
 
 namespace PanoramicDataWin8.view.vis
 {
-    public sealed partial class OperationContainerView : UserControl, IScribbable, AttributeTransformationViewModelEventHandler, IOneFingerListener
+    public sealed partial class OperationContainerView : UserControl, IScribbable, AttributeViewModelEventHandler, IOneFingerListener
     {
         private Point _previousPoint = new Point();
         private Point _initialPoint = new Point();
@@ -474,31 +474,31 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
-        public void AttributeTransformationViewModelMoved(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement)
+        public void AttributeViewModelMoved(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
         {
-            AttributeTransformationViewModelEventHandler inputModelEventHandler = _renderer as AttributeTransformationViewModelEventHandler;
+            AttributeViewModelEventHandler inputModelEventHandler = _renderer as AttributeViewModelEventHandler;
             if (inputModelEventHandler != null)
             {
-                inputModelEventHandler.AttributeTransformationViewModelMoved(sender, e, overElement);
+                inputModelEventHandler.AttributeViewModelMoved(sender, e, overElement);
             }
         }
 
-        public void AttributeTransformationViewModelDropped(AttributeTransformationViewModel sender, AttributeTransformationViewModelEventArgs e, bool overElement)
+        public void AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
         {
-            AttributeTransformationViewModelEventHandler inputModelEventHandler = _renderer as AttributeTransformationViewModelEventHandler;
+            AttributeViewModelEventHandler inputModelEventHandler = _renderer as AttributeViewModelEventHandler;
             if (inputModelEventHandler != null)
             {
-                inputModelEventHandler.AttributeTransformationViewModelDropped(sender, e, overElement);
+                inputModelEventHandler.AttributeViewModelDropped(sender, e, overElement);
             }
         }
 
-        public AttributeTransformationModel CurrentAttributeTransformationModel { get { return null; } }
+        public AttributeModel CurrentAttributeModel { get { return null; } }
 
         public GeoAPI.Geometries.IGeometry BoundsGeometry
         {
             get
             {
-                AttributeTransformationViewModelEventHandler inputModelEventHandler = _renderer as AttributeTransformationViewModelEventHandler;
+                AttributeViewModelEventHandler inputModelEventHandler = _renderer as AttributeViewModelEventHandler;
                 if (inputModelEventHandler != null)
                 {
                     return inputModelEventHandler.BoundsGeometry;
