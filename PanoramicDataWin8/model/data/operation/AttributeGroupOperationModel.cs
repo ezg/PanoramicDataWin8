@@ -9,7 +9,7 @@ using IDEA_common.catalog;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public class AttributeGroupOperationModel : AttributeUsageOperationModel, IFilterConsumerOperationModel
+    public class AttributeGroupOperationModel : OperationModel, IFilterConsumerOperationModel
     {
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 

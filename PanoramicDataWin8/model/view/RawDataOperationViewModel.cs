@@ -12,7 +12,7 @@ using IDEA_common.aggregates;
 
 namespace PanoramicDataWin8.model.view.operation
 {
-    public class RawDataOperationViewModel : OperationViewModel
+    public class RawDataOperationViewModel : AttributeUsageOperationViewModel
     {
         private void createAxisMenu(AttachmentOrientation attachmentOrientation,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
@@ -161,6 +161,7 @@ namespace PanoramicDataWin8.model.view.operation
             // axis attachment view models
             createAxisMenu(AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
             createTopRightFilterDragMenu();
+            createTopInputsExpandingMenu(8);
 
             if (attributeModel?.InputVisualizationType == InputVisualizationTypeConstants.ENUM ||
                 attributeModel?.InputVisualizationType == InputVisualizationTypeConstants.CATEGORY ||

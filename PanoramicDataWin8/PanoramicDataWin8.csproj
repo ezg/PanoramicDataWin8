@@ -237,9 +237,6 @@
     <Compile Include="model\view\ToggleMenuItemComponentViewModel.cs" />
     <Compile Include="utils\ClipToBounds.cs" />
     <Compile Include="utils\ObservableDictionary.cs" />
-    <Compile Include="view\common\AttributeGroupView.xaml.cs">
-      <DependentUpon>AttributeGroupView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="view\common\BudgetView.xaml.cs">
       <DependentUpon>BudgetView.xaml</DependentUpon>
     </Compile>
@@ -486,10 +483,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Page Include="MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="view\common\AttributeGroupView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

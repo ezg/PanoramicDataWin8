@@ -43,7 +43,7 @@ namespace PanoramicDataWin8.view.common
 
         private PointerManager _mainPointerManager = new PointerManager();
         private Point _mainPointerManagerPreviousPoint = new Point();
-
+    
         public AttributeFieldView()
         {
             this.InitializeComponent();
@@ -107,10 +107,13 @@ namespace PanoramicDataWin8.view.common
             }
 
             toggleHighlighted(model.IsHighlighted);
+
         }
 
         void toggleHighlighted(bool isHighlighted)
         {
+            AttributeTransformationViewModel model = DataContext as AttributeTransformationViewModel;
+
             ExponentialEase easingFunction = new ExponentialEase();
             easingFunction.EasingMode = EasingMode.EaseInOut;
 
@@ -122,12 +125,12 @@ namespace PanoramicDataWin8.view.common
             if (isHighlighted)
             {
                 backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush).Color;
-                txtBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush);
+                txtBlock.Foreground = model.HighlightBrush;
             }
             else
             {
                 backgroundAnimation.To = (Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush).Color;
-                txtBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush);
+                txtBlock.Foreground = model.NormalBrush;
             }
             Storyboard storyboard = new Storyboard();
             storyboard.Children.Add(backgroundAnimation);
@@ -140,11 +143,6 @@ namespace PanoramicDataWin8.view.common
 
         private void mainPointerManager_Added(object sender, PointerManagerEvent e)
         {
-            if (!(DataContext as AttributeTransformationViewModel).IsDraggable)
-            {
-                return;
-            }
-
             if (e.NumActiveContacts == 1)
             {
                 GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
@@ -155,10 +153,6 @@ namespace PanoramicDataWin8.view.common
 
         void mainPointerManager_Moved(object sender, PointerManagerEvent e)
         {
-            if (!(DataContext as AttributeTransformationViewModel).IsDraggable)
-            {
-                return;
-            }
             if (e.NumActiveContacts == 1)
             {
                 GeneralTransform gt = this.TransformToVisual(MainViewController.Instance.InkableScene);
@@ -195,10 +189,6 @@ namespace PanoramicDataWin8.view.common
 
         void mainPointerManager_Removed(object sender, PointerManagerEvent e)
         {
-            if (!(DataContext as AttributeTransformationViewModel).IsDraggable)
-            {
-                return;
-            }
             if (_shadow == null &&
                 _manipulationStartTime + TimeSpan.FromSeconds(0.5).Ticks > DateTime.Now.Ticks)
             {

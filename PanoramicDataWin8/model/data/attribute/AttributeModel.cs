@@ -98,6 +98,14 @@ namespace PanoramicDataWin8.model.data.attribute
 
         public class AttributeFuncModel : BindableBase
         {
+            public enum AttributeModelType {
+                Group,
+                Column,
+                Code,
+                Backend
+            };
+
+            public virtual AttributeModelType ModelType { get; }
             public class AttributeCodeFuncModel : AttributeFuncModel
             {
                 string _code;
@@ -105,6 +113,7 @@ namespace PanoramicDataWin8.model.data.attribute
                 {
                     _code = code;
                 }
+                public override AttributeModelType ModelType => AttributeModelType.Code;
                 public List<string> Terms { get { return TransformCode(Code).Item2;  }  }
                 public string RefactorVariable(string oldName, string newName)
                 {
@@ -201,6 +210,7 @@ namespace PanoramicDataWin8.model.data.attribute
             public class AttributeBackendFuncModel : AttributeFuncModel
             {
                 string _id;
+                public override AttributeModelType ModelType => AttributeModelType.Backend;
                 public AttributeBackendFuncModel(string id)
                 {
                     _id = id;
@@ -209,11 +219,12 @@ namespace PanoramicDataWin8.model.data.attribute
             }
             public class AttributeColumnFuncModel : AttributeFuncModel
             {
+                public override AttributeModelType ModelType => AttributeModelType.Column;
             }
-
             public class AttributeGroupFuncModel : AttributeFuncModel
             {
                 private List<AttributeModel> _inputModels = new List<AttributeModel>();
+                public override AttributeModelType ModelType => AttributeModelType.Group;
                 public List<AttributeModel> InputModels
                 {
                     get { return _inputModels; }

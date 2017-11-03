@@ -9,10 +9,11 @@ using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
+using Windows.UI.Xaml.Media;
 
 namespace PanoramicDataWin8.model.view
 {
-    public class AttributeTransformationViewModel : ExtendedBindableBase
+    public class AttributeTransformationViewModel : MenuItemViewModel
     {
         private AttachmentOrientation _attachmentOrientation;
 
@@ -21,10 +22,6 @@ namespace PanoramicDataWin8.model.view
         private Thickness _borderThicknes;
 
         private bool _hideAggregationFunction;
-
-        private bool _isDraggable = true;
-
-        private bool _isDraggableByPen;
 
         private bool _isFiltered;
 
@@ -39,8 +36,7 @@ namespace PanoramicDataWin8.model.view
         private bool _isRemoveEnabled;
 
         private bool _isScaleFunctionEnabled = true;
-
-
+        
         private bool _isShadow;
 
         private string _mainLabel;
@@ -70,6 +66,10 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _attachmentOrientation, value); }
         }
 
+        public virtual Brush HighlightBrush => Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush;
+
+        public virtual Brush NormalBrush => Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush;
+
         public double TextAngle
         {
             get { return _textAngle; }
@@ -97,19 +97,7 @@ namespace PanoramicDataWin8.model.view
             get { return _borderThicknes; }
             set { SetProperty(ref _borderThicknes, value); }
         }
-
-        public bool IsDraggable
-        {
-            get { return _isDraggable; }
-            set { SetProperty(ref _isDraggable, value); }
-        }
-
-        public bool IsDraggableByPen
-        {
-            get { return _isDraggableByPen; }
-            set { SetProperty(ref _isDraggableByPen, value); }
-        }
-
+        
         public bool IsNoChrome
         {
             get { return _isNoChrome; }
@@ -223,10 +211,6 @@ namespace PanoramicDataWin8.model.view
                 {
                     mainLabel = addDetailToLabel(mainLabel);
                     MainLabel = mainLabel?.Replace("_", " ");
-                }
-                else
-                {
-                    mainLabel = mainLabel;
                 }
                 SubLabel = subLabel;
             }

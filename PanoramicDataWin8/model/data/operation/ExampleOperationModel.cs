@@ -4,7 +4,7 @@ using PanoramicDataWin8.model.data.attribute;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public class ExampleOperationModel : AttributeUsageOperationModel, IFilterConsumerOperationModel
+    public class ExampleOperationModel : OperationModel, IFilterConsumerOperationModel
     {
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
