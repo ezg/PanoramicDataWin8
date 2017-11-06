@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Windows.UI.Xaml.Media;
 using IDEA_common.aggregates;
+using System.ComponentModel;
 
 namespace PanoramicDataWin8.model.view.operation
 {
@@ -26,7 +27,7 @@ namespace PanoramicDataWin8.model.view.operation
                 NrColumns = 2,
                 NrRows = 2
             };
-            
+
             HistogramOperationModel.PropertyChanged += (sender, args) =>
             {
                 var model = HistogramOperationModel;
@@ -34,7 +35,7 @@ namespace PanoramicDataWin8.model.view.operation
                 {
                     if (model.StatisticalComparisonOperationModel == null)
                     {
-                        foreach (var mvm in menuViewModel.MenuItemViewModels.ToArray())
+                        foreach (var mvm in menuViewModel.MenuItemViewModels)
                         {
                             menuViewModel.MenuItemViewModels.Remove(mvm);
                         }
@@ -45,76 +46,69 @@ namespace PanoramicDataWin8.model.view.operation
                         {
                             MenuViewModel = menuViewModel,
                             Row = 0,
-                            ColumnSpan = 1,
                             RowSpan = 2,
                             Column = 0,
+                            ColumnSpan = 1,
                             Size = new Vec(54, 54),
                             Position = Position,
                             TargetSize = new Vec(54, 54),
-                            IsAlwaysDisplayed = true
-                        };
-                        var attr1 = new StatisticalComparisonMenuItemViewModel
-                        {
-                            StatisticalComparisonOperationModel = model.StatisticalComparisonOperationModel
+                            IsAlwaysDisplayed = true,
+                            MenuItemComponentViewModel = new StatisticalComparisonMenuItemViewModel
+                            {
+                                StatisticalComparisonOperationModel = model.StatisticalComparisonOperationModel
+                            }
                         };
 
-                        menuItem.MenuItemComponentViewModel = attr1;
                         menuViewModel.MenuItemViewModels.Add(menuItem);
-
-                        var toggles = new List<ToggleMenuItemComponentViewModel>();
-                        var items = new List<MenuItemViewModel>();
-                        TestType[] types = new TestType[] { TestType.chi2, TestType.ttest };
-                        int count = 0;
-                        foreach (var type in types)
+                        
+                        var count = 0;
+                        foreach (var type in new TestType[] { TestType.chi2, TestType.ttest })
                         {
-                            var toggleMenuItem = new MenuItemViewModel
-                            {
-                                MenuViewModel = menuViewModel,
-                                Row = count,
-                                RowSpan = 0,
-                                Position = Position,
-                                Column = 1,
-                                Size = new Vec(54, 25),
-                                TargetSize = new Vec(54, 25),
-                                IsAlwaysDisplayed = true
-                            };
-                            //toggleMenuItem.Position = attachmentItemViewModel.Position;
-                            var toggle = new ToggleMenuItemComponentViewModel
-                            {
-                                Label = type.ToString(),
-                                IsChecked = model.StatisticalComparisonOperationModel.TestType == type
-                            };
-                            toggles.Add(toggle);
-                            toggleMenuItem.MenuItemComponentViewModel = toggle;
-                            toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender2, args2) =>
-                            {
-                                var toogleModel = sender2 as ToggleMenuItemComponentViewModel;
-                                if (args2.PropertyName == model.GetPropertyName(() => toogleModel.IsChecked))
-                                {
-                                    if (toogleModel.IsChecked)
-                                    {
-                                        model.StatisticalComparisonOperationModel.TestType = type;
-                                        model.StatisticalComparisonOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
-                                        foreach (var tg in toogleModel.OtherToggles)
-                                        {
-                                            tg.IsChecked = false;
-                                        }
-                                    }
-                                }
-                            };
-                            menuViewModel.MenuItemViewModels.Add(toggleMenuItem);
-                            items.Add(toggleMenuItem);
-                            count++;
+                            menuViewModel.MenuItemViewModels.Add(createTopFunctionToggleMenuItem(menuViewModel, model, count++, type));
                         }
-                        foreach (var mi in items)
-                        {
-                            (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
-                        }
+                        var toggles = menuViewModel.MenuItemViewModels.Select(i => i.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel);
+                        foreach (var t in toggles.Where(t => t != null))
+                            t.OtherToggles.AddRange(toggles.Where(ti => ti !=t));
                     }
                 }
             };
 
             attachmentViewModel.MenuViewModel = menuViewModel;
+        }
+
+        MenuItemViewModel createTopFunctionToggleMenuItem(MenuViewModel menuViewModel, HistogramOperationModel model, int count, TestType type)
+        {
+            var toggleMenuItem = new MenuItemViewModel
+            {
+                MenuViewModel = menuViewModel,
+                Row        = count,
+                RowSpan    = 0,
+                Position   = Position,
+                Column     = 1,
+                Size       = new Vec(54, 25),
+                TargetSize = new Vec(54, 25),
+                IsAlwaysDisplayed = true,
+                MenuItemComponentViewModel = new ToggleMenuItemComponentViewModel
+                {
+                    Label = type.ToString(),
+                    IsChecked = model.StatisticalComparisonOperationModel?.TestType == type
+                }
+            };
+            toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender2, args2) =>
+            {
+                var toogleModel = sender2 as ToggleMenuItemComponentViewModel;
+                if (args2.PropertyName == model.GetPropertyName(() => toogleModel.IsChecked))
+                {
+                    if (toogleModel.IsChecked)
+                    {
+                        model.StatisticalComparisonOperationModel.TestType = type;
+                        model.StatisticalComparisonOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+                        foreach (var tg in toogleModel.OtherToggles)
+                            tg.IsChecked = false;
+                    }
+                }
+            };
+            return toggleMenuItem;
         }
 
         private void createRightHistogramMenu()
@@ -193,174 +187,185 @@ namespace PanoramicDataWin8.model.view.operation
             attachmentViewModel.MenuViewModel = menuViewModel;
         }
 
-        private void createAxisMenu(AttachmentOrientation attachmentOrientation,
-            AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
-        {
-            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
+        public class AxisMenu {
+            HistogramOperationViewModel HistogramOperationViewModel;
+            AttributeTransformationModel attributeTransformationModel;
+            AttributeMenuItemViewModel attributeMenuItemViewModel;
+            AttachmentViewModel        attachmentViewModel;
+            MenuViewModel menuViewModel;
+            AttachmentOrientation attachmentOrientation;
+            AttributeUsage axis;
 
-            var menuViewModel = new MenuViewModel
+            private void AttributeTransformationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
             {
-                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
-                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
-            };
-            attachmentViewModel.MenuViewModel = menuViewModel;
+                attributeMenuItemViewModel.Label = (sender as AttributeTransformationModel).GetLabel();
+            }
+            private void AttributeModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                attributeMenuItemViewModel.Label = attributeTransformationModel.GetLabel();
+            }
+            public HistogramOperationModel HistogramOperationModel => (HistogramOperationModel)HistogramOperationViewModel.OperationModel;
+            public AxisMenu(HistogramOperationViewModel h, AttachmentOrientation orientation, AttributeUsage ax, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
+            {
+                axis = ax;
+                attachmentOrientation       = orientation;
+                HistogramOperationViewModel = h;
+                attachmentViewModel         = HistogramOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
 
-            var menuItem = new MenuItemViewModel
-            {
-                MenuViewModel = menuViewModel,
-                Row = 0,
-                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 1,
-                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 5,
-                Column = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
-                Size = size,
-                Position = Position,
-                TargetSize = size,
-                IsAlwaysDisplayed = true,
-                IsWidthBoundToParent = isWidthBoundToParent,
-                IsHeightBoundToParent = isHeightBoundToParent
-            };
-            menuViewModel.MenuItemViewModels.Add(menuItem);
+                menuViewModel = new MenuViewModel
+                {
+                    AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
+                    NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
+                    NrRows    = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
+                };
+                attachmentViewModel.MenuViewModel = menuViewModel;
+                var menuItem = new MenuItemViewModel
+                {
+                    MenuViewModel = menuViewModel,
+                    Row = 0,
+                    ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 1,
+                    RowSpan    = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 5,
+                    Column     = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
+                    Size       = size,
+                    Position   = HistogramOperationViewModel.Position,
+                    TargetSize = size,
+                    IsAlwaysDisplayed = true,
+                    IsWidthBoundToParent = isWidthBoundToParent,
+                    IsHeightBoundToParent = isHeightBoundToParent,
+                    MenuItemComponentViewModel = new AttributeMenuItemViewModel
+                    {
+                        TextAngle = textAngle,
+                        TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                        TappedTriggered  = () => attachmentViewModel.ActiveStopwatch.Restart(),
+                        DroppedTriggered = droppedTriggered
+                    }
+                };
+                menuViewModel.MenuItemViewModels.Add(menuItem);
 
-            var attr1 = new AttributeTransformationMenuItemViewModel
-            {
-                TextAngle = textAngle,
-                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"))
-            };
-            attr1.TappedTriggered = () => { attachmentViewModel.ActiveStopwatch.Restart(); };
-            menuItem.MenuItemComponentViewModel = attr1;
+                attributeMenuItemViewModel = menuItem.MenuItemComponentViewModel as AttributeMenuItemViewModel;
+                HistogramOperationModel.GetAttributeUsageTransformationModel(axis).CollectionChanged += AxisMenu_CollectionChanged;
+            }
 
-            HistogramOperationModel.GetAttributeUsageTransformationModel(axis).CollectionChanged += (sender, args) =>
+            void droppedTriggered(AttributeViewModel attributeViewModel)
             {
+                var attributeTransformationModel = new AttributeTransformationModel(attributeViewModel.AttributeModel) { // copy ATM because drop target doesn't want to share parameters with source
+                    AggregateFunction = attributeViewModel.AttributeTransformationModel?.AggregateFunction ?? AggregateFunction.None
+                };
+                if (attributeTransformationModel.AttributeModel.DataType != DataType.Undefined)
+                {
+                    var otherAxis          = axis == AttributeUsage.X ? AttributeUsage.Y : AttributeUsage.X;
+                    var existingModel      = HistogramOperationModel.GetAttributeUsageTransformationModel(axis).FirstOrDefault();
+                    var existingOtherModel = HistogramOperationModel.GetAttributeUsageTransformationModel(otherAxis).FirstOrDefault();
+                    var swapAxes           = existingModel != null && existingOtherModel.AttributeModel    == attributeTransformationModel.AttributeModel &&
+                                                                      existingOtherModel.AggregateFunction == attributeTransformationModel.AggregateFunction;
+
+                    if (existingModel != null)
+                    {
+                        HistogramOperationModel.RemoveAttributeUsageTransformationModel(axis, existingModel);
+                        existingModel.PropertyChanged -= AttributeTransformationModel_PropertyChanged;
+                        existingModel.AttributeModel.PropertyChanged -= AttributeModel_PropertyChanged;
+                    }
+                    if (!HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
+                    {
+                        HistogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, 
+                            new AttributeTransformationModel(attributeTransformationModel.AttributeModel) { AggregateFunction = AggregateFunction.Count });
+                    }
+                    HistogramOperationModel.AddAttributeUsageTransformationModel(axis, attributeTransformationModel);
+                    if (swapAxes)
+                    {
+                        HistogramOperationModel.RemoveAttributeUsageTransformationModel(otherAxis, existingOtherModel);
+                        existingOtherModel.PropertyChanged -= AttributeTransformationModel_PropertyChanged;
+                        existingOtherModel.AttributeModel.PropertyChanged -= AttributeModel_PropertyChanged;
+                        if (!HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
+                        {
+                            HistogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue,
+                                new AttributeTransformationModel(attributeTransformationModel.AttributeModel) { AggregateFunction = AggregateFunction.Count });
+                        }
+                        HistogramOperationModel.AddAttributeUsageTransformationModel(otherAxis, existingModel);
+                    }
+                    attachmentViewModel.ActiveStopwatch.Restart();
+                }
+            }
+
+            void AxisMenu_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
+            {
+                var oldAttributeTransformationModel = args.OldItems?.Count > 0 ? args.OldItems[0] as AttributeTransformationModel : null;
+                if (oldAttributeTransformationModel != null)
+                {
+                    oldAttributeTransformationModel.PropertyChanged -= AttributeTransformationModel_PropertyChanged;
+                    oldAttributeTransformationModel.AttributeModel.PropertyChanged -= AttributeModel_PropertyChanged;
+                }
+
                 var coll = sender as ObservableCollection<AttributeTransformationModel>;
-                var attributeTransformationModel = coll.FirstOrDefault();
-                attr1.Label = attributeTransformationModel == null ? "" : attributeTransformationModel.GetLabel();
-                attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, coll.FirstOrDefault());
-
+                attributeTransformationModel = coll.FirstOrDefault();
+                attributeMenuItemViewModel.Label = attributeTransformationModel?.GetLabel();
+                attributeMenuItemViewModel.AttributeViewModel = new AttributeViewModel(HistogramOperationViewModel, coll.FirstOrDefault());
                 if (attributeTransformationModel != null)
                 {
-                    attributeTransformationModel.PropertyChanged += (sender2, args2) =>
-                    {
-                        attr1.Label = (sender2 as AttributeTransformationModel).GetLabel();
-                    };
-                    attributeTransformationModel.AttributeModel.PropertyChanged += (sender2, arg2) =>
-                    {
-                        attr1.Label = attributeTransformationModel.GetLabel();
-                    };
+                    attributeTransformationModel.PropertyChanged += AttributeTransformationModel_PropertyChanged;
+                    attributeTransformationModel.AttributeModel.PropertyChanged += AttributeModel_PropertyChanged;
                 }
 
                 // remove old ones first
                 foreach (var mvm in menuViewModel.MenuItemViewModels.Where(mvm => mvm.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel).ToArray())
                     menuViewModel.MenuItemViewModels.Remove(mvm);
 
-                var aom = attr1.AttributeTransformationViewModel.AttributeTransformationModel;
-                var aggregateFunctions = new[] { AggregateFunction.None, AggregateFunction.Count }.ToList();
-                if (aom != null)
+                var atm = (attributeMenuItemViewModel.AttributeViewModel as AttributeViewModel)?.AttributeTransformationModel;
+                if (atm != null)
                 {
-                    if (aom.AttributeModel.DataType == DataType.Float ||
-                        aom.AttributeModel.DataType == DataType.Double ||
-                        aom.AttributeModel.DataType == DataType.Int)
-                    {
-                        aggregateFunctions.Add(AggregateFunction.Avg);
-                        aggregateFunctions.Add(AggregateFunction.Sum);
-                        if (MainViewController.Instance.MainModel.IsUnknownUnknownEnabled)
-                        {
-                            aggregateFunctions.Add(AggregateFunction.SumE);
-                        }
-                    }
-
-                    var toggles = new List<ToggleMenuItemComponentViewModel>();
-                    var items = new List<MenuItemViewModel>();
-
                     var count = 0;
-                    foreach (var aggregationFunction in aggregateFunctions)
+                    foreach (var aggregationFunction in atm.AggregateFunctions)
                     {
-                        var toggleMenuItem = new MenuItemViewModel
-                        {
-                            MenuViewModel = menuViewModel,
-                            Row = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : count,
-                            RowSpan = 0,
-                            Position = Position,
-                            Column = attachmentOrientation == AttachmentOrientation.Bottom ? count : 0,
-                            Size = new Vec(32, 32),
-                            TargetSize = new Vec(32, 32)
-                        };
-                        //toggleMenuItem.Position = attachmentItemViewModel.Position;
-                        var toggle = new ToggleMenuItemComponentViewModel
-                        {
-                            Label = aggregationFunction.ToString(),
-                            IsChecked = aom.AggregateFunction == aggregationFunction
-                        };
-                        toggles.Add(toggle);
-                        toggleMenuItem.MenuItemComponentViewModel = toggle;
-                        toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender2, args2) =>
-                        {
-                            var model = sender2 as ToggleMenuItemComponentViewModel;
-                            if (args2.PropertyName == model.GetPropertyName(() => model.IsChecked))
-                                if (model.IsChecked)
-                                {
-                                    aom.AggregateFunction = aggregationFunction;
-                                    foreach (var tg in model.OtherToggles)
-                                        tg.IsChecked = false;
-                                }
-                        };
-                        menuViewModel.MenuItemViewModels.Add(toggleMenuItem);
-                        items.Add(toggleMenuItem);
-                        count++;
+                        menuViewModel.MenuItemViewModels.Add(AddAggregateToggleMenuItem(atm, count++, aggregationFunction));
                     }
 
-                    foreach (var mi in items)
-                        (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
+                    var toggles = menuViewModel.MenuItemViewModels.Select(i => i.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel);
+                    foreach (var t in toggles.Where(t => t != null))
+                        t.OtherToggles.AddRange(toggles.Where(ti => ti != null && ti != t));
                 }
+            }
 
-            };
-            attr1.DroppedTriggered = attributeViewModel =>
+            MenuItemViewModel AddAggregateToggleMenuItem(AttributeTransformationModel atm,int count, AggregateFunction aggregationFunction)
             {
-                var attributeTransformationModel = 
-                    (attributeViewModel is AttributeViewModel) ? new AttributeTransformationModel((attributeViewModel as AttributeViewModel).AttributeModel) :
-                    (attributeViewModel as AttributeTransformationViewModel)?.AttributeTransformationModel;
-                if (attributeTransformationModel.AttributeModel.DataType == DataType.Undefined)
-                    return;
-                var otherAxis = axis == AttributeUsage.X ? AttributeUsage.Y : AttributeUsage.X;
-                var existingModel = HistogramOperationModel.GetAttributeUsageTransformationModel(axis).Any() ?
-                      HistogramOperationModel.GetAttributeUsageTransformationModel(axis).First() : null;
-                var existingOtherModel = HistogramOperationModel.GetAttributeUsageTransformationModel(otherAxis).Any() ?
-                    HistogramOperationModel.GetAttributeUsageTransformationModel(otherAxis).First() : null;
-                var swapAxes = existingModel != null && existingOtherModel.AttributeModel == attributeTransformationModel.AttributeModel &&
-                existingOtherModel.AggregateFunction == attributeTransformationModel.AggregateFunction;
-
-                if (existingModel != null)
-                    HistogramOperationModel.RemoveAttributeUsageTransformationModel(axis, existingModel);
-                if (!HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
+                var toggleMenuItem = new MenuItemViewModel
                 {
-                    var value = new AttributeTransformationModel(attributeTransformationModel.AttributeModel);
-                    value.AggregateFunction = AggregateFunction.Count;
-                    HistogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
-                }
-                HistogramOperationModel.AddAttributeUsageTransformationModel(axis, attributeTransformationModel);
-                attachmentViewModel.ActiveStopwatch.Restart();
-                if (swapAxes)
-                {
-                    HistogramOperationModel.RemoveAttributeUsageTransformationModel(otherAxis, existingOtherModel);
-                    if (!HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
+                    MenuViewModel = menuViewModel,
+                    Column     = attachmentOrientation == AttachmentOrientation.Bottom ? count : 0,
+                    Row        = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : count,
+                    RowSpan    = 0,
+                    Position   = HistogramOperationViewModel.Position,
+                    Size       = new Vec(32, 32),
+                    TargetSize = new Vec(32, 32),
+                    MenuItemComponentViewModel = new ToggleMenuItemComponentViewModel
                     {
-                        var value = new AttributeTransformationModel(attributeTransformationModel.AttributeModel);
-                        value.AggregateFunction = AggregateFunction.Count;
-                        HistogramOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue, value);
+                        Label = aggregationFunction.ToString(),
+                        IsChecked = atm.AggregateFunction == aggregationFunction
                     }
-                    HistogramOperationModel.AddAttributeUsageTransformationModel(otherAxis, existingModel);
-
-                }
-            };
+                };
+                
+                toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
+                {
+                    var model = sender as ToggleMenuItemComponentViewModel;
+                    if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
+                        if (model.IsChecked)
+                        {
+                            atm.AggregateFunction = aggregationFunction;
+                            foreach (var tg in model.OtherToggles)
+                                tg.IsChecked = false;
+                        }
+                };
+                return toggleMenuItem;
+            }
         }
+        
 
         public HistogramOperationViewModel(HistogramOperationModel histogramOperationModel, AttributeModel attributeModel) : base(histogramOperationModel)
         {
             addAttachmentViewModels();
 
             // axis attachment view models
-            createAxisMenu(AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
-            createAxisMenu(AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
+            var xAxisMenu = new AxisMenu(this, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
+            var yAxisMenu = new AxisMenu(this, AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
             if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode &&
                 !MainViewController.Instance.MainModel.IsIGTMode)
             {

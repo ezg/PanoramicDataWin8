@@ -197,9 +197,9 @@
     <Compile Include="model\data\OperationTypeModel.cs" />
     <Compile Include="model\view\AttachedTo.cs" />
     <Compile Include="model\view\AttachmentOrientation.cs" />
-    <Compile Include="model\view\AttributeTransformationMenuItemViewModel.cs" />
-    <Compile Include="model\view\AttributeTransformationViewModelEventArgs.cs" />
-    <Compile Include="model\view\AttributeTransformationViewModelEventHandler.cs" />
+    <Compile Include="model\view\AttributeMenuItemViewModel.cs" />
+    <Compile Include="model\view\AttributeViewModelEventArgs.cs" />
+    <Compile Include="model\view\AttributeViewModelEventHandler.cs" />
     <Compile Include="model\view\BrushableOperationViewModelState.cs" />
     <Compile Include="model\view\IncludeExludeMenuItemViewModel.cs" />
     <Compile Include="model\view\BudgetViewModel.cs" />
@@ -258,7 +258,7 @@
     <Compile Include="model\view\MenuViewModel.cs" />
     <Compile Include="model\view\MenuItemViewModel.cs" />
     <Compile Include="model\view\AttachmentViewModel.cs" />
-    <Compile Include="model\view\AttributeTransformationViewModel.cs" />
+    <Compile Include="model\view\AttributeViewModel.cs" />
     <Compile Include="model\view\FilterLinkViewModel.cs" />
     <Compile Include="model\view\MainModel.cs" />
     <Compile Include="model\view\operation\HistogramOperationViewModel.cs" />

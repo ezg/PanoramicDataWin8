@@ -14,8 +14,6 @@ namespace PanoramicDataWin8.model.view
 
         private AttachmentViewModel _attachmentViewModel;
 
-        private AttributeTransformationViewModel _attributeTransformationViewModel;
-
         private bool _isDisplayed;
 
         private bool _moveOnHide = false;

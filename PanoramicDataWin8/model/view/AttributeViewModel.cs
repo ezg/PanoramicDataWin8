@@ -17,6 +17,8 @@ namespace PanoramicDataWin8.model.view
     {
         private AttachmentOrientation _attachmentOrientation;
 
+        private AttributeTransformationModel _attributeTransformationModel;
+
         private AttributeModel _attributeModel;
 
         private Thickness _borderThicknes;
@@ -47,21 +49,44 @@ namespace PanoramicDataWin8.model.view
 
         private double _textAngle;
 
-        public AttributeViewModel()
-        {
-        }
+        public AttributeViewModel() { }
 
         public AttributeViewModel(OperationViewModel operationViewModel, AttributeModel attributeModel)
         {
             OperationViewModel = operationViewModel;
-            AttributeModel = attributeModel;
+            _attributeModel= attributeModel;
+            _attributeTransformationModel = new AttributeTransformationModel(attributeModel);
+            updateLabels();
+        }
+        public AttributeViewModel(OperationViewModel operationViewModel, AttributeTransformationModel attributeTransformationModel)
+        {
+            OperationViewModel = operationViewModel;
+            _attributeModel = attributeTransformationModel?.AttributeModel;
+            _attributeTransformationModel = attributeTransformationModel;
+            updateLabels();
+        }
+
+        public AttributeTransformationModel AttributeTransformationModel
+        {
+            get { return _attributeTransformationModel; }
+            set
+            {
+                if (_attributeTransformationModel != null)
+                    _attributeTransformationModel.PropertyChanged -= (sender, e) => updateLabels();
+                SetProperty(ref _attributeTransformationModel, value);
+                if (_attributeTransformationModel != null)
+                {
+                    _attributeTransformationModel.PropertyChanged += (sender, e) => updateLabels();
+                    updateLabels();
+                }
+            }
         }
 
         public virtual AttributeViewModel Clone()
         {
-            return new AttributeViewModel(OperationViewModel, AttributeModel);
+            return new AttributeViewModel(OperationViewModel, AttributeTransformationModel);
         }
-
+ 
         public AttachmentOrientation AttachmentOrientation
         {
             get { return _attachmentOrientation; }
@@ -175,79 +200,27 @@ namespace PanoramicDataWin8.model.view
         public static event EventHandler<AttributeViewModelEventArgs> AttributeViewModelMoved;
         public static event EventHandler<AttributeViewModelEventArgs> AttributeViewModelDropped;
 
-        public void FireMoved(Rct bounds, AttributeModel attributeModel)
+        public void FireMoved(Rct bounds, AttributeViewModel attributeViewModel)
         {
-            AttributeViewModelMoved?.Invoke(this, new AttributeViewModelEventArgs(attributeModel, bounds));
+            AttributeViewModelMoved?.Invoke(this, new AttributeViewModelEventArgs(attributeViewModel, bounds));
         }
 
-        public void FireDropped(Rct bounds, AttributeModel attributeModel)
+        public void FireDropped(Rct bounds, AttributeViewModel attributeViewModel)
         {
-            AttributeViewModelDropped?.Invoke(this, new AttributeViewModelEventArgs(attributeModel, bounds));
+            AttributeViewModelDropped?.Invoke(this, new AttributeViewModelEventArgs(attributeViewModel, bounds));
         }
-        public void FireMoved(Rct bounds, AttributeTransformationModel attributeModel)
-        {
-            AttributeViewModelMoved?.Invoke(this, new AttributeViewModelEventArgs(attributeModel, bounds));
-        }
-
-        public void FireDropped(Rct bounds, AttributeTransformationModel attributeModel)
-        {
-            AttributeViewModelDropped?.Invoke(this, new AttributeViewModelEventArgs(attributeModel, bounds));
-        }
-
         protected virtual void updateLabels()
         {
             if (_attributeModel != null)
             {
-                MainLabel = _attributeModel.DisplayName; 
-
+                if (AttributeTransformationModel != null)
+                     MainLabel = AttributeTransformationModel.GetLabel();
+                else MainLabel = AttributeModel.DisplayName; 
             }
-        }
-    }
-    public class AttributeTransformationViewModel : AttributeViewModel
-    {
-        private AttributeTransformationModel _attributeTransformationModel;
-        public AttributeTransformationViewModel(OperationViewModel operationViewModel, AttributeTransformationModel attributeTransformationModel)
-            : base(operationViewModel, attributeTransformationModel?.AttributeModel)
-        {
-            AttributeTransformationModel = attributeTransformationModel;
-        }
-        public AttributeTransformationModel AttributeTransformationModel
-        {
-            get { return _attributeTransformationModel; }
-            set
-            {
-                if (_attributeTransformationModel != null)
-                    _attributeTransformationModel.PropertyChanged -= (sender, e) => updateLabels();
-                SetProperty(ref _attributeTransformationModel, value);
-                if (_attributeTransformationModel != null)
-                {
-                    _attributeTransformationModel.PropertyChanged += (sender, e) => updateLabels();
-                    updateLabels();
-                }
-            }
-        }
-
-        protected override void updateLabels()
-        {
-            base.updateLabels();
-            if (AttributeTransformationModel != null)
-            {
-                MainLabel = AttributeTransformationModel.GetLabel();
-            }
-        }
-
-
-        public override AttributeViewModel Clone()
-        {
-            return new AttributeTransformationViewModel(OperationViewModel, AttributeTransformationModel);
         }
     }
     public class AttributeGroupViewModel : AttributeViewModel
     {
-        public AttributeGroupViewModel()
-        {
-        }
-
         public AttributeGroupViewModel(OperationViewModel operationViewModel, AttributeModel attributeGroupModel) :
             base(operationViewModel, attributeGroupModel)
         {

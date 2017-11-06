@@ -113,8 +113,6 @@ namespace PanoramicDataWin8.view.vis.menu
             storyboard.Begin();
         }
 
-
-
         private void mainPointerManager_Added(object sender, PointerManagerEvent e)
         {
             var model = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
@@ -169,7 +167,7 @@ namespace PanoramicDataWin8.view.vis.menu
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        model.AttributeViewModel.FireMoved(bounds, model.AttributeViewModel.AttributeModel);
+                        model.AttributeViewModel.FireMoved(bounds, model.AttributeViewModel);
                     }
                 }
 
@@ -200,7 +198,7 @@ namespace PanoramicDataWin8.view.vis.menu
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
 
-                model.AttributeViewModel.FireDropped(bounds, model.AttributeViewModel.AttributeModel);
+                model.AttributeViewModel.FireDropped(bounds, model.AttributeViewModel);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -212,13 +210,13 @@ namespace PanoramicDataWin8.view.vis.menu
         public void createShadow(Point fromInkableScene)
         {
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
-            var model = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel).AttributeViewModel;
+            var attributeViewModel = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel).AttributeViewModel;
 
-            if (inkableScene != null && model != null)
+            if (inkableScene != null && attributeViewModel != null)
             {
                 _currentFromInkableScene = fromInkableScene;
                 _shadow = new AttributeFieldView();
-                _shadow.DataContext = new AttributeViewModel(null, model.AttributeModel)
+                _shadow.DataContext = new AttributeViewModel(null, attributeViewModel.AttributeModel)
                 {
                     IsNoChrome = false,
                     IsMenuEnabled = true,
@@ -228,7 +226,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 _shadow.Measure(new Size(double.PositiveInfinity,
                                          double.PositiveInfinity));
 
-                double add = model.IsNoChrome ? 30 : 0;
+                double add = attributeViewModel.IsNoChrome ? 30 : 0;
                 //_shadow.Width = this.ActualWidth + add;
                 //_shadow.Height = _shadow.DesiredSize.Height;
 
@@ -241,9 +239,8 @@ namespace PanoramicDataWin8.view.vis.menu
 
                 inkableScene.Add(_shadow);
                 _shadow.SendToFront();
-
-                Rct bounds = _shadow.GetBounds(inkableScene);
-                model.FireMoved(bounds, model.AttributeModel);
+                
+                attributeViewModel.FireMoved(_shadow.GetBounds(inkableScene), attributeViewModel);
             }
         }
 

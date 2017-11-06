@@ -63,10 +63,6 @@ namespace PanoramicDataWin8.view.common
                 {
                     (args.NewValue as AttributeViewModel).PropertyChanged += InputFieldView_PropertyChanged;
                 }
-                if (args.NewValue is AttributeTransformationViewModel)
-                {
-                    (args.NewValue as AttributeTransformationViewModel).PropertyChanged += InputFieldView_PropertyChanged;
-                }
             }
             updateRendering();
         }
@@ -185,7 +181,7 @@ namespace PanoramicDataWin8.view.common
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        (DataContext as AttributeViewModel).FireMoved(bounds, (DataContext as AttributeViewModel).AttributeModel);
+                        (DataContext as AttributeViewModel).FireMoved(bounds, DataContext as AttributeViewModel);
                     }
                 }
 
@@ -195,10 +191,11 @@ namespace PanoramicDataWin8.view.common
 
         void mainPointerManager_Removed(object sender, PointerManagerEvent e)
         {
+            var attributeViewModel = DataContext as AttributeViewModel;
             if (_shadow == null &&
                 _manipulationStartTime + TimeSpan.FromSeconds(0.5).Ticks > DateTime.Now.Ticks)
             {
-                if ((DataContext as AttributeTransformationViewModel).IsMenuEnabled && InputFieldViewModelTapped != null)
+                if (attributeViewModel.IsMenuEnabled && InputFieldViewModelTapped != null)
                 {
                     Debug.WriteLine("--TAPP");
                     InputFieldViewModelTapped(this, new EventArgs());
@@ -209,14 +206,7 @@ namespace PanoramicDataWin8.view.common
             {
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
-                Rct bounds = _shadow.GetBounds(inkableScene);
-                if (DataContext is AttributeTransformationViewModel)
-                    (DataContext as AttributeTransformationViewModel).FireDropped(bounds, // (DataContext as AttributeTransformationViewModel).AttributeTransformationModel
-                        new AttributeTransformationModel((DataContext as AttributeTransformationViewModel).AttributeModel)
-                        {
-                            AggregateFunction = (DataContext as AttributeTransformationViewModel).AttributeTransformationModel.AggregateFunction
-                        });
-                else (DataContext as AttributeViewModel).FireDropped(bounds, (DataContext as AttributeViewModel).AttributeModel);
+                attributeViewModel.FireDropped(_shadow.GetBounds(inkableScene), attributeViewModel);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -255,7 +245,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow.SendToFront();
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as AttributeViewModel).FireMoved(bounds, (DataContext as AttributeViewModel).AttributeModel);
+                (DataContext as AttributeViewModel).FireMoved(bounds, DataContext as AttributeViewModel);
             }
         }
     }

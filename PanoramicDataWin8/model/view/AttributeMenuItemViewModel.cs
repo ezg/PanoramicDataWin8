@@ -18,7 +18,7 @@ namespace PanoramicDataWin8.model.view
 
         private bool _displayOnTap;
 
-        private Windows.UI.Xaml.Visibility _editing = Windows.UI.Xaml.Visibility.Collapsed;
+        private Visibility _editing = Visibility.Collapsed;
 
         private double _textAngle;
 
@@ -74,18 +74,6 @@ namespace PanoramicDataWin8.model.view
                 SetProperty(ref _displayOnTap, value);
                 if (value)
                     TappedTriggered += (() => Editing = Visibility.Visible);
-            }
-        }
-    }
-    public class AttributeTransformationMenuItemViewModel : AttributeMenuItemViewModel
-    {
-        private AttributeTransformationViewModel _attributeTransformationViewModel;
-        
-        public AttributeTransformationViewModel AttributeTransformationViewModel
-        {
-            get { return _attributeTransformationViewModel; }
-            set { SetProperty(ref _attributeTransformationViewModel, value);
-                AttributeViewModel = value == null ? null : new AttributeViewModel(value.OperationViewModel, value.AttributeModel);
             }
         }
     }

@@ -68,8 +68,7 @@ namespace PanoramicDataWin8.model.view.operation
             attr1.TappedTriggered = () => { attachmentViewModel.ActiveStopwatch.Restart(); };
             attr1.DroppedTriggered = attributeViewModel =>
             {
-                var attributeModel = (attributeViewModel is AttributeViewModel) ? (attributeViewModel as AttributeViewModel).AttributeModel :
-                                     (attributeViewModel as AttributeTransformationViewModel)?.AttributeTransformationModel.AttributeModel;
+                var attributeModel = (attributeViewModel as AttributeViewModel).AttributeModel;
                 if (attributeModel.DataType == DataType.Undefined)
                     return;
 

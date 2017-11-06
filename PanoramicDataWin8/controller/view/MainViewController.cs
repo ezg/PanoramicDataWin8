@@ -42,7 +42,7 @@ namespace PanoramicDataWin8.controller.view
             MainModel = new MainModel();
            
             AttributeViewModel.AttributeViewModelDropped += AttributeViewModelDropped;
-            IDisposable disposable = Observable.FromEventPattern<AttributeViewModelEventArgs>(typeof(AttributeTransformationViewModel), "AttributeViewModelMoved")
+            IDisposable disposable = Observable.FromEventPattern<AttributeViewModelEventArgs>(typeof(AttributeViewModel), "AttributeViewModelMoved")
                 .Sample(TimeSpan.FromMilliseconds(20))
                 .Subscribe(async arg =>
                 {
