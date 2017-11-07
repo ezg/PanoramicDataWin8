@@ -60,8 +60,7 @@ namespace PanoramicDataWin8.model.view.operation
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Bottom);
             attachmentViewModel.ShowOnAttributeMove = true;
-
-            OperationViewModelTapped += (args) => attachmentViewModel.ActiveStopwatch.Restart();
+            attachmentViewModel.ShowOnAttributeTapped = true;
 
             var menuViewModel = new MenuViewModel
             {
