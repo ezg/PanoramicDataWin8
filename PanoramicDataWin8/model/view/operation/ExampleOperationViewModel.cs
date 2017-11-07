@@ -13,7 +13,7 @@ namespace PanoramicDataWin8.model.view.operation
     {
         private void createRightExampleMenu()
         {
-            var attachmentViewModel = AttachementViewModels.First( avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
             attachmentViewModel.ShowOnAttributeTapped = true;
 
             var menuViewModel = new MenuViewModel
@@ -68,6 +68,7 @@ namespace PanoramicDataWin8.model.view.operation
                 NrColumns = 3,
                 NrRows = 1
             };
+            attachmentViewModel.MenuViewModel = menuViewModel;
 
             var addMenuItem = new MenuItemViewModel
             {
@@ -81,20 +82,17 @@ namespace PanoramicDataWin8.model.view.operation
                 IsAlwaysDisplayed = false,
                 IsWidthBoundToParent = false,
                 IsHeightBoundToParent = false,
-                Position = Position
+                Position = Position,
+                MenuItemComponentViewModel = new AttributeMenuItemViewModel
+                {
+                    Label = "+",
+                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
+                    CanDrag = false,
+                    CanDrop = true,
+                    DroppedTriggered = attributeViewModel => ExampleOperationModel.AttributeUsageModels.Add(attributeViewModel.AttributeModel)
+                }
             };
-            var attr1 = new AttributeMenuItemViewModel
-            {
-                Label = "+",
-                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
-                CanDrag = false,
-                CanDrop = true
-            };
-            attr1.DroppedTriggered = attributeViewModel =>ExampleOperationModel.AttributeUsageModels.Add(attributeViewModel.AttributeModel);
-
-            addMenuItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(addMenuItem);
-            attachmentViewModel.MenuViewModel = menuViewModel;
 
             ExampleOperationModel.AttributeUsageModels.CollectionChanged += (sender, args) =>
             {
