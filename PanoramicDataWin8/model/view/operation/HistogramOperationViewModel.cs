@@ -116,6 +116,8 @@ namespace PanoramicDataWin8.model.view.operation
             var rovm = RecommenderViewController.Instance.CreateRecommenderOperationViewModel(this);
 
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+            attachmentViewModel.ShowOnAttributeTapped = true;
+
             var menuViewModel = new MenuViewModel
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
@@ -124,6 +126,7 @@ namespace PanoramicDataWin8.model.view.operation
                 IsRigid = true,
                 RigidSize = 54
             };
+            attachmentViewModel.MenuViewModel = menuViewModel;
 
             var menuItem = new MenuItemViewModel
             {
@@ -135,14 +138,15 @@ namespace PanoramicDataWin8.model.view.operation
                 Size = new Vec(54, 54),
                 Position = Position,
                 TargetSize = new Vec(54, 54),
-                IsAlwaysDisplayed = false
+                IsAlwaysDisplayed = false,
+                MenuItemComponentViewModel = new RecommenderMenuItemViewModel()
+                {
+                    AttachmentViewModel = attachmentViewModel,
+                    RecommenderOperationViewModel = rovm
+                }
             };
-            var attr1 = new RecommenderMenuItemViewModel()
-            {
-                AttachmentViewModel = attachmentViewModel,
-                RecommenderOperationViewModel = rovm
-            };
-            attr1.CreateRecommendationEvent += (sender, bounds, percentage) =>
+            menuViewModel.MenuItemViewModels.Add(menuItem);
+            (menuItem.MenuItemComponentViewModel as RecommenderMenuItemViewModel).CreateRecommendationEvent += (sender, bounds, percentage) =>
             {
                 RecommenderOperationViewModel.RecommenderOperationModel.Page = 0;
                 RecommenderOperationViewModel.RecommenderOperationModel.Budget =
@@ -176,26 +180,15 @@ namespace PanoramicDataWin8.model.view.operation
                     menuViewModel.MenuItemViewModels.Add(subMenuItem);
                 }
             };
-            menuItem.MenuItemComponentViewModel = attr1;
-            menuViewModel.MenuItemViewModels.Add(menuItem);
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-
-            attachmentViewModel.MenuViewModel = menuViewModel;
         }
 
         public HistogramOperationViewModel(HistogramOperationModel histogramOperationModel, AttributeModel attributeModel) : base(histogramOperationModel)
         {
-            addAttachmentViewModels();
-
             // axis attachment view models
             var xAxisMenu = new AttributeUsageMenu(this, attributeModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
             var yAxisMenu = new AttributeUsageMenu(this, attributeModel, AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
-            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode &&
-                !MainViewController.Instance.MainModel.IsIGTMode)
+
+            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode && !MainViewController.Instance.MainModel.IsIGTMode)
             {
                 // commented for demo
                 //createRightHistogramMenu();

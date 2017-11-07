@@ -16,8 +16,6 @@ namespace PanoramicDataWin8.model.view.operation
     {
         public RawDataOperationViewModel(RawDataOperationModel rawDataOperationModel, AttributeModel attributeModel) : base(rawDataOperationModel)
         {
-            addAttachmentViewModels();
-
             // axis attachment view models
             //createAxisMenu(AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
             new AttributeUsageMenu(this, attributeModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false) { CanSwapAxes = false, CanTransformAxes = false };

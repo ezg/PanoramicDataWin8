@@ -16,7 +16,7 @@ namespace PanoramicDataWin8.model.view.operation
               AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
-            OperationViewModelTapped += (args) => attachmentViewModel.ActiveStopwatch.Restart();
+            attachmentViewModel.ShowOnAttributeTapped = true;
 
             var menuViewModel = new MenuViewModel
             {
@@ -45,14 +45,13 @@ namespace PanoramicDataWin8.model.view.operation
                     TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
                     Label = "Apply",
                     AttributeViewModel = new AttributeViewModel(this, AttributeGroupOperationModel.AttributeModel),
-                    DisplayOnTap = true
+                    EditNameOnTap = true
                 }
             };
             menuViewModel.MenuItemViewModels.Add(menuItem);
         }
         public AttributeGroupOperationViewModel(AttributeGroupOperationModel attributeGroupOperationModel) : base(attributeGroupOperationModel)
         {
-            addAttachmentViewModels();
             createTopInputsExpandingMenu();
             createFunctionMenu(AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
 

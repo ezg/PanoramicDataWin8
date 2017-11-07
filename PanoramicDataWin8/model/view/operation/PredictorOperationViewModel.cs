@@ -12,23 +12,83 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class PredictorOperationViewModel : AttributeUsageOperationViewModel
     {
-        private void createRightTargetMenu()
+        MenuViewModel     TargetMenuViewModel;
+        MenuItemViewModel TargetMenuItemViewModel;
+        MenuItemViewModel PredictorNameMenuItemViewModel = null;
+        public PredictorOperationModel PredictorOperationModel => (PredictorOperationModel)OperationModel;
+        void hideLabelUnlessPredictorHasResult(MenuViewModel menuViewModel)
+        {
+            menuViewModel.MenuItemViewModels.Remove(PredictorNameMenuItemViewModel);
+            PredictorOperationModel.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName == PredictorOperationModel.GetPropertyName(() => PredictorOperationModel.Result))
+                {
+                    if (PredictorOperationModel.Result == null)
+                    {
+                        menuViewModel.MenuItemViewModels.Remove(PredictorNameMenuItemViewModel);
+                    }
+                    else if (!menuViewModel.MenuItemViewModels.Contains(PredictorNameMenuItemViewModel))
+                    {
+                        menuViewModel.MenuItemViewModels.Add(PredictorNameMenuItemViewModel);
+                    }
+                }
+            };
+        }
+        void TargetDropped(AttributeViewModel attributeViewModel)
+        {
+            var attributeMenuItemViewModel = (PredictorNameMenuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel);
+            PredictorOperationModel.TargetAttributeUsageModel = attributeViewModel.AttributeModel;
+            attributeMenuItemViewModel.Label = new Regex("\\(.*\\)", RegexOptions.None).Replace(attributeMenuItemViewModel.Label, "(" + attributeViewModel.AttributeModel.DisplayName + ")");
+            PredictorOperationModel.SetRawName(attributeMenuItemViewModel.Label);
+
+            if (TargetMenuViewModel.MenuItemViewModels.Count > 1)
+                TargetMenuViewModel.MenuItemViewModels.RemoveAt(1);
+
+            TargetMenuViewModel.NrColumns = 2;
+            TargetMenuItemViewModel.Column = TargetMenuViewModel.NrColumns - 1;
+
+            var newAttributeModel = PredictorOperationModel.TargetAttributeUsageModel;
+            var newMenuItem = new MenuItemViewModel
+            {
+                MenuViewModel = TargetMenuViewModel,
+                Size = new Vec(50, 50),
+                TargetSize = new Vec(50, 50),
+                Position = TargetMenuItemViewModel.Position,
+                MenuItemComponentViewModel = new AttributeMenuItemViewModel
+                {
+                    Label = newAttributeModel.DisplayName,
+                    AttributeViewModel = new AttributeViewModel(this, newAttributeModel),
+                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                    CanDrag = false,
+                    CanDrop = false
+                }
+            };
+            newMenuItem.Deleted += (sender1, args1) =>
+            {
+                var atm = ((AttributeMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeViewModel.AttributeModel;
+                PredictorOperationModel.AttributeUsageModels.Remove(atm);
+            };
+            TargetMenuViewModel.MenuItemViewModels.Add(newMenuItem);
+
+            PredictorOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+        }
+        void createRightTargetMenu()
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
             attachmentViewModel.ShowOnAttributeMove = true;
-            OperationViewModelTapped += (args) =>  attachmentViewModel.ActiveStopwatch.Restart();
+            attachmentViewModel.ShowOnAttributeTapped = true;
 
-            var menuViewModel = new MenuViewModel
+            TargetMenuViewModel = new MenuViewModel
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = 1,
                 NrRows = 3
             };
-            attachmentViewModel.MenuViewModel = menuViewModel;
+            attachmentViewModel.MenuViewModel = TargetMenuViewModel;
 
-            var addMenuItem = new MenuItemViewModel
+            TargetMenuItemViewModel = new MenuItemViewModel
             {
-                MenuViewModel = menuViewModel,
+                MenuViewModel = TargetMenuViewModel,
                 Row = 0,
                 Column = 0,
                 RowSpan = 1,
@@ -38,121 +98,23 @@ namespace PanoramicDataWin8.model.view.operation
                 IsAlwaysDisplayed = false,
                 IsWidthBoundToParent = false,
                 IsHeightBoundToParent = false,
-                Position = Position
-            };
-            menuViewModel.MenuItemViewModels.Add(addMenuItem);
-
-            var attr1 = new AttributeMenuItemViewModel
-            {
-                Label = "target",
-                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
-                CanDrag = false,
-                CanDrop = true
-            };
-            addMenuItem.MenuItemComponentViewModel = attr1;
-
-            attr1.DroppedTriggered = attributeViewModel =>
-            {
-                PredictorOperationModel.TargetAttributeUsageModel = attributeViewModel.AttributeModel;
-                PredictorNameMenuItemViewModel.Label = new Regex("\\(.*\\)", RegexOptions.None).Replace(PredictorNameMenuItemViewModel.Label, "(" + attributeViewModel.AttributeModel.DisplayName + ")");
-                PredictorOperationModel.SetRawName(PredictorNameMenuItemViewModel.Label);
-            
-                if (menuViewModel.MenuItemViewModels.Count > 1)
-                    menuViewModel.MenuItemViewModels.RemoveAt(1);
-
-                menuViewModel.NrColumns = 2;
-                addMenuItem.Column = menuViewModel.NrColumns - 1;
-
-                var newAttributeModel = PredictorOperationModel.TargetAttributeUsageModel;
-                var newMenuItem = new MenuItemViewModel
-                {
-                    MenuViewModel = menuViewModel,
-                    Size = new Vec(50, 50),
-                    TargetSize = new Vec(50, 50),
-                    Position = addMenuItem.Position
-                };
-                var newAttr = new AttributeMenuItemViewModel
-                {
-                    Label = newAttributeModel.DisplayName,
-                    AttributeViewModel = new AttributeViewModel(this, newAttributeModel),
-                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                    CanDrag = false,
-                    CanDrop = false
-                };
-                newMenuItem.Deleted += (sender1, args1) =>
-                {
-                    var atm =
-                        ((AttributeMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeViewModel.AttributeModel;
-                    PredictorOperationModel.AttributeUsageModels.Remove(atm);
-                };
-                newMenuItem.MenuItemComponentViewModel = newAttr;
-                menuViewModel.MenuItemViewModels.Add(newMenuItem);
-
-                PredictorOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
-            };
-        }
-        AttributeMenuItemViewModel PredictorNameMenuItemViewModel = null;
-        private void createAxisMenu(AttachmentOrientation attachmentOrientation,
-            AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
-        {
-            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
-
-            var menuViewModel = new MenuViewModel
-            {
-                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
-                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
-            };
-            var menuItem = new MenuItemViewModel
-            {
-                MenuViewModel = menuViewModel,
-                Row = 0,
-                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 1,
-                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 5,
-                Column = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
-                Size = size,
                 Position = Position,
-                TargetSize = size,
-                IsAlwaysDisplayed = true,
-                IsWidthBoundToParent = isWidthBoundToParent,
-                IsHeightBoundToParent = isHeightBoundToParent
-            };
-            PredictorNameMenuItemViewModel = new AttributeMenuItemViewModel
-            {
-                TextAngle = textAngle,
-                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = PredictorOperationModel.GetAttributeModel().DisplayName,
-                DisplayOnTap = true
-            };
-            PredictorOperationModel.SetRawName(PredictorNameMenuItemViewModel.Label);
-            PredictorNameMenuItemViewModel.AttributeViewModel = new AttributeViewModel(this, PredictorOperationModel.GetAttributeModel());
-            menuItem.MenuItemComponentViewModel = PredictorNameMenuItemViewModel;
-            
-            attachmentViewModel.MenuViewModel = menuViewModel;
-            menuViewModel.MenuItemViewModels.Add(menuItem);
-
-            PredictorOperationModel.PropertyChanged += (sender, args) =>
-            {
-                var model = PredictorOperationModel;
-                if (args.PropertyName == model.GetPropertyName(() => model.Result))
+                MenuItemComponentViewModel = new AttributeMenuItemViewModel
                 {
-                    if (model.Result == null)
-                    {
-                        menuViewModel.MenuItemViewModels.Remove(menuItem);
-                    }
-                    else if (!menuViewModel.MenuItemViewModels.Contains(menuItem))
-                    {
-                        menuViewModel.MenuItemViewModels.Add(menuItem);
-                    }
+                    Label = "target",
+                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
+                    CanDrag = false,
+                    CanDrop = true,
+                    DroppedTriggered = TargetDropped
                 }
             };
+            TargetMenuViewModel.MenuItemViewModels.Add(TargetMenuItemViewModel);
         }
-
-        protected void createLeftInputsExpandingMenu()
+        void createLeftInputsExpandingMenu()
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Left);
             attachmentViewModel.ShowOnAttributeMove = true;
-            OperationViewModelTapped += (args) => attachmentViewModel.ActiveStopwatch.Restart();
+            attachmentViewModel.ShowOnAttributeTapped = true;
 
             var menuViewModel = new MenuViewModel
             {
@@ -256,15 +218,11 @@ namespace PanoramicDataWin8.model.view.operation
         }
         public PredictorOperationViewModel(PredictorOperationModel predictorOperationModel) : base(predictorOperationModel)
         {
-            addAttachmentViewModels();
-
-            createAxisMenu(AttachmentOrientation.Bottom, AttributeUsage.X,  
-                 new Vec(200, 50), 0, true, false);
+            var menuViewModel = createLabelMenu(AttachmentOrientation.Bottom, predictorOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false, null, out PredictorNameMenuItemViewModel);
             createRightTargetMenu();
             createTopInputsExpandingMenu();
             createLeftInputsExpandingMenu();
+            hideLabelUnlessPredictorHasResult(menuViewModel);
         }
-
-        public PredictorOperationModel PredictorOperationModel => (PredictorOperationModel)OperationModel;
     }
 }

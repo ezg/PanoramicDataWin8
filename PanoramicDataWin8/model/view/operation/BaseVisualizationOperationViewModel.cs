@@ -23,24 +23,26 @@ namespace PanoramicDataWin8.model.view.operation
         public class AttributeUsageMenu
         {
             BaseVisualizationOperationViewModel BaseVisualizationOperationViewModel;
-            AttributeTransformationModel attributeTransformationModel;
-            AttributeMenuItemViewModel attributeMenuItemViewModel;
-            AttachmentViewModel attachmentViewModel;
-            MenuViewModel menuViewModel;
-            AttachmentOrientation AttachmentOrientation;
-            AttributeUsage Axis;
+            AttributeTransformationModel        attributeTransformationModel;
+            MenuItemViewModel                   menuItemViewModel;
+            AttachmentViewModel                 attachmentViewModel;
+            MenuViewModel                       menuViewModel;
+            AttachmentOrientation               AttachmentOrientation;
+            AttributeUsage                      Axis;
 
             private void AttributeTransformationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
             {
+                var attributeMenuItemViewModel = menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel;
                 attributeMenuItemViewModel.Label = (sender as AttributeTransformationModel).GetLabel();
             }
             private void AttributeModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
             {
+                var attributeMenuItemViewModel = menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel;
                 attributeMenuItemViewModel.Label = attributeTransformationModel.GetLabel();
             }
             public BaseVisualizationOperationModel BaseVisualizationOperationModel => (BaseVisualizationOperationModel)BaseVisualizationOperationViewModel.OperationModel;
 
-            public bool CanSwapAxes { get; set; } = true;
+            public bool CanSwapAxes      { get; set; } = true;
             public bool CanTransformAxes { get; set; } = true;
             public AttributeUsageMenu(BaseVisualizationOperationViewModel baseVisualizationOperationViewModel, AttributeModel attributeModel, AttachmentOrientation attachmentOrientation, AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
             {
@@ -50,7 +52,7 @@ namespace PanoramicDataWin8.model.view.operation
                 attachmentViewModel = BaseVisualizationOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation);
 
                 menuViewModel = BaseVisualizationOperationViewModel.createLabelMenu(AttachmentOrientation, attributeModel, Axis, size, textAngle, 
-                            isWidthBoundToParent, isHeightBoundToParent, droppedTriggered, out attributeMenuItemViewModel);
+                            isWidthBoundToParent, isHeightBoundToParent, droppedTriggered, out menuItemViewModel);
                 
                 BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(axis).CollectionChanged += AxisMenu_CollectionChanged;
             }
@@ -106,6 +108,7 @@ namespace PanoramicDataWin8.model.view.operation
                     oldAttributeTransformationModel.AttributeModel.PropertyChanged -= AttributeModel_PropertyChanged;
                 }
 
+                var attributeMenuItemViewModel = menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel;
                 var coll = sender as ObservableCollection<AttributeTransformationModel>;
                 attributeTransformationModel = coll.FirstOrDefault();
                 attributeMenuItemViewModel.Label = attributeTransformationModel?.GetLabel();

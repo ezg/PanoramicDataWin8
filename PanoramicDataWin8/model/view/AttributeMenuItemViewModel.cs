@@ -16,7 +16,7 @@ namespace PanoramicDataWin8.model.view
 
         private string _label = "";
 
-        private bool _displayOnTap;
+        private bool _editNameOnTap;
 
         private Visibility _editing = Visibility.Collapsed;
 
@@ -66,15 +66,19 @@ namespace PanoramicDataWin8.model.view
             get { return _textAngle; }
             set { SetProperty(ref _textAngle, value); }
         }
-        public bool DisplayOnTap 
+        public bool EditNameOnTap 
         {
-            get { return _displayOnTap; }
+            get { return _editNameOnTap; }
             set {
                 TappedTriggered -= (() => Editing = Visibility.Visible);
-                SetProperty(ref _displayOnTap, value);
+                SetProperty(ref _editNameOnTap, value);
                 if (value)
                     TappedTriggered += (() => Editing = Visibility.Visible);
             }
+        }
+        public AttributeMenuItemViewModel()
+        {
+
         }
     }
 }

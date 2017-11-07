@@ -14,6 +14,7 @@ namespace PanoramicDataWin8.model.view.operation
         private void createRightExampleMenu()
         {
             var attachmentViewModel = AttachementViewModels.First( avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+            attachmentViewModel.ShowOnAttributeTapped = true;
 
             var menuViewModel = new MenuViewModel
             {
@@ -21,6 +22,7 @@ namespace PanoramicDataWin8.model.view.operation
                 NrColumns = 3,
                 NrRows = 1
             };
+            attachmentViewModel.MenuViewModel = menuViewModel;
 
             var sliderItem = new MenuItemViewModel
             {
@@ -34,32 +36,24 @@ namespace PanoramicDataWin8.model.view.operation
                 TargetSize = new Vec(100, 50),
                 IsAlwaysDisplayed = false,
                 IsWidthBoundToParent = false,
-                IsHeightBoundToParent = false
+                IsHeightBoundToParent = false,
+                MenuItemComponentViewModel = new SliderMenuItemComponentViewModel
+                {
+                    Label = "dummy slider",
+                    Value = ExampleOperationModel.DummyValue,
+                    MinValue = 1,
+                    MaxValue = 100
+                }
             };
 
-            var attr1 = new SliderMenuItemComponentViewModel
-            {
-                Label = "dummy slider",
-                Value = ExampleOperationModel.DummyValue,
-                MinValue = 1,
-                MaxValue = 100
-            };
-            attr1.PropertyChanged += (sender, args) =>
+            (sliderItem.MenuItemComponentViewModel as SliderMenuItemComponentViewModel).PropertyChanged += (sender, args) =>
             {
                 var model = sender as SliderMenuItemComponentViewModel;
                 if (args.PropertyName == model.GetPropertyName(() => model.FinalValue))
                     ExampleOperationModel.DummyValue = model.FinalValue;
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-
-            sliderItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(sliderItem);
-            attachmentViewModel.MenuViewModel = menuViewModel;
         }
 
         private void createBottomExampleMenu()
@@ -168,7 +162,7 @@ namespace PanoramicDataWin8.model.view.operation
         private  void createLeftExampleMenu()
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Left);
-
+            attachmentViewModel.ShowOnAttributeTapped = true;
             var menuViewModel = new MenuViewModel
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
@@ -220,13 +214,6 @@ namespace PanoramicDataWin8.model.view.operation
 
             foreach (var mi in items)
                 (mi.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).OtherToggles.AddRange(toggles.Where(ti => ti != mi.MenuItemComponentViewModel));
-
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-
         }
         public ExampleOperationViewModel(ExampleOperationModel exampleOperationModel) : base(exampleOperationModel)
         {

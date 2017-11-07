@@ -391,7 +391,8 @@ namespace PanoramicDataWin8.view.vis
                     ((OperationViewModel)DataContext).FireOperationViewModelTapped(e);
                     foreach (var avm in model.AttachementViewModels)
                     {
-                        //avm.ActiveStopwatch.Restart();
+                        if (avm.ShowOnAttributeTapped)
+                            avm.ActiveStopwatch.Restart();
                     }
                 }
             }

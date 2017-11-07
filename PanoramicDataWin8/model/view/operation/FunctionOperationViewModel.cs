@@ -17,6 +17,7 @@ namespace PanoramicDataWin8.model.view.operation
         private void createDummyParameterMenu()
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+            attachmentViewModel.ShowOnAttributeTapped = true;
 
             var menuViewModel = new MenuViewModel
             {
@@ -56,11 +57,6 @@ namespace PanoramicDataWin8.model.view.operation
                 attachmentViewModel.ActiveStopwatch.Restart();
             };
 
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-
             sliderItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(sliderItem);
             attachmentViewModel.MenuViewModel = menuViewModel;
@@ -70,7 +66,7 @@ namespace PanoramicDataWin8.model.view.operation
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
-            OperationViewModelTapped += (args) => attachmentViewModel.ActiveStopwatch.Restart();
+            attachmentViewModel.ShowOnAttributeTapped = true;
 
             var menuViewModel = new MenuViewModel
             {
@@ -98,7 +94,7 @@ namespace PanoramicDataWin8.model.view.operation
                     TextAngle = textAngle,
                     TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
                     Label = "Apply",
-                    DisplayOnTap = true,
+                    EditNameOnTap = true,
                     AttributeViewModel = new AttributeViewModel(this, FunctionOperationModel.GetAttributeModel())
                 }
             };
@@ -107,8 +103,6 @@ namespace PanoramicDataWin8.model.view.operation
 
         public FunctionOperationViewModel(FunctionOperationModel functionOperationModel, bool fromMouse = false) : base(functionOperationModel)
         {
-            addAttachmentViewModels();
-
             // fill-in UI specific to function's subtype
             if (FunctionOperationModel.FunctionSubtypeModel is MinMaxScaleFunctionSubtypeModel)
                 ; // createDummyParameterMenu();

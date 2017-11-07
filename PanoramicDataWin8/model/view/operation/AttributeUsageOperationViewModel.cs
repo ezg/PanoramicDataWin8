@@ -19,7 +19,7 @@ namespace PanoramicDataWin8.model.view.operation
     {
         public AttributeUsageOperationViewModel(OperationModel operationModel) : base(operationModel)
         {
-
+            addAttachmentViewModels();
         }
 
         static List<AttributeModel> findAllNestedGroups(AttributeModel attributeGroupModel)
@@ -46,7 +46,7 @@ namespace PanoramicDataWin8.model.view.operation
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Top);
             attachmentViewModel.ShowOnAttributeMove = true;
-            OperationViewModelTapped += (args) => attachmentViewModel.ActiveStopwatch.Restart();
+            attachmentViewModel.ShowOnAttributeTapped = true;
 
             if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
             {
@@ -166,8 +166,9 @@ namespace PanoramicDataWin8.model.view.operation
         
 
         protected MenuViewModel createLabelMenu(AttachmentOrientation attachmentOrientation, AttributeModel code,
-            AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent, DroppedTriggeredHandler droppedTriggered,
-            out AttributeMenuItemViewModel attributeMenuItemViewModel)
+            AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent, 
+            DroppedTriggeredHandler droppedTriggered,
+            out MenuItemViewModel menuItemViewModel)
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
 
@@ -179,7 +180,7 @@ namespace PanoramicDataWin8.model.view.operation
             };
             attachmentViewModel.MenuViewModel = menuViewModel;
 
-            var menuItem = new MenuItemViewModel
+            menuItemViewModel = new MenuItemViewModel
             {
                 MenuViewModel = menuViewModel,
                 Row = 0,
@@ -196,22 +197,24 @@ namespace PanoramicDataWin8.model.view.operation
                 {
                     TextAngle = textAngle,
                     TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                    DisplayOnTap = true,
+                    EditNameOnTap = !( code?.FuncModel is AttributeModel.AttributeFuncModel.AttributeColumnFuncModel),
                     Label = code?.DisplayName,
                     AttributeViewModel = new AttributeViewModel(this, code),
                     DroppedTriggered = droppedTriggered == null ? null : new Action<AttributeViewModel>(droppedTriggered)
                 }
             };
-            menuViewModel.MenuItemViewModels.Add(menuItem);
-            attributeMenuItemViewModel = menuItem.MenuItemComponentViewModel as AttributeMenuItemViewModel;
+            var attributeMenuItemViewModel = menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel;
+            menuViewModel.MenuItemViewModels.Add(menuItemViewModel);
             if (code != null)
             {
                 code.PropertyChanged += (sender, args) =>
                 {
                     if (args.PropertyName == "DisplayName")
-                        (menuItem.MenuItemComponentViewModel as AttributeMenuItemViewModel).Label = code.DisplayName;
+                        attributeMenuItemViewModel.Label = code.DisplayName;
                 };
             }
+            attributeMenuItemViewModel.TappedTriggered += (() => // when label is tapped, display any attached menu options
+                attachmentViewModel.ActiveStopwatch.Restart());
             return menuViewModel;
         }
     }

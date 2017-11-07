@@ -75,18 +75,21 @@ namespace PanoramicDataWin8.model.view.operation
         }
         protected void createTopRightFilterDragMenu()
         {
-            AttachementViewModels.Add(new AttachmentViewModel
+            var attachmentRightViewModel = new AttachmentViewModel
             {
                 AttachmentOrientation = AttachmentOrientation.TopRight,
-                OperationViewModel = this
-            });
-            var attachmentRightViewModel = AttachementViewModels.Last();
+                OperationViewModel = this,
+                ShowOnAttributeTapped = true
+            };
+            AttachementViewModels.Add(attachmentRightViewModel);
+
             var menuViewModelDrag = new MenuViewModel
             {
                 AttachmentOrientation = attachmentRightViewModel.AttachmentOrientation,
                 NrColumns = 1,
                 NrRows = 1
             };
+            attachmentRightViewModel.MenuViewModel = menuViewModelDrag;
 
             var menuItemDrag = new MenuItemViewModel
             {
@@ -98,23 +101,12 @@ namespace PanoramicDataWin8.model.view.operation
                 Size = new Vec(25, 25),
                 Position = this.Position,
                 TargetSize = new Vec(25, 25),
-                IsAlwaysDisplayed = false
+                IsAlwaysDisplayed = false,
+                MenuItemComponentViewModel = new CreateLinkMenuItemViewModel()
             };
-            var attrDrag = new CreateLinkMenuItemViewModel();
-            attrDrag.CreateLinkEvent += (sender, bounds) =>
-            {
-                controller.view.FilterLinkViewController.Instance.CreateFilterLinkViewModel(this, bounds);
-            };
-
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentRightViewModel.ActiveStopwatch.Restart();
-            };
-
-            menuItemDrag.MenuItemComponentViewModel = attrDrag;
             menuViewModelDrag.MenuItemViewModels.Add(menuItemDrag);
-            attachmentRightViewModel.MenuViewModel = menuViewModelDrag;
+            (menuItemDrag.MenuItemComponentViewModel as CreateLinkMenuItemViewModel).CreateLinkEvent += (sender, bounds) => FilterLinkViewController.Instance.CreateFilterLinkViewModel(this, bounds);
+             
         }
 
         public OperationViewModel(OperationModel operationModel)
