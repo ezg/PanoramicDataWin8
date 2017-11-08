@@ -79,7 +79,6 @@ namespace PanoramicDataWin8.view.vis.render
     }
     public sealed partial class RawDataRenderer : Renderer, IScribbable
     {
-
         public ObservableCollection<object> Records { get; set; } = new ObservableCollection<object>();
         public RawDataRenderer()
         {
@@ -244,7 +243,7 @@ namespace PanoramicDataWin8.view.vis.render
         }
         void OperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            RawDataOperationModel operationModel = (RawDataOperationModel)((OperationViewModel)DataContext).OperationModel;
+            var operationModel = (RawDataOperationModel)((OperationViewModel)DataContext).OperationModel;
             if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.Result))
             {
                 var result = (DataContext as RawDataOperationViewModel).OperationModel.Result;
@@ -253,6 +252,9 @@ namespace PanoramicDataWin8.view.vis.render
                     loadResult(result);
                     render();
                 }
+            } else if (e.PropertyName == "Sorted")
+            {
+                render();
             }
         }
 
@@ -321,8 +323,15 @@ namespace PanoramicDataWin8.view.vis.render
         }
         void render(bool sizeChanged = false)
         {
-            //viewBox.Visibility = Visibility.Collapsed;
-            //dxSurface?.Redraw();
+            var model = (DataContext as RawDataOperationViewModel);
+            if (model.RawDataOperationModel.Sorted != null)
+            {
+                if (model.RawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel.DataType == IDEA_common.catalog.DataType.Int)
+                    Records.Sort((obj) => (long)obj, model.RawDataOperationModel.Sorted == false);
+                else if (model.RawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel.DataType == IDEA_common.catalog.DataType.Double)
+                    Records.Sort((obj) => (double)obj, model.RawDataOperationModel.Sorted == false);
+                else Records.Sort((obj) => obj.ToString(), model.RawDataOperationModel.Sorted == false);
+            }
         }
         public GeoAPI.Geometries.IGeometry BoundsGeometry
         {
