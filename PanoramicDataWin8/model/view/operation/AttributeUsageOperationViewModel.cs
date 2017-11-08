@@ -39,60 +39,64 @@ namespace PanoramicDataWin8.model.view.operation
         {
             return findAllNestedGroups(newAttributeModel).Contains(testAttributeModel);
         }
-        public delegate void InputAddedHandler(object sender);
-        public event         InputAddedHandler TopInputAdded;
+        public delegate void InputAddedHandler(object sender, ObservableCollection<AttributeModel> usageModels);
+        public event         InputAddedHandler ExpandingMenuInputAdded;
         public delegate void DroppedTriggeredHandler(AttributeViewModel model);
-        protected void createTopInputsExpandingMenu(int maxColumns = 3)
+        protected MenuViewModel createExpandingMenu(AttachmentOrientation orientation, ObservableCollection<AttributeModel> operationAttributeModels, 
+            string label,  int maxExpansionSlots, out MenuItemViewModel menuItemViewModel)
         {
-            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Top);
+            var swapOrientation = orientation == AttachmentOrientation.Left || orientation == AttachmentOrientation.Right;
+            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == orientation);
             attachmentViewModel.ShowOnAttributeMove = true;
             attachmentViewModel.ShowOnAttributeTapped = true;
 
-            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
+            var menuViewModel = new MenuViewModel
             {
-                var menuViewModel = new MenuViewModel
-                {
-                    AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                    NrColumns = maxColumns,
-                    NrRows = 1
-                };
-                attachmentViewModel.MenuViewModel = menuViewModel;
+                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
+                NrColumns = swapOrientation ? 1 : maxExpansionSlots,
+                NrRows = swapOrientation ? maxExpansionSlots : 1
+            };
 
-                var addMenuItem = new MenuItemViewModel
+            menuItemViewModel = new MenuItemViewModel
+            {
+                MenuViewModel = menuViewModel,
+                Row = 0,
+                ColumnSpan = 1,
+                RowSpan = 1,
+                Column = 0,
+                Size = new Vec(25, 25),
+                TargetSize = new Vec(25, 25),
+                IsAlwaysDisplayed = false,
+                IsWidthBoundToParent = false,
+                IsHeightBoundToParent = false,
+                Position = Position,
+                MenuItemComponentViewModel = new AttributeMenuItemViewModel
                 {
-                    MenuViewModel = menuViewModel,
-                    Row = 0,
-                    ColumnSpan = 1,
-                    RowSpan = 1,
-                    Column = 0,
-                    Size = new Vec(25, 25),
-                    TargetSize = new Vec(25, 25),
-                    IsAlwaysDisplayed = false,
-                    IsWidthBoundToParent = false,
-                    IsHeightBoundToParent = false,
-                    Position = Position,
-                    MenuItemComponentViewModel = new AttributeMenuItemViewModel
+                    Label = label,
+                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
+                    CanDrag = false,
+                    CanDrop = true,
+                    DroppedTriggered = attributeViewModel =>
                     {
-                        Label = "+",
-                        TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
-                        CanDrag = false,
-                        CanDrop = true,
-                        DroppedTriggered = attributeViewModel =>
+                        var attributeModel = attributeViewModel.AttributeModel;
+                        if (!operationAttributeModels.Contains(attributeModel) &&
+                            !attributeModelContainsAttributeModel((OperationModel as AttributeGroupOperationModel)?.AttributeModel, attributeModel))
                         {
-                            var attributeModel = attributeViewModel.AttributeModel;
-                            if (!OperationModel.AttributeUsageModels.Contains(attributeModel) &&
-                                !attributeModelContainsAttributeModel((OperationModel as AttributeGroupOperationModel)?.AttributeModel, attributeModel))
-                            {
-                                OperationModel.AttributeUsageModels.Add(attributeModel);
-                                if (TopInputAdded != null)
-                                    TopInputAdded(this);
-                            }
+                            operationAttributeModels.Add(attributeModel);
+                            if (ExpandingMenuInputAdded != null)
+                                ExpandingMenuInputAdded(this, operationAttributeModels);
                         }
                     }
-                };
-                menuViewModel.MenuItemViewModels.Add(addMenuItem);
+                }
+            };
 
-                OperationModel.AttributeUsageModels.CollectionChanged += (sender, args) =>
+            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
+            {
+                attachmentViewModel.MenuViewModel = menuViewModel;
+                menuViewModel.MenuItemViewModels.Add(menuItemViewModel);
+
+                var menuItemViewModelCaptured = menuItemViewModel;
+                operationAttributeModels.CollectionChanged += (sender, args) =>
                 {
                     var coll = sender as ObservableCollection<AttributeModel>;
                     var attributeModel = coll.FirstOrDefault();
@@ -103,16 +107,16 @@ namespace PanoramicDataWin8.model.view.operation
                         {
                             var oldAttributeModel = oldItem as AttributeModel;
                             var found = menuViewModel.MenuItemViewModels.FirstOrDefault(mvm =>
-                                (((AttributeMenuItemViewModel)mvm.MenuItemComponentViewModel)
-                                 .AttributeViewModel != null) &&
-                                (((AttributeMenuItemViewModel)mvm.MenuItemComponentViewModel)
-                                 .AttributeViewModel.AttributeModel ==
+                                (((AttributeMenuItemViewModel)mvm.MenuItemComponentViewModel).AttributeViewModel != null) &&
+                                (((AttributeMenuItemViewModel)mvm.MenuItemComponentViewModel).AttributeViewModel.AttributeModel ==
                                  oldAttributeModel));
                             if (found != null)
                                 menuViewModel.MenuItemViewModels.Remove(found);
                         }
 
-                    menuViewModel.NrRows = (int)Math.Ceiling(1.0 * coll.Count / maxColumns) + 1;
+                    if (swapOrientation)
+                         menuViewModel.NrColumns = (int)Math.Ceiling(1.0 * coll.Count / maxExpansionSlots) + 1;
+                    else menuViewModel.NrRows = (int)Math.Ceiling(1.0 * coll.Count / maxExpansionSlots) + 1;
 
                     // add new ones
                     if (args.NewItems != null)
@@ -125,43 +129,43 @@ namespace PanoramicDataWin8.model.view.operation
                                 MenuViewModel = menuViewModel,
                                 Size = new Vec(50, 50),
                                 TargetSize = new Vec(50, 50),
-                                Position = addMenuItem.Position
+                                Position = menuItemViewModelCaptured.Position,
+                                MenuItemComponentViewModel = new AttributeMenuItemViewModel
+                                {
+                                    Label = newAttributeModel.DisplayName,
+                                    AttributeViewModel = new AttributeViewModel(this, newAttributeModel),
+                                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                                    CanDrag = true,
+                                    CanDrop = false
+                                }
                             };
-                            var newAttr = new AttributeMenuItemViewModel
-                            {
-                                Label = newAttributeModel.DisplayName,
-                                AttributeViewModel = new AttributeViewModel(this, newAttributeModel),
-                                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                                CanDrag = false,
-                                CanDrop = false
-                            };
-
-                            if (newAttributeModel != null)
-                            {
-                                newAttributeModel.PropertyChanged += (sender2, args2) => newAttr.Label = (sender2 as AttributeModel).DisplayName;
-                            }
-
                             newMenuItem.Deleted += (sender1, args1) =>
                             {
                                 var atm = ((AttributeMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeViewModel.AttributeModel;
                                 OperationModel.AttributeUsageModels.Remove(atm);
                             };
-                            newMenuItem.MenuItemComponentViewModel = newAttr;
                             menuViewModel.MenuItemViewModels.Add(newMenuItem);
+                            
+                            if (newAttributeModel != null)
+                            {
+                                newAttributeModel.PropertyChanged += (sender2, args2) => 
+                                    (newMenuItem.MenuItemComponentViewModel as AttributeMenuItemViewModel).Label = (sender2 as AttributeModel).DisplayName;
+                            }
                         }
                     }
 
                     var count = 0;
-                    foreach (var menuItemViewModel in menuViewModel.MenuItemViewModels.Where(mvm => mvm != addMenuItem))
+                    foreach (var mItemViewModel in menuViewModel.MenuItemViewModels.Where(mvm => mvm != menuItemViewModelCaptured).Where((mivm) => !(mivm.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel)))
                     {
-                        menuItemViewModel.Column = count % maxColumns;
-                        menuItemViewModel.Row = menuViewModel.NrRows - 1 - (int)Math.Floor(1.0 * count / maxColumns);
+                        mItemViewModel.Row    = swapOrientation ? count % maxExpansionSlots : menuViewModel.NrRows - 1 - (int)Math.Floor(1.0 * count / maxExpansionSlots);
+                        mItemViewModel.Column = swapOrientation ? menuViewModel.NrColumns - 1 - (int)Math.Floor(1.0 * count / maxExpansionSlots) : count % maxExpansionSlots;
                         count++;
                     }
                     attachmentViewModel.StartDisplayActivationStopwatch();
                     menuViewModel.FireUpdate();
                 };
             }
+            return menuViewModel;
         }
 
         protected void createApplyAttributeMenu(AttributeModel attributeModel, AttachmentOrientation attachmentOrientation,

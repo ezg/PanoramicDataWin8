@@ -27,5 +27,11 @@ namespace PanoramicDataWin8.model.data.operation
         {
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
+        bool? _sorted = false;
+        public bool? Sorted
+        {
+            get { return _sorted; }
+            set { SetProperty(ref _sorted, value); }
+        }
     }
 }

@@ -87,7 +87,7 @@ namespace PanoramicDataWin8.controller.view
             MainModel.StartDataset = config["StartDataset"].ToString();
             MainModel.SampleSize = double.Parse(config["SampleSize"].ToString());
             MainModel.IsDarpaSubmissionMode = bool.Parse(config["IsDarpaSubmissionMode"].ToString());
-            MainModel.IsIGTMode = bool.Parse(config["IsIGTMode"].ToString());
+          //  MainModel.IsIGTMode = bool.Parse(config["IsIGTMode"].ToString());
             MainModel.APIPath = config["APIPath"].ToString();
             MainModel.Hostname = config["Hostname"].ToString();
 
@@ -512,7 +512,7 @@ namespace PanoramicDataWin8.controller.view
                     (hits.Count() > 0) && (orderderHits[0] == element));
             }
 
-            if (!hits.Any())
+            if (!hits.Any() && e.AttributeModel != null)
             {
                 var operationContainerView = new OperationContainerView();
                 var histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(e.AttributeModel, position);

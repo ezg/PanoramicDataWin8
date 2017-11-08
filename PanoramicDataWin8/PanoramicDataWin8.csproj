@@ -213,7 +213,7 @@
     <Compile Include="model\view\operation\DefinitionOperationViewModel.cs" />
     <Compile Include="model\view\operation\FunctionOperationViewModel.cs" />
     <Compile Include="model\view\operation\RecommenderOperationViewModel.cs" />
-    <Compile Include="model\view\RawDataOperationViewModel.cs" />
+    <Compile Include="model\view\operation\RawDataOperationViewModel.cs" />
     <Compile Include="model\view\RecommenderHandleViewModel.cs" />
     <Compile Include="model\view\RecommendedHistogramMenuItemViewModel.cs" />
     <Compile Include="model\view\PagingMenuItemViewModel.cs" />

@@ -75,6 +75,8 @@ namespace PanoramicDataWin8.view.common
         void updateRendering()
         {
             var model = DataContext as AttributeViewModel;
+            if (model?.AttributeModel == null)
+                return;
             txtBlock.Inlines.Clear();
             Run r = new Run { Text = model.MainLabel };
             if (model.AttributeModel.IsTarget)

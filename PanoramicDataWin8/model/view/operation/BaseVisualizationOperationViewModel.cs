@@ -23,12 +23,12 @@ namespace PanoramicDataWin8.model.view.operation
         public class AttributeUsageMenu
         {
             BaseVisualizationOperationViewModel BaseVisualizationOperationViewModel;
-            AttributeTransformationModel        attributeTransformationModel;
-            MenuItemViewModel                   menuItemViewModel;
-            AttachmentViewModel                 attachmentViewModel;
-            MenuViewModel                       menuViewModel;
-            AttachmentOrientation               AttachmentOrientation;
-            AttributeUsage                      Axis;
+            AttributeTransformationModel attributeTransformationModel;
+            MenuItemViewModel menuItemViewModel;
+            AttachmentViewModel attachmentViewModel;
+            MenuViewModel menuViewModel;
+            AttachmentOrientation AttachmentOrientation;
+            AttributeUsage Axis;
 
             private void AttributeTransformationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
             {
@@ -42,7 +42,7 @@ namespace PanoramicDataWin8.model.view.operation
             }
             public BaseVisualizationOperationModel BaseVisualizationOperationModel => (BaseVisualizationOperationModel)BaseVisualizationOperationViewModel.OperationModel;
 
-            public bool CanSwapAxes      { get; set; } = true;
+            public bool CanSwapAxes { get; set; } = true;
             public bool CanTransformAxes { get; set; } = true;
             public AttributeUsageMenu(BaseVisualizationOperationViewModel baseVisualizationOperationViewModel, AttributeModel attributeModel, AttachmentOrientation attachmentOrientation, AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
             {
@@ -51,9 +51,9 @@ namespace PanoramicDataWin8.model.view.operation
                 BaseVisualizationOperationViewModel = baseVisualizationOperationViewModel;
                 attachmentViewModel = BaseVisualizationOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation);
 
-                menuViewModel = BaseVisualizationOperationViewModel.createAttributeLabelMenu(AttachmentOrientation, attributeModel, Axis, size, textAngle, 
+                menuViewModel = BaseVisualizationOperationViewModel.createAttributeLabelMenu(AttachmentOrientation, attributeModel, Axis, size, textAngle,
                             isWidthBoundToParent, isHeightBoundToParent, droppedTriggered, out menuItemViewModel);
-                
+
                 BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(axis).CollectionChanged += AxisMenu_CollectionChanged;
             }
 
@@ -65,8 +65,8 @@ namespace PanoramicDataWin8.model.view.operation
                 };
                 if (droppedTransformationModel.AttributeModel.DataType != DataType.Undefined)
                 {
-                    var otherAxis          = Axis == AttributeUsage.X ? AttributeUsage.Y : AttributeUsage.X;
-                    var existingModel      = BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(Axis).FirstOrDefault();
+                    var otherAxis = Axis == AttributeUsage.X ? AttributeUsage.Y : AttributeUsage.X;
+                    var existingModel = BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(Axis).FirstOrDefault();
                     var existingOtherModel = BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(otherAxis).FirstOrDefault();
                     var swapAxes = CanSwapAxes && existingModel != null && existingOtherModel.AttributeModel == droppedTransformationModel.AttributeModel &&
                                                                       existingOtherModel.AggregateFunction == droppedTransformationModel.AggregateFunction;
@@ -80,7 +80,7 @@ namespace PanoramicDataWin8.model.view.operation
                 }
             }
 
-            void AssignTransformationModel(AttributeTransformationModel newModel,  AttributeTransformationModel oldModel, AttributeUsage axis)
+            void AssignTransformationModel(AttributeTransformationModel newModel, AttributeTransformationModel oldModel, AttributeUsage axis)
             {
                 if (oldModel != null)
                 {
@@ -88,7 +88,7 @@ namespace PanoramicDataWin8.model.view.operation
                     oldModel.PropertyChanged -= AttributeTransformationModel_PropertyChanged;
                     oldModel.AttributeModel.PropertyChanged -= AttributeModel_PropertyChanged;
                 }
-                if (!BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
+                if (attributeTransformationModel != null && !BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
                 {
                     BaseVisualizationOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue,
                         new AttributeTransformationModel(attributeTransformationModel.AttributeModel) { AggregateFunction = AggregateFunction.Count });

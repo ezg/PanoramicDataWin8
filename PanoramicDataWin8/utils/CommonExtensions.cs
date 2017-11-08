@@ -219,10 +219,12 @@ namespace PanoramicDataWin8.utils
             return c;
         }
 
-        public static void Sort<TSource, TKey>(this Collection<TSource> source, Func<TSource, TKey> keySelector)
+        public static void Sort<TSource, TKey>(this Collection<TSource> source, Func<TSource, TKey> keySelector, bool down = false)
         {
-            List<TSource> sortedList = source.OrderBy(keySelector).ToList();
+            var sortedList = source.OrderBy(keySelector).ToList();
             source.Clear();
+            if (down)
+                sortedList.Reverse();
             foreach (var sortedItem in sortedList)
                 source.Add(sortedItem);
         }

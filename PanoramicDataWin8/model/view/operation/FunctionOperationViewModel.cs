@@ -68,7 +68,8 @@ namespace PanoramicDataWin8.model.view.operation
             if (FunctionOperationModel.FunctionSubtypeModel is MinMaxScaleFunctionSubtypeModel)
                 ; // createDummyParameterMenu();
 
-            createTopInputsExpandingMenu();
+            MenuItemViewModel menuItemViewModel;
+            createExpandingMenu(AttachmentOrientation.Top, FunctionOperationModel.AttributeUsageModels, "+", 3, out menuItemViewModel);
             createApplyAttributeMenu(FunctionOperationModel.GetAttributeModel(), AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
         }
 
