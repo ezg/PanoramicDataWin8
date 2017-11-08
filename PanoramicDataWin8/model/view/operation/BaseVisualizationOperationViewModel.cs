@@ -53,6 +53,7 @@ namespace PanoramicDataWin8.model.view.operation
 
                 menuViewModel = BaseVisualizationOperationViewModel.createAttributeLabelMenu(AttachmentOrientation, attributeModel, Axis, size, textAngle,
                             isWidthBoundToParent, isHeightBoundToParent, droppedTriggered, out menuItemViewModel);
+                menuViewModel.SynchronizeItemsDisplay = false;
 
                 BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(axis).CollectionChanged += AxisMenu_CollectionChanged;
             }

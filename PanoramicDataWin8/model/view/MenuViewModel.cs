@@ -12,8 +12,6 @@ namespace PanoramicDataWin8.model.view
 
         private AttachmentOrientation _attachmentOrientation;
 
-        private AttachmentViewModel _attachmentViewModel;
-
         private bool _isDisplayed;
 
         private bool _moveOnHide = false;
@@ -27,6 +25,8 @@ namespace PanoramicDataWin8.model.view
         private int _nrColumns;
 
         private int _nrRows;
+
+        public bool SynchronizeItemsDisplay { get; set; } = true;
 
         public ObservableCollection<MenuItemViewModel> MenuItemViewModels
         {
@@ -90,8 +90,6 @@ namespace PanoramicDataWin8.model.view
             get { return _attachmentOrientation; }
             set { SetProperty(ref _attachmentOrientation, value); }
         }
-
-
 
         public event EventHandler Updated;
 

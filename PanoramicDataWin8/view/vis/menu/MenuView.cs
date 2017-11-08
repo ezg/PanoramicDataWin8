@@ -239,7 +239,6 @@ namespace PanoramicDataWin8.view.vis.menu
                 updateRendering();
             }
         }
-
         void MenuItemViewModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
@@ -256,19 +255,21 @@ namespace PanoramicDataWin8.view.vis.menu
             }
             else if (e.NewItems != null)
             {
+                var menuModel = (DataContext as MenuViewModel);
                 foreach (var item in e.NewItems)
                 {
                     var menuItemView = new MenuItemView()
                     {
                         DataContext = (item as MenuItemViewModel)
                     };
-                    var model = (item as MenuItemViewModel);
+                    var model = item as MenuItemViewModel;
                     model.PropertyChanged += MenuItemViewModel_PropertyChanged;
                     _menuViewItems.Add(model, menuItemView);
                     _contentCanvas.Children.Insert(0, menuItemView);
                     updateRendering();
                     menuItemView.Opacity = 0;
-                    fadeStoryboard(menuItemView.Opacity, 1, menuItemView).Begin();
+                    if (Opacity == 1 && menuModel.SynchronizeItemsDisplay)
+                        fadeStoryboard(menuItemView.Opacity, 1, menuItemView).Begin();
                 }
             }
         }
