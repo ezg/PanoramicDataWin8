@@ -48,6 +48,9 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _ankerOffset, value); }
         }
 
+        public void StartDisplayActivationStopwatch() {
+            ActiveStopwatch.Restart();
+        }
         public Stopwatch ActiveStopwatch
         {
             get { return _activeStopwatch; }

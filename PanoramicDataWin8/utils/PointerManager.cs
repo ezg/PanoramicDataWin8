@@ -193,7 +193,8 @@ namespace PanoramicDataWin8.utils
                 CurrentContacts = currentContactsCopy,
                 CurrentPointers = currentPointerCopy,
                 StartContacts = startContactsCopy,
-                IsRightMouse = rightMouse
+                IsRightMouse = rightMouse,
+                Timestamp = DateTime.Now
             };
         }
 
@@ -236,5 +237,6 @@ namespace PanoramicDataWin8.utils
         public Dictionary<uint, PointerPoint> CurrentContacts { get; set; }
         public Dictionary<uint, PointerPoint> StartContacts { get; set; }
         public bool DoHandle { get; set; } = true;
+        public DateTime Timestamp {get;set;} = DateTime.MinValue;
     }
 }

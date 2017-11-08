@@ -51,7 +51,7 @@ namespace PanoramicDataWin8.model.view.operation
                 BaseVisualizationOperationViewModel = baseVisualizationOperationViewModel;
                 attachmentViewModel = BaseVisualizationOperationViewModel.AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation);
 
-                menuViewModel = BaseVisualizationOperationViewModel.createLabelMenu(AttachmentOrientation, attributeModel, Axis, size, textAngle, 
+                menuViewModel = BaseVisualizationOperationViewModel.createAttributeLabelMenu(AttachmentOrientation, attributeModel, Axis, size, textAngle, 
                             isWidthBoundToParent, isHeightBoundToParent, droppedTriggered, out menuItemViewModel);
                 
                 BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(axis).CollectionChanged += AxisMenu_CollectionChanged;
@@ -59,44 +59,41 @@ namespace PanoramicDataWin8.model.view.operation
 
             void droppedTriggered(AttributeViewModel attributeViewModel)
             {
-                var attributeTransformationModel = new AttributeTransformationModel(attributeViewModel.AttributeModel)
+                var droppedTransformationModel = new AttributeTransformationModel(attributeViewModel.AttributeModel)
                 { // copy ATM because drop target doesn't want to share parameters with source
                     AggregateFunction = CanTransformAxes ? (attributeViewModel.AttributeTransformationModel?.AggregateFunction ?? AggregateFunction.None) : AggregateFunction.None
                 };
-                if (attributeTransformationModel.AttributeModel.DataType != DataType.Undefined)
+                if (droppedTransformationModel.AttributeModel.DataType != DataType.Undefined)
                 {
-                    var otherAxis = Axis == AttributeUsage.X ? AttributeUsage.Y : AttributeUsage.X;
-                    var existingModel = BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(Axis).FirstOrDefault();
+                    var otherAxis          = Axis == AttributeUsage.X ? AttributeUsage.Y : AttributeUsage.X;
+                    var existingModel      = BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(Axis).FirstOrDefault();
                     var existingOtherModel = BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(otherAxis).FirstOrDefault();
-                    var swapAxes = CanSwapAxes && existingModel != null && existingOtherModel.AttributeModel == attributeTransformationModel.AttributeModel &&
-                                                                      existingOtherModel.AggregateFunction == attributeTransformationModel.AggregateFunction;
+                    var swapAxes = CanSwapAxes && existingModel != null && existingOtherModel.AttributeModel == droppedTransformationModel.AttributeModel &&
+                                                                      existingOtherModel.AggregateFunction == droppedTransformationModel.AggregateFunction;
 
-                    if (existingModel != null)
-                    {
-                        BaseVisualizationOperationModel.RemoveAttributeUsageTransformationModel(Axis, existingModel);
-                        existingModel.PropertyChanged -= AttributeTransformationModel_PropertyChanged;
-                        existingModel.AttributeModel.PropertyChanged -= AttributeModel_PropertyChanged;
-                    }
-                    if (!BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
-                    {
-                        BaseVisualizationOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue,
-                            new AttributeTransformationModel(attributeTransformationModel.AttributeModel) { AggregateFunction = AggregateFunction.Count });
-                    }
-                    BaseVisualizationOperationModel.AddAttributeUsageTransformationModel(Axis, attributeTransformationModel);
+                    AssignTransformationModel(droppedTransformationModel, existingModel, Axis);
+
                     if (swapAxes)
                     {
-                        BaseVisualizationOperationModel.RemoveAttributeUsageTransformationModel(otherAxis, existingOtherModel);
-                        existingOtherModel.PropertyChanged -= AttributeTransformationModel_PropertyChanged;
-                        existingOtherModel.AttributeModel.PropertyChanged -= AttributeModel_PropertyChanged;
-                        if (!BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
-                        {
-                            BaseVisualizationOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue,
-                                new AttributeTransformationModel(attributeTransformationModel.AttributeModel) { AggregateFunction = AggregateFunction.Count });
-                        }
-                        BaseVisualizationOperationModel.AddAttributeUsageTransformationModel(otherAxis, existingModel);
+                        AssignTransformationModel(existingModel, existingOtherModel, otherAxis);
                     }
-                    attachmentViewModel.ActiveStopwatch.Restart();
                 }
+            }
+
+            void AssignTransformationModel(AttributeTransformationModel newModel,  AttributeTransformationModel oldModel, AttributeUsage axis)
+            {
+                if (oldModel != null)
+                {
+                    BaseVisualizationOperationModel.RemoveAttributeUsageTransformationModel(axis, oldModel);
+                    oldModel.PropertyChanged -= AttributeTransformationModel_PropertyChanged;
+                    oldModel.AttributeModel.PropertyChanged -= AttributeModel_PropertyChanged;
+                }
+                if (!BaseVisualizationOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
+                {
+                    BaseVisualizationOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.DefaultValue,
+                        new AttributeTransformationModel(attributeTransformationModel.AttributeModel) { AggregateFunction = AggregateFunction.Count });
+                }
+                BaseVisualizationOperationModel.AddAttributeUsageTransformationModel(axis, newModel);
             }
 
             void AxisMenu_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
@@ -121,27 +118,32 @@ namespace PanoramicDataWin8.model.view.operation
 
                 if (CanTransformAxes)  // display menu options of the transformations that can be performed on the attribute
                 {
-                    // remove old ones first
-                    foreach (var mvm in menuViewModel.MenuItemViewModels.Where(mvm => mvm.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel).ToArray())
-                        menuViewModel.MenuItemViewModels.Remove(mvm);
-
-                    var atm = (attributeMenuItemViewModel.AttributeViewModel as AttributeViewModel)?.AttributeTransformationModel;
-                    if (atm != null)
-                    {
-                        var count = 0;
-                        foreach (var aggregationFunction in atm.AggregateFunctions)
-                        {
-                            menuViewModel.MenuItemViewModels.Add(AddAggregateToggleMenuItem(atm, count++, aggregationFunction));
-                        }
-
-                        var toggles = menuViewModel.MenuItemViewModels.Select(i => i.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel);
-                        foreach (var t in toggles.Where(t => t != null))
-                            t.OtherToggles.AddRange(toggles.Where(ti => ti != null && ti != t));
-                    }
+                    addAttributeTransformationToggleMenuItems(attributeMenuItemViewModel);
                 }
             }
 
-            MenuItemViewModel AddAggregateToggleMenuItem(AttributeTransformationModel atm, int count, AggregateFunction aggregationFunction)
+            void addAttributeTransformationToggleMenuItems(AttributeMenuItemViewModel attributeMenuItemViewModel)
+            {
+                // remove old ones first
+                foreach (var mvm in menuViewModel.MenuItemViewModels.Where(mvm => mvm.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel).ToArray())
+                    menuViewModel.MenuItemViewModels.Remove(mvm);
+
+                var atm = (attributeMenuItemViewModel.AttributeViewModel as AttributeViewModel)?.AttributeTransformationModel;
+                if (atm != null)
+                {
+                    var count = 0;
+                    foreach (var aggregationFunction in atm.AggregateFunctions)
+                    {
+                        menuViewModel.MenuItemViewModels.Add(createAggregateTransformationToggleMenuItem(atm, count++, aggregationFunction));
+                    }
+
+                    var toggles = menuViewModel.MenuItemViewModels.Select(i => i.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel);
+                    foreach (var t in toggles.Where(t => t != null))
+                        t.OtherToggles.AddRange(toggles.Where(ti => ti != null && ti != t));
+                }
+            }
+
+            MenuItemViewModel createAggregateTransformationToggleMenuItem(AttributeTransformationModel atm, int count, AggregateFunction aggregationFunction)
             {
                 var toggleMenuItem = new MenuItemViewModel
                 {

@@ -83,7 +83,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 updatePosition();
             }
 
-            _model.AttachmentViewModel.ActiveStopwatch.Restart();
+            _model.AttachmentViewModel.StartDisplayActivationStopwatch();
         }
 
         private void updatePosition()

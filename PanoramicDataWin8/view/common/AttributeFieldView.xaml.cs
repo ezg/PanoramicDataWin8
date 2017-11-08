@@ -165,7 +165,7 @@ namespace PanoramicDataWin8.view.common
 
                 if (delta.Length > 10 && _shadow == null)
                 {
-                    createShadow(currentPoint);
+                    createShadow(currentPoint, e);
                 }
 
                 if (_shadow != null)
@@ -181,7 +181,10 @@ namespace PanoramicDataWin8.view.common
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        (DataContext as AttributeViewModel).FireMoved(bounds, DataContext as AttributeViewModel);
+                        if (e.NumActiveContacts > 0)
+                        {
+                            (DataContext as AttributeViewModel).FireMoved(bounds, DataContext as AttributeViewModel, e);
+                        }
                     }
                 }
 
@@ -205,8 +208,8 @@ namespace PanoramicDataWin8.view.common
             if (_shadow != null)
             {
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
-
-                attributeViewModel.FireDropped(_shadow.GetBounds(inkableScene), attributeViewModel);
+                
+                attributeViewModel.FireDropped(_shadow.GetBounds(inkableScene), attributeViewModel, e);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -215,7 +218,7 @@ namespace PanoramicDataWin8.view.common
             _manipulationStartTime = 0;
         }
 
-        public void createShadow(Point fromInkableScene)
+        public void createShadow(Point fromInkableScene, PointerManagerEvent e)
         {
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
             if (inkableScene != null && DataContext != null && (DataContext as AttributeViewModel).AttributeModel != null)
@@ -245,7 +248,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow.SendToFront();
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as AttributeViewModel).FireMoved(bounds, DataContext as AttributeViewModel);
+                (DataContext as AttributeViewModel).FireMoved(bounds, DataContext as AttributeViewModel, e);
             }
         }
     }

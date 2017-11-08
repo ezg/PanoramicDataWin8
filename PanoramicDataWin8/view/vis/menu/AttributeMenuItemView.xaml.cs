@@ -80,9 +80,17 @@ namespace PanoramicDataWin8.view.vis.menu
             }
         }
 
-        private bool _isHighlighted = false;
+        bool? _isHighlighted = false;
+        DateTime _highlightStoryboardStart = DateTime.MinValue;
+        DateTime _unhighlightStoryboardStart = DateTime.MinValue;
         void toggleHighlighted(bool isHighlighted)
         {
+            if (isHighlighted == _isHighlighted)
+                return;
+            if (isHighlighted && _highlightStoryboardStart != DateTime.MinValue && _highlightStoryboardStart > _unhighlightStoryboardStart)
+                return;
+            if (!isHighlighted &&  _unhighlightStoryboardStart != DateTime.MinValue && _unhighlightStoryboardStart > _highlightStoryboardStart)
+                return;
             var model = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
 
             ExponentialEase easingFunction = new ExponentialEase();
@@ -110,6 +118,24 @@ namespace PanoramicDataWin8.view.vis.menu
             Storyboard.SetTargetProperty(backgroundAnimation, "(Border.Background).(SolidColorBrush.Color)");
             //Storyboard.SetTargetProperty(foregroundAnimation, "(TextBlock.Foreground).Color");
 
+            if (isHighlighted)
+            {
+                _isHighlighted = null;
+                _highlightStoryboardStart = DateTime.Now;
+                storyboard.Completed += (sender, args) => {
+                    _highlightStoryboardStart = DateTime.MinValue;
+                    _isHighlighted = _unhighlightStoryboardStart == null ? (bool?) true : null;
+                };
+            }
+            else
+            {
+                _isHighlighted = null;
+                _unhighlightStoryboardStart = DateTime.Now;
+                storyboard.Completed += (sender, args) => {
+                    _unhighlightStoryboardStart = DateTime.MinValue;
+                    _isHighlighted = _highlightStoryboardStart == null ? (bool?)false : null;
+                };
+            }
             storyboard.Begin();
         }
 
@@ -151,7 +177,7 @@ namespace PanoramicDataWin8.view.vis.menu
 
                 if (delta.Length > 10 && _shadow == null)
                 {
-                    createShadow(currentPoint);
+                    createShadow(currentPoint, e);
                 }
 
                 if (_shadow != null)
@@ -167,7 +193,7 @@ namespace PanoramicDataWin8.view.vis.menu
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        model.AttributeViewModel.FireMoved(bounds, model.AttributeViewModel);
+                        model.AttributeViewModel.FireMoved(bounds, model.AttributeViewModel, e);
                     }
                 }
 
@@ -198,7 +224,7 @@ namespace PanoramicDataWin8.view.vis.menu
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
 
-                model.AttributeViewModel.FireDropped(bounds, model.AttributeViewModel);
+                model.AttributeViewModel.FireDropped(bounds, model.AttributeViewModel, e);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -207,7 +233,7 @@ namespace PanoramicDataWin8.view.vis.menu
             _manipulationStartTime = 0;
         }
 
-        public void createShadow(Point fromInkableScene)
+        public void createShadow(Point fromInkableScene, PointerManagerEvent e)
         {
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
             var attributeViewModel = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel).AttributeViewModel;
@@ -240,7 +266,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 inkableScene.Add(_shadow);
                 _shadow.SendToFront();
                 
-                attributeViewModel.FireMoved(_shadow.GetBounds(inkableScene), attributeViewModel);
+                attributeViewModel.FireMoved(_shadow.GetBounds(inkableScene), attributeViewModel, e);
             }
         }
 
@@ -256,22 +282,21 @@ namespace PanoramicDataWin8.view.vis.menu
             AttributeViewModelEventArgs e, bool overElement)
         {
             var model = (AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
-
-            if (model.CanDrop)
+            if (e.PointerArgs.Timestamp > _lastDropTime && model.CanDrop)
             {
-                if (overElement && !_isHighlighted)
+                if (overElement)
                 {
                     toggleHighlighted(true);
-                    _isHighlighted = true;
 
                 }
-                else if (!overElement && _isHighlighted)
+                else if (!overElement)
                 {
                     toggleHighlighted(false);
-                    _isHighlighted = false;
                 }
             }
         }
+
+        DateTime _lastDropTime = DateTime.MinValue;
 
         public void AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
         {
@@ -279,11 +304,8 @@ namespace PanoramicDataWin8.view.vis.menu
 
             if (model.CanDrop)
             {
-                if (_isHighlighted)
-                {
-                    toggleHighlighted(false);
-                    _isHighlighted = false;
-                }
+                _lastDropTime = e.PointerArgs.Timestamp;
+                toggleHighlighted(false);
 
                 if (overElement)
                 {

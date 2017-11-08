@@ -469,7 +469,7 @@ namespace PanoramicDataWin8.controller.view
                     {
                         if (a.ShowOnAttributeMove)
                         {
-                            a.ActiveStopwatch.Restart();
+                            a.StartDisplayActivationStopwatch();
                         }
                     }
                 }

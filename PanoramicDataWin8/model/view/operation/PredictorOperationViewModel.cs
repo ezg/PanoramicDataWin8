@@ -218,7 +218,7 @@ namespace PanoramicDataWin8.model.view.operation
         }
         public PredictorOperationViewModel(PredictorOperationModel predictorOperationModel) : base(predictorOperationModel)
         {
-            var menuViewModel = createLabelMenu(AttachmentOrientation.Bottom, predictorOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false, null, out PredictorNameMenuItemViewModel);
+            var menuViewModel = createAttributeLabelMenu(AttachmentOrientation.Bottom, predictorOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false, null, out PredictorNameMenuItemViewModel);
             createRightTargetMenu();
             createTopInputsExpandingMenu();
             createLeftInputsExpandingMenu();

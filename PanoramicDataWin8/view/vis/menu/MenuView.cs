@@ -268,8 +268,11 @@ namespace PanoramicDataWin8.view.vis.menu
                     _contentCanvas.Children.Insert(0, menuItemView);
                     updateRendering();
                     menuItemView.Opacity = 0;
-                    var sb = fadeStoryboard(menuItemView.Opacity, 1, menuItemView);
-                    sb.Begin();
+                    if ((DataContext as MenuViewModel)?.IsDisplayed == true)
+                    {
+                        var sb = fadeStoryboard(menuItemView.Opacity, 1, menuItemView);
+                        sb.Begin();
+                    }
                 }
             }
         }

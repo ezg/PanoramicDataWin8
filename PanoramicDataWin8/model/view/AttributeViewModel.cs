@@ -10,6 +10,7 @@ using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Input;
 
 namespace PanoramicDataWin8.model.view
 {
@@ -200,14 +201,14 @@ namespace PanoramicDataWin8.model.view
         public static event EventHandler<AttributeViewModelEventArgs> AttributeViewModelMoved;
         public static event EventHandler<AttributeViewModelEventArgs> AttributeViewModelDropped;
 
-        public void FireMoved(Rct bounds, AttributeViewModel attributeViewModel)
+        public void FireMoved(Rct bounds, AttributeViewModel attributeViewModel, PointerManagerEvent e)
         {
-            AttributeViewModelMoved?.Invoke(this, new AttributeViewModelEventArgs(attributeViewModel, bounds));
+            AttributeViewModelMoved?.Invoke(this, new AttributeViewModelEventArgs(attributeViewModel, bounds, e));
         }
 
-        public void FireDropped(Rct bounds, AttributeViewModel attributeViewModel)
+        public void FireDropped(Rct bounds, AttributeViewModel attributeViewModel, PointerManagerEvent e)
         {
-            AttributeViewModelDropped?.Invoke(this, new AttributeViewModelEventArgs(attributeViewModel, bounds));
+            AttributeViewModelDropped?.Invoke(this, new AttributeViewModelEventArgs(attributeViewModel, bounds, e));
         }
         protected virtual void updateLabels()
         {

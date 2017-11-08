@@ -158,14 +158,52 @@ namespace PanoramicDataWin8.model.view.operation
                         menuItemViewModel.Row = menuViewModel.NrRows - 1 - (int)Math.Floor(1.0 * count / maxColumns);
                         count++;
                     }
-                    attachmentViewModel.ActiveStopwatch.Restart();
+                    attachmentViewModel.StartDisplayActivationStopwatch();
                     menuViewModel.FireUpdate();
                 };
             }
         }
-        
 
-        protected MenuViewModel createLabelMenu(AttachmentOrientation attachmentOrientation, AttributeModel code,
+        protected void createApplyAttributeMenu(AttributeModel attributeModel, AttachmentOrientation attachmentOrientation,
+              AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
+        {
+            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
+            attachmentViewModel.ShowOnAttributeTapped = true;
+
+            var menuViewModel = new MenuViewModel
+            {
+                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
+                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
+                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
+            };
+            attachmentViewModel.MenuViewModel = menuViewModel;
+
+            var menuItem = new MenuItemViewModel
+            {
+                MenuViewModel = menuViewModel,
+                Row = 0,
+                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 1,
+                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 5,
+                Column = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
+                Size = size,
+                Position = Position,
+                TargetSize = size,
+                IsAlwaysDisplayed = false,
+                IsWidthBoundToParent = isWidthBoundToParent,
+                IsHeightBoundToParent = isHeightBoundToParent,
+                MenuItemComponentViewModel = new AttributeMenuItemViewModel
+                {
+                    TextAngle = textAngle,
+                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                    Label = "Apply",
+                    AttributeViewModel = new AttributeViewModel(this, attributeModel),
+                    EditNameOnTap = true
+                }
+            };
+            menuViewModel.MenuItemViewModels.Add(menuItem);
+        }
+
+        protected MenuViewModel createAttributeLabelMenu(AttachmentOrientation attachmentOrientation, AttributeModel code,
             AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent, 
             DroppedTriggeredHandler droppedTriggered,
             out MenuItemViewModel menuItemViewModel)
@@ -214,7 +252,7 @@ namespace PanoramicDataWin8.model.view.operation
                 };
             }
             attributeMenuItemViewModel.TappedTriggered += (() => // when label is tapped, display any attached menu options
-                attachmentViewModel.ActiveStopwatch.Restart());
+                attachmentViewModel.StartDisplayActivationStopwatch());
             return menuViewModel;
         }
     }
