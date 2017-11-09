@@ -86,7 +86,7 @@ namespace PanoramicDataWin8.view.vis.render
             
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
-           // xRawDataView.ItemsSource = Records;
+            xRawDataView.ItemsSource = Records;
             xRawDataGridView.ItemsSource = Records;
             this.SizeChanged += RawDataRenderer_SizeChanged;
             this.Tapped += RawDataRenderer_Tapped;
@@ -97,14 +97,18 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var res = VisualTreeHelper.FindElementsInHostCoordinates(e.GetCurrentPoint(null).Position, this);
             if (res.Count() == 0)
+            {
                 xRawDataGridView.IsHitTestVisible = false;
-        }
+                xRawDataView.IsHitTestVisible = false;
+            }
+            }
         
 
         private void RawDataRenderer_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             var model = (DataContext as RawDataOperationViewModel);
             xRawDataGridView.IsHitTestVisible = true;
+            xRawDataView.IsHitTestVisible = true;
             var res = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), this);
             foreach (var r in res)
                 if (r is Image)
@@ -192,6 +196,7 @@ namespace PanoramicDataWin8.view.vis.render
             b.Source = this;
             b.Path = new PropertyPath("ActualWidth");
             this.xRawDataGridView.ItemsPanelRoot.SetBinding(WidthProperty, b);
+            this.xRawDataView.ItemsPanelRoot.SetBinding(WidthProperty, b);
         }
         
 
@@ -252,7 +257,8 @@ namespace PanoramicDataWin8.view.vis.render
                     loadResult(result);
                     render();
                 }
-            } else if (e.PropertyName == "Sorted")
+            }
+            else if (e.PropertyName == "Sorted")
             {
                 render();
             }
@@ -364,6 +370,11 @@ namespace PanoramicDataWin8.view.vis.render
         public bool Consume(InkStroke inkStroke)
         {
             return false;
+        }
+
+        private void xRawDataView_DragStarting(UIElement sender, DragStartingEventArgs args)
+        {
+
         }
     }
 }

@@ -14,7 +14,7 @@
     FontFamily="{StaticResource abel}">
     <Grid  Background="{StaticResource lightBrush}">
         <common:DXSurface x:Name="dxSurface" Visibility="Collapsed"/>
-        <!--ListView x:Name="xRawDataView" Margin="20"
+        <ListView x:Name="xRawDataView" Margin="20"
                   VirtualizingStackPanel.VirtualizationMode="Recycling" 
                   SelectionMode="None"
                       HorizontalAlignment="Left"
@@ -41,7 +41,7 @@
                     <Border Child="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
-        </ListView-->
+        </ListView>
         <GridView x:Name="xRawDataGridView" 
                   IsHitTestVisible="False"
                   Margin="20" 
