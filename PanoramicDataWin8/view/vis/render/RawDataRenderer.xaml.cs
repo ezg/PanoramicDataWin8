@@ -79,15 +79,16 @@ namespace PanoramicDataWin8.view.vis.render
     }
     public sealed partial class RawDataRenderer : Renderer, IScribbable
     {
-        public ObservableCollection<object> Records { get; set; } = new ObservableCollection<object>();
+        public ObservableCollection<ObservableCollection<object>> Records { get; set; } = new ObservableCollection<ObservableCollection<object>>();
+
         public RawDataRenderer()
         {
             this.InitializeComponent();
             
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
-            xRawDataView.ItemsSource = Records;
-            xRawDataGridView.ItemsSource = Records;
+            xListView.ItemsSource = Records;
+            //xRawDataGridView.ItemsSource = Records;
             this.SizeChanged += RawDataRenderer_SizeChanged;
             this.Tapped += RawDataRenderer_Tapped;
             MainViewController.Instance.MainPage.AddHandler(PointerPressedEvent, new PointerEventHandler(RawDataRenderer_PointerPressed), true);
@@ -99,16 +100,16 @@ namespace PanoramicDataWin8.view.vis.render
             if (res.Count() == 0)
             {
                 xRawDataGridView.IsHitTestVisible = false;
-                xRawDataView.IsHitTestVisible = false;
+                xListView.IsHitTestVisible = false;
             }
-            }
+        }
         
 
         private void RawDataRenderer_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             var model = (DataContext as RawDataOperationViewModel);
             xRawDataGridView.IsHitTestVisible = true;
-            xRawDataView.IsHitTestVisible = true;
+            xListView.IsHitTestVisible = true;
             var res = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), this);
             foreach (var r in res)
                 if (r is Image)
@@ -195,8 +196,8 @@ namespace PanoramicDataWin8.view.vis.render
             var b = new Binding();
             b.Source = this;
             b.Path = new PropertyPath("ActualWidth");
-            this.xRawDataGridView.ItemsPanelRoot.SetBinding(WidthProperty, b);
-            this.xRawDataView.ItemsPanelRoot.SetBinding(WidthProperty, b);
+            //this.xRawDataGridView.ItemsPanelRoot.SetBinding(WidthProperty, b);
+            // this.xRawDataView.ItemsPanelRoot.SetBinding(WidthProperty, b);
         }
         
 
@@ -260,7 +261,7 @@ namespace PanoramicDataWin8.view.vis.render
             }
             else if (e.PropertyName == "Sorted")
             {
-                render();
+                render(operationModel.Sorted);
             }
         }
 
@@ -285,35 +286,41 @@ namespace PanoramicDataWin8.view.vis.render
         void loadResult(IResult result)
         {
             var model = (DataContext as RawDataOperationViewModel);
-            var clone = (RawDataOperationModel)model.OperationModel.ResultCauserClone;
-            AttributeTransformationModel valueIom = null;
-
-            if (clone.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
-            {
-                valueIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.Value).First();
-            }
-            else if (clone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
-            {
-                valueIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
-            }
-
-            Records.Clear();
+            Records = new ObservableCollection<ObservableCollection<object>>();
             xWordCloud.TheText = "";
             model.RawDataOperationModel.ClearFilterModels();
-            if ((result as RawDataResult).WeightedWords?.Count > 0)
+            if ((result as RawDataResult).Samples.Count() == 1 && (result as RawDataResult).WeightedWords?.Count > 0)
             {
-                xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords;
+                xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords.FirstOrDefault().Value;
                 xWordCloud.Visibility = Visibility.Visible;
+                xRawDataGridView.Visibility = Visibility.Collapsed;
+                xListView.Visibility = Visibility.Collapsed;
             }
             else
             {
                 xWordCloud.Visibility = Visibility.Collapsed;
-                loadRecordsAsync((result as RawDataResult).Samples);
+                foreach (var s in (result as RawDataResult).Samples)
+                    loadRecordsAsync(s.Value);
+                if ((result as RawDataResult).Samples.Count() == 1)
+                {
+                    xRawDataGridView.Visibility = Visibility.Visible;
+                    xListView.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    xRawDataGridView.Visibility = Visibility.Collapsed;
+                    xListView.Visibility = Visibility.Visible;
+                }
+
             }
+            this.xListView.ItemsSource = Records;
+            this.xRawDataGridView.ItemsSource = Records.FirstOrDefault();
         }
 
         void loadRecordsAsync(List<object> records)
         {
+            var acollection = new ObservableCollection<object>();
+            Records.Add(acollection);
             if (records != null)
 #pragma warning disable CS4014
                 CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
@@ -322,21 +329,44 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     foreach (var val in records)
                     {
-                        Records.Add(val);
+                        acollection.Add(val);
                     }
                 });
 #pragma warning restore CS4014
         }
-        void render(bool sizeChanged = false)
+
+        void render(Tuple<string,bool?> sorted = null)
         {
             var model = (DataContext as RawDataOperationViewModel);
-            if (model.RawDataOperationModel.Sorted != null)
+            if (sorted?.Item2 != null)
             {
-                if (model.RawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel.DataType == IDEA_common.catalog.DataType.Int)
-                    Records.Sort((obj) => (long)obj, model.RawDataOperationModel.Sorted == false);
-                else if (model.RawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel.DataType == IDEA_common.catalog.DataType.Double)
-                    Records.Sort((obj) => (double)obj, model.RawDataOperationModel.Sorted == false);
-                else Records.Sort((obj) => obj.ToString(), model.RawDataOperationModel.Sorted == false);
+                var sortField = sorted.Item1;
+                var sortDir = sorted.Item2;
+
+                var combinde = new List<object[]>();
+                for (var i = 0; i < Records.First().Count; i++)
+                {
+                    var objList = new object[Records.Count];
+                    for (int j = 0; j < Records.Count; j++)
+                        objList[j] = Records[j][i];
+                    combinde.Add(objList);
+                }
+                var attrModelIndex = model.RawDataOperationModel.AttributeTransformationModels.IndexOf((am) => am.AttributeModel.RawName == sortField);
+                if (model.RawDataOperationModel.AttributeUsageModels[attrModelIndex].DataType == IDEA_common.catalog.DataType.Int)
+                    Sort(combinde.OrderBy( (obj) => (long)obj[attrModelIndex]), sortDir == false);
+                else if (model.RawDataOperationModel.AttributeUsageModels[attrModelIndex].DataType == IDEA_common.catalog.DataType.Double)
+                    Sort(combinde.OrderBy((obj) => (double)obj[attrModelIndex]), sortDir == false);
+                else
+                    Sort(combinde.OrderBy((obj) => obj[attrModelIndex].ToString()), sortDir == false);
+            }
+        }
+        public void Sort(IEnumerable<object[]> sortedList, bool down = false)
+        {
+            for (var index = 0; index < Records.Count; index++)
+            {
+                Records[index].Clear();
+                foreach (var x in down ? sortedList.Reverse() : sortedList)
+                    Records[index].Add(x[index]);
             }
         }
         public GeoAPI.Geometries.IGeometry BoundsGeometry
@@ -370,11 +400,6 @@ namespace PanoramicDataWin8.view.vis.render
         public bool Consume(InkStroke inkStroke)
         {
             return false;
-        }
-
-        private void xRawDataView_DragStarting(UIElement sender, DragStartingEventArgs args)
-        {
-
         }
     }
 }

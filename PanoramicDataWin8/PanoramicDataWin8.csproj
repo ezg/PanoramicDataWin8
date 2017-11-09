@@ -379,6 +379,9 @@
       <DependentUpon>PlotRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\PlotRendererContentProvider.cs" />
+    <Compile Include="view\vis\render\RawDataColumn.xaml.cs">
+      <DependentUpon>RawDataColumn.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\render\RawDataRenderer.xaml.cs">
       <DependentUpon>RawDataRenderer.xaml</DependentUpon>
     </Compile>
@@ -622,6 +625,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\OperationContainerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\RawDataColumn.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

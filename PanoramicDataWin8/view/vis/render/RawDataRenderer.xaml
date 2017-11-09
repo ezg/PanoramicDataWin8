@@ -14,18 +14,18 @@
     FontFamily="{StaticResource abel}">
     <Grid  Background="{StaticResource lightBrush}">
         <common:DXSurface x:Name="dxSurface" Visibility="Collapsed"/>
-        <ListView x:Name="xRawDataView" Margin="20"
-                  VirtualizingStackPanel.VirtualizationMode="Recycling" 
+        <ListView x:Name="xListView" x:FieldModifier="public" Margin="20" 
                   SelectionMode="None"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Stretch"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch"
                   ManipulationMode="TranslateRailsY"
                   ShowsScrollingPlaceholders="True"
-                  DragStarting="xRawDataView_DragStarting"  
                   CanDragItems="False"  >
-            <ListView.Resources>
-                <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter"></local:ObjectToFrameworkElementConverter>
-            </ListView.Resources>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsStackPanel CanDrag="False" Orientation="Horizontal"  Margin="0"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -38,12 +38,14 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border Child="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}"/>
+                    <local:RawDataColumn DataContext="{Binding}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
         <GridView x:Name="xRawDataGridView" 
+                  Visibility="Collapsed"
                   IsHitTestVisible="False"
+                  Grid.Column="0"
                   Margin="20" 
                   SelectionMode="None"
                   ShowsScrollingPlaceholders="True">

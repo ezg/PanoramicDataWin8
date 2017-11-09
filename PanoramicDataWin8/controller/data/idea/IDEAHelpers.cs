@@ -442,7 +442,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             return parameters;
         }
 
-        public static RawDataOperationParameters GetRawDataOperationParameters(BaseVisualizationOperationModel model, int sampleSize)
+        public static RawDataOperationParameters GetRawDataOperationParameters(RawDataOperationModel model, int sampleSize)
         {
             List<AttributeCaclculatedParameters> attributeCodeParameters;
             List<AttributeTransformationModel> aggregates;
@@ -462,17 +462,16 @@ namespace PanoramicDataWin8.controller.data.progressive
 
             var xIom = model.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
 
-            var xBinning = xIom.AggregateFunction == AggregateFunction.None
-                ? new EquiWidthBinningParameters
+            var binnings = new List<BinningParameters>();
+            foreach (var a in model.AttributeUsageModels)
+            {
+                var aBinning = new EquiWidthBinningParameters
                 {
-                    AttributeParameters = GetAttributeParameters(xIom.AttributeModel),
+                    AttributeParameters = GetAttributeParameters(a),
                     RequestedNrOfBins = MainViewController.Instance.MainModel.NrOfXBins,
-                }
-                : (BinningParameters)new SingleBinBinningParameters
-                {
-                    AttributeParameters = GetAttributeParameters(xIom.AttributeModel),
                 };
-            
+                binnings.Add(aBinning);
+            }
 
             var psm = model.SchemaModel as IDEASchemaModel;
             AggregateParameters sortAggregateParam = null;
@@ -506,7 +505,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
                 Filter = filter,
                 Brushes = new List<string>(),
-                BinningParameters = Extensions.Yield(xBinning, xBinning).ToList(),
+                BinningParameters = binnings,
                 SampleStreamBlockSize = sampleSize,
                 AttributeCalculatedParameters = attributeCodeParameters.OfType<AttributeCaclculatedParameters>().ToList()
             };

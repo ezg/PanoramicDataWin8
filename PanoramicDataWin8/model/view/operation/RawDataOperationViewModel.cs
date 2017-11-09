@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Windows.UI.Xaml.Media;
 using IDEA_common.aggregates;
+using System;
 
 namespace PanoramicDataWin8.model.view.operation
 {
@@ -22,17 +23,17 @@ namespace PanoramicDataWin8.model.view.operation
             menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, RawDataOperationModel.AttributeUsageModels, "+", 8, out menuItemViewModel);
             RawDataOperationModel.AttributeUsageModels.CollectionChanged += AttributeUsageModels_CollectionChanged;
 
-            if (attributeModel?.InputVisualizationType == InputVisualizationTypeConstants.ENUM ||
-                attributeModel?.InputVisualizationType == InputVisualizationTypeConstants.CATEGORY ||
-                attributeModel?.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
-            {
-                var x = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.None };
-                rawDataOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
-            }
+            //if (attributeModel?.InputVisualizationType == InputVisualizationTypeConstants.ENUM ||
+            //    attributeModel?.InputVisualizationType == InputVisualizationTypeConstants.CATEGORY ||
+            //    attributeModel?.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
+            //{
+            //    var x = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.None };
+            //    rawDataOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
+            //}
             var attributeMenuItemViewModel = menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel;
             addColumnOptions(attributeMenuItemViewModel, AttachmentOrientation.Top);
         }
-
+        AttributeMenuItemViewModel SelectedColumn = null;
         private void AttributeUsageModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         { 
             foreach (var mivm in menuViewModel.MenuItemViewModels.Where((mivm) => e.NewItems.Contains((mivm.MenuItemComponentViewModel as AttributeMenuItemViewModel)?.AttributeViewModel?.AttributeModel)))
@@ -43,6 +44,7 @@ namespace PanoramicDataWin8.model.view.operation
                 RawDataOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, atx);
 
                 amivm.TappedTriggered = (() => {
+                    SelectedColumn = amivm;
                     AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
 
                     foreach (var toggle in menuViewModel.MenuItemViewModels.Where((t) => t.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel).Select((t)=> t.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel))
@@ -96,7 +98,7 @@ namespace PanoramicDataWin8.model.view.operation
 
                         foreach (var tg in model.OtherToggles)
                             tg.IsChecked = false;
-                        RawDataOperationModel.Sorted = !RawDataOperationModel.Sorted;
+                        RawDataOperationModel.Sorted = new Tuple<string,bool?>(SelectedColumn.AttributeViewModel.AttributeModel.RawName, RawDataOperationModel.Sorted.Item2 != true);
                     }
             };
             return toggleMenuItem;

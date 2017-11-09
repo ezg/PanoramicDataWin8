@@ -27,8 +27,8 @@ namespace PanoramicDataWin8.model.data.operation
         {
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
-        bool? _sorted = false;
-        public bool? Sorted
+        Tuple<string, bool?> _sorted = new Tuple<string, bool?>("", null);
+        public Tuple<string,bool?> Sorted
         {
             get { return _sorted; }
             set { SetProperty(ref _sorted, value); }
