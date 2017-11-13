@@ -59,7 +59,7 @@ namespace PanoramicDataWin8.model.view.operation
                 menuViewModel.MenuItemViewModels.Remove(mvm);
             
             var count = 0;
-            foreach (var aggregationFunction in new string[] { "whoops", "Group By", "Sort", "Avg" })
+            foreach (var aggregationFunction in new string[] {   "Whoops", "Group By", "Sort", "Avg" })
             {
                 menuViewModel.MenuItemViewModels.Add(createColumnOptionToggleMenuItem(count++, aggregationFunction, orientation));
             }
@@ -98,7 +98,16 @@ namespace PanoramicDataWin8.model.view.operation
 
                         foreach (var tg in model.OtherToggles)
                             tg.IsChecked = false;
-                        RawDataOperationModel.Sorted = new Tuple<string,bool?>(SelectedColumn.AttributeViewModel.AttributeModel.RawName, RawDataOperationModel.Sorted.Item2 != true);
+                        if ((sender as ToggleMenuItemComponentViewModel).Label == "Avg")
+                        {
+                            RawDataOperationModel.Function = new RawDataOperationModel.FunctionApplied { Averaged = RawDataOperationModel.Function?.Averaged != true };
+                            if (!RawDataOperationModel.Function.Averaged)
+                                model.IsChecked = false;
+                        }
+                        else RawDataOperationModel.Function = new RawDataOperationModel.FunctionApplied
+                        {
+                            Sorted = new Tuple<string, bool?>(SelectedColumn.AttributeViewModel.AttributeModel.RawName, RawDataOperationModel.Function?.Sorted?.Item2 != true)
+                        };
                     }
             };
             return toggleMenuItem;

@@ -9,17 +9,24 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
     
-    <ListView x:Name="xListView" x:FieldModifier="public" Margin="20"
+    <ListView x:Name="xListView" x:FieldModifier="public" Margin="2.5"
                   SelectionMode="None"
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Stretch"
-                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible"
                   ManipulationMode="TranslateRailsY"
                   Loaded="xListView_Loaded"
                   CanDragItems="False"  >
         <ListView.Resources>
             <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter"></local:ObjectToFrameworkElementConverter>
         </ListView.Resources>
+        <ListView.HeaderTemplate>
+            <DataTemplate>
+                <Grid Background="Gray">
+                    <TextBlock Text="{Binding Title}" Foreground="White" VerticalAlignment="Top" FontSize="9" MaxHeight="20"/>
+                </Grid>
+            </DataTemplate>
+        </ListView.HeaderTemplate>
         <ListView.ItemContainerStyle>
             <Style TargetType="ListViewItem">
                 <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -32,8 +39,9 @@
         </ListView.ItemContainerStyle>
         <ListView.ItemTemplate>
             <DataTemplate>
-                <Border Child="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}"/>
-            </DataTemplate>
+                <ContentPresenter Content="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}" 
+                                  Width="{Binding Path=DataContext.ColumnWidth, ElementName=xListView}" Background="LightGray"/>
+             </DataTemplate>
         </ListView.ItemTemplate>
     </ListView>
     

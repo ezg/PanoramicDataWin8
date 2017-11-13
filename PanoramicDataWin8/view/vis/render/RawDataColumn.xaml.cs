@@ -1,5 +1,7 @@
-﻿using System;
+﻿using PanoramicDataWin8.utils;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -26,7 +28,44 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void xListView_Loaded(object sender, RoutedEventArgs e)
         {
-            xListView.ItemsSource = (DataContext);
+            var dataCol = (DataContext as RawDataRenderer.RawColumnData);
+            xListView.ItemsSource = dataCol.Data;
+            var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
+            cp.ViewChanged += Cp_ViewChanged;
+            if (!dataCol.ShowScroll)
+            {
+                var sbar = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollBar>(this);
+                sbar.Visibility = Visibility.Collapsed;
+            } else
+            {
+                //var scroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
+                //foreach (var dcol in dataCol.Renderer.xListView.ItemsPanelRoot.Children)
+                //{
+                //    var otherScroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(dcol);
+                //    if (otherScroll != scroll)
+                //        otherScroll.SetBinding(ScrollViewer.VerticalOffsetProperty, new Binding() { Source = scroll, Path = new PropertyPath(nameof(ScrollViewer.VerticalOffsetProperty)) });
+                //}
+            }
+        }
+
+        private void Cp_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+        {
+            //var dataCol = (DataContext as RawDataRenderer.RawColumnData);
+            //var scroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
+            //foreach (var dcol in dataCol.Renderer.xListView.ItemsPanelRoot.Children)
+            //{
+            //    var otherScroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(dcol);
+            //    if (otherScroll != scroll)
+            //        otherScroll.SetBinding(ScrollViewer.VerticalOffsetProperty, new Binding() { Source = scroll, Path = new PropertyPath(nameof(ScrollViewer.VerticalOffsetProperty)) });
+            //}
+            var scroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
+            var dataCol = (DataContext as RawDataRenderer.RawColumnData);
+            foreach (var dcol in dataCol.Renderer.xListView.ItemsPanelRoot.Children)
+            {
+                var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(dcol);
+                if (cp != scroll)
+                    cp.ChangeView(null, scroll.VerticalOffset, null, true);
+            }
         }
     }
 }

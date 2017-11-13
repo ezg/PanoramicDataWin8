@@ -22,16 +22,24 @@ namespace PanoramicDataWin8.model.data.operation
             ColumnHeaderAttributeUsageModels.CollectionChanged += columnHeaderAttributeUsageModels_CollectionChanged;
         }
         public ObservableCollection<AttributeModel> ColumnHeaderAttributeUsageModels { get; } = new ObservableCollection<AttributeModel>();
-        
+
         private void columnHeaderAttributeUsageModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
-        Tuple<string, bool?> _sorted = new Tuple<string, bool?>("", null);
-        public Tuple<string,bool?> Sorted
+
+        public class FunctionApplied
         {
-            get { return _sorted; }
-            set { SetProperty(ref _sorted, value); }
+            public Tuple<string, bool?> Sorted = new Tuple<string, bool?>("", null);
+
+            public bool Averaged { get; set; } = false;
+        }
+
+        FunctionApplied _function;
+        public FunctionApplied Function
+        {
+            get { return _function; }
+            set { SetProperty(ref _function, value); }
         }
     }
 }

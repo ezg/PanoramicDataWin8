@@ -14,11 +14,14 @@
     FontFamily="{StaticResource abel}">
     <Grid  Background="{StaticResource lightBrush}">
         <common:DXSurface x:Name="dxSurface" Visibility="Collapsed"/>
-        <ListView x:Name="xListView" x:FieldModifier="public" Margin="20" 
+        <ListView x:Name="xListView" x:FieldModifier="public" 
                   SelectionMode="None"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
-                  ManipulationMode="TranslateRailsY"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Top"
+                  VerticalContentAlignment="Top"
+                  HorizontalContentAlignment="Left"
+                  Grid.Column="0"
+                  Margin="20" 
                   ShowsScrollingPlaceholders="True"
                   CanDragItems="False"  >
             <ListView.ItemsPanel>
@@ -32,13 +35,13 @@
                     <Setter Property="VerticalContentAlignment"   Value="Center" />
                     <Setter Property="Margin" Value="0,0,0,0" />
                     <Setter Property="Padding" Value="0,0,0,0" />
-                    <Setter Property="MinWidth" Value="0" />
+                    <Setter Property="MinWidth" Value="25" />
                     <Setter Property="MinHeight" Value="25" />
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <local:RawDataColumn DataContext="{Binding}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    <local:RawDataColumn DataContext="{Binding}" HorizontalAlignment="Left" VerticalAlignment="Stretch"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
