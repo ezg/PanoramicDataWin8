@@ -1,4 +1,5 @@
-﻿using PanoramicDataWin8.utils;
+﻿using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.utils;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -45,6 +46,14 @@ namespace PanoramicDataWin8.view.vis.render
                 //    if (otherScroll != scroll)
                 //        otherScroll.SetBinding(ScrollViewer.VerticalOffsetProperty, new Binding() { Source = scroll, Path = new PropertyPath(nameof(ScrollViewer.VerticalOffsetProperty)) });
                 //}
+            }
+        }
+
+        public AttributeTransformationModel Model
+        {
+            get
+            {
+                return (DataContext as RawDataRenderer.RawColumnData).Model;
             }
         }
 

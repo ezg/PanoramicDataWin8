@@ -107,8 +107,8 @@ namespace PanoramicDataWin8.model.view.operation
                         {
                             var oldAttributeModel = oldItem as AttributeModel;
                             var found = menuViewModel.MenuItemViewModels.FirstOrDefault(mvm =>
-                                (((AttributeMenuItemViewModel)mvm.MenuItemComponentViewModel).AttributeViewModel != null) &&
-                                (((AttributeMenuItemViewModel)mvm.MenuItemComponentViewModel).AttributeViewModel.AttributeModel ==
+                                ((mvm.MenuItemComponentViewModel as AttributeMenuItemViewModel)?.AttributeViewModel != null) &&
+                                ((mvm.MenuItemComponentViewModel as AttributeMenuItemViewModel)?.AttributeViewModel?.AttributeModel ==
                                  oldAttributeModel));
                             if (found != null)
                                 menuViewModel.MenuItemViewModels.Remove(found);
@@ -255,7 +255,7 @@ namespace PanoramicDataWin8.model.view.operation
                         attributeMenuItemViewModel.Label = code.DisplayName;
                 };
             }
-            attributeMenuItemViewModel.TappedTriggered += (() => // when label is tapped, display any attached menu options
+            attributeMenuItemViewModel.TappedTriggered += ((e) => // when label is tapped, display any attached menu options
                 attachmentViewModel.StartDisplayActivationStopwatch());
             return menuViewModel;
         }

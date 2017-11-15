@@ -101,7 +101,7 @@ namespace PanoramicDataWin8.view.vis.menu
                     AggregateFunction = AggregateFunction.Count
                 };
 
-                txtBlock.Text = xIom.GetLabel();
+                txtBlock.Text = xIom.GetLabel;
 
                 var filterModels = IDEAHelpers.GetFilterModelsFromSelections(_model.RecommendedHistogram.Selections,
                         _model.HistogramOperationViewModel.HistogramOperationModel.SchemaModel.OriginModels.First());

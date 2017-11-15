@@ -215,7 +215,7 @@ namespace PanoramicDataWin8.model.view
             if (_attributeModel != null)
             {
                 if (AttributeTransformationModel != null)
-                     MainLabel = AttributeTransformationModel.GetLabel();
+                     MainLabel = AttributeTransformationModel.GetLabel;
                 else MainLabel = AttributeModel.DisplayName; 
             }
         }

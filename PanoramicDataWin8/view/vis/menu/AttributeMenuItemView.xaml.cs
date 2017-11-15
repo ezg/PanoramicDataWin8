@@ -214,7 +214,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 var attrModel = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
                 if (attrModel != null && attrModel.TappedTriggered != null)
                 {
-                    attrModel.TappedTriggered();
+                    attrModel.TappedTriggered(e);
                 }
             }
 

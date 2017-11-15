@@ -3,6 +3,7 @@ using Windows.UI;
 using Windows.UI.Xaml.Media;
 using PanoramicDataWin8.model.data.attribute;
 using Windows.UI.Xaml;
+using PanoramicDataWin8.utils;
 
 namespace PanoramicDataWin8.model.view
 {
@@ -24,7 +25,7 @@ namespace PanoramicDataWin8.model.view
 
         private Brush _textBrush = new SolidColorBrush(Colors.Black);
         public Action<AttributeViewModel> DroppedTriggered { get; set; }
-        public Action TappedTriggered { get; set; }
+        public Action<PointerManagerEvent> TappedTriggered { get; set; }
 
         public bool CanDrag
         {
@@ -70,10 +71,10 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _editNameOnTap; }
             set {
-                TappedTriggered -= (() => Editing = Visibility.Visible);
+                TappedTriggered -= ((e) => Editing = Visibility.Visible);
                 SetProperty(ref _editNameOnTap, value);
                 if (value)
-                    TappedTriggered += (() => Editing = Visibility.Visible);
+                    TappedTriggered += ((e) => Editing = Visibility.Visible);
             }
         }
         public AttributeMenuItemViewModel()

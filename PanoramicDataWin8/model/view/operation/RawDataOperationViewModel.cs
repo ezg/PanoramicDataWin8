@@ -35,21 +35,36 @@ namespace PanoramicDataWin8.model.view.operation
         }
         AttributeMenuItemViewModel SelectedColumn = null;
         private void AttributeUsageModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        { 
-            foreach (var mivm in menuViewModel.MenuItemViewModels.Where((mivm) => e.NewItems.Contains((mivm.MenuItemComponentViewModel as AttributeMenuItemViewModel)?.AttributeViewModel?.AttributeModel)))
+        {
+            if (e.NewItems != null)
             {
-                var amivm = (mivm.MenuItemComponentViewModel as AttributeMenuItemViewModel);
-                var avm = amivm.AttributeViewModel;
-                var atx = new AttributeTransformationModel(avm?.AttributeModel) { AggregateFunction = AggregateFunction.None };
-                RawDataOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, atx);
+                foreach (var mivm in menuViewModel.MenuItemViewModels.Where((mivm) => e.NewItems.Contains((mivm.MenuItemComponentViewModel as AttributeMenuItemViewModel)?.AttributeViewModel?.AttributeModel)))
+                {
+                    var amivm = (mivm.MenuItemComponentViewModel as AttributeMenuItemViewModel);
+                    var avm = amivm.AttributeViewModel;
+                    RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
 
-                amivm.TappedTriggered = (() => {
-                    SelectedColumn = amivm;
-                    AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
+                    amivm.TappedTriggered = ((args) =>
+                    {
+                        if (args.IsRightMouse)
+                        {
+                            RawDataOperationModel.AttributeUsageModels.Remove(amivm.AttributeViewModel.AttributeTransformationModel.AttributeModel);
+                            SelectedColumn = null;
+                        }
+                        else
+                        {
+                            SelectedColumn = amivm;
+                            AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
 
-                    foreach (var toggle in menuViewModel.MenuItemViewModels.Where((t) => t.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel).Select((t)=> t.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel))
-                        toggle.IsVisible = !toggle.IsVisible;
-                });
+                            foreach (var toggle in menuViewModel.MenuItemViewModels.Where((t) => t.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel).Select((t) => t.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel))
+                                toggle.IsVisible = !toggle.IsVisible;
+                        }
+                    });
+                }
+            }
+            if (e.OldItems != null)
+            {
+                RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
             }
         }
         void addColumnOptions(AttributeMenuItemViewModel attributeMenuItemViewModel, AttachmentOrientation orientation)

@@ -80,16 +80,17 @@ namespace PanoramicDataWin8.view.vis.render
     public sealed partial class RawDataRenderer : Renderer, IScribbable
     {
         public class RawColumnData : ExtendedBindableBase {
-            string _title;
+            AttributeTransformationModel _model;
             double _cwidth;
             public bool ShowScroll = false;
             public ObservableCollection<object> Data;
-            public  RawDataRenderer Renderer;
-            public string Title {
-                get { return _title;  }
+            public RawDataRenderer Renderer;
+            public AttributeTransformationModel Model
+            {
+                get { return _model; }
                 set
                 {
-                    this.SetProperty(ref _title, value);
+                    this.SetProperty(ref _model, value);
                 }
             }
             public double ColumnWidth
@@ -100,7 +101,7 @@ namespace PanoramicDataWin8.view.vis.render
                     this.SetProperty(ref _cwidth, value);
                 }
             }
-            public RawColumnData() { Title = "<Untitled>"; Data = new ObservableCollection<object>(); }
+            public RawColumnData() { Data = new ObservableCollection<object>(); }
         }
 
         public ObservableCollection<RawColumnData> Records { get; set; } = new ObservableCollection<RawColumnData>();
@@ -156,6 +157,8 @@ namespace PanoramicDataWin8.view.vis.render
                 else if (r is TextBlock)
                 {
                     var tb = r as TextBlock;
+                    var col = tb.GetFirstAncestorOfType<RawDataColumn>()?.Model ??
+                             new AttributeTransformationModel(model.RawDataOperationModel.AttributeUsageModels.First());
                     if (tb.Tag != null)
                     {
                         model.RawDataOperationModel.RemoveFilterModel(tb.Tag as FilterModel);
@@ -166,10 +169,9 @@ namespace PanoramicDataWin8.view.vis.render
                     {
                         tb.FontStyle = Windows.UI.Text.FontStyle.Italic;
                         var fm = new FilterModel();
-                        var xIom = model.RawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
-                        var vc = xIom.AttributeModel.DataType == IDEA_common.catalog.DataType.String ?
-                            new ValueComparison(xIom, IDEA_common.operations.recommender.Predicate.CONTAINS, tb.Text) :
-                            new ValueComparison(xIom, IDEA_common.operations.recommender.Predicate.EQUALS, ToObject(xIom.AttributeModel, tb.Text));
+                        var vc = col.AttributeModel.DataType == IDEA_common.catalog.DataType.String ?
+                            new ValueComparison(col, IDEA_common.operations.recommender.Predicate.CONTAINS, tb.Text) :
+                            new ValueComparison(col, IDEA_common.operations.recommender.Predicate.EQUALS, ToObject(col.AttributeModel, tb.Text));
 
                         fm.ValueComparisons.Add(vc);
                         model.RawDataOperationModel.AddFilterModel(fm);
@@ -320,7 +322,8 @@ namespace PanoramicDataWin8.view.vis.render
                 xWordCloud.Visibility = Visibility.Collapsed;
                 for (int sampleIndex = 0; sampleIndex < (result as RawDataResult).Samples.Count(); sampleIndex++) {
                     var s = (result as RawDataResult).Samples[model.RawDataOperationModel.AttributeUsageModels[sampleIndex].RawName];
-                    loadRecordsAsync(s, model.RawDataOperationModel.AttributeUsageModels[sampleIndex].RawName, sampleIndex+1 == (result as RawDataResult).Samples.Count());
+                    if (s.Count > 0)
+                        loadRecordsAsync(s, model.RawDataOperationModel.AttributeUsageModels[sampleIndex], sampleIndex+1 == (result as RawDataResult).Samples.Count());
 
                 }
                 if ((result as RawDataResult).Samples.Count() == 1)
@@ -339,10 +342,10 @@ namespace PanoramicDataWin8.view.vis.render
             this.xRawDataGridView.ItemsSource = Records.FirstOrDefault()?.Data;
         }
 
-        void loadRecordsAsync(List<object> records, string name, bool showScroll)
+        void loadRecordsAsync(List<object> records, AttributeModel model, bool showScroll)
         {
-            var acollection = new RawColumnData() {
-                Title = name,
+            var acollection = new RawColumnData {
+                Model = new AttributeTransformationModel(model),
                 ColumnWidth =records.First() is string|| records.First() is IDEA_common.range.PreProcessedString ? 200:50,
                 Renderer = this,
                 ShowScroll = showScroll
@@ -378,7 +381,7 @@ namespace PanoramicDataWin8.view.vis.render
                         objList[j] = Records[j].Data[i];
                     combinde.Add(objList);
                 }
-                var attrModelIndex = model.RawDataOperationModel.AttributeTransformationModels.IndexOf((am) => am.AttributeModel.RawName == sortField);
+                var attrModelIndex = model.RawDataOperationModel.AttributeUsageModels.IndexOf((am) => am.RawName == sortField);
                 if (model.RawDataOperationModel.AttributeUsageModels[attrModelIndex].DataType == IDEA_common.catalog.DataType.Int)
                     Sort(combinde.OrderBy( (obj) => (long)obj[attrModelIndex]), sortDir == false);
                 else if (model.RawDataOperationModel.AttributeUsageModels[attrModelIndex].DataType == IDEA_common.catalog.DataType.Double)
@@ -396,7 +399,7 @@ namespace PanoramicDataWin8.view.vis.render
                         ColumnWidth = Records[index].ColumnWidth,
                         Renderer = this,
                         Data = new ObservableCollection<object>(new object[] { avg }),
-                        Title = "Avg(" + Records[index].Title + ")"
+                        Model = new AttributeTransformationModel(Records[index].Model.AttributeModel) { AggregateFunction = IDEA_common.aggregates.AggregateFunction.Avg }
                     });
                 }
                 xListView.ItemsSource = newRecords;

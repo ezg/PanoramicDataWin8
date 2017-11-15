@@ -10,6 +10,7 @@
     d:DesignWidth="400">
     
     <ListView x:Name="xListView" x:FieldModifier="public" Margin="2.5"
+              
                   SelectionMode="None"
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Stretch"
@@ -23,7 +24,7 @@
         <ListView.HeaderTemplate>
             <DataTemplate>
                 <Grid Background="Gray">
-                    <TextBlock Text="{Binding Title}" Foreground="White" VerticalAlignment="Top" FontSize="9" MaxHeight="20"/>
+                    <TextBlock Text="{Binding Model.GetLabel}" Foreground="White" VerticalAlignment="Top" FontSize="9" MaxHeight="20"/>
                 </Grid>
             </DataTemplate>
         </ListView.HeaderTemplate>

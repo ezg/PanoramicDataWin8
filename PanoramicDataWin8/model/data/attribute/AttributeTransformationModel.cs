@@ -111,13 +111,15 @@ namespace PanoramicDataWin8.model.data.attribute
         }
 
 
-        public string GetLabel()
+        public string GetLabel
         {
-            var mainLabel = addDetailToLabel(AttributeModel.DisplayName);
-            mainLabel = mainLabel.Replace("_", " ");
-            return mainLabel;
+            get
+            {
+                var mainLabel = addDetailToLabel(AttributeModel.DisplayName);
+                mainLabel = mainLabel.Replace("_", " ");
+                return mainLabel;
+            }
         }
-
         private string addDetailToLabel(string name)
         {
             if (AggregateFunction == AggregateFunction.Avg)

@@ -33,12 +33,12 @@ namespace PanoramicDataWin8.model.view.operation
             private void AttributeTransformationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
             {
                 var attributeMenuItemViewModel = menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel;
-                attributeMenuItemViewModel.Label = (sender as AttributeTransformationModel).GetLabel();
+                attributeMenuItemViewModel.Label = (sender as AttributeTransformationModel).GetLabel;
             }
             private void AttributeModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
             {
                 var attributeMenuItemViewModel = menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel;
-                attributeMenuItemViewModel.Label = attributeTransformationModel.GetLabel();
+                attributeMenuItemViewModel.Label = attributeTransformationModel.GetLabel;
             }
             public BaseVisualizationOperationModel BaseVisualizationOperationModel => (BaseVisualizationOperationModel)BaseVisualizationOperationViewModel.OperationModel;
 
@@ -109,7 +109,7 @@ namespace PanoramicDataWin8.model.view.operation
                 var attributeMenuItemViewModel = menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel;
                 var coll = sender as ObservableCollection<AttributeTransformationModel>;
                 attributeTransformationModel = coll.FirstOrDefault();
-                attributeMenuItemViewModel.Label = attributeTransformationModel?.GetLabel();
+                attributeMenuItemViewModel.Label = attributeTransformationModel?.GetLabel;
                 attributeMenuItemViewModel.AttributeViewModel = new AttributeViewModel(BaseVisualizationOperationViewModel, attributeTransformationModel);
                 if (attributeTransformationModel != null)
                 {
