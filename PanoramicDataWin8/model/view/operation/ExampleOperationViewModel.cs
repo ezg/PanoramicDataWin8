@@ -88,6 +88,7 @@ namespace PanoramicDataWin8.model.view.operation
                     Label = "+",
                     TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
                     CanDrag = false,
+                    CanDelete = false,
                     CanDrop = true,
                     DroppedTriggered = attributeViewModel => ExampleOperationModel.AttributeUsageModels.Add(attributeViewModel.AttributeModel)
                 }
@@ -132,6 +133,7 @@ namespace PanoramicDataWin8.model.view.operation
                             AttributeViewModel = new AttributeViewModel(this, newAttributeModel),
                             TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
                             CanDrag = false,
+                            CanDelete = true,
                             CanDrop = false
                         };
                         newMenuItem.Deleted += (sender1, args1) =>

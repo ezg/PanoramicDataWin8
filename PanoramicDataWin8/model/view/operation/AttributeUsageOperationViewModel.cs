@@ -76,6 +76,7 @@ namespace PanoramicDataWin8.model.view.operation
                     TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
                     CanDrag = false,
                     CanDrop = true,
+                    CanDelete = true,
                     DroppedTriggered = attributeViewModel =>
                     {
                         var attributeModel = attributeViewModel.AttributeModel;
@@ -136,13 +137,15 @@ namespace PanoramicDataWin8.model.view.operation
                                     AttributeViewModel = new AttributeViewModel(this, newAttributeModel),
                                     TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
                                     CanDrag = true,
+                                    CanDelete = true,
                                     CanDrop = false
                                 }
                             };
+                         
                             newMenuItem.Deleted += (sender1, args1) =>
                             {
                                 var atm = ((AttributeMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeViewModel.AttributeModel;
-                                OperationModel.AttributeUsageModels.Remove(atm);
+                                operationAttributeModels.Remove(atm);
                             };
                             menuViewModel.MenuItemViewModels.Add(newMenuItem);
                             

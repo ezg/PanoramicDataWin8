@@ -45,7 +45,7 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 var oldOperationViewModel = rawDataOperationViewModel;
                 var oldOperationModel = rawDataOperationViewModel.RawDataOperationModel;
-                var attributeModel = rawDataOperationViewModel.RawDataOperationModel.AttributeUsageTransformationModels[AttributeUsage.X].First().AttributeModel;
+                var attributeModel = rawDataOperationViewModel.RawDataOperationModel.AttributeUsageModels.First();
                 var newRawDataOperationViewModel = CreateDefaultRawDataOperationViewModel(operationViewModel.OperationModel.SchemaModel,
                     attributeModel, operationViewModel.Position);
                 var newOperationModel = (RawDataOperationModel)newRawDataOperationViewModel.OperationModel;

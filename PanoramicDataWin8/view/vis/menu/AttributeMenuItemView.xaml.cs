@@ -142,7 +142,7 @@ namespace PanoramicDataWin8.view.vis.menu
         private void mainPointerManager_Added(object sender, PointerManagerEvent e)
         {
             var model = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
-            if (!model.CanDrag)
+            if (model.CanDelete)
             {
                 if (e.TriggeringPointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
                 {

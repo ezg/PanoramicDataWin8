@@ -163,11 +163,14 @@ namespace PanoramicDataWin8.view.vis.render
                     {
                         model.RawDataOperationModel.RemoveFilterModel(tb.Tag as FilterModel);
                         tb.FontStyle = Windows.UI.Text.FontStyle.Normal;
+                        tb.FontWeight = Windows.UI.Text.FontWeights.Normal;
                         tb.Tag = null;
                     }
                     else
                     {
                         tb.FontStyle = Windows.UI.Text.FontStyle.Italic;
+                        tb.FontWeight = Windows.UI.Text.FontWeights.ExtraBold;
+                        tb.SelectAll();
                         var fm = new FilterModel();
                         var vc = col.AttributeModel.DataType == IDEA_common.catalog.DataType.String ?
                             new ValueComparison(col, IDEA_common.operations.recommender.Predicate.CONTAINS, tb.Text) :

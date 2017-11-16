@@ -60,6 +60,7 @@ namespace PanoramicDataWin8.model.view.operation
                     AttributeViewModel = new AttributeViewModel(this, newAttributeModel),
                     TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
                     CanDrag = false,
+                    CanDelete = true,
                     CanDrop = false
                 }
             };
@@ -104,6 +105,7 @@ namespace PanoramicDataWin8.model.view.operation
                     Label = "target",
                     TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
                     CanDrag = false,
+                    CanDelete = true,
                     CanDrop = true,
                     DroppedTriggered = TargetDropped
                 }

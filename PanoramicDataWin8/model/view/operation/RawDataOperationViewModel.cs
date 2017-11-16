@@ -46,12 +46,7 @@ namespace PanoramicDataWin8.model.view.operation
 
                     amivm.TappedTriggered = ((args) =>
                     {
-                        if (args.IsRightMouse)
-                        {
-                            RawDataOperationModel.AttributeUsageModels.Remove(amivm.AttributeViewModel.AttributeTransformationModel.AttributeModel);
-                            SelectedColumn = null;
-                        }
-                        else
+                        if (!args.IsRightMouse)
                         {
                             SelectedColumn = amivm;
                             AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();

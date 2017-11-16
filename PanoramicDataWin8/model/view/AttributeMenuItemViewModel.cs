@@ -15,6 +15,8 @@ namespace PanoramicDataWin8.model.view
 
         private bool _canDrop = true;
 
+        private bool _canDelete = false;
+
         private string _label = "";
 
         private bool _editNameOnTap;
@@ -31,6 +33,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _canDrag; }
             set { SetProperty(ref _canDrag, value); }
+        }
+
+        public bool CanDelete
+        {
+            get { return _canDelete; }
+            set { SetProperty(ref _canDelete, value); }
         }
 
         public bool CanDrop

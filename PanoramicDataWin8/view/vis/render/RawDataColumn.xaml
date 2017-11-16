@@ -9,8 +9,8 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
     
-    <ListView x:Name="xListView" x:FieldModifier="public" Margin="2.5"
-              
+    <ListView x:Name="xListView" x:FieldModifier="public" 
+                  Margin="2.5"
                   SelectionMode="None"
                   HorizontalAlignment="Stretch"
                   VerticalAlignment="Stretch"
@@ -21,6 +21,11 @@
         <ListView.Resources>
             <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter"></local:ObjectToFrameworkElementConverter>
         </ListView.Resources>
+        <ListView.ItemsPanel>
+            <ItemsPanelTemplate>
+                <ItemsStackPanel Orientation="Vertical" GroupHeaderPlacement="Top" AreStickyGroupHeadersEnabled="True"/>
+            </ItemsPanelTemplate>
+        </ListView.ItemsPanel>
         <ListView.HeaderTemplate>
             <DataTemplate>
                 <Grid Background="Gray">
