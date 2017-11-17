@@ -11,7 +11,7 @@
     <AssemblyName>PanoramicDataWin8</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.10586.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10586.0</TargetPlatformMinVersion>
+    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
@@ -23,8 +23,8 @@
     <RestorePackages>true</RestorePackages>
     <NuGetPackageImportStamp>4aa295fa</NuGetPackageImportStamp>
     <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
-    <AppxBundlePlatforms>x86|x64|arm</AppxBundlePlatforms>
-    <PackageCertificateThumbprint>C3907D969F4C69B4AA2C783EA89E7D02D1227C33</PackageCertificateThumbprint>
+    <AppxBundlePlatforms>x64</AppxBundlePlatforms>
+    <PackageCertificateThumbprint>D0BB54A25DF6DEAE56CDEC837C15B600968D46DB</PackageCertificateThumbprint>
     <AppxBundle>Always</AppxBundle>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
     <HockeyAppResourceId>acd270b7dad4436ba60fa158c6187574</HockeyAppResourceId>
@@ -433,7 +433,6 @@
     <Content Include="Assets\data\tutorials.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="PanoramicDataWin8_TemporaryKey.pfx" />
     <Content Include="Assets\BadgeLogo.scale-400.png" />
     <Content Include="Assets\font\Lato-Light.ttf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -453,7 +452,6 @@
     <Content Include="Assets\data\config.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <None Include="Vizdom-Key.snk" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\img\logo310x310.scale-100.png" />
@@ -686,7 +684,9 @@
       <Version>1.9.4</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="PanoramicDataWin8_TemporaryKey.pfx" />
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
@@ -694,7 +694,8 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>Vizdom-Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

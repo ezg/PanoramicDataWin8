@@ -177,7 +177,6 @@
                             </Grid>
                             <Grid Background="#01000000">
                                 <Interactivity:Interaction.Behaviors>
-                                    <local:TwoFingerScrollBehavior />
                                 </Interactivity:Interaction.Behaviors>
                             </Grid>
                         </Grid>

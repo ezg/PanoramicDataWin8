@@ -437,7 +437,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 GlobalAggregateParameters = globalAggregates,
                 AttributeCalculatedParameters = attributeCodeParameters.OfType<AttributeCaclculatedParameters>().ToList(),
                 DegreeOfParallism = 4,
-                IsCachable = false
+                IsCachable = true
             };
             return parameters;
         }

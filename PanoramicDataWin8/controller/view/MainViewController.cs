@@ -91,6 +91,8 @@ namespace PanoramicDataWin8.controller.view
             MainModel.APIPath = config["APIPath"].ToString();
             MainModel.Hostname = config["Hostname"].ToString();
 
+            MainPage.SetupMainPage();
+
             try
             {
                 LoadCatalog();

@@ -1,7 +1,8 @@
 ﻿{
-  "Hostname": "http://localhost:1234",
+  "Hostname": "http://localhost:8080",
   "APIPath": "/api",
   "StartDataset": "o_185_dataset",
   "SampleSize": 100000,
-  "IsDarpaSubmissionMode": false
+  "IsDarpaSubmissionMode": false,
+  "IsIGTMode": true
 }

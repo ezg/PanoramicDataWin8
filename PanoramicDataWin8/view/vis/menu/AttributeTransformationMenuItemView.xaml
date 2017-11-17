@@ -126,15 +126,6 @@
         </Style>
     </UserControl.Resources>
 
-    <d:DesignProperties.DataContext>
-        <view:MenuItemViewModel>
-            <view:MenuItemViewModel.MenuItemComponentViewModel>
-                <view:AttributeTransformationMenuItemViewModel Label="Test" />
-            </view:MenuItemViewModel.MenuItemComponentViewModel>
-        </view:MenuItemViewModel>
-    </d:DesignProperties.DataContext>
-
-
     <Grid Name="mainGrid" Background="{StaticResource lightBrush}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
         <Viewbox Margin="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" >
             <controls:LayoutTransformControl x:Name="transformControl">

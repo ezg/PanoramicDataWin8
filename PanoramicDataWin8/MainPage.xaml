@@ -10,12 +10,6 @@
     mc:Ignorable="d"
     FontFamily="Assets/font/Abel-Regular.ttf#Abel">
 
-    <Page.Resources>
-        <DataTemplate x:Name="Foo">
-            <common:AttributeFieldView DataContext="{Binding}" />
-        </DataTemplate>
-    </Page.Resources>
-
     <Grid Background="{StaticResource backgroundBrush}"  Name="mainGrid">
 
         <Canvas x:Name="layoutRoot" Width="Auto" Height="Auto" Visibility="Visible">

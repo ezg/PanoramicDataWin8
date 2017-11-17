@@ -337,7 +337,15 @@ namespace PanoramicDataWin8
             _mainPointerManager.Removed += mainPointerManager_Removed;
             _mainPointerManager.Attach(MainViewController.Instance.InkableScene);
 
-            //await Task.Delay(500);
+            AddHandler(PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
+            AddHandler(PointerReleasedEvent, new PointerEventHandler(InkableScene_PointerReleased), true);
+            AddHandler(PointerMovedEvent, new PointerEventHandler(InkableScene_PointerMoved), true);
+
+            hypothesisButton.DataContext = new BudgetViewModel();
+        }
+
+        public void SetupMainPage()
+        {
             if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode &&
                 !MainViewController.Instance.MainModel.IsIGTMode)
             {
@@ -358,13 +366,8 @@ namespace PanoramicDataWin8
             {
                 helpButton.Visibility = Visibility.Collapsed;
             }
-
-            AddHandler(PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
-            AddHandler(PointerReleasedEvent, new PointerEventHandler(InkableScene_PointerReleased), true);
-            AddHandler(PointerMovedEvent, new PointerEventHandler(InkableScene_PointerMoved), true);
-
-            hypothesisButton.DataContext = new BudgetViewModel();
         }
+
         public bool LastTouchWasMouse = false;
         private void InkableScene_PointerPressed(object sender, PointerRoutedEventArgs e)
         {

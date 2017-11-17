@@ -12,12 +12,6 @@
     Width="{Binding Size.X}" Height="{Binding Size.Y}"
     FontFamily="{StaticResource abel}">
 
-    <d:DesignProperties.DataContext>
-        <view:InputGroupViewModel>
-            <view:InputGroupViewModel.MainLabel>Cancellation code</view:InputGroupViewModel.MainLabel>
-        </view:InputGroupViewModel>
-    </d:DesignProperties.DataContext>
-
     <Grid Name="mainGrid" Background="{StaticResource lightBrush}">
         <Border Name="border" BorderBrush="{StaticResource backgroundBrush}">
             <Viewbox Margin="2">

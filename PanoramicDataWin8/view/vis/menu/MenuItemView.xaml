@@ -13,11 +13,6 @@
         <TranslateTransform X="{Binding Position.X}" Y="{Binding Position.Y}"/>
     </UserControl.RenderTransform>
 
-    <d:DesignProperties.DataContext>
-        <model:MenuItemViewModel>
-        </model:MenuItemViewModel>
-    </d:DesignProperties.DataContext>
-
     <Grid Name="mainGrid">
     </Grid>
 </UserControl>
