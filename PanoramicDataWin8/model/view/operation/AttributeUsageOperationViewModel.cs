@@ -22,27 +22,27 @@ namespace PanoramicDataWin8.model.view.operation
             addAttachmentViewModels();
         }
 
-        static List<AttributeModel> findAllNestedGroups(AttributeModel attributeGroupModel)
+        static List<AttributeTransformationModel> findAllNestedGroups(AttributeTransformationModel attributeGroupModel)
         {
-            var models = new List<AttributeModel>();
+            var models = new List<AttributeTransformationModel>();
             if (attributeGroupModel != null)
             {
                 models.Add(attributeGroupModel);
-                var inputModels = (attributeGroupModel.FuncModel as AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)?.InputModels;
+                var inputModels = (attributeGroupModel.AttributeModel.FuncModel as AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)?.InputModels;
                 if (inputModels != null)
                     foreach (var at in inputModels)
-                        models.AddRange(findAllNestedGroups(at));
+                        models.AddRange(findAllNestedGroups(new AttributeTransformationModel(at)));
             }
             return models;
         }
-        static public bool attributeModelContainsAttributeModel(AttributeModel testAttributeModel, AttributeModel newAttributeModel)
+        static public bool attributeModelContainsAttributeModel(AttributeTransformationModel testAttributeModel, AttributeTransformationModel newAttributeModel)
         {
             return findAllNestedGroups(newAttributeModel).Contains(testAttributeModel);
         }
-        public delegate void InputAddedHandler(object sender, ObservableCollection<AttributeModel> usageModels);
+        public delegate void InputAddedHandler(object sender, ObservableCollection<AttributeTransformationModel> usageModels);
         public event         InputAddedHandler ExpandingMenuInputAdded;
         public delegate void DroppedTriggeredHandler(AttributeViewModel model);
-        protected MenuViewModel createExpandingMenu(AttachmentOrientation orientation, ObservableCollection<AttributeModel> operationAttributeModels, 
+        protected MenuViewModel createExpandingMenu(AttachmentOrientation orientation, ObservableCollection<AttributeTransformationModel> operationAttributeModels, 
             string label,  int maxExpansionSlots, out MenuItemViewModel menuItemViewModel)
         {
             var swapOrientation = orientation == AttachmentOrientation.Left || orientation == AttachmentOrientation.Right;
@@ -79,9 +79,9 @@ namespace PanoramicDataWin8.model.view.operation
                     CanDelete = true,
                     DroppedTriggered = attributeViewModel =>
                     {
-                        var attributeModel = attributeViewModel.AttributeModel;
+                        var attributeModel = attributeViewModel.AttributeTransformationModel;
                         if (!operationAttributeModels.Contains(attributeModel) &&
-                            !attributeModelContainsAttributeModel((OperationModel as AttributeGroupOperationModel)?.AttributeModel, attributeModel))
+                            !attributeModelContainsAttributeModel(new AttributeTransformationModel((OperationModel as AttributeGroupOperationModel)?.AttributeModel), attributeModel))
                         {
                             operationAttributeModels.Add(attributeModel);
                             if (ExpandingMenuInputAdded != null)
@@ -99,18 +99,18 @@ namespace PanoramicDataWin8.model.view.operation
                 var menuItemViewModelCaptured = menuItemViewModel;
                 operationAttributeModels.CollectionChanged += (sender, args) =>
                 {
-                    var coll = sender as ObservableCollection<AttributeModel>;
+                    var coll = sender as ObservableCollection<AttributeTransformationModel>;
                     var attributeModel = coll.FirstOrDefault();
 
                     // remove old ones first
                     if (args.OldItems != null)
                         foreach (var oldItem in args.OldItems)
                         {
-                            var oldAttributeModel = oldItem as AttributeModel;
+                            var oldAttributeTransformationModel = oldItem as AttributeTransformationModel;
                             var found = menuViewModel.MenuItemViewModels.FirstOrDefault(mvm =>
                                 ((mvm.MenuItemComponentViewModel as AttributeMenuItemViewModel)?.AttributeViewModel != null) &&
-                                ((mvm.MenuItemComponentViewModel as AttributeMenuItemViewModel)?.AttributeViewModel?.AttributeModel ==
-                                 oldAttributeModel));
+                                ((mvm.MenuItemComponentViewModel as AttributeMenuItemViewModel)?.AttributeViewModel?.AttributeTransformationModel ==
+                                 oldAttributeTransformationModel));
                             if (found != null)
                                 menuViewModel.MenuItemViewModels.Remove(found);
                         }
@@ -124,7 +124,7 @@ namespace PanoramicDataWin8.model.view.operation
                     {
                         foreach (var newItem in args.NewItems)
                         {
-                            var newAttributeModel = newItem as AttributeModel;
+                            var newAttributeTransformationModel = newItem as AttributeTransformationModel;
                             var newMenuItem = new MenuItemViewModel
                             {
                                 MenuViewModel = menuViewModel,
@@ -133,8 +133,8 @@ namespace PanoramicDataWin8.model.view.operation
                                 Position = menuItemViewModelCaptured.Position,
                                 MenuItemComponentViewModel = new AttributeMenuItemViewModel
                                 {
-                                    Label = newAttributeModel.DisplayName,
-                                    AttributeViewModel = new AttributeViewModel(this, newAttributeModel),
+                                    Label = newAttributeTransformationModel.GetLabel,
+                                    AttributeViewModel = new AttributeViewModel(this, newAttributeTransformationModel),
                                     TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
                                     CanDrag = true,
                                     CanDelete = true,
@@ -144,15 +144,15 @@ namespace PanoramicDataWin8.model.view.operation
                          
                             newMenuItem.Deleted += (sender1, args1) =>
                             {
-                                var atm = ((AttributeMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeViewModel.AttributeModel;
+                                var atm = ((AttributeMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeViewModel.AttributeTransformationModel;
                                 operationAttributeModels.Remove(atm);
                             };
                             menuViewModel.MenuItemViewModels.Add(newMenuItem);
                             
-                            if (newAttributeModel != null)
+                            if (newAttributeTransformationModel != null)
                             {
-                                newAttributeModel.PropertyChanged += (sender2, args2) => 
-                                    (newMenuItem.MenuItemComponentViewModel as AttributeMenuItemViewModel).Label = (sender2 as AttributeModel).DisplayName;
+                                newAttributeTransformationModel.PropertyChanged += (sender2, args2) => 
+                                    (newMenuItem.MenuItemComponentViewModel as AttributeMenuItemViewModel).Label = (sender2 as AttributeTransformationModel).GetLabel;
                             }
                         }
                     }

@@ -153,7 +153,6 @@ namespace PanoramicDataWin8.view.vis.menu
                         return;
                     }
                 }
-                return;
             }
 
             if (e.NumActiveContacts == 1)

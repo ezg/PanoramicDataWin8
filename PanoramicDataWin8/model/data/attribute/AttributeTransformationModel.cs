@@ -158,7 +158,7 @@ namespace PanoramicDataWin8.model.data.attribute
                 var aom = obj as AttributeTransformationModel;
                 return
                     aom._aggregateFunction.Equals(AggregateFunction) &&
-                    aom._attributeModel.Equals(_attributeModel) &&
+                    ((aom._attributeModel == null && _attributeModel == null) || (aom._attributeModel != null && aom._attributeModel.Equals(_attributeModel))) &&
                     aom._transformationFunction.Equals(_transformationFunction) &&
                     aom._binSize.Equals(_binSize) &&
                     aom._scaleFunction.Equals(_scaleFunction) &&

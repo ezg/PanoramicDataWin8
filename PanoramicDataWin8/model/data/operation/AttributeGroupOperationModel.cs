@@ -29,7 +29,7 @@ namespace PanoramicDataWin8.model.data.operation
         {
             attributeGroupModel = IDEAAttributeModel.AddGroupField(rawName, rawName, schemaModel.OriginModels.First());
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
-            AttributeUsageModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
+            AttributeTransformationModelParameters.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
         private string _name;
 
@@ -53,8 +53,8 @@ namespace PanoramicDataWin8.model.data.operation
 
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            foreach (var attributeUsageModel in AttributeUsageModels)
-                GroupFuncModel.InputModels.Add(attributeUsageModel);
+            foreach (var attributeUsageModel in AttributeTransformationModelParameters)
+                GroupFuncModel.InputModels.Add(attributeUsageModel.AttributeModel);
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
     }

@@ -11,6 +11,7 @@ using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.controller.data.progressive;
 using IDEA_common.operations;
 using static PanoramicDataWin8.model.data.attribute.AttributeModel;
+using IDEA_common.aggregates;
 
 namespace PanoramicDataWin8.model.data.operation
 {
@@ -32,7 +33,7 @@ namespace PanoramicDataWin8.model.data.operation
         {
             public Tuple<string, bool?> Sorted = new Tuple<string, bool?>("", null);
 
-            public bool Averaged { get; set; } = false;
+            public AggregateFunction Function;
         }
 
         FunctionApplied _function;

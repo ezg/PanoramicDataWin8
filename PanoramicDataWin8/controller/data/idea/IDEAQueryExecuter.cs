@@ -58,7 +58,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                         else if (operationModel is RawDataOperationModel)
                         {
                             var rawDataOperationModel = (RawDataOperationModel)operationModel;
-                            if (rawDataOperationModel.AttributeUsageModels.Any())
+                            if (rawDataOperationModel.AttributeTransformationModelParameters.Any())
                             {
                                 newJob = new RawDataOperationJob(
                                     rawDataOperationModel,

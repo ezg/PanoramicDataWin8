@@ -242,9 +242,9 @@ namespace PanoramicDataWin8.controller.view
             await Instance.LoadConfig();
         }
 
-        public RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(AttributeModel attributeModel, Pt position)
+        public RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(Pt position)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultRawDataOperationViewModel(MainModel.SchemaModel, attributeModel, position);
+            var visModel = OperationViewModelFactory.CreateDefaultRawDataOperationViewModel(MainModel.SchemaModel, position);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -404,7 +404,7 @@ namespace PanoramicDataWin8.controller.view
             }
             else if (operationTypeModel.OperationType == OperationType.RawData)
             {
-                operationViewModel = CreateDefaultRawDataOperationViewModel(null, position);
+                operationViewModel = CreateDefaultRawDataOperationViewModel(position);
             }
             else if (operationTypeModel.OperationType == OperationType.Predictor)
             {

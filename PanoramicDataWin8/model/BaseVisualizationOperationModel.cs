@@ -66,7 +66,7 @@ namespace PanoramicDataWin8.model.data.operation
             var attributeChanged = sender as IDEAAttributeModel;
             List<AttributeCaclculatedParameters> attributeCodeParameters;
             List<string> brushes;
-            var aggregates = this.AttributeUsageModels.Select((am)=>new AttributeTransformationModel(am)).Concat(
+            var aggregates = this.AttributeTransformationModelParameters.Concat(
                 GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(
                 GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).Concat(
                 GetAttributeUsageTransformationModel(AttributeUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(

@@ -66,8 +66,8 @@ namespace PanoramicDataWin8.model.view.operation
             };
             newMenuItem.Deleted += (sender1, args1) =>
             {
-                var atm = ((AttributeMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeViewModel.AttributeModel;
-                PredictorOperationModel.AttributeUsageModels.Remove(atm);
+                var atm = ((AttributeMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeViewModel.AttributeTransformationModel;
+                PredictorOperationModel.AttributeTransformationModelParameters.Remove(atm);
             };
             TargetMenuViewModel.MenuItemViewModels.Add(newMenuItem);
 
@@ -117,8 +117,8 @@ namespace PanoramicDataWin8.model.view.operation
             var menuViewModel = createAttributeLabelMenu(AttachmentOrientation.Bottom, predictorOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false, null, out PredictorNameMenuItemViewModel);
             createRightTargetMenu();
             MenuItemViewModel menuItemViewModel;
-            createExpandingMenu(AttachmentOrientation.Top,  PredictorOperationModel.AttributeUsageModels, "+", 3, out menuItemViewModel);
-            createExpandingMenu(AttachmentOrientation.Left, PredictorOperationModel.IgnoredAttributeUsageModels, "-", 3, out menuItemViewModel);
+            createExpandingMenu(AttachmentOrientation.Top,  PredictorOperationModel.AttributeTransformationModelParameters, "+", 3, out menuItemViewModel);
+            createExpandingMenu(AttachmentOrientation.Left, PredictorOperationModel.IgnoredAttributeTransformationUsageModels, "-", 3, out menuItemViewModel);
             hideLabelUnlessPredictorHasResult(menuViewModel);
         }
     }

@@ -90,12 +90,12 @@ namespace PanoramicDataWin8.model.view.operation
                     CanDrag = false,
                     CanDelete = false,
                     CanDrop = true,
-                    DroppedTriggered = attributeViewModel => ExampleOperationModel.AttributeUsageModels.Add(attributeViewModel.AttributeModel)
+                    DroppedTriggered = attributeViewModel => ExampleOperationModel.AttributeTransformationModelParameters.Add(attributeViewModel.AttributeTransformationModel)
                 }
             };
             menuViewModel.MenuItemViewModels.Add(addMenuItem);
 
-            ExampleOperationModel.AttributeUsageModels.CollectionChanged += (sender, args) =>
+            ExampleOperationModel.AttributeTransformationModelParameters.CollectionChanged += (sender, args) =>
             {
                 var coll = sender as ObservableCollection<AttributeModel>;
 
@@ -139,8 +139,8 @@ namespace PanoramicDataWin8.model.view.operation
                         newMenuItem.Deleted += (sender1, args1) =>
                         {
                             var atm =
-                                ((AttributeMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeViewModel.AttributeModel;
-                            ExampleOperationModel.AttributeUsageModels.Remove(atm);
+                                ((AttributeMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeViewModel.AttributeTransformationModel;
+                            ExampleOperationModel.AttributeTransformationModelParameters.Remove(atm);
                         };
                         newMenuItem.MenuItemComponentViewModel = newAttr;
                         menuViewModel.MenuItemViewModels.Add(newMenuItem);

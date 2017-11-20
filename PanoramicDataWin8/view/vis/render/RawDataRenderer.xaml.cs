@@ -158,7 +158,7 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     var tb = r as TextBlock;
                     var col = tb.GetFirstAncestorOfType<RawDataColumn>()?.Model ??
-                             new AttributeTransformationModel(model.RawDataOperationModel.AttributeUsageModels.First());
+                              model.RawDataOperationModel.AttributeTransformationModelParameters.First();
                     if (tb.Tag != null)
                     {
                         model.RawDataOperationModel.RemoveFilterModel(tb.Tag as FilterModel);
@@ -324,9 +324,9 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 xWordCloud.Visibility = Visibility.Collapsed;
                 for (int sampleIndex = 0; sampleIndex < (result as RawDataResult).Samples.Count(); sampleIndex++) {
-                    var s = (result as RawDataResult).Samples[model.RawDataOperationModel.AttributeUsageModels[sampleIndex].RawName];
+                    var s = (result as RawDataResult).Samples[model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex].AttributeModel.RawName];
                     if (s.Count > 0)
-                        loadRecordsAsync(s, model.RawDataOperationModel.AttributeUsageModels[sampleIndex], sampleIndex+1 == (result as RawDataResult).Samples.Count());
+                        loadRecordsAsync(s, model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex].AttributeModel, sampleIndex+1 == (result as RawDataResult).Samples.Count());
 
                 }
                 if ((result as RawDataResult).Samples.Count() == 1)
@@ -384,31 +384,37 @@ namespace PanoramicDataWin8.view.vis.render
                         objList[j] = Records[j].Data[i];
                     combinde.Add(objList);
                 }
-                var attrModelIndex = model.RawDataOperationModel.AttributeUsageModels.IndexOf((am) => am.RawName == sortField);
-                if (model.RawDataOperationModel.AttributeUsageModels[attrModelIndex].DataType == IDEA_common.catalog.DataType.Int)
+                var attrModelIndex = model.RawDataOperationModel.AttributeTransformationModelParameters.IndexOf((atm) => atm.AttributeModel.RawName == sortField);
+                if (model.RawDataOperationModel.AttributeTransformationModelParameters[attrModelIndex].AttributeModel.DataType == IDEA_common.catalog.DataType.Int)
                     Sort(combinde.OrderBy( (obj) => (long)obj[attrModelIndex]), sortDir == false);
-                else if (model.RawDataOperationModel.AttributeUsageModels[attrModelIndex].DataType == IDEA_common.catalog.DataType.Double)
+                else if (model.RawDataOperationModel.AttributeTransformationModelParameters[attrModelIndex].AttributeModel.DataType == IDEA_common.catalog.DataType.Double)
                     Sort(combinde.OrderBy((obj) => (double)obj[attrModelIndex]), sortDir == false);
                 else
                     Sort(combinde.OrderBy((obj) => obj[attrModelIndex].ToString()), sortDir == false);
                 xListView.ItemsSource = Records;
-            } else if (function?.Averaged == true)
+            }
+            else
             {
-                var newRecords = new ObservableCollection<RawColumnData>();
-                for (var index = 0; index < Records.Count; index++)
-                {
-                    var avg = Records[index].Data.Average((l) => l is long ? (double)(long)l : l is int ? (double)(int)l : l is double ? (double)l : 0);
-                    newRecords.Add(new RawColumnData {
-                        ColumnWidth = Records[index].ColumnWidth,
-                        Renderer = this,
-                        Data = new ObservableCollection<object>(new object[] { avg }),
-                        Model = new AttributeTransformationModel(Records[index].Model.AttributeModel) { AggregateFunction = IDEA_common.aggregates.AggregateFunction.Avg }
-                    });
-                }
-                xListView.ItemsSource = newRecords;
-            } else
-
                 xListView.ItemsSource = Records;
+                foreach (var atm in model.RawDataOperationModel.AttributeTransformationModelParameters)
+                if (atm.AggregateFunction == IDEA_common.aggregates.AggregateFunction.Avg)
+                {
+                    var newRecords = new ObservableCollection<RawColumnData>();
+                    for (var index = 0; index < Records.Count; index++)
+                        if (Records[index].Data.Count > 0) {
+                            var avg = Records[index].Data.Average((l) => l is long ? (double)(long)l : l is int ? (double)(int)l : l is double ? (double)l : 0);
+                            newRecords.Add(new RawColumnData
+                            {
+                                ColumnWidth = Records[index].ColumnWidth,
+                                Renderer = this,
+                                Data = new ObservableCollection<object>(new object[] { avg }),
+                                Model = new AttributeTransformationModel(Records[index].Model.AttributeModel) { AggregateFunction = IDEA_common.aggregates.AggregateFunction.Avg }
+                            });
+                        }
+                    xListView.ItemsSource = newRecords;
+                    break;
+                }
+            } 
         }
         public void Sort(IEnumerable<object[]> sortedList, bool down = false)
         {
