@@ -18,11 +18,11 @@ namespace PanoramicDataWin8.model.data.operation
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             
             AttributeTransformationModelParameters.CollectionChanged += _attributeUsageModels_CollectionChanged;
-            IgnoredAttributeTransformationUsageModels.CollectionChanged += _ignoredAttributeUsageModels_CollectionChanged;
+            IgnoredAttributeTransformationModels.CollectionChanged += _ignoredAttributeUsageModels_CollectionChanged;
         }
 
         public AttributeModel TargetAttributeUsageModel { get; set; }
-        public ObservableCollection<AttributeTransformationModel> IgnoredAttributeTransformationUsageModels { get; } = new ObservableCollection<AttributeTransformationModel>();
+        public ObservableCollection<AttributeTransformationModel> IgnoredAttributeTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
 
         public void UpdateBackendOperatorId(string backendOperatorId)
         {

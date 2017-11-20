@@ -210,7 +210,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             var psm = model.SchemaModel as IDEASchemaModel;
 
             var includes = model.AttributeTransformationModelParameters.Select(a => GetAttributeParameters(a.AttributeModel)).ToList();
-            var excludes = model.IgnoredAttributeTransformationUsageModels.Select(a => GetAttributeParameters(a.AttributeModel)).ToList();
+            var excludes = model.IgnoredAttributeTransformationModels.Select(a => GetAttributeParameters(a.AttributeModel)).ToList();
             var all = psm.RootOriginModel.InputModels
                 .Where(im => im != model.TargetAttributeUsageModel)
                 .Select(im => GetAttributeParameters(im)).ToList();
@@ -295,14 +295,55 @@ namespace PanoramicDataWin8.controller.data.progressive
             return filter;
         }
 
+        public static HistogramOperationParameters GetRawDataComputedOperationParameters(RawDataOperationModel model, int sampleSize)
+        {
+            List<AttributeCaclculatedParameters> attributeCodeParameters;
+            List<string> brushes;
+            var aggregates = model.AttributeTransformationModelParameters.ToList();
+            var filter = GetBaseOperationParameters(model, out attributeCodeParameters, out brushes, model.BrushOperationModels.Select((m) => (object)m).ToList(), aggregates);
+            attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(model.SchemaModel.OriginModels.First()).Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
+
+            var nrOfBins = new List<double>();
+
+            nrOfBins = new[] { MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins }.ToList();
+
+            var groupBy = new List<BinningParameters>();
+            foreach (var atm in model.AttributeTransformationModelParameters)
+                if (atm.GroupBy)
+                    groupBy.Add(new EquiWidthBinningParameters
+                    {
+                        AttributeParameters = GetAttributeParameters(atm.AttributeModel),
+                        RequestedNrOfBins = MainViewController.Instance.MainModel.NrOfXBins,
+                    });
+
+            var aggregateParameters = getAggregateParameters(model, aggregates, model.AttributeTransformationModelParameters.Where((atm) => atm.GroupBy).ToList());
+
+            var numericDataTypes = new[] { DataType.Int, DataType.Double, DataType.Float }.ToList();
+            var globalAggregates = new List<AggregateParameters>();
+
+            var parameters = new HistogramOperationParameters
+            {
+                AdapterName = (model.SchemaModel as IDEASchemaModel).RootOriginModel.DatasetConfiguration.Schema.RawName,
+                Filter = filter,
+                Brushes = brushes,
+                BinningParameters = groupBy,
+                SampleStreamBlockSize = sampleSize,
+                PerBinAggregateParameters = aggregateParameters,
+                SortPerBinAggregateParameter = null,
+                GlobalAggregateParameters = globalAggregates,
+                AttributeCalculatedParameters = attributeCodeParameters.OfType<AttributeCaclculatedParameters>().ToList(),
+                DegreeOfParallism = 4,
+                IsCachable = false
+            };
+            return parameters;
+        }
+
         public static HistogramOperationParameters GetHistogramOperationParameters(HistogramOperationModel model, int sampleSize)
         {
             List<AttributeCaclculatedParameters> attributeCodeParameters;
             List<string> brushes;
             List<AttributeTransformationModel> aggregates = model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(
-                model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).Concat(
-                model.GetAttributeUsageTransformationModel(AttributeUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
-                model.GetAttributeUsageTransformationModel(AttributeUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).ToList();
+                model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).ToList();
             var filter = GetBaseOperationParameters(model, out attributeCodeParameters, out brushes, model.BrushOperationModels.Select((m) => (object)m).ToList(), aggregates);
             attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(model.SchemaModel.OriginModels.First()).Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
 
@@ -330,7 +371,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 }
                 : (BinningParameters)new SingleBinBinningParameters
                 {
-                    AttributeParameters = GetAttributeParameters(xIom.AttributeModel),
+                    AttributeParameters = GetAttributeParameters(xIom.AttributeModel), // logically not needed, but needed
                 };
 
 
@@ -343,7 +384,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 }
                 : (BinningParameters)new SingleBinBinningParameters
                 {
-                    AttributeParameters = GetAttributeParameters(yIom.AttributeModel)
+                    AttributeParameters = GetAttributeParameters(yIom.AttributeModel) // logically not needed, but needed
                 };
             
             var aggregateParameters = getAggregateParameters(model, aggregates);
@@ -393,32 +434,19 @@ namespace PanoramicDataWin8.controller.data.progressive
             return parameters;
         }
 
-        private static List<AggregateParameters> getAggregateParameters(BaseVisualizationOperationModel model, List<AttributeTransformationModel> aggregates)
+        private static List<AggregateParameters> getAggregateParameters(BaseVisualizationOperationModel model, List<AttributeTransformationModel> aggregates,
+            List<AttributeTransformationModel> groupBy = null)
         {
             var psm = model.SchemaModel as IDEASchemaModel;
             var aggregateParameters = new List<AggregateParameters>();
             foreach (var agg in aggregates)
             {
+                if (groupBy != null && groupBy.Contains(agg))
+                    continue;
                 AggregateParameters aggParam = null;
                 if (agg.AggregateFunction == AggregateFunction.Avg)
                 {
                     aggParam = new AverageAggregateParameters
-                    {
-                        AttributeParameters = GetAttributeParameters(agg.AttributeModel),
-                        DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters
-                    };
-                }
-                else if (agg.AggregateFunction == AggregateFunction.Count)
-                {
-                    aggParam = new CountAggregateParameters
-                    {
-                        AttributeParameters = GetAttributeParameters(agg.AttributeModel),
-                        DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters
-                    };
-                }
-                else if (agg.AggregateFunction == AggregateFunction.Sum)
-                {
-                    aggParam = new SumAggregateParameters()
                     {
                         AttributeParameters = GetAttributeParameters(agg.AttributeModel),
                         DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters
@@ -432,14 +460,31 @@ namespace PanoramicDataWin8.controller.data.progressive
                         DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters
                     };
                 }
-               aggregateParameters.Add(aggParam);
-
-                aggregateParameters.Add(new MarginAggregateParameters
+                else if (agg.AggregateFunction == AggregateFunction.Count)
                 {
-                    AttributeParameters = GetAttributeParameters(agg.AttributeModel),
-                    DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters,
-                    AggregateFunction = agg.AggregateFunction
-                });
+                    aggParam = new CountAggregateParameters
+                    {
+                        AttributeParameters = GetAttributeParameters(agg.AttributeModel),
+                        DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters
+                    };
+                }
+                else // if (agg.AggregateFunction == AggregateFunction.Sum)
+                {
+                    aggParam = new SumAggregateParameters()
+                    {
+                        AttributeParameters = GetAttributeParameters(agg.AttributeModel),
+                        DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters
+                    };
+                }
+                aggregateParameters.Add(aggParam);
+
+                if (groupBy == null)
+                    aggregateParameters.Add(new MarginAggregateParameters
+                    {
+                        AttributeParameters = GetAttributeParameters(agg.AttributeModel),
+                        DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters,
+                        AggregateFunction = agg.AggregateFunction
+                    });
             }
 
             return aggregateParameters;
@@ -484,16 +529,6 @@ namespace PanoramicDataWin8.controller.data.progressive
 
             var numericDataTypes = new[] { DataType.Int, DataType.Double, DataType.Float }.ToList();
             var globalAggregates = new List<AggregateParameters>();
-            //var axes = new[] { xIom };
-         
-            //foreach (var iom in axes.Where(i => i.AggregateFunction == AggregateFunction.None &&
-            //   numericDataTypes.Contains(i.AttributeModel.DataType)))
-            //{
-            //    globalAggregates.Add(new AverageAggregateParameters()
-            //    {
-            //        AttributeParameters = GetAttributeParameters(iom.AttributeModel)
-            //    });
-            //}
 
             var parameters = new RawDataOperationParameters
             {

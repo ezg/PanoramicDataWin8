@@ -24,6 +24,8 @@ namespace PanoramicDataWin8.model.data.attribute
 
         private double _minBinSize = 1.0;
 
+        private bool   _groupBy = false;
+
         private OperationModel _operationModel;
 
         private ScaleFunction _scaleFunction = ScaleFunction.None;
@@ -49,6 +51,13 @@ namespace PanoramicDataWin8.model.data.attribute
             get { return _operationModel; }
             set { SetProperty(ref _operationModel, value); }
         }
+
+        public bool GroupBy
+        {
+            get { return _groupBy; }
+            set { SetProperty(ref _groupBy, value); }
+        }
+
 
         public AggregateFunction AggregateFunction
         {

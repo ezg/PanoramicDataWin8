@@ -35,6 +35,7 @@ namespace PanoramicDataWin8.model.view.operation
                     var amivm = (mivm.MenuItemComponentViewModel as AttributeMenuItemViewModel);
                     var avm = amivm.AttributeViewModel;
                     RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+                    avm.AttributeTransformationModel.AggregateFunction = AggregateFunction.None; // strip off any aggregate function when dropping onto a RawData View
 
                     amivm.TappedTriggered = ((args) =>
                     {
@@ -65,16 +66,14 @@ namespace PanoramicDataWin8.model.view.operation
             foreach (var mvm in menuViewModel.MenuItemViewModels.Where(mvm => mvm.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel).ToArray())
                 menuViewModel.MenuItemViewModels.Remove(mvm); 
             var count = 0;
-            var funcs = new List<AggregateFunction>(new AggregateFunction[] { AggregateFunction.None });
+            var funcs = new List<string>(new string[] { "dummy", "group by", "avg", "sort", "count", "sum" });
             var attributeTransformationModel = attributeMenuItemViewModel.AttributeViewModel?.AttributeTransformationModel;
-            funcs.AddRange(Enum.GetValues(typeof(AggregateFunction)).Cast<AggregateFunction>());
             if (attributeTransformationModel != null)
             {
                 foreach (var aggregationFunction in funcs)
                 {
                     menuViewModel.MenuItemViewModels.Add(createColumnOptionToggleMenuItem(count++, attributeTransformationModel, aggregationFunction, orientation));
                 }
-                menuViewModel.MenuItemViewModels.Add(createColumnOptionToggleMenuItem(count++, attributeTransformationModel, null, orientation));
 
                 var toggles = menuViewModel.MenuItemViewModels.Select(i => i.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel);
                 foreach (var t in toggles.Where(t => t != null))
@@ -82,7 +81,7 @@ namespace PanoramicDataWin8.model.view.operation
             }
         }
 
-        MenuItemViewModel createColumnOptionToggleMenuItem(int count, AttributeTransformationModel atm, AggregateFunction? function, AttachmentOrientation orientation)
+        MenuItemViewModel createColumnOptionToggleMenuItem(int count, AttributeTransformationModel atm, string function, AttachmentOrientation orientation)
         {
             var toggleMenuItem = new MenuItemViewModel
             {
@@ -111,19 +110,22 @@ namespace PanoramicDataWin8.model.view.operation
                             if (tg.IsChecked)
                                 tg.IsChecked = false;
 
-                        atm.AggregateFunction = function != null ? (AggregateFunction)function : AggregateFunction.None;
+                        atm.AggregateFunction = function == "sum" ? AggregateFunction.Sum : function == "avg" ? AggregateFunction.Avg : function == "count" ? AggregateFunction.Count : AggregateFunction.None;
+                        atm.GroupBy = function == "group by";
                         AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
 
-                        if (function == null)
-                            RawDataOperationModel.Function = new RawDataOperationModel.FunctionApplied
-                            {
-                                Sorted = new Tuple<string, bool?>(SelectedColumn.AttributeViewModel.AttributeModel.RawName, RawDataOperationModel.Function?.Sorted?.Item2 != true)
-                            };
-                        else
+                        if (function == "sort")
                             RawDataOperationModel.Function = new RawDataOperationModel.FunctionApplied
                             {
                                 Sorted = new Tuple<string, bool?>(SelectedColumn.AttributeViewModel.AttributeModel.RawName, null)
                             };
+
+                        //else
+                        //    RawDataOperationModel.Function = new RawDataOperationModel.FunctionApplied
+                        //    {
+                        //        Sorted = new Tuple<string, bool?>(SelectedColumn.AttributeViewModel.AttributeModel.RawName, RawDataOperationModel.Function?.Sorted?.Item2 != true)
+                        //    };
+                        RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                     }
                     else
                         atm.AggregateFunction = AggregateFunction.None;

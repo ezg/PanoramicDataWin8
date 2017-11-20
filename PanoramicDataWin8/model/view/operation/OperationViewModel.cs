@@ -245,7 +245,7 @@ namespace PanoramicDataWin8.model.view.operation
                     CanDelete = true,
                     DroppedTriggered = attributeViewModel =>
                     {
-                        var attributeModel = attributeViewModel.AttributeTransformationModel;
+                        var attributeModel = new AttributeTransformationModel(attributeViewModel.AttributeTransformationModel.AttributeModel) { AggregateFunction = attributeViewModel.AttributeTransformationModel.AggregateFunction };
                         if (!operationAttributeModels.Contains(attributeModel) &&
                             !attributeModelContainsAttributeModel(new AttributeTransformationModel((OperationModel as AttributeGroupOperationModel)?.AttributeModel), attributeModel))
                         {
