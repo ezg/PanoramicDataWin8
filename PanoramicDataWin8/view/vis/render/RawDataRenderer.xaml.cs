@@ -265,7 +265,7 @@ namespace PanoramicDataWin8.view.vis.render
                 else
                 {
                     var operationModel = (RawDataOperationModel)((OperationViewModel)DataContext).OperationModel;
-                    if (!operationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any())
+                    if (!operationModel.AttributeTransformationModelParameters.Any())
                     {
                     }
                 }

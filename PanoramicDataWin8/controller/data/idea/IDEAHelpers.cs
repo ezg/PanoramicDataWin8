@@ -295,7 +295,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             return filter;
         }
 
-        public static HistogramOperationParameters GetHistogramOperationParameters(BaseVisualizationOperationModel model, int sampleSize)
+        public static HistogramOperationParameters GetHistogramOperationParameters(HistogramOperationModel model, int sampleSize)
         {
             List<AttributeCaclculatedParameters> attributeCodeParameters;
             List<string> brushes;
@@ -345,9 +345,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                 {
                     AttributeParameters = GetAttributeParameters(yIom.AttributeModel)
                 };
-
-            AggregateParameters sortAggregateParam = null;
-            var aggregateParameters = getAggregateParameters(model, aggregates, out sortAggregateParam);
+            
+            var aggregateParameters = getAggregateParameters(model, aggregates);
 
             var numericDataTypes = new[] { DataType.Int, DataType.Double, DataType.Float }.ToList();
             var globalAggregates = new List<AggregateParameters>();
@@ -385,7 +384,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 BinningParameters = Extensions.Yield(xBinning, yBinning).ToList(),
                 SampleStreamBlockSize = sampleSize,
                 PerBinAggregateParameters = aggregateParameters,
-                SortPerBinAggregateParameter = sortAggregateParam,
+                SortPerBinAggregateParameter = null,
                 GlobalAggregateParameters = globalAggregates,
                 AttributeCalculatedParameters = attributeCodeParameters.OfType<AttributeCaclculatedParameters>().ToList(),
                 DegreeOfParallism = 4,
@@ -394,10 +393,9 @@ namespace PanoramicDataWin8.controller.data.progressive
             return parameters;
         }
 
-        private static List<AggregateParameters> getAggregateParameters(BaseVisualizationOperationModel model, List<AttributeTransformationModel> aggregates, out AggregateParameters sortAggregateParam)
+        private static List<AggregateParameters> getAggregateParameters(BaseVisualizationOperationModel model, List<AttributeTransformationModel> aggregates)
         {
             var psm = model.SchemaModel as IDEASchemaModel;
-            sortAggregateParam = null;
             var aggregateParameters = new List<AggregateParameters>();
             foreach (var agg in aggregates)
             {
@@ -436,9 +434,6 @@ namespace PanoramicDataWin8.controller.data.progressive
                 }
                aggregateParameters.Add(aggParam);
 
-                if (agg == model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).FirstOrDefault())
-                    sortAggregateParam = aggParam;
-
                 aggregateParameters.Add(new MarginAggregateParameters
                 {
                     AttributeParameters = GetAttributeParameters(agg.AttributeModel),
@@ -458,10 +453,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             var filter = GetBaseOperationParameters(model, out attributeCodeParameters, out brushes, model.BrushOperationModels.Select((m) => (object)m).ToList(), aggregates);
             attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(model.SchemaModel.OriginModels.First()).Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
 
-            var nrOfBins = new List<double>();
-
-            nrOfBins = new[] { MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins }.Concat(
-                model.GetAttributeUsageTransformationModel(AttributeUsage.Group).Select(qom => MainViewController.Instance.MainModel.NrOfGroupBins)).ToList();
+            var nrOfBins  = new[] { MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins }.ToList();
             
             var binnings = new List<BinningParameters>();
             foreach (var a in model.AttributeTransformationModelParameters)
@@ -488,8 +480,7 @@ namespace PanoramicDataWin8.controller.data.progressive
             var psm = model.SchemaModel as IDEASchemaModel;
 
             aggregates.Add(new AttributeTransformationModel(model.AttributeTransformationModelParameters.First().AttributeModel) { AggregateFunction = AggregateFunction.Avg });
-            AggregateParameters sortAggregateParam = null;
-            var aggregateParameters = getAggregateParameters(model, aggregates, out sortAggregateParam);
+            var aggregateParameters = getAggregateParameters(model, aggregates);
 
             var numericDataTypes = new[] { DataType.Int, DataType.Double, DataType.Float }.ToList();
             var globalAggregates = new List<AggregateParameters>();
@@ -509,7 +500,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
                 Filter = filter,
                 PerBinAggregateParameters = aggregateParameters,
-                SortPerBinAggregateParameter = sortAggregateParam,
+                SortPerBinAggregateParameter = null,
                 GlobalAggregateParameters = globalAggregates,
                 Brushes = new List<string>(),
                 BinningParameters = binnings,

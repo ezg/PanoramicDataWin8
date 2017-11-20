@@ -13,7 +13,7 @@ using System;
 
 namespace PanoramicDataWin8.model.view.operation
 {
-    public class RawDataOperationViewModel : BaseVisualizationOperationViewModel
+    public class RawDataOperationViewModel : OperationViewModel
     {
         MenuViewModel     menuViewModel;
         MenuItemViewModel menuItemViewModel;
@@ -23,13 +23,6 @@ namespace PanoramicDataWin8.model.view.operation
             menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, RawDataOperationModel.AttributeTransformationModelParameters, "+", 8, out menuItemViewModel);
             RawDataOperationModel.AttributeTransformationModelParameters.CollectionChanged += AttributeUsageModels_CollectionChanged;
 
-            //if (attributeModel?.InputVisualizationType == InputVisualizationTypeConstants.ENUM ||
-            //    attributeModel?.InputVisualizationType == InputVisualizationTypeConstants.CATEGORY ||
-            //    attributeModel?.InputVisualizationType == InputVisualizationTypeConstants.NUMERIC)
-            //{
-            //    var x = new AttributeTransformationModel(attributeModel) { AggregateFunction = AggregateFunction.None };
-            //    rawDataOperationModel.AddAttributeUsageTransformationModel(AttributeUsage.X, x);
-            //}
             var attributeMenuItemViewModel = menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel;
         }
         AttributeMenuItemViewModel SelectedColumn = null;

@@ -10,7 +10,7 @@ using Windows.UI.Xaml.Media;
 
 namespace PanoramicDataWin8.model.view.operation
 {
-    public class AttributeGroupOperationViewModel : AttributeUsageOperationViewModel
+    public class AttributeGroupOperationViewModel : LabeledOperationViewModel
     {
         public AttributeGroupOperationViewModel(AttributeGroupOperationModel attributeGroupOperationModel) : base(attributeGroupOperationModel)
         {

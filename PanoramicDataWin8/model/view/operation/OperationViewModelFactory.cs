@@ -49,9 +49,8 @@ namespace PanoramicDataWin8.model.view.operation
                 var newOperationModel            = (RawDataOperationModel)newRawDataOperationViewModel.OperationModel;
                 newOperationModel.VisualizationType = VisualizationType.plot;
 
-                foreach (var usage in oldOperationModel.AttributeUsageTransformationModels.Keys.ToArray())
-                    foreach (var atm in oldOperationModel.AttributeUsageTransformationModels[usage].ToArray())
-                        newOperationModel.AddAttributeUsageTransformationModel(usage,
+                foreach (var atm in oldOperationModel.AttributeTransformationModelParameters.ToArray())
+                        newOperationModel.AttributeTransformationModelParameters.Add(
                             new AttributeTransformationModel(atm.AttributeModel)
                             {
                                 AggregateFunction = atm.AggregateFunction

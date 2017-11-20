@@ -10,7 +10,7 @@ using Windows.UI.Xaml.Media;
 
 namespace PanoramicDataWin8.model.view.operation
 {
-    public class PredictorOperationViewModel : AttributeUsageOperationViewModel
+    public class PredictorOperationViewModel : LabeledOperationViewModel
     {
         MenuViewModel     TargetMenuViewModel;
         MenuItemViewModel TargetMenuItemViewModel;
