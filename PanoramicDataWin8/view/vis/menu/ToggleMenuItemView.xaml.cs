@@ -34,7 +34,6 @@ namespace PanoramicDataWin8.view.vis.menu
             if (model.IsChecked)
             {
                 model.IsChecked = false;
-                model.IsChecked = true;
             }
             else
             {

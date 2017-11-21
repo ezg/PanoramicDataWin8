@@ -441,8 +441,16 @@ namespace PanoramicDataWin8.controller.data.progressive
             var aggregateParameters = new List<AggregateParameters>();
             foreach (var agg in aggregates)
             {
-                if (groupBy != null && groupBy.Contains(agg))
-                    continue;
+                if (groupBy != null)
+                {
+                    if (groupBy.Contains(agg))
+                        continue;
+                    if (groupBy.Count == 0)
+                        agg.AggregateFunction = AggregateFunction.None;
+                    else if (agg.AggregateFunction == AggregateFunction.None)
+                        agg.AggregateFunction = agg.AggregateFunctions.Last();
+                }
+
                 AggregateParameters aggParam = null;
                 if (agg.AggregateFunction == AggregateFunction.Avg)
                 {
@@ -468,7 +476,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                         DistinctAttributeParameters = psm.RootOriginModel.DatasetConfiguration.Schema.DistinctAttributeParameters
                     };
                 }
-                else // if (agg.AggregateFunction == AggregateFunction.Sum)
+                else if (agg.AggregateFunction == AggregateFunction.Sum)
                 {
                     aggParam = new SumAggregateParameters()
                     {
@@ -492,51 +500,24 @@ namespace PanoramicDataWin8.controller.data.progressive
 
         public static OperationParameters GetRawDataOperationParameters(RawDataOperationModel model, int sampleSize)
         {
+            List<string> brushes;
             List<AttributeCaclculatedParameters> attributeCodeParameters;
-            List<AttributeTransformationModel>   aggregates = new List<AttributeTransformationModel>();
-            List<string>                         brushes;
-            var filter = GetBaseOperationParameters(model, out attributeCodeParameters, out brushes, model.BrushOperationModels.Select((m) => (object)m).ToList(), aggregates);
+            var aggregates = model.AttributeTransformationModelParameters.ToList();
+            var filter       = GetBaseOperationParameters(model, out attributeCodeParameters, out brushes, model.BrushOperationModels.Select((m) => (object)m).ToList(), aggregates);
             attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(model.SchemaModel.OriginModels.First()).Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
-
-            var nrOfBins  = new[] { MainViewController.Instance.MainModel.NrOfXBins, MainViewController.Instance.MainModel.NrOfYBins }.ToList();
-            
             var binnings = new List<BinningParameters>();
             foreach (var a in model.AttributeTransformationModelParameters)
             {
-                if (a != model.AttributeTransformationModelParameters.First())
-                {
-                    var bBinning = new SingleBinBinningParameters
-                    {
-                        AttributeParameters = GetAttributeParameters(a.AttributeModel),
-                    };
-                    binnings.Add(bBinning);
-                }
-                else
-                {
-                    var aBinning = new EquiWidthBinningParameters
-                    {
-                        AttributeParameters = GetAttributeParameters(a),
-                        RequestedNrOfBins = MainViewController.Instance.MainModel.NrOfXBins,
-                    };
-                    binnings.Add(aBinning);
-                }
+                binnings.Add( (BinningParameters)new SingleBinBinningParameters { AttributeParameters = GetAttributeParameters(a.AttributeModel)} );
             }
-
-            var psm = model.SchemaModel as IDEASchemaModel;
-
-            aggregates.Add(new AttributeTransformationModel(model.AttributeTransformationModelParameters.First().AttributeModel) { AggregateFunction = AggregateFunction.Avg });
-            var aggregateParameters = getAggregateParameters(model, aggregates);
-
-            var numericDataTypes = new[] { DataType.Int, DataType.Double, DataType.Float }.ToList();
-            var globalAggregates = new List<AggregateParameters>();
-
+            var aggregateParameters = getAggregateParameters(model, aggregates, model.AttributeTransformationModelParameters.Where((atm) => atm.GroupBy).ToList());
             var parameters = new RawDataOperationParameters
             {
-                AdapterName = psm.RootOriginModel.DatasetConfiguration.Schema.RawName,
+                AdapterName = (model.SchemaModel as IDEASchemaModel).RootOriginModel.DatasetConfiguration.Schema.RawName,
                 Filter = filter,
-                PerBinAggregateParameters = aggregateParameters,
+                PerBinAggregateParameters =  new List<AggregateParameters>(),
                 SortPerBinAggregateParameter = null,
-                GlobalAggregateParameters = globalAggregates,
+                GlobalAggregateParameters = new List<AggregateParameters>(),
                 Brushes = new List<string>(),
                 BinningParameters = binnings,
                 SampleStreamBlockSize = sampleSize,

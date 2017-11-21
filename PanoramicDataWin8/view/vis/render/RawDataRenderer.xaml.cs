@@ -65,8 +65,9 @@ namespace PanoramicDataWin8.view.vis.render
                     tb.Foreground = new SolidColorBrush(Colors.Black);
                     tb.Text = value.ToString();
                     tb.Height = 25;
-                    tb.MinWidth = 50;
-                    tb.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    tb.MinWidth = 75;
+                    tb.HorizontalAlignment = HorizontalAlignment.Left;
+                    tb.TextAlignment = TextAlignment.Right;
                     g.Children.Add(tb);
                 }
             }
@@ -281,7 +282,7 @@ namespace PanoramicDataWin8.view.vis.render
                 if (result != null)
                 {
                     loadResult(result);
-                    render();
+                   // render(operationModel.Function);
                 }
             }
             else if (e.PropertyName == "Function")
@@ -341,7 +342,7 @@ namespace PanoramicDataWin8.view.vis.render
                 var acollection = new RawColumnData
                 {
                     Model = col,
-                    ColumnWidth = 200,// records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? 200 : 50,
+                    ColumnWidth = 85,// records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? 200 : 50,
                     Renderer = this,
                     ShowScroll = false
                 };
@@ -417,7 +418,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var acollection = new RawColumnData {
                 Model = model,
-                ColumnWidth =records.First() is string|| records.First() is IDEA_common.range.PreProcessedString ? 200:50,
+                ColumnWidth =records.First() is string|| records.First() is IDEA_common.range.PreProcessedString ? 200:85,
                 Renderer = this,
                 ShowScroll = showScroll
             };
@@ -453,12 +454,18 @@ namespace PanoramicDataWin8.view.vis.render
                     combinde.Add(objList);
                 }
                 var attrModelIndex = model.RawDataOperationModel.AttributeTransformationModelParameters.IndexOf((atm) => atm.AttributeModel.RawName == sortField);
-                if (model.RawDataOperationModel.AttributeTransformationModelParameters[attrModelIndex].AttributeModel.DataType == IDEA_common.catalog.DataType.Int)
-                    Sort(combinde.OrderBy( (obj) => (long)obj[attrModelIndex]), sortDir == false);
-                else if (model.RawDataOperationModel.AttributeTransformationModelParameters[attrModelIndex].AttributeModel.DataType == IDEA_common.catalog.DataType.Double)
-                    Sort(combinde.OrderBy((obj) => (double)obj[attrModelIndex]), sortDir == false);
-                else
-                    Sort(combinde.OrderBy((obj) => obj[attrModelIndex].ToString()), sortDir == false);
+                if (combinde.Count > 0)
+                {
+                    var type = combinde[0][attrModelIndex].GetType();
+                    if (type == typeof(int))
+                        Sort(combinde.OrderBy((obj) => (int)obj[attrModelIndex]), sortDir == false);
+                    else if (type == typeof(double))
+                        Sort(combinde.OrderBy((obj) => (double)obj[attrModelIndex]), sortDir == false);
+                    else if (type == typeof(long))
+                        Sort(combinde.OrderBy((obj) => (long)obj[attrModelIndex]), sortDir == false);
+                    else if (type == typeof(string))
+                        Sort(combinde.OrderBy((obj) => (string)obj[attrModelIndex]), sortDir == false);
+                }
             }
             xListView.ItemsSource = Records;
         }

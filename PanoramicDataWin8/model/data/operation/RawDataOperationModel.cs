@@ -31,7 +31,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         public class FunctionApplied
         {
-            public Tuple<string, bool?> Sorted = new Tuple<string, bool?>("", null);
+            public Tuple<string, bool> Sorted = null;
 
             public AggregateFunction Function;
         }
