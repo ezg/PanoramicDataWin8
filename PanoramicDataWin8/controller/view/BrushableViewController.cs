@@ -169,6 +169,7 @@ namespace PanoramicDataWin8.controller.view
                 foreach (var link in links)
                 {
                     chain.Add(link.ToOperationModel);
+                    chain.Add(link.FromOperationModel);
                     recursiveCheckForCircularBrushing(link.ToOperationModel, chain);
                 }
                 var brushes = ((IBrushableOperationModel) current).BrushOperationModels;
