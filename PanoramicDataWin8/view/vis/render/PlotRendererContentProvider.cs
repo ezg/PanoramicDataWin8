@@ -1281,17 +1281,17 @@ namespace PanoramicDataWin8.view.vis.render
             var yMarginAggregateKey = IDEAHelpers.CreateAggregateKey(_yIom, new MarginAggregateParameters() { AggregateFunction = _yIom.AggregateFunction }, _histogramResult, brush.BrushIndex);
             Rect marginRect = Rect.Empty;
             double marginPercentage = 0.0;
-            var xValue = ((DoubleValueAggregateResult)bin.GetAggregateResult(xAggregateKey)).Result;
+            var xValue = ((DoubleValueAggregateResult)bin.GetAggregateResult(xAggregateKey));
             if (xValue == null)
                 return;
-            var xFrom = DataToScreenX((double)xValue) - 5;
-            var xTo = DataToScreenX((double)xValue) + 5;
+            var xFrom = DataToScreenX(xValue.Result) - 5;
+            var xTo = DataToScreenX(xValue.Result) + 5;
 
-            var yValue = ((DoubleValueAggregateResult)bin.GetAggregateResult(yAggregateKey)).Result;
+            var yValue = ((DoubleValueAggregateResult)bin.GetAggregateResult(yAggregateKey));
             if (yValue == null)
                 return;
-            var yFrom = DataToScreenY((double)yValue) + 5;
-            var yTo = DataToScreenY((double)yValue);
+            var yFrom = DataToScreenY(yValue.Result) + 5;
+            var yTo = DataToScreenY(yValue.Result);
 
             var xMargin = (double)((MarginAggregateResult)bin.GetAggregateResult(xMarginAggregateKey)).Margin;
             var xMarginAbsolute = (double)((MarginAggregateResult)bin.GetAggregateResult(xMarginAggregateKey)).AbsolutMargin;

@@ -342,8 +342,12 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             List<AttributeCaclculatedParameters> attributeCodeParameters;
             List<string> brushes;
-            List<AttributeTransformationModel> aggregates = model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(
-                model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).ToList();
+            var aggregates = model.GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(
+                model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).Concat(
+                model.GetAttributeUsageTransformationModel(AttributeUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
+                model.GetAttributeUsageTransformationModel(AttributeUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).ToList();
+
+
             var filter = GetBaseOperationParameters(model, out attributeCodeParameters, out brushes, model.BrushOperationModels.Select((m) => (object)m).ToList(), aggregates);
             attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(model.SchemaModel.OriginModels.First()).Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
 
