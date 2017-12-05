@@ -541,6 +541,8 @@ namespace PanoramicDataWin8.view.vis.render
                         Sort(combinde.OrderBy((obj) => (long)obj[attrModelIndex]), sortDir == false);
                     else if (type == typeof(string))
                         Sort(combinde.OrderBy((obj) => (string)obj[attrModelIndex]), sortDir == false);
+                    else if (type == typeof(IDEA_common.range.PreProcessedString))
+                        Sort(combinde.OrderBy((obj) => (IDEA_common.range.PreProcessedString)obj[attrModelIndex]), sortDir == false);
                 }
             }
             setupListView(Records);

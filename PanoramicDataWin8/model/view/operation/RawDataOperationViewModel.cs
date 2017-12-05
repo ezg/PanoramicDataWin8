@@ -143,10 +143,11 @@ namespace PanoramicDataWin8.model.view.operation
                                                             (curSort == true ? (bool?)false : null);
                         if (model.IsChecked)
                         {
-                            RawDataOperationModel.Function = new RawDataOperationModel.FunctionApplied
-                            {
-                                Sorted = sort == null ? null : new Tuple<string, bool>(SelectedColumn.AttributeViewModel.AttributeModel.RawName, curSort == null || curSort == false ? true : false)
-                            };
+                            if (SelectedColumn != null)
+                                RawDataOperationModel.Function = new RawDataOperationModel.FunctionApplied
+                                {
+                                    Sorted = sort == null ? null : new Tuple<string, bool>(SelectedColumn.AttributeViewModel.AttributeModel.RawName, curSort == null || curSort == false ? true : false)
+                                };
                         }
                         else
                         {
