@@ -71,8 +71,6 @@
                 </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>
-        <NewControls:WordCloud x:Name="xWordCloud">
-
-        </NewControls:WordCloud>
+        <NewControls:WordCloud x:Name="xWordCloud" Visibility="Collapsed"/>
     </Grid>
 </local:Renderer>

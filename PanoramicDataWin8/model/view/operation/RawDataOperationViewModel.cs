@@ -25,6 +25,10 @@ namespace PanoramicDataWin8.model.view.operation
 
             var attributeMenuItemViewModel = menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel;
         }
+        public void ForceDrop(AttributeViewModel am)
+        {
+            (menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel).DroppedTriggered(am);
+        }
         AttributeMenuItemViewModel SelectedColumn = null;
         private void AttributeUsageModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {

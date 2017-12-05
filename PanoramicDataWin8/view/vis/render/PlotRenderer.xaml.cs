@@ -35,7 +35,7 @@ using IDEA_common.operations.histogram;
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public sealed partial class PlotRenderer : Renderer, IScribbable
+    public sealed partial class PlotRenderer : Renderer, IScribbable, AttributeViewModelEventHandler
     {
         private PlotRendererContentProvider _plotRendererContentProvider = new PlotRendererContentProvider();
         static int count = 0;
@@ -351,6 +351,22 @@ namespace PanoramicDataWin8.view.vis.render
                 }
             }
             return true;
+        }
+        
+
+        AttributeModel AttributeViewModelEventHandler.CurrentAttributeModel => throw new NotImplementedException();
+        
+
+        void AttributeViewModelEventHandler.AttributeViewModelMoved(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        {
+        }
+        void AttributeViewModelEventHandler.AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        {
+            if (overElement)
+            {
+                var model = (DataContext as HistogramOperationViewModel);
+                model.ForceDrop(sender);
+            }
         }
     }
 }
