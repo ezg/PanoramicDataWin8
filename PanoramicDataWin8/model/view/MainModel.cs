@@ -33,6 +33,8 @@ namespace PanoramicDataWin8.model.view
 
         private double _sampleSize = 100.0;
 
+        private double _rawDataSize = 1000.0;
+
         private SchemaModel _schemaModel;
 
         private bool _showCodeGen;
@@ -97,6 +99,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _sampleSize; }
             set { SetProperty(ref _sampleSize, value); }
+        }
+        
+        public double RawDataSize
+        {
+            get { return _rawDataSize; }
+            set { SetProperty(ref _rawDataSize, value); }
         }
 
         public bool IsDarpaSubmissionMode

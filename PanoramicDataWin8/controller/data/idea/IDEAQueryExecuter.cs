@@ -62,7 +62,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                             {
                                 newJob = new RawDataOperationJob(
                                     rawDataOperationModel,
-                                    (int)MainViewController.Instance.MainModel.SampleSize);
+                                    (int)MainViewController.Instance.MainModel.SampleSize ,
+                                    (int)MainViewController.Instance.MainModel.RawDataSize);
                             }
                         }
                         else if (operationModel is StatisticalComparisonOperationModel)

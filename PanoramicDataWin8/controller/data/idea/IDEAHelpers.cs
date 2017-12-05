@@ -346,6 +346,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 model.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).Concat(
                 model.GetAttributeUsageTransformationModel(AttributeUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
                 model.GetAttributeUsageTransformationModel(AttributeUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None)).ToList();
+            aggregates = aggregates.Distinct().ToList();
 
 
             var filter = GetBaseOperationParameters(model, out attributeCodeParameters, out brushes, model.BrushOperationModels.Select((m) => (object)m).ToList(), aggregates);
