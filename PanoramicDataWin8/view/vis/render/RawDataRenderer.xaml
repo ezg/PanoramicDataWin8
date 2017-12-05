@@ -14,36 +14,41 @@
     FontFamily="{StaticResource abel}">
     <Grid  Background="{StaticResource lightBrush}">
         <common:DXSurface x:Name="dxSurface" Visibility="Collapsed"/>
-        <!--ListView x:Name="xRawDataView" Margin="20"
-                  VirtualizingStackPanel.VirtualizationMode="Recycling" 
+        <ListView x:Name="xListView" x:FieldModifier="public" 
                   SelectionMode="None"
-                      HorizontalAlignment="Left"
-                      VerticalAlignment="Stretch"
-                  ManipulationMode="TranslateRailsY"
+                  HorizontalAlignment="Left"
+                  VerticalAlignment="Top"
+                  VerticalContentAlignment="Top"
+                  HorizontalContentAlignment="Left"
+                  Grid.Column="0"
+                  Margin="20" 
                   ShowsScrollingPlaceholders="True"
-                  DragStarting="xRawDataView_DragStarting"  
                   CanDragItems="False"  >
-            <ListView.Resources>
-                <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter"></local:ObjectToFrameworkElementConverter>
-            </ListView.Resources>
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsStackPanel AreStickyGroupHeadersEnabled="True" CanDrag="False" Orientation="Horizontal"  Margin="0"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Left" />
                     <Setter Property="VerticalContentAlignment"   Value="Center" />
                     <Setter Property="Margin" Value="0,0,0,0" />
                     <Setter Property="Padding" Value="0,0,0,0" />
-                    <Setter Property="MinWidth" Value="0" />
+                    <Setter Property="MinWidth" Value="25" />
                     <Setter Property="MinHeight" Value="25" />
                 </Style>
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Border Child="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}"/>
+                    <local:RawDataColumn DataContext="{Binding}" HorizontalAlignment="Left" VerticalAlignment="Stretch"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
-        </ListView-->
+        </ListView>
         <GridView x:Name="xRawDataGridView" 
+                  Visibility="Collapsed"
                   IsHitTestVisible="False"
+                  Grid.Column="0"
                   Margin="20" 
                   SelectionMode="None"
                   ShowsScrollingPlaceholders="True">

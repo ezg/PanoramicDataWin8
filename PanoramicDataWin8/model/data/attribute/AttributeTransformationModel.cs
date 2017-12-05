@@ -7,6 +7,7 @@ using IDEA_common.aggregates;
 using System.Collections.Generic;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.view;
+using IDEA_common.catalog;
 
 namespace PanoramicDataWin8.model.data.attribute
 {
@@ -91,13 +92,34 @@ namespace PanoramicDataWin8.model.data.attribute
             set { SetProperty(ref _scaleFunction, value); }
         }
 
-        public string GetLabel()
-        {
-            var mainLabel = addDetailToLabel(AttributeModel.DisplayName);
-            mainLabel = mainLabel.Replace("_", " ");
-            return mainLabel;
+        public List<AggregateFunction> AggregateFunctions {
+            get { 
+                var aggregateFunctions = new[] { AggregateFunction.None, AggregateFunction.Count }.ToList();
+                if (AttributeModel.DataType == DataType.Float ||
+                    AttributeModel.DataType == DataType.Double ||
+                    AttributeModel.DataType == DataType.Int)
+                {
+                    aggregateFunctions.Add(AggregateFunction.Avg);
+                    aggregateFunctions.Add(AggregateFunction.Sum);
+                    if (MainViewController.Instance.MainModel.IsUnknownUnknownEnabled)
+                    {
+                        aggregateFunctions.Add(AggregateFunction.SumE);
+                    }
+                }
+                return aggregateFunctions;
+            }
         }
 
+
+        public string GetLabel
+        {
+            get
+            {
+                var mainLabel = addDetailToLabel(AttributeModel.DisplayName);
+                mainLabel = mainLabel.Replace("_", " ");
+                return mainLabel;
+            }
+        }
         private string addDetailToLabel(string name)
         {
             if (AggregateFunction == AggregateFunction.Avg)

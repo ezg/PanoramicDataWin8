@@ -1,0 +1,54 @@
+﻿<UserControl
+    x:Class="PanoramicDataWin8.view.vis.render.RawDataColumn"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:PanoramicDataWin8.view.vis.render"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+    
+    <ListView x:Name="xListView" x:FieldModifier="public" 
+                  Margin="2.5"
+                  SelectionMode="None"
+                  HorizontalAlignment="Stretch"
+                  VerticalAlignment="Stretch"
+                  ScrollViewer.VerticalScrollBarVisibility="Visible"
+                  ManipulationMode="TranslateRailsY"
+                  Loaded="xListView_Loaded"
+                  CanDragItems="False"  >
+        <ListView.Resources>
+            <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter"></local:ObjectToFrameworkElementConverter>
+        </ListView.Resources>
+        <ListView.ItemsPanel>
+            <ItemsPanelTemplate>
+                <ItemsStackPanel Orientation="Vertical" GroupHeaderPlacement="Top" AreStickyGroupHeadersEnabled="True"/>
+            </ItemsPanelTemplate>
+        </ListView.ItemsPanel>
+        <ListView.HeaderTemplate>
+            <DataTemplate>
+                <Grid Background="Gray">
+                    <TextBlock Text="{Binding Model.GetLabel}" Foreground="White" VerticalAlignment="Top" FontSize="9" MaxHeight="20"/>
+                </Grid>
+            </DataTemplate>
+        </ListView.HeaderTemplate>
+        <ListView.ItemContainerStyle>
+            <Style TargetType="ListViewItem">
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="VerticalContentAlignment"   Value="Center" />
+                <Setter Property="Margin" Value="0,0,0,0" />
+                <Setter Property="Padding" Value="0,0,0,0" />
+                <Setter Property="MinWidth" Value="0" />
+                <Setter Property="MinHeight" Value="25" />
+            </Style>
+        </ListView.ItemContainerStyle>
+        <ListView.ItemTemplate>
+            <DataTemplate>
+                <ContentPresenter Content="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}" 
+                                  Width="{Binding Path=DataContext.ColumnWidth, ElementName=xListView}" Background="LightGray"/>
+             </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+    
+</UserControl>

@@ -12,6 +12,7 @@ namespace PanoramicDataWin8.model.view
         private MenuViewModel _menuViewModel;
         private OperationViewModel _operationViewModel;
         private bool _showOnAttributeMove;
+        private bool _showOnAttributeTapped;
         private Vec _ankerOffset = new Vec();
 
         public AttachmentViewModel()
@@ -47,6 +48,9 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _ankerOffset, value); }
         }
 
+        public void StartDisplayActivationStopwatch() {
+            ActiveStopwatch.Restart();
+        }
         public Stopwatch ActiveStopwatch
         {
             get { return _activeStopwatch; }
@@ -63,6 +67,11 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _showOnAttributeMove; }
             set { SetProperty(ref _showOnAttributeMove, value); }
+        }
+        public bool ShowOnAttributeTapped
+        {
+            get { return _showOnAttributeTapped; }
+            set { SetProperty(ref _showOnAttributeTapped, value); }
         }
 
         private void OperationViewModelPropertyChanged(object sender, PropertyChangedEventArgs e)

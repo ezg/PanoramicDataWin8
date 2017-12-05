@@ -17,6 +17,29 @@ namespace PanoramicDataWin8.model.data.operation
     [JsonObject(MemberSerialization.OptOut)]
     public class RawDataOperationModel : BaseVisualizationOperationModel
     {
-        public RawDataOperationModel(SchemaModel schemaModel) : base(schemaModel) { }
+        public RawDataOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        {
+            ColumnHeaderAttributeUsageModels.CollectionChanged += columnHeaderAttributeUsageModels_CollectionChanged;
+        }
+        public ObservableCollection<AttributeModel> ColumnHeaderAttributeUsageModels { get; } = new ObservableCollection<AttributeModel>();
+
+        private void columnHeaderAttributeUsageModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+        }
+
+        public class FunctionApplied
+        {
+            public Tuple<string, bool?> Sorted = new Tuple<string, bool?>("", null);
+
+            public bool Averaged { get; set; } = false;
+        }
+
+        FunctionApplied _function;
+        public FunctionApplied Function
+        {
+            get { return _function; }
+            set { SetProperty(ref _function, value); }
+        }
     }
 }

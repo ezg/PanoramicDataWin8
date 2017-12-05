@@ -64,7 +64,7 @@ namespace PanoramicDataWin8.view.vis.render
                     tb.Foreground = new SolidColorBrush(Colors.Black);
                     tb.Text = value.ToString();
                     tb.Height = 25;
-                    tb.MinWidth = value is string ? 200 : 50;
+                    tb.MinWidth = 50;
                     tb.HorizontalAlignment = HorizontalAlignment.Stretch;
                     g.Children.Add(tb);
                 }
@@ -79,16 +79,39 @@ namespace PanoramicDataWin8.view.vis.render
     }
     public sealed partial class RawDataRenderer : Renderer, IScribbable
     {
+        public class RawColumnData : ExtendedBindableBase {
+            AttributeTransformationModel _model;
+            double _cwidth;
+            public bool ShowScroll = false;
+            public ObservableCollection<object> Data;
+            public RawDataRenderer Renderer;
+            public AttributeTransformationModel Model
+            {
+                get { return _model; }
+                set
+                {
+                    this.SetProperty(ref _model, value);
+                }
+            }
+            public double ColumnWidth
+            {
+                get { return _cwidth; }
+                set
+                {
+                    this.SetProperty(ref _cwidth, value);
+                }
+            }
+            public RawColumnData() { Data = new ObservableCollection<object>(); }
+        }
 
-        public ObservableCollection<object> Records { get; set; } = new ObservableCollection<object>();
+        public ObservableCollection<RawColumnData> Records { get; set; } = new ObservableCollection<RawColumnData>();
+
         public RawDataRenderer()
         {
             this.InitializeComponent();
-            
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
-           // xRawDataView.ItemsSource = Records;
-            xRawDataGridView.ItemsSource = Records;
+            //xRawDataGridView.ItemsSource = Records;
             this.SizeChanged += RawDataRenderer_SizeChanged;
             this.Tapped += RawDataRenderer_Tapped;
             MainViewController.Instance.MainPage.AddHandler(PointerPressedEvent, new PointerEventHandler(RawDataRenderer_PointerPressed), true);
@@ -98,7 +121,10 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var res = VisualTreeHelper.FindElementsInHostCoordinates(e.GetCurrentPoint(null).Position, this);
             if (res.Count() == 0)
+            {
                 xRawDataGridView.IsHitTestVisible = false;
+                xListView.IsHitTestVisible = false;
+            }
         }
         
 
@@ -106,6 +132,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var model = (DataContext as RawDataOperationViewModel);
             xRawDataGridView.IsHitTestVisible = true;
+            xListView.IsHitTestVisible = true;
             var res = VisualTreeHelper.FindElementsInHostCoordinates(e.GetPosition(null), this);
             foreach (var r in res)
                 if (r is Image)
@@ -130,20 +157,24 @@ namespace PanoramicDataWin8.view.vis.render
                 else if (r is TextBlock)
                 {
                     var tb = r as TextBlock;
+                    var col = tb.GetFirstAncestorOfType<RawDataColumn>()?.Model ??
+                             new AttributeTransformationModel(model.RawDataOperationModel.AttributeUsageModels.First());
                     if (tb.Tag != null)
                     {
                         model.RawDataOperationModel.RemoveFilterModel(tb.Tag as FilterModel);
                         tb.FontStyle = Windows.UI.Text.FontStyle.Normal;
+                        tb.FontWeight = Windows.UI.Text.FontWeights.Normal;
                         tb.Tag = null;
                     }
                     else
                     {
                         tb.FontStyle = Windows.UI.Text.FontStyle.Italic;
+                        tb.FontWeight = Windows.UI.Text.FontWeights.ExtraBold;
+                        tb.SelectAll();
                         var fm = new FilterModel();
-                        var xIom = model.RawDataOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
-                        var vc = xIom.AttributeModel.DataType == IDEA_common.catalog.DataType.String ?
-                            new ValueComparison(xIom, IDEA_common.operations.recommender.Predicate.CONTAINS, tb.Text) :
-                            new ValueComparison(xIom, IDEA_common.operations.recommender.Predicate.EQUALS, ToObject(xIom.AttributeModel, tb.Text));
+                        var vc = col.AttributeModel.DataType == IDEA_common.catalog.DataType.String ?
+                            new ValueComparison(col, IDEA_common.operations.recommender.Predicate.CONTAINS, tb.Text) :
+                            new ValueComparison(col, IDEA_common.operations.recommender.Predicate.EQUALS, ToObject(col.AttributeModel, tb.Text));
 
                         fm.ValueComparisons.Add(vc);
                         model.RawDataOperationModel.AddFilterModel(fm);
@@ -189,10 +220,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void RawDataRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            var b = new Binding();
-            b.Source = this;
-            b.Path = new PropertyPath("ActualWidth");
-            this.xRawDataGridView.ItemsPanelRoot.SetBinding(WidthProperty, b);
+            //this.xRawDataGridView.ItemsPanelRoot.SetBinding(WidthProperty, b);
+            // this.xRawDataView.ItemsPanelRoot.SetBinding(WidthProperty, b);
         }
         
 
@@ -244,7 +273,7 @@ namespace PanoramicDataWin8.view.vis.render
         }
         void OperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            RawDataOperationModel operationModel = (RawDataOperationModel)((OperationViewModel)DataContext).OperationModel;
+            var operationModel = (RawDataOperationModel)((OperationViewModel)DataContext).OperationModel;
             if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.Result))
             {
                 var result = (DataContext as RawDataOperationViewModel).OperationModel.Result;
@@ -253,6 +282,10 @@ namespace PanoramicDataWin8.view.vis.render
                     loadResult(result);
                     render();
                 }
+            }
+            else if (e.PropertyName == "Function")
+            {
+                render(operationModel.Function);
             }
         }
 
@@ -277,35 +310,50 @@ namespace PanoramicDataWin8.view.vis.render
         void loadResult(IResult result)
         {
             var model = (DataContext as RawDataOperationViewModel);
-            var clone = (RawDataOperationModel)model.OperationModel.ResultCauserClone;
-            AttributeTransformationModel valueIom = null;
-
-            if (clone.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
-            {
-                valueIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.Value).First();
-            }
-            else if (clone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
-            {
-                valueIom = clone.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
-            }
-
-            Records.Clear();
+            Records = new ObservableCollection<RawColumnData>();
             xWordCloud.TheText = "";
             model.RawDataOperationModel.ClearFilterModels();
-            if ((result as RawDataResult).WeightedWords.Count > 0)
+            if ((result as RawDataResult).Samples.Count() == 1 && (result as RawDataResult).WeightedWords?.Count > 0)
             {
-                xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords;
+                xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords.FirstOrDefault().Value;
                 xWordCloud.Visibility = Visibility.Visible;
+                xRawDataGridView.Visibility = Visibility.Collapsed;
+                xListView.Visibility = Visibility.Collapsed;
             }
             else
             {
                 xWordCloud.Visibility = Visibility.Collapsed;
-                loadRecordsAsync((result as RawDataResult).Samples);
+                for (int sampleIndex = 0; sampleIndex < (result as RawDataResult).Samples.Count(); sampleIndex++) {
+                    var s = (result as RawDataResult).Samples[model.RawDataOperationModel.AttributeUsageModels[sampleIndex].RawName];
+                    if (s.Count > 0)
+                        loadRecordsAsync(s, model.RawDataOperationModel.AttributeUsageModels[sampleIndex], sampleIndex+1 == (result as RawDataResult).Samples.Count());
+
+                }
+                if ((result as RawDataResult).Samples.Count() == 1)
+                {
+                    xRawDataGridView.Visibility = Visibility.Visible;
+                    xListView.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    xRawDataGridView.Visibility = Visibility.Collapsed;
+                    xListView.Visibility = Visibility.Visible;
+                }
+
             }
+            this.xListView.ItemsSource = Records;
+            this.xRawDataGridView.ItemsSource = Records.FirstOrDefault()?.Data;
         }
 
-        void loadRecordsAsync(List<object> records)
+        void loadRecordsAsync(List<object> records, AttributeModel model, bool showScroll)
         {
+            var acollection = new RawColumnData {
+                Model = new AttributeTransformationModel(model),
+                ColumnWidth =records.First() is string|| records.First() is IDEA_common.range.PreProcessedString ? 200:50,
+                Renderer = this,
+                ShowScroll = showScroll
+            };
+            Records.Add(acollection);
             if (records != null)
 #pragma warning disable CS4014
                 CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
@@ -314,15 +362,62 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     foreach (var val in records)
                     {
-                        Records.Add(val);
+                        acollection.Data.Add(val);
                     }
                 });
 #pragma warning restore CS4014
         }
-        void render(bool sizeChanged = false)
+
+        void render(RawDataOperationModel.FunctionApplied function = null) 
         {
-            //viewBox.Visibility = Visibility.Collapsed;
-            //dxSurface?.Redraw();
+            var model = (DataContext as RawDataOperationViewModel);
+            if (function?.Sorted?.Item2 != null)
+            {
+                var sortField = function?.Sorted.Item1;
+                var sortDir = function?.Sorted.Item2;
+
+                var combinde = new List<object[]>();
+                for (var i = 0; i < Records.First().Data.Count; i++)
+                {
+                    var objList = new object[Records.Count];
+                    for (int j = 0; j < Records.Count; j++)
+                        objList[j] = Records[j].Data[i];
+                    combinde.Add(objList);
+                }
+                var attrModelIndex = model.RawDataOperationModel.AttributeUsageModels.IndexOf((am) => am.RawName == sortField);
+                if (model.RawDataOperationModel.AttributeUsageModels[attrModelIndex].DataType == IDEA_common.catalog.DataType.Int)
+                    Sort(combinde.OrderBy( (obj) => (long)obj[attrModelIndex]), sortDir == false);
+                else if (model.RawDataOperationModel.AttributeUsageModels[attrModelIndex].DataType == IDEA_common.catalog.DataType.Double)
+                    Sort(combinde.OrderBy((obj) => (double)obj[attrModelIndex]), sortDir == false);
+                else
+                    Sort(combinde.OrderBy((obj) => obj[attrModelIndex].ToString()), sortDir == false);
+                xListView.ItemsSource = Records;
+            } else if (function?.Averaged == true)
+            {
+                var newRecords = new ObservableCollection<RawColumnData>();
+                for (var index = 0; index < Records.Count; index++)
+                {
+                    var avg = Records[index].Data.Average((l) => l is long ? (double)(long)l : l is int ? (double)(int)l : l is double ? (double)l : 0);
+                    newRecords.Add(new RawColumnData {
+                        ColumnWidth = Records[index].ColumnWidth,
+                        Renderer = this,
+                        Data = new ObservableCollection<object>(new object[] { avg }),
+                        Model = new AttributeTransformationModel(Records[index].Model.AttributeModel) { AggregateFunction = IDEA_common.aggregates.AggregateFunction.Avg }
+                    });
+                }
+                xListView.ItemsSource = newRecords;
+            } else
+
+                xListView.ItemsSource = Records;
+        }
+        public void Sort(IEnumerable<object[]> sortedList, bool down = false)
+        {
+            for (var index = 0; index < Records.Count; index++)
+            {
+                Records[index].Data.Clear();
+                foreach (var x in down ? sortedList.Reverse() : sortedList)
+                    Records[index].Data.Add(x[index]);
+            }
         }
         public GeoAPI.Geometries.IGeometry BoundsGeometry
         {

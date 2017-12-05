@@ -84,10 +84,12 @@ namespace PanoramicDataWin8.controller.view
                                 comparisonOperationViewModel.OperationViewModels.Add(other);
                                 comparisonOperationViewModel.OperationViewModels.Add(current);
 
-                                var a1 = (other.OperationModel as HistogramOperationModel)
+                                var a1 = (other.OperationModel as BaseVisualizationOperationModel)
                                     .GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
-                                var a2 = (current.OperationModel as HistogramOperationModel)
+                                var a2 = (current.OperationModel as BaseVisualizationOperationModel)
                                     .GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+                                if (a1 == null || a2 == null)
+                                    continue;
 
                                 comparisonOperationViewModel.StatisticalComparisonOperationModel.TestType = TestType.chi2;
                                 if (a1.AttributeModel.RawName != a2.AttributeModel.RawName)

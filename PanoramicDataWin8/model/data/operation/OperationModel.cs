@@ -25,6 +25,8 @@ namespace PanoramicDataWin8.model.data.operation
         private IResult _result;
 
         private SchemaModel _schemaModel;
+        public ObservableCollection<AttributeModel> AttributeUsageModels { get; } = new ObservableCollection<AttributeModel>();
+
 
         public OperationModel(SchemaModel schemaModel)
         {
@@ -130,13 +132,6 @@ namespace PanoramicDataWin8.model.data.operation
     {
         Running,
         Stopped
-    }
-
-    public class AttributeUsageOperationModel : OperationModel {
-
-        public AttributeUsageOperationModel(SchemaModel schemaModel) : base(schemaModel) { }
-
-        public ObservableCollection<AttributeTransformationModel> AttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
     }
 
 }

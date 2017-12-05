@@ -16,7 +16,7 @@ using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public class ComputationalOperationModel : AttributeUsageOperationModel
+    public class ComputationalOperationModel : OperationModel
     {
         string _rawName;
 

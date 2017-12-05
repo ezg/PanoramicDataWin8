@@ -75,18 +75,21 @@ namespace PanoramicDataWin8.model.view.operation
         }
         protected void createTopRightFilterDragMenu()
         {
-            AttachementViewModels.Add(new AttachmentViewModel
+            var attachmentRightViewModel = new AttachmentViewModel
             {
                 AttachmentOrientation = AttachmentOrientation.TopRight,
-                OperationViewModel = this
-            });
-            var attachmentRightViewModel = AttachementViewModels.Last();
+                OperationViewModel = this,
+                ShowOnAttributeTapped = true
+            };
+            AttachementViewModels.Add(attachmentRightViewModel);
+
             var menuViewModelDrag = new MenuViewModel
             {
                 AttachmentOrientation = attachmentRightViewModel.AttachmentOrientation,
                 NrColumns = 1,
                 NrRows = 1
             };
+            attachmentRightViewModel.MenuViewModel = menuViewModelDrag;
 
             var menuItemDrag = new MenuItemViewModel
             {
@@ -98,23 +101,12 @@ namespace PanoramicDataWin8.model.view.operation
                 Size = new Vec(25, 25),
                 Position = this.Position,
                 TargetSize = new Vec(25, 25),
-                IsAlwaysDisplayed = false
+                IsAlwaysDisplayed = false,
+                MenuItemComponentViewModel = new CreateLinkMenuItemViewModel()
             };
-            var attrDrag = new CreateLinkMenuItemViewModel();
-            attrDrag.CreateLinkEvent += (sender, bounds) =>
-            {
-                controller.view.FilterLinkViewController.Instance.CreateFilterLinkViewModel(this, bounds);
-            };
-
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentRightViewModel.ActiveStopwatch.Restart();
-            };
-
-            menuItemDrag.MenuItemComponentViewModel = attrDrag;
             menuViewModelDrag.MenuItemViewModels.Add(menuItemDrag);
-            attachmentRightViewModel.MenuViewModel = menuViewModelDrag;
+            (menuItemDrag.MenuItemComponentViewModel as CreateLinkMenuItemViewModel).CreateLinkEvent += (sender, bounds) => FilterLinkViewController.Instance.CreateFilterLinkViewModel(this, bounds);
+             
         }
 
         public OperationViewModel(OperationModel operationModel)
@@ -194,225 +186,6 @@ namespace PanoramicDataWin8.model.view.operation
             if (_nextColorId >= COLORS.Count() - 1)
                 _nextColorId = 0;
             Color = COLORS[_nextColorId++];
-        }
-    }
-    public class AttributeUsageOperationViewModel : OperationViewModel {
-        
-        public AttributeUsageOperationViewModel(OperationModel operationModel):base(operationModel)
-        {
-
-        }
-        public AttributeUsageOperationModel AttributeUsageOperationModel => (AttributeUsageOperationModel)OperationModel;
-
-        static List<AttributeModel> findAllNestedGroups(AttributeModel attributeGroupModel)
-        {
-            var models = new List<AttributeModel>();
-            if (attributeGroupModel != null)
-            {
-                models.Add(attributeGroupModel);
-                var inputModels = (attributeGroupModel.FuncModel as AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)?.InputModels;
-                if (inputModels != null)
-                    foreach (var at in inputModels)
-                        models.AddRange(findAllNestedGroups(at));
-            }
-            return models;
-        }
-        static public bool attributeTransformationModelContainsAttributeModel(AttributeModel testAttributeModel, AttributeTransformationModel newAttributeTransformationModel)
-        {
-            return findAllNestedGroups(newAttributeTransformationModel.AttributeModel).Contains(testAttributeModel);
-        }
-        public delegate void InputAddedHandler(object sender);
-        public event InputAddedHandler TopInputAdded;
-
-        protected void createTopInputsExpandingMenu()
-        {
-            var attachmentViewModel =
-                AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Top);
-            attachmentViewModel.ShowOnAttributeMove = true;
-
-            var menuViewModel = new MenuViewModel
-            {
-                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = 3,
-                NrRows = 1
-            };
-
-            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
-            {
-                var addMenuItem = new MenuItemViewModel
-                {
-                    MenuViewModel = menuViewModel,
-                    Row = 0,
-                    ColumnSpan = 1,
-                    RowSpan = 1,
-                    Column = 0,
-                    Size = new Vec(25, 25),
-                    TargetSize = new Vec(25, 25),
-                    IsAlwaysDisplayed = false,
-                    IsWidthBoundToParent = false,
-                    IsHeightBoundToParent = false,
-                    Position = Position
-                };
-
-
-                var attr1 = new AttributeTransformationMenuItemViewModel
-                {
-                    Label = "+",
-                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
-                    CanDrag = false,
-                    CanDrop = true
-                };
-                attr1.DroppedTriggered = attributeTransformationModel =>
-                {
-                    if (!AttributeUsageOperationModel.AttributeUsageTransformationModels.Contains(
-                            attributeTransformationModel) &&
-                        !attributeTransformationModelContainsAttributeModel(
-                            (AttributeUsageOperationModel as AttributeGroupOperationModel)?.AttributeModel,
-                            attributeTransformationModel))
-                    {
-                        AttributeUsageOperationModel.AttributeUsageTransformationModels.Add(
-                            attributeTransformationModel);
-                        if (TopInputAdded != null)
-                            TopInputAdded(this);
-                    }
-                };
-
-                addMenuItem.MenuItemComponentViewModel = attr1;
-                menuViewModel.MenuItemViewModels.Add(addMenuItem);
-
-                attachmentViewModel.MenuViewModel = menuViewModel;
-
-                AttributeUsageOperationModel.AttributeUsageTransformationModels.CollectionChanged += (sender, args) =>
-                {
-                    var coll = sender as ObservableCollection<AttributeTransformationModel>;
-                    var attributeTransformationModel = coll.FirstOrDefault();
-
-                    // remove old ones first
-                    if (args.OldItems != null)
-                        foreach (var oldItem in args.OldItems)
-                        {
-                            var oldAttributeTransformationModel = oldItem as AttributeTransformationModel;
-                            var found = menuViewModel.MenuItemViewModels.FirstOrDefault(mvm =>
-                                (((AttributeTransformationMenuItemViewModel) mvm.MenuItemComponentViewModel)
-                                 .AttributeTransformationViewModel != null) &&
-                                (((AttributeTransformationMenuItemViewModel) mvm.MenuItemComponentViewModel)
-                                 .AttributeTransformationViewModel.AttributeTransformationModel ==
-                                 oldAttributeTransformationModel));
-                            if (found != null)
-                                menuViewModel.MenuItemViewModels.Remove(found);
-                        }
-
-                    menuViewModel.NrRows = (int) Math.Ceiling(coll.Count / 3.0) + 1;
-
-                    // add new ones
-                    if (args.NewItems != null)
-                    {
-                        foreach (var newItem in args.NewItems)
-                        {
-                            var newAttributeTransformationModel = newItem as AttributeTransformationModel;
-                            var newMenuItem = new MenuItemViewModel
-                            {
-                                MenuViewModel = menuViewModel,
-                                Size = new Vec(50, 50),
-                                TargetSize = new Vec(50, 50),
-                                Position = addMenuItem.Position
-                            };
-                            var newAttr = new AttributeTransformationMenuItemViewModel
-                            {
-                                Label = newAttributeTransformationModel.GetLabel(),
-                                AttributeTransformationViewModel =
-                                    new AttributeTransformationViewModel(this, newAttributeTransformationModel),
-                                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                                CanDrag = false,
-                                CanDrop = false
-                            };
-
-                            if (newAttributeTransformationModel != null)
-                            {
-                                newAttributeTransformationModel.PropertyChanged += (sender2, args2) =>
-                                {
-                                    newAttr.Label = (sender2 as AttributeTransformationModel).GetLabel();
-                                };
-                                newAttributeTransformationModel.AttributeModel.PropertyChanged += (sender2, arg2) =>
-                                {
-                                    newAttr.Label = (sender2 as AttributeModel).DisplayName;
-                                };
-                            }
-
-                            newMenuItem.Deleted += (sender1, args1) =>
-                            {
-                                var atm =
-                                    ((AttributeTransformationMenuItemViewModel) ((MenuItemViewModel) sender1)
-                                        .MenuItemComponentViewModel).AttributeTransformationViewModel
-                                    .AttributeTransformationModel;
-                                AttributeUsageOperationModel.AttributeUsageTransformationModels.Remove(atm);
-                            };
-                            newMenuItem.MenuItemComponentViewModel = newAttr;
-                            menuViewModel.MenuItemViewModels.Add(newMenuItem);
-                        }
-                    }
-
-                    var count = 0;
-                    foreach (var menuItemViewModel in menuViewModel.MenuItemViewModels.Where(mvm => mvm != addMenuItem))
-                    {
-                        menuItemViewModel.Column = count % 3;
-                        menuItemViewModel.Row = menuViewModel.NrRows - 1 - (int) Math.Floor(count / 3.0);
-                        count++;
-                    }
-                    attachmentViewModel.ActiveStopwatch.Restart();
-                    menuViewModel.FireUpdate();
-                };
-            }
-
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-        }
-        protected void createLabelMenu(AttachmentOrientation attachmentOrientation, IDEAAttributeModel code,
-            AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
-        {
-            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
-
-            var menuViewModel = new MenuViewModel
-            {
-                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
-                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
-            };
-
-            var menuItem = new MenuItemViewModel
-            {
-                MenuViewModel = menuViewModel,
-                Row = 0,
-                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 1,
-                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 5,
-                Column = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
-                Size = size,
-                Position = Position,
-                TargetSize = size,
-                IsAlwaysDisplayed = true,
-                IsWidthBoundToParent = isWidthBoundToParent,
-                IsHeightBoundToParent = isHeightBoundToParent
-            };
-            var attr1 = new AttributeTransformationMenuItemViewModel
-            {
-                TextAngle = textAngle,
-                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = code.DisplayName
-            };
-
-            code.PropertyChanged += (sender, args) => {
-                if (args.PropertyName == "DisplayName")
-                    attr1.Label = code.DisplayName;
-            };
-
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(code));
-            attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
-            menuItem.MenuItemComponentViewModel = attr1;
-            menuViewModel.MenuItemViewModels.Add(menuItem);
-            attachmentViewModel.MenuViewModel = menuViewModel;
         }
     }
 

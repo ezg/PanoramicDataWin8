@@ -13,12 +13,11 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class CalculationOperationViewModel : AttributeUsageOperationViewModel
     {
-        public CalculationOperationModel CalculationOperationModel {  get { return OperationModel as CalculationOperationModel;  } }
-      
+        MenuItemViewModel CalculationNameMenuItemViewModel = null;
+        public CalculationOperationModel CalculationOperationModel { get { return OperationModel as CalculationOperationModel;  } }      
         public CalculationOperationViewModel(CalculationOperationModel operationModel, bool fromMouse = false) : base(operationModel)
         {
-            addAttachmentViewModels();
-            createLabelMenu(AttachmentOrientation.Bottom, CalculationOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false);
+            createAttributeLabelMenu(AttachmentOrientation.Bottom, CalculationOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false, null, out CalculationNameMenuItemViewModel);
         }
     }
 }

@@ -1,5 +1,5 @@
 ﻿{
-  "Hostname": "http://localhost:8080",
+  "Hostname": "http://localhost:1234",
   "APIPath": "/api",
   "StartDataset": "o_185_dataset",
   "SampleSize": 100000,

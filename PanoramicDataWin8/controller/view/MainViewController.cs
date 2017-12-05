@@ -41,15 +41,15 @@ namespace PanoramicDataWin8.controller.view
 
             MainModel = new MainModel();
            
-            AttributeTransformationViewModel.AttributeTransformationViewModelDropped += AttributeTransformationViewModelDropped;
-            IDisposable disposable = Observable.FromEventPattern<AttributeTransformationViewModelEventArgs>(typeof(AttributeTransformationViewModel), "AttributeTransformationViewModelMoved")
+            AttributeViewModel.AttributeViewModelDropped += AttributeViewModelDropped;
+            IDisposable disposable = Observable.FromEventPattern<AttributeViewModelEventArgs>(typeof(AttributeViewModel), "AttributeViewModelMoved")
                 .Sample(TimeSpan.FromMilliseconds(20))
                 .Subscribe(async arg =>
                 {
                     var dispatcher = MainPage.Dispatcher;
                     await dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
-                        AttributeTransformationViewModelMoved(arg.Sender, arg.EventArgs);
+                        AttributeViewModelMoved(arg.Sender, arg.EventArgs);
                     });
                 });
 
@@ -87,7 +87,7 @@ namespace PanoramicDataWin8.controller.view
             MainModel.StartDataset = config["StartDataset"].ToString();
             MainModel.SampleSize = double.Parse(config["SampleSize"].ToString());
             MainModel.IsDarpaSubmissionMode = bool.Parse(config["IsDarpaSubmissionMode"].ToString());
-            MainModel.IsIGTMode = bool.Parse(config["IsIGTMode"].ToString());
+          //  MainModel.IsIGTMode = bool.Parse(config["IsIGTMode"].ToString());
             MainModel.APIPath = config["APIPath"].ToString();
             MainModel.Hostname = config["Hostname"].ToString();
 
@@ -447,11 +447,11 @@ namespace PanoramicDataWin8.controller.view
         }
         
 
-        private void AttributeTransformationViewModelMoved(object sender, AttributeTransformationViewModelEventArgs e)
+        private void AttributeViewModelMoved(object sender, AttributeViewModelEventArgs e)
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
-            var hits = new List<AttributeTransformationViewModelEventHandler>();
-            var attTransDescendants = InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>().ToList();
+            var hits = new List<AttributeViewModelEventHandler>();
+            var attTransDescendants = InkableScene.GetDescendants().OfType<AttributeViewModelEventHandler>().ToList();
             foreach (var element in attTransDescendants)
             {
                 var geom = element.BoundsGeometry;
@@ -471,7 +471,7 @@ namespace PanoramicDataWin8.controller.view
                     {
                         if (a.ShowOnAttributeMove)
                         {
-                            a.ActiveStopwatch.Restart();
+                            a.StartDisplayActivationStopwatch();
                         }
                     }
                 }
@@ -481,17 +481,17 @@ namespace PanoramicDataWin8.controller.view
 
             foreach (var element in attTransDescendants)
             {
-                element.AttributeTransformationViewModelMoved(
-                    sender as AttributeTransformationViewModel, e,
+                element.AttributeViewModelMoved(
+                    sender as AttributeViewModel, e,
                     (hits.Count() > 0) && (orderderHits[0] == element));
             }
         }
 
-        private void AttributeTransformationViewModelDropped(object sender, AttributeTransformationViewModelEventArgs e)
+        private void AttributeViewModelDropped(object sender, AttributeViewModelEventArgs e)
         {
             IGeometry mainPageBounds = e.Bounds.GetPolygon();
-            var hits = new List<AttributeTransformationViewModelEventHandler>();
-            var attTransDescendants = InkableScene.GetDescendants().OfType<AttributeTransformationViewModelEventHandler>().ToList();
+            var hits = new List<AttributeViewModelEventHandler>();
+            var attTransDescendants = InkableScene.GetDescendants().OfType<AttributeViewModelEventHandler>().ToList();
             foreach (var element in attTransDescendants)
             {
                 var geom = element.BoundsGeometry;
@@ -509,15 +509,15 @@ namespace PanoramicDataWin8.controller.view
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
             foreach (var element in attTransDescendants)
             {
-                element.AttributeTransformationViewModelDropped(
-                    sender as AttributeTransformationViewModel, e,
+                element.AttributeViewModelDropped(
+                    sender as AttributeViewModel, e,
                     (hits.Count() > 0) && (orderderHits[0] == element));
             }
 
-            if (!hits.Any())
+            if (!hits.Any() && e.AttributeModel != null)
             {
                 var operationContainerView = new OperationContainerView();
-                var histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(e.AttributeTransformationModel.AttributeModel, position);
+                var histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(e.AttributeModel, position);
                 histogramOperationViewModel.Size = size;
                 operationContainerView.DataContext = histogramOperationViewModel;
                 InkableScene.Add(operationContainerView);

@@ -33,35 +33,23 @@ namespace PanoramicDataWin8.view.vis.render
             this.InitializeComponent();
         }
 
-        public bool IsDeletable
-        {
-            get { return false; }
-        }
+        public bool IsDeletable { get { return false; } }
 
-        public IGeometry Geometry
-        {
-            get
-            {
-                var model = this.DataContext as FunctionOperationViewModel;
+        public FunctionOperationViewModel FunctionOperationViewModel => DataContext as FunctionOperationViewModel;
 
-                Rct bounds = new Rct(model.Position, model.Size);
-                return bounds.GetPolygon();
-            }
-        }
+        public IGeometry Geometry => new Rct(FunctionOperationViewModel.Position, FunctionOperationViewModel.Size).GetPolygon();
+
+        public List<IScribbable> Children => new List<IScribbable>();
+        public bool Consume(InkStroke inkStroke) { return false; }
+
         void dataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             MinHeight = OperationViewModel.MIN_HEIGHT / 2;
             if (args.NewValue != null)
             {
-
-                var model = this.DataContext as FunctionOperationViewModel;
-                NameTextBox.Text = model.FunctionOperationModel.GetAttributeModel().DisplayName;
-                model.OperationModel.OperationModelUpdated -= OperationModelUpdated;
-                model.OperationModel.OperationModelUpdated += OperationModelUpdated;
-                model.OperationModel.PropertyChanged -= OperationModelPropertyChanged;
-                model.OperationModel.PropertyChanged += OperationModelPropertyChanged;
-
-                model.OperationViewModelTapped += OperationViewModelTapped;
+                NameTextBox.Text = FunctionOperationViewModel.FunctionOperationModel.GetAttributeModel().DisplayName;
+                FunctionOperationViewModel.OperationViewModelTapped -= OperationViewModelTapped;
+                FunctionOperationViewModel.OperationViewModelTapped += OperationViewModelTapped;
             }
         }
 
@@ -69,22 +57,6 @@ namespace PanoramicDataWin8.view.vis.render
         {
             NameTextBox.IsEnabled = true;
             NameTextBox.Focus(FocusState.Keyboard);
-        }
-        private void OperationModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-        }
-
-        private void OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
-        {
-        }
-
-        public List<IScribbable> Children
-        {
-            get { return new List<IScribbable>(); }
-        }
-        public bool Consume(InkStroke inkStroke)
-        {
-            return false;
         }
 
 

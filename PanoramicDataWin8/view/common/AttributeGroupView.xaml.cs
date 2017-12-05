@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.view.common
         public AttributeGroupView()
         {
             this.InitializeComponent();
-            this.DataContextChanged += JobTypeView_DataContextChanged;
+            this.DataContextChanged += AttributeGroupView_DataContextChanged;
 
             _mainPointerManager.Added += mainPointerManager_Added;
             _mainPointerManager.Moved += mainPointerManager_Moved;
@@ -43,7 +43,7 @@ namespace PanoramicDataWin8.view.common
             _mainPointerManager.Attach(this);
         }
 
-        void JobTypeView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        void AttributeGroupView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (args.NewValue != null && args.NewValue is InputGroupViewModel)
             {
@@ -110,7 +110,8 @@ namespace PanoramicDataWin8.view.common
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        (DataContext as InputGroupViewModel).FireMoved(bounds, (DataContext as InputGroupViewModel).AttributeOperationModel);
+                        (DataContext as InputGroupViewModel).FireMoved(bounds, 
+                            (DataContext as InputGroupViewModel).AttributeTransformationModel);
                     }
                 }
 
@@ -132,7 +133,7 @@ namespace PanoramicDataWin8.view.common
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as InputGroupViewModel).FireDropped(bounds, (DataContext as InputGroupViewModel).AttributeOperationModel);
+                (DataContext as InputGroupViewModel).FireDropped(bounds, (DataContext as InputGroupViewModel).AttributeTransformationModel);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -172,7 +173,7 @@ namespace PanoramicDataWin8.view.common
                 _shadow.SendToFront();
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                (DataContext as InputGroupViewModel).FireMoved(bounds, (DataContext as InputGroupViewModel).AttributeOperationModel);
+                (DataContext as InputGroupViewModel).FireMoved(bounds, (DataContext as InputGroupViewModel).AttributeTransformationModel);
             }
         }
     }

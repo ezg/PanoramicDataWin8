@@ -197,21 +197,23 @@
     <Compile Include="model\data\OperationTypeModel.cs" />
     <Compile Include="model\view\AttachedTo.cs" />
     <Compile Include="model\view\AttachmentOrientation.cs" />
-    <Compile Include="model\view\AttributeTransformationMenuItemViewModel.cs" />
-    <Compile Include="model\view\AttributeTransformationViewModelEventArgs.cs" />
-    <Compile Include="model\view\AttributeTransformationViewModelEventHandler.cs" />
+    <Compile Include="model\view\AttributeMenuItemViewModel.cs" />
+    <Compile Include="model\view\AttributeViewModelEventArgs.cs" />
+    <Compile Include="model\view\AttributeViewModelEventHandler.cs" />
     <Compile Include="model\view\BrushableOperationViewModelState.cs" />
     <Compile Include="model\view\IncludeExludeMenuItemViewModel.cs" />
     <Compile Include="model\view\BudgetViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModelEventArgs.cs" />
     <Compile Include="model\view\operation\AttributeGroupOperationViewModel.cs" />
+    <Compile Include="model\view\operation\AttributeUsageOperationViewModel.cs" />
+    <Compile Include="model\view\operation\BaseVisualizationOperationViewModel.cs" />
     <Compile Include="model\view\operation\CalculationOperationViewModel.cs" />
     <Compile Include="model\view\operation\PredictorOperationViewModel.cs" />
     <Compile Include="model\view\operation\DefinitionOperationViewModel.cs" />
     <Compile Include="model\view\operation\FunctionOperationViewModel.cs" />
     <Compile Include="model\view\operation\RecommenderOperationViewModel.cs" />
-    <Compile Include="model\view\RawDataOperationViewModel.cs" />
+    <Compile Include="model\view\operation\RawDataOperationViewModel.cs" />
     <Compile Include="model\view\RecommenderHandleViewModel.cs" />
     <Compile Include="model\view\RecommendedHistogramMenuItemViewModel.cs" />
     <Compile Include="model\view\PagingMenuItemViewModel.cs" />
@@ -237,9 +239,6 @@
     <Compile Include="model\view\ToggleMenuItemComponentViewModel.cs" />
     <Compile Include="utils\ClipToBounds.cs" />
     <Compile Include="utils\ObservableDictionary.cs" />
-    <Compile Include="view\common\AttributeGroupView.xaml.cs">
-      <DependentUpon>AttributeGroupView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="view\common\BudgetView.xaml.cs">
       <DependentUpon>BudgetView.xaml</DependentUpon>
     </Compile>
@@ -261,7 +260,7 @@
     <Compile Include="model\view\MenuViewModel.cs" />
     <Compile Include="model\view\MenuItemViewModel.cs" />
     <Compile Include="model\view\AttachmentViewModel.cs" />
-    <Compile Include="model\view\AttributeTransformationViewModel.cs" />
+    <Compile Include="model\view\AttributeViewModel.cs" />
     <Compile Include="model\view\FilterLinkViewModel.cs" />
     <Compile Include="model\view\MainModel.cs" />
     <Compile Include="model\view\operation\HistogramOperationViewModel.cs" />
@@ -311,6 +310,9 @@
     </Compile>
     <Compile Include="view\style\TwoFingerScrollBehavior.cs" />
     <Compile Include="view\vis\HypothesesView.cs" />
+    <Compile Include="view\vis\menu\AttributeMenuItemView.xaml.cs">
+      <DependentUpon>AttributeMenuItemView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\menu\IncludeExcludeMenuItemView.xaml.cs">
       <DependentUpon>IncludeExcludeMenuItemView.xaml</DependentUpon>
     </Compile>
@@ -337,9 +339,6 @@
     </Compile>
     <Compile Include="view\vis\menu\SliderMenuItemView.xaml.cs">
       <DependentUpon>SliderMenuItemView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="view\vis\menu\AttributeTransformationMenuItemView.xaml.cs">
-      <DependentUpon>AttributeTransformationMenuItemView.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\menu\CreateLinkMenuItemView.xaml.cs">
       <DependentUpon>CreateLinkMenuItemView.xaml</DependentUpon>
@@ -380,6 +379,9 @@
       <DependentUpon>PlotRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\PlotRendererContentProvider.cs" />
+    <Compile Include="view\vis\render\RawDataColumn.xaml.cs">
+      <DependentUpon>RawDataColumn.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\vis\render\RawDataRenderer.xaml.cs">
       <DependentUpon>RawDataRenderer.xaml</DependentUpon>
     </Compile>
@@ -487,10 +489,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="view\common\AttributeGroupView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="view\common\BudgetView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -540,6 +538,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="view\vis\menu\AttributeMenuItemView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="view\vis\menu\IncludeExcludeMenuItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -569,10 +571,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\vis\menu\SliderMenuItemView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="view\vis\menu\AttributeTransformationMenuItemView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -625,6 +623,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="view\vis\OperationContainerView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\RawDataColumn.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

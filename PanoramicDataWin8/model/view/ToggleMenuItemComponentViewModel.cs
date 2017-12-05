@@ -5,6 +5,7 @@ namespace PanoramicDataWin8.model.view
     public class ToggleMenuItemComponentViewModel : MenuItemComponentViewModel
     {
         private bool _isChecked;
+        private bool _isVisible = true;
 
         private string _label = "";
 
@@ -20,6 +21,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _label; }
             set { SetProperty(ref _label, value); }
+        }
+
+        public bool IsVisible
+        {
+            get { return _isVisible; }
+            set { SetProperty(ref _isVisible, value); }
         }
 
         public List<ToggleMenuItemComponentViewModel> OtherToggles

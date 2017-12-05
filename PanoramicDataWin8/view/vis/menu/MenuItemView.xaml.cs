@@ -67,10 +67,10 @@ namespace PanoramicDataWin8.view.vis.menu
                 mainGrid.Children.Clear();
                 mainGrid.Children.Add(new SliderMenuItemView());
             }
-            else if (model.MenuItemComponentViewModel is AttributeTransformationMenuItemViewModel)
+            else if (model.MenuItemComponentViewModel is AttributeMenuItemViewModel)
             {
                 mainGrid.Children.Clear();
-                mainGrid.Children.Add(new AttributeTransformationMenuItemView());
+                mainGrid.Children.Add(new AttributeMenuItemView());
             }
             else if (model.MenuItemComponentViewModel is StatisticalComparisonMenuItemViewModel)
             {

@@ -17,12 +17,12 @@ namespace PanoramicDataWin8.model.data.operation
         {
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             
-            AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
-            IgnoredAttributeUsageTransformationModels.CollectionChanged += _ignoredAttributeUsageTransformationModels_CollectionChanged;
+            AttributeUsageModels.CollectionChanged += _attributeUsageModels_CollectionChanged;
+            IgnoredAttributeUsageModels.CollectionChanged += _ignoredAttributeUsageModels_CollectionChanged;
         }
 
-        public AttributeTransformationModel TargetAttributeUsageTransformationModel { get; set; }
-        public ObservableCollection<AttributeTransformationModel> IgnoredAttributeUsageTransformationModels { get; } = new ObservableCollection<AttributeTransformationModel>();
+        public AttributeModel TargetAttributeUsageModel { get; set; }
+        public ObservableCollection<AttributeModel> IgnoredAttributeUsageModels { get; } = new ObservableCollection<AttributeModel>();
 
         public void UpdateBackendOperatorId(string backendOperatorId)
         {
@@ -30,8 +30,8 @@ namespace PanoramicDataWin8.model.data.operation
             var funcModel = attributeModel.FuncModel as AttributeModel.AttributeFuncModel.AttributeBackendFuncModel;
             funcModel.Id = backendOperatorId;
 
-            attributeModel.DataType = TargetAttributeUsageTransformationModel.AttributeModel.DataType;
-            attributeModel.InputVisualizationType = TargetAttributeUsageTransformationModel.AttributeModel.InputVisualizationType;
+            attributeModel.DataType = TargetAttributeUsageModel.DataType;
+            attributeModel.InputVisualizationType = TargetAttributeUsageModel.InputVisualizationType;
         }
 
         public FilteringOperation FilteringOperation
@@ -46,12 +46,12 @@ namespace PanoramicDataWin8.model.data.operation
             set { _filterConsumerOperationModelImpl.ConsumerLinkModels = value; }
         }
 
-        private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void _attributeUsageModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
 
-        private void _ignoredAttributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void _ignoredAttributeUsageModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }

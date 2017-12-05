@@ -35,7 +35,7 @@ using PanoramicDataWin8.controller.data.progressive;
 
 namespace PanoramicDataWin8.view.vis.menu
 {
-    public sealed partial class AttributeTransformationMenuItemView : UserControl, AttributeViewModelEventHandler
+    public sealed partial class AttributeMenuItemView : UserControl, AttributeViewModelEventHandler
     {
         private AttributeFieldView _shadow = null;
         private long _manipulationStartTime = 0;
@@ -45,10 +45,10 @@ namespace PanoramicDataWin8.view.vis.menu
         private PointerManager _mainPointerManager = new PointerManager();
         private Point _mainPointerManagerPreviousPoint = new Point();
 
-        public AttributeTransformationMenuItemView()
+        public AttributeMenuItemView()
         {
             this.InitializeComponent();
-            this.DataContextChanged += AttributeTransformationMenuItemView_DataContextChanged;
+            this.DataContextChanged += AttributeMenuItemView_DataContextChanged;
 
             _mainPointerManager.Added += mainPointerManager_Added;
             _mainPointerManager.Moved += mainPointerManager_Moved;
@@ -56,34 +56,42 @@ namespace PanoramicDataWin8.view.vis.menu
             _mainPointerManager.Attach(this);
         }
 
-        void AttributeTransformationMenuItemView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        void AttributeMenuItemView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (args.NewValue != null)
             {
-                (args.NewValue as MenuItemViewModel).PropertyChanged += AttributeTransformationMenuItemView_PropertyChanged;
+                (args.NewValue as MenuItemViewModel).PropertyChanged += AttributeMenuItemView_PropertyChanged;
             }
         }
 
-        private void AttributeTransformationMenuItemView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void AttributeMenuItemView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var model = sender as MenuItemViewModel;
             if (e.PropertyName == model.GetPropertyName(() => model.Size))
             {
-                if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 270)
+                if ((model.MenuItemComponentViewModel as AttributeMenuItemViewModel).TextAngle == 270)
                 {
                     txtBlock.MaxWidth = model.Size.Y;
                 }
-                if ((model.MenuItemComponentViewModel as AttributeTransformationMenuItemViewModel).TextAngle == 0)
+                if ((model.MenuItemComponentViewModel as AttributeMenuItemViewModel).TextAngle == 0)
                 {
                     txtBlock.MaxWidth = model.Size.X;
                 }
             }
         }
 
-        private bool _isHighlighted = false;
+        bool? _isHighlighted = false;
+        DateTime _highlightStoryboardStart = DateTime.MinValue;
+        DateTime _unhighlightStoryboardStart = DateTime.MinValue;
         void toggleHighlighted(bool isHighlighted)
         {
-            var model = ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
+            if (isHighlighted == _isHighlighted)
+                return;
+            if (isHighlighted && _highlightStoryboardStart != DateTime.MinValue && _highlightStoryboardStart > _unhighlightStoryboardStart)
+                return;
+            if (!isHighlighted &&  _unhighlightStoryboardStart != DateTime.MinValue && _unhighlightStoryboardStart > _highlightStoryboardStart)
+                return;
+            var model = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
 
             ExponentialEase easingFunction = new ExponentialEase();
             easingFunction.EasingMode = EasingMode.EaseInOut;
@@ -110,15 +118,31 @@ namespace PanoramicDataWin8.view.vis.menu
             Storyboard.SetTargetProperty(backgroundAnimation, "(Border.Background).(SolidColorBrush.Color)");
             //Storyboard.SetTargetProperty(foregroundAnimation, "(TextBlock.Foreground).Color");
 
+            if (isHighlighted)
+            {
+                _isHighlighted = null;
+                _highlightStoryboardStart = DateTime.Now;
+                storyboard.Completed += (sender, args) => {
+                    _highlightStoryboardStart = DateTime.MinValue;
+                    _isHighlighted = _unhighlightStoryboardStart == null ? (bool?) true : null;
+                };
+            }
+            else
+            {
+                _isHighlighted = null;
+                _unhighlightStoryboardStart = DateTime.Now;
+                storyboard.Completed += (sender, args) => {
+                    _unhighlightStoryboardStart = DateTime.MinValue;
+                    _isHighlighted = _highlightStoryboardStart == null ? (bool?)false : null;
+                };
+            }
             storyboard.Begin();
         }
 
-
-
         private void mainPointerManager_Added(object sender, PointerManagerEvent e)
         {
-            var model = ((AttributeTransformationMenuItemViewModel) ((MenuItemViewModel) DataContext).MenuItemComponentViewModel);
-            if (!model.CanDrag)
+            var model = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
+            if (model.CanDelete)
             {
                 if (e.TriggeringPointer.PointerDeviceType == Windows.Devices.Input.PointerDeviceType.Mouse)
                 {
@@ -142,7 +166,7 @@ namespace PanoramicDataWin8.view.vis.menu
 
         void mainPointerManager_Moved(object sender, PointerManagerEvent e)
         {
-            var model = ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
+            var model = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
 
             if (e.NumActiveContacts == 1 && model.CanDrag)
             {
@@ -153,7 +177,7 @@ namespace PanoramicDataWin8.view.vis.menu
 
                 if (delta.Length > 10 && _shadow == null)
                 {
-                    createShadow(currentPoint);
+                    createShadow(currentPoint, e);
                 }
 
                 if (_shadow != null)
@@ -169,7 +193,7 @@ namespace PanoramicDataWin8.view.vis.menu
                         inkableScene.Add(_shadow);
 
                         Rct bounds = _shadow.GetBounds(inkableScene);
-                        model.AttributeTransformationViewModel.FireMoved(bounds, model.AttributeTransformationViewModel.AttributeTransformationModel);
+                        model.AttributeViewModel.FireMoved(bounds, model.AttributeViewModel, e);
                     }
                 }
 
@@ -179,7 +203,7 @@ namespace PanoramicDataWin8.view.vis.menu
 
         void mainPointerManager_Removed(object sender, PointerManagerEvent e)
         {
-            var model = ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
+            var model = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
             if (!model.CanDrag)
             {
                 return;
@@ -187,10 +211,10 @@ namespace PanoramicDataWin8.view.vis.menu
             if (_shadow == null &&
                 _manipulationStartTime + TimeSpan.FromSeconds(0.5).Ticks > DateTime.Now.Ticks)
             {
-                var attrTransformationModel =  ((AttributeTransformationMenuItemViewModel) ((MenuItemViewModel) DataContext).MenuItemComponentViewModel);
-                if (attrTransformationModel != null && attrTransformationModel.TappedTriggered != null)
+                var attrModel = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel);
+                if (attrModel != null && attrModel.TappedTriggered != null)
                 {
-                    attrTransformationModel.TappedTriggered();
+                    attrModel.TappedTriggered(e);
                 }
             }
 
@@ -199,12 +223,8 @@ namespace PanoramicDataWin8.view.vis.menu
                 InkableScene inkableScene = MainViewController.Instance.InkableScene;
 
                 Rct bounds = _shadow.GetBounds(inkableScene);
-                
-                model.AttributeTransformationViewModel.FireDropped(bounds,
-                    new AttributeTransformationModel(model.AttributeTransformationViewModel.AttributeModel)
-                    {
-                        AggregateFunction = model.AttributeTransformationViewModel.AttributeTransformationModel.AggregateFunction
-                    });
+
+                model.AttributeViewModel.FireDropped(bounds, model.AttributeViewModel, e);
 
                 inkableScene.Remove(_shadow);
                 _shadow = null;
@@ -213,16 +233,16 @@ namespace PanoramicDataWin8.view.vis.menu
             _manipulationStartTime = 0;
         }
 
-        public void createShadow(Point fromInkableScene)
+        public void createShadow(Point fromInkableScene, PointerManagerEvent e)
         {
             InkableScene inkableScene = MainViewController.Instance.InkableScene;
-            var model = ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel).AttributeTransformationViewModel;
+            var attributeViewModel = ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel).AttributeViewModel;
 
-            if (inkableScene != null && model != null)
+            if (inkableScene != null && attributeViewModel != null)
             {
                 _currentFromInkableScene = fromInkableScene;
                 _shadow = new AttributeFieldView();
-                _shadow.DataContext = new AttributeTransformationViewModel(null, model.AttributeTransformationModel)
+                _shadow.DataContext = new AttributeViewModel(null, attributeViewModel.AttributeModel)
                 {
                     IsNoChrome = false,
                     IsMenuEnabled = true,
@@ -232,7 +252,7 @@ namespace PanoramicDataWin8.view.vis.menu
                 _shadow.Measure(new Size(double.PositiveInfinity,
                                          double.PositiveInfinity));
 
-                double add = model.IsNoChrome ? 30 : 0;
+                double add = attributeViewModel.IsNoChrome ? 30 : 0;
                 //_shadow.Width = this.ActualWidth + add;
                 //_shadow.Height = _shadow.DesiredSize.Height;
 
@@ -245,9 +265,8 @@ namespace PanoramicDataWin8.view.vis.menu
 
                 inkableScene.Add(_shadow);
                 _shadow.SendToFront();
-
-                Rct bounds = _shadow.GetBounds(inkableScene);
-                model.FireMoved(bounds, model.AttributeTransformationModel);
+                
+                attributeViewModel.FireMoved(_shadow.GetBounds(inkableScene), attributeViewModel, e);
             }
         }
 
@@ -262,34 +281,31 @@ namespace PanoramicDataWin8.view.vis.menu
         public void AttributeViewModelMoved(AttributeViewModel sender,
             AttributeViewModelEventArgs e, bool overElement)
         {
-            var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
-
-            if (model.CanDrop)
+            var model = (AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
+            if (e.PointerArgs.Timestamp > _lastDropTime && model.CanDrop)
             {
-                if (overElement && !_isHighlighted)
+                if (overElement)
                 {
                     toggleHighlighted(true);
-                    _isHighlighted = true;
 
                 }
-                else if (!overElement && _isHighlighted)
+                else if (!overElement)
                 {
                     toggleHighlighted(false);
-                    _isHighlighted = false;
                 }
             }
         }
 
+        DateTime _lastDropTime = DateTime.MinValue;
+
         public void AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
         {
-            var model = (AttributeTransformationMenuItemViewModel) ((MenuItemViewModel) DataContext).MenuItemComponentViewModel;
+            var model = (AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
 
-            if (model.CanDrop) { 
-                if (_isHighlighted)
-                {
-                    toggleHighlighted(false);
-                    _isHighlighted = false;
-                }
+            if (model.CanDrop)
+            {
+                _lastDropTime = e.PointerArgs.Timestamp;
+                toggleHighlighted(false);
 
                 if (overElement)
                 {
@@ -305,7 +321,7 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             get
             {
-                return ((AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel).AttributeTransformationViewModel.AttributeModel;
+                return ((AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel).AttributeViewModel.AttributeModel;
             }
         }
 
@@ -315,27 +331,28 @@ namespace PanoramicDataWin8.view.vis.menu
             {
                 ChangeCodeRawName(TextInputBox.Text);
             }
-            var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
+            var model = (AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
             model.Editing = Visibility.Collapsed;
         }
-        
+
         private void TextInputBox_KeyUp(object sender, KeyRoutedEventArgs e)
         {
             if (TextInputBox.Text != "" && e.Key == Windows.System.VirtualKey.Enter)
                 ChangeCodeRawName(TextInputBox.Text);
         }
-        AttributeTransformationMenuItemViewModel ChangeCodeRawName(string newName)
+        AttributeMenuItemViewModel ChangeCodeRawName(string newName)
         {
-            var model = (AttributeTransformationMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
+            var model = (AttributeMenuItemViewModel)((MenuItemViewModel)DataContext).MenuItemComponentViewModel;
             var attr = AttributeTransformationModel.MatchesExistingField(newName, true);
             // if attribute label doesn't match any known attribute and this is a calculation operation, 
             // then set the name of the Calculation operation to the attribute label 
-            if (attr == null && !IDEAAttributeModel.NameExists(newName, model.AttributeTransformationViewModel.AttributeTransformationModel.AttributeModel.OriginModel))
+            if (attr == null && !IDEAAttributeModel.NameExists(newName, model.AttributeViewModel.AttributeModel.OriginModel))
             {
-                var compModel = model.AttributeTransformationViewModel.OperationViewModel.OperationModel as ComputationalOperationModel;
-                compModel.RefactorFunctionName(newName);
+                var compModel = model.AttributeViewModel.OperationViewModel.OperationModel as ComputationalOperationModel;
+                if (compModel != null)
+                    compModel.RefactorFunctionName(newName);
             }
-            
+
             return model;
         }
     }

@@ -2,9 +2,9 @@
 {
     public class InputGroupViewTileMenuContentViewModel : TileMenuContentViewModel
     {
-        private InputGroupViewModel _inputGroupViewModel;
+        private AttributeGroupViewModel _inputGroupViewModel;
 
-        public InputGroupViewModel InputGroupViewModel
+        public AttributeGroupViewModel InputGroupViewModel
         {
             get { return _inputGroupViewModel; }
             set { SetProperty(ref _inputGroupViewModel, value); }

@@ -11,6 +11,7 @@ using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.controller.data.progressive;
 using IDEA_common.operations;
 using static PanoramicDataWin8.model.data.attribute.AttributeModel;
+using IDEA_common.aggregates;
 
 namespace PanoramicDataWin8.model.data.operation
 {
@@ -65,8 +66,12 @@ namespace PanoramicDataWin8.model.data.operation
             var attributeChanged = sender as IDEAAttributeModel;
             List<AttributeCaclculatedParameters> attributeCodeParameters;
             List<string> brushes;
-            List<AttributeTransformationModel> aggregates;
-            IDEAHelpers.GetHistogramRawOperationParameters(this, out attributeCodeParameters, out brushes, out aggregates);
+            var aggregates = this.AttributeUsageModels.Select((am)=>new AttributeTransformationModel(am)).Concat(
+                GetAttributeUsageTransformationModel(AttributeUsage.Value).Concat(
+                GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)).Concat(
+                GetAttributeUsageTransformationModel(AttributeUsage.X).Where(aom => aom.AggregateFunction != AggregateFunction.None)).Concat(
+                GetAttributeUsageTransformationModel(AttributeUsage.Y).Where(aom => aom.AggregateFunction != AggregateFunction.None))).ToList();
+            IDEAHelpers.GetBaseOperationParameters(this, out attributeCodeParameters, out brushes, BrushOperationModels.Select((m)=>(object)m).ToList(), aggregates);
 
             foreach (var attr in attributeCodeParameters.OfType<AttributeCodeParameters>())
             {

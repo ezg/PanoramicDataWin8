@@ -31,7 +31,12 @@ namespace PanoramicDataWin8.view.vis.menu
         void ToggleMenuItemView_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             var model = ((DataContext as MenuItemViewModel).MenuItemComponentViewModel as ToggleMenuItemComponentViewModel);
-            if (!model.IsChecked)
+            if (model.IsChecked)
+            {
+                model.IsChecked = false;
+                model.IsChecked = true;
+            }
+            else
             {
                 model.IsChecked = true;
             }
@@ -54,6 +59,7 @@ namespace PanoramicDataWin8.view.vis.menu
                     txtBlock.Foreground = (Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush);
                 }
             }
+            updateRendering();
         }
 
         void MenuItemComponentViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -63,8 +69,11 @@ namespace PanoramicDataWin8.view.vis.menu
 
         void updateRendering()
         {
+            var model = ((DataContext as MenuItemViewModel)?.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel);
+
             if (DataContext != null)
             {
+                Visibility = model.IsVisible ? Visibility.Visible : Visibility.Collapsed;
                 ExponentialEase easingFunction = new ExponentialEase();
                 easingFunction.EasingMode = EasingMode.EaseInOut;
 

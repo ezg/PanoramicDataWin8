@@ -2,12 +2,12 @@
 {
     public class InputFieldViewTileMenuContentViewModel : TileMenuContentViewModel
     {
-        private AttributeTransformationViewModel _attributeTransformationViewModel;
+        private AttributeViewModel _attributeViewModel;
 
-        public AttributeTransformationViewModel AttributeTransformationViewModel
+        public AttributeViewModel AttributeViewModel
         {
-            get { return _attributeTransformationViewModel; }
-            set { SetProperty(ref _attributeTransformationViewModel, value); }
+            get { return _attributeViewModel; }
+            set { SetProperty(ref _attributeViewModel, value); }
         }
     }
 }

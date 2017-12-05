@@ -17,6 +17,7 @@ namespace PanoramicDataWin8.model.view.operation
         private void createDummyParameterMenu()
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+            attachmentViewModel.ShowOnAttributeTapped = true;
 
             var menuViewModel = new MenuViewModel
             {
@@ -53,74 +54,23 @@ namespace PanoramicDataWin8.model.view.operation
                 var model = sender as SliderMenuItemComponentViewModel;
                 if (args.PropertyName == model.GetPropertyName(() => model.FinalValue))
                     subtype.DummyValue = model.FinalValue;
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
+                attachmentViewModel.StartDisplayActivationStopwatch();
             };
 
             sliderItem.MenuItemComponentViewModel = attr1;
             menuViewModel.MenuItemViewModels.Add(sliderItem);
             attachmentViewModel.MenuViewModel = menuViewModel;
         }
-
-        private void createFunctionMenu(AttachmentOrientation attachmentOrientation,
-            AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
-        {
-            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
-
-            var menuViewModel = new MenuViewModel
-            {
-                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
-                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
-            };
-
-            var menuItem = new MenuItemViewModel
-            {
-                MenuViewModel = menuViewModel,
-                Row = 0,
-                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 1,
-                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 5,
-                Column = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
-                Size = size,
-                Position = Position,
-                TargetSize = size,
-                IsAlwaysDisplayed = false,
-                IsWidthBoundToParent = isWidthBoundToParent,
-                IsHeightBoundToParent = isHeightBoundToParent
-            };
-            var attr1 = new AttributeTransformationMenuItemViewModel
-            {
-                TextAngle = textAngle,
-                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = "Apply"
-            };
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(FunctionOperationModel.GetAttributeModel()));
-            attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
-            menuItem.MenuItemComponentViewModel = attr1;
-            menuViewModel.MenuItemViewModels.Add(menuItem);
-            attachmentViewModel.MenuViewModel = menuViewModel;
-        }
-
+        
         public FunctionOperationViewModel(FunctionOperationModel functionOperationModel, bool fromMouse = false) : base(functionOperationModel)
         {
-            addAttachmentViewModels();
-
             // fill-in UI specific to function's subtype
             if (FunctionOperationModel.FunctionSubtypeModel is MinMaxScaleFunctionSubtypeModel)
                 ; // createDummyParameterMenu();
 
-            createTopInputsExpandingMenu();
-            createFunctionMenu(AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
+            MenuItemViewModel menuItemViewModel;
+            createExpandingMenu(AttachmentOrientation.Top, FunctionOperationModel.AttributeUsageModels, "+", 3, out menuItemViewModel);
+            createApplyAttributeMenu(FunctionOperationModel.GetAttributeModel(), AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
         }
 
         public FunctionOperationModel FunctionOperationModel => (FunctionOperationModel)OperationModel;

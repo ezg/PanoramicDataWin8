@@ -121,7 +121,7 @@ namespace PanoramicDataWin8.view.common
                     mainGrid.Children.Add(new AttributeFieldView()
                     {
                         DataContext =
-                            ((InputFieldViewTileMenuContentViewModel) model.TileMenuContentViewModel).AttributeTransformationViewModel
+                            ((InputFieldViewTileMenuContentViewModel) model.TileMenuContentViewModel).AttributeViewModel
                     });
                 }
                 else if (model.TileMenuContentViewModel is OperationTypeTileMenuContentViewModel)
@@ -145,7 +145,7 @@ namespace PanoramicDataWin8.view.common
                 else if (model.TileMenuContentViewModel is InputGroupViewTileMenuContentViewModel)
                 {
                     mainGrid.Children.Clear();
-                    mainGrid.Children.Add(new AttributeGroupView()
+                    mainGrid.Children.Add(new AttributeFieldView()
                     {
                         DataContext =
                             ((InputGroupViewTileMenuContentViewModel)model.TileMenuContentViewModel).InputGroupViewModel

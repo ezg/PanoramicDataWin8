@@ -138,7 +138,7 @@ namespace PanoramicDataWin8.view.vis
                     _menuViewModel.AnkerPosition = new Pt(model.OperationViewModel.Position.X + model.OperationViewModel.Size.X,
                         model.OperationViewModel.Position.Y) + model.AnkerOffset;
                 }
-                else if (model.AttachmentOrientation == AttachmentOrientation.Top)
+                else if (model.AttachmentOrientation == AttachmentOrientation.Top || model.AttachmentOrientation == AttachmentOrientation.TopStacked)
                 {
                     _menuViewModel.AnkerPosition = new Pt(model.OperationViewModel.Position.X,
                         model.OperationViewModel.Position.Y) + model.AnkerOffset;

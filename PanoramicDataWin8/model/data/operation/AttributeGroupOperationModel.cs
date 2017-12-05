@@ -9,7 +9,7 @@ using IDEA_common.catalog;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public class AttributeGroupOperationModel : AttributeUsageOperationModel, IFilterConsumerOperationModel
+    public class AttributeGroupOperationModel : OperationModel, IFilterConsumerOperationModel
     {
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
@@ -29,7 +29,7 @@ namespace PanoramicDataWin8.model.data.operation
         {
             attributeGroupModel = IDEAAttributeModel.AddGroupField(rawName, rawName, schemaModel.OriginModels.First());
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
-            AttributeUsageTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
+            AttributeUsageModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
         private string _name;
 
@@ -53,8 +53,8 @@ namespace PanoramicDataWin8.model.data.operation
 
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            foreach (var attributeUsageTransformationModel in AttributeUsageTransformationModels)
-                GroupFuncModel.InputModels.Add(attributeUsageTransformationModel.AttributeModel);
+            foreach (var attributeUsageModel in AttributeUsageModels)
+                GroupFuncModel.InputModels.Add(attributeUsageModel);
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
     }

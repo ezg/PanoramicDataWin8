@@ -239,7 +239,6 @@ namespace PanoramicDataWin8.view.vis.menu
                 updateRendering();
             }
         }
-
         void MenuItemViewModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.OldItems != null)
@@ -256,20 +255,21 @@ namespace PanoramicDataWin8.view.vis.menu
             }
             else if (e.NewItems != null)
             {
+                var menuModel = (DataContext as MenuViewModel);
                 foreach (var item in e.NewItems)
                 {
                     var menuItemView = new MenuItemView()
                     {
                         DataContext = (item as MenuItemViewModel)
                     };
-                    var model = (item as MenuItemViewModel);
+                    var model = item as MenuItemViewModel;
                     model.PropertyChanged += MenuItemViewModel_PropertyChanged;
                     _menuViewItems.Add(model, menuItemView);
                     _contentCanvas.Children.Insert(0, menuItemView);
                     updateRendering();
                     menuItemView.Opacity = 0;
-                    var sb = fadeStoryboard(menuItemView.Opacity, 1, menuItemView);
-                    sb.Begin();
+                    if (Opacity == 1 && menuModel.SynchronizeItemsDisplay)
+                        fadeStoryboard(menuItemView.Opacity, 1, menuItemView).Begin();
                 }
             }
         }
@@ -404,6 +404,31 @@ namespace PanoramicDataWin8.view.vis.menu
                                 rowItem.TargetPosition = new Pt(currentX, currentY);
                             }
                         }
+                    }
+                }
+                else if (model.AttachmentOrientation == AttachmentOrientation.TopStacked)
+                {
+                    double rowHeight = 0;
+                    for (int row = model.NrRows - 1; row >= 0; row--)
+                    {
+                        double maxCellHeight = 0;
+                        for (int col = 0; col < model.NrColumns; col++)
+                            {
+                            var itemsInSameCol = model.MenuItemViewModels.Where(mi => mi.Row > row && mi.Column == col).ToList();
+                            var itemsInSameRow = model.MenuItemViewModels.Where(mi => mi.Column < col && (mi.Row == row || (mi.Row < row && mi.Row + mi.RowSpan - 1 >= row))).ToList();
+                            var iColCnt = col;
+                            var iRowCnt = model.NrRows - row -1;
+
+                            var rowItem = model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
+                            if (rowItem != null)
+                            {
+                                maxCellHeight = Math.Max(maxCellHeight, rowItem.TargetSize.Y);
+                                double currentY = model.AnkerPosition.Y - rowHeight - GAP;
+                                double currentX = model.AnkerPosition.X + iColCnt * rowItem.TargetSize.X + iColCnt * GAP;
+                                rowItem.TargetPosition = new Pt(currentX, currentY - rowItem.Size.Y);
+                            }
+                        }
+                        rowHeight += maxCellHeight + GAP;
                     }
                 }
                 else if (model.AttachmentOrientation == AttachmentOrientation.Top)

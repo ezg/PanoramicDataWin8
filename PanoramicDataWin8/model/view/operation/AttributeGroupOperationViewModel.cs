@@ -12,61 +12,17 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class AttributeGroupOperationViewModel : AttributeUsageOperationViewModel
     {
-        private void createFunctionMenu(AttachmentOrientation attachmentOrientation,
-              AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
-        {
-            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
-
-            var menuViewModel = new MenuViewModel
-            {
-                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
-                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
-            };
-
-            var menuItem = new MenuItemViewModel
-            {
-                MenuViewModel = menuViewModel,
-                Row = 0,
-                ColumnSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 1,
-                RowSpan = attachmentOrientation == AttachmentOrientation.Bottom ? 1 : 5,
-                Column = attachmentOrientation == AttachmentOrientation.Bottom ? 0 : 1,
-                Size = size,
-                Position = Position,
-                TargetSize = size,
-                IsAlwaysDisplayed = false,
-                IsWidthBoundToParent = isWidthBoundToParent,
-                IsHeightBoundToParent = isHeightBoundToParent
-            };
-            var attr1 = new AttributeTransformationMenuItemViewModel
-            {
-                TextAngle = textAngle,
-                TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
-                Label = "Apply"
-            };
-
-            OperationViewModelTapped += (args) =>
-            {
-                attachmentViewModel.ActiveStopwatch.Restart();
-            };
-
-            attr1.AttributeTransformationViewModel = new AttributeTransformationViewModel(this, new AttributeTransformationModel(AttributeGroupOperationModel.AttributeModel));
-            attr1.TappedTriggered = (() => attr1.Editing = Visibility.Visible);
-            menuItem.MenuItemComponentViewModel = attr1;
-            menuViewModel.MenuItemViewModels.Add(menuItem);
-            attachmentViewModel.MenuViewModel = menuViewModel;
-        }
         public AttributeGroupOperationViewModel(AttributeGroupOperationModel attributeGroupOperationModel) : base(attributeGroupOperationModel)
         {
-            addAttachmentViewModels();
-            createTopInputsExpandingMenu();
-            createFunctionMenu(AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
+            MenuItemViewModel menuItemViewModel;
+            createExpandingMenu(AttachmentOrientation.Top, AttributeGroupOperationModel.AttributeUsageModels, "+", 3, out menuItemViewModel);
+            createApplyAttributeMenu(AttributeGroupOperationModel.AttributeModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
 
-            TopInputAdded += (sender) =>
+            ExpandingMenuInputAdded += (sender, usageModels) =>
             {
                 var str = "(";
-                foreach (var g in AttributeGroupOperationModel.AttributeUsageTransformationModels)
-                    str += g.AttributeModel.DisplayName + ",";
+                foreach (var g in usageModels)
+                    str += g.DisplayName + ",";
                 str = str.TrimEnd(',') + ")";
                 var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(AttributeGroupOperationModel.AttributeModel.DisplayName, str);
                 AttributeGroupOperationModel.SetName(newName);

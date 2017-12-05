@@ -6,6 +6,7 @@
         Top,
         Bottom,
         Right,
-        TopRight
+        TopRight, 
+        TopStacked
     }
 }
