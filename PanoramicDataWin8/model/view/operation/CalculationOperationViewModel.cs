@@ -11,7 +11,7 @@ using Windows.UI.Xaml.Media;
 
 namespace PanoramicDataWin8.model.view.operation
 {
-    public class CalculationOperationViewModel : AttributeUsageOperationViewModel
+    public class CalculationOperationViewModel : LabeledOperationViewModel
     {
         MenuItemViewModel CalculationNameMenuItemViewModel = null;
         public CalculationOperationModel CalculationOperationModel { get { return OperationModel as CalculationOperationModel;  } }      

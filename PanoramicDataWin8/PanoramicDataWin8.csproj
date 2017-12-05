@@ -206,8 +206,7 @@
     <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModelEventArgs.cs" />
     <Compile Include="model\view\operation\AttributeGroupOperationViewModel.cs" />
-    <Compile Include="model\view\operation\AttributeUsageOperationViewModel.cs" />
-    <Compile Include="model\view\operation\BaseVisualizationOperationViewModel.cs" />
+    <Compile Include="model\view\operation\LabeledOperationViewModel.cs" />
     <Compile Include="model\view\operation\CalculationOperationViewModel.cs" />
     <Compile Include="model\view\operation\PredictorOperationViewModel.cs" />
     <Compile Include="model\view\operation\DefinitionOperationViewModel.cs" />

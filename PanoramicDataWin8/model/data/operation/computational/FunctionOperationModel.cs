@@ -52,7 +52,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         {
             FunctionSubtypeModel = functionSubtypeModel;
-            AttributeUsageModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
+            AttributeTransformationModelParameters.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
         
         public void SetParameters(Dictionary<string,object> parameters)
@@ -63,8 +63,8 @@ namespace PanoramicDataWin8.model.data.operation
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             var parameters = new Dictionary<string, object>();
-            foreach (var attributeUsageModel in AttributeUsageModels)
-                parameters.Add(attributeUsageModel.DisplayName, attributeUsageModel);
+            foreach (var attributeUsageModel in AttributeTransformationModelParameters)
+                parameters.Add(attributeUsageModel.AttributeModel.DisplayName, attributeUsageModel);
             SetParameters(parameters);
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }

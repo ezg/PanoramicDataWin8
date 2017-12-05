@@ -10,19 +10,19 @@ using Windows.UI.Xaml.Media;
 
 namespace PanoramicDataWin8.model.view.operation
 {
-    public class AttributeGroupOperationViewModel : AttributeUsageOperationViewModel
+    public class AttributeGroupOperationViewModel : LabeledOperationViewModel
     {
         public AttributeGroupOperationViewModel(AttributeGroupOperationModel attributeGroupOperationModel) : base(attributeGroupOperationModel)
         {
             MenuItemViewModel menuItemViewModel;
-            createExpandingMenu(AttachmentOrientation.Top, AttributeGroupOperationModel.AttributeUsageModels, "+", 3, out menuItemViewModel);
+            createExpandingMenu(AttachmentOrientation.Top, AttributeGroupOperationModel.AttributeTransformationModelParameters, "+", 3, out menuItemViewModel);
             createApplyAttributeMenu(AttributeGroupOperationModel.AttributeModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
 
             ExpandingMenuInputAdded += (sender, usageModels) =>
             {
                 var str = "(";
                 foreach (var g in usageModels)
-                    str += g.DisplayName + ",";
+                    str += g.AttributeModel.DisplayName + ",";
                 str = str.TrimEnd(',') + ")";
                 var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(AttributeGroupOperationModel.AttributeModel.DisplayName, str);
                 AttributeGroupOperationModel.SetName(newName);

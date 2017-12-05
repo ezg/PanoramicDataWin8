@@ -12,7 +12,7 @@ using Windows.UI.Xaml.Media;
 
 namespace PanoramicDataWin8.model.view.operation
 {
-    public class FunctionOperationViewModel : AttributeUsageOperationViewModel
+    public class FunctionOperationViewModel : LabeledOperationViewModel
     {
         private void createDummyParameterMenu()
         {
@@ -69,7 +69,7 @@ namespace PanoramicDataWin8.model.view.operation
                 ; // createDummyParameterMenu();
 
             MenuItemViewModel menuItemViewModel;
-            createExpandingMenu(AttachmentOrientation.Top, FunctionOperationModel.AttributeUsageModels, "+", 3, out menuItemViewModel);
+            createExpandingMenu(AttachmentOrientation.Top, FunctionOperationModel.AttributeTransformationModelParameters, "+", 3, out menuItemViewModel);
             createApplyAttributeMenu(FunctionOperationModel.GetAttributeModel(), AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
         }
 

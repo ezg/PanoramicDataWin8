@@ -43,17 +43,14 @@ namespace PanoramicDataWin8.model.view.operation
             var rawDataOperationViewModel = operationViewModel as RawDataOperationViewModel;
             if (rawDataOperationViewModel != null)
             {
-                var oldOperationViewModel = rawDataOperationViewModel;
-                var oldOperationModel = rawDataOperationViewModel.RawDataOperationModel;
-                var attributeModel = rawDataOperationViewModel.RawDataOperationModel.AttributeUsageModels.First();
-                var newRawDataOperationViewModel = CreateDefaultRawDataOperationViewModel(operationViewModel.OperationModel.SchemaModel,
-                    attributeModel, operationViewModel.Position);
-                var newOperationModel = (RawDataOperationModel)newRawDataOperationViewModel.OperationModel;
+                var oldOperationViewModel        = rawDataOperationViewModel;
+                var oldOperationModel            = rawDataOperationViewModel.RawDataOperationModel;
+                var newRawDataOperationViewModel = CreateDefaultRawDataOperationViewModel(operationViewModel.OperationModel.SchemaModel, operationViewModel.Position);
+                var newOperationModel            = (RawDataOperationModel)newRawDataOperationViewModel.OperationModel;
                 newOperationModel.VisualizationType = VisualizationType.plot;
 
-                foreach (var usage in oldOperationModel.AttributeUsageTransformationModels.Keys.ToArray())
-                    foreach (var atm in oldOperationModel.AttributeUsageTransformationModels[usage].ToArray())
-                        newOperationModel.AddAttributeUsageTransformationModel(usage,
+                foreach (var atm in oldOperationModel.AttributeTransformationModelParameters.ToArray())
+                        newOperationModel.AttributeTransformationModelParameters.Add(
                             new AttributeTransformationModel(atm.AttributeModel)
                             {
                                 AggregateFunction = atm.AggregateFunction
@@ -78,9 +75,9 @@ namespace PanoramicDataWin8.model.view.operation
         }
 
 
-        public static RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(SchemaModel schemaModel, AttributeModel attributeModel, Pt position)
+        public static RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(SchemaModel schemaModel, Pt position)
         {
-            return new RawDataOperationViewModel(new RawDataOperationModel(schemaModel), attributeModel) { Position = position };
+            return new RawDataOperationViewModel(new RawDataOperationModel(schemaModel), null) { Position = position };
         }
 
         public static HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(SchemaModel schemaModel, AttributeModel attributeModel, Pt position)
