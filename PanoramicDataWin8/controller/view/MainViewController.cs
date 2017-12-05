@@ -479,12 +479,8 @@ namespace PanoramicDataWin8.controller.view
 
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
 
-            foreach (var element in attTransDescendants)
-            {
-                element.AttributeViewModelMoved(
-                    sender as AttributeViewModel, e,
-                    (hits.Count() > 0) && (orderderHits[0] == element));
-            }
+            foreach (var h in attTransDescendants)
+                h.AttributeViewModelMoved(sender as AttributeViewModel, e, h == orderderHits?.FirstOrDefault());
         }
 
         private void AttributeViewModelDropped(object sender, AttributeViewModelEventArgs e)
@@ -507,13 +503,7 @@ namespace PanoramicDataWin8.controller.view
             var position = (Pt) new Vec(e.Bounds.Center.X, e.Bounds.Center.Y) - size/2.0;
 
             var orderderHits = hits.OrderBy(fe => (fe.BoundsGeometry.Centroid.GetVec() - e.Bounds.Center.GetVec()).LengthSquared).ToList();
-            foreach (var element in attTransDescendants)
-            {
-                element.AttributeViewModelDropped(
-                    sender as AttributeViewModel, e,
-                    (hits.Count() > 0) && (orderderHits[0] == element));
-            }
-
+           
             if (!hits.Any() && e.AttributeModel != null)
             {
                 var operationContainerView = new OperationContainerView();
@@ -522,6 +512,8 @@ namespace PanoramicDataWin8.controller.view
                 operationContainerView.DataContext = histogramOperationViewModel;
                 InkableScene.Add(operationContainerView);
             }
+            else
+                orderderHits.First().AttributeViewModelDropped(sender as AttributeViewModel, e, true);
         }
 
         private void OperationViewViewModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

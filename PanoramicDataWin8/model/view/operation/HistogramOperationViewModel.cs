@@ -191,6 +191,10 @@ namespace PanoramicDataWin8.model.view.operation
             MenuViewModel menuViewModel;
             AttachmentOrientation AttachmentOrientation;
             AttributeUsage Axis;
+            public void ForceDrop(AttributeViewModel am)
+            {
+                (menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel).DroppedTriggered(am);
+            }
 
             private void AttributeTransformationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
             {
@@ -338,11 +342,18 @@ namespace PanoramicDataWin8.model.view.operation
                 return toggleMenuItem;
             }
         }
+        public void ForceDrop(AttributeViewModel am)
+        {
+            xAxisMenu.ForceDrop(am);
+        }
+
+
+        private AttributeUsageMenu xAxisMenu, yAxisMenu;
         public HistogramOperationViewModel(HistogramOperationModel histogramOperationModel, AttributeModel attributeModel) : base(histogramOperationModel)
         {
             // axis attachment view models
-            var xAxisMenu = new AttributeUsageMenu(this, attributeModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
-            var yAxisMenu = new AttributeUsageMenu(this, attributeModel, AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
+            xAxisMenu = new AttributeUsageMenu(this, attributeModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(200, 50), 0, true, false);
+            yAxisMenu = new AttributeUsageMenu(this, attributeModel, AttachmentOrientation.Left, AttributeUsage.Y, new Vec(50, 200), 270, false, true);
 
             if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode && !MainViewController.Instance.MainModel.IsIGTMode)
             {

@@ -34,7 +34,7 @@ using PanoramicDataWin8.view.style;
 
 namespace PanoramicDataWin8.view.vis
 {
-    public sealed partial class OperationContainerView : UserControl, IScribbable, AttributeViewModelEventHandler, IOneFingerListener
+    public sealed partial class OperationContainerView : UserControl, IScribbable, IOneFingerListener
     {
         private Point _previousPoint = new Point();
         private Point _initialPoint = new Point();
@@ -481,15 +481,6 @@ namespace PanoramicDataWin8.view.vis
             if (inputModelEventHandler != null)
             {
                 inputModelEventHandler.AttributeViewModelMoved(sender, e, overElement);
-            }
-        }
-
-        public void AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
-        {
-            AttributeViewModelEventHandler inputModelEventHandler = _renderer as AttributeViewModelEventHandler;
-            if (inputModelEventHandler != null)
-            {
-                inputModelEventHandler.AttributeViewModelDropped(sender, e, overElement);
             }
         }
 

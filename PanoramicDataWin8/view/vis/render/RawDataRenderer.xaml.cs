@@ -25,6 +25,7 @@ using Windows.ApplicationModel.Core;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Input;
 using IDEA_common.operations.histogram;
+using PanoramicDataWin8.model.view;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -79,7 +80,7 @@ namespace PanoramicDataWin8.view.vis.render
             throw new NotImplementedException();
         }
     }
-    public sealed partial class RawDataRenderer : Renderer, IScribbable
+    public sealed partial class RawDataRenderer : Renderer, IScribbable, AttributeViewModelEventHandler
     {
         public class RawColumnData : ExtendedBindableBase {
             AttributeTransformationModel _model;
@@ -506,9 +507,33 @@ namespace PanoramicDataWin8.view.vis.render
         {
             get { return new List<IScribbable>(); }
         }
+
+        IGeometry AttributeViewModelEventHandler.BoundsGeometry
+        {
+            get
+            {
+                return this.GetBounds(MainViewController.Instance.InkableScene).GetPolygon();
+            }
+        }
+
+        AttributeModel AttributeViewModelEventHandler.CurrentAttributeModel => throw new NotImplementedException();
+
         public bool Consume(InkStroke inkStroke)
         {
             return false;
+        }
+
+        void AttributeViewModelEventHandler.AttributeViewModelMoved(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        {
+        }
+
+        void AttributeViewModelEventHandler.AttributeViewModelDropped(AttributeViewModel sender, AttributeViewModelEventArgs e, bool overElement)
+        {
+            if (overElement)
+            {
+                var model = (DataContext as RawDataOperationViewModel);
+                model.ForceDrop(sender);
+            }
         }
     }
 }
