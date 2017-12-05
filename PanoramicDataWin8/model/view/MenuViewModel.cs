@@ -26,6 +26,8 @@ namespace PanoramicDataWin8.model.view
 
         private int _nrRows;
 
+        private Vec _parentSize;
+
         public bool SynchronizeItemsDisplay { get; set; } = true;
 
         public ObservableCollection<MenuItemViewModel> MenuItemViewModels
@@ -39,6 +41,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _hidePosition; }
             set { SetProperty(ref _hidePosition, value); }
+        }
+
+        public Vec ParentSize
+        {
+            get { return _parentSize; }
+            set { SetProperty(ref _parentSize, value); }
         }
 
 

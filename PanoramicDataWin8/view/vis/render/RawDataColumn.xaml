@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    x:Name="RawDataCol"
     d:DesignHeight="300"
     d:DesignWidth="400">
     
@@ -19,20 +20,20 @@
                   Loaded="xListView_Loaded"
                   CanDragItems="False"  >
         <ListView.Resources>
-            <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter"></local:ObjectToFrameworkElementConverter>
+            <local:ObjectToListFrameworkElementConverter x:Key="ObjectToListFrameworkElementConverter"></local:ObjectToListFrameworkElementConverter>
         </ListView.Resources>
         <ListView.ItemsPanel>
             <ItemsPanelTemplate>
                 <ItemsStackPanel Orientation="Vertical" GroupHeaderPlacement="Top" AreStickyGroupHeadersEnabled="True"/>
             </ItemsPanelTemplate>
         </ListView.ItemsPanel>
-        <ListView.HeaderTemplate>
+        <!--<ListView.HeaderTemplate>
             <DataTemplate>
                 <Grid Background="Gray">
                     <TextBlock Text="{Binding Model.GetLabel}" Foreground="White" VerticalAlignment="Top" FontSize="9" MaxHeight="20"/>
                 </Grid>
             </DataTemplate>
-        </ListView.HeaderTemplate>
+        </ListView.HeaderTemplate>-->
         <ListView.ItemContainerStyle>
             <Style TargetType="ListViewItem">
                 <Setter Property="HorizontalContentAlignment" Value="Left" />
@@ -45,8 +46,9 @@
         </ListView.ItemContainerStyle>
         <ListView.ItemTemplate>
             <DataTemplate>
-                <ContentPresenter Content="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}" 
-                                  Width="{Binding Path=DataContext.ColumnWidth, ElementName=xListView}" Background="LightGray"/>
+                <ContentPresenter Content="{Binding Converter={StaticResource ObjectToListFrameworkElementConverter}}" 
+                                  Width="{Binding Path=ActualWidth, ElementName=RawDataCol}"
+                                  HorizontalAlignment="Stretch" Background="LightGray"/>
              </DataTemplate>
         </ListView.ItemTemplate>
     </ListView>

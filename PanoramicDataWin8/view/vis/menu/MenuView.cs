@@ -234,7 +234,8 @@ namespace PanoramicDataWin8.view.vis.menu
                 }
                 toggleDisplayed();
             }
-            else if (e.PropertyName == model.GetPropertyName(() => model.AnkerPosition))
+            else if (e.PropertyName == model.GetPropertyName(() => model.AnkerPosition) ||
+                     e.PropertyName == model.GetPropertyName(() => model.ParentSize))
             {
                 updateRendering();
             }
@@ -411,11 +412,13 @@ namespace PanoramicDataWin8.view.vis.menu
                     double rowHeight = 0;
                     for (int row = model.NrRows - 1; row >= 0; row--)
                     {
+                        var maxc = model.MenuItemViewModels.Max((mi) => mi.Column);
+                        var total = (double)model.MenuItemViewModels.Where((mi) => mi.Row == row).Sum((mi) => mi.ProportionalSize.X);
+                        var gaps = (double)model.MenuItemViewModels.Where((mi) => mi.Row == row).Sum((mi) => GAP) + 30-GAP;
                         double maxCellHeight = 0;
-                        for (int col = 0; col < model.NrColumns; col++)
+                        var currentX = model.AnkerPosition.X +15;
+                        for (int col = 0; col <= maxc; col++)
                             {
-                            var itemsInSameCol = model.MenuItemViewModels.Where(mi => mi.Row > row && mi.Column == col).ToList();
-                            var itemsInSameRow = model.MenuItemViewModels.Where(mi => mi.Column < col && (mi.Row == row || (mi.Row < row && mi.Row + mi.RowSpan - 1 >= row))).ToList();
                             var iColCnt = col;
                             var iRowCnt = model.NrRows - row -1;
 
@@ -424,8 +427,16 @@ namespace PanoramicDataWin8.view.vis.menu
                             {
                                 maxCellHeight = Math.Max(maxCellHeight, rowItem.TargetSize.Y);
                                 double currentY = model.AnkerPosition.Y - rowHeight - GAP;
-                                double currentX = model.AnkerPosition.X + iColCnt * rowItem.TargetSize.X + iColCnt * GAP;
                                 rowItem.TargetPosition = new Pt(currentX, currentY - rowItem.Size.Y);
+                                if (total > 0)
+                                {
+                                    var sizeX = (model.ParentSize.X-gaps) / total * rowItem.ProportionalSize.X;
+                                    rowItem.Size = new Vec(sizeX, rowItem.Size.Y);
+                                    rowItem.TargetSize = rowItem.Size;
+                                    currentX += GAP + sizeX;
+                                }
+                                else
+                                    currentX += GAP + rowItem.Size.X;
                             }
                         }
                         rowHeight += maxCellHeight + GAP;

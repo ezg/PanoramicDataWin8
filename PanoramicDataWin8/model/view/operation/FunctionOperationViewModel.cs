@@ -69,7 +69,7 @@ namespace PanoramicDataWin8.model.view.operation
                 ; // createDummyParameterMenu();
 
             MenuItemViewModel menuItemViewModel;
-            createExpandingMenu(AttachmentOrientation.Top, FunctionOperationModel.AttributeTransformationModelParameters, "+", 3, out menuItemViewModel);
+            createExpandingMenu(AttachmentOrientation.Top, FunctionOperationModel.AttributeTransformationModelParameters, "+", 3, false, out menuItemViewModel);
             createApplyAttributeMenu(FunctionOperationModel.GetAttributeModel(), AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
         }
 

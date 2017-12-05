@@ -41,6 +41,8 @@ namespace PanoramicDataWin8.model.view
 
         private Vec _targetSize = new Vec(50, 50);
 
+        private Vec _proportionalSize = new Vec(0,0);
+
         public MenuItemViewModel()
         {
             _dampingFactor = random.NextDouble()*3.0 + 3;
@@ -105,6 +107,11 @@ namespace PanoramicDataWin8.model.view
             get { return _targetSize; }
             set { SetProperty(ref _targetSize, value); }
         }
+        public Vec ProportionalSize
+        {
+            get { return _proportionalSize; }
+            set { SetProperty(ref _proportionalSize, value); }
+        }
 
         public Pt TargetPosition
         {
@@ -129,7 +136,7 @@ namespace PanoramicDataWin8.model.view
             get { return _size; }
             set { SetProperty(ref _size, value); }
         }
-
+        
         public Pt Position
         {
             get { return _position; }

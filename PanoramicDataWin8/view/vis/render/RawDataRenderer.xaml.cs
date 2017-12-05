@@ -80,6 +80,55 @@ namespace PanoramicDataWin8.view.vis.render
             throw new NotImplementedException();
         }
     }
+    public class ObjectToListFrameworkElementConverter : IValueConverter
+    {
+        static public Grid LastHit = null;
+        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
+        {
+            var g = new Grid();
+            if (value != null)
+            {
+                if (false) // data is an image
+                {
+                    var ib = new Image();
+                    ib.Source = new BitmapImage(new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
+                    ib.Width = ib.Height = 200;
+                    g.Children.Add(ib);
+                    g.CanDrag = false;
+                    g.PointerPressed += (sender, e) =>
+                    {
+                        if (LastHit != g && LastHit != null)
+                            LastHit.CanDrag = false;
+                        LastHit = g;
+                    };
+                    g.DragStarting += (UIElement sender, DragStartingEventArgs args) =>
+                    {
+                        args.Data.RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
+                        args.Data.Properties.Add("MYFORMAT", new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
+                    };
+                }
+                else
+                {
+                    var tb = new TextBlock();
+                    tb.FontFamily = FontFamily.XamlAutoFontFamily;
+                    tb.FontSize = 14;
+                    tb.Foreground = new SolidColorBrush(Colors.Black);
+                    tb.Text = value.ToString();
+                    tb.Height = 25;
+                    tb.HorizontalAlignment = HorizontalAlignment.Stretch;
+                    tb.TextAlignment = TextAlignment.Right;
+                    tb.Margin = new Thickness(5, 0, 20, 0);
+                    g.Children.Add(tb);
+                }
+            }
+            return g;
+        }
+
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
     public sealed partial class RawDataRenderer : Renderer, IScribbable, AttributeViewModelEventHandler
     {
         public class RawColumnData : ExtendedBindableBase {
@@ -223,20 +272,22 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void RawDataRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            //this.xRawDataGridView.ItemsPanelRoot.SetBinding(WidthProperty, b);
-            // this.xRawDataView.ItemsPanelRoot.SetBinding(WidthProperty, b);
+            this.setupListView(Records);
         }
         
 
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
             var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollBar>(this);
-            cp.HorizontalAlignment = HorizontalAlignment.Left;
-            cp.Background = new SolidColorBrush(Colors.DarkGray);
-            cp.Margin = new Thickness(0, 0, 2, 0);
-            Grid.SetColumn(cp, 0);
-            var cp2 = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollContentPresenter>(this);
-            Grid.SetColumn(cp2, 1);
+            if (cp != null)
+            {
+                cp.HorizontalAlignment = HorizontalAlignment.Left;
+                cp.Background = new SolidColorBrush(Colors.DarkGray);
+                cp.Margin = new Thickness(0, 0, 2, 0);
+                Grid.SetColumn(cp, 0);
+                var cp2 = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollContentPresenter>(this);
+                Grid.SetColumn(cp2, 1);
+            }
         }
 
         public override void Dispose()
@@ -334,11 +385,11 @@ namespace PanoramicDataWin8.view.vis.render
             var hresult = result as HistogramResult;
             var operationModel = (RawDataOperationModel)((OperationViewModel)DataContext).OperationModel;
 
-            var groupBy = operationModel.AttributeTransformationModelParameters.Where((atm) => atm.GroupBy).Select((atm)=>atm.AttributeModel).ToList();
+            var groupBy = operationModel.AttributeTransformationModelParameters.Where((atm) => atm.GroupBy).Select((atm) => atm.AttributeModel).ToList();
 
             Records.Clear();
             var newRecords = new ObservableCollection<RawColumnData>();
-            foreach (var col in  operationModel.AttributeTransformationModelParameters)
+            foreach (var col in operationModel.AttributeTransformationModelParameters)
             {
                 var acollection = new RawColumnData
                 {
@@ -354,14 +405,37 @@ namespace PanoramicDataWin8.view.vis.render
             foreach (var bin in hresult.Bins)
             {
                 extractBin(operationModel,
-                    newRecords, 
+                    newRecords,
                      indices,
-                    operationModel.AttributeTransformationModelParameters.Select((atm)=>atm.AttributeModel).Where((am) => !groupBy.Contains(am)).ToList(),
+                    operationModel.AttributeTransformationModelParameters.Select((atm) => atm.AttributeModel).Where((am) => !groupBy.Contains(am)).ToList(),
                     bin.Value);
             }
-            Records = newRecords;
 
-            this.xListView.ItemsSource = newRecords;
+            setupListView(newRecords);
+        }
+
+        private void setupListView(ObservableCollection<RawColumnData> newRecords)
+        {
+            Records = newRecords;
+            this.xListView.Children.Clear();
+            this.xListView.ColumnDefinitions.Clear();
+            foreach (var n in newRecords)
+            {
+                this.xListView.Children.Add(
+                    new RawDataColumn()
+                    {
+                        DataContext = n,
+                        HorizontalAlignment = HorizontalAlignment.Stretch,
+                        VerticalAlignment = VerticalAlignment.Stretch
+                    });
+                Grid.SetColumn(xListView.Children.Last() as FrameworkElement, xListView.ColumnDefinitions.Count);
+                xListView.ColumnDefinitions.Add(
+                    new ColumnDefinition()
+                    {
+                        Width = new GridLength(n.Model.AttributeModel.DataType == IDEA_common.catalog.DataType.String ? 2 : 1, GridUnitType.Star)
+                    }
+                );
+            }
         }
 
         static void extractBin(RawDataOperationModel operationModel, ObservableCollection<RawColumnData> newRecords, int[] binIndex, List<AttributeModel> grouped,  Bin values)
@@ -399,6 +473,7 @@ namespace PanoramicDataWin8.view.vis.render
                         loadRecordsAsync(s, model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex], sampleIndex+1 == (result as RawDataResult).Samples.Count());
 
                 }
+                setupListView(Records);
                 if ((result as RawDataResult).Samples.Count() == 1)
                 {
                     xRawDataGridView.Visibility = Visibility.Visible;
@@ -411,7 +486,6 @@ namespace PanoramicDataWin8.view.vis.render
                 }
 
             }
-            this.xListView.ItemsSource = Records;
             this.xRawDataGridView.ItemsSource = Records.FirstOrDefault()?.Data;
         }
 
@@ -424,6 +498,7 @@ namespace PanoramicDataWin8.view.vis.render
                 ShowScroll = showScroll
             };
             Records.Add(acollection);
+
             if (records != null)
 #pragma warning disable CS4014
                 CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
@@ -468,7 +543,7 @@ namespace PanoramicDataWin8.view.vis.render
                         Sort(combinde.OrderBy((obj) => (string)obj[attrModelIndex]), sortDir == false);
                 }
             }
-            xListView.ItemsSource = Records;
+            setupListView(Records);
         }
         public void Sort(IEnumerable<object[]> sortedList, bool down = false)
         {

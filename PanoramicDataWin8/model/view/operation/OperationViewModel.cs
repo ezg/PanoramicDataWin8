@@ -209,7 +209,7 @@ namespace PanoramicDataWin8.model.view.operation
             return findAllNestedGroups(newAttributeModel).Contains(testAttributeModel);
         }
         protected MenuViewModel createExpandingMenu(AttachmentOrientation orientation, ObservableCollection<AttributeTransformationModel> operationAttributeModels,
-           string label, int maxExpansionSlots, out MenuItemViewModel menuItemViewModel)
+           string label, int maxExpansionSlots, bool isalwaysDisplayed, out MenuItemViewModel menuItemViewModel)
         {
             var swapOrientation = orientation == AttachmentOrientation.Left || orientation == AttachmentOrientation.Right;
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == orientation);
@@ -220,7 +220,8 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = swapOrientation ? 1 : maxExpansionSlots,
-                NrRows = swapOrientation ? maxExpansionSlots : 1
+                NrRows = swapOrientation ? maxExpansionSlots : 1,
+                ParentSize = this.Size
             };
 
             menuItemViewModel = new MenuItemViewModel
@@ -232,7 +233,7 @@ namespace PanoramicDataWin8.model.view.operation
                 Column = 0,
                 Size = new Vec(25, 25),
                 TargetSize = new Vec(25, 25),
-                IsAlwaysDisplayed = false,
+                IsAlwaysDisplayed = isalwaysDisplayed,
                 IsWidthBoundToParent = false,
                 IsHeightBoundToParent = false,
                 Position = Position,
@@ -295,7 +296,9 @@ namespace PanoramicDataWin8.model.view.operation
                             {
                                 MenuViewModel = menuViewModel,
                                 Size = new Vec(50, 50),
+                                IsAlwaysDisplayed = isalwaysDisplayed,
                                 TargetSize = new Vec(50, 50),
+                                ProportionalSize = new Vec(newAttributeTransformationModel.AttributeModel.DataType == IDEA_common.catalog.DataType.String ? 2 : 1, 50),
                                 Position = menuItemViewModelCaptured.Position,
                                 MenuItemComponentViewModel = new AttributeMenuItemViewModel
                                 {
@@ -336,7 +339,6 @@ namespace PanoramicDataWin8.model.view.operation
             }
             return menuViewModel;
         }
-
     }
 
 }

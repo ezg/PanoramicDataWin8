@@ -32,7 +32,8 @@ namespace PanoramicDataWin8.view.vis.render
             var dataCol = (DataContext as RawDataRenderer.RawColumnData);
             xListView.ItemsSource = dataCol.Data;
             var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
-            cp.ViewChanged += Cp_ViewChanged;
+            if (cp != null)
+                cp.ViewChanged += Cp_ViewChanged;
             if (!dataCol.ShowScroll)
             {
                 var sbar = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollBar>(this);
@@ -69,7 +70,7 @@ namespace PanoramicDataWin8.view.vis.render
             //}
             var scroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
             var dataCol = (DataContext as RawDataRenderer.RawColumnData);
-            foreach (var dcol in dataCol.Renderer.xListView.ItemsPanelRoot.Children)
+            foreach (var dcol in dataCol.Renderer.xListView.Children)
             {
                 var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(dcol);
                 if (cp != scroll)
