@@ -33,7 +33,11 @@ namespace PanoramicDataWin8.model.view
         public ObservableCollection<MenuItemViewModel> MenuItemViewModels
         {
             get { return _menuItemViewModels; }
-            set { SetProperty(ref _menuItemViewModels, value); }
+            set {
+                foreach (var v in value)
+                    v.MenuViewModel = this;
+                SetProperty(ref _menuItemViewModels, value);
+            }
         }
         
 

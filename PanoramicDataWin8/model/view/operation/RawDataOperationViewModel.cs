@@ -20,7 +20,7 @@ namespace PanoramicDataWin8.model.view.operation
         public RawDataOperationViewModel(RawDataOperationModel rawDataOperationModel, AttributeModel attributeModel) : base(rawDataOperationModel)
         {
             createTopRightFilterDragMenu();
-            menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, RawDataOperationModel.AttributeTransformationModelParameters, "+", 100, true, out menuItemViewModel);
+            menuViewModel = createExpandingMenu(AttachmentOrientation.BotStacked, RawDataOperationModel.AttributeTransformationModelParameters, "+", 100, true, out menuItemViewModel);
             RawDataOperationModel.AttributeTransformationModelParameters.CollectionChanged += AttributeUsageModels_CollectionChanged;
             
             PropertyChanged += RawDataOperationViewModel_PropertyChanged;
@@ -62,7 +62,7 @@ namespace PanoramicDataWin8.model.view.operation
                                 SelectedColumn = amivm;
                             }
 
-                            AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
+                            AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.BotStacked).StartDisplayActivationStopwatch();
 
                             foreach (var toggle in menuViewModel.MenuItemViewModels.Where((t) => t.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel).Select((t) => t.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel))
                                 toggle.IsVisible = !toggle.IsVisible;
@@ -194,7 +194,7 @@ namespace PanoramicDataWin8.model.view.operation
 
                     if (fire)
                     {
-                        AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
+                        AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.BotStacked).StartDisplayActivationStopwatch();
                         RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                         SelectedColumn = null;
                         if (tapTrigger)

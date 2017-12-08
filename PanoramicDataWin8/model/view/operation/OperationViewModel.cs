@@ -78,35 +78,29 @@ namespace PanoramicDataWin8.model.view.operation
             var attachmentRightViewModel = new AttachmentViewModel
             {
                 AttachmentOrientation = AttachmentOrientation.TopRight,
-                OperationViewModel = this,
-                ShowOnAttributeTapped = true
+                OperationViewModel    = this,
+                ShowOnAttributeTapped = true,
+                MenuViewModel = new MenuViewModel
+                {
+                    AttachmentOrientation = AttachmentOrientation.TopRight,
+                    NrColumns = 1, 
+                    NrRows    = 1,
+                    MenuItemViewModels = new ObservableCollection<MenuItemViewModel>(new MenuItemViewModel[] {
+                        new MenuItemViewModel()  {
+                            Row = 0,
+                            ColumnSpan = 1,
+                            RowSpan = 1,
+                            Column = 0,
+                            Size = new Vec(25, 25),
+                            Position = this.Position,
+                            TargetSize = new Vec(25, 25),
+                            IsAlwaysDisplayed = false,
+                            MenuItemComponentViewModel = new CreateLinkMenuItemViewModel(this)
+                        }
+                    })
+                }
             };
             AttachementViewModels.Add(attachmentRightViewModel);
-
-            var menuViewModelDrag = new MenuViewModel
-            {
-                AttachmentOrientation = attachmentRightViewModel.AttachmentOrientation,
-                NrColumns = 1,
-                NrRows = 1
-            };
-            attachmentRightViewModel.MenuViewModel = menuViewModelDrag;
-
-            var menuItemDrag = new MenuItemViewModel
-            {
-                MenuViewModel = menuViewModelDrag,
-                Row = 0,
-                ColumnSpan = 1,
-                RowSpan = 1,
-                Column = 0,
-                Size = new Vec(25, 25),
-                Position = this.Position,
-                TargetSize = new Vec(25, 25),
-                IsAlwaysDisplayed = false,
-                MenuItemComponentViewModel = new CreateLinkMenuItemViewModel()
-            };
-            menuViewModelDrag.MenuItemViewModels.Add(menuItemDrag);
-            (menuItemDrag.MenuItemComponentViewModel as CreateLinkMenuItemViewModel).CreateLinkEvent += (sender, bounds) => FilterLinkViewController.Instance.CreateFilterLinkViewModel(this, bounds);
-             
         }
 
         public OperationViewModel(OperationModel operationModel)
@@ -221,47 +215,45 @@ namespace PanoramicDataWin8.model.view.operation
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = swapOrientation ? 1 : maxExpansionSlots,
                 NrRows = swapOrientation ? maxExpansionSlots : 1,
-                ParentSize = this.Size
-            };
-
-            menuItemViewModel = new MenuItemViewModel
-            {
-                MenuViewModel = menuViewModel,
-                Row = 0,
-                ColumnSpan = 1,
-                RowSpan = 1,
-                Column = 0,
-                Size = new Vec(25, 25),
-                TargetSize = new Vec(25, 25),
-                IsAlwaysDisplayed = isalwaysDisplayed,
-                IsWidthBoundToParent = false,
-                IsHeightBoundToParent = false,
-                Position = Position,
-                MenuItemComponentViewModel = new AttributeMenuItemViewModel
-                {
-                    Label = label,
-                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
-                    CanDrag = false,
-                    CanDrop = true,
-                    CanDelete = true,
-                    DroppedTriggered = attributeViewModel =>
-                    {
-                        var attributeModel = new AttributeTransformationModel(attributeViewModel.AttributeTransformationModel.AttributeModel) { AggregateFunction = attributeViewModel.AttributeTransformationModel.AggregateFunction };
-                        if (!operationAttributeModels.Contains(attributeModel) &&
-                            !attributeModelContainsAttributeModel(new AttributeTransformationModel((OperationModel as AttributeGroupOperationModel)?.AttributeModel), attributeModel))
+                ParentSize = this.Size,
+                MenuItemViewModels = new ObservableCollection<MenuItemViewModel>(new MenuItemViewModel[] {
+                    menuItemViewModel = new MenuItemViewModel {
+                        Row = 0,
+                        ColumnSpan = 1,
+                        RowSpan = 1,
+                        Column = 0,
+                        Size = new Vec(25, 25),
+                        TargetSize = new Vec(25, 25),
+                        IsAlwaysDisplayed = isalwaysDisplayed,
+                        IsWidthBoundToParent = false,
+                        IsHeightBoundToParent = false,
+                        Position = Position,
+                        MenuItemComponentViewModel = new AttributeMenuItemViewModel
                         {
-                            operationAttributeModels.Add(attributeModel);
-                            if (ExpandingMenuInputAdded != null)
-                                ExpandingMenuInputAdded(this, operationAttributeModels);
+                            Label = label,
+                            TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
+                            CanDrag = false,
+                            CanDrop = true,
+                            CanDelete = true,
+                            DroppedTriggered = attributeViewModel =>
+                            {
+                                var attributeModel = new AttributeTransformationModel(attributeViewModel.AttributeTransformationModel.AttributeModel) { AggregateFunction = attributeViewModel.AttributeTransformationModel.AggregateFunction };
+                                if (!operationAttributeModels.Contains(attributeModel) &&
+                                    !attributeModelContainsAttributeModel(new AttributeTransformationModel((OperationModel as AttributeGroupOperationModel)?.AttributeModel), attributeModel))
+                                {
+                                    operationAttributeModels.Add(attributeModel);
+                                    if (ExpandingMenuInputAdded != null)
+                                        ExpandingMenuInputAdded(this, operationAttributeModels);
+                                }
+                            }
                         }
                     }
-                }
+                })
             };
 
             if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
             {
                 attachmentViewModel.MenuViewModel = menuViewModel;
-                menuViewModel.MenuItemViewModels.Add(menuItemViewModel);
 
                 var menuItemViewModelCaptured = menuItemViewModel;
                 operationAttributeModels.CollectionChanged += (sender, args) =>
