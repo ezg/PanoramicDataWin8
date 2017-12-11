@@ -14,6 +14,7 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class FunctionOperationViewModel : LabeledOperationViewModel
     {
+        MenuViewModel menuViewModel;
         private void createDummyParameterMenu()
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
@@ -61,16 +62,31 @@ namespace PanoramicDataWin8.model.view.operation
             menuViewModel.MenuItemViewModels.Add(sliderItem);
             attachmentViewModel.MenuViewModel = menuViewModel;
         }
-        
+
+        public ObservableCollection<AttributeTransformationModel> ExtraAttributeTransformationModelParameters { get; } = new ObservableCollection<AttributeTransformationModel>();
+
         public FunctionOperationViewModel(FunctionOperationModel functionOperationModel, bool fromMouse = false) : base(functionOperationModel)
         {
             // fill-in UI specific to function's subtype
             if (FunctionOperationModel.FunctionSubtypeModel is MinMaxScaleFunctionSubtypeModel)
-                ; // createDummyParameterMenu();
+                 createDummyParameterMenu();
 
             MenuItemViewModel menuItemViewModel;
-            createExpandingMenu(AttachmentOrientation.Top, FunctionOperationModel.AttributeTransformationModelParameters, "+", 3, false, out menuItemViewModel);
+            var dict = new  Dictionary<string, ObservableCollection<AttributeTransformationModel>>();
+            dict.Add("Pasdfsd1", FunctionOperationModel.AttributeTransformationModelParameters);
+            dict.Add("P2", ExtraAttributeTransformationModelParameters);
+            menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, dict, 30, false, out menuItemViewModel);
             createApplyAttributeMenu(FunctionOperationModel.GetAttributeModel(), AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
+
+            PropertyChanged += RawDataOperationViewModel_PropertyChanged;
+        }
+
+        private void RawDataOperationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Size")
+            {
+                menuViewModel.ParentSize = this.Size;
+            }
         }
 
         public FunctionOperationModel FunctionOperationModel => (FunctionOperationModel)OperationModel;

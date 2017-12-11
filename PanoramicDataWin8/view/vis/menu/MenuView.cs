@@ -412,9 +412,10 @@ namespace PanoramicDataWin8.view.vis.menu
                     double rowHeight = 0;
                     for (int row = model.NrRows - 1; row >= 0; row--)
                     {
-                        var maxc = model.MenuItemViewModels.Max((mi) => mi.Column);
-                        var total = (double)model.MenuItemViewModels.Where((mi) => mi.Row == row).Sum((mi) => mi.ProportionalSize.X);
-                        var gaps = (double)model.MenuItemViewModels.Where((mi) => mi.Row == row).Sum((mi) => GAP) + 30-GAP;
+                        var rowMenuItems = model.MenuItemViewModels.Where((mi) => mi.Row == row && mi.Visible == Visibility.Visible);
+                        var maxc = rowMenuItems.Count() < 1 ? 0 : rowMenuItems.Max((mi) => mi.Column);
+                        var total = (double)rowMenuItems.Sum((mi) => mi.ProportionalSize.X);
+                        var gaps = (double)rowMenuItems.Sum((mi) => GAP) + 30-GAP;
                         double maxCellHeight = 0;
                         var currentX = model.AnkerPosition.X;
                         for (int col = 0; col <= maxc; col++)
@@ -422,7 +423,7 @@ namespace PanoramicDataWin8.view.vis.menu
                             var iColCnt = col;
                             var iRowCnt = model.NrRows - row -1;
 
-                            var rowItem = model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
+                            var rowItem = model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col && mi.Visible == Visibility.Visible);
                             if (rowItem != null)
                             {
                                 maxCellHeight = Math.Max(maxCellHeight, rowItem.TargetSize.Y);
@@ -431,7 +432,7 @@ namespace PanoramicDataWin8.view.vis.menu
                                 var padding = (col == 0 ? 15 : 0) + (col == maxc ? 15 : 0);
                                 if (total > 0)
                                 {
-                                    var sizeX = (model.ParentSize.X-gaps) / total * rowItem.ProportionalSize.X;
+                                    var sizeX = rowItem.ProportionalSize.X == 0 ? rowItem.Size.X : (model.ParentSize.X-gaps) / total * rowItem.ProportionalSize.X;
                                     rowItem.Size = new Vec(sizeX + padding, rowItem.Size.Y);
                                     rowItem.TargetSize = rowItem.Size;
                                     currentX += GAP + sizeX + padding;
@@ -448,9 +449,10 @@ namespace PanoramicDataWin8.view.vis.menu
                     double rowHeight = 0;
                     for (int row = model.NrRows - 1; row >= 0; row--)
                     {
-                        var maxc = model.MenuItemViewModels.Max((mi) => mi.Column);
-                        var total = (double)model.MenuItemViewModels.Where((mi) => mi.Row == row).Sum((mi) => mi.ProportionalSize.X);
-                        var gaps = (double)model.MenuItemViewModels.Where((mi) => mi.Row == row).Sum((mi) => GAP) + 30 - GAP;
+                        var rowMenuItems = model.MenuItemViewModels.Where((mi) => mi.Row == row && mi.Visible == Visibility.Visible);
+                        var maxc = rowMenuItems.Count() < 1 ? 0 : rowMenuItems.Max((mi) => mi.Column);
+                        var total = (double)rowMenuItems.Sum((mi) => mi.ProportionalSize.X);
+                        var gaps = (double)rowMenuItems.Sum((mi) => GAP) + 30 - GAP;
                         double maxCellHeight = 0;
                         var currentX = model.AnkerPosition.X;
                         for (int col = 0; col <= maxc; col++)
@@ -458,7 +460,7 @@ namespace PanoramicDataWin8.view.vis.menu
                             var iColCnt = col;
                             var iRowCnt = model.NrRows - row - 1;
 
-                            var rowItem = model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
+                            var rowItem = model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col && mi.Visible == Visibility.Visible);
                             if (rowItem != null)
                             {
                                 maxCellHeight = Math.Max(maxCellHeight, rowItem.TargetSize.Y);
@@ -467,7 +469,7 @@ namespace PanoramicDataWin8.view.vis.menu
                                 var padding = (col == 0 ? 15 : 0) + (col == maxc ? 15 : 0);
                                 if (total > 0)
                                 {
-                                    var sizeX = (model.ParentSize.X - gaps) / total * rowItem.ProportionalSize.X;
+                                    var sizeX = rowItem.ProportionalSize.X == 0 ? rowItem.Size.X : (model.ParentSize.X - gaps) / total * rowItem.ProportionalSize.X;
                                     rowItem.Size = new Vec(sizeX + padding, rowItem.Size.Y);
                                     rowItem.TargetSize = rowItem.Size;
                                     currentX += GAP + sizeX + padding;

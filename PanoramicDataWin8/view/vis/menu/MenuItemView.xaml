@@ -7,12 +7,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    Visibility="{Binding Visible}"
     Width="{Binding Size.X}" Height="{Binding Size.Y}"
     FontFamily="{StaticResource abel}">
     <UserControl.RenderTransform>
         <TranslateTransform X="{Binding Position.X}" Y="{Binding Position.Y}"/>
     </UserControl.RenderTransform>
 
-    <Grid Name="mainGrid">
-    </Grid>
+    <Border Name="mainBorder" BorderThickness="{Binding FocusThickness}" BorderBrush="{StaticResource highlightBrush}">
+        <Grid Name="mainGrid" Tapped="mainGrid_Tapped" />
+    </Border>
 </UserControl>

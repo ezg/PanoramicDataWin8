@@ -1,11 +1,15 @@
 ﻿using System;
 using PanoramicDataWin8.utils;
+using System.Collections.Generic;
+using Windows.UI.Xaml;
 
 namespace PanoramicDataWin8.model.view
 {
     public class MenuItemViewModel : ExtendedBindableBase
     {
         private static readonly Random random = new Random();
+
+        private Visibility _visible = Visibility.Visible;
 
         private int _column;
 
@@ -20,6 +24,8 @@ namespace PanoramicDataWin8.model.view
         private bool _isHeightBoundToParent;
 
         private bool _isWidthBoundToParent;
+
+        private Thickness _focusThickness = new Thickness(0);
 
         private MenuItemComponentViewModel _menuItemComponentViewModel;
 
@@ -47,6 +53,21 @@ namespace PanoramicDataWin8.model.view
         {
             _dampingFactor = random.NextDouble()*3.0 + 3;
         }
+
+        public Visibility Visible
+        {
+            get { return _visible; }
+            set { SetProperty(ref _visible, value); }
+        }
+
+        public Thickness FocusThickness
+        {
+            get { return _focusThickness; }
+            set { SetProperty(ref _focusThickness, value); }
+        }
+
+
+        public List<MenuItemViewModel> SubMenuItemViewModels = new List<MenuItemViewModel>();
 
         public MenuViewModel MenuViewModel
         {
@@ -165,6 +186,21 @@ namespace PanoramicDataWin8.model.view
         public Rct Bounds
         {
             get { return new Rct(Position, Size); }
+        }
+        public void Focus()
+        {
+            if (SubMenuItemViewModels.Count > 0)
+            {
+                foreach (var mItemViewModel in MenuViewModel.MenuItemViewModels)
+                {
+                    mItemViewModel.FocusThickness = new Thickness(0);
+                    foreach (var msubItemViewModel in mItemViewModel.SubMenuItemViewModels)
+                        msubItemViewModel.Visible = Visibility.Collapsed;
+                }
+                FocusThickness = new Thickness(2);
+                foreach (var mItemViewModel in SubMenuItemViewModels)
+                    mItemViewModel.Visible = Visibility.Visible;
+            }
         }
     }
 

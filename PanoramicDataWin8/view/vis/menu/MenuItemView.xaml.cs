@@ -131,5 +131,12 @@ namespace PanoramicDataWin8.view.vis.menu
         {
             return false;
         }
+
+        private void mainGrid_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            MenuItemViewModel model = this.DataContext as MenuItemViewModel;
+            model.Focus();
+        }
+
     }
 }
