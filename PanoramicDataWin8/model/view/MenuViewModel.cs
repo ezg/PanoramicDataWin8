@@ -14,6 +14,8 @@ namespace PanoramicDataWin8.model.view
 
         private bool _isDisplayed;
 
+        private bool _clickToDismiss = false;
+
         private bool _moveOnHide = false;
 
         private bool _isRigid = false;
@@ -51,6 +53,12 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _parentSize; }
             set { SetProperty(ref _parentSize, value); }
+        }
+
+        public bool ClickToDismiss
+        {
+            get { return _clickToDismiss; }
+            set { SetProperty(ref _clickToDismiss, value); }
         }
 
 

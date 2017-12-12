@@ -43,15 +43,20 @@ namespace PanoramicDataWin8.view.vis
         void _activeTimer_Tick(object sender, object e)
         {
             var model = ((AttachmentViewModel) DataContext);
-            if (_menuViewModel != null)
+            if (_menuViewModel != null && model.ActiveStopwatch.IsRunning)
             {
-                if (model.ActiveStopwatch.Elapsed > TimeSpan.FromSeconds(4) && _menuViewModel.IsDisplayed)
+                if (model.ActiveStopwatch.Elapsed > TimeSpan.FromSeconds(4) && _menuViewModel.IsDisplayed && !_menuViewModel.ClickToDismiss)
                 {
                     _menuViewModel.IsDisplayed = false;
+                    Debug.WriteLine("Tick = false");
+                    model.ActiveStopwatch.Stop();
                 }
                 if (model.ActiveStopwatch.Elapsed.Ticks > 0 && model.ActiveStopwatch.Elapsed < TimeSpan.FromSeconds(2.5) && !_menuViewModel.IsDisplayed)
                 {
                     _menuViewModel.IsDisplayed = true;
+                    Debug.WriteLine("Tick = true");
+                    if (_menuViewModel.ClickToDismiss)
+                        model.ActiveStopwatch.Stop();
                 }
             }
         }

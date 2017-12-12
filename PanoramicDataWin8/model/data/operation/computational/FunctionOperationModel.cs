@@ -13,59 +13,57 @@ namespace PanoramicDataWin8.model.data.operation
     public interface FunctionSubtypeModel {
         DataType DataType { get; }
         string   Name { get; }
-        string InputVisualizationType { get; }
-        string Code(Dictionary<string, object> parameters);
+        Dictionary<string, ObservableCollection<AttributeTransformationModel>> Parameters { get;}
+        string   InputVisualizationType { get; }
+        string   Code();
     }
 
     public class MinMaxScaleFunctionSubtypeModel : FunctionSubtypeModel
     {
-        public MinMaxScaleFunctionSubtypeModel()
-        {
-            Name = "MinMaxScale";
-        }
-        public DataType DataType {  get { return DataType.Double;  } }
-        public string Name { get; }
-        public string InputVisualizationType { get { return InputVisualizationTypeConstants.NUMERIC; } }
+        public MinMaxScaleFunctionSubtypeModel() { }
+        public DataType      DataType {  get { return DataType.Double;  } }
+        public string        Name     { get; } = "MinMaxScale";
+        public Dictionary<string, ObservableCollection<AttributeTransformationModel>> Parameters { get;  } =  
+            new Dictionary<string, ObservableCollection<AttributeTransformationModel>>() {
+                    ["P1"] = new ObservableCollection<AttributeTransformationModel>(),
+                    ["P2"] = new ObservableCollection<AttributeTransformationModel>()
+            };
+        public string        InputVisualizationType { get { return InputVisualizationTypeConstants.NUMERIC; } }
 
         public double DummyValue { get; set;  }
 
-        public string Code(Dictionary<string,object> parameters)
+        public string Code()
         {
             var code = "MinMax(";
-            if (parameters != null)
-                foreach (var p in parameters)
-                    code += (p.Key + ":" + (p.Value as AttributeTransformationModel).AttributeModel.RawName) + ",";
+            if (Parameters != null)
+                foreach (var p in Parameters)
+                    foreach (var v in p.Value)
+                        code += (p.Key + ":" + v.AttributeModel.RawName) + ",";
 
             code = code.TrimEnd(',') + ")";
-            return "0";
             return code;
         }
     }
 
     public class FunctionOperationModel : ComputationalOperationModel
     {
-
         public FunctionSubtypeModel FunctionSubtypeModel;
-        public FunctionOperationModel(SchemaModel schemaModel, FunctionSubtypeModel functionSubtypeModel, string displayName = null) : 
-            base(schemaModel, "0", functionSubtypeModel.DataType, functionSubtypeModel.InputVisualizationType,
-                 functionSubtypeModel.Name + new Random().Next(), displayName == null ? functionSubtypeModel.Name : displayName)
 
+        public FunctionOperationModel(SchemaModel schemaModel, string rawName, FunctionSubtypeModel functionSubtypeModel, string displayName = null) : 
+            base(schemaModel, "0", 
+                functionSubtypeModel.DataType, 
+                functionSubtypeModel.InputVisualizationType,
+                rawName, 
+                displayName == null ? rawName : displayName)
         {
             FunctionSubtypeModel = functionSubtypeModel;
-            AttributeTransformationModelParameters.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
-        }
-        
-        public void SetParameters(Dictionary<string,object> parameters)
-        {
-            GetAttributeModel().SetCode(FunctionSubtypeModel.Code(parameters), FunctionSubtypeModel.DataType);
+            foreach (var p in functionSubtypeModel.Parameters)
+                p.Value.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
 
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var parameters = new Dictionary<string, object>();
-            foreach (var attributeUsageModel in AttributeTransformationModelParameters)
-                parameters.Add(attributeUsageModel.AttributeModel.DisplayName, attributeUsageModel);
-            SetParameters(parameters);
+            GetAttributeModel().SetCode(FunctionSubtypeModel.Code(), FunctionSubtypeModel.DataType);
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
     }

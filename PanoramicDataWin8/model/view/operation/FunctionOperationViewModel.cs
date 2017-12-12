@@ -24,7 +24,8 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = 3,
-                NrRows = 1
+                NrRows = 1,
+                ClickToDismiss = true
             };
 
             var sliderItem = new MenuItemViewModel
@@ -73,10 +74,13 @@ namespace PanoramicDataWin8.model.view.operation
 
             MenuItemViewModel menuItemViewModel;
             var dict = new  Dictionary<string, ObservableCollection<AttributeTransformationModel>>();
-            dict.Add("Pasdfsd1", FunctionOperationModel.AttributeTransformationModelParameters);
-            dict.Add("P2", ExtraAttributeTransformationModelParameters);
-            menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, dict, 30, false, out menuItemViewModel);
-            createApplyAttributeMenu(FunctionOperationModel.GetAttributeModel(), AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
+            var subtype = this.FunctionOperationModel.FunctionSubtypeModel as MinMaxScaleFunctionSubtypeModel;
+            foreach (var p in subtype.Parameters)
+                dict.Add(p.Key, p.Value);
+            menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, dict, 30, 30, false, true,  out menuItemViewModel);
+            MenuItemViewModel labelViewModel;
+            createAttributeLabelMenu(AttachmentOrientation.Bottom, FunctionOperationModel.GetAttributeModel() , AttributeUsage.X, new Vec(60, 50), 0, true, false, null, out labelViewModel);
+           // createApplyAttributeMenu(FunctionOperationModel.GetAttributeModel(), AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false, true);
 
             PropertyChanged += RawDataOperationViewModel_PropertyChanged;
         }

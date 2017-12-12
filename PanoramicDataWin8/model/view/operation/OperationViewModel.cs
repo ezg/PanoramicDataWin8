@@ -206,20 +206,24 @@ namespace PanoramicDataWin8.model.view.operation
            AttachmentOrientation orientation,
            ObservableCollection<AttributeTransformationModel> operationAttributeModels,
            string label,
+           int menuHeight,
            int maxExpansionSlots,
-           bool isalwaysDisplayed,
+           bool isAlwaysDisplayed,
+           bool clickToDismiss,
            out MenuItemViewModel menuItemViewModel
            )
         {
             var dict = new Dictionary<string, ObservableCollection<AttributeTransformationModel>>();
             dict.Add(label, operationAttributeModels);
-            return createExpandingMenu(orientation, dict, maxExpansionSlots, isalwaysDisplayed, out menuItemViewModel);
+            return createExpandingMenu(orientation, dict, menuHeight, maxExpansionSlots, isAlwaysDisplayed, clickToDismiss, out menuItemViewModel);
         }
         protected MenuViewModel createExpandingMenu(
             AttachmentOrientation orientation, 
             Dictionary<string, ObservableCollection<AttributeTransformationModel>> operationAttributeModels,
-            int maxExpansionSlots, 
-            bool isalwaysDisplayed, 
+            int menuHeight,
+            int maxExpansionSlots,
+            bool isAlwaysDisplayed,
+            bool clickToDismiss, 
             out MenuItemViewModel menuItemViewModel
             )
         {
@@ -233,11 +237,14 @@ namespace PanoramicDataWin8.model.view.operation
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = swapOrientation ? 2 : maxExpansionSlots,
                 NrRows = swapOrientation ? maxExpansionSlots : 1,
+                ClickToDismiss = clickToDismiss,
                 ParentSize = this.Size,
             };
 
             menuViewModel.MenuItemViewModels = new ObservableCollection<MenuItemViewModel>(
-                    operationAttributeModels.Select((pair,index) =>  AddExpandingMenuItem(attachmentViewModel, menuViewModel, pair.Value, pair.Key, isalwaysDisplayed, index, swapOrientation, maxExpansionSlots)) );
+                operationAttributeModels.Select((pair,index) =>  
+                    AddExpandingMenuItem(attachmentViewModel, menuViewModel, pair.Value, pair.Key,
+                                         menuHeight, isAlwaysDisplayed, index, swapOrientation, maxExpansionSlots)) );
             if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
             {
                 attachmentViewModel.MenuViewModel = menuViewModel;
@@ -249,7 +256,7 @@ namespace PanoramicDataWin8.model.view.operation
         void CollectionChanged(AttachmentViewModel attachmentViewModel, 
             MenuViewModel menuViewModel, 
             ObservableCollection<AttributeTransformationModel> operationAttributeModels, 
-            MenuItemViewModel menuItemViewModelCaptured, 
+            MenuItemViewModel menuItemViewModelCaptured, int menuHeight,
             bool isAlwaysDisplayed, bool swapOrientation, int maxExpansionSlots)
         {
             operationAttributeModels.CollectionChanged += (sender, args) =>
@@ -286,9 +293,9 @@ namespace PanoramicDataWin8.model.view.operation
                         var newMenuItem = new MenuItemViewModel
                         {
                             MenuViewModel = menuViewModel,
-                            Size = new Vec(50, 50),
+                            Size = new Vec(50, menuHeight),
                             IsAlwaysDisplayed = isAlwaysDisplayed,
-                            TargetSize = new Vec(50, 50),
+                            TargetSize = new Vec(50, menuHeight),
                             ProportionalSize = new Vec(newAttributeTransformationModel.AttributeModel.DataType == IDEA_common.catalog.DataType.String ? 2 : 1, 50),
                             Position = menuItemViewModelCaptured.Position,
                             MenuItemComponentViewModel = new AttributeMenuItemViewModel
@@ -319,7 +326,6 @@ namespace PanoramicDataWin8.model.view.operation
                 }
 
                 var count = 0;
-                //menuViewModel.MenuItemViewModels.Where(mvm => !PrimaryExpandingMenuItems.Contains(mvm) && menuItemViewModelCaptured.SubMenuItemViewModels.Contains(mvm)).Where((mivm) => !(mivm.MenuItemComponentViewModel is ToggleMenuItemComponentViewModel)))
                 foreach (var mItemViewModel in menuItemViewModelCaptured.SubMenuItemViewModels)
                 {
                     mItemViewModel.Row = swapOrientation ? count % maxExpansionSlots : menuViewModel.NrRows - 1 - (int)Math.Floor(1.0 * count / maxExpansionSlots);
@@ -332,13 +338,12 @@ namespace PanoramicDataWin8.model.view.operation
             };
         }
 
-        List<MenuItemViewModel> PrimaryExpandingMenuItems = new List<MenuItemViewModel>();
-
         MenuItemViewModel AddExpandingMenuItem(
             AttachmentViewModel attachmentViewModel, 
             MenuViewModel menuViewModel,
             ObservableCollection<AttributeTransformationModel> operationAttributeModels, 
             string label, 
+            int menuHeight,
             bool isAlwaysDisplayed, 
             int column, 
             bool swapOrientation, 
@@ -376,9 +381,8 @@ namespace PanoramicDataWin8.model.view.operation
                     }
                 }
             };
-            PrimaryExpandingMenuItems.Add(capturedMenuItemViewModel);
 
-            CollectionChanged(attachmentViewModel, menuViewModel, operationAttributeModels, capturedMenuItemViewModel, isAlwaysDisplayed, swapOrientation,  maxExpansionSlots);
+            CollectionChanged(attachmentViewModel, menuViewModel, operationAttributeModels, capturedMenuItemViewModel, menuHeight, isAlwaysDisplayed, swapOrientation,  maxExpansionSlots);
 
             return capturedMenuItemViewModel;
         }

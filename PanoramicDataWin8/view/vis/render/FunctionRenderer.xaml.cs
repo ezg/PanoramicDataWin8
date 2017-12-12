@@ -45,30 +45,32 @@ namespace PanoramicDataWin8.view.vis.render
         void dataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             MinHeight = OperationViewModel.MIN_HEIGHT / 2;
-            if (args.NewValue != null)
+            var viewModel = (DataContext as FunctionOperationViewModel);
+            if (viewModel != null)
             {
-                NameTextBox.Text = FunctionOperationViewModel.FunctionOperationModel.GetAttributeModel().DisplayName;
+                NameTextBox.Text = FunctionOperationViewModel.FunctionOperationModel.FunctionSubtypeModel.Name;
                 FunctionOperationViewModel.OperationViewModelTapped -= OperationViewModelTapped;
                 FunctionOperationViewModel.OperationViewModelTapped += OperationViewModelTapped;
+                viewModel.FunctionOperationModel.OperationModelUpdated += (s, e) => viewModel.FunctionOperationModel.UpdateName() ;
             }
         }
 
         private void OperationViewModelTapped(PointerRoutedEventArgs e)
         {
-            NameTextBox.IsEnabled = true;
-            NameTextBox.Focus(FocusState.Keyboard);
+            //NameTextBox.IsEnabled = true;
+            //NameTextBox.Focus(FocusState.Keyboard);
         }
 
 
         private void NameTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-            if (e.Key == Windows.System.VirtualKey.Enter)
-            {
+            //if (e.Key == Windows.System.VirtualKey.Enter)
+            //{
 
-                e.Handled = true;
-            }
-            else
-                _keyboardTimer.Start();
+            //    e.Handled = true;
+            //}
+            //else
+            //    _keyboardTimer.Start();
         }
 
         private void NameTextBox_PointerExited(object sender, PointerRoutedEventArgs e)
@@ -76,11 +78,11 @@ namespace PanoramicDataWin8.view.vis.render
 
             if (!NameTextBox.GetBounds().Contains(e.GetCurrentPoint(NameTextBox).Position))
             {
-                var model = (this.DataContext as FunctionOperationViewModel).OperationModel as FunctionOperationModel;
-                NameTextBox.IsEnabled = false;
-                model.SetRawName(NameTextBox.Text);
-                MainViewController.Instance.MainPage.addAttributeButton.Focus(FocusState.Pointer);
-                MainViewController.Instance.MainPage.clearAndDisposeMenus();
+                //var model = (this.DataContext as FunctionOperationViewModel).OperationModel as FunctionOperationModel;
+                //NameTextBox.IsEnabled = false;
+                //model.SetRawName(NameTextBox.Text);
+                //MainViewController.Instance.MainPage.addAttributeButton.Focus(FocusState.Pointer);
+                //MainViewController.Instance.MainPage.clearAndDisposeMenus();
             }
         }
     }

@@ -554,6 +554,11 @@ namespace PanoramicDataWin8
 
         private void mainPointerManager_Removed(object sender, PointerManagerEvent e)
         {
+            foreach (var m in this.GetDescendantsOfType<MenuView>())
+                if ((m.DataContext as MenuViewModel).ClickToDismiss)
+                {
+                    (m.DataContext as MenuViewModel).IsDisplayed = false;
+                }
             if (e.NumActiveContacts == 1)
             {
                 var gt = MainViewController.Instance.InkableScene.TransformToVisual(this);

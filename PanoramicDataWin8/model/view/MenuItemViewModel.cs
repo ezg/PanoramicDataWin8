@@ -47,11 +47,11 @@ namespace PanoramicDataWin8.model.view
 
         private Vec _targetSize = new Vec(50, 50);
 
-        private Vec _proportionalSize = new Vec(0,0);
+        private Vec _proportionalSize = new Vec(0, 0);
 
         public MenuItemViewModel()
         {
-            _dampingFactor = random.NextDouble()*3.0 + 3;
+            _dampingFactor = random.NextDouble() * 3.0 + 3;
         }
 
         public Visibility Visible
@@ -65,7 +65,6 @@ namespace PanoramicDataWin8.model.view
             get { return _focusThickness; }
             set { SetProperty(ref _focusThickness, value); }
         }
-
 
         public List<MenuItemViewModel> SubMenuItemViewModels = new List<MenuItemViewModel>();
 
@@ -157,7 +156,7 @@ namespace PanoramicDataWin8.model.view
             get { return _size; }
             set { SetProperty(ref _size, value); }
         }
-        
+
         public Pt Position
         {
             get { return _position; }
@@ -189,7 +188,7 @@ namespace PanoramicDataWin8.model.view
         }
         public void Focus()
         {
-            if (SubMenuItemViewModels.Count > 0)
+            if (MenuViewModel.ClickToDismiss)
             {
                 foreach (var mItemViewModel in MenuViewModel.MenuItemViewModels)
                 {
@@ -197,9 +196,11 @@ namespace PanoramicDataWin8.model.view
                     foreach (var msubItemViewModel in mItemViewModel.SubMenuItemViewModels)
                         msubItemViewModel.Visible = Visibility.Collapsed;
                 }
-                FocusThickness = new Thickness(2);
                 foreach (var mItemViewModel in SubMenuItemViewModels)
                     mItemViewModel.Visible = Visibility.Visible;
+
+                this.MenuViewModel.FireUpdate();
+                FocusThickness = new Thickness(2);
             }
         }
     }

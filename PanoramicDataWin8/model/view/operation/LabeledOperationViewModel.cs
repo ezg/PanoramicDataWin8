@@ -24,7 +24,7 @@ namespace PanoramicDataWin8.model.view.operation
         public delegate void DroppedTriggeredHandler(AttributeViewModel model);
        
         protected void createApplyAttributeMenu(AttributeModel attributeModel, AttachmentOrientation attachmentOrientation,
-              AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent)
+              AttributeUsage axis, Vec size, double textAngle, bool isWidthBoundToParent, bool isHeightBoundToParent, bool clickToDismiss=false)
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == attachmentOrientation);
             attachmentViewModel.ShowOnAttributeTapped = true;
@@ -33,7 +33,8 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
                 NrColumns = attachmentOrientation == AttachmentOrientation.Bottom ? 5 : 2,
-                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5
+                NrRows = attachmentOrientation == AttachmentOrientation.Bottom ? 2 : 5,
+                ClickToDismiss = clickToDismiss
             };
             attachmentViewModel.MenuViewModel = menuViewModel;
 
