@@ -24,9 +24,11 @@ namespace PanoramicDataWin8.model.data.operation
             }
         }
 
-        public AttributeGroupOperationModel(SchemaModel schemaModel, string rawName) : base(schemaModel)
+        public AttributeGroupOperationModel(SchemaModel schemaModel, string rawName, AttributeModel groupModel) : base(schemaModel)
         {
-            attributeGroupModel = IDEAAttributeModel.AddGroupField(rawName, rawName, schemaModel.OriginModels.First());
+            attributeGroupModel = groupModel ?? IDEAAttributeModel.AddGroupField(rawName, rawName, schemaModel.OriginModels.First());
+            foreach (var am in GroupFuncModel.InputModels)
+                AttributeTransformationModelParameters.Add(new AttributeTransformationModel(am));
             AttributeTransformationModelParameters.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
         private string _name;
@@ -40,6 +42,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            GroupFuncModel.InputModels.Clear();
             foreach (var attributeUsageModel in AttributeTransformationModelParameters)
                 GroupFuncModel.InputModels.Add(attributeUsageModel.AttributeModel);
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());

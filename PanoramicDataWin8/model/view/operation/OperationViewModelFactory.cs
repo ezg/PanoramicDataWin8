@@ -95,10 +95,10 @@ namespace PanoramicDataWin8.model.view.operation
             return new PredictorOperationViewModel(new PredictorOperationModel(schemaModel, "P"+(predictorCount++)+"()")) { Position = position };
         }
         static int groupCount = 0;
-        public static AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(SchemaModel schemaModel, Pt position)
+        public static AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(SchemaModel schemaModel, Pt position, AttributeModel groupModel=null)
         {
             return new AttributeGroupOperationViewModel(
-                new AttributeGroupOperationModel(schemaModel, "G" + (calcCount++) + "()")) { Position = position };
+                new AttributeGroupOperationModel(schemaModel, "G" + (groupCount++) + "()", groupModel), groupModel == null) { Position = position };
         }
         static int funcCount = 0;
         public static FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(SchemaModel schemaModel, Pt position, FunctionSubtypeModel functionSubtypeModel, bool fromMouse = false)

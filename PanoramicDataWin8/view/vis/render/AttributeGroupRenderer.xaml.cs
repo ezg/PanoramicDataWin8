@@ -68,7 +68,9 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void AttributeGroupRenderer_OperationViewModelTapped(PointerRoutedEventArgs e)
         {
-            NameTextBox.IsEnabled = true;
+            var attributeGroupOperationViewModel = DataContext as AttributeGroupOperationViewModel;
+
+            NameTextBox.IsEnabled = true && attributeGroupOperationViewModel.Editable;
             NameTextBox.Focus(FocusState.Keyboard);
         }
 
@@ -102,17 +104,14 @@ namespace PanoramicDataWin8.view.vis.render
                 _keyboardTimer.Start();
         }
 
-        private void NameTextBox_PointerExited(object sender, PointerRoutedEventArgs e)
+        private void NameTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
 
-            if (!NameTextBox.GetBounds().Contains(e.GetCurrentPoint(NameTextBox).Position))
-            {
-                var model = (this.DataContext as AttributeGroupOperationViewModel).OperationModel as AttributeGroupOperationModel;
-                NameTextBox.IsEnabled = false;
-                model.SetName(NameTextBox.Text);
-                MainViewController.Instance.MainPage.addAttributeButton.Focus(FocusState.Pointer);
-                MainViewController.Instance.MainPage.clearAndDisposeMenus();
-            }
+            var model = (this.DataContext as AttributeGroupOperationViewModel).OperationModel as AttributeGroupOperationModel;
+            NameTextBox.IsEnabled = false;
+            model.SetName(NameTextBox.Text);
+            MainViewController.Instance.MainPage.addAttributeButton.Focus(FocusState.Pointer);
+            MainViewController.Instance.MainPage.clearAndDisposeMenus();
         }
     }
 }

@@ -303,9 +303,9 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.Add(visModel);
             return visModel;
         }
-        public AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(Pt position)
+        public AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(Pt position, AttributeModel groupModel=null)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultAttributeGroupOperationViewModel(MainModel.SchemaModel, position);
+            var visModel = OperationViewModelFactory.CreateDefaultAttributeGroupOperationViewModel(MainModel.SchemaModel, position, groupModel);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -510,9 +510,9 @@ namespace PanoramicDataWin8.controller.view
                 var operationContainerView = new OperationContainerView();
                 if (e.AttributeModel.FuncModel is AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)
                 {
-                    var histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(e.AttributeModel, position);
-                    histogramOperationViewModel.Size = size;
-                    operationContainerView.DataContext = histogramOperationViewModel;
+                    var groupOperationViewModel = CreateDefaultAttributeGroupOperationViewModel(position, e.AttributeModel);
+                    groupOperationViewModel.Size = new Vec(size.X, 50);
+                    operationContainerView.DataContext = groupOperationViewModel;
                 }
                 else
                 {
