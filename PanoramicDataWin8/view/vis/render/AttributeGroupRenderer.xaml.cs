@@ -109,7 +109,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 var model = (this.DataContext as AttributeGroupOperationViewModel).OperationModel as AttributeGroupOperationModel;
                 NameTextBox.IsEnabled = false;
-                model.AttributeModel.DisplayName = NameTextBox.Text;
+                model.SetName(NameTextBox.Text);
                 MainViewController.Instance.MainPage.addAttributeButton.Focus(FocusState.Pointer);
                 MainViewController.Instance.MainPage.clearAndDisposeMenus();
             }

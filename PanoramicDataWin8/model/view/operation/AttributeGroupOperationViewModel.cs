@@ -15,7 +15,7 @@ namespace PanoramicDataWin8.model.view.operation
         public AttributeGroupOperationViewModel(AttributeGroupOperationModel attributeGroupOperationModel) : base(attributeGroupOperationModel)
         {
             MenuItemViewModel menuItemViewModel;
-            createExpandingMenu(AttachmentOrientation.Top, AttributeGroupOperationModel.AttributeTransformationModelParameters, "+", 50, 3, false, false, out menuItemViewModel);
+            createExpandingMenu(AttachmentOrientation.TopStacked, AttributeGroupOperationModel.AttributeTransformationModelParameters, "+", 50, 3, false, false, out menuItemViewModel);
             createApplyAttributeMenu(AttributeGroupOperationModel.AttributeModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
 
             ExpandingMenuInputAdded += (sender, usageModels) =>

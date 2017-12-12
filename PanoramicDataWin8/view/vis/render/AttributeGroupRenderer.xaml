@@ -143,7 +143,7 @@
                 </Grid>
             </Grid>
             <Grid x:Name="TypingPanel" HorizontalAlignment="Stretch">
-                <TextBox  x:Name="NameTextBox" IsEnabled="False" Text="Hello World" IsSpellCheckEnabled="False" FontSize="30" TextAlignment="Center" KeyDown="NameTextBox_KeyDown"   PointerExited="NameTextBox_PointerExited"   />
+                <TextBox  x:Name="NameTextBox" IsEnabled="False" Text="Hello World" VerticalAlignment="Center" IsSpellCheckEnabled="False" FontSize="30" TextAlignment="Center" KeyDown="NameTextBox_KeyDown"   PointerExited="NameTextBox_PointerExited"   />
             </Grid>
         </Grid>
 

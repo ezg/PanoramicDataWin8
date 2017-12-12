@@ -14,7 +14,6 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class FunctionOperationViewModel : LabeledOperationViewModel
     {
-        MenuViewModel menuViewModel;
         private void createDummyParameterMenu()
         {
             var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
@@ -77,20 +76,10 @@ namespace PanoramicDataWin8.model.view.operation
             var subtype = this.FunctionOperationModel.FunctionSubtypeModel as MinMaxScaleFunctionSubtypeModel;
             foreach (var p in subtype.Parameters)
                 dict.Add(p.Key, p.Value);
-            menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, dict, 30, 30, false, true,  out menuItemViewModel);
+            var menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, dict, 30, 30, false, true,  out menuItemViewModel);
             MenuItemViewModel labelViewModel;
             createAttributeLabelMenu(AttachmentOrientation.Bottom, FunctionOperationModel.GetAttributeModel() , AttributeUsage.X, new Vec(60, 50), 0, true, false, null, out labelViewModel);
-           // createApplyAttributeMenu(FunctionOperationModel.GetAttributeModel(), AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false, true);
-
-            PropertyChanged += RawDataOperationViewModel_PropertyChanged;
-        }
-
-        private void RawDataOperationViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == "Size")
-            {
-                menuViewModel.ParentSize = this.Size;
-            }
+            // createApplyAttributeMenu(FunctionOperationModel.GetAttributeModel(), AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false, true);
         }
 
         public FunctionOperationModel FunctionOperationModel => (FunctionOperationModel)OperationModel;

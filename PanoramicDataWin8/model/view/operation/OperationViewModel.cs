@@ -250,6 +250,13 @@ namespace PanoramicDataWin8.model.view.operation
                 attachmentViewModel.MenuViewModel = menuViewModel;
             }
             menuItemViewModel = menuViewModel.MenuItemViewModels.First();
+
+            PropertyChanged += (sender, e) =>
+            {
+                if (e.PropertyName == "Size")
+                    menuViewModel.ParentSize = this.Size;
+            };
+
             return menuViewModel;
         }
         
@@ -315,6 +322,7 @@ namespace PanoramicDataWin8.model.view.operation
                             var atm = ((AttributeMenuItemViewModel)((MenuItemViewModel)sender1).MenuItemComponentViewModel).AttributeViewModel.AttributeTransformationModel;
                             operationAttributeModels.Remove(atm);
                         };
+                        newMenuItem.Visible = Visibility.Collapsed;
                         menuViewModel.MenuItemViewModels.Add(newMenuItem);
 
                         if (newAttributeTransformationModel != null)
@@ -328,6 +336,7 @@ namespace PanoramicDataWin8.model.view.operation
                 var count = 0;
                 foreach (var mItemViewModel in menuItemViewModelCaptured.SubMenuItemViewModels)
                 {
+                    mItemViewModel.Visible = Visibility.Visible;
                     mItemViewModel.Row = swapOrientation ? count % maxExpansionSlots : menuViewModel.NrRows - 1 - (int)Math.Floor(1.0 * count / maxExpansionSlots);
                     mItemViewModel.Column = swapOrientation ? menuViewModel.NrColumns - 1 - (int)Math.Floor(1.0 * count / maxExpansionSlots) : count % maxExpansionSlots;
                     count++;

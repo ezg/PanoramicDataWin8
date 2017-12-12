@@ -243,16 +243,19 @@ namespace PanoramicDataWin8.view.vis.render
         public override void Refactor(string oldName, string newName)
         {
             // find the old AttributeModel and refactor its name
-            foreach (var atm in ResultHistogramOperationModel.AttributeTransformationModels)
+            if (ResultHistogramOperationModel != null)
             {
-                if (atm.AttributeModel?.RawName == oldName)
-                    atm.AttributeModel.RawName = newName;
+                foreach (var atm in ResultHistogramOperationModel.AttributeTransformationModels)
+                {
+                    if (atm.AttributeModel?.RawName == oldName)
+                        atm.AttributeModel.RawName = newName;
+                }
+                // also, refactor the names of all AggregateParameters in the results collection
+                foreach (var ar in _lastResult.AggregateParameters)
+                    foreach (var ap in ar.GetAllAttributeParameters())
+                        if (ap?.RawName == oldName)
+                            ap.RawName = newName;
             }
-            // also, refactor the names of all AggregateParameters in the results collection
-            foreach (var ar in _lastResult.AggregateParameters)
-                foreach (var ap in ar.GetAllAttributeParameters())
-                    if (ap?.RawName == oldName)
-                        ap.RawName = newName;
         }
 
         void render(bool sizeChanged = false)

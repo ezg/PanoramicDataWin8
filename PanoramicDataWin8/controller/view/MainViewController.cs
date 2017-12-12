@@ -508,9 +508,18 @@ namespace PanoramicDataWin8.controller.view
             if (!hits.Any() && e.AttributeModel != null)
             {
                 var operationContainerView = new OperationContainerView();
-                var histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(e.AttributeModel, position);
-                histogramOperationViewModel.Size = size;
-                operationContainerView.DataContext = histogramOperationViewModel;
+                if (e.AttributeModel.FuncModel is AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)
+                {
+                    var histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(e.AttributeModel, position);
+                    histogramOperationViewModel.Size = size;
+                    operationContainerView.DataContext = histogramOperationViewModel;
+                }
+                else
+                {
+                    var histogramOperationViewModel = CreateDefaultHistogramOperationViewModel(e.AttributeModel, position);
+                    histogramOperationViewModel.Size = size;
+                    operationContainerView.DataContext = histogramOperationViewModel;
+                }
                 InkableScene.Add(operationContainerView);
             }
             else

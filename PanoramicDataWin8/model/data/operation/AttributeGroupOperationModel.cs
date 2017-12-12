@@ -9,9 +9,8 @@ using IDEA_common.catalog;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public class AttributeGroupOperationModel : OperationModel, IFilterConsumerOperationModel
+    public class AttributeGroupOperationModel : OperationModel
     {
-        private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
         AttributeModel attributeGroupModel;
 
@@ -28,7 +27,6 @@ namespace PanoramicDataWin8.model.data.operation
         public AttributeGroupOperationModel(SchemaModel schemaModel, string rawName) : base(schemaModel)
         {
             attributeGroupModel = IDEAAttributeModel.AddGroupField(rawName, rawName, schemaModel.OriginModels.First());
-            _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             AttributeTransformationModelParameters.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
         private string _name;
@@ -38,17 +36,6 @@ namespace PanoramicDataWin8.model.data.operation
             attributeGroupModel.RawName = name;
             attributeGroupModel.DisplayName = name;
             SetProperty<string>(ref _name, name);
-        }
-        public FilteringOperation FilteringOperation
-        {
-            get { return _filterConsumerOperationModelImpl.FilteringOperation; }
-            set { _filterConsumerOperationModelImpl.FilteringOperation = value; }
-        }
-
-        public ObservableCollection<FilterLinkModel> ConsumerLinkModels
-        {
-            get { return _filterConsumerOperationModelImpl.ConsumerLinkModels; }
-            set { _filterConsumerOperationModelImpl.ConsumerLinkModels = value; }
         }
 
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
