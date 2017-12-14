@@ -35,7 +35,7 @@ namespace PanoramicDataWin8.model.view.operation
                 {
                     if (model.StatisticalComparisonOperationModel == null)
                     {
-                        foreach (var mvm in menuViewModel.MenuItemViewModels)
+                        foreach (var mvm in menuViewModel.MenuItemViewModels.ToArray())
                         {
                             menuViewModel.MenuItemViewModels.Remove(mvm);
                         }
