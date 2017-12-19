@@ -976,6 +976,16 @@ namespace PanoramicDataWin8
             return viewShown;
         }
 
+        private IEnumerable<IDEA_common.catalog.Attribute> flatAttributes(AttributeGroup group)
+        {
+            var attributes = group.Attributes.Select(f => f);
+            foreach (var child in group.AttributeGroups)
+            {
+                attributes = attributes.Concat(flatAttributes(child));
+            }
+            return attributes;
+        }
+
         public async void ShowHelp()
         {
             var schema = (((MainModel) DataContext)?.SchemaModel as IDEASchemaModel)?.RootOriginModel.DatasetConfiguration.Schema;
@@ -985,9 +995,9 @@ namespace PanoramicDataWin8
             var problemHelpText = "";
             if (schema != null && !string.IsNullOrEmpty(schema.ProblemDescription))
             {
-                var json = (JObject)JsonConvert.DeserializeObject(schema.ProblemDescription);
-
-                var fieldName = json["target"]["field"].ToString();
+                var attributes = flatAttributes(schema.RootAttributeGroup);
+                var field = attributes.FirstOrDefault(a => a.IsTarget);
+                var fieldName = field == null ? "" : field.DisplayName;
 
                 problemHelpText =
                     "Hi, thanks for participating in this study!\n\n" +
