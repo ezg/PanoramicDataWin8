@@ -28,7 +28,7 @@ namespace PanoramicDataWin8.model.view.operation
         {
             (menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel).DroppedTriggered(am);
         }
-        AttributeMenuItemViewModel SelectedColumn = null;
+        AttributeMenuItemViewModel SelectedDataAttribute = null;
         private void AttributeUsageModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
@@ -44,10 +44,11 @@ namespace PanoramicDataWin8.model.view.operation
                     {
                         if (!args.IsRightMouse)
                         {
-                            if (SelectedColumn != amivm)
+                            if (SelectedDataAttribute != amivm)
                             {
                                 addColumnOptions(amivm, AttachmentOrientation.Top);
-                                SelectedColumn = amivm;
+                                SelectedDataAttribute = amivm;
+                                System.Diagnostics.Debug.WriteLine("Seleted Column = " + SelectedDataAttribute);
                             }
 
                             AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
@@ -86,8 +87,8 @@ namespace PanoramicDataWin8.model.view.operation
                     t.OtherToggles.AddRange(toggles.Where(ti => ti != null && ti != t));
                 
                 menuViewModel.MenuItemViewModels.Insert(1, createColumnOptionToggleMenuItem(attributeMenuItemViewModel, 1, attributeTransformationModel, "group by", orientation, attributeTransformationModel.GroupBy));
-                if (!computeAsHistogram)
-                    menuViewModel.MenuItemViewModels.Insert(1, createColumnOptionToggleMenuItem(attributeMenuItemViewModel, 2, attributeTransformationModel, "sort", orientation, false));
+                //if (!computeAsHistogram)
+                    menuViewModel.MenuItemViewModels.Insert(1, createColumnOptionToggleMenuItem(attributeMenuItemViewModel, 2, attributeTransformationModel, "sort", orientation, attributeTransformationModel.OrderingFunction != OrderingFunction.None));
             }
         }
 
@@ -124,35 +125,25 @@ namespace PanoramicDataWin8.model.view.operation
                     }
                     else if (function == "sort")
                     {
+                        RawDataOperationModel.Function = new RawDataOperationModel.FunctionApplied { };
                         tapTrigger = false;
-                        fire = false; // don't need to recompute anything, just need to order the display of the results
-                        var curSort = RawDataOperationModel?.Function?.Sorted?.Item1 == SelectedColumn?.AttributeViewModel?.AttributeModel?.RawName ? RawDataOperationModel?.Function?.Sorted?.Item2 : null;
-                        var sort = model.IsChecked ? (bool?)(curSort == null || curSort == false ? true : false) :
-                                                            (curSort == true ? (bool?)false : null);
                         if (model.IsChecked)
                         {
-                            if (SelectedColumn != null)
-                                RawDataOperationModel.Function = new RawDataOperationModel.FunctionApplied
-                                {
-                                    Sorted = sort == null ? null : new Tuple<string, bool>(SelectedColumn.AttributeViewModel.AttributeModel.RawName, curSort == null || curSort == false ? true : false)
-                                };
+                            atm.OrderingFunction = (atm.OrderingFunction == OrderingFunction.SortDown ? OrderingFunction.SortUp : OrderingFunction.SortDown);
                         }
                         else
                         {
-                            if (sort != null)
+                            var newOrdering = (atm.OrderingFunction == OrderingFunction.SortDown ? OrderingFunction.SortUp : OrderingFunction.None);
+                            if (newOrdering != OrderingFunction.None)
                             {
-                                RawDataOperationModel.Function = new RawDataOperationModel.FunctionApplied
-                                {
-                                    Sorted = new Tuple<string, bool>(SelectedColumn.AttributeViewModel.AttributeModel.RawName, (bool)true)
-                                };
                                 model.IsChecked = true;
                             }
-                            else
-                            {
-                                RawDataOperationModel.Function = new RawDataOperationModel.FunctionApplied { Sorted = null };
-                                fire = true; // need to recompute everything since we don't keep track of the original unsorted results
-                            }
+                            atm.OrderingFunction = newOrdering;
                         }
+                        foreach (var atmOthers in this.RawDataOperationModel.AttributeTransformationModelParameters)
+
+                            if (atmOthers != atm)
+                                atmOthers.OrderingFunction = OrderingFunction.None;
                     }
                     else if (model.IsChecked)
                     {
@@ -184,7 +175,8 @@ namespace PanoramicDataWin8.model.view.operation
                     {
                         AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
                         RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
-                        SelectedColumn = null;
+                        //SelectedColumn = null;
+                        //System.Diagnostics.Debug.WriteLine("Clear Selected Column = " + SelectedColumn);
                         if (tapTrigger)
                             attributeMenuItemViewModel.TappedTriggered(new PointerManagerEvent());
                     }

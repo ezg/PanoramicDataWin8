@@ -507,19 +507,26 @@ namespace PanoramicDataWin8.controller.data.progressive
         {
             List<string> brushes;
             List<AttributeCaclculatedParameters> attributeCodeParameters;
-            var aggregates = model.AttributeTransformationModelParameters.ToList();
+            var aggregates   = model.AttributeTransformationModelParameters.ToList();
             var filter       = GetBaseOperationParameters(model, out attributeCodeParameters, out brushes, model.BrushOperationModels.Select((m) => (object)m).ToList(), aggregates);
             attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(model.SchemaModel.OriginModels.First()).Select(a => GetAttributeParameters(a)).OfType<AttributeCaclculatedParameters>().ToList();
             var binnings = new List<BinningParameters>();
+            string sortUp = null, sortDown = null;
             foreach (var a in model.AttributeTransformationModelParameters)
             {
                 binnings.Add( (BinningParameters)new SingleBinBinningParameters { AttributeParameters = GetAttributeParameters(a.AttributeModel)} );
+                if (a.OrderingFunction == OrderingFunction.SortDown)
+                    sortDown = a.AttributeModel.RawName;
+                else if (a.OrderingFunction == OrderingFunction.SortUp)
+                    sortUp = a.AttributeModel.RawName;
             }
             var aggregateParameters = getAggregateParameters(model, aggregates, model.AttributeTransformationModelParameters.Where((atm) => atm.GroupBy).ToList());
             var parameters = new RawDataOperationParameters
             {
                 AdapterName = (model.SchemaModel as IDEASchemaModel).RootOriginModel.DatasetConfiguration.Schema.RawName,
                 Filter = filter,
+                SortDownRawName = sortDown,
+                SortUpRawName = sortUp,
                 Brushes = new List<string>(),
                 BinningParameters = binnings,
                 SampleStreamBlockSize = sampleSize,

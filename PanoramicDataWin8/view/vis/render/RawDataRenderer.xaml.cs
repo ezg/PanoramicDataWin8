@@ -33,7 +33,7 @@ namespace PanoramicDataWin8.view.vis.render
 {
     public class ObjectToFrameworkElementConverter : IValueConverter
     {
-        static public Grid LastHit = null;
+        static public FrameworkElement LastHit = null;
         object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
         {
             var g = new Grid();
@@ -44,19 +44,14 @@ namespace PanoramicDataWin8.view.vis.render
                     var ib = new Image();
                     ib.Source = new BitmapImage(new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
                     ib.Width = ib.Height = 200;
-                    g.Children.Add(ib);
-                    g.CanDrag = false;
-                    g.PointerPressed += (sender, e) =>
+                    ib.CanDrag = false;
+                    ib.PointerPressed += (sender, e) =>
                     {
                         if (LastHit != g && LastHit != null)
                             LastHit.CanDrag = false;
-                        LastHit = g;
+                        LastHit = ib;
                     };
-                    g.DragStarting += (UIElement sender, DragStartingEventArgs args) =>
-                    {
-                        args.Data.RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
-                        args.Data.Properties.Add("MYFORMAT", new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
-                    };
+                    return ib;
                 }
                 else
                 {
@@ -68,8 +63,9 @@ namespace PanoramicDataWin8.view.vis.render
                     tb.Height = 25;
                     tb.MinWidth = 75;
                     tb.HorizontalAlignment = HorizontalAlignment.Left;
-                    tb.TextAlignment = TextAlignment.Right;
-                    g.Children.Add(tb);
+                    tb.TextAlignment = value is IDEA_common.range.PreProcessedString || value is string ? TextAlignment.Left : TextAlignment.Right;
+                    tb.Margin = new Thickness(2, 0, 25, 0);
+                    return tb;
                 }
             }
             return g;
@@ -82,7 +78,7 @@ namespace PanoramicDataWin8.view.vis.render
     }
     public class ObjectToListFrameworkElementConverter : IValueConverter
     {
-        static public Grid LastHit = null;
+        static public FrameworkElement LastHit = null;
         object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
         {
             var g = new Grid();
@@ -93,19 +89,14 @@ namespace PanoramicDataWin8.view.vis.render
                     var ib = new Image();
                     ib.Source = new BitmapImage(new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
                     ib.Width = ib.Height = 200;
-                    g.Children.Add(ib);
-                    g.CanDrag = false;
-                    g.PointerPressed += (sender, e) =>
+                    ib.CanDrag = false;
+                    ib.PointerPressed += (sender, e) =>
                     {
                         if (LastHit != g && LastHit != null)
                             LastHit.CanDrag = false;
-                        LastHit = g;
+                        LastHit = ib;
                     };
-                    g.DragStarting += (UIElement sender, DragStartingEventArgs args) =>
-                    {
-                        args.Data.RequestedOperation = Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy;
-                        args.Data.Properties.Add("MYFORMAT", new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
-                    };
+                    return ib;
                 }
                 else
                 {
@@ -116,7 +107,7 @@ namespace PanoramicDataWin8.view.vis.render
                     tb.Text = value.ToString();
                     tb.Height = 25;
                     tb.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    tb.TextAlignment = TextAlignment.Right;
+                    tb.TextAlignment = value is IDEA_common.range.PreProcessedString || value is string ? TextAlignment.Left : TextAlignment.Right;
                     tb.Margin = new Thickness(5, 0, 20, 0);
                     g.Children.Add(tb);
                 }
@@ -450,31 +441,47 @@ namespace PanoramicDataWin8.view.vis.render
                 else newRecords[AttributeTransformationModelToIndex(operationModel, grouped[i])].Data.Add(res.N);
             }
         }
-
+        bool hasMultipleColumns = false;
         void loadRawDataResult(IResult result)
         {
             var model = (DataContext as RawDataOperationViewModel);
             Records = new ObservableCollection<RawColumnData>();
             xWordCloud.TheText = "";
+            xWordCloud.WeightedWords = null;
             model.RawDataOperationModel.ClearFilterModels();
-            if ((result as RawDataResult).Samples.Count() == 1 && (result as RawDataResult).WeightedWords?.Count > 0)
+            hasMultipleColumns = (result as RawDataResult).Samples.Count() > 1;
+            if ((result as RawDataResult).Samples.Count() == 1 && !hasMultipleColumns)
             {
                 xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords.FirstOrDefault().Value;
                 xWordCloud.Visibility = Visibility.Visible;
                 xRawDataGridView.Visibility = Visibility.Collapsed;
                 xListView.Visibility = Visibility.Collapsed;
             }
-            else
+            for (int sampleIndex = 0; sampleIndex < (result as RawDataResult).Samples.Count(); sampleIndex++) {
+                var s = (result as RawDataResult).Samples[model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex].AttributeModel.RawName];
+                if (s.Count > 0)
+                    loadRecordsAsync(s, model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex], sampleIndex+1 == (result as RawDataResult).Samples.Count());
+
+            }
+
+            setupListView(Records);
+
+            configureLayout(true);
+                
+            this.xRawDataGridView.ItemsSource = Records.FirstOrDefault()?.Data;
+        }
+
+        void configureLayout(bool useDefault)
+        {
+            if (xWordCloud.WeightedWords != null && useDefault)
+            {
+                xWordCloud.Visibility = Visibility.Visible;
+                xRawDataGridView.Visibility = Visibility.Collapsed;
+                xListView.Visibility = Visibility.Collapsed;
+            } else
             {
                 xWordCloud.Visibility = Visibility.Collapsed;
-                for (int sampleIndex = 0; sampleIndex < (result as RawDataResult).Samples.Count(); sampleIndex++) {
-                    var s = (result as RawDataResult).Samples[model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex].AttributeModel.RawName];
-                    if (s.Count > 0)
-                        loadRecordsAsync(s, model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex], sampleIndex+1 == (result as RawDataResult).Samples.Count());
-
-                }
-                setupListView(Records);
-                if ((result as RawDataResult).Samples.Count() == 1)
+                if (!hasMultipleColumns)
                 {
                     xRawDataGridView.Visibility = Visibility.Visible;
                     xListView.Visibility = Visibility.Collapsed;
@@ -484,9 +491,7 @@ namespace PanoramicDataWin8.view.vis.render
                     xRawDataGridView.Visibility = Visibility.Collapsed;
                     xListView.Visibility = Visibility.Visible;
                 }
-
             }
-            this.xRawDataGridView.ItemsSource = Records.FirstOrDefault()?.Data;
         }
 
         void loadRecordsAsync(List<object> records, AttributeTransformationModel model, bool showScroll)
@@ -516,45 +521,49 @@ namespace PanoramicDataWin8.view.vis.render
         void render(RawDataOperationModel.FunctionApplied function = null) 
         {
             var model = (DataContext as RawDataOperationViewModel);
-            if (function?.Sorted?.Item2 != null)
-            {
-                var sortField = function?.Sorted.Item1;
-                var sortDir = function?.Sorted.Item2;
+            //if (function?.Sorted?.Item2 != null)
+            //{
+            //    var sortField = function?.Sorted.Item1;
+            //    var sortDir = function?.Sorted.Item2;
 
-                var combinde = new List<object[]>();
-                for (var i = 0; i < Records.First().Data.Count; i++)
-                {
-                    var objList = new object[Records.Count];
-                    for (int j = 0; j < Records.Count; j++)
-                        objList[j] = Records[j].Data[i];
-                    combinde.Add(objList);
-                }
-                var attrModelIndex = model.RawDataOperationModel.AttributeTransformationModelParameters.IndexOf((atm) => atm.AttributeModel.RawName == sortField);
-                if (combinde.Count > 0)
-                {
-                    var type = combinde[0][attrModelIndex].GetType();
-                    if (type == typeof(int))
-                        Sort(combinde.OrderBy((obj) => (int)obj[attrModelIndex]), sortDir == false);
-                    else if (type == typeof(double))
-                        Sort(combinde.OrderBy((obj) => (double)obj[attrModelIndex]), sortDir == false);
-                    else if (type == typeof(long))
-                        Sort(combinde.OrderBy((obj) => (long)obj[attrModelIndex]), sortDir == false);
-                    else if (type == typeof(string))
-                        Sort(combinde.OrderBy((obj) => (string)obj[attrModelIndex]), sortDir == false);
-                    else if (type == typeof(IDEA_common.range.PreProcessedString))
-                        Sort(combinde.OrderBy((obj) => (IDEA_common.range.PreProcessedString)obj[attrModelIndex]), sortDir == false);
-                }
-            }
+            //    var combinde = new List<object[]>();
+            //    for (var i = 0; i < Records.First().Data.Count; i++)
+            //    {
+            //        var objList = new object[Records.Count];
+            //        for (int j = 0; j < Records.Count; j++)
+            //            objList[j] = Records[j].Data[i];
+            //        combinde.Add(objList);
+            //    }
+            //    var attrModelIndex = model.RawDataOperationModel.AttributeTransformationModelParameters.IndexOf((atm) => atm.AttributeModel.RawName == sortField);
+            //    if (combinde.Count > 0 && attrModelIndex >= 0)
+            //    {
+            //        var type = combinde[0][attrModelIndex].GetType();
+            //        if (type == typeof(int))
+            //            Sort(combinde.OrderBy((obj) => (int)obj[attrModelIndex]), sortDir == false);
+            //        else if (type == typeof(double))
+            //            Sort(combinde.OrderBy((obj) => (double)obj[attrModelIndex]), sortDir == false);
+            //        else if (type == typeof(long))
+            //            Sort(combinde.OrderBy((obj) => (long)obj[attrModelIndex]), sortDir == false);
+            //        else if (type == typeof(string))
+            //            Sort(combinde.OrderBy((obj) => (string)obj[attrModelIndex]), sortDir == false);
+            //        else if (type == typeof(IDEA_common.range.PreProcessedString))
+            //            Sort(combinde.OrderBy((obj) => (IDEA_common.range.PreProcessedString)obj[attrModelIndex]), sortDir == false);
+            //    }
+            //    configureLayout(false);
+            //}
+            //else
+                configureLayout(true);
             setupListView(Records);
         }
         public void Sort(IEnumerable<object[]> sortedList, bool down = false)
         {
-            for (var index = 0; index < Records.Count; index++)
-            {
-                Records[index].Data.Clear();
-                foreach (var x in down ? sortedList.Reverse() : sortedList)
-                    Records[index].Data.Add(x[index]);
-            }
+            if (sortedList.Count() > 0)
+                for (var index = 0; index < Records.Count; index++)
+                {
+                    Records[index].Data.Clear();
+                    foreach (var x in down ? sortedList.Reverse() : sortedList)
+                        Records[index].Data.Add(x[index]);
+                }
         }
         public GeoAPI.Geometries.IGeometry BoundsGeometry
         {

@@ -15,6 +15,7 @@ namespace PanoramicDataWin8.model.data.attribute
     public class AttributeTransformationModel : BindableBase
     {
         private AggregateFunction _aggregateFunction = AggregateFunction.None;
+        private OrderingFunction  _orderingFunction = OrderingFunction.None;
 
         private AttributeModel _attributeModel;
 
@@ -29,8 +30,6 @@ namespace PanoramicDataWin8.model.data.attribute
         private OperationModel _operationModel;
 
         private ScaleFunction _scaleFunction = ScaleFunction.None;
-
-        private SortMode _sortMode = SortMode.None;
 
         private TransformationFunction _transformationFunction = TransformationFunction.None;
 
@@ -58,11 +57,15 @@ namespace PanoramicDataWin8.model.data.attribute
             set { SetProperty(ref _groupBy, value); }
         }
 
-
         public AggregateFunction AggregateFunction
         {
             get { return _aggregateFunction; }
             set { SetProperty(ref _aggregateFunction, value); }
+        }
+        public OrderingFunction OrderingFunction
+        {
+            get { return _orderingFunction; }
+            set { SetProperty(ref _orderingFunction, value); }
         }
 
         public double BinSize
@@ -88,12 +91,7 @@ namespace PanoramicDataWin8.model.data.attribute
             get { return _transformationFunction; }
             set { SetProperty(ref _transformationFunction, value); }
         }
-
-        public SortMode SortMode
-        {
-            get { return _sortMode; }
-            set { SetProperty(ref _sortMode, value); }
-        }
+        
 
         public ScaleFunction ScaleFunction
         {
@@ -167,11 +165,11 @@ namespace PanoramicDataWin8.model.data.attribute
                 var aom = obj as AttributeTransformationModel;
                 return
                     aom._aggregateFunction.Equals(AggregateFunction) &&
+                    aom._orderingFunction.Equals(OrderingFunction) &&
                     ((aom._attributeModel == null && _attributeModel == null) || (aom._attributeModel != null && aom._attributeModel.Equals(_attributeModel))) &&
                     aom._transformationFunction.Equals(_transformationFunction) &&
                     aom._binSize.Equals(_binSize) &&
-                    aom._scaleFunction.Equals(_scaleFunction) &&
-                    aom._sortMode.Equals(_sortMode);
+                    aom._scaleFunction.Equals(_scaleFunction);
             }
             return false;
         }

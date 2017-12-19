@@ -37,7 +37,8 @@ namespace PanoramicDataWin8.view.vis.render
             if (!dataCol.ShowScroll)
             {
                 var sbar = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollBar>(this);
-                sbar.Visibility = Visibility.Collapsed;
+                if (sbar != null)
+                    sbar.Visibility = Visibility.Collapsed;
             } else
             {
                 //var scroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);

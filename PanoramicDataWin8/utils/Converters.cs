@@ -47,22 +47,7 @@ namespace PanoramicDataWin8.utils
             return input == null ? Visibility.Collapsed : Visibility.Visible;
         }
     }
-
-    public class SortModeAscToVisibilityConverter : SimpleValueConverter<SortMode, Visibility>
-    {
-        protected override Visibility ConvertBase(SortMode input)
-        {
-            return input == SortMode.Asc ? Visibility.Visible : Visibility.Collapsed;
-        }
-    }
-
-    public class SortModeDescToVisibilityConverter : SimpleValueConverter<SortMode, Visibility>
-    {
-        protected override Visibility ConvertBase(SortMode input)
-        {
-            return input == SortMode.Desc ? Visibility.Visible : Visibility.Collapsed;
-        }
-    }
+    
 
     public class VisualizationTypeToMarginConverter : SimpleValueConverter<VisualizationType, Thickness>
     {

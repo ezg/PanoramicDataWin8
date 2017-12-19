@@ -135,7 +135,6 @@
     <Compile Include="model\BaseVisualizationOperationModel.cs" />
     <Compile Include="model\data\attribute\ErrorHandler.cs" />
     <Compile Include="model\data\attribute\ScaleFunction.cs" />
-    <Compile Include="model\data\attribute\SortMode.cs" />
     <Compile Include="model\data\attribute\TransformationFunction.cs" />
     <Compile Include="model\data\attribute\AttributeModel.cs" />
     <Compile Include="model\data\idea\IDEAAttributeModel.cs" />
