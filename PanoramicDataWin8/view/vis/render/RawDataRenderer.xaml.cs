@@ -59,7 +59,11 @@ namespace PanoramicDataWin8.view.vis.render
                     tb.FontFamily = FontFamily.XamlAutoFontFamily;
                     tb.FontSize = 14;
                     tb.Foreground = new SolidColorBrush(Colors.Black);
-                    tb.Text = value.ToString();
+                    if (value is Tuple<int, object>)
+                        tb.Text = (value as Tuple<int, object>).Item2.ToString() + " (" + (value as Tuple<int, object>).Item1 + ")";
+                    else if (value is Tuple<int, double>)
+                        tb.Text = "avg=" + (value as Tuple<int, double>).Item2;
+                    else tb.Text = value.ToString();
                     tb.Height = 25;
                     tb.MinWidth = 75;
                     tb.HorizontalAlignment = HorizontalAlignment.Left;
@@ -104,7 +108,11 @@ namespace PanoramicDataWin8.view.vis.render
                     tb.FontFamily = FontFamily.XamlAutoFontFamily;
                     tb.FontSize = 14;
                     tb.Foreground = new SolidColorBrush(Colors.Black);
-                    tb.Text = value.ToString();
+                    if (value is Tuple<int, object>)
+                        tb.Text = (value as Tuple<int, object>).Item2.ToString() + " (" + (value as Tuple<int, object>).Item1+")";
+                    else if (value is Tuple<int, double>)
+                        tb.Text = "avg=" + (value as Tuple<int, double>).Item2;
+                    else tb.Text = value.ToString();
                     tb.Height = 25;
                     tb.HorizontalAlignment = HorizontalAlignment.Stretch;
                     tb.TextAlignment = value is IDEA_common.range.PreProcessedString || value is string ? TextAlignment.Left : TextAlignment.Right;
@@ -453,9 +461,6 @@ namespace PanoramicDataWin8.view.vis.render
             if ((result as RawDataResult).Samples.Count() == 1 && !hasMultipleColumns)
             {
                 xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords.FirstOrDefault().Value;
-                xWordCloud.Visibility = Visibility.Visible;
-                xRawDataGridView.Visibility = Visibility.Collapsed;
-                xListView.Visibility = Visibility.Collapsed;
             }
 
             for (int sampleIndex = 0; sampleIndex < (result as RawDataResult).Samples.Count(); sampleIndex++) {
@@ -524,16 +529,6 @@ namespace PanoramicDataWin8.view.vis.render
             var model = (DataContext as RawDataOperationViewModel);
             configureLayout(true);
             setupListView(Records);
-        }
-        public void Sort(IEnumerable<object[]> sortedList, bool down = false)
-        {
-            if (sortedList.Count() > 0)
-                for (var index = 0; index < Records.Count; index++)
-                {
-                    Records[index].Data.Clear();
-                    foreach (var x in down ? sortedList.Reverse() : sortedList)
-                        Records[index].Data.Add(x[index]);
-                }
         }
         public GeoAPI.Geometries.IGeometry BoundsGeometry
         {

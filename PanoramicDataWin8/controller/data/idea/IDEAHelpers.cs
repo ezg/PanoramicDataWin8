@@ -527,6 +527,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 Filter = filter,
                 SortDownRawName = sortDown,
                 SortUpRawName = sortUp,
+                NumRecords = 1000,
                 Brushes = new List<string>(),
                 BinningParameters = binnings,
                 SampleStreamBlockSize = sampleSize,
