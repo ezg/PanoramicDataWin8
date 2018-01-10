@@ -457,6 +457,7 @@ namespace PanoramicDataWin8.view.vis.render
                 xRawDataGridView.Visibility = Visibility.Collapsed;
                 xListView.Visibility = Visibility.Collapsed;
             }
+
             for (int sampleIndex = 0; sampleIndex < (result as RawDataResult).Samples.Count(); sampleIndex++) {
                 var s = (result as RawDataResult).Samples[model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex].AttributeModel.RawName];
                 if (s.Count > 0)
@@ -521,38 +522,7 @@ namespace PanoramicDataWin8.view.vis.render
         void render(RawDataOperationModel.FunctionApplied function = null) 
         {
             var model = (DataContext as RawDataOperationViewModel);
-            //if (function?.Sorted?.Item2 != null)
-            //{
-            //    var sortField = function?.Sorted.Item1;
-            //    var sortDir = function?.Sorted.Item2;
-
-            //    var combinde = new List<object[]>();
-            //    for (var i = 0; i < Records.First().Data.Count; i++)
-            //    {
-            //        var objList = new object[Records.Count];
-            //        for (int j = 0; j < Records.Count; j++)
-            //            objList[j] = Records[j].Data[i];
-            //        combinde.Add(objList);
-            //    }
-            //    var attrModelIndex = model.RawDataOperationModel.AttributeTransformationModelParameters.IndexOf((atm) => atm.AttributeModel.RawName == sortField);
-            //    if (combinde.Count > 0 && attrModelIndex >= 0)
-            //    {
-            //        var type = combinde[0][attrModelIndex].GetType();
-            //        if (type == typeof(int))
-            //            Sort(combinde.OrderBy((obj) => (int)obj[attrModelIndex]), sortDir == false);
-            //        else if (type == typeof(double))
-            //            Sort(combinde.OrderBy((obj) => (double)obj[attrModelIndex]), sortDir == false);
-            //        else if (type == typeof(long))
-            //            Sort(combinde.OrderBy((obj) => (long)obj[attrModelIndex]), sortDir == false);
-            //        else if (type == typeof(string))
-            //            Sort(combinde.OrderBy((obj) => (string)obj[attrModelIndex]), sortDir == false);
-            //        else if (type == typeof(IDEA_common.range.PreProcessedString))
-            //            Sort(combinde.OrderBy((obj) => (IDEA_common.range.PreProcessedString)obj[attrModelIndex]), sortDir == false);
-            //    }
-            //    configureLayout(false);
-            //}
-            //else
-                configureLayout(true);
+            configureLayout(true);
             setupListView(Records);
         }
         public void Sort(IEnumerable<object[]> sortedList, bool down = false)

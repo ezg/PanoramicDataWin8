@@ -27,8 +27,10 @@ namespace PanoramicDataWin8.view.vis.menu
     {
         public static double GAP = 4;
 
-        private DispatcherTimer _activeTimer = new DispatcherTimer();
+        private static DispatcherTimer _activeTimer = null;
         private Canvas _contentCanvas = new Canvas();
+
+        private static List<MenuView> AllMenuViews = new List<MenuView>();
 
         private Dictionary<MenuItemViewModel, MenuItemView> _menuViewItems = new Dictionary<MenuItemViewModel, MenuItemView>();
 
@@ -38,44 +40,54 @@ namespace PanoramicDataWin8.view.vis.menu
             this.Content = _contentCanvas;
             this.Opacity = 1;
 
+            if (_activeTimer == null)
+            {
+                _activeTimer = new DispatcherTimer();
+                _activeTimer.Interval = TimeSpan.FromMilliseconds(10);
+                _activeTimer.Tick += _activeTimer_Tick;
+                _activeTimer.Start();
+            }
 
-            _activeTimer.Interval = TimeSpan.FromMilliseconds(10);
-            _activeTimer.Tick += _activeTimer_Tick;
-            _activeTimer.Start();
+            AllMenuViews.Add(this);
         }
 
-        void _activeTimer_Tick(object sender, object e)
+        static void _activeTimer_Tick(object sender, object e)
         {
-            // animate all elements to target size, position
-            var model = (DataContext as MenuViewModel);
-            if (model != null)
+            foreach (var Menu in AllMenuViews.ToArray())
             {
-                foreach (var item in model.MenuItemViewModels)
+                if (!Menu.IsInVisualTree())
+                    AllMenuViews.Remove(Menu);
+                // animate all elements to target size, position
+                var model = (Menu.DataContext as MenuViewModel);
+                if (model != null)
                 {
-                    // position
-                    if (item.Position.X == 0 && item.Position.Y == 0)
+                    foreach (var item in model.MenuItemViewModels)
                     {
+                        // position
+                        if (item.Position.X == 0 && item.Position.Y == 0)
+                        {
                             item.Position = item.TargetPosition;
-                    }
-                    else
-                    {
-                        var delta = item.TargetPosition - item.Position;
-                        var deltaNorm = delta.Normalized();
-                        var t = delta.Length;
-                        item.Position = t <= 1 ? item.TargetPosition : item.Position + deltaNorm * (t / item.DampingFactor);
-                    }
+                        }
+                        else
+                        {
+                            var delta = item.TargetPosition - item.Position;
+                            var deltaNorm = delta.Normalized();
+                            var t = delta.Length;
+                            item.Position = t <= 1 ? item.TargetPosition : item.Position + deltaNorm * (t / item.DampingFactor);
+                        }
 
-                    // size
-                    if (item.Size.X == 0 && item.Size.Y == 0)
-                    {
-                        item.Size = item.TargetSize;
-                    }
-                    else
-                    {
-                        var delta = item.TargetSize - item.Size;
-                        var deltaNorm = delta.Normalized();
-                        var t = delta.Length;
-                        item.Size = t <= 1 ? item.TargetSize : item.Size + deltaNorm * (t / item.DampingFactor);
+                        // size
+                        if (item.Size.X == 0 && item.Size.Y == 0)
+                        {
+                            item.Size = item.TargetSize;
+                        }
+                        else
+                        {
+                            var delta = item.TargetSize - item.Size;
+                            var deltaNorm = delta.Normalized();
+                            var t = delta.Length;
+                            item.Size = t <= 1 ? item.TargetSize : item.Size + deltaNorm * (t / item.DampingFactor);
+                        }
                     }
                 }
             }
