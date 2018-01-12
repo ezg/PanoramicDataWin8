@@ -39,10 +39,10 @@ namespace PanoramicDataWin8.view.vis.render
             var g = new Grid();
             if (value != null)
             {
-                if (false) // data is an image
+                if (value is RawDataRenderer.MyUri) // data is an image
                 {
                     var ib = new Image();
-                    ib.Source = new BitmapImage(new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
+                    ib.Source = new BitmapImage((value as RawDataRenderer.MyUri).Uri);// "https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
                     ib.Width = ib.Height = 200;
                     ib.CanDrag = false;
                     ib.PointerPressed += (sender, e) =>
@@ -88,11 +88,11 @@ namespace PanoramicDataWin8.view.vis.render
             var g = new Grid();
             if (value != null)
             {
-                if (false) // data is an image
+                if (value is RawDataRenderer.MyUri) // data is an image
                 {
                     var ib = new Image();
-                    ib.Source = new BitmapImage(new Uri("https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
-                    ib.Width = ib.Height = 200;
+                    ib.Source = new BitmapImage((value as RawDataRenderer.MyUri).Uri);// "https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
+                    ib.Width = ib.Height = 25;
                     ib.CanDrag = false;
                     ib.PointerPressed += (sender, e) =>
                     {
@@ -273,7 +273,12 @@ namespace PanoramicDataWin8.view.vis.render
         {
             this.setupListView(Records);
         }
-        
+
+        public class MyUri {
+            public MyUri(string str) { Uri = new Uri(str);  }
+            public Uri Uri { get; set; }
+        }
+
 
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
@@ -511,17 +516,37 @@ namespace PanoramicDataWin8.view.vis.render
             Records.Add(acollection);
 
             if (records != null)
-#pragma warning disable CS4014
-                CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                CoreDispatcherPriority.Low,
-                () =>
+                if (model.AttributeModel.VisualizationHints.FirstOrDefault() == IDEA_common.catalog.VisualizationHint.Image)
                 {
-                    foreach (var val in records)
+                    var dataset = model.AttributeModel.OriginModel.Name;
+                    string prepend = "http://localhost:1234/api/rawdata/" + dataset + "/"+model.AttributeModel.RawName+"/";
+#pragma warning disable CS4014
+                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                    CoreDispatcherPriority.Low,
+                    () =>
                     {
-                        acollection.Data.Add(val);
-                    }
-                });
+                        foreach (var val in records)
+                        {
+                            acollection.Data.Add(new MyUri(prepend + val.ToString()));
+                        }
+                    });
 #pragma warning restore CS4014
+
+                }
+                else
+                {
+#pragma warning disable CS4014
+                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
+                    CoreDispatcherPriority.Low,
+                    () =>
+                    {
+                        foreach (var val in records)
+                        {
+                            acollection.Data.Add(val);
+                        }
+                    });
+#pragma warning restore CS4014
+                }
         }
 
         void render(RawDataOperationModel.FunctionApplied function = null) 
