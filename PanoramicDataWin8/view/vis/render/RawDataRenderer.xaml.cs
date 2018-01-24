@@ -80,49 +80,59 @@ namespace PanoramicDataWin8.view.vis.render
             throw new NotImplementedException();
         }
     }
-    public class ObjectToListFrameworkElementConverter : IValueConverter
+
+    public class ObjectToUriConverter : IValueConverter
+    {
+        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is RawDataRenderer.MyUri) // data is an image
+                return (value as RawDataRenderer.MyUri).Uri;
+            throw new NotImplementedException();
+        }
+
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class ObjectToStringConverter : IValueConverter
     {
         static public FrameworkElement LastHit = null;
         object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
         {
-            var g = new Grid();
-            if (value != null)
-            {
-                if (value is RawDataRenderer.MyUri) // data is an image
-                {
-                    var ib = new Image();
-                    ib.Source = new BitmapImage((value as RawDataRenderer.MyUri).Uri);// "https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
-                    ib.Width = ib.Height = 25;
-                    ib.CanDrag = false;
-                    ib.PointerPressed += (sender, e) =>
-                    {
-                        if (LastHit != g && LastHit != null)
-                            LastHit.CanDrag = false;
-                        LastHit = ib;
-                    };
-                    return ib;
-                }
-                else
-                {
-                    var tb = new TextBlock();
-                    tb.FontFamily = FontFamily.XamlAutoFontFamily;
-                    tb.FontSize = 14;
-                    tb.Foreground = new SolidColorBrush(Colors.Black);
-                    if (value is Tuple<int, object>)
-                        tb.Text = (value as Tuple<int, object>).Item2.ToString() + " (" + (value as Tuple<int, object>).Item1+")";
-                    else if (value is Tuple<int, double>)
-                        tb.Text = "avg=" + (value as Tuple<int, double>).Item2;
-                    else tb.Text = value.ToString();
-                    tb.Height = 25;
-                    tb.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    tb.TextAlignment = value is IDEA_common.range.PreProcessedString || value is string ? TextAlignment.Left : TextAlignment.Right;
-                    tb.Margin = new Thickness(5, 0, 20, 0);
-                    g.Children.Add(tb);
-                }
-            }
-            return g;
+            string text = "";
+            if (value is Tuple<int, object>)
+                text = (value as Tuple<int, object>).Item2.ToString() + " (" + (value as Tuple<int, object>).Item1 + ")";
+            else if (value is Tuple<int, double>)
+                text = "avg=" + (value as Tuple<int, double>).Item2;
+            else text = value.ToString();
+            return text;
         }
 
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class ObjectToTextAlignmentConverter : IValueConverter
+    {
+        static public FrameworkElement LastHit = null;
+        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
+        {
+            return value is IDEA_common.range.PreProcessedString || value is string ? TextAlignment.Left : TextAlignment.Right;
+        }
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class ObjectToAlignmentConverter : IValueConverter
+    {
+        static public FrameworkElement LastHit = null;
+        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
+        {
+            return value is IDEA_common.range.PreProcessedString || value is string ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+        }         
         object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
         {
             throw new NotImplementedException();
@@ -152,6 +162,7 @@ namespace PanoramicDataWin8.view.vis.render
                     this.SetProperty(ref _cwidth, value);
                 }
             }
+            public HorizontalAlignment Alignment;
             public RawColumnData() { Data = new ObservableCollection<object>(); }
         }
 
@@ -177,7 +188,7 @@ namespace PanoramicDataWin8.view.vis.render
                 xListView.IsHitTestVisible = false;
             }
         }
-        
+
 
         private void RawDataRenderer_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
@@ -271,7 +282,24 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void RawDataRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            this.setupListView(Records);
+            //this.xListView.ColumnDefinitions.Clear();
+            //foreach (var n in newRecords)
+            //{
+            //    this.xListView.Children.Add(
+            //        new RawDataColumn()
+            //        {
+            //            DataContext = n,
+            //            HorizontalAlignment = HorizontalAlignment.Stretch,
+            //            VerticalAlignment = VerticalAlignment.Stretch
+            //        });
+            //    Grid.SetColumn(xListView.Children.Last() as FrameworkElement, xListView.ColumnDefinitions.Count);
+            //    xListView.ColumnDefinitions.Add(
+            //        new ColumnDefinition()
+            //        {
+            //            Width = new GridLength(n.Model.AttributeModel.DataType == IDEA_common.catalog.DataType.String ? 2 : 1, GridUnitType.Star)
+            //        }
+            //    );
+            //}
         }
 
         public class MyUri {
@@ -346,9 +374,9 @@ namespace PanoramicDataWin8.view.vis.render
                 render(operationModel.Function);
             }
         }
-
+        
         void OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
-        {
+        { 
             if (e is FilterOperationModelUpdatedEventArgs &&
                 ((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.ClearFilterModels)
             {
@@ -397,6 +425,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 var acollection = new RawColumnData
                 {
+                    Alignment = HorizontalAlignment.Right,
                     Model = col,
                     ColumnWidth = 85,// records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? 200 : 50,
                     Renderer = this,
@@ -425,13 +454,13 @@ namespace PanoramicDataWin8.view.vis.render
             this.xListView.ColumnDefinitions.Clear();
             foreach (var n in newRecords)
             {
-                this.xListView.Children.Add(
-                    new RawDataColumn()
-                    {
-                        DataContext = n,
-                        HorizontalAlignment = HorizontalAlignment.Stretch,
-                        VerticalAlignment = VerticalAlignment.Stretch
-                    });
+                var rawColumn = new RawDataColumn()
+                {
+                    DataContext = n,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    VerticalAlignment = VerticalAlignment.Stretch
+                };
+                this.xListView.Children.Add(rawColumn);
                 Grid.SetColumn(xListView.Children.Last() as FrameworkElement, xListView.ColumnDefinitions.Count);
                 xListView.ColumnDefinitions.Add(
                     new ColumnDefinition()
@@ -463,7 +492,8 @@ namespace PanoramicDataWin8.view.vis.render
             xWordCloud.WeightedWords = null;
             model.RawDataOperationModel.ClearFilterModels();
             hasMultipleColumns = (result as RawDataResult).Samples.Count() > 1;
-            if ((result as RawDataResult).Samples.Count() == 1 && !hasMultipleColumns)
+            if ((result as RawDataResult).Samples.Count() == 1 && !hasMultipleColumns &&
+                model.RawDataOperationModel.AttributeTransformationModelParameters[0].AttributeModel.VisualizationHints.FirstOrDefault() != IDEA_common.catalog.VisualizationHint.Image)
             {
                 xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords.FirstOrDefault().Value;
             }
@@ -508,6 +538,7 @@ namespace PanoramicDataWin8.view.vis.render
         void loadRecordsAsync(List<object> records, AttributeTransformationModel model, bool showScroll)
         {
             var acollection = new RawColumnData {
+                Alignment = records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? HorizontalAlignment.Left : HorizontalAlignment.Right,
                 Model = model,
                 ColumnWidth =records.First() is string|| records.First() is IDEA_common.range.PreProcessedString ? 200:85,
                 Renderer = this,
@@ -553,7 +584,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var model = (DataContext as RawDataOperationViewModel);
             configureLayout(true);
-            setupListView(Records);
+            //setupListView(Records);
         }
         public GeoAPI.Geometries.IGeometry BoundsGeometry
         {

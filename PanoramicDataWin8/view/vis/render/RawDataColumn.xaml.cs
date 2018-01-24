@@ -1,4 +1,6 @@
 ﻿using PanoramicDataWin8.model.data.attribute;
+using PanoramicDataWin8.model.data.operation;
+using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using System;
 using System.Collections.Generic;
@@ -8,6 +10,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -25,12 +28,26 @@ namespace PanoramicDataWin8.view.vis.render
         public RawDataColumn()
         {
             this.InitializeComponent();
+            DataContextChanged += RawDataColumn_DataContextChanged;
+        }
+
+        private void RawDataColumn_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        {
+            var rawdata = args.NewValue as RawDataRenderer.RawColumnData;
+            if (rawdata != null)
+            {
+                xListView.ItemContainerStyle = (Style)Resources[rawdata.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
+                if (!IsImage)
+                    xListView.Visibility = Visibility.Visible;
+                else xImageListView.Visibility = Visibility.Visible;
+            }
         }
 
         private void xListView_Loaded(object sender, RoutedEventArgs e)
         {
+            var listView = (sender as ListView);
             var dataCol = (DataContext as RawDataRenderer.RawColumnData);
-            xListView.ItemsSource = dataCol.Data;
+            listView.ItemsSource = dataCol.Data;
             var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
             if (cp != null)
                 cp.ViewChanged += Cp_ViewChanged;
@@ -59,6 +76,11 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
+        public bool IsImage
+        {
+            get => Model.AttributeModel.VisualizationHints.FirstOrDefault() == IDEA_common.catalog.VisualizationHint.Image;
+        }
+
         private void Cp_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
             //var dataCol = (DataContext as RawDataRenderer.RawColumnData);
@@ -78,5 +100,6 @@ namespace PanoramicDataWin8.view.vis.render
                     cp.ChangeView(null, scroll.VerticalOffset, null, true);
             }
         }
+        
     }
 }
