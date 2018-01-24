@@ -36,10 +36,17 @@ namespace PanoramicDataWin8.view.vis.render
             var rawdata = args.NewValue as RawDataRenderer.RawColumnData;
             if (rawdata != null)
             {
-                xListView.ItemContainerStyle = (Style)Resources[rawdata.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
-                if (!IsImage)
-                    xListView.Visibility = Visibility.Visible;
-                else xImageListView.Visibility = Visibility.Visible;
+                if (IsImage)
+                {
+                    xListView.ItemContainerStyle = (Style)Resources["ImageStyle"];
+                    xListView.ItemTemplate = (DataTemplate)Resources["ImageColTemplate"];
+                }
+                else
+                {
+                    xListView.ItemContainerStyle = (Style)Resources[rawdata.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
+                    xListView.ItemTemplate = (DataTemplate)Resources["TextColTemplate"];
+
+                }
             }
         }
 

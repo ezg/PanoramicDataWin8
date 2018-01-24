@@ -31,56 +31,6 @@ using PanoramicDataWin8.model.view;
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public class ObjectToFrameworkElementConverter : IValueConverter
-    {
-        static public FrameworkElement LastHit = null;
-        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
-        {
-            var g = new Grid();
-            if (value != null)
-            {
-                if (value is RawDataRenderer.MyUri) // data is an image
-                {
-                    var ib = new Image();
-                    ib.Source = new BitmapImage((value as RawDataRenderer.MyUri).Uri);// "https://static.pexels.com/photos/39803/pexels-photo-39803.jpeg"));
-                    ib.Width = ib.Height = 200;
-                    ib.CanDrag = false;
-                    ib.PointerPressed += (sender, e) =>
-                    {
-                        if (LastHit != g && LastHit != null)
-                            LastHit.CanDrag = false;
-                        LastHit = ib;
-                    };
-                    return ib;
-                }
-                else
-                {
-                    var tb = new TextBlock();
-                    tb.FontFamily = FontFamily.XamlAutoFontFamily;
-                    tb.FontSize = 14;
-                    tb.Foreground = new SolidColorBrush(Colors.Black);
-                    if (value is Tuple<int, object>)
-                        tb.Text = (value as Tuple<int, object>).Item2.ToString() + " (" + (value as Tuple<int, object>).Item1 + ")";
-                    else if (value is Tuple<int, double>)
-                        tb.Text = "avg=" + (value as Tuple<int, double>).Item2;
-                    else tb.Text = value.ToString();
-                    tb.Height = 25;
-                    tb.MinWidth = 75;
-                    tb.HorizontalAlignment = HorizontalAlignment.Left;
-                    tb.TextAlignment = value is IDEA_common.range.PreProcessedString || value is string ? TextAlignment.Left : TextAlignment.Right;
-                    tb.Margin = new Thickness(2, 0, 25, 0);
-                    return tb;
-                }
-            }
-            return g;
-        }
-
-        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
     public class ObjectToUriConverter : IValueConverter
     {
         object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
@@ -188,7 +138,6 @@ namespace PanoramicDataWin8.view.vis.render
                 xListView.IsHitTestVisible = false;
             }
         }
-
 
         private void RawDataRenderer_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
@@ -346,7 +295,6 @@ namespace PanoramicDataWin8.view.vis.render
                 if (result != null)
                 {
                     loadResult(result);
-                    render();
                 }
                 else
                 {
@@ -376,7 +324,8 @@ namespace PanoramicDataWin8.view.vis.render
         }
         
         void OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
-        { 
+        {
+            return;
             if (e is FilterOperationModelUpdatedEventArgs &&
                 ((FilterOperationModelUpdatedEventArgs)e).FilterOperationModelUpdatedEventType == FilterOperationModelUpdatedEventType.ClearFilterModels)
             {
@@ -507,12 +456,12 @@ namespace PanoramicDataWin8.view.vis.render
 
             setupListView(Records);
 
-            configureLayout(true);
+            configureLayout(true, model.RawDataOperationModel.AttributeTransformationModelParameters[0].AttributeModel.VisualizationHints.FirstOrDefault() == IDEA_common.catalog.VisualizationHint.Image);
                 
             this.xRawDataGridView.ItemsSource = Records.FirstOrDefault()?.Data;
         }
 
-        void configureLayout(bool useDefault)
+        void configureLayout(bool useDefault, bool firstColumnIsImage)
         {
             if (xWordCloud.WeightedWords != null && useDefault)
             {
@@ -524,6 +473,15 @@ namespace PanoramicDataWin8.view.vis.render
                 xWordCloud.Visibility = Visibility.Collapsed;
                 if (!hasMultipleColumns)
                 {
+                    if (firstColumnIsImage)
+                    {
+                        xRawDataGridView.ItemTemplate = LayoutRoot.Resources["xImageTemplate"] as DataTemplate;
+                        xRawDataGridView.ItemContainerStyle = LayoutRoot.Resources["AImageStyle"] as Style;
+                    } else
+                    {
+                        xRawDataGridView.ItemTemplate = LayoutRoot.Resources["xTextTemplate"] as DataTemplate;
+                        xRawDataGridView.ItemContainerStyle = LayoutRoot.Resources["TextStyle"] as Style;
+                    }
                     xRawDataGridView.Visibility = Visibility.Visible;
                     xListView.Visibility = Visibility.Collapsed;
                 }
@@ -583,9 +541,8 @@ namespace PanoramicDataWin8.view.vis.render
         void render(RawDataOperationModel.FunctionApplied function = null) 
         {
             var model = (DataContext as RawDataOperationViewModel);
-            configureLayout(true);
-            //setupListView(Records);
-        }
+            configureLayout(true, model.RawDataOperationModel.AttributeTransformationModelParameters[0].AttributeModel.VisualizationHints.FirstOrDefault() == IDEA_common.catalog.VisualizationHint.Image);
+         }
         public GeoAPI.Geometries.IGeometry BoundsGeometry
         {
             get

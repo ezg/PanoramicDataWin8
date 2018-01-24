@@ -25,7 +25,7 @@
         <Style x:Key="RightStyle" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Right" />
             <Setter Property="VerticalContentAlignment"   Value="Center" />
-            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="Margin" Value="0,0,50,0" />
             <Setter Property="Padding" Value="0,0,0,0" />
             <Setter Property="MinWidth" Value="0" />
             <Setter Property="MinHeight" Value="25" />
@@ -33,67 +33,44 @@
         <Style x:Key="ImageStyle" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Center" />
             <Setter Property="VerticalContentAlignment"   Value="Center" />
-            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="Margin" Value="0,0,2,0" />
             <Setter Property="Padding" Value="0,0,0,0" />
             <Setter Property="MinWidth" Value="0" />
             <Setter Property="MinHeight" Value="25" />
         </Style>
+        <DataTemplate x:Key="ImageColTemplate">
+            <Image Source="{Binding Converter={StaticResource ObjectToUriConverter}}" Width="25" CanDrag="False"/>
+        </DataTemplate>
+        <DataTemplate x:Key="TextColTemplate">
+            <TextBlock Text="{Binding Converter={StaticResource ObjectToStringConverter}}"
+                           TextAlignment="{Binding Converter={StaticResource ObjectToTextAlignmentConverter}}"
+                           
+                           HorizontalAlignment="{Binding Converter={StaticResource ObjectToAlignmentConverter}}" />
+        </DataTemplate>
     </UserControl.Resources>
-    <Grid>
-        <ListView x:Name="xListView" x:FieldModifier="public" 
-                  Margin="2.5"
-                  SelectionMode="None"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
-                  ScrollViewer.VerticalScrollBarVisibility="Visible"
-                  ManipulationMode="TranslateRailsY"
-                  Loaded="xListView_Loaded"
-                  ItemContainerStyle="{StaticResource LeftStyle}"
-                  Visibility="Collapsed"
-                  CanDragItems="False"  >
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsStackPanel Orientation="Vertical" GroupHeaderPlacement="Top" AreStickyGroupHeadersEnabled="True"/>
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <!--<ListView.HeaderTemplate>
+    <ListView x:Name="xListView" x:FieldModifier="public" 
+                Margin="2.5"
+                SelectionMode="None"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                ManipulationMode="TranslateRailsY"
+                Loaded="xListView_Loaded"
+                ItemContainerStyle="{StaticResource LeftStyle}"
+                ItemTemplate="{StaticResource TextColTemplate}"
+                CanDragItems="False"  >
+        <ListView.ItemsPanel>
+            <ItemsPanelTemplate>
+                <ItemsStackPanel Orientation="Vertical" GroupHeaderPlacement="Top" AreStickyGroupHeadersEnabled="True"/>
+            </ItemsPanelTemplate>
+        </ListView.ItemsPanel>
+        <!--<ListView.HeaderTemplate>
             <DataTemplate>
                 <Grid Background="Gray">
                     <TextBlock Text="{Binding Model.GetLabel}" Foreground="White" VerticalAlignment="Top" FontSize="9" MaxHeight="20"/>
                 </Grid>
             </DataTemplate>
         </ListView.HeaderTemplate>-->
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding Converter={StaticResource ObjectToStringConverter}}"
-                           TextAlignment="{Binding Converter={StaticResource ObjectToTextAlignmentConverter}}"
-                           
-                           HorizontalAlignment="{Binding Converter={StaticResource ObjectToAlignmentConverter}}" />
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <ListView x:Name="xImageListView" x:FieldModifier="public" 
-                  Margin="2.5"
-                  SelectionMode="None"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
-                  ScrollViewer.VerticalScrollBarVisibility="Visible"
-                  ManipulationMode="TranslateRailsY"
-                  Loaded="xListView_Loaded"
-                  Visibility="Collapsed"
-                  ItemContainerStyle="{StaticResource ImageStyle}"
-                  CanDragItems="False"  >
-            <ListView.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <ItemsStackPanel Orientation="Vertical" GroupHeaderPlacement="Top" AreStickyGroupHeadersEnabled="True"/>
-                </ItemsPanelTemplate>
-            </ListView.ItemsPanel>
-            <ListView.ItemTemplate>
-            <DataTemplate>
-                <Image Source="{Binding Converter={StaticResource ObjectToUriConverter}}" Width="25" CanDrag="False"/>
-            </DataTemplate>
-        </ListView.ItemTemplate>
-        </ListView>
-    </Grid>
+    </ListView>
 
 </UserControl>
