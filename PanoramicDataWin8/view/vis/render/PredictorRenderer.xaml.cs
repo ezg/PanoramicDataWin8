@@ -151,6 +151,11 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 submitProblem();
             }
+            else if (_predictorRendererContentProvider.SpecifyProblemHitTarget != null &&
+                _predictorRendererContentProvider.SpecifyProblemHitTarget.Contains(_selectionPoints.First().GetPoint()))
+            {
+                specifyProblem();
+            }
             return false;
         }
 
@@ -158,8 +163,30 @@ namespace PanoramicDataWin8.view.vis.render
         {
             ContentDialog locationPromptDialog = new ContentDialog
             {
-                Title = "Submit this prediction as a solution?",
-                Content = "The application will exit after you submit a solution.",
+                Title = "TASK 2: Submit solution?",
+                Content = "Submit this prediction as a solution? The application will exit after you press OK.\nThis means you are done with Task 2. \n\nNever use this for Task 1, rather use the \"Problem?\" button in that case.",
+                SecondaryButtonText = "Cancel",
+                PrimaryButtonText = "OK"
+            };
+
+            ContentDialogResult result = await locationPromptDialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
+                var operationModel = (PredictorOperationModel)model.OperationModel;
+
+                var catalogCommand = new SubmitProblemCommand();
+                await catalogCommand.SumbitResult(operationModel);
+                Application.Current.Exit();
+            }
+        }
+
+        async void specifyProblem()
+        {
+            ContentDialog locationPromptDialog = new ContentDialog
+            {
+                Title = "TASK 1: Specify problem?",
+                Content = "Sumbit this a new problem specification.",
                 SecondaryButtonText = "Cancel",
                 PrimaryButtonText = "OK"
             };
@@ -170,9 +197,8 @@ namespace PanoramicDataWin8.view.vis.render
                 PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
                 var operationModel = (PredictorOperationModel) model.OperationModel;
 
-                var catalogCommand = new SubmitProblemCommand();
-                await catalogCommand.SumbitResult(operationModel);
-                Application.Current.Exit();
+                var catalogCommand = new SpecifyProblemCommand();
+                await catalogCommand.SpecifyProblem(operationModel);
             }
         }
 

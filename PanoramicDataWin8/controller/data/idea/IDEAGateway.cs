@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -25,32 +26,40 @@ namespace PanoramicDataWin8.controller.data.progressive
             while (true)
                 try
                 {
-                    if (MainViewController.Instance.MainModel.Verbose)
-                        ; // Debug.WriteLine(data.ToString());
                     var sw = new Stopwatch();
                     sw.Start();
+                    var handler = new HttpClientHandler();
                     var httpClient = new HttpClient();
+
+                    if (!string.IsNullOrEmpty(MainViewController.Instance.MainModel.Username))
+                    {
+                        var byteArray = Encoding.ASCII.GetBytes(MainViewController.Instance.MainModel.Username + ":" + MainViewController.Instance.MainModel.Password);
+                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+                    }
                     httpClient.Timeout = TimeSpan.FromMinutes(5);
                     httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     HttpResponseMessage httpResponseMessage = null;
                     if (data != null)
+                    {
                         httpResponseMessage = await httpClient.PostAsync(
                             MainViewController.Instance.MainModel.Hostname +
                             MainViewController.Instance.MainModel.APIPath + "/" + endpoint, new StringContent(
-                            data.ToString(),
-                            Encoding.UTF8,
-                            "application/json"));
+                                data.ToString(),
+                                Encoding.UTF8,
+                                "application/json"));
+                    }
                     else
+                    {
                         httpResponseMessage = await httpClient.GetAsync(
                             MainViewController.Instance.MainModel.Hostname +
                             MainViewController.Instance.MainModel.APIPath + "/" + endpoint);
-                    if (MainViewController.Instance.MainModel.Verbose)
-                        ;// Debug.WriteLine("TuppleWare Roundtrip Time: " + sw.ElapsedMilliseconds);
+                    }
                     sw.Restart();
-
                     var stringContent = await httpResponseMessage.Content.ReadAsStringAsync();
-                    if (MainViewController.Instance.MainModel.Verbose)
-                        ; // Debug.WriteLine("TuppleWare Read Content Time: " + sw.ElapsedMilliseconds);
+                    if (stringContent.ToUpper().Contains("LOGIN FORM"))
+                    {
+                        throw new WebException();
+                    }
                     sw.Restart();
 
                     return stringContent;
@@ -62,7 +71,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                     {
                         Ip = MainViewController.Instance.MainModel.Hostname,
                         Content = darpa ? 
-                            "Enter the connection URLs that was provided by the evaluator."
+                            "Enter the connection URLs that was provided by the evaluator\nand your D3M login."
                             : e.Message,
                         StackTrace = (MainViewController.Instance.MainModel.Hostname + "/" + endpoint) + "\n" + e.InnerException + "\n" + e.StackTrace
                     };
@@ -83,6 +92,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                             newIp = "http://" + newIp;
                         }
                         MainViewController.Instance.MainModel.Hostname = newIp;
+                        MainViewController.Instance.MainModel.Username = dialog.Username;
+                        MainViewController.Instance.MainModel.Password = dialog.Password;
                     }
                 }
         }

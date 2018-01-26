@@ -18,6 +18,10 @@ namespace PanoramicDataWin8.model.view
 
         private string _hostname;
 
+        private string _username;
+
+        private string _password;
+
         private string _apiPath;
 
         private double _nrOfGroupBins = 10.0;
@@ -75,6 +79,18 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _hostname; }
             set { SetProperty(ref _hostname, value); }
+        }
+
+        public string Username
+        {
+            get { return _username; }
+            set { SetProperty(ref _username, value); }
+        }
+
+        public string Password
+        {
+            get { return _password; }
+            set { SetProperty(ref _password, value); }
         }
 
         public string APIPath

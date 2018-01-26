@@ -18,4 +18,16 @@ namespace PanoramicDataWin8.controller.data.progressive
             var response = await IDEAGateway.Request(ser, "submitProblem");
         }
     }
+
+    public class SpecifyProblemCommand
+    {
+        public async Task SpecifyProblem(PredictorOperationModel model)
+        {
+            var specifyProblemParam = new SpecifyProblemParameters();
+            specifyProblemParam.Id = (model.Result as OptimizerResult).PipelineId;
+
+            var ser = JsonConvert.SerializeObject(specifyProblemParam, IDEAGateway.JsonSerializerSettings);
+            var response = await IDEAGateway.Request(ser, "specifyProblem");
+        }
+    }
 }

@@ -38,6 +38,7 @@ namespace PanoramicDataWin8.view.vis.render
         public float CompositionScaleY { get; set; }
 
         public IGeometry SubmitHitTarget { get; set; }
+        public IGeometry SpecifyProblemHitTarget { get; set; }
 
         public void UpdateData(IResult result, PredictorOperationModel predictorOperationModel, PredictorOperationModel predictorOperationModelClone)
         {
@@ -71,15 +72,27 @@ namespace PanoramicDataWin8.view.vis.render
                 if (MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
                 {
                     var blue = Color.FromArgb(255, 41, 170, 213);
-                    DrawString(canvasArgs, _textFormatSubmit, deviceWidth, topOffset, "submit?", blue, false, false, false);
-                    SubmitHitTarget = null;
+                    DrawString(canvasArgs, _textFormatSubmit, deviceWidth, topOffset, "submit\nsolution?", blue, false, false, false);
 
-                    var layout = new CanvasTextLayout(canvas, "submit?", _textFormatSubmit, 1000f, 1000f);
+                    var layout = new CanvasTextLayout(canvas, "submit\nsolution?", _textFormatSubmit, 1000f, 1000f);
                     var layoutBounds = layout.DrawBounds;
                     layout.Dispose();
                     var rct = new Rct(new Pt(deviceWidth - layoutBounds.Width - 5, topOffset),
                         new Vec(layoutBounds.Width + 10, layoutBounds.Height + 10));
+                    //canvasArgs.DrawingSession.DrawRectangle(rct, blue);
                     SubmitHitTarget = rct.GetPolygon();
+
+                    
+                    DrawString(canvasArgs, _textFormatSubmit, leftOffset, topOffset, "specify\nproblem?", blue, true, false, false);
+
+                    layout = new CanvasTextLayout(canvas, "specify\nproblem?", _textFormatSubmit, 1000f, 1000f);
+                    layoutBounds = layout.DrawBounds;
+                    layout.Dispose();
+                    rct = new Rct(new Pt(leftOffset - 5, topOffset),
+                        new Vec(layoutBounds.Width + 10, layoutBounds.Height + 10));
+                    //canvasArgs.DrawingSession.DrawRectangle(rct, blue);
+                    SpecifyProblemHitTarget = rct.GetPolygon();
+
                 }
 
 

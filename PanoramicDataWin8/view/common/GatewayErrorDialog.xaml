@@ -7,8 +7,27 @@
     PrimaryButtonClick="ContentDialog_PrimaryButtonClick">
 
     <StackPanel Orientation="Vertical">
-        <TextBlock Name="tbError"></TextBlock>
-        <TextBox Name="tbIp"></TextBox>
+        <TextBlock Name="tbError" Margin="3"></TextBlock>
+        <TextBox Name="tbIp" Margin="3"></TextBox>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="D3M Username:" Grid.Column="0" Grid.Row="0" VerticalAlignment="Center"></TextBlock>
+            <TextBlock Text="D3M Password:" Grid.Column="0" Grid.Row="1" VerticalAlignment="Center"></TextBlock>
+
+            <TextBox Name="tbUsername" Grid.Column="1" Grid.Row="0" Margin="3"></TextBox>
+            <PasswordBox Name="tbPassword" Grid.Column="1" Grid.Row="1" Margin="3"></PasswordBox>
+
+        </Grid>
+        
         <ScrollViewer Height="100" VerticalScrollBarVisibility="Auto" Name="scrollViewer">
             <TextBox x:Name="tbStackTrace" AcceptsReturn="True" TextWrapping="Wrap"/>
         </ScrollViewer>

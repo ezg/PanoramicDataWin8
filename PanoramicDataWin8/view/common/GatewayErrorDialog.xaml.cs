@@ -65,6 +65,20 @@ namespace PanoramicDataWin8.view.common
             get { return _ip; }
         }
 
+        private string _username = "";
+        public string Username
+        {
+            set { _username = value.Trim(); }
+            get { return _username; }
+        }
+
+        private string _password = "";
+        public string Password
+        {
+            set { _password = value.Trim(); }
+            get { return _password; }
+        }
+
         public GatewayErrorDialog()
         {
             this.InitializeComponent();
@@ -78,6 +92,8 @@ namespace PanoramicDataWin8.view.common
         private void ContentDialog_PrimaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
             _ip = tbIp.Text.Trim();
+            _username = tbUsername.Text;
+            _password = tbPassword.Password;
         }
     }
 }
