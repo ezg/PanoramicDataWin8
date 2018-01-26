@@ -13,36 +13,10 @@ namespace PanoramicDataWin8.model.data.operation
     public interface FunctionSubtypeModel {
         DataType DataType { get; }
         string   Name { get; }
-        Dictionary<string, ObservableCollection<AttributeTransformationModel>> Parameters { get;}
+        Dictionary<string, ObservableCollection<AttributeTransformationModel>> AttributeParameterGroups { get; }
+        Dictionary<string, object> ValueParameters { get; }
         string   InputVisualizationType { get; }
         string   Code();
-    }
-
-    public class MinMaxScaleFunctionSubtypeModel : FunctionSubtypeModel
-    {
-        public MinMaxScaleFunctionSubtypeModel() { }
-        public DataType      DataType {  get { return DataType.Double;  } }
-        public string        Name     { get; } = "MinMaxScale";
-        public Dictionary<string, ObservableCollection<AttributeTransformationModel>> Parameters { get;  } =  
-            new Dictionary<string, ObservableCollection<AttributeTransformationModel>>() {
-                    ["P1"] = new ObservableCollection<AttributeTransformationModel>(),
-                    ["P2"] = new ObservableCollection<AttributeTransformationModel>()
-            };
-        public string        InputVisualizationType { get { return InputVisualizationTypeConstants.NUMERIC; } }
-
-        public double DummyValue { get; set;  }
-
-        public string Code()
-        {
-            var code = "MinMax(";
-            if (Parameters != null)
-                foreach (var p in Parameters)
-                    foreach (var v in p.Value)
-                        code += (p.Key + ":" + v.AttributeModel.RawName) + ",";
-
-            code = code.TrimEnd(',') + ")";
-            return code;
-        }
     }
 
     public class FunctionOperationModel : ComputationalOperationModel
@@ -57,7 +31,7 @@ namespace PanoramicDataWin8.model.data.operation
                 displayName == null ? rawName : displayName)
         {
             FunctionSubtypeModel = functionSubtypeModel;
-            foreach (var p in functionSubtypeModel.Parameters)
+            foreach (var p in functionSubtypeModel.AttributeParameterGroups)
                 p.Value.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
 

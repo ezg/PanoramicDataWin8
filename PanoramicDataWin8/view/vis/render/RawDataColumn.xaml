@@ -9,19 +9,56 @@
     x:Name="RawDataCol"
     d:DesignHeight="300"
     d:DesignWidth="400">
-    
+    <UserControl.Resources>
+        <local:ObjectToStringConverter x:Key="ObjectToStringConverter"></local:ObjectToStringConverter>
+        <local:ObjectToUriConverter x:Key="ObjectToUriConverter"></local:ObjectToUriConverter>
+        <local:ObjectToAlignmentConverter x:Key="ObjectToAlignmentConverter"></local:ObjectToAlignmentConverter>
+        <local:ObjectToTextAlignmentConverter x:Key="ObjectToTextAlignmentConverter"></local:ObjectToTextAlignmentConverter>
+        <Style x:Key="LeftStyle" TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="VerticalContentAlignment"   Value="Center" />
+            <Setter Property="Margin" Value="10,0,0,0" />
+            <Setter Property="Padding" Value="0,0,0,0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="25" />
+        </Style>
+        <Style x:Key="RightStyle" TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Right" />
+            <Setter Property="VerticalContentAlignment"   Value="Center" />
+            <Setter Property="Margin" Value="0,0,20,0" />
+            <Setter Property="Padding" Value="0,0,0,0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="25" />
+        </Style>
+        <Style x:Key="ImageStyle" TargetType="ListViewItem">
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment"   Value="Center" />
+            <Setter Property="Margin" Value="0,0,2,0" />
+            <Setter Property="Padding" Value="0,0,0,0" />
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="MinHeight" Value="25" />
+        </Style>
+        <DataTemplate x:Key="ImageColTemplate">
+            <Image Source="{Binding Converter={StaticResource ObjectToUriConverter}}" Width="25" CanDrag="False"/>
+        </DataTemplate>
+        <DataTemplate x:Key="TextColTemplate">
+            <TextBlock Text="{Binding Converter={StaticResource ObjectToStringConverter}}"
+                           TextAlignment="{Binding Converter={StaticResource ObjectToTextAlignmentConverter}}"
+                           
+                           HorizontalAlignment="{Binding Converter={StaticResource ObjectToAlignmentConverter}}" />
+        </DataTemplate>
+    </UserControl.Resources>
     <ListView x:Name="xListView" x:FieldModifier="public" 
-                  Margin="2.5"
-                  SelectionMode="None"
-                  HorizontalAlignment="Stretch"
-                  VerticalAlignment="Stretch"
-                  ScrollViewer.VerticalScrollBarVisibility="Visible"
-                  ManipulationMode="TranslateRailsY"
-                  Loaded="xListView_Loaded"
-                  CanDragItems="False"  >
-        <ListView.Resources>
-            <local:ObjectToListFrameworkElementConverter x:Key="ObjectToListFrameworkElementConverter"></local:ObjectToListFrameworkElementConverter>
-        </ListView.Resources>
+                Margin="2.5"
+                SelectionMode="None"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
+                ScrollViewer.VerticalScrollBarVisibility="Visible"
+                ManipulationMode="TranslateRailsY"
+                Loaded="xListView_Loaded"
+                ItemContainerStyle="{StaticResource LeftStyle}"
+                ItemTemplate="{StaticResource TextColTemplate}"
+                CanDragItems="False"  >
         <ListView.ItemsPanel>
             <ItemsPanelTemplate>
                 <ItemsStackPanel Orientation="Vertical" GroupHeaderPlacement="Top" AreStickyGroupHeadersEnabled="True"/>
@@ -34,23 +71,6 @@
                 </Grid>
             </DataTemplate>
         </ListView.HeaderTemplate>-->
-        <ListView.ItemContainerStyle>
-            <Style TargetType="ListViewItem">
-                <Setter Property="HorizontalContentAlignment" Value="Left" />
-                <Setter Property="VerticalContentAlignment"   Value="Center" />
-                <Setter Property="Margin" Value="0,0,0,0" />
-                <Setter Property="Padding" Value="0,0,0,0" />
-                <Setter Property="MinWidth" Value="0" />
-                <Setter Property="MinHeight" Value="25" />
-            </Style>
-        </ListView.ItemContainerStyle>
-        <ListView.ItemTemplate>
-            <DataTemplate>
-                <ContentPresenter Content="{Binding Converter={StaticResource ObjectToListFrameworkElementConverter}}" 
-                                  Width="{Binding Path=ActualWidth, ElementName=RawDataCol}"
-                                  HorizontalAlignment="Stretch" Background="LightGray"/>
-             </DataTemplate>
-        </ListView.ItemTemplate>
     </ListView>
-    
+
 </UserControl>

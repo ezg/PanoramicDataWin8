@@ -12,7 +12,33 @@
     d:DesignWidth="400"
     AllowDrop="True"
     FontFamily="{StaticResource abel}">
-    <Grid  Background="{StaticResource lightBrush}">
+    <Grid x:Name="LayoutRoot" Background="{StaticResource lightBrush}">
+        <Grid.Resources>
+            <local:ObjectToStringConverter x:Key="ObjectToStringConverter"></local:ObjectToStringConverter>
+            <local:ObjectToUriConverter x:Key="ObjectToUriConverter"></local:ObjectToUriConverter>
+            <Style x:Name="TextStyle" TargetType="GridViewItem">
+                <Setter Property="HorizontalContentAlignment" Value="Left" />
+                <Setter Property="VerticalContentAlignment"   Value="Center" />
+                <Setter Property="Margin" Value="10,0,10,0" />
+                <Setter Property="Padding" Value="0,0,0,0" />
+                <Setter Property="MinHeight" Value="25" />
+                <Setter Property="MinWidth" Value="0" />
+            </Style>
+            <Style x:Name="AImageStyle" TargetType="GridViewItem">
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment"   Value="Center" />
+                <Setter Property="Margin" Value="5" />
+                <Setter Property="Padding" Value="0,0,0,0" />
+                <Setter Property="MaxWidth" Value="200"></Setter>
+                <Setter Property="MaxHeight" Value="200"></Setter>
+            </Style>
+            <DataTemplate x:Name="xImageTemplate">
+                <Image Source="{Binding Converter={StaticResource ObjectToUriConverter}}" Stretch="Uniform" />
+            </DataTemplate>
+            <DataTemplate x:Name="xTextTemplate">
+                <TextBlock Text="{Binding Converter={StaticResource ObjectToStringConverter}}" />
+            </DataTemplate>
+        </Grid.Resources>
         <common:DXSurface x:Name="dxSurface" Visibility="Collapsed"/>
         <Grid x:Name="xListView" x:FieldModifier="public"
                   HorizontalAlignment="Stretch"
@@ -20,7 +46,6 @@
                   Grid.Column="0"
                   Margin="20" >
             <Grid.ColumnDefinitions>
-
             </Grid.ColumnDefinitions>
         </Grid>
         <GridView x:Name="xRawDataGridView" 
@@ -29,25 +54,9 @@
                   Grid.Column="0"
                   Margin="20" 
                   SelectionMode="None"
+                  ItemContainerStyle="{StaticResource TextStyle}"
+                  ItemTemplate="{StaticResource xTextTemplate}"
                   ShowsScrollingPlaceholders="True">
-            <GridView.Resources>
-                <local:ObjectToFrameworkElementConverter x:Key="ObjectToFrameworkElementConverter" />
-            </GridView.Resources>
-            <GridView.ItemContainerStyle>
-                <Style TargetType="GridViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Left" />
-                    <Setter Property="VerticalContentAlignment"   Value="Center" />
-                    <Setter Property="Margin" Value="0,0,0,0" />
-                    <Setter Property="Padding" Value="0,0,0,0" />
-                    <Setter Property="MinHeight" Value="25" />
-                    <Setter Property="MinWidth" Value="0" />
-                </Style>
-            </GridView.ItemContainerStyle>
-            <GridView.ItemTemplate>
-                <DataTemplate>
-                    <Border Child="{Binding Converter={StaticResource ObjectToFrameworkElementConverter}}" />
-                </DataTemplate>
-            </GridView.ItemTemplate>
         </GridView>
         <NewControls:WordCloud x:Name="xWordCloud" Visibility="Collapsed"/>
     </Grid>
