@@ -74,7 +74,7 @@ namespace PanoramicDataWin8.model.view.operation
             MenuItemViewModel menuItemViewModel;
             var dict = new  Dictionary<string, ObservableCollection<AttributeTransformationModel>>();
             var subtype = this.FunctionOperationModel.FunctionSubtypeModel as MinMaxScaleFunctionSubtypeModel;
-            foreach (var p in subtype.Parameters)
+            foreach (var p in subtype.AttributeParameterGroups)
                 dict.Add(p.Key, p.Value);
             var menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, dict, 30, 30, false, true,  out menuItemViewModel);
             MenuItemViewModel labelViewModel;
