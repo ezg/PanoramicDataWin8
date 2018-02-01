@@ -21,10 +21,11 @@ namespace PanoramicDataWin8.controller.data.progressive
 
     public class SpecifyProblemCommand
     {
-        public async Task SpecifyProblem(PredictorOperationModel model)
+        public async Task SpecifyProblem(PredictorOperationModel model, string userComment)
         {
             var specifyProblemParam = new SpecifyProblemParameters();
             specifyProblemParam.Id = (model.Result as OptimizerResult).PipelineId;
+            specifyProblemParam.UserComment = userComment;
 
             var ser = JsonConvert.SerializeObject(specifyProblemParam, IDEAGateway.JsonSerializerSettings);
             var response = await IDEAGateway.Request(ser, "specifyProblem");

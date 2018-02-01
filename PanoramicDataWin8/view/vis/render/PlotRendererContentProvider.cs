@@ -1339,9 +1339,9 @@ namespace PanoramicDataWin8.view.vis.render
                         eYFrom - eYTo);
                 }
 
-                var marginRect = new Rect(xFrom + (xTo - xFrom) / 2.0 - 2,
+                var marginRect = new Rect(xFrom + (xTo - xFrom) / 2.0 - 1,
                     DataToScreenY((double) (yValue + yMarginAbsolute)),
-                    4,
+                    2,
                     DataToScreenY((double) (yValue - yMarginAbsolute)) - DataToScreenY((double) (yValue + yMarginAbsolute)));
 
                 createBinPrimitives(bin, binPrimitiveCollection, brush, estimationRect, marginRect, marginPercentage,
@@ -1371,9 +1371,9 @@ namespace PanoramicDataWin8.view.vis.render
                 var xMarginAbsolute = (double) ((MarginAggregateResult) bin.GetAggregateResult(xMarginAggregateKey)).AbsolutMargin;
 
                 var marginRect = new Rect(DataToScreenX((double) (xValue - xMarginAbsolute)),
-                    yTo + (yFrom - yTo) / 2.0 - 2,
+                    yTo + (yFrom - yTo) / 2.0 - 1,
                     DataToScreenX((double) (xValue + xMarginAbsolute)) - DataToScreenX((double) (xValue - xMarginAbsolute)),
-                    4.0);
+                    2.0);
 
                 createBinPrimitives(bin, binPrimitiveCollection, brush, Rect.Empty, marginRect, marginPercentage,
                     xFrom, xTo, yFrom, yTo, normalization.Axis == BczNormalization.axis.Y ? baseColorFromBrush(brush, 0.8 * binBrushMaxAxis / _xScale + 0.2) : baseColorFromBrush(brush), unNormalizedvalue, dataValue.Result);

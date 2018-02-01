@@ -164,7 +164,7 @@ namespace PanoramicDataWin8.view.vis.render
             ContentDialog locationPromptDialog = new ContentDialog
             {
                 Title = "TASK 2: Submit solution?",
-                Content = "Submit this prediction as a solution? The application will exit after you press OK.\nThis means you are done with Task 2. \n\nNever use this for Task 1, rather use the \"Problem?\" button in that case.",
+                Content = "Submit this prediction as a solution? The application will exit after you press OK.\nThis means you are done with Task 2. \n\nNever use this for Task 1, rather use the \"specify problem?\" button in that case.",
                 SecondaryButtonText = "Cancel",
                 PrimaryButtonText = "OK"
             };
@@ -183,22 +183,38 @@ namespace PanoramicDataWin8.view.vis.render
 
         async void specifyProblem()
         {
-            ContentDialog locationPromptDialog = new ContentDialog
-            {
-                Title = "TASK 1: Specify problem?",
-                Content = "Sumbit this a new problem specification.",
-                SecondaryButtonText = "Cancel",
-                PrimaryButtonText = "OK"
-            };
+            TextBlock tb = new TextBlock();
+            tb.Text = "Sumbit this a new problem specification. Please provide a brief description or comments.";
 
-            ContentDialogResult result = await locationPromptDialog.ShowAsync();
+            RichEditBox inputTextBox = new RichEditBox();
+            inputTextBox.AcceptsReturn = true;
+            inputTextBox.TextWrapping = TextWrapping.Wrap;
+            inputTextBox.Height = 3 * 32;
+
+            StackPanel sp = new StackPanel();
+            sp.Orientation = Orientation.Vertical;
+            
+            sp.Children.Add(tb);
+            sp.Children.Add(inputTextBox);
+
+            ContentDialog dialog = new ContentDialog();
+            dialog.Content = sp;
+            dialog.Title = "TASK 1: Specify problem?";
+            dialog.IsSecondaryButtonEnabled = true;
+            dialog.PrimaryButtonText = "OK";
+            dialog.SecondaryButtonText = "Cancel";
+
+            ContentDialogResult result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
                 PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
                 var operationModel = (PredictorOperationModel) model.OperationModel;
 
+                string userComment = string.Empty;
+                inputTextBox.Document.GetText(Windows.UI.Text.TextGetOptions.None, out userComment);
+
                 var catalogCommand = new SpecifyProblemCommand();
-                await catalogCommand.SpecifyProblem(operationModel);
+                await catalogCommand.SpecifyProblem(operationModel, userComment);
             }
         }
 

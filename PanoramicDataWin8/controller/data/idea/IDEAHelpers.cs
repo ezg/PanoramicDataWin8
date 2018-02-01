@@ -215,13 +215,21 @@ namespace PanoramicDataWin8.controller.data.progressive
                 .Where(im => im != model.TargetAttributeUsageModel)
                 .Select(im => GetAttributeParameters(im)).ToList();
             var used = all;
-            if (excludes.Any())
+            /*if (excludes.Any())
             {
                 used = used.Except(excludes).ToList();
             }
             if (includes.Any())
             {
                 //used = all.Concat(includes).
+            }*/
+            if (excludes.Any())
+            {
+                used = used.Except(excludes).ToList();
+            }
+            if (includes.Any())
+            {
+                used = includes.ToList();
             }
 
             var calculated = IDEAAttributeModel.GetAllCalculatedAttributeModels(psm.OriginModels.First())
@@ -332,7 +340,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 SortPerBinAggregateParameter = null,
                 GlobalAggregateParameters = globalAggregates,
                 AttributeCalculatedParameters = attributeCodeParameters.OfType<AttributeCaclculatedParameters>().ToList(),
-                DegreeOfParallism = 4,
+                DegreeOfParallism = 1,
                 IsCachable = false
             };
             return parameters;
@@ -433,7 +441,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                 SortPerBinAggregateParameter = null,
                 GlobalAggregateParameters = globalAggregates,
                 AttributeCalculatedParameters = attributeCodeParameters.OfType<AttributeCaclculatedParameters>().ToList(),
-                DegreeOfParallism = 4,
+                DegreeOfParallism = 1,
                 IsCachable = false
             };
             return parameters;

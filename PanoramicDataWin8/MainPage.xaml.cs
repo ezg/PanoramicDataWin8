@@ -81,6 +81,34 @@ namespace PanoramicDataWin8
 
         private async void MainPage_KeyDown(object sender, KeyRoutedEventArgs e)
         {
+            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode &&
+                !MainViewController.Instance.MainModel.IsIGTMode)
+            {
+                if (e.Key == VirtualKey.F1)
+                {
+                    msgPresentation.Text = "Direct Manipulation";
+                }
+                else if (e.Key == VirtualKey.F2)
+                {
+                    msgPresentation.Text = "Progressive Computation";
+                }
+                else if (e.Key == VirtualKey.F3)
+                {
+                    msgPresentation.Text = "Statistics";
+                }
+                else if (e.Key == VirtualKey.F4)
+                {
+                    msgPresentation.Text = "Machine Learning ";
+                }
+            }
+            if (e.Key == VirtualKey.Escape)
+            {
+                msgPresentation.Text = "";
+                helpGrid.Children.Clear();
+                helpGrid.Visibility = Visibility.Collapsed;
+
+            }
+
             var state = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Control);
             if ((state & CoreVirtualKeyStates.Down) == CoreVirtualKeyStates.Down)
             {
@@ -985,7 +1013,7 @@ namespace PanoramicDataWin8
             }
             return attributes;
         }
-
+        
         public async void ShowHelp()
         {
             var schema = (((MainModel) DataContext)?.SchemaModel as IDEASchemaModel)?.RootOriginModel.DatasetConfiguration.Schema;
@@ -993,11 +1021,11 @@ namespace PanoramicDataWin8
             //var dataset = ((MainModel)DataContext)?.DatasetConfigurations.FirstOrDefault();
 
             var problemHelpText = "";
-            if (schema != null && !string.IsNullOrEmpty(schema.ProblemDescription))
+            if (schema != null)
             {
                 var attributes = flatAttributes(schema.RootAttributeGroup);
                 var field = attributes.FirstOrDefault(a => a.IsTarget);
-                var fieldName = field == null ? "" : field.DisplayName;
+                var fieldName = field == null ? "n/a" : field.DisplayName;
 
                 problemHelpText =
                     "Hi, thanks for participating in this study!\n\n" +
@@ -1009,14 +1037,15 @@ namespace PanoramicDataWin8
                     "Thanks!";
             }
 
-            var dialog = new HelpDialog()
+            var helpDialog  = new HelpDialog()
             {
                 Problem = problemHelpText
             };
+            helpGrid.Children.Clear();
             helpGrid.Visibility = Visibility.Visible;
             //dialog.MaxWidth = this.ActualWidth;
-            helpGrid.Children.Add(dialog);
-            dialog.CloseEvent += (sender, args) =>
+            helpGrid.Children.Add(helpDialog);
+            helpDialog.CloseEvent += (sender, args) =>
             {
                 helpGrid.Children.Clear();
                 helpGrid.Visibility = Visibility.Collapsed;

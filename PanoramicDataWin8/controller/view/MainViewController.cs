@@ -148,6 +148,21 @@ namespace PanoramicDataWin8.controller.view
                     Name = "predictor",
                     OperationType = OperationType.Predictor
                 });
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "calculation",
+                    OperationType = OperationType.Calculation
+                });
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "definition",
+                    OperationType = OperationType.Definition
+                });
+                parent.OperationTypeModels.Add(new OperationTypeModel
+                {
+                    Name = "raw data",
+                    OperationType = OperationType.RawData
+                });
             }
             else if (MainModel.IsIGTMode)
             {

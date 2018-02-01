@@ -269,7 +269,7 @@ namespace PanoramicDataWin8.model.view.operation
 
             layoutExpandingMenuItems(maxExpansionSlots, menuItemViewModel, swapOrientation, menuViewModel);
 
-            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
+            //if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
             {
                 attachmentViewModel.MenuViewModel = menuViewModel;
             }

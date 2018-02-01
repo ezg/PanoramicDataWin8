@@ -72,12 +72,12 @@ namespace PanoramicDataWin8.view.vis.render
                 if (MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
                 {
                     var blue = Color.FromArgb(255, 41, 170, 213);
-                    DrawString(canvasArgs, _textFormatSubmit, deviceWidth, topOffset, "submit\nsolution?", blue, false, false, false);
+                    DrawString(canvasArgs, _textFormatSubmit, deviceWidth + leftOffset, topOffset, "submit\nsolution?", blue, false, false, false);
 
                     var layout = new CanvasTextLayout(canvas, "submit\nsolution?", _textFormatSubmit, 1000f, 1000f);
                     var layoutBounds = layout.DrawBounds;
                     layout.Dispose();
-                    var rct = new Rct(new Pt(deviceWidth - layoutBounds.Width - 5, topOffset),
+                    var rct = new Rct(new Pt(deviceWidth + leftOffset - layoutBounds.Width - 5, topOffset),
                         new Vec(layoutBounds.Width + 10, layoutBounds.Height + 10));
                     //canvasArgs.DrawingSession.DrawRectangle(rct, blue);
                     SubmitHitTarget = rct.GetPolygon();

@@ -185,7 +185,7 @@ namespace PanoramicDataWin8.view.vis
                 progressGridTransform.Angle = 0;
             }
 
-            if (resultModel != null)
+            if (resultModel != null && resultModel.Progress > 0)
             {
                 progressGrid.Visibility = Visibility.Visible;
                 double progress = resultModel?.Progress ?? 0;

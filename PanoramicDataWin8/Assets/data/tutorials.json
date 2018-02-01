@@ -1,18 +1,18 @@
 ﻿[
   {
-    "Description": "Creating a Prediction",
-    "Video": "Assets\\mp4\\prediction.mp4"
-  },
-  {
-    "Description": "Submitting a Prediction",
-    "Video": "Assets\\mp4\\submitting.mp4"
-  },
-  {
-    "Description": "Advanced Predictions",
-    "Video": "Assets\\mp4\\prediction_advanced.mp4"
-  },
-  {
-    "Description": "Exploring with Visualizations",
+    "Description": "Exploring a Dataset",
     "Video": "Assets\\mp4\\visualizations.mp4"
+  },
+  {
+    "Description": "Defining Problems (Task 1)",
+    "Video": "Assets\\mp4\\task1.mp4"
+  },
+  {
+    "Description": "Creating Models (Task 2)",
+    "Video": "Assets\\mp4\\task2.mp4"
+  },
+  {
+    "Description": "Advanced Features",
+    "Video": "Assets\\mp4\\advanced.mp4"
   }
 ]

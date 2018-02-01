@@ -123,6 +123,10 @@
 
         <TextBlock Name="msgTextBlock" Text="" HorizontalAlignment="Left" VerticalAlignment="Bottom" Foreground="{StaticResource darkBrush}" Margin="10" Opacity="0"/>
 
+        <TextBlock Name="msgPresentation" Text="" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                   Foreground="{StaticResource darkBrush}" Margin="10" Opacity="1"
+                   FontSize="40"/>
+
 
         <Canvas Name="fingerAndPenCanvas"></Canvas>
         <TextBlock HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5"  
