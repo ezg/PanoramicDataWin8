@@ -100,6 +100,9 @@ namespace PanoramicDataWin8.view.common
         {
             if (e.Key == VirtualKey.Enter)
             {
+                _ip = tbIp.Text.Trim();
+                _username = tbUsername.Text;
+                _password = tbPassword.Password;
                 this.Hide();
             }
         }
