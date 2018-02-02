@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -86,6 +87,20 @@ namespace PanoramicDataWin8.view.common
             if (MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
             {
                 scrollViewer.Visibility = Visibility.Collapsed;
+            }
+            this.Loaded += GatewayErrorDialog_Loaded;
+        }
+
+        private void GatewayErrorDialog_Loaded(object sender, RoutedEventArgs e)
+        {
+            this.KeyUp += GatewayErrorDialog_KeyUp;
+        }
+
+        private void GatewayErrorDialog_KeyUp(object sender, KeyRoutedEventArgs e)
+        {
+            if (e.Key == VirtualKey.Enter)
+            {
+                this.Hide();
             }
         }
 

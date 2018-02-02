@@ -11,7 +11,7 @@
     <Grid>
         <common:DXSurface x:Name="dxSurface">
         </common:DXSurface>
-        <Viewbox Name="viewBox" Margin="20" Visibility="Collapsed" 
+        <Viewbox Name="viewBox" Margin="20" Visibility="Visible" 
                 CacheMode="BitmapCache">
             <TextBlock 
                 Name="txtBlock"

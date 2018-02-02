@@ -13,7 +13,7 @@
     <Grid>
         <common:DXSurface x:Name="dxSurface">
         </common:DXSurface>
-        <Viewbox Name="viewBox" Margin="20" Visibility="Collapsed" 
+        <!--<Viewbox Name="viewBox" Margin="20" Visibility="Visible" 
                 CacheMode="BitmapCache">
             <TextBlock 
                 Name="txtBlock"
@@ -21,7 +21,7 @@
                 VerticalAlignment="Stretch"
                 HorizontalAlignment="Stretch"
                 TextAlignment="Center"
-                Text="hist" FontSize="11" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
-        </Viewbox>
+                Text="" FontSize="11" Foreground="{StaticResource highlightBrush}" TextWrapping="Wrap"/>
+        </Viewbox>-->
     </Grid>
 </local:Renderer>

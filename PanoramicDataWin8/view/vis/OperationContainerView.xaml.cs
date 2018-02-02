@@ -178,36 +178,39 @@ namespace PanoramicDataWin8.view.vis
         {
             IResult resultModel = ((OperationViewModel)DataContext).OperationModel.Result;
 
-            if (_rotateStoryboard != null)
-            {
-                _rotateStoryboard.Stop();
-                _rotateStoryboard = null;
-                progressGridTransform.Angle = 0;
-            }
-
             if (resultModel != null && resultModel.Progress > 0)
             {
                 progressGrid.Visibility = Visibility.Visible;
                 double progress = resultModel?.Progress ?? 0;
                 setProgressPercentage(progress);
+
+                if (_rotateStoryboard != null)
+                {
+                    _rotateStoryboard.Stop();
+                    _rotateStoryboard = null;
+                    progressGridTransform.Angle = 0;
+                }
             }
             else
             {
                 if (((OperationViewModel) DataContext).OperationModel.ExecutionState == ExecutionState.Running)
                 {
-                    setProgressPercentage(0.15);
-                    progressGrid.Visibility = Visibility.Visible;
-
-                    _rotateStoryboard = new Storyboard();
-                    var doubleAnimation = new DoubleAnimation();
-                    doubleAnimation.Duration = TimeSpan.FromMilliseconds(2000);
-                    doubleAnimation.EnableDependentAnimation = true;
-                    doubleAnimation.RepeatBehavior = RepeatBehavior.Forever;
-                    doubleAnimation.To = 360;
-                    Storyboard.SetTargetProperty(doubleAnimation, "Angle");
-                    Storyboard.SetTarget(doubleAnimation, progressGridTransform);
-                    _rotateStoryboard.Children.Add(doubleAnimation);
-                    _rotateStoryboard.Begin();
+                    if (_rotateStoryboard == null)
+                    {
+                        setProgressPercentage(0.15);
+                        progressGrid.Visibility = Visibility.Visible;
+                        
+                        _rotateStoryboard = new Storyboard();
+                        var doubleAnimation = new DoubleAnimation();
+                        doubleAnimation.Duration = TimeSpan.FromMilliseconds(2000);
+                        doubleAnimation.EnableDependentAnimation = true;
+                        doubleAnimation.RepeatBehavior = RepeatBehavior.Forever;
+                        doubleAnimation.To = 360;
+                        Storyboard.SetTargetProperty(doubleAnimation, "Angle");
+                        Storyboard.SetTarget(doubleAnimation, progressGridTransform);
+                        _rotateStoryboard.Children.Add(doubleAnimation);
+                        _rotateStoryboard.Begin();
+                    }
                 }
                 else
                 {

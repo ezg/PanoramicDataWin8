@@ -86,6 +86,10 @@ namespace PanoramicDataWin8.controller.data.progressive
                     else
                     {
                         string newIp = dialog.Ip;
+                        if (newIp.EndsWith("/"))
+                        {
+                            newIp = newIp.TrimEnd('/');
+                        }
                         if (!newIp.StartsWith("http://") &&
                             !newIp.StartsWith("https://"))
                         {

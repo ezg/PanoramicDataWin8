@@ -508,7 +508,8 @@ namespace PanoramicDataWin8.view.vis.render
                 if (model.AttributeModel.VisualizationHints.FirstOrDefault() == IDEA_common.catalog.VisualizationHint.Image)
                 {
                     var dataset = model.AttributeModel.OriginModel.Name;
-                    string prepend = "http://localhost:1234/api/rawdata/" + dataset + "/"+model.AttributeModel.RawName+"/";
+                    var hostname = MainViewController.Instance.MainModel.Hostname;
+                    string prepend = hostname + "/api/rawdata/" + dataset + "/"+model.AttributeModel.RawName+"/";
 #pragma warning disable CS4014
                     CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
                     CoreDispatcherPriority.Low,

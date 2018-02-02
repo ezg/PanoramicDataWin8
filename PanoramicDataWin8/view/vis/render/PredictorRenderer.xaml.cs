@@ -38,8 +38,7 @@ namespace PanoramicDataWin8.view.vis.render
     public sealed partial class PredictorRenderer : Renderer, IScribbable
     {
         private PredictorRendererContentProvider _predictorRendererContentProvider = new PredictorRendererContentProvider();
-
-
+        
         public PredictorRenderer()
         {
             this.InitializeComponent();

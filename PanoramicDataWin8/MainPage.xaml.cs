@@ -344,7 +344,14 @@ namespace PanoramicDataWin8
                         b.Icon = new SymbolIcon(Symbol.Library);
                         b.DataContext = datasetConfiguration;
                         b.Click += appBarButton_Click;
-                        commandBar.SecondaryCommands.Add(b);
+                        try
+                        {
+                            commandBar.SecondaryCommands.Add(b);
+                        }
+                        catch (Exception exception)
+                        {
+                            Console.WriteLine(exception);
+                        }
                     }
                     commandBar.Visibility = Visibility.Visible;
                 }
@@ -757,7 +764,11 @@ namespace PanoramicDataWin8
                     menuCanvas.Children.Remove(_attributeMenu);
                 }
 
-                var allModels = inputModels.Count() + groupModels.Count() + 1; // + 1 for the (+) attribute group model
+                var allModels = inputModels.Count() + groupModels.Count();
+                if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
+                {
+                    allModels += 1; // + 1 for the (+) attribute group model
+                }
                 var parentModel = new TileMenuItemViewModel(null);
                 parentModel.ChildrenNrColumns = (int) Math.Ceiling(allModels / 10.0);
                 parentModel.ChildrenNrRows = (int) Math.Min(10.0, allModels);
@@ -897,6 +908,7 @@ namespace PanoramicDataWin8
 
         private void addOperationButton_Click(object sender, RoutedEventArgs e)
         {
+            var mainModel = DataContext as MainModel;
             if ((_operationMenu != null) && ((TileMenuItemViewModel) _operationMenu.DataContext).AreChildrenExpanded)
             {
                 ((TileMenuItemViewModel) _operationMenu.DataContext).AreChildrenExpanded = false;
@@ -905,9 +917,8 @@ namespace PanoramicDataWin8
             {
                 ((TileMenuItemViewModel) _operationMenu.DataContext).AreChildrenExpanded = true;
             }
-            else if (_operationMenu == null)
+            else if (_operationMenu == null && (mainModel.SchemaModel != null))
             {
-                var mainModel = DataContext as MainModel;
                 var buttonBounds = addOperationButton.GetBounds(this);
                 var taskModels =
                     mainModel.OperationTypeModels;

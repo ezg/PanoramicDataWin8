@@ -38,16 +38,13 @@ namespace PanoramicDataWin8.view.vis.render
     public sealed partial class PlotRenderer : Renderer, IScribbable, AttributeViewModelEventHandler
     {
         private PlotRendererContentProvider _plotRendererContentProvider = new PlotRendererContentProvider();
-        static int count = 0;
-        int MyCount = 0;
         private readonly DispatcherTimer _operationViewMovingTimer = new DispatcherTimer();
+        private bool _ifNotLoadedYet = true;
 
         public PlotRenderer()
         {
             this.InitializeComponent();
-
-            MyCount = count++;
-
+            
             _plotRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
             _plotRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
             dxSurface.ContentProvider = _plotRendererContentProvider;
@@ -62,7 +59,7 @@ namespace PanoramicDataWin8.view.vis.render
         private void _operationViewMovingTimer_Tick(object sender, object e)
         {
             var result = (DataContext as HistogramOperationViewModel)?.OperationModel?.Result;
-            if (result != null && ifNotLoadedYet)
+            if (result != null && _ifNotLoadedYet)
             {
                 loadResult(result);
                 render();
@@ -108,7 +105,7 @@ namespace PanoramicDataWin8.view.vis.render
                     if (!operationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any() &&
                         !operationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).Any())
                     {
-                        viewBox.Visibility = Visibility.Visible;
+                        //viewBox.Visibility = Visibility.Visible;
                     }
                 }
             }
@@ -150,10 +147,10 @@ namespace PanoramicDataWin8.view.vis.render
 
         HistogramOperationModel ResultHistogramOperationModel;
         HistogramResult _lastResult;
-        private bool ifNotLoadedYet = true;
+        
         void loadResult(IResult result)
         {
-            ifNotLoadedYet = false;
+            _ifNotLoadedYet = false;
             _lastResult = result as HistogramResult;
             var model = (DataContext as HistogramOperationViewModel);
             _plotRendererContentProvider.UpdateFilterModels(model.HistogramOperationModel.FilterModels.ToList());
@@ -260,7 +257,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         void render(bool sizeChanged = false)
         {
-            viewBox.Visibility = Visibility.Collapsed;
+           // viewBox.Visibility = Visibility.Collapsed;
             dxSurface?.Redraw();
         }
 
