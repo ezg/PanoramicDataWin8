@@ -41,6 +41,12 @@ namespace PanoramicDataWin8.model.view
                 SetProperty(ref _menuItemViewModels, value);
             }
         }
+
+        public void AddMenuItemViewModel(MenuItemViewModel mivm)
+        {
+            mivm.MenuViewModel = this;
+            _menuItemViewModels.Add(mivm);
+        }
         
 
         public Pt HidePosition

@@ -117,8 +117,8 @@ namespace PanoramicDataWin8.model.view.operation
             var menuViewModel = createAttributeLabelMenu(AttachmentOrientation.Bottom, predictorOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false, null, out PredictorNameMenuItemViewModel);
             createRightTargetMenu();
             MenuItemViewModel menuItemViewModel;
-            createExpandingMenu(AttachmentOrientation.Top,  PredictorOperationModel.AttributeTransformationModelParameters, "+", 50, 3, false, false, out menuItemViewModel);
-            createExpandingMenu(AttachmentOrientation.Left, PredictorOperationModel.IgnoredAttributeTransformationModels, "-", 50, 3, false, false, out menuItemViewModel);
+            createExpandingMenu(AttachmentOrientation.Top,  PredictorOperationModel.AttributeTransformationModelParameters, "+", 50, 3, false, false, true, out menuItemViewModel);
+            createExpandingMenu(AttachmentOrientation.Left, PredictorOperationModel.IgnoredAttributeTransformationModels, "-", 50, 3, false, false, true, out menuItemViewModel);
             hideLabelUnlessPredictorHasResult(menuViewModel);
         }
     }

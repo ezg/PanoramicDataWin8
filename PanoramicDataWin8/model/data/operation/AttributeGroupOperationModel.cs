@@ -27,10 +27,25 @@ namespace PanoramicDataWin8.model.data.operation
         public AttributeGroupOperationModel(SchemaModel schemaModel, string rawName, AttributeModel groupModel) : base(schemaModel)
         {
             attributeGroupModel = groupModel ?? IDEAAttributeModel.AddGroupField(rawName, rawName, schemaModel.OriginModels.First());
+            GroupFuncModel.InputModels.CollectionChanged += GroupFuncModel_CollectionChanged;
+
             foreach (var am in GroupFuncModel.InputModels)
                 AttributeTransformationModelParameters.Add(new AttributeTransformationModel(am));
             AttributeTransformationModelParameters.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
+
+        private void GroupFuncModel_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (AttributeTransformationModelParameters.Count != GroupFuncModel.InputModels.Count)
+            {
+                AttributeTransformationModelParameters.CollectionChanged -= _attributeUsageTransformationModels_CollectionChanged;
+                AttributeTransformationModelParameters.Clear();
+                foreach (var am in GroupFuncModel.InputModels)
+                    AttributeTransformationModelParameters.Add(new AttributeTransformationModel(am));
+                AttributeTransformationModelParameters.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
+            }
+        }
+
         private string _name;
 
         public void SetName(string name)
@@ -42,10 +57,12 @@ namespace PanoramicDataWin8.model.data.operation
 
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            GroupFuncModel.InputModels.CollectionChanged -= GroupFuncModel_CollectionChanged;
             GroupFuncModel.InputModels.Clear();
             foreach (var attributeUsageModel in AttributeTransformationModelParameters)
                 GroupFuncModel.InputModels.Add(attributeUsageModel.AttributeModel);
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+            GroupFuncModel.InputModels.CollectionChanged += GroupFuncModel_CollectionChanged;
         }
     }
 }

@@ -70,14 +70,14 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var attributeGroupOperationViewModel = DataContext as AttributeGroupOperationViewModel;
 
-            NameTextBox.IsEnabled = true && attributeGroupOperationViewModel.Editable;
+            NameTextBox.IsEnabled = true && attributeGroupOperationViewModel?.Editable == true;
             NameTextBox.Focus(FocusState.Keyboard);
         }
 
         private void OperationModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             var attributeGroupOperationViewModel = DataContext as AttributeGroupOperationViewModel;
-            NameTextBox.Text = attributeGroupOperationViewModel.AttributeGroupOperationModel.AttributeModel.DisplayName ?? "";
+            NameTextBox.Text = attributeGroupOperationViewModel?.AttributeGroupOperationModel.AttributeModel.DisplayName ?? "";
         }
 
         private void OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
@@ -111,7 +111,6 @@ namespace PanoramicDataWin8.view.vis.render
             NameTextBox.IsEnabled = false;
             model.SetName(NameTextBox.Text);
             MainViewController.Instance.MainPage.addAttributeButton.Focus(FocusState.Pointer);
-            MainViewController.Instance.MainPage.clearAndDisposeMenus();
         }
     }
 }
