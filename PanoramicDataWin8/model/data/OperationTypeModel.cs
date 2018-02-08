@@ -12,7 +12,7 @@ namespace PanoramicDataWin8.model.data
 
         private OperationType _operationType;
 
-        private FunctionSubtypeModel _functionSubtypeModel;
+        private FunctionOperationModel _functionTypeModel;
 
         private Vec _size = new Vec(50, 50);
 
@@ -34,10 +34,10 @@ namespace PanoramicDataWin8.model.data
             set { SetProperty(ref _operationType, value); }
         }
 
-        public FunctionSubtypeModel FunctionType
+        public FunctionOperationModel FunctionType
         {
-            get { return _functionSubtypeModel; }
-            set { SetProperty(ref _functionSubtypeModel, value); }
+            get { return _functionTypeModel; }
+            set { SetProperty(ref _functionTypeModel, value); }
         }
 
         public Vec Size

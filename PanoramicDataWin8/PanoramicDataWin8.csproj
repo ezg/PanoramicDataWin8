@@ -148,7 +148,6 @@
     <Compile Include="model\data\operation\BrushOperationModelUpdatedEventArgs.cs" />
     <Compile Include="model\data\operation\computational\CalculationOperationModel.cs" />
     <Compile Include="model\data\operation\computational\ComputationalOperationModel.cs" />
-    <Compile Include="model\data\operation\computational\FunctionGenericOperationModel.cs" />
     <Compile Include="model\data\operation\computational\PredictorOperationModel.cs" />
     <Compile Include="model\data\operation\computational\DefinitionOperationModel.cs" />
     <Compile Include="model\data\operation\ExampleOperationModel.cs" />

@@ -26,7 +26,8 @@ namespace PanoramicDataWin8.model.data.operation
             if (attrModel?.FuncModel is AttributeFuncModel.AttributeCodeFuncModel)
             {
                 var str = "(";
-                foreach (var n in (attrModel.FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Terms)
+                var terms = (attrModel.FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Terms;
+                foreach (var n in terms)
                     if (n != null)
                         str += n + ",";
                 str = str.TrimEnd(',') + ")";

@@ -180,7 +180,7 @@ namespace PanoramicDataWin8.model.data.attribute
                             {
                                 var s = strings[i];
                                 var startBoundaryOk = i == 0 || "()[]<> {}.*/+-%^$#@!\0".Contains(strings[i - 1].LastOrDefault());
-                                var endBoundaryOk = "()[]<> {}.*/+-%^$#@!\0x0".Contains(s.FirstOrDefault());
+                                var endBoundaryOk = "()[]<> {}.*/+-%^$#@!\0".Contains(s.FirstOrDefault());
                                 if (startBoundaryOk && endBoundaryOk)
                                 {
                                     if (rawName == oldName)

@@ -255,7 +255,7 @@ namespace PanoramicDataWin8.model.view.operation
             
             menuItemViewModel = operationAttributeModels.Select((opAtMo, colIndex) =>
                 AddExpandingMenuItem(attachmentViewModel, menuViewModel, opAtMo.Value, opAtMo.Key,
-                                         menuHeight, isAlwaysDisplayed, colIndex++, swapOrientation, canDeleteItems, maxExpansionSlots)).Last();
+                                         menuHeight, isAlwaysDisplayed, colIndex++, swapOrientation, canDeleteItems, maxExpansionSlots)).LastOrDefault();
 
             //if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
             {

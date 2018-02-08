@@ -48,7 +48,7 @@ namespace PanoramicDataWin8.view.vis.render
             var viewModel = (DataContext as FunctionOperationViewModel);
             if (viewModel != null)
             {
-                NameTextBox.Text = FunctionOperationViewModel.FunctionOperationModel.FunctionSubtypeModel.Name;
+                NameTextBox.Text = FunctionOperationViewModel.FunctionOperationModel.GetAttributeModel().DisplayName;
                 FunctionOperationViewModel.OperationViewModelTapped -= OperationViewModelTapped;
                 FunctionOperationViewModel.OperationViewModelTapped += OperationViewModelTapped;
                 viewModel.FunctionOperationModel.OperationModelUpdated += (s, e) => viewModel.FunctionOperationModel.UpdateName() ;

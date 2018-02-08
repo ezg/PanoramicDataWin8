@@ -101,9 +101,14 @@ namespace PanoramicDataWin8.model.view.operation
                 new AttributeGroupOperationModel(schemaModel, "G" + (groupCount++) + "()", groupModel), groupModel == null) { Position = position };
         }
         static int funcCount = 0;
-        public static FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(SchemaModel schemaModel, Pt position, FunctionSubtypeModel functionSubtypeModel, bool fromMouse = false)
+        public static FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(SchemaModel schemaModel, Pt position, FunctionOperationModel genericFunctionModel, bool fromMouse = false)
         {
-            return new FunctionOperationViewModel(new FunctionOperationModel(schemaModel, functionSubtypeModel.Name + (funcCount++) + "()", functionSubtypeModel), fromMouse) { Position = position }; ;
+            return new FunctionOperationViewModel(new FunctionOperationModel(schemaModel,
+                genericFunctionModel.GetAttributeModel().DataType, genericFunctionModel.GetAttributeModel().InputVisualizationType,
+                genericFunctionModel.AttributeParameterGroups().Select((am) => am.Item1),
+                genericFunctionModel.ValueParameterPairs(),
+                genericFunctionModel.GetAttributeModel().RawName + (funcCount++) + "()",
+                genericFunctionModel.GetAttributeModel().RawName), fromMouse) { Position = position }; ;
         }
         static int calcCount = 0;
         public static CalculationOperationViewModel CreateDefaultCalculationOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse = false)

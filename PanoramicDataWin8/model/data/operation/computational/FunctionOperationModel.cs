@@ -5,40 +5,85 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using Windows.UI;
 using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 
 namespace PanoramicDataWin8.model.data.operation
 {
-    public interface FunctionSubtypeModel {
-        DataType DataType { get; }
-        string   Name { get; }
-        Dictionary<string, ObservableCollection<AttributeTransformationModel>> AttributeParameterGroups { get; }
-        Dictionary<string, object> ValueParameters { get; }
-        string   InputVisualizationType { get; }
-        string   Code();
-    }
-
     public class FunctionOperationModel : ComputationalOperationModel
     {
-        public FunctionSubtypeModel FunctionSubtypeModel;
-
-        public FunctionOperationModel(SchemaModel schemaModel, string rawName, FunctionSubtypeModel functionSubtypeModel, string displayName = null) : 
-            base(schemaModel, "0", 
-                functionSubtypeModel.DataType, 
-                functionSubtypeModel.InputVisualizationType,
-                rawName, 
-                displayName == null ? rawName : displayName)
-        {
-            FunctionSubtypeModel = functionSubtypeModel;
-            foreach (var p in functionSubtypeModel.AttributeParameterGroups)
-                p.Value.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
-        }
-
+        Dictionary<string, ObservableCollection<AttributeTransformationModel>> _attributeParameterGroups = new Dictionary<string, ObservableCollection<AttributeTransformationModel>>();
+        Dictionary<string, object>                                             _valueParameters        = new Dictionary<string, object>();
+       
         private void _attributeUsageTransformationModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            GetAttributeModel().SetCode(FunctionSubtypeModel.Code(), FunctionSubtypeModel.DataType);
+            GetAttributeModel().SetCode(Code(), GetAttributeModel().DataType);
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
+
+        public FunctionOperationModel(SchemaModel schemaModel, DataType outputType, string inputVisualizationType,
+                    IEnumerable<string> attributeParameterGroups = null,
+                    IEnumerable<Tuple<string, object>> valueParameters = null, string rawName = null, string displayName = null) :
+        base(schemaModel, "0",
+            outputType,
+            inputVisualizationType,
+            rawName,
+            displayName == null ? rawName : displayName)
+        {
+            foreach (var v in attributeParameterGroups ?? new string[] { })
+            {
+                var observableAttributeTransformationModels = new ObservableCollection<AttributeTransformationModel>();
+                _attributeParameterGroups.Add(v, observableAttributeTransformationModels);
+                observableAttributeTransformationModels.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
+            }
+            foreach (var v in valueParameters ?? new Tuple<string, object>[] { })
+                _valueParameters.Add(v.Item1, v.Item2);
+        }
+
+
+        public IEnumerable<Tuple<string, ObservableCollection<AttributeTransformationModel>>> AttributeParameterGroups()
+        {
+            return _attributeParameterGroups.Select((am) => new Tuple<string, ObservableCollection<AttributeTransformationModel>>(am.Key, am.Value));
+        }
+        public IEnumerable<Tuple<string, object>> ValueParameterPairs() {
+            return _valueParameters.Select((vm) => new Tuple<string,object>(vm.Key,vm.Value));
+        }
+
+        public void SetValue(string inputName, object value) { _valueParameters[inputName] = value; }
+        public object GetValue(string inputName)             { return _valueParameters[inputName]; }
+
+        public string Code()
+        {
+            var code = "";
+            if (_attributeParameterGroups != null)
+                foreach (var p in _attributeParameterGroups)
+                    foreach (var v in p.Value)
+                        code += (p.Key + ":" + v.AttributeModel.RawName) + ",";
+            if (_valueParameters != null)
+                foreach (var p in _valueParameters)
+                    code += (p.Key + "=" + p.Value) + ",";
+            return code;
+        }
+    }
+
+    /// <summary>
+    /// Example of a filled in function -- these should be created automatically from a pipeline script, etc
+    /// </summary>
+    public class MinMaxScaleFunctionModel : FunctionOperationModel
+    {
+        public MinMaxScaleFunctionModel(SchemaModel schemaModel) : base(
+            schemaModel,
+            DataType.Double,
+            InputVisualizationTypeConstants.NUMERIC,
+            new string[] { "P1", "P2" },
+            new Tuple<string, object>[] { new Tuple<string, object>("Dummy", 0.0), new Tuple<string, object>("Yummy", 1.0) },
+            "MinMaxScale",
+            "MinMaxScale"
+            )
+        {
+
+        }
+        // public double DummyValue { get { return (double)GetValue("Dummy"); } set { SetValue("Dummy", value); } }
     }
 }

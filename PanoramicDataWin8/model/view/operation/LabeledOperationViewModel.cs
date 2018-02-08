@@ -96,7 +96,7 @@ namespace PanoramicDataWin8.model.view.operation
                     TextAngle = textAngle,
                     TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
                     EditNameOnTap = !( code?.FuncModel is AttributeModel.AttributeFuncModel.AttributeColumnFuncModel),
-                    Label = code?.DisplayName,
+                    Label = code?.RawName,
                     AttributeViewModel = new AttributeViewModel(this, code),
                     DroppedTriggered = droppedTriggered == null ? null : new Action<AttributeViewModel>(droppedTriggered)
                 }

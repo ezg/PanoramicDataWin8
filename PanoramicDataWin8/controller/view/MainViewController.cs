@@ -217,7 +217,7 @@ namespace PanoramicDataWin8.controller.view
                 {
                     Name = "MinMaxScale",
                     OperationType = OperationType.Function,
-                    FunctionType = new MinMaxScaleFunctionSubtypeModel()
+                    FunctionType = new MinMaxScaleFunctionModel(MainModel.SchemaModel)
                 });
             }
             MainModel.OperationTypeModels = parent.OperationTypeModels.ToList();
@@ -276,9 +276,10 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.Add(visModel);
             return visModel;
         }
-        public FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(Pt position, FunctionSubtypeModel functionSubtypeModel)
+        public FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(Pt position, FunctionOperationModel functionTypeModel
+            )
         {
-            var visModel = OperationViewModelFactory.CreateDefaultFunctionOperationViewModel(MainModel.SchemaModel, position, functionSubtypeModel);
+            var visModel = OperationViewModelFactory.CreateDefaultFunctionOperationViewModel(MainModel.SchemaModel, position, functionTypeModel);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
