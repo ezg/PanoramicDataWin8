@@ -6,6 +6,7 @@ using Microsoft.Practices.Prism.Mvvm;
 using PanoramicDataWin8.model.data.idea;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Collections.ObjectModel;
 
 namespace PanoramicDataWin8.model.data.attribute
 {
@@ -179,7 +180,7 @@ namespace PanoramicDataWin8.model.data.attribute
                             {
                                 var s = strings[i];
                                 var startBoundaryOk = i == 0 || "()[]<> {}.*/+-%^$#@!\0".Contains(strings[i - 1].LastOrDefault());
-                                var endBoundaryOk = "()[]<> {}.*/+-%^$#@!\0x0".Contains(s.FirstOrDefault());
+                                var endBoundaryOk = "()[]<> {}.*/+-%^$#@!\0".Contains(s.FirstOrDefault());
                                 if (startBoundaryOk && endBoundaryOk)
                                 {
                                     if (rawName == oldName)
@@ -223,12 +224,12 @@ namespace PanoramicDataWin8.model.data.attribute
             }
             public class AttributeGroupFuncModel : AttributeFuncModel
             {
-                private List<AttributeModel> _inputModels = new List<AttributeModel>();
+                private ObservableCollection<AttributeModel> _inputModels = new ObservableCollection<AttributeModel>();
                 public override AttributeModelType ModelType => AttributeModelType.Group;
-                public List<AttributeModel> InputModels
+                public ObservableCollection<AttributeModel> InputModels
                 {
                     get { return _inputModels; }
-                    set { SetProperty(ref _inputModels, value); }
+                    //set { SetProperty(ref _inputModels, value); }
                 }
             }
         };

@@ -14,23 +14,12 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class FunctionOperationViewModel : LabeledOperationViewModel
     {
-        private void createDummyParameterMenu()
+        private void createSliderParameterMenus(AttachmentViewModel attachmentViewModel, MenuViewModel parametersMenuViewModel, string name, double value, int ind)
         {
-            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
-            attachmentViewModel.ShowOnAttributeTapped = true;
-
-            var menuViewModel = new MenuViewModel
-            {
-                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
-                NrColumns = 3,
-                NrRows = 1,
-                ClickToDismiss = true
-            };
-
             var sliderItem = new MenuItemViewModel
             {
-                MenuViewModel = menuViewModel,
-                Row = 0,
+                MenuViewModel = parametersMenuViewModel,
+                Row = ind,
                 ColumnSpan = 1,
                 RowSpan = 1,
                 Column = 0,
@@ -42,11 +31,10 @@ namespace PanoramicDataWin8.model.view.operation
                 IsHeightBoundToParent = false
             };
 
-            var subtype = this.FunctionOperationModel.FunctionSubtypeModel as MinMaxScaleFunctionSubtypeModel;
             var attr1 = new SliderMenuItemComponentViewModel
             {
-                Label = "dummy slider",
-                Value = subtype.DummyValue,
+                Label = name,
+                Value = value,
                 MinValue = 1,
                 MaxValue = 100
             };
@@ -54,32 +42,48 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 var model = sender as SliderMenuItemComponentViewModel;
                 if (args.PropertyName == model.GetPropertyName(() => model.FinalValue))
-                    subtype.DummyValue = model.FinalValue;
+                    FunctionOperationModel.SetValue(name, model.FinalValue);
                 attachmentViewModel.StartDisplayActivationStopwatch();
             };
 
             sliderItem.MenuItemComponentViewModel = attr1;
-            menuViewModel.MenuItemViewModels.Add(sliderItem);
-            attachmentViewModel.MenuViewModel = menuViewModel;
+            parametersMenuViewModel.MenuItemViewModels.Add(sliderItem);
         }
 
         public ObservableCollection<AttributeTransformationModel> ExtraAttributeTransformationModelParameters { get; } = new ObservableCollection<AttributeTransformationModel>();
 
         public FunctionOperationViewModel(FunctionOperationModel functionOperationModel, bool fromMouse = false) : base(functionOperationModel)
         {
-            // fill-in UI specific to function's subtype
-            if (FunctionOperationModel.FunctionSubtypeModel is MinMaxScaleFunctionSubtypeModel)
-                 createDummyParameterMenu();
+            var attachmentViewModel     = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+            var parametersMenuViewModel = CreateParameterRightSideMenu(attachmentViewModel, FunctionOperationModel.ValueParameterPairs().Count());
+            
+            FunctionOperationModel.ValueParameterPairs().ForEach((p, ind) =>
+                createSliderParameterMenus(attachmentViewModel, parametersMenuViewModel, p.Item1, (double)p.Item2, ind)
+            );
 
             MenuItemViewModel menuItemViewModel;
-            var dict = new  Dictionary<string, ObservableCollection<AttributeTransformationModel>>();
-            var subtype = this.FunctionOperationModel.FunctionSubtypeModel as MinMaxScaleFunctionSubtypeModel;
-            foreach (var p in subtype.AttributeParameterGroups)
-                dict.Add(p.Key, p.Value);
-            var menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, dict, 30, 30, false, true,  out menuItemViewModel);
+            var dict = new Dictionary<string, ObservableCollection<AttributeTransformationModel>>();
+            foreach (var p in FunctionOperationModel.AttributeParameterGroups())
+                dict.Add(p.Item1, p.Item2);
+            var menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, dict, 30, 30, false, true, true, out menuItemViewModel);
             MenuItemViewModel labelViewModel;
-            createAttributeLabelMenu(AttachmentOrientation.Bottom, FunctionOperationModel.GetAttributeModel() , AttributeUsage.X, new Vec(60, 50), 0, true, false, null, out labelViewModel);
+            createAttributeLabelMenu(AttachmentOrientation.Bottom, FunctionOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(60, 50), 0, true, false, null, out labelViewModel);
             // createApplyAttributeMenu(FunctionOperationModel.GetAttributeModel(), AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false, true);
+        }
+
+        private MenuViewModel CreateParameterRightSideMenu(AttachmentViewModel attachmentViewModel, int numParameters)
+        {
+            attachmentViewModel.ShowOnAttributeTapped = true;
+
+            var menuViewModel = new MenuViewModel
+            {
+                AttachmentOrientation = attachmentViewModel.AttachmentOrientation,
+                NrColumns = 3,
+                NrRows = numParameters,
+                ClickToDismiss = true
+            };
+            attachmentViewModel.MenuViewModel = menuViewModel;
+            return menuViewModel;
         }
 
         public FunctionOperationModel FunctionOperationModel => (FunctionOperationModel)OperationModel;

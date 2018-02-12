@@ -12,12 +12,12 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class AttributeGroupOperationViewModel : LabeledOperationViewModel
     {
+        MenuItemViewModel menuItemViewModel;
         public AttributeGroupOperationViewModel(AttributeGroupOperationModel attributeGroupOperationModel, bool editable) : base(attributeGroupOperationModel)
         {
             Editable = editable;
 
-            MenuItemViewModel menuItemViewModel;
-            createExpandingMenu(AttachmentOrientation.TopStacked, AttributeGroupOperationModel.AttributeTransformationModelParameters, editable ? "+" : "", 50, 100, !Editable, false, out menuItemViewModel);
+            createExpandingMenu(AttachmentOrientation.TopStacked, AttributeGroupOperationModel.AttributeTransformationModelParameters, Editable ? "+" : "", 50, 100, !Editable, false, Editable, out menuItemViewModel);
             createApplyAttributeMenu(AttributeGroupOperationModel.AttributeModel, AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false);
       
             ExpandingMenuInputAdded += (sender, usageModels) =>
@@ -29,6 +29,7 @@ namespace PanoramicDataWin8.model.view.operation
                 var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(AttributeGroupOperationModel.AttributeModel.DisplayName, str);
                 AttributeGroupOperationModel.SetName(newName);
             };
+
         }
 
         public bool Editable = true;

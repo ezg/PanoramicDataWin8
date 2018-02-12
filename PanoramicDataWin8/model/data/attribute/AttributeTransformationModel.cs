@@ -199,10 +199,22 @@ namespace PanoramicDataWin8.model.data.attribute
                     attributeTransformationModel = new AttributeTransformationModel(im as AttributeModel);
             return attributeTransformationModel;
         }
+        static IEnumerable<AttributeModel> flattenAttributes(IEnumerable<AttributeModel> ams)
+        {
+            if (ams != null)
+            {
+                foreach (var am in ams)
+                {
+                    yield return am;
+                    foreach (var flatasbum in flattenAttributes((am.FuncModel as AttributeModel.AttributeFuncModel.AttributeGroupFuncModel)?.InputModels))
+                        yield return flatasbum;
+                }
+            }
+        }
         public static IEnumerable<string> ExistingFieldList()
         {
             var originModel = (MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel.OriginModels.First();
-            var inputModels = originModel.InputModels.Where(am => am.IsDisplayed).ToList();
+            var inputModels = flattenAttributes(originModel.InputModels.Where(am => am.IsDisplayed)).ToList();
             inputModels.AddRange(IDEAAttributeModel.GetAllCalculatedAttributeModels(originModel));
             var existingFields = new List<string>();
             foreach (var im in inputModels)

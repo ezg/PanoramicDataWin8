@@ -39,6 +39,7 @@ using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.view.vis;
 using PanoramicDataWin8.view.vis.menu;
 using PanoramicDataWin8.view.vis.render;
+using PanoramicDataWin8.model.data.pipeline;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -64,6 +65,7 @@ namespace PanoramicDataWin8
         public MainPage()
         {
             InitializeComponent();
+            Pipeline.testc();
             Loaded += MainPage_Loaded;
             DataContextChanged += MainPage_DataContextChanged;
             AddHandler(PointerPressedEvent, new PointerEventHandler(MainPage_PointerPressed), true);
@@ -741,6 +743,10 @@ namespace PanoramicDataWin8
 
         private void addAttributeButton_Click(object sender, RoutedEventArgs e)
         {
+            if (_deferClearAndDisposeMenus)
+            {
+                clearAndDisposeMenus();
+            }
             var mainModel = DataContext as MainModel;
             if ((_attributeMenu != null) && ((TileMenuItemViewModel) _attributeMenu.DataContext).AreChildrenExpanded)
             {
@@ -806,22 +812,23 @@ namespace PanoramicDataWin8
                     }
                 }
 
-                foreach (var attributeGroupOperationModel in groupModels)
-                    if (attributeGroupOperationModel != null)
-                    {
-                        var tileMenuItemViewModel = recursiveCreateTileMenu(attributeGroupOperationModel.AttributeModel, parentModel);
-                        tileMenuItemViewModel.Row = count;
-                        tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
-                                                       (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
-                        tileMenuItemViewModel.RowSpan = 1;
-                        tileMenuItemViewModel.ColumnSpan = 1;
+                var groupAttributeModels = new List<AttributeModel>();
+                foreach (var attributeGroupOperationModel in groupModels.Where((gm) => gm != null && !inputModels.Contains(gm.AttributeModel) & !groupAttributeModels.Contains(gm.AttributeModel)))
+                {
+                    groupAttributeModels.Add(attributeGroupOperationModel.AttributeModel);
+                       var tileMenuItemViewModel = recursiveCreateTileMenu(attributeGroupOperationModel.AttributeModel, parentModel);
+                    tileMenuItemViewModel.Row = count;
+                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
+                                                    (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
+                    tileMenuItemViewModel.RowSpan = 1;
+                    tileMenuItemViewModel.ColumnSpan = 1;
 
-                        count++;
-                        if (count == 10.0)
-                        {
-                            count = 0;
-                        }
+                    count++;
+                    if (count == 10.0)
+                    {
+                        count = 0;
                     }
+                }
 
                 _attributeMenu = new TileMenuItemView {MenuCanvas = menuCanvas, DataContext = parentModel};
                 menuCanvas.Children.Add(_attributeMenu);
@@ -965,25 +972,30 @@ namespace PanoramicDataWin8
                 parentModel.AreChildrenExpanded = true;
             }
         }
-        
 
-        public void clearAndDisposeMenus()
+
+        bool _deferClearAndDisposeMenus = false;
+        public void clearAndDisposeMenus(bool defer=false)
         {
-            if (_operationMenu != null)
+            _deferClearAndDisposeMenus = defer;
+            if (!_deferClearAndDisposeMenus)
             {
-                ((TileMenuItemViewModel) _operationMenu.DataContext).AreChildrenExpanded = false;
-                ((TileMenuItemViewModel) _operationMenu.DataContext).IsBeingRemoved = true;
-                _operationMenu.Dispose();
-                menuCanvas.Children.Remove(_operationMenu);
-                _operationMenu = null;
-            }
-            if (_attributeMenu != null)
-            {
-                ((TileMenuItemViewModel) _attributeMenu.DataContext).AreChildrenExpanded = false;
-                ((TileMenuItemViewModel) _attributeMenu.DataContext).IsBeingRemoved = true;
-                _attributeMenu.Dispose();
-                menuCanvas.Children.Remove(_attributeMenu);
-                _attributeMenu = null;
+                if (_operationMenu != null)
+                {
+                    ((TileMenuItemViewModel)_operationMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel)_operationMenu.DataContext).IsBeingRemoved = true;
+                    _operationMenu.Dispose();
+                    menuCanvas.Children.Remove(_operationMenu);
+                    _operationMenu = null;
+                }
+                if (_attributeMenu != null)
+                {
+                    ((TileMenuItemViewModel)_attributeMenu.DataContext).AreChildrenExpanded = false;
+                    ((TileMenuItemViewModel)_attributeMenu.DataContext).IsBeingRemoved = true;
+                    _attributeMenu.Dispose();
+                    menuCanvas.Children.Remove(_attributeMenu);
+                    _attributeMenu = null;
+                }
             }
         }
 

@@ -67,6 +67,11 @@ namespace PanoramicDataWin8.model.view
         }
 
         public List<MenuItemViewModel> SubMenuItemViewModels = new List<MenuItemViewModel>();
+        public void AddSubMenuItemViewModel(MenuItemViewModel mivm)
+        {
+            SubMenuItemViewModels.Add(mivm);
+            MenuViewModel.AddMenuItemViewModel(mivm);
+        }
 
         public MenuViewModel MenuViewModel
         {
