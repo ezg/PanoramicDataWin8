@@ -11,6 +11,7 @@ using Windows.Foundation;
 using Windows.Graphics.Display;
 using Windows.Networking.Sockets;
 using Windows.UI;
+using Windows.UI.Xaml;
 using PanoramicDataWin8.utils;
 using GeoAPI.Geometries;
 using IDEA_common.aggregates;
@@ -277,7 +278,8 @@ namespace PanoramicDataWin8.view.vis.render
         void drawLabelsAndGridLines(Microsoft.Graphics.Canvas.UI.Xaml.CanvasDrawEventArgs canvasArgs, bool renderLines, bool xaxis, Dictionary<int, int> sortedList)
         {
             double xFrom = 0, xTo = 0, yFrom = 0, yTo = 0;
-            var white    = Color.FromArgb(255, 255, 255, 255);
+            //var white    = Color.FromArgb(255, 255, 255, 255);
+            var white = (Color)Application.Current.Resources.MergedDictionaries[0]["backgroundColor"];
             var binRange = _helper.VisualBinRanges[xaxis ? 0 : 1];
             var Labels = GetAxisLabels(binRange, xaxis);
             
@@ -398,8 +400,10 @@ namespace PanoramicDataWin8.view.vis.render
                 DrawString(canvasArgs, _textFormat, 25, _helper.DeviceHeight + _helper.TopOffset + 25, "null values: " + _histogramResult.NullValueCount, _textColor, true, false, false);
             }
 
-            var white = Color.FromArgb(255, 255, 255, 255);
-            var dark = Color.FromArgb(255, 11, 11, 11);
+            //var white = Color.FromArgb(255, 255, 255, 255);
+            var white = (Color)Application.Current.Resources.MergedDictionaries[0]["backgroundColor"];
+            //var dark = Color.FromArgb(255, 11, 11, 11);
+            var dark = (Color)Application.Current.Resources.MergedDictionaries[0]["darkColor"];
 
             var highlightedBinPrimitiveCollections = new List<BinPrimitiveCollection>();
             HitTargets.Clear();
@@ -707,7 +711,7 @@ namespace PanoramicDataWin8.view.vis.render
                 FontSize = 11,
                 FontFamily = "/Assets/font/Abel-Regular.ttf#Abel"
             };
-            _textColor = Color.FromArgb(255, 17, 17, 17);
+            _textColor = (Color) Application.Current.Resources.MergedDictionaries[0]["darkColor"];
         }
         
     }
@@ -1422,7 +1426,8 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 var alpha = 0.15f;
                 var color = baseColorFromBrush(brush);
-                var lerpColor = LABColor.Lerp(Windows.UI.Color.FromArgb(255, 222, 227, 229), color, (float) (alpha + Math.Pow(value.Value, 1.0 / 3.0) * (1.0 - alpha)));
+                var minValueColor = (Color) Application.Current.Resources.MergedDictionaries[0]["minValueColor"];
+                var lerpColor = LABColor.Lerp(minValueColor, color, (float) (alpha + Math.Pow(value.Value, 1.0 / 3.0) * (1.0 - alpha)));
                 dataColor = Color.FromArgb(255, lerpColor.R, lerpColor.G, lerpColor.B);
             }
 
@@ -1577,11 +1582,12 @@ namespace PanoramicDataWin8.view.vis.render
             Color baseColor;
             if (brush.BrushIndex == _histogramResult.RestBrushIndex())
             {
-                baseColor = Windows.UI.Color.FromArgb(255, 40, 170, 213);
+                baseColor = (Color) Application.Current.Resources.MergedDictionaries[0]["highlightColor"];
+                // baseColor = Windows.UI.Color.FromArgb(255, 40, 170, 213);
             }
             else if (brush.BrushIndex == _histogramResult.OverlapBrushIndex())
             {
-                baseColor = Color.FromArgb(255, 17, 17, 17);
+                baseColor = (Color)Application.Current.Resources.MergedDictionaries[0]["darkColor"]; 
             }
             else if (brush.BrushIndex == _histogramResult.AllBrushIndex())
             {

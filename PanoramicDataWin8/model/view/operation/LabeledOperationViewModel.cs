@@ -54,7 +54,7 @@ namespace PanoramicDataWin8.model.view.operation
                 MenuItemComponentViewModel = new AttributeMenuItemViewModel
                 {
                     TextAngle = textAngle,
-                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                    TextBrush = Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush,
                     Label = "Apply",
                     AttributeViewModel = new AttributeViewModel(this, attributeModel),
                     EditNameOnTap = true
@@ -94,7 +94,7 @@ namespace PanoramicDataWin8.model.view.operation
                 MenuItemComponentViewModel = new AttributeMenuItemViewModel
                 {
                     TextAngle = textAngle,
-                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                    TextBrush = Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush,
                     EditNameOnTap = !( code?.FuncModel is AttributeModel.AttributeFuncModel.AttributeColumnFuncModel),
                     Label = code?.DisplayName,
                     AttributeViewModel = new AttributeViewModel(this, code),

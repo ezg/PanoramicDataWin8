@@ -12,7 +12,7 @@
     d:DesignWidth="400">
 
     <Grid>
-        <canvas:CanvasControl x:Name="canvasControl" ClearColor="#E6E6E6" 
+        <canvas:CanvasControl x:Name="canvasControl" ClearColor="{StaticResource lightColor}"
                               Draw="canvasControl_Draw"
                               CreateResources="canvasControl_CreateResources"/>
     </Grid>

@@ -55,8 +55,8 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
         
-        private SolidColorBrush _textBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
-        private readonly SolidColorBrush _lightBrush = new SolidColorBrush(Helpers.GetColorFromString("#e6e6e6"));
+        private SolidColorBrush _textBrush = Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush;
+        private readonly SolidColorBrush _lightBrush = Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush;
 
         public override void Refactor(string oldName, string newName)
         {

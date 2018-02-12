@@ -377,6 +377,9 @@ namespace PanoramicDataWin8
             AddHandler(PointerMovedEvent, new PointerEventHandler(InkableScene_PointerMoved), true);
 
             hypothesisButton.DataContext = new BudgetViewModel();
+            var titleBar = ApplicationView.GetForCurrentView().TitleBar;
+            titleBar.ForegroundColor = ((SolidColorBrush) Application.Current.Resources.MergedDictionaries[0]["highlightBrush"]).Color;
+            titleBar.BackgroundColor = ((SolidColorBrush)Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"]).Color;
         }
 
         public void SetupMainPage()
@@ -462,8 +465,8 @@ namespace PanoramicDataWin8
             };
             BindingOperations.SetBinding(p, Path.DataProperty, b);
 
-            p.Fill = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
-            p.Stroke = new SolidColorBrush(Helpers.GetColorFromString("#ffffff"));
+            p.Fill = Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush;
+            p.Stroke = Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush;
             p.StrokeThickness = 1;
             p.RenderTransform = new MatrixTransform
             {

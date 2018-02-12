@@ -1,5 +1,6 @@
 ﻿using PanoramicDataWin8.utils;
 using Windows.UI;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Shapes;
@@ -9,8 +10,8 @@ namespace PanoramicDataWin8.view.inq
     public class InkStrokeElement : Canvas
     {
         private static SolidColorBrush ERASE_COLOR = new SolidColorBrush(Helpers.GetColorFromString("#d57074"));
-        //private static SolidColorBrush COLOR = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
-        private static SolidColorBrush COLOR = new SolidColorBrush(Helpers.GetColorFromString("#111111"));
+        //private static SolidColorBrush COLOR = Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush;
+        private static SolidColorBrush COLOR = Application.Current.Resources.MergedDictionaries[0]["darkBrush"] as SolidColorBrush;
 
         protected InkStroke _inkStroke;
         public InkStroke InkStroke { get { return _inkStroke; } }
