@@ -45,6 +45,7 @@ namespace PanoramicDataWin8.view.inq
             if (!_elements.Contains(elem))
             {
                 _elementCanvas.Children.Add(elem);
+               // elem.DataContext = elem.DataContext; // forces propagation of DataContext to children of 'elem' -- apparently not needed when running Debug code from VisStudio
                 _elements.Add(elem);
             }
         }

@@ -5,6 +5,7 @@ using PanoramicDataWin8.utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Windows.UI;
 using Windows.UI.Xaml;
@@ -81,20 +82,26 @@ namespace PanoramicDataWin8.model.data.operation
                     bool first = true;
                     foreach (var filt in opModel.FilterModels)
                     {
+                        string curPrefix = "";
                         if (first)
                         {
-                            code += "(";
+                            curPrefix = "(";
                             first = false;
                         }
                         else
-                            code += "|| (";
-                        foreach (var vc in filt.ValueComparisons)
-                            code += vc.ToPythonString() + " && ";
-                        code = code.Substring(0, code.Length - 4);
-                        code += ")";
+                            curPrefix = "|| (";
+                        if (filt.ValueComparisons.Count > 0)
+                        {
+                            code += curPrefix;
+                            foreach (var vc in filt.ValueComparisons)
+                                code += vc.ToPythonString() + " && ";
+                            code = code.Substring(0, code.Length - 4);
+                            code += ")";
+                        }
                     }
                     code += ")";
-                    expressions.Add(code);
+                    if (code != "()")
+                        expressions.Add(code);
                 }
             }
 
@@ -129,7 +136,7 @@ namespace PanoramicDataWin8.model.data.operation
                     index++;
                 }
             }
-            expression += "\"" + BrushDescriptors[0].Name + "\"";
+            expression += "\"" + BrushDescriptors.FirstOrDefault()?.Name + "\"";
             GetAttributeModel().VisualizationHints = new List<IDEA_common.catalog.VisualizationHint>(new IDEA_common.catalog.VisualizationHint[] { IDEA_common.catalog.VisualizationHint.TreatAsEnumeration});
             GetAttributeModel().SetCode(expression, DataType.String, refactoring);
         }

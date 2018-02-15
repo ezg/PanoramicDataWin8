@@ -39,6 +39,8 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void DefinitionLabel_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
+            if (DataContext == null)
+                return;
             var color = (DataContext as BrushDescriptor).Color;
             Background = new SolidColorBrush(color);
             if (color == Colors.Black)

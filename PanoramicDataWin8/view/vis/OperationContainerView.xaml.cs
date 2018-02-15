@@ -54,7 +54,7 @@ namespace PanoramicDataWin8.view.vis
             this.InitializeComponent();
 
             this.Loaded += OperationContainerView_Loaded;
-            this.DataContextChanged += operationContainerView_DataContextChanged;
+            this.Unloaded += OperationContainerView_Unloaded;
             MainViewController.Instance.InkableScene.AddHandler(UIElement.PointerPressedEvent, new PointerEventHandler(InkableScene_PointerPressed), true);
             this.PointerMoved += OperationContainerView_PointerHover;
             this.PointerEntered += OperationContainerView_PointerEntered;
@@ -105,27 +105,44 @@ namespace PanoramicDataWin8.view.vis
             }
         }
 
+        void OperationContainerView_Unloaded(object sender, RoutedEventArgs e)
+        {
+            DataContextChanged -= operationContainerView_DataContextChanged;
+            PointerPressed     -= OperationContainerView_PointerPressed;
+
+            _resizePointerManager.Added -= resizePointerManager_Added;
+            _resizePointerManager.Moved -= resizePointerManager_Moved;
+            _resizePointerManager.Removed -= resizePointerManager_Removed;
+            _resizePointerManager.Detach();
+        }
         void OperationContainerView_Loaded(object sender, RoutedEventArgs e)
         {
-            this.PointerPressed += OperationContainerView_PointerPressed;
+            DataContextChanged += operationContainerView_DataContextChanged;
+            PointerPressed     += OperationContainerView_PointerPressed;
 
             _resizePointerManager.Added += resizePointerManager_Added;
             _resizePointerManager.Moved += resizePointerManager_Moved;
             _resizePointerManager.Removed += resizePointerManager_Removed;
             _resizePointerManager.Attach(resizeGrid);
+            configureDataContext();
         }
 
         void operationContainerView_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             args.Handled = true;
-            if (args.NewValue != null)
+            configureDataContext();
+            updateProgressAndNullVisualization();
+        }
+
+        void configureDataContext()
+        {
+            var model = ((OperationViewModel)DataContext)?.OperationModel;
+            if (model != null)
             {
-                OperationViewModel model = ((OperationViewModel) args.NewValue);
-                model.OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
-                model.OperationModel.PropertyChanged += OperationModel_PropertyChanged;
+                model.PropertyChanged -= OperationModel_PropertyChanged;
+                model.PropertyChanged += OperationModel_PropertyChanged;
                 operationTypeUpdated();
             }
-            updateProgressAndNullVisualization();
         }
 
         void OperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
