@@ -38,8 +38,6 @@ namespace PanoramicDataWin8.view.vis.render
     public sealed partial class PlotRenderer : Renderer, IScribbable, AttributeViewModelEventHandler
     {
         private PlotRendererContentProvider _plotRendererContentProvider = new PlotRendererContentProvider();
-        private readonly DispatcherTimer _operationViewMovingTimer = new DispatcherTimer();
-        private bool _ifNotLoadedYet = true;
 
         public PlotRenderer()
         {
@@ -48,29 +46,21 @@ namespace PanoramicDataWin8.view.vis.render
             _plotRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
             _plotRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
             dxSurface.ContentProvider = _plotRendererContentProvider;
-            this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
-
-            _operationViewMovingTimer.Interval = TimeSpan.FromMilliseconds(200);
-            _operationViewMovingTimer.Tick += _operationViewMovingTimer_Tick;
-            _operationViewMovingTimer.Start();
+            this.Unloaded += PlotRenderer_Unloaded; 
         }
 
-        private void _operationViewMovingTimer_Tick(object sender, object e)
+        private void PlotRenderer_Unloaded(object sender, RoutedEventArgs e)
         {
-            var result = (DataContext as HistogramOperationViewModel)?.OperationModel?.Result;
-            if (result != null && _ifNotLoadedYet)
-            {
-                loadResult(result);
-                render();
-                _operationViewMovingTimer.Stop();
-            }
+            DataContextChanged -= PlotRenderer_DataContextChanged;
         }
 
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
             _plotRendererContentProvider.CompositionScaleX = dxSurface.CompositionScaleX;
             _plotRendererContentProvider.CompositionScaleY = dxSurface.CompositionScaleY;
+            DataContextChanged += PlotRenderer_DataContextChanged;
+            configureDataContext();
         }
 
         public override void Dispose()
@@ -86,12 +76,17 @@ namespace PanoramicDataWin8.view.vis.render
         
         void PlotRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (args.NewValue != null)
+            configureDataContext();
+        }
+        void configureDataContext()
+        {
+            var model = (DataContext as HistogramOperationViewModel)?.HistogramOperationModel;
+            if (model != null)
             {
-                (DataContext as HistogramOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
-                (DataContext as HistogramOperationViewModel).OperationModel.OperationModelUpdated += OperationModelUpdated;
-                (DataContext as HistogramOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
-                (DataContext as HistogramOperationViewModel).OperationModel.PropertyChanged += OperationModel_PropertyChanged;
+                model.OperationModelUpdated -= OperationModelUpdated;
+                model.OperationModelUpdated += OperationModelUpdated;
+                model.PropertyChanged -= OperationModel_PropertyChanged;
+                model.PropertyChanged += OperationModel_PropertyChanged;
 
                 var result = (DataContext as HistogramOperationViewModel).OperationModel.Result;
                 if (result != null)
@@ -101,9 +96,8 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 else
                 {
-                    HistogramOperationModel operationModel = (HistogramOperationModel)((OperationViewModel)DataContext).OperationModel;
-                    if (!operationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).Any() &&
-                        !operationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).Any())
+                    if (!model.GetAttributeUsageTransformationModel(AttributeUsage.X).Any() &&
+                        !model.GetAttributeUsageTransformationModel(AttributeUsage.Y).Any())
                     {
                         //viewBox.Visibility = Visibility.Visible;
                     }
@@ -150,7 +144,6 @@ namespace PanoramicDataWin8.view.vis.render
         
         void loadResult(IResult result)
         {
-            _ifNotLoadedYet = false;
             _lastResult = result as HistogramResult;
             var model = (DataContext as HistogramOperationViewModel);
             _plotRendererContentProvider.UpdateFilterModels(model.HistogramOperationModel.FilterModels.ToList());
