@@ -36,16 +36,14 @@ namespace PanoramicDataWin8.view.vis
         private Canvas _contentCanvas = new Canvas();
 
         private readonly double _attachmentRectHalfSize = 15;
-        private SolidColorBrush _backgroundBrush = new SolidColorBrush(Helpers.GetColorFromString("#ffffff"));
+        private SolidColorBrush _backgroundBrush = Application.Current.Resources.MergedDictionaries[0]["backgroundBrush"] as SolidColorBrush;
         //private Dictionary<FilteringType, Vec> _attachmentCenters = new Dictionary<FilteringType, Vec>(); 
 
-        private SolidColorBrush _darkBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717"));
-        private readonly SolidColorBrush _highlightBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5"));
+        private readonly SolidColorBrush _highlightBrush = Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush;
 
-        private readonly SolidColorBrush _highlightFaintBrush =
-            new SolidColorBrush(Helpers.GetColorFromString("#3329aad5"));
+        private readonly SolidColorBrush _highlightFaintBrush = null;
 
-        private readonly SolidColorBrush _lightBrush = new SolidColorBrush(Helpers.GetColorFromString("#e6e6e6"));
+        private readonly SolidColorBrush _lightBrush = Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush;
         private IGeometry _linkViewGeometry;
 
         private FilterLinkViewModel _currentModel = null;
@@ -65,6 +63,10 @@ namespace PanoramicDataWin8.view.vis
             DataContextChanged += LinkView_DataContextChanged;
             PointerPressed += LinkView_PointerPressed;
             this.Content = _contentCanvas;
+
+            var brush = Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush;
+            var color = Color.FromArgb(33, brush.Color.R, brush.Color.G, brush.Color.B);
+            _highlightFaintBrush = new SolidColorBrush(color);
         }
 
         public IGeometry Geometry

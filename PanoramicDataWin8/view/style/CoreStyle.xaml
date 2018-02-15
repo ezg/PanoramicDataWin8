@@ -3,19 +3,26 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:PanoramicDataWin8.view.style">
 
-    <SolidColorBrush x:Key="darkBrush">#111111</SolidColorBrush>
-    <SolidColorBrush x:Key="lightBrush">#e6e6e6</SolidColorBrush>
-    <SolidColorBrush x:Key="highlightBrush">#29aad5</SolidColorBrush>
+    <SolidColorBrush x:Key="darkBrush" Color="{StaticResource darkColor}" />
+    <SolidColorBrush x:Key="lightBrush" Color="{StaticResource lightColor}" />
+    <SolidColorBrush x:Key="highlightBrush" Color="{StaticResource highlightColor}" />
+    <SolidColorBrush x:Key="backgroundBrush" Color="{StaticResource backgroundColor}" />
     <SolidColorBrush x:Key="alternativeBrush">#B24D94</SolidColorBrush>
-    <SolidColorBrush x:Key="backgroundBrush">#ffffff</SolidColorBrush>
     <SolidColorBrush x:Key="acceptBrush">#fd5d4c</SolidColorBrush>
     <SolidColorBrush x:Key="rejectBrush">#6bc565</SolidColorBrush>
-    
-    
+
+
     <Color x:Key="darkColor">#111111</Color>
     <Color x:Key="lightColor">#e6e6e6</Color>
     <Color x:Key="highlightColor">#29aad5</Color>
     <Color x:Key="backgroundColor">#ffffff</Color>
+    <Color x:Key="minValueColor">#dee3e5</Color>
+
+    <!--<Color x:Key="darkColor">#F8F8F2</Color>
+    <Color x:Key="lightColor">#41423d</Color>
+    <Color x:Key="highlightColor">#f92672</Color>
+    <Color x:Key="backgroundColor">#272822</Color>    
+    <Color x:Key="minValueColor">#dee3e5</Color>-->
 
     <FontFamily x:Key="abel">Assets/font/Abel-Regular.ttf#Abel</FontFamily>
 

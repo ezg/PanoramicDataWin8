@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
 
 namespace PanoramicDataWin8.model.view.operation
@@ -86,7 +87,7 @@ namespace PanoramicDataWin8.model.view.operation
                 MenuItemComponentViewModel = new AttributeMenuItemViewModel
                 {
                     Label = "+",
-                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
+                    TextBrush = Application.Current.Resources.MergedDictionaries[0]["darkBrush"] as SolidColorBrush,
                     CanDrag = false,
                     CanDelete = false,
                     CanDrop = true,
@@ -131,7 +132,7 @@ namespace PanoramicDataWin8.model.view.operation
                         {
                             Label = newAttributeModel.DisplayName,
                             AttributeViewModel = new AttributeViewModel(this, newAttributeModel),
-                            TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                            TextBrush = Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush,
                             CanDrag = false,
                             CanDelete = true,
                             CanDrop = false

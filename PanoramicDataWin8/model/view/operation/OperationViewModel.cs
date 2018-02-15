@@ -280,7 +280,7 @@ namespace PanoramicDataWin8.model.view.operation
                 {
                     Label = newAttributeTransformationModel.GetLabel,
                     AttributeViewModel = new AttributeViewModel(this, newAttributeTransformationModel),
-                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#29aad5")),
+                    TextBrush = Application.Current.Resources.MergedDictionaries[0]["highlightBrush"] as SolidColorBrush,
                     CanDrag = true,
                     CanDelete = canDeleteItems,
                     CanDrop = false
@@ -391,7 +391,7 @@ namespace PanoramicDataWin8.model.view.operation
                 MenuItemComponentViewModel = label == "" ? null : new AttributeMenuItemViewModel
                 {
                     Label = label,
-                    TextBrush = new SolidColorBrush(Helpers.GetColorFromString("#171717")),
+                    TextBrush = Application.Current.Resources.MergedDictionaries[0]["darkBrush"] as SolidColorBrush,
                     CanDrag = false,
                     CanDrop = true,
                     CanDelete = true,

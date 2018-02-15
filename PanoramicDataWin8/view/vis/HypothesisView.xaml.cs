@@ -23,7 +23,7 @@ namespace PanoramicDataWin8.view
     public sealed partial class HypothesisView : UserControl
     {
         private HypothesisViewModel _model = null;
-        private Brush _lightBrush = new SolidColorBrush(Helpers.GetColorFromString("#e6e6e6"));
+        private Brush _lightBrush = Application.Current.Resources.MergedDictionaries[0]["lightBrush"] as SolidColorBrush;
         private Brush _acceptedBrush = new SolidColorBrush(Color.FromArgb(255, 253, 93, 76));
         private Brush _rejectedBrush = new SolidColorBrush(Color.FromArgb(255, 107, 197, 101));
 
