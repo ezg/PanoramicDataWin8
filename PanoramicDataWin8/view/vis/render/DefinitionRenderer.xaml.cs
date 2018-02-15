@@ -21,6 +21,7 @@ using System.ComponentModel;
 using Windows.UI;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data.idea;
+using System.Diagnostics;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -36,8 +37,39 @@ namespace PanoramicDataWin8.view.vis.render
         public DefinitionRenderer()
         {
             this.InitializeComponent();
+            this.Loaded += DefinitionRenderer_Loaded;
+            this.Unloaded += DefinitionRenderer_Unloaded;
+        }
+
+        private void DefinitionRenderer_Unloaded(object sender, RoutedEventArgs e)
+        {
+            this.DataContextChanged -= DefinitionRenderer_DataContextChanged;
+        }
+
+        private void DefinitionRenderer_Loaded(object sender, RoutedEventArgs e)
+        {
             this.DataContextChanged += DefinitionRenderer_DataContextChanged;
-            this.SizeChanged += (sender, e) => Relayout();
+            configureDataContext();
+        }
+        
+        private void DefinitionRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        {
+            configureDataContext();
+            args.Handled = true;
+        }
+        void configureDataContext()
+        {
+            var viewModel = (DataContext as DefinitionOperationViewModel);
+            if (viewModel != null)
+            {
+                if (viewModel.DefinitionOperationModel?.GetDescriptorFromColor(_textBrush.Color) == null)
+                    viewModel.DefinitionOperationModel.SetDescriptorForColor(_textBrush.Color, new BrushDescriptor(_textBrush.Color, "Rest"));
+                if (viewModel.DefinitionOperationModel?.GetDescriptorFromColor(Colors.Black) == null)
+                    viewModel.DefinitionOperationModel.SetDescriptorForColor(Colors.Black, new BrushDescriptor(Colors.Black, "Overlap"));
+                viewModel.DefinitionOperationModel.OperationModelUpdated -= RelayoutHandler;
+                viewModel.DefinitionOperationModel.OperationModelUpdated += RelayoutHandler;
+                Relayout();
+            }
         }
 
         public override void StartSelection(Point point)
@@ -50,32 +82,19 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        private void DefinitionRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-        {
-            args.Handled = true;
-            var viewModel = (DataContext as DefinitionOperationViewModel);
-            if (viewModel != null)
-            {
-                if (viewModel.DefinitionOperationModel?.GetDescriptorFromColor(_textBrush.Color) == null)
-                    viewModel.DefinitionOperationModel.SetDescriptorForColor(_textBrush.Color, new BrushDescriptor(_textBrush.Color, "Rest"));
-                if (viewModel.DefinitionOperationModel?.GetDescriptorFromColor(Colors.Black) == null)
-                    viewModel.DefinitionOperationModel.SetDescriptorForColor(Colors.Black, new BrushDescriptor(Colors.Black, "Overlap"));
-                viewModel.DefinitionOperationModel.PropertyChanged -= (s, e) => Relayout();
-                viewModel.DefinitionOperationModel.OperationModelUpdated -= (s, e) => Relayout();
-                viewModel.DefinitionOperationModel.PropertyChanged += (s, e) => Relayout();
-                viewModel.DefinitionOperationModel.OperationModelUpdated += (s, e) => Relayout();
-            }
-        }
+        public DefinitionOperationModel  DefinitionOperationModel { get => (DataContext as DefinitionOperationViewModel)?.DefinitionOperationModel; }
 
-        public override void Refactor(string oldName, string newName)
-        {
-            var model = (DataContext as DefinitionOperationViewModel).DefinitionOperationModel;
-            model.UpdateCode(true);
-        }
+        void RelayoutHandler(object sender, OperationModelUpdatedEventArgs e) { Relayout(); }
 
+        public override void Refactor(string oldName, string newName) { DefinitionOperationModel.UpdateCode(true); }
         void Relayout()
         {
-            var model = (DataContext as DefinitionOperationViewModel).DefinitionOperationModel;
+            var model = DefinitionOperationModel;
+            if (model == null)
+            {
+                Debug.WriteLine("WHY is model null???");
+                return;
+            }
             Labels.Children.Clear();
             Labels.RowDefinitions.Clear();
             int numLabels = model.BrushColors.Count + 1 + (model.BrushColors.Count > 1 ? 1 : 0);
@@ -96,7 +115,8 @@ namespace PanoramicDataWin8.view.vis.render
             var textGrid = new DefinitionLabel() {
                 DataContext = d,
                 DefinitionOperationModel = model,
-                Height = FontSize = (ActualHeight - 5 * numLabels) / numLabels
+                Height = double.NaN, // FontSize = (ActualHeight - 5 * numLabels) / numLabels
+                VerticalAlignment = VerticalAlignment.Stretch
             };
             Grid.SetRow(textGrid, rowIndex);
             Labels.Children.Add(textGrid);
