@@ -88,7 +88,7 @@ namespace PanoramicDataWin8.controller.view
             MainModel.SampleSize = double.Parse(config["SampleSize"].ToString());
             MainModel.RawDataSize = double.Parse(config["RawDataSize"].ToString());
             MainModel.IsDarpaSubmissionMode = bool.Parse(config["IsDarpaSubmissionMode"].ToString());
-          //  MainModel.IsIGTMode = bool.Parse(config["IsIGTMode"].ToString());
+            MainModel.IsIGTMode = bool.Parse(config["IsIGTMode"].ToString());
             MainModel.APIPath = config["APIPath"].ToString();
             MainModel.Hostname = config["Hostname"].ToString();
 

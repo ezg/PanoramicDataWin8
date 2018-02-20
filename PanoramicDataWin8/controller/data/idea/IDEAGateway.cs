@@ -4,8 +4,10 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.Core;
+using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using Newtonsoft.Json;
 using PanoramicDataWin8.controller.view;
@@ -21,23 +23,50 @@ namespace PanoramicDataWin8.controller.data.progressive
             Formatting = Formatting.Indented
         };
 
+        private static HttpClient getHttpClient()
+        {
+            var httpClient = new HttpClient();
+
+            if (!string.IsNullOrEmpty(MainViewController.Instance.MainModel.Username))
+            {
+                var byteArray = Encoding.ASCII.GetBytes(MainViewController.Instance.MainModel.Username + ":" + MainViewController.Instance.MainModel.Password);
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
+            }
+
+            httpClient.Timeout = TimeSpan.FromMinutes(5);
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            return httpClient;
+        }
+
+        private static async Task<bool> supportsProtocol(string hostname, string protocol)
+        {
+            var newHostname = protocol + Regex.Replace(hostname, "http://|https://", "", RegexOptions.IgnoreCase);
+
+            var httpClient = getHttpClient();
+            bool supports = true;
+            try
+            {
+                var response = await httpClient.GetAsync(newHostname);
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    supports = false;
+                }
+            }
+            catch (Exception exception)
+            {
+                supports = false;
+            }
+            return supports;
+        }
+
         public static async Task<string> Request(object data, string endpoint)
         {
             while (true)
+            {
                 try
                 {
-                    var sw = new Stopwatch();
-                    sw.Start();
-                    var handler = new HttpClientHandler();
-                    var httpClient = new HttpClient();
+                    var httpClient = getHttpClient();
 
-                    if (!string.IsNullOrEmpty(MainViewController.Instance.MainModel.Username))
-                    {
-                        var byteArray = Encoding.ASCII.GetBytes(MainViewController.Instance.MainModel.Username + ":" + MainViewController.Instance.MainModel.Password);
-                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(byteArray));
-                    }
-                    httpClient.Timeout = TimeSpan.FromMinutes(5);
-                    httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     HttpResponseMessage httpResponseMessage = null;
                     if (data != null)
                     {
@@ -54,13 +83,13 @@ namespace PanoramicDataWin8.controller.data.progressive
                             MainViewController.Instance.MainModel.Hostname +
                             MainViewController.Instance.MainModel.APIPath + "/" + endpoint);
                     }
-                    sw.Restart();
+
                     var stringContent = await httpResponseMessage.Content.ReadAsStringAsync();
-                    if (stringContent.ToUpper().Contains("LOGIN FORM"))
+                    if (!httpResponseMessage.IsSuccessStatusCode ||
+                        stringContent.ToUpper().Contains("LOGIN FORM"))
                     {
                         throw new WebException();
                     }
-                    sw.Restart();
 
                     return stringContent;
                 }
@@ -70,8 +99,10 @@ namespace PanoramicDataWin8.controller.data.progressive
                     var dialog = new GatewayErrorDialog
                     {
                         Ip = MainViewController.Instance.MainModel.Hostname,
-                        Content = darpa ? 
-                            "Enter the connection URLs that was provided by the evaluator\nand your D3M login."
+                        Username = MainViewController.Instance.MainModel.Username,
+                        Password = MainViewController.Instance.MainModel.Password,
+                        Content = darpa
+                            ? "Enter the connection URLs that was provided by the evaluator\nand your D3M login."
                             : e.Message,
                         StackTrace = (MainViewController.Instance.MainModel.Hostname + "/" + endpoint) + "\n" + e.InnerException + "\n" + e.StackTrace
                     };
@@ -90,16 +121,24 @@ namespace PanoramicDataWin8.controller.data.progressive
                         {
                             newIp = newIp.TrimEnd('/');
                         }
-                        if (!newIp.StartsWith("http://") &&
-                            !newIp.StartsWith("https://"))
+                        bool supportsHttp = await supportsProtocol(newIp, "http://");
+                        bool supportsHttps = await supportsProtocol(newIp, "https://");
+
+                        if (supportsHttps)
                         {
-                            newIp = "http://" + newIp;
+                            newIp = "https://" + Regex.Replace(newIp, "http://|https://", "", RegexOptions.IgnoreCase);
                         }
+                        else if (supportsHttp)
+                        {
+                            newIp = "http://" + Regex.Replace(newIp, "http://|https://", "", RegexOptions.IgnoreCase);
+                        }
+
                         MainViewController.Instance.MainModel.Hostname = newIp;
                         MainViewController.Instance.MainModel.Username = dialog.Username;
                         MainViewController.Instance.MainModel.Password = dialog.Password;
                     }
                 }
+            }
         }
     }
 }

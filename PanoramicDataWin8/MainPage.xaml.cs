@@ -328,10 +328,48 @@ namespace PanoramicDataWin8
                 (args.NewValue as MainModel).DatasetConfigurations.CollectionChanged +=
                     DatasetConfigurations_CollectionChanged;
             }
+            setVisibilities();
+        }
+
+        private void setVisibilities()
+        {
+            commandBar.Visibility = Visibility.Collapsed;
+            addAttributeButton.Visibility = Visibility.Collapsed;
+            addOperationButton.Visibility = Visibility.Collapsed;
+            hypothesisButton.Visibility = Visibility.Collapsed;
+            hypothesisGrid.Visibility = Visibility.Collapsed;
+            helpButton.Visibility = Visibility.Collapsed;
+
+            if (MainViewController.Instance != null)
+            {
+                if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode ||
+                    ((MainModel) DataContext)?.DatasetConfigurations?.Count > 1)
+                {
+                    commandBar.Visibility = Visibility.Visible;
+                }
+
+                if (((MainModel) DataContext)?.DatasetConfigurations?.Count > 1)
+                {
+                    addAttributeButton.Visibility = Visibility.Visible;
+                    addOperationButton.Visibility = Visibility.Visible;
+                }
+
+                if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode &&
+                    !MainViewController.Instance.MainModel.IsIGTMode)
+                {
+                    hypothesisButton.Visibility = Visibility.Visible;
+                    hypothesisGrid.Visibility = Visibility.Visible;
+                }
+                if (MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
+                {
+                    helpButton.Visibility = Visibility.Visible;
+                }
+            }
         }
 
         private void DatasetConfigurations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            setVisibilities();
             if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode ||
                 ((MainModel)DataContext).DatasetConfigurations.Count > 1)
             {
@@ -355,12 +393,8 @@ namespace PanoramicDataWin8
                             Console.WriteLine(exception);
                         }
                     }
-                    commandBar.Visibility = Visibility.Visible;
+                    
                 }
-            }
-            else
-            {
-                commandBar.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -396,15 +430,6 @@ namespace PanoramicDataWin8
                 hypothesisGrid.Children.Add(hypothesesView);
                 RecommenderViewController.CreateInstance(MainViewController.Instance.MainModel,
                     MainViewController.Instance.OperationViewModels);
-            }
-            else
-            {
-                hypothesisButton.Visibility = Visibility.Collapsed;
-                hypothesisGrid.Visibility = Visibility.Collapsed;
-            }
-            if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
-            {
-                helpButton.Visibility = Visibility.Collapsed;
             }
         }
 

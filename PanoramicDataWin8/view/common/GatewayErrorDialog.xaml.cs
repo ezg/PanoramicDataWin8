@@ -69,14 +69,29 @@ namespace PanoramicDataWin8.view.common
         private string _username = "";
         public string Username
         {
-            set { _username = value.Trim(); }
+            set
+            {
+                _username = value;
+                if (_username != null && tbUsername != null)
+                {
+                    tbUsername.Text = _username;
+                }
+            }
             get { return _username; }
         }
 
         private string _password = "";
         public string Password
         {
-            set { _password = value.Trim(); }
+            set
+            {
+                _password = value;
+
+                if (_password != null && tbPassword != null)
+                {
+                    tbPassword.Password = _password;
+                }
+            }
             get { return _password; }
         }
 

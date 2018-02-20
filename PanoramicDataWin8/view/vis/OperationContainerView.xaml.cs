@@ -216,17 +216,20 @@ namespace PanoramicDataWin8.view.vis
                     {
                         setProgressPercentage(0.15);
                         progressGrid.Visibility = Visibility.Visible;
-                        
-                        _rotateStoryboard = new Storyboard();
-                        var doubleAnimation = new DoubleAnimation();
-                        doubleAnimation.Duration = TimeSpan.FromMilliseconds(2000);
-                        doubleAnimation.EnableDependentAnimation = true;
-                        doubleAnimation.RepeatBehavior = RepeatBehavior.Forever;
-                        doubleAnimation.To = 360;
-                        Storyboard.SetTargetProperty(doubleAnimation, "Angle");
-                        Storyboard.SetTarget(doubleAnimation, progressGridTransform);
-                        _rotateStoryboard.Children.Add(doubleAnimation);
-                        _rotateStoryboard.Begin();
+
+                        if (_rotateStoryboard == null)
+                        {
+                            _rotateStoryboard = new Storyboard();
+                            var doubleAnimation = new DoubleAnimation();
+                            doubleAnimation.Duration = TimeSpan.FromMilliseconds(2000);
+                            doubleAnimation.EnableDependentAnimation = true;
+                            doubleAnimation.RepeatBehavior = RepeatBehavior.Forever;
+                            doubleAnimation.To = 360;
+                            Storyboard.SetTargetProperty(doubleAnimation, "Angle");
+                            Storyboard.SetTarget(doubleAnimation, progressGridTransform);
+                            _rotateStoryboard.Children.Add(doubleAnimation);
+                            _rotateStoryboard.Begin();
+                        }
                     }
                 }
                 else
