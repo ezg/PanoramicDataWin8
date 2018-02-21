@@ -812,14 +812,27 @@ namespace PanoramicDataWin8
                 var count = 0;
                 if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
                 {
-                    var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "+", OperationType = OperationType.AttributeGroup }, parentModel);
-                    tileMenuItemViewModel.Row = count;
-                    tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
-                                                   (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
-                    tileMenuItemViewModel.RowSpan = 1;
-                    tileMenuItemViewModel.ColumnSpan = 1;
+                    {
+                        var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "+g", OperationType = OperationType.AttributeGroup }, parentModel);
+                        tileMenuItemViewModel.Row = count;
+                        tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
+                                                       (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
+                        tileMenuItemViewModel.RowSpan = 1;
+                        tileMenuItemViewModel.ColumnSpan = 1;
 
-                    count++;
+                        count++;
+                    }
+
+                    {
+                        var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "+a", OperationType = OperationType.Attribute }, parentModel);
+                        tileMenuItemViewModel.Row = count;
+                        tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
+                                                       (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
+                        tileMenuItemViewModel.RowSpan = 1;
+                        tileMenuItemViewModel.ColumnSpan = 1;
+
+                        count++;
+                    }
                 }
                 foreach (var inputModel in inputModels)
                 {

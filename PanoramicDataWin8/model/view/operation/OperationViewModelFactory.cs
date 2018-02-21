@@ -12,6 +12,7 @@ using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.vis.menu;
 using Windows.UI.Xaml;
+using PanoramicDataWin8.model.data.operation.computational;
 
 namespace PanoramicDataWin8.model.view.operation
 {
@@ -99,6 +100,13 @@ namespace PanoramicDataWin8.model.view.operation
         {
             return new AttributeGroupOperationViewModel(
                 new AttributeGroupOperationModel(schemaModel, "G" + (groupCount++) + "()", groupModel), groupModel == null) { Position = position };
+        }
+        static int attrCount = 0;
+        public static AttributeOperationViewModel CreateDefaultAttributeOperationViewModel(SchemaModel schemaModel, Pt position)
+        {
+            return new AttributeOperationViewModel(
+                new AttributeOperationModel(schemaModel, "A" + (attrCount++)), true)
+            { Position = position };
         }
         static int funcCount = 0;
         public static FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(SchemaModel schemaModel, Pt position, FunctionOperationModel genericFunctionModel, bool fromMouse = false)

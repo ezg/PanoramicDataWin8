@@ -104,6 +104,7 @@ namespace PanoramicDataWin8.view.vis.render
                     this.SetProperty(ref _model, value);
                 }
             }
+            public AttributeModel Key;
             public double ColumnWidth
             {
                 get { return _cwidth; }
@@ -447,10 +448,12 @@ namespace PanoramicDataWin8.view.vis.render
                 xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords.FirstOrDefault().Value;
             }
 
+            var primaryKeyColumnData = (result as RawDataResult).Samples[model.RawDataOperationModel.AttributeTransformationModelParameters[0].AttributeModel.RawName];
             for (int sampleIndex = 0; sampleIndex < (result as RawDataResult).Samples.Count(); sampleIndex++) {
                 var s = (result as RawDataResult).Samples[model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex].AttributeModel.RawName];
                 if (s.Count > 0)
-                    loadRecordsAsync(s, model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex], sampleIndex+1 == (result as RawDataResult).Samples.Count());
+                    loadRecordsAsync(s, model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex], sampleIndex+1 == (result as RawDataResult).Samples.Count(),
+                        model.RawDataOperationModel.AttributeTransformationModelParameters[0].AttributeModel, primaryKeyColumnData);
 
             }
 
@@ -493,11 +496,12 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        void loadRecordsAsync(List<object> records, AttributeTransformationModel model, bool showScroll)
+        void loadRecordsAsync(List<object> records, AttributeTransformationModel model, bool showScroll, AttributeModel primaryKey, List<object> primaryKeys)
         {
             var acollection = new RawColumnData {
                 Alignment = records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? HorizontalAlignment.Left : HorizontalAlignment.Right,
                 Model = model,
+                Key = primaryKey,
                 ColumnWidth =records.First() is string|| records.First() is IDEA_common.range.PreProcessedString ? 200:85,
                 Renderer = this,
                 ShowScroll = showScroll
@@ -511,10 +515,8 @@ namespace PanoramicDataWin8.view.vis.render
                     var hostname = MainViewController.Instance.MainModel.Hostname;
                     string prepend = hostname + "/api/rawdata/" + dataset + "/"+model.AttributeModel.RawName+"/";
 #pragma warning disable CS4014
-                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                    CoreDispatcherPriority.Low,
-                    () =>
-                    {
+                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync( CoreDispatcherPriority.Low,
+                    () =>  {
                         foreach (var val in records)
                         {
                             acollection.Data.Add(new MyUri(prepend + val.ToString()));
@@ -523,18 +525,21 @@ namespace PanoramicDataWin8.view.vis.render
 #pragma warning restore CS4014
 
                 }
+                else if (model.AttributeModel.FuncModel.ModelType == AttributeModel.AttributeFuncModel.AttributeModelType.Assigned)
+                {
+#pragma warning disable CS4014
+                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync( CoreDispatcherPriority.Low,
+                    () => {
+                        for (int i = 0; i < records.Count; i++)
+                            acollection.Data.Add( new Tuple<object, object>(primaryKeys[i], records[i]) );
+                    });
+#pragma warning restore CS4014
+                }
                 else
                 {
 #pragma warning disable CS4014
-                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                    CoreDispatcherPriority.Low,
-                    () =>
-                    {
-                        foreach (var val in records)
-                        {
-                            acollection.Data.Add(val);
-                        }
-                    });
+                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low,
+                        () => records.ForEach((r) => acollection.Data.Add(r)) );
 #pragma warning restore CS4014
                 }
         }

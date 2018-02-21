@@ -146,6 +146,7 @@
     <Compile Include="model\data\operation\AttributeUsage.cs" />
     <Compile Include="model\data\attribute\AttributeTransformationModel.cs" />
     <Compile Include="model\data\operation\BrushOperationModelUpdatedEventArgs.cs" />
+    <Compile Include="model\data\operation\computational\AttributeOperationModel.cs" />
     <Compile Include="model\data\operation\computational\CalculationOperationModel.cs" />
     <Compile Include="model\data\operation\computational\ComputationalOperationModel.cs" />
     <Compile Include="model\data\operation\computational\PredictorOperationModel.cs" />
@@ -207,6 +208,7 @@
     <Compile Include="model\view\InputGroupViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModelEventArgs.cs" />
     <Compile Include="model\view\operation\AttributeGroupOperationViewModel.cs" />
+    <Compile Include="model\view\operation\AttributeOperationViewModel.cs" />
     <Compile Include="model\view\operation\LabeledOperationViewModel.cs" />
     <Compile Include="model\view\operation\CalculationOperationViewModel.cs" />
     <Compile Include="model\view\operation\PredictorOperationViewModel.cs" />
@@ -351,6 +353,9 @@
     </Compile>
     <Compile Include="view\vis\render\AttributeGroupRenderer.xaml.cs">
       <DependentUpon>AttributeGroupRenderer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\render\AttributeRenderer.xaml.cs">
+      <DependentUpon>AttributeRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\CalculationRenderer.xaml.cs">
       <DependentUpon>CalculationRenderer.xaml</DependentUpon>
@@ -587,6 +592,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\vis\render\AttributeGroupRenderer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\AttributeRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

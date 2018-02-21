@@ -18,6 +18,10 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using PanoramicDataWin8.model.data.attribute;
+using static PanoramicDataWin8.model.data.attribute.AttributeModel;
+using PanoramicDataWin8.model.data.idea;
+using PanoramicDataWin8.controller.view;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -40,6 +44,12 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     xListView.ItemContainerStyle = (Style)Resources["ImageStyle"];
                     xListView.ItemTemplate = (DataTemplate)Resources["ImageColTemplate"];
+                }
+                else if (IsEditable)
+                {
+                    xListView.ItemContainerStyle = (Style)Resources[rawdata.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
+                    xListView.ItemTemplate = (DataTemplate)Resources["ValueColTemplate"];
+
                 }
                 else
                 {
@@ -82,12 +92,24 @@ namespace PanoramicDataWin8.view.vis.render
                 return (DataContext as RawDataRenderer.RawColumnData).Model;
             }
         }
+        public AttributeModel PrimaryKey
+        {
+            get
+            {
+                return (DataContext as RawDataRenderer.RawColumnData).Key;
+            }
+        }
 
         public bool IsImage
         {
             get => Model.AttributeModel.VisualizationHints.FirstOrDefault() == IDEA_common.catalog.VisualizationHint.Image;
         }
 
+        public bool IsEditable
+        {
+            get => Model.AttributeModel.FuncModel.ModelType == AttributeModel.AttributeFuncModel.AttributeModelType.Assigned;
+        }
+        
         private void Cp_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
             //var dataCol = (DataContext as RawDataRenderer.RawColumnData);
@@ -107,6 +129,33 @@ namespace PanoramicDataWin8.view.vis.render
                     cp.ChangeView(null, scroll.VerticalOffset, null, true);
             }
         }
-        
+
+        private void TextBox_TextChanged2(object sender, TextChangedEventArgs e)
+        {
+            var tb = sender as TextBox;
+            var codemodel = Model.AttributeModel.FuncModel as AttributeFuncModel.AttributeCodeFuncModel;
+            var dcontext = tb.DataContext as Tuple<object, object>;
+            var keyval = dcontext.Item1;
+            int newval;
+            if (int.TryParse(tb.Text, out newval))
+            {
+                var code = PrimaryKey.RawName + " == " + keyval + " ? " + newval + " : 0";
+                var func = IDEAAttributeModel.Function(Model.AttributeModel.RawName,
+                    MainViewController.Instance.MainModel.SchemaModel.OriginModels.First());
+                func.SetCode(code, IDEA_common.catalog.DataType.Int, false);
+            }
+        }
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var tb = sender as TextBox;
+            tb.TextChanged -= TextBox_TextChanged;
+            tb.TextChanged -= TextBox_TextChanged2;
+            tb.TextChanged += TextBox_TextChanged2;
+        }
+
+        private void TextBoxLoaded(object sender, RoutedEventArgs e)
+        {
+            (sender as TextBox).TextChanged += TextBox_TextChanged;
+        }
     }
 }

@@ -276,8 +276,7 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.Add(visModel);
             return visModel;
         }
-        public FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(Pt position, FunctionOperationModel functionTypeModel
-            )
+        public FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(Pt position, FunctionOperationModel functionTypeModel)
         {
             var visModel = OperationViewModelFactory.CreateDefaultFunctionOperationViewModel(MainModel.SchemaModel, position, functionTypeModel);
             visModel.Position = position;
@@ -285,7 +284,6 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.Add(visModel);
             return visModel;
         }
-
         public CalculationOperationViewModel CreateDefaultCalculationOperationViewModel(Pt position)
         {
             var visModel = OperationViewModelFactory.CreateDefaultCalculationOperationViewModel(MainModel.SchemaModel, position);
@@ -294,7 +292,6 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.Add(visModel);
             return visModel;
         }
-
         public DefinitionOperationViewModel CreateDefaultDefinitionOperationViewModel(Pt position)
         {
             var visModel = OperationViewModelFactory.CreateDefaultDefinitionOperationViewModel(MainModel.SchemaModel, position);
@@ -327,7 +324,14 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.Add(visModel);
             return visModel;
         }
-
+        public AttributeOperationViewModel CreateDefaultAttributeOperationViewModel(Pt position)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultAttributeOperationViewModel(MainModel.SchemaModel, position);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
         public FilterOperationViewModel CreateDefaultFilterOperationViewModel(Pt position, bool fromMouse)
         {
             var visModel = OperationViewModelFactory.CreateDefaultFilterOperationViewModel(MainModel.SchemaModel, position, fromMouse);
@@ -432,6 +436,12 @@ namespace PanoramicDataWin8.controller.view
             else if (operationTypeModel.OperationType == OperationType.Example)
             {
                 operationViewModel = CreateDefaultExampleOperationViewModel(position);
+            }
+            else if (operationTypeModel.OperationType == OperationType.Attribute)
+            {
+                operationViewModel = CreateDefaultAttributeOperationViewModel(position);
+                height = 50;
+                size = new Vec(width, height);
             }
             else if (operationTypeModel.OperationType == OperationType.AttributeGroup)
             {

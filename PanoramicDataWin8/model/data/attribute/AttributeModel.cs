@@ -103,18 +103,20 @@ namespace PanoramicDataWin8.model.data.attribute
                 Group,
                 Column,
                 Code,
+                Assigned,
                 Backend
             };
 
-            public virtual AttributeModelType ModelType { get; }
+            public virtual AttributeModelType ModelType { get; set;  }
             public class AttributeCodeFuncModel : AttributeFuncModel
             {
+                AttributeModelType _modelType = AttributeModelType.Code;
                 string _code;
                 public AttributeCodeFuncModel(string code)
                 {
                     _code = code;
                 }
-                public override AttributeModelType ModelType => AttributeModelType.Code;
+                public override AttributeModelType ModelType { get; set; } = AttributeModelType.Code;
                 public List<string> Terms { get { return TransformCode(Code).Item2;  }  }
                 public string RefactorVariable(string oldName, string newName)
                 {

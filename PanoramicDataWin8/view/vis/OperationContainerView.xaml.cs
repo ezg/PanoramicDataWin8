@@ -29,6 +29,7 @@ using PanoramicDataWin8.model.view;
 using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.view.inq;
 using PanoramicDataWin8.view.style;
+using PanoramicDataWin8.model.data.operation.computational;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -275,6 +276,11 @@ namespace PanoramicDataWin8.view.vis
             else if (operationViewModel.OperationModel is FunctionOperationModel)
             {
                 _renderer = new FunctionRenderer();
+                contentGrid.Children.Add(_renderer);
+            }
+            else if (operationViewModel.OperationModel is AttributeOperationModel)
+            {
+                _renderer = new AttributeRenderer();
                 contentGrid.Children.Add(_renderer);
             }
             else if (operationViewModel.OperationModel is AttributeGroupOperationModel)

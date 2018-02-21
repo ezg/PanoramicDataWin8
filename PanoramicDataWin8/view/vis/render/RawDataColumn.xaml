@@ -20,7 +20,7 @@
             <Setter Property="Margin" Value="10,0,0,0" />
             <Setter Property="Padding" Value="0,0,0,0" />
             <Setter Property="MinWidth" Value="0" />
-            <Setter Property="MinHeight" Value="25" />
+            <Setter Property="MinHeight" Value="10" />
         </Style>
         <Style x:Key="RightStyle" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Right" />
@@ -28,7 +28,7 @@
             <Setter Property="Margin" Value="0,0,20,0" />
             <Setter Property="Padding" Value="0,0,0,0" />
             <Setter Property="MinWidth" Value="0" />
-            <Setter Property="MinHeight" Value="25" />
+            <Setter Property="MinHeight" Value="10" />
         </Style>
         <Style x:Key="ImageStyle" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -36,13 +36,22 @@
             <Setter Property="Margin" Value="0,0,2,0" />
             <Setter Property="Padding" Value="0,0,0,0" />
             <Setter Property="MinWidth" Value="0" />
-            <Setter Property="MinHeight" Value="25" />
+            <Setter Property="MinHeight" Value="10" />
         </Style>
         <DataTemplate x:Key="ImageColTemplate">
-            <Image Source="{Binding Converter={StaticResource ObjectToUriConverter}}" Width="25" CanDrag="False"/>
+            <Image Source="{Binding Converter={StaticResource ObjectToUriConverter}}" Width="30" Height="30" CanDrag="False"/>
         </DataTemplate>
         <DataTemplate x:Key="TextColTemplate">
             <TextBlock Text="{Binding Converter={StaticResource ObjectToStringConverter}}"
+                       Height="32"
+                           TextAlignment="{Binding Converter={StaticResource ObjectToTextAlignmentConverter}}"
+                           
+                           HorizontalAlignment="{Binding Converter={StaticResource ObjectToAlignmentConverter}}" />
+        </DataTemplate>
+        <DataTemplate x:Key="ValueColTemplate">
+            <TextBox Text="{Binding Path=Item2, Converter={StaticResource ObjectToStringConverter}}"
+                       Height="20"
+                     TextChanged="TextBox_TextChanged"
                            TextAlignment="{Binding Converter={StaticResource ObjectToTextAlignmentConverter}}"
                            
                            HorizontalAlignment="{Binding Converter={StaticResource ObjectToAlignmentConverter}}" />

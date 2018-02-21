@@ -218,7 +218,7 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 [label] = operationAttributeModels
             };
-            return createExpandingMenu(orientation, dict, menuHeight, maxExpansionSlots, isAlwaysDisplayed, clickToDismiss, canDeleteItems, out menuItemViewModel);
+            return createExpandingMenu(orientation, dict, menuHeight, maxExpansionSlots : maxExpansionSlots, isAlwaysDisplayed : isAlwaysDisplayed, canDeleteItems: canDeleteItems, clickToDismiss: clickToDismiss, menuItemViewModel: out menuItemViewModel);
         }
 
         protected MenuViewModel createExpandingMenu(
