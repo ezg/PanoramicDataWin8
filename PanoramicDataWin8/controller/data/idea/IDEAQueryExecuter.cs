@@ -7,6 +7,8 @@ using Windows.UI.Core;
 using IDEA_common.operations;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data.operation;
+using PanoramicDataWin8.model.data.operation.computational;
+using PanoramicDataWin8.controller.data.idea;
 
 namespace PanoramicDataWin8.controller.data.progressive
 {
@@ -53,6 +55,17 @@ namespace PanoramicDataWin8.controller.data.progressive
                                 newJob = new HistogramOperationJob(
                                     histogramOperationModel,
                                     (int) MainViewController.Instance.MainModel.SampleSize);
+                            }
+                        }
+                        else if (operationModel is AttributeOperationModel)
+                        {
+                            var attributeOperationModel = (AttributeOperationModel)operationModel;
+                            if (attributeOperationModel.AttributeTransformationModelParameters.Any())
+                            {
+                                newJob = new AttributeOperationJob(
+                                    attributeOperationModel,
+                                    (int)MainViewController.Instance.MainModel.SampleSize,
+                                    (int)MainViewController.Instance.MainModel.RawDataSize);
                             }
                         }
                         else if (operationModel is RawDataOperationModel)

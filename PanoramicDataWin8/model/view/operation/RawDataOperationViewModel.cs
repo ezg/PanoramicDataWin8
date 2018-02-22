@@ -48,7 +48,6 @@ namespace PanoramicDataWin8.model.view.operation
                             {
                                 addColumnOptions(amivm, AttachmentOrientation.Top);
                                 SelectedDataAttribute = amivm;
-                                System.Diagnostics.Debug.WriteLine("Seleted Column = " + SelectedDataAttribute);
                             }
 
                             AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();

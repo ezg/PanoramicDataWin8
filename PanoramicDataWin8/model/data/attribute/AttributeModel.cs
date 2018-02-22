@@ -112,6 +112,8 @@ namespace PanoramicDataWin8.model.data.attribute
             {
                 AttributeModelType _modelType = AttributeModelType.Code;
                 string _code;
+                [NonSerialized]
+                public object Data;
                 public AttributeCodeFuncModel(string code)
                 {
                     _code = code;

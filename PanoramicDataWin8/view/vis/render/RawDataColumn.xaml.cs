@@ -18,10 +18,10 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-using PanoramicDataWin8.model.data.attribute;
 using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.controller.view;
+using System.Collections.ObjectModel;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -29,6 +29,35 @@ namespace PanoramicDataWin8.view.vis.render
 {
     public sealed partial class RawDataColumn : UserControl
     {
+        public class RawDataColumnModel : ExtendedBindableBase
+        {
+            AttributeTransformationModel _model;
+            double _cwidth;
+            public bool ShowScroll = false;
+            public ObservableCollection<object> Data;
+            public Grid  RendererListView;
+            public AttributeTransformationModel Model
+            {
+                get { return _model; }
+                set
+                {
+                    this.SetProperty(ref _model, value);
+                }
+            }
+            public List<AttributeModel> PrimaryKeys;
+            public List<List<object>> PrimaryValues;
+            public double ColumnWidth
+            {
+                get { return _cwidth; }
+                set
+                {
+                    this.SetProperty(ref _cwidth, value);
+                }
+            }
+            public HorizontalAlignment Alignment;
+            public RawDataColumnModel() { Data = new ObservableCollection<object>(); }
+        }
+
         public RawDataColumn()
         {
             this.InitializeComponent();
@@ -37,7 +66,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void RawDataColumn_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            var rawdata = args.NewValue as RawDataRenderer.RawColumnData;
+            var rawdata = args.NewValue as RawDataColumnModel;
             if (rawdata != null)
             {
                 if (IsImage)
@@ -63,7 +92,7 @@ namespace PanoramicDataWin8.view.vis.render
         private void xListView_Loaded(object sender, RoutedEventArgs e)
         {
             var listView = (sender as ListView);
-            var dataCol = (DataContext as RawDataRenderer.RawColumnData);
+            var dataCol = (DataContext as RawDataColumnModel);
             listView.ItemsSource = dataCol.Data;
             var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
             if (cp != null)
@@ -89,14 +118,21 @@ namespace PanoramicDataWin8.view.vis.render
         {
             get
             {
-                return (DataContext as RawDataRenderer.RawColumnData).Model;
+                return (DataContext as RawDataColumnModel).Model;
             }
         }
-        public AttributeModel PrimaryKey
+        public List<AttributeModel> PrimaryKeys
         {
             get
             {
-                return (DataContext as RawDataRenderer.RawColumnData).Key;
+                return (DataContext as RawDataColumnModel).PrimaryKeys;
+            }
+        }
+        public List<List<object>> PrimaryValues
+        {
+            get
+            {
+                return (DataContext as RawDataColumnModel).PrimaryValues;
             }
         }
 
@@ -121,8 +157,8 @@ namespace PanoramicDataWin8.view.vis.render
             //        otherScroll.SetBinding(ScrollViewer.VerticalOffsetProperty, new Binding() { Source = scroll, Path = new PropertyPath(nameof(ScrollViewer.VerticalOffsetProperty)) });
             //}
             var scroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
-            var dataCol = (DataContext as RawDataRenderer.RawColumnData);
-            foreach (var dcol in dataCol.Renderer.xListView.Children)
+            var dataCol = DataContext as RawDataColumnModel;
+            foreach (var dcol in dataCol.RendererListView.Children)
             {
                 var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(dcol);
                 if (cp != scroll)
@@ -134,14 +170,49 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var tb = sender as TextBox;
             var codemodel = Model.AttributeModel.FuncModel as AttributeFuncModel.AttributeCodeFuncModel;
-            var dcontext = tb.DataContext as Tuple<object, object>;
-            var keyval = dcontext.Item1;
+            var dcontext = tb.DataContext as Tuple<int, object>;
             int newval;
+            var func = IDEAAttributeModel.Function(Model.AttributeModel.RawName,
+                MainViewController.Instance.MainModel.SchemaModel.OriginModels.First());
+            var dict = (func.FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Data as Dictionary<List<object>, object>;
             if (int.TryParse(tb.Text, out newval))
             {
-                var code = PrimaryKey.RawName + " == " + keyval + " ? " + newval + " : 0";
-                var func = IDEAAttributeModel.Function(Model.AttributeModel.RawName,
-                    MainViewController.Instance.MainModel.SchemaModel.OriginModels.First());
+                var key = new List<object>();
+                foreach (var primaryKey in PrimaryKeys)
+                {
+                    key.Add(PrimaryValues[PrimaryKeys.IndexOf(primaryKey)][dcontext.Item1]);
+                }
+                bool found = false;
+                foreach (var di in dict)
+                {
+                    foreach (var k in di.Key)
+                        if (key[di.Key.IndexOf(k)] == k)
+                        {
+                            found = true;
+                            dict.Remove(di.Key);
+                            break;
+                        }
+                    if (found)
+                        break;
+                }
+                dict[key] = newval;
+
+                var code = "";
+                if (PrimaryKeys.Count != 0)
+                {
+                    foreach (var di in dict)
+                    {
+                        code += "(";
+                        foreach (var primaryKey in PrimaryKeys)
+                        {
+                            code += primaryKey.RawName + " == " + di.Key[PrimaryKeys.IndexOf(primaryKey)] + "&&";
+                        }
+                        code = code.Substring(0, code.Length - 2) + ")";
+                        code +=  " ? " + di.Value + " : ";
+                    }
+                }
+                code += "0";
+                Debug.WriteLine("<<<code>>>" + code);
                 func.SetCode(code, IDEA_common.catalog.DataType.Int, false);
             }
         }

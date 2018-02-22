@@ -13,7 +13,10 @@ namespace PanoramicDataWin8.model.data.operation.computational
         {
             var attrModel = this.GetAttributeModel();
             if (attrModel != null)
+            {
                 attrModel.FuncModel.ModelType = attribute.AttributeModel.AttributeFuncModel.AttributeModelType.Assigned;
+                (attrModel.FuncModel as attribute.AttributeModel.AttributeFuncModel.AttributeCodeFuncModel).Data = new Dictionary<List<object>, object>();
+            }
         }
     }
 }
