@@ -22,6 +22,8 @@ using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.controller.view;
 using System.Collections.ObjectModel;
+using Windows.UI.Core;
+using Windows.System;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -36,6 +38,8 @@ namespace PanoramicDataWin8.view.vis.render
             public bool ShowScroll = false;
             public ObservableCollection<object> Data;
             public Grid  RendererListView;
+            public bool IsEditable { get; set; } = false;
+            public bool IsImage => Model.AttributeModel.VisualizationHints.FirstOrDefault() == IDEA_common.catalog.VisualizationHint.Image;
             public AttributeTransformationModel Model
             {
                 get { return _model; }
@@ -66,25 +70,25 @@ namespace PanoramicDataWin8.view.vis.render
 
         private void RawDataColumn_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            var rawdata = args.NewValue as RawDataColumnModel;
-            if (rawdata != null)
+            Debug.WriteLine("DC = " + args.NewValue);
+            var rawDataModel = args.NewValue as RawDataColumnModel;
+            if (rawDataModel != null)
             {
-                if (IsImage)
+                if (rawDataModel.IsImage)
                 {
                     xListView.ItemContainerStyle = (Style)Resources["ImageStyle"];
                     xListView.ItemTemplate = (DataTemplate)Resources["ImageColTemplate"];
                 }
-                else if (IsEditable)
+                else if (rawDataModel.IsEditable)
                 {
-                    xListView.ItemContainerStyle = (Style)Resources[rawdata.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
+                    xListView.ItemContainerStyle = (Style)Resources[rawDataModel.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
                     xListView.ItemTemplate = (DataTemplate)Resources["ValueColTemplate"];
 
                 }
                 else
                 {
-                    xListView.ItemContainerStyle = (Style)Resources[rawdata.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
+                    xListView.ItemContainerStyle = (Style)Resources[rawDataModel.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
                     xListView.ItemTemplate = (DataTemplate)Resources["TextColTemplate"];
-
                 }
             }
         }
@@ -135,16 +139,6 @@ namespace PanoramicDataWin8.view.vis.render
                 return (DataContext as RawDataColumnModel).PrimaryValues;
             }
         }
-
-        public bool IsImage
-        {
-            get => Model.AttributeModel.VisualizationHints.FirstOrDefault() == IDEA_common.catalog.VisualizationHint.Image;
-        }
-
-        public bool IsEditable
-        {
-            get => Model.AttributeModel.FuncModel.ModelType == AttributeModel.AttributeFuncModel.AttributeModelType.Assigned;
-        }
         
         private void Cp_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
@@ -166,67 +160,59 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        private void TextBox_TextChanged2(object sender, TextChangedEventArgs e)
-        {
-            var tb = sender as TextBox;
-            var codemodel = Model.AttributeModel.FuncModel as AttributeFuncModel.AttributeCodeFuncModel;
-            var dcontext = tb.DataContext as Tuple<int, object>;
-            int newval;
-            var func = IDEAAttributeModel.Function(Model.AttributeModel.RawName,
-                MainViewController.Instance.MainModel.SchemaModel.OriginModels.First());
-            var dict = (func.FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Data as Dictionary<List<object>, object>;
-            if (int.TryParse(tb.Text, out newval))
-            {
-                var key = new List<object>();
-                foreach (var primaryKey in PrimaryKeys)
-                {
-                    key.Add(PrimaryValues[PrimaryKeys.IndexOf(primaryKey)][dcontext.Item1]);
-                }
-                bool found = false;
-                foreach (var di in dict)
-                {
-                    foreach (var k in di.Key)
-                        if (key[di.Key.IndexOf(k)] == k)
-                        {
-                            found = true;
-                            dict.Remove(di.Key);
-                            break;
-                        }
-                    if (found)
-                        break;
-                }
-                dict[key] = newval;
 
-                var code = "";
-                if (PrimaryKeys.Count != 0)
-                {
-                    foreach (var di in dict)
-                    {
-                        code += "(";
-                        foreach (var primaryKey in PrimaryKeys)
-                        {
-                            code += primaryKey.RawName + " == " + di.Key[PrimaryKeys.IndexOf(primaryKey)] + "&&";
-                        }
-                        code = code.Substring(0, code.Length - 2) + ")";
-                        code +=  " ? " + di.Value + " : ";
-                    }
-                }
-                code += "0";
-                Debug.WriteLine("<<<code>>>" + code);
-                func.SetCode(code, IDEA_common.catalog.DataType.Int, false);
+        private void UpdateCellValue(Tuple<int, object> dcontext, string text)
+        {
+            int newval;
+            var codemodel = Model.AttributeModel.FuncModel as AttributeFuncModel.AttributeAssignedValueFuncModel;
+            var func = IDEAAttributeModel.Function(Model.AttributeModel.RawName,
+                                 MainViewController.Instance.MainModel.SchemaModel.OriginModels.First());
+            if (int.TryParse(text, out newval))
+            {
+                var key = new List<object>(PrimaryKeys.Select((pkey) => PrimaryValues[PrimaryKeys.IndexOf(pkey)][dcontext.Item1]));
+                codemodel.Add(PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), newval);
+                func.SetCode(codemodel.ComputeCode(), IDEA_common.catalog.DataType.Int, false);
             }
         }
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+
+        private void Tb_KeyDown(object sender, KeyRoutedEventArgs e)
         {
+            var shift = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
             var tb = sender as TextBox;
-            tb.TextChanged -= TextBox_TextChanged;
-            tb.TextChanged -= TextBox_TextChanged2;
-            tb.TextChanged += TextBox_TextChanged2;
+            if (e.Key == VirtualKey.Enter)
+            {
+                tb.LostFocus -= Tb_LostFocus;
+                UpdateCellValue(tb.DataContext as Tuple<int, object>, tb.Text);
+                var container = this.GetFirstAncestorOfType<Grid>();
+                var ind = (this.DataContext as RawDataColumnModel).Data.IndexOf(tb.DataContext);
+                var nextInd = shift ? Math.Max(0, ind - 1) : Math.Min(xListView.ItemsPanelRoot.Children.Count - 1, ind + 1);
+                var listContainer = xListView.ItemsPanelRoot.Children[nextInd] as ListViewItem;
+                var tbn = listContainer.GetFirstDescendantOfType<TextBox>();
+                tbn.SelectAll();
+                tbn.Focus(FocusState.Keyboard);
+                e.Handled = true;
+            }
+            else
+            {
+                tb.LostFocus -= Tb_LostFocus;
+                tb.LostFocus += Tb_LostFocus;
+            }
         }
 
-        private void TextBoxLoaded(object sender, RoutedEventArgs e)
+        private void Tb_LostFocus(object sender, RoutedEventArgs e)
         {
-            (sender as TextBox).TextChanged += TextBox_TextChanged;
+            var tb = sender as TextBox;
+            UpdateCellValue(tb.DataContext as Tuple<int, object>, tb.Text);
+            tb.KeyDown -= Tb_KeyDown;
+            tb.LostFocus -= Tb_LostFocus;
         }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var tb = sender as TextBox;
+            tb.KeyDown -= Tb_KeyDown;
+            tb.KeyDown += Tb_KeyDown;
+        }
+        
     }
 }

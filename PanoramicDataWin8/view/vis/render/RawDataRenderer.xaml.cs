@@ -197,12 +197,7 @@ namespace PanoramicDataWin8.view.vis.render
                 if (result != null)
                 {
                     loadResult(result);
-                   // render(operationModel.Function);
                 }
-            }
-            else if (e.PropertyName == "Function")
-            {
-                render(operationModel.Function);
             }
         }
         

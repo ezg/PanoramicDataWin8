@@ -7,6 +7,7 @@ using PanoramicDataWin8.model.data.idea;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace PanoramicDataWin8.model.data.attribute
 {
@@ -108,12 +109,88 @@ namespace PanoramicDataWin8.model.data.attribute
             };
 
             public virtual AttributeModelType ModelType { get; set;  }
+            public class AttributeAssignedValueFuncModel : AttributeCodeFuncModel
+            {
+                public class Key
+                {
+                    public List<object> values;
+                    public Key(List<object> vals) { values = vals; }
+                    public override int GetHashCode()
+                    {
+                        var code = 0;
+                        foreach (var v in values)
+                            code ^= v.GetHashCode();
+                        return code;
+                    }
+                    public override bool Equals(object obj)
+                    {
+                        var otherKey = obj as Key;
+                        if (otherKey == null || otherKey.values.Count != values.Count)
+                            return false;
+                        for (int i = 0; i < values.Count; i++)
+                            if (!otherKey.values[i].Equals(values[i]))
+                                return false;
+                        return true;
+                    }
+                }
+
+                public class AssignmentDictionary
+                {
+                    [NonSerialized]
+                    List<Tuple<Key, object>> _dict = new List<Tuple<Key, object>>();
+                    // Dictionary<Key, object> _dict = new Dictionary<Key, object>();
+                    public void Add(Key key, object value) { _dict.Add(new Tuple<Key,object>(key, value)); } //  _dict[key] = value; }
+                    // public Dictionary<Key, object> GetDict() { return _dict; }
+                    public List<Tuple<Key, object>> GetDict() { return _dict; }
+                    [NonSerialized]
+                    public List<AttributeModel> PrimaryKeys = new List<AttributeModel>();
+                }
+
+                [NonSerialized]
+                AssignmentDictionary _dict;
+                public void SetData(AssignmentDictionary d)
+                {
+                    _dict = d;
+                    _code = "0";
+                }
+                public void Add(List<AttributeModel> primaryKeys, Key key, object value)
+                {
+                    var d = _dict ?? new AssignmentDictionary();
+                    d.PrimaryKeys = primaryKeys;
+                    d.Add(key, value);
+                    _dict = d;
+                }
+
+                public string ComputeCode()
+                {
+                    var code = "";
+                    if (_dict?.PrimaryKeys.Count != 0)
+                    {
+                        foreach (var di in _dict.GetDict().ToArray().Reverse())
+                        {
+                            code += "(";
+                            foreach (var primaryKey in _dict.PrimaryKeys)
+                            {
+                                if (_dict.PrimaryKeys.IndexOf(primaryKey) < di.Item1.values.Count)
+                                    code += primaryKey.RawName + " == " + di.Item1.values[_dict.PrimaryKeys.IndexOf(primaryKey)] + "&&";
+                            }
+                            code = code.Substring(0, code.Length - 2) + ")";
+                            code += " ? " + di.Item2 + " : ";
+                        }
+                    }
+                    code += "0";
+                    Debug.WriteLine("<<<code>>>" + code);
+                    return code;
+                }
+                public AttributeAssignedValueFuncModel():base("0")
+                {
+                }
+            }
+
             public class AttributeCodeFuncModel : AttributeFuncModel
             {
-                AttributeModelType _modelType = AttributeModelType.Code;
-                string _code;
                 [NonSerialized]
-                public object Data;
+                protected string _code;
                 public AttributeCodeFuncModel(string code)
                 {
                     _code = code;
@@ -125,7 +202,6 @@ namespace PanoramicDataWin8.model.data.attribute
                     return TransformCode(Code, oldName, newName).Item1;
                 }
                 public string Code { get => _code; set => _code = value; }
-
 
                 public static Tuple<string, List<string>> TransformCode(string expression, string oldName = null, string newName = null)
                 {

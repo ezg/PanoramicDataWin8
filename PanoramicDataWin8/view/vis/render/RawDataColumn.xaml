@@ -51,8 +51,7 @@
         </DataTemplate>
         <DataTemplate x:Key="ValueColTemplate">
             <TextBox Text="{Binding Path=Item2, Converter={StaticResource ObjectToStringConverter}}"
-                       Height="20"
-                     TextChanged="TextBox_TextChanged"
+                     Height="20" GotFocus="TextBox_GotFocus"
                            TextAlignment="{Binding Converter={StaticResource ObjectToTextAlignmentConverter}}"
                            
                            HorizontalAlignment="{Binding Converter={StaticResource ObjectToAlignmentConverter}}" />

@@ -33,7 +33,8 @@ namespace PanoramicDataWin8.model.data.operation
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
         
-        public DefinitionOperationModel(SchemaModel schemaModel, string rawName, string displayName=null) : base(schemaModel, "0", DataType.String, "numeric", rawName, displayName)
+        public DefinitionOperationModel(SchemaModel schemaModel, string rawName, string displayName=null) : 
+            base(schemaModel, DataType.String, AttributeFuncModel.AttributeModelType.Code, "numeric", rawName, displayName)
         {
             _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
             IDEAAttributeModel.CodeDefinitionChangedEvent += (sender) => { UpdateCode(); UpdateName(); };

@@ -4,6 +4,6 @@
   "StartDataset": "mimic",
   "SampleSize": 100000,
   "RawDataSize": 1000,
-  "IsDarpaSubmissionMode": true,
+  "IsDarpaSubmissionMode": false,
   "IsIGTMode": false
 }

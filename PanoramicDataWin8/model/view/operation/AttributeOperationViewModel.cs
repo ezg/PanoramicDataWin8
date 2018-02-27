@@ -10,6 +10,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Media;
+using static PanoramicDataWin8.model.data.attribute.AttributeModel;
+using static PanoramicDataWin8.view.vis.render.RawDataColumn;
 
 namespace PanoramicDataWin8.model.view.operation
 {
@@ -62,6 +64,7 @@ namespace PanoramicDataWin8.model.view.operation
             }
             if (e.OldItems != null)
             {
+                AttributeOperationModel.FuncModel.SetData(null);
                 AttributeOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
             }
         }

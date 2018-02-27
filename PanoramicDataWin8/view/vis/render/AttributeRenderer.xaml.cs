@@ -85,7 +85,7 @@ namespace PanoramicDataWin8.view.vis.render
             if (result != null)
             {
                 var attributeModel = this.Model.AttributeOperationModel.GetAttributeModel();
-                ((attributeModel.FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Data as Dictionary<List<object>,object>).Clear();
+              //  ((attributeModel.FuncModel as AttributeFuncModel.AttributeCodeFuncModel).Data as Dictionary<List<object>,object>).Clear();
                 Records = new ObservableCollection<RawDataColumn.RawDataColumnModel>();
 
                 var primaryKeyData = new List<List<object>>();
@@ -97,17 +97,21 @@ namespace PanoramicDataWin8.view.vis.render
                         primaryKeyData.Add(samples);
                     }
                 }
-                for (int sampleIndex = 0; sampleIndex < (result as RawDataResult).Samples.Count(); sampleIndex++)
+                if (primaryKeyData.Count > 0)
                 {
-                    var s = (result as RawDataResult).Samples[Model.AttributeOperationModel.AttributeTransformationModelParameters[sampleIndex].AttributeModel.RawName];
-                    if (s.Count > 0)
-                        loadRecordsAsync(
-                            s,
-                            Model.AttributeOperationModel.AttributeTransformationModelParameters[sampleIndex], 
-                            sampleIndex + 1 == (result as RawDataResult).Samples.Count(),
-                            Model.AttributeOperationModel.AttributeTransformationModelParameters.Select((atm)=>atm.AttributeModel).Where((am) => am != attributeModel).ToList(),
-                            primaryKeyData);
+                    for (int sampleIndex = 0; sampleIndex < (result as RawDataResult).Samples.Count(); sampleIndex++)
+                    {
+                        var s = (result as RawDataResult).Samples[Model.AttributeOperationModel.AttributeTransformationModelParameters[sampleIndex].AttributeModel.RawName];
+                        if (s.Count > 0)
+                            loadRecordsAsync(
+                                s,
+                                Model.AttributeOperationModel.AttributeTransformationModelParameters[sampleIndex],
+                                sampleIndex + 1 == (result as RawDataResult).Samples.Count(),
+                                Model.AttributeOperationModel.AttributeTransformationModelParameters.Select((atm) => atm.AttributeModel).Where((am) => am != attributeModel).ToList(),
+                                primaryKeyData);
+                    }
                 }
+                else this.xListView.Children.Clear();
 
                 setupListView(Records);
             }
@@ -145,6 +149,7 @@ namespace PanoramicDataWin8.view.vis.render
                 Alignment = records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? HorizontalAlignment.Left : HorizontalAlignment.Right,
                 Model = model,
                 PrimaryKeys = primaryKeys,
+                IsEditable = model.AttributeModel.FuncModel is AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel,
                 PrimaryValues = primaryKeyValues,
                 RendererListView = xListView,
                 ColumnWidth = records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? 200 : 85,
@@ -169,7 +174,7 @@ namespace PanoramicDataWin8.view.vis.render
 #pragma warning restore CS4014
 
                 }
-                else if (model.AttributeModel.FuncModel.ModelType == AttributeModel.AttributeFuncModel.AttributeModelType.Assigned)
+                else if (model.AttributeModel.FuncModel is AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel)
                 {
 #pragma warning disable CS4014
                     CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low,
