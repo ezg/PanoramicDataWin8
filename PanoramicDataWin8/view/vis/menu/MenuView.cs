@@ -342,11 +342,11 @@ namespace PanoramicDataWin8.view.vis.menu
                         {
                             for (int row = 0; row < model.NrRows; row++)
                             {
-                                var itemsInSameCol = model.MenuItemViewModels
+                                var itemsInSameCol = model.MenuItemViewModels.Where((mi) => mi.Visible == Visibility.Visible || mi.Placeholding)
                                     .Where(mi => mi.Row < row &&
                                                  (mi.Column == col ||
                                                   (mi.Column < col && mi.Column + mi.ColumnSpan - 1 >= col))).ToList();
-                                var itemsInSameRow = model.MenuItemViewModels
+                                var itemsInSameRow = model.MenuItemViewModels.Where((mi) => mi.Visible == Visibility.Visible || mi.Placeholding)
                                     .Where(mi => mi.Column < col &&
                                                  (mi.Row == row || (mi.Row < row && mi.Row + mi.RowSpan - 1 >= row)))
                                     .ToList();
@@ -356,7 +356,7 @@ namespace PanoramicDataWin8.view.vis.menu
                                                   itemsInSameRow.Count() * GAP + GAP;
 
                                 var rowItem =
-                                    model.MenuItemViewModels.FirstOrDefault(mi => mi.Row == row && mi.Column == col);
+                                    model.MenuItemViewModels.Where((mi) => mi.Visible == Visibility.Visible || mi.Placeholding).FirstOrDefault(mi => mi.Row == row && mi.Column == col);
 
                                 if (rowItem != null)
                                 {

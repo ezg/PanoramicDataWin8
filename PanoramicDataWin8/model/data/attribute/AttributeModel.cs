@@ -161,7 +161,7 @@ namespace PanoramicDataWin8.model.data.attribute
                     _dict = d;
                 }
 
-                public string ComputeCode()
+                public string ComputeCode(DataType dtype)
                 {
                     var code = "";
                     if (_dict?.PrimaryKeys.Count != 0)
@@ -175,10 +175,14 @@ namespace PanoramicDataWin8.model.data.attribute
                                     code += primaryKey.RawName + " == " + di.Item1.values[_dict.PrimaryKeys.IndexOf(primaryKey)] + "&&";
                             }
                             code = code.Substring(0, code.Length - 2) + ")";
-                            code += " ? " + di.Item2 + " : ";
+                            if (dtype == DataType.String)
+                                code += " ? \"" + di.Item2 + "\" : ";
+                            else code += " ? " + di.Item2 + " : ";
                         }
                     }
-                    code += "0";
+                    if (dtype == DataType.String)
+                        code += "\"\"";
+                    else code += "0";
                     Debug.WriteLine("<<<code>>>" + code);
                     return code;
                 }

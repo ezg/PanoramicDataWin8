@@ -173,7 +173,6 @@ namespace PanoramicDataWin8.model.view.operation
                     if (fire)
                     {
                         AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
-                        RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                         //SelectedColumn = null;
                         //System.Diagnostics.Debug.WriteLine("Clear Selected Column = " + SelectedColumn);
                         if (tapTrigger)

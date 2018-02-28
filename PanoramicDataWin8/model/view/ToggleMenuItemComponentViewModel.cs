@@ -23,6 +23,8 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _label, value); }
         }
 
+        public object Data { get; set; }
+
         public bool IsVisible
         {
             get { return _isVisible; }

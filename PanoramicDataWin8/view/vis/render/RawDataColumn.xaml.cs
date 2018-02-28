@@ -164,14 +164,25 @@ namespace PanoramicDataWin8.view.vis.render
         private void UpdateCellValue(Tuple<int, object> dcontext, string text)
         {
             int newval;
+            double newdoub;
             var codemodel = Model.AttributeModel.FuncModel as AttributeFuncModel.AttributeAssignedValueFuncModel;
             var func = IDEAAttributeModel.Function(Model.AttributeModel.RawName,
                                  MainViewController.Instance.MainModel.SchemaModel.OriginModels.First());
-            if (int.TryParse(text, out newval))
+            var key = new List<object>(PrimaryKeys.Select((pkey) => PrimaryValues[PrimaryKeys.IndexOf(pkey)][dcontext.Item1]));
+            if (int.TryParse(text, out newval) && Model.AttributeModel.DataType == IDEA_common.catalog.DataType.Int)
             {
-                var key = new List<object>(PrimaryKeys.Select((pkey) => PrimaryValues[PrimaryKeys.IndexOf(pkey)][dcontext.Item1]));
                 codemodel.Add(PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), newval);
-                func.SetCode(codemodel.ComputeCode(), IDEA_common.catalog.DataType.Int, false);
+                func.SetCode(codemodel.ComputeCode(Model.AttributeModel.DataType), Model.AttributeModel.DataType, false);
+            }
+            else if (double.TryParse(text, out newdoub) && Model.AttributeModel.DataType == IDEA_common.catalog.DataType.Double)
+            {
+                codemodel.Add(PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), newdoub);
+                func.SetCode(codemodel.ComputeCode(Model.AttributeModel.DataType), Model.AttributeModel.DataType, false);
+            }
+            else if (Model.AttributeModel.DataType == IDEA_common.catalog.DataType.String)
+            {
+                codemodel.Add(PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), text);
+                func.SetCode(codemodel.ComputeCode(Model.AttributeModel.DataType), Model.AttributeModel.DataType, false);
             }
         }
 

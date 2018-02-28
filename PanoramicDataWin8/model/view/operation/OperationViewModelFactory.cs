@@ -104,9 +104,7 @@ namespace PanoramicDataWin8.model.view.operation
         static int attrCount = 0;
         public static AttributeOperationViewModel CreateDefaultAttributeOperationViewModel(SchemaModel schemaModel, Pt position)
         {
-            return new AttributeOperationViewModel(
-                new AttributeOperationModel(schemaModel, "A" + (attrCount++)), true)
-            { Position = position };
+            return new AttributeOperationViewModel(new AttributeOperationModel(schemaModel, "A" + (attrCount++))) { Position = position };
         }
         static int funcCount = 0;
         public static FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(SchemaModel schemaModel, Pt position, FunctionOperationModel genericFunctionModel, bool fromMouse = false)
