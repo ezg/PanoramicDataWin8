@@ -17,7 +17,6 @@ namespace PanoramicDataWin8.model.data.operation.computational
         public AttributeOperationModel(SchemaModel schemaModel, string rawName, string displayName=null) : 
             base(schemaModel, DataType.Double, AttributeFuncModel.AttributeModelType.Assigned, "numeric", rawName, displayName ?? rawName)
         {
-            var attrModel = this.GetAttributeModel();
             IDEAAttributeModel.CodeDefinitionChangedEvent += TestForRefresh;
         }
         private void TestForRefresh(object sender)

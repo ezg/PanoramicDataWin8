@@ -23,10 +23,10 @@ namespace PanoramicDataWin8.model.view.operation
         MenuViewModel menuViewModel;
         List<MenuItemViewModel> types = new List<MenuItemViewModel>();
         List<MenuItemViewModel> hints = new List<MenuItemViewModel>();
-        MenuItemViewModel createColumnOptionToggleMenuItem(MenuViewModel parentMenuViewModel, int row, int col, AttachmentOrientation orientation, string name, object hints=null)
+        MenuItemViewModel createColumnOptionToggleMenuItem(MenuViewModel parentMenuViewModel, int row, int col, AttachmentOrientation orientation, string name, object data=null)
         {
-            var isChecked = (hints is DataType && this.AttributeOperationModel.GetAttributeModel().DataType == (DataType)hints) ||
-                   (hints is VisualizationHint && this.AttributeOperationModel.GetAttributeModel().VisualizationHints.Contains((VisualizationHint)hints));
+            var isChecked = (data is DataType && this.AttributeOperationModel.GetAttributeModel().DataType == (DataType)data) ||
+                   (data is VisualizationHint && this.AttributeOperationModel.GetAttributeModel().VisualizationHints.Contains((VisualizationHint)data));
             var toggleMenuItem = new MenuItemViewModel
             {
                 IsAlwaysDisplayed = false,
@@ -43,24 +43,26 @@ namespace PanoramicDataWin8.model.view.operation
                     Label = name,
                     IsVisible = true,
                     IsChecked = isChecked,
-                    Data = hints
+                    Data = data
                 }
             };
             toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += toggleMenuItemChanged;
             return toggleMenuItem;
         }
         
-        void toggleMenuItemChanged(object sender, PropertyChangedEventArgs args) { 
-            var model = sender as ToggleMenuItemComponentViewModel; ;
+        void toggleMenuItemChanged(object sender, PropertyChangedEventArgs args)
+        { 
+            var model     = sender as ToggleMenuItemComponentViewModel;
+            var attrModel = AttributeOperationModel.GetAttributeModel();
             if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
             {
-                var attrModel = AttributeOperationModel.GetAttributeModel();
                 if (model.Data is VisualizationHint)
                 {
                     if (model.IsChecked)
                         AttributeOperationModel.GetAttributeModel()?.VisualizationHints.Add((VisualizationHint)model.Data);
                     else
                         AttributeOperationModel.GetAttributeModel()?.VisualizationHints.Remove((VisualizationHint)model.Data);
+                    AttributeOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                 }
                 else if (model.Data is DataType && model.IsChecked)
                 {
@@ -70,9 +72,8 @@ namespace PanoramicDataWin8.model.view.operation
                     funcMod.SetData(new AttributeFuncModel.AttributeAssignedValueFuncModel.AssignmentDictionary());
                     attrModel.DataType = (DataType)model.Data;
                     attrModel.SetCode(funcMod.ComputeCode(attrModel.DataType), attrModel.DataType, false);
-
+                    AttributeOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                 }
-                AttributeOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
             }
         }
         MenuViewModel CreateRightSideMenu(AttachmentViewModel attachmentViewModel)
@@ -150,7 +151,7 @@ namespace PanoramicDataWin8.model.view.operation
 
             menuViewModel.MenuItemViewModels.Add(TypesMenuItemViewModel);
             menuViewModel.MenuItemViewModels.Add(HintsMenuItemViewModel);
-            for (int x = 2; x < 7; x++)
+            for (int x = 2; x < Math.Max(hints.Count, types.Count); x++) // fill up the first column with empty items to make second column appear to the right like a submenu.
                 menuViewModel.MenuItemViewModels.Add( new MenuItemViewModel  {
                     MenuViewModel = menuViewModel,
                     Row = x,
@@ -159,10 +160,7 @@ namespace PanoramicDataWin8.model.view.operation
                     ColumnSpan = 1,
                     Placeholding = true
                 } );
-            foreach (var h in hints)
-                menuViewModel.MenuItemViewModels.Add(h);
-            foreach (var t in types)
-                menuViewModel.MenuItemViewModels.Add(t);
+            hints.ToArray().Concat(types).ForEach((d,c) => menuViewModel.MenuItemViewModels.Add(d));
             attachmentViewModel.MenuViewModel = menuViewModel;
             return menuViewModel;
         }
@@ -195,12 +193,15 @@ namespace PanoramicDataWin8.model.view.operation
 
             MenuItemViewModel menuItemViewModel, AttributeNameMenuItemViewModel;
             menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, AttributeOperationModel.AttributeTransformationModelParameters, "+", 50, 100, true, false, true, out menuItemViewModel);
-            createAttributeLabelMenu(AttachmentOrientation.Bottom, AttributeOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false, null, out AttributeNameMenuItemViewModel);
+            createAttributeLabelMenu(AttachmentOrientation.Bottom, AttributeOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false, droppedTriggered, out AttributeNameMenuItemViewModel);
             AttributeOperationModel.AttributeTransformationModelParameters.CollectionChanged += AttributeUsageModels_CollectionChanged;
-            AttributeOperationModel.AttributeTransformationModelParameters.Add(new AttributeTransformationModel(attributeGroupOperationModel.GetAttributeModel())); // this creates a menu item that we configure to be not deletable below.
+            AttributeOperationModel.AttributeTransformationModelParameters.Add(new AttributeTransformationModel(AttributeOperationModel.GetAttributeModel())); // this creates a menu item that we configure to be not deletable below.
             (menuViewModel.MenuItemViewModels.Last().MenuItemComponentViewModel as AttributeMenuItemViewModel).CanDelete = false;
         }
-        
+        void droppedTriggered(AttributeViewModel attributeViewModel)
+        {
+        }
+
         public AttributeOperationModel AttributeOperationModel => (AttributeOperationModel)OperationModel;
     }
 }

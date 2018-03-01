@@ -152,6 +152,10 @@ namespace PanoramicDataWin8.model.data.attribute
                 {
                     _dict = d;
                 }
+                public List<AttributeModel> GetKeys()
+                {
+                    return _dict?.PrimaryKeys;
+                }
                 public void Add(List<AttributeModel> primaryKeys, Key key, object value)
                 {
                     var d = _dict ?? new AssignmentDictionary();
@@ -171,7 +175,12 @@ namespace PanoramicDataWin8.model.data.attribute
                             foreach (var primaryKey in _dict.PrimaryKeys)
                             {
                                 if (_dict.PrimaryKeys.IndexOf(primaryKey) < di.Item1.values.Count)
-                                    code += primaryKey.RawName + " == " + di.Item1.values[_dict.PrimaryKeys.IndexOf(primaryKey)] + "&&";
+                                {
+                                    code += primaryKey.RawName + " == ";
+                                    if (di.Item1.values[_dict.PrimaryKeys.IndexOf(primaryKey)] is IDEA_common.range.PreProcessedString)
+                                        code += "\"" + di.Item1.values[_dict.PrimaryKeys.IndexOf(primaryKey)] + "\"&&";
+                                    else code += di.Item1.values[_dict.PrimaryKeys.IndexOf(primaryKey)] + "&&";
+                                }
                             }
                             code = code.Substring(0, code.Length - 2) + ")";
                             if (dtype == DataType.String)
