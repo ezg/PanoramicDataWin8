@@ -223,6 +223,10 @@ namespace PanoramicDataWin8.model.view.operation
             createLeftExampleMenu();
         }
 
+        public override void Dispose()
+        {
+            ExampleOperationModel.Dispose();
+        }
         public ExampleOperationModel ExampleOperationModel => (ExampleOperationModel) OperationModel;
     }
 }

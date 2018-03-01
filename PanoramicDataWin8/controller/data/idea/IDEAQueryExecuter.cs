@@ -28,7 +28,7 @@ namespace PanoramicDataWin8.controller.data.progressive
                     {
                         var operationModel = arg.EventArgs.OperationModel;
                         if (operationModel.ResultCauserClone != null)
-                            operationModel.ResultCauserClone.Cleanup();
+                            operationModel.ResultCauserClone.Dispose();
                         operationModel.ResultCauserClone = operationModel.Clone();
                         operationModel.Result = null;
 

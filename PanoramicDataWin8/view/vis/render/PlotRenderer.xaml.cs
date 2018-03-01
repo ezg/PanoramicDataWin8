@@ -68,6 +68,7 @@ namespace PanoramicDataWin8.view.vis.render
             base.Dispose();
             (DataContext as HistogramOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
             (DataContext as HistogramOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
+            (DataContext as HistogramOperationViewModel).Dispose();
             if (dxSurface != null)
             {
                 dxSurface.Dispose();

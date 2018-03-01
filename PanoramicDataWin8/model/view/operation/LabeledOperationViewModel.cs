@@ -21,6 +21,11 @@ namespace PanoramicDataWin8.model.view.operation
         {
         }
 
+        public override void Dispose()
+        {
+            OperationModel.Dispose();
+        }
+
         public delegate void DroppedTriggeredHandler(AttributeViewModel model);
        
         protected void createApplyAttributeMenu(AttributeModel attributeModel, AttachmentOrientation attachmentOrientation,

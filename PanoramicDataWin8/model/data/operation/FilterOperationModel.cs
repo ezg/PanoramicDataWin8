@@ -18,6 +18,10 @@ namespace PanoramicDataWin8.model.data.operation
             _brushableOperationModelImpl = new BrushableOperationModelImpl(this);
         }
 
+        public override void Dispose()
+        {
+        }
+
         public ObservableCollection<FilterModel> FilterModels
         {
             get { return _filterProviderOperationModelImpl.FilterModels; }

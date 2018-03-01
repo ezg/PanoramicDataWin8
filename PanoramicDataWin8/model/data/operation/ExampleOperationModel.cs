@@ -17,7 +17,11 @@ namespace PanoramicDataWin8.model.data.operation
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             AttributeTransformationModelParameters.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
-        
+
+        public override void Dispose()
+        {
+        }
+
         public double DummyValue
         {
             get { return _dummyValue; }

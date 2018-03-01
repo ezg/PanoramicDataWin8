@@ -24,6 +24,13 @@ namespace PanoramicDataWin8.model.data.operation
 
             IDEAAttributeModel.CodeDefinitionChangedEvent += TestForRefresh;
         }
+
+        public override void Dispose()
+        {
+            IDEAAttributeModel.CodeDefinitionChangedEvent -= TestForRefresh;
+            ResultCauserClone?.Dispose();
+        }
+
         private void TestForRefresh(object sender)
         {
             var attributeChanged = sender as IDEAAttributeModel;

@@ -13,13 +13,17 @@ namespace PanoramicDataWin8.model.data.operation
         private ObservableCollection<IBrusherOperationModel> _brushOperationModels = new ObservableCollection<IBrusherOperationModel>();
         private readonly IOperationModel _host;
 
-        public void Cleanup() { }
-
         public BrushableOperationModelImpl(IOperationModel host)
         {
             _host = host;
             _brushOperationModels.CollectionChanged += BrushOperationModelsCollectionChanged;
         }
+
+        public void Dispose()
+        {
+
+        }
+
         public int ExecutionId { get; set; } = 0;
         public ObservableCollection<IBrusherOperationModel> BrushOperationModels
         {

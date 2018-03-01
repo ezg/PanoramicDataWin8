@@ -22,7 +22,12 @@ namespace PanoramicDataWin8.model.view.operation
             createTopRightFilterDragMenu();
             menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, RawDataOperationModel.AttributeTransformationModelParameters, "+", 50, 100, true, false, true, out menuItemViewModel);
             RawDataOperationModel.AttributeTransformationModelParameters.CollectionChanged += AttributeUsageModels_CollectionChanged;
-         }
+        }
+
+        public override void Dispose()
+        {
+            RawDataOperationModel.Dispose();
+        }
 
         public void ForceDrop(AttributeViewModel am)
         {

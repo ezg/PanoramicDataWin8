@@ -115,7 +115,7 @@ namespace PanoramicDataWin8.view.vis.render
                 if (a.Key == VirtualKey.Enter)
                 {
                     tb.LostFocus -= Tb_LostFocus;
-                    EditableDataValue_Update(tb.DataContext as Tuple<int, object>, tb.Text);
+                    EditableDataValue_Update();
                     var container = this.GetFirstAncestorOfType<Grid>();
                     var ind = (this.DataContext as RawDataColumnModel).Data.IndexOf(tb.DataContext);
                     var nextInd = shift ? Math.Max(0, ind - 1) : Math.Min(xListView.ItemsPanelRoot.Children.Count - 1, ind + 1);
@@ -133,15 +133,17 @@ namespace PanoramicDataWin8.view.vis.render
             }
             void Tb_LostFocus(object s, RoutedEventArgs a)
             {
-                EditableDataValue_Update(tb.DataContext as Tuple<int, object>, tb.Text);
+                EditableDataValue_Update();
                 tb.KeyDown -= Tb_KeyDown;
                 tb.LostFocus -= Tb_LostFocus;
             }
             tb.KeyDown -= Tb_KeyDown;
             tb.KeyDown += Tb_KeyDown;
 
-            void EditableDataValue_Update(Tuple<int, object> dcontext, string text)
+            void EditableDataValue_Update()
             {
+                var dcontext = tb.DataContext as Tuple<int, object>;
+                string text = tb.Text;
                 var primKeys = DataColumnModel.PrimaryKeys;
                 var AttributeModel = DataColumnModel.AttributeTranformationModel.AttributeModel;
                 var codemodel = AttributeModel.FuncModel as AttributeFuncModel.AttributeAssignedValueFuncModel;
@@ -154,6 +156,7 @@ namespace PanoramicDataWin8.view.vis.render
                         {
                             codemodel?.Add(DataColumnModel.PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), newval);
                         }
+                        else tb.Text = "";
                         break;
                     case DataType.Double:
                         double newdoub;
@@ -161,6 +164,7 @@ namespace PanoramicDataWin8.view.vis.render
                         {
                             codemodel?.Add(DataColumnModel.PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), newdoub);
                         }
+                        else tb.Text = "";
                         break;
                     case DataType.String:
                         codemodel?.Add(DataColumnModel.PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), text);

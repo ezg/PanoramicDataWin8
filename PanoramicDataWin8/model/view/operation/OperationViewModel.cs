@@ -15,7 +15,7 @@ using PanoramicDataWin8.controller.view;
 
 namespace PanoramicDataWin8.model.view.operation
 {
-    public class OperationViewModel : ExtendedBindableBase
+    public abstract class OperationViewModel : ExtendedBindableBase
     {
         public static double WIDTH = 200;
         public static double HEIGHT = 200;
@@ -109,6 +109,8 @@ namespace PanoramicDataWin8.model.view.operation
             selectColor();
             addAttachmentViewModels();
         }
+
+        public abstract void Dispose();
 
         public Stopwatch ActiveStopwatch
         {

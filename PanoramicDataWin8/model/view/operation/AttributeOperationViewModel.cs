@@ -7,6 +7,7 @@ using PanoramicDataWin8.utils;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -24,8 +25,10 @@ namespace PanoramicDataWin8.model.view.operation
         MenuViewModel menuViewModel;
 
 
-        MenuItemViewModel createColumnOptionToggleMenuItem(MenuViewModel parentMenuViewModel, int row, int col, AttachmentOrientation orientation, string name, bool isChecked, object hints=null)
+        MenuItemViewModel createColumnOptionToggleMenuItem(MenuViewModel parentMenuViewModel, int row, int col, AttachmentOrientation orientation, string name, object hints=null)
         {
+            var isChecked = (hints is DataType && this.AttributeOperationModel.GetAttributeModel().DataType == (DataType)hints) ||
+                   (hints is VisualizationHint && this.AttributeOperationModel.GetAttributeModel().VisualizationHints.Contains((VisualizationHint)hints));
             var toggleMenuItem = new MenuItemViewModel
             {
                 IsAlwaysDisplayed = false,
@@ -45,21 +48,39 @@ namespace PanoramicDataWin8.model.view.operation
                     Data = hints
                 }
             };
-            toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
-            {
-                var model = sender as ToggleMenuItemComponentViewModel;;
-                if (args.PropertyName == model.GetPropertyName(() => model.IsChecked) && model.Data != null)
-                {
-                    if (model.Data is List<VisualizationHint>)
-                        AttributeOperationModel.GetAttributeModel().VisualizationHints = (List<VisualizationHint>)model.Data;
-                    else if (model.Data is List<DataType>)
-                        AttributeOperationModel.GetAttributeModel().DataType = ((List<DataType>)model.Data).First();
-                }
-            };
+            toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += toggleMenuItemChanged;
             return toggleMenuItem;
+        }
+        
+        void toggleMenuItemChanged(object sender, PropertyChangedEventArgs args) { 
+            var model = sender as ToggleMenuItemComponentViewModel; ;
+            if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
+            {
+                var attrModel = AttributeOperationModel.GetAttributeModel();
+                if (model.Data is VisualizationHint)
+                {
+                    if (model.IsChecked)
+                        AttributeOperationModel.GetAttributeModel()?.VisualizationHints.Add((VisualizationHint)model.Data);
+                    else
+                        AttributeOperationModel.GetAttributeModel()?.VisualizationHints.Remove((VisualizationHint)model.Data);
+                }
+                else if (model.Data is DataType && model.IsChecked)
+                {
+                    foreach (var t in types.Select((t) => t.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).Where((m) => m != model))
+                        t.IsChecked = false;
+                    var funcMod = (attrModel.FuncModel as AttributeFuncModel.AttributeAssignedValueFuncModel);
+                    funcMod.SetData(new AttributeFuncModel.AttributeAssignedValueFuncModel.AssignmentDictionary());
+                    attrModel.DataType = (DataType)model.Data;
+                    attrModel.SetCode(funcMod.ComputeCode(attrModel.DataType), attrModel.DataType, false);
+
+                }
+                AttributeOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+            }
         }
 
 
+        List<MenuItemViewModel> types = new List<MenuItemViewModel>();
+        List<MenuItemViewModel> hints = new List<MenuItemViewModel>();
         private MenuViewModel CreateRightSideMenu(AttachmentViewModel attachmentViewModel)
         {
             attachmentViewModel.ShowOnAttributeTapped = true;
@@ -71,15 +92,13 @@ namespace PanoramicDataWin8.model.view.operation
                 NrRows = 5,
             };
 
-            var types = new List<MenuItemViewModel>();
             int i = 0;
             foreach (var str in Enum.GetValues(typeof(VisualizationHint)).Cast<VisualizationHint>())
-                types.Add(createColumnOptionToggleMenuItem(menuViewModel, i++, 1, AttachmentOrientation.Right, str.ToString(), false, new List<VisualizationHint>(new VisualizationHint[] {str})));
+                hints.Add(createColumnOptionToggleMenuItem(menuViewModel, i++, 1, AttachmentOrientation.Right, str.ToString(), str));
 
-            var hints = new List<MenuItemViewModel>();
             int j = 0;
             foreach (var str in Enum.GetValues(typeof(DataType)).Cast<DataType>())
-                hints.Add(createColumnOptionToggleMenuItem(menuViewModel, j++, 1, AttachmentOrientation.Right, str.ToString(), false, new List<DataType>(new DataType[] { str }) ));
+                types.Add(createColumnOptionToggleMenuItem(menuViewModel, j++, 1, AttachmentOrientation.Right, str.ToString(), str));
 
             var TypesMenuItemViewModel = new MenuItemViewModel
             {
@@ -99,9 +118,9 @@ namespace PanoramicDataWin8.model.view.operation
                     Label = "Types",
                     TappedTriggered = ((args) => {
                         foreach (var m in types)
-                            m.Visible = Visibility.Collapsed;
-                        foreach (var m in hints)
                             m.Visible = m.Visible == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+                        foreach (var m in hints)
+                            m.Visible = Visibility.Collapsed;
                         menuViewModel.FireUpdate();
                         attachmentViewModel.StartDisplayActivationStopwatch();
                     })
@@ -126,9 +145,9 @@ namespace PanoramicDataWin8.model.view.operation
                     Label = "Hints",
                     TappedTriggered = ((args) => {
                         foreach (var m in types)
-                            m.Visible = m.Visible == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-                        foreach (var m in hints)
                             m.Visible = Visibility.Collapsed;
+                        foreach (var m in hints)
+                            m.Visible = m.Visible == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
                         menuViewModel.FireUpdate();
                         attachmentViewModel.StartDisplayActivationStopwatch();
                     })
@@ -180,7 +199,10 @@ namespace PanoramicDataWin8.model.view.operation
             }
             if (e.OldItems != null)
             {
-                AttributeOperationModel.FuncModel.SetData(null);
+                var funcMod = (AttributeOperationModel.FuncModel as AttributeFuncModel.AttributeAssignedValueFuncModel);
+                var attrModel = AttributeOperationModel.GetAttributeModel();
+                funcMod.SetData(null);
+                attrModel.SetCode(funcMod.ComputeCode(attrModel.DataType), attrModel.DataType, false);
                 AttributeOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
             }
         }

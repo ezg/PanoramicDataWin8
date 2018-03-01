@@ -151,7 +151,6 @@ namespace PanoramicDataWin8.model.data.attribute
                 public void SetData(AssignmentDictionary d)
                 {
                     _dict = d;
-                    _code = "0";
                 }
                 public void Add(List<AttributeModel> primaryKeys, Key key, object value)
                 {
@@ -164,7 +163,7 @@ namespace PanoramicDataWin8.model.data.attribute
                 public string ComputeCode(DataType dtype)
                 {
                     var code = "";
-                    if (_dict?.PrimaryKeys.Count != 0)
+                    if (_dict!= null && _dict.PrimaryKeys.Count != 0)
                     {
                         foreach (var di in _dict.GetDict().ToArray().Reverse())
                         {

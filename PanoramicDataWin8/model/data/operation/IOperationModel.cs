@@ -10,7 +10,7 @@ namespace PanoramicDataWin8.model.data.operation
         int ExecutionId { get; set; }
         ResultParameters ResultParameters { get; }
 
-        void Cleanup();
+        void Dispose();
 
         IOperationModel ResultCauserClone { get; set; }
         

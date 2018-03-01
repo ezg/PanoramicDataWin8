@@ -30,6 +30,10 @@ namespace PanoramicDataWin8.model.data.operation
         {
         }
 
+        public override void Dispose()
+        {
+        }
+
         public RiskControlType RiskControlType
         {
             get { return _riskControlType; }

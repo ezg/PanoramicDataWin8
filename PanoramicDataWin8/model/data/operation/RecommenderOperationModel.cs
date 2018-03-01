@@ -19,6 +19,10 @@ namespace PanoramicDataWin8.model.data.operation
         {
         }
 
+        public override void Dispose()
+        {
+        }
+
         public double Budget
         {
             get { return _budget; }

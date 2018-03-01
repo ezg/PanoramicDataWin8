@@ -16,14 +16,17 @@ namespace PanoramicDataWin8.model.data.operation
             _host = host;
         }
 
+        public void Dispose()
+        {
+
+        }
+
         public event OperationModel.OperationModelUpdatedHandler OperationModelUpdated;
 
         public void FireOperationModelUpdated(OperationModelUpdatedEventArgs args)
         {
             throw new NotImplementedException();
         }
-
-        public void Cleanup() { }
 
         public IResult Result { get; set; }
         public int ExecutionId { get; set; } = 0;

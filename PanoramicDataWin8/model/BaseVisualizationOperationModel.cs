@@ -16,7 +16,7 @@ using IDEA_common.aggregates;
 namespace PanoramicDataWin8.model.data.operation
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class BaseVisualizationOperationModel : OperationModel, IBrushableOperationModel,
+    public abstract class BaseVisualizationOperationModel : OperationModel, IBrushableOperationModel,
         IBrusherOperationModel, IFilterConsumerOperationModel
     {
         private readonly BrushableOperationModelImpl _brushableOperationModelImpl;
