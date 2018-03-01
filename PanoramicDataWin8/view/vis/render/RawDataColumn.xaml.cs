@@ -1,29 +1,19 @@
 ﻿using PanoramicDataWin8.model.data.attribute;
-using PanoramicDataWin8.model.data.operation;
-using PanoramicDataWin8.model.view.operation;
 using PanoramicDataWin8.utils;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Text;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 using PanoramicDataWin8.model.data.idea;
 using PanoramicDataWin8.controller.view;
 using System.Collections.ObjectModel;
 using Windows.UI.Core;
 using Windows.System;
+using IDEA_common.catalog;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -35,195 +25,153 @@ namespace PanoramicDataWin8.view.vis.render
         {
             AttributeTransformationModel _model;
             double _cwidth;
-            public bool ShowScroll = false;
-            public ObservableCollection<object> Data;
-            public Grid  RendererListView;
-            public bool IsEditable { get; set; } = false;
-            public bool IsImage => Model.AttributeModel.VisualizationHints.FirstOrDefault() == IDEA_common.catalog.VisualizationHint.Image;
-            public AttributeTransformationModel Model
+            public bool                         ShowScroll = false;
+            public ObservableCollection<object> Data = new ObservableCollection<object>();
+            public Grid                         RendererListView;
+            public bool                         IsEditable { get; set; } = false;
+            public bool                         IsImage => AttributeTranformationModel.AttributeModel.VisualizationHints.FirstOrDefault() == VisualizationHint.Image;
+            public AttributeTransformationModel AttributeTranformationModel
             {
-                get { return _model; }
-                set
-                {
-                    this.SetProperty(ref _model, value);
-                }
+                get => _model;
+                set => SetProperty(ref _model, value);
             }
-            public List<AttributeModel> PrimaryKeys;
-            public List<List<object>> PrimaryValues;
-            public double ColumnWidth
+            public List<AttributeModel>         PrimaryKeys;
+            public List<List<object>>           PrimaryValues;
+            public double                       ColumnWidth
             {
-                get { return _cwidth; }
-                set
-                {
-                    this.SetProperty(ref _cwidth, value);
-                }
+                get => _cwidth;
+                set => SetProperty(ref _cwidth, value);
             }
-            public HorizontalAlignment Alignment;
-            public RawDataColumnModel() { Data = new ObservableCollection<object>(); }
+            public HorizontalAlignment          Alignment;
         }
+
+        public RawDataColumnModel DataColumnModel { get => DataContext as RawDataColumnModel; }
 
         public RawDataColumn()
         {
             this.InitializeComponent();
-            DataContextChanged += RawDataColumn_DataContextChanged;
-        }
-
-        private void RawDataColumn_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-        {
-            Debug.WriteLine("DC = " + args.NewValue);
-            var rawDataModel = args.NewValue as RawDataColumnModel;
-            if (rawDataModel != null)
+            DataContextChanged += (sender, e) =>  // set the style of the cell based on properties of the data column model
             {
-                if (rawDataModel.IsImage)
+                if (DataColumnModel?.IsImage == true)
                 {
                     xListView.ItemContainerStyle = (Style)Resources["ImageStyle"];
                     xListView.ItemTemplate = (DataTemplate)Resources["ImageColTemplate"];
                 }
-                else if (rawDataModel.IsEditable)
+                else if (DataColumnModel?.IsEditable == true)
                 {
-                    xListView.ItemContainerStyle = (Style)Resources[rawDataModel.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
+                    xListView.ItemContainerStyle = (Style)Resources[DataColumnModel.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
                     xListView.ItemTemplate = (DataTemplate)Resources["ValueColTemplate"];
 
                 }
-                else
+                else if (DataColumnModel != null)
                 {
-                    xListView.ItemContainerStyle = (Style)Resources[rawDataModel.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
+                    xListView.ItemContainerStyle = (Style)Resources[DataColumnModel.Alignment == HorizontalAlignment.Right ? "RightStyle" : "LeftStyle"];
                     xListView.ItemTemplate = (DataTemplate)Resources["TextColTemplate"];
+                }
+            };
+        }
+
+        /// <summary>
+        /// Configure the display so that only one scroll bar is shown on the right of the view, 
+        /// instead of one scroll bar for each column. Then synch all the scrollbars to move together.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void xListView_Loaded(object sender, RoutedEventArgs e)
+        {
+            xListView.ItemsSource = DataColumnModel.Data;
+            var scrollViewer = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
+            if (scrollViewer != null)
+                scrollViewer.ViewChanged += scrollViewer_ViewChanged;
+            if (!DataColumnModel.ShowScroll)
+            {
+                var scrollBar = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollBar>(this);
+                if (scrollBar != null)
+                    scrollBar.Visibility = Visibility.Collapsed;
+            } 
+            void scrollViewer_ViewChanged(object s, ScrollViewerViewChangedEventArgs a)
+            {
+                foreach (var dcol in DataColumnModel.RendererListView.Children)
+                {
+                    var columnScrollViewer = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(dcol);
+                    if (columnScrollViewer != scrollViewer)
+                        columnScrollViewer.ChangeView(null, scrollViewer.VerticalOffset, null, true);
                 }
             }
         }
 
-        private void xListView_Loaded(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Handle editing of a data value when it gets keyboard focus.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void EditableDataValue_GotFocus(object sender, RoutedEventArgs e)
         {
-            var listView = (sender as ListView);
-            var dataCol = (DataContext as RawDataColumnModel);
-            listView.ItemsSource = dataCol.Data;
-            var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
-            if (cp != null)
-                cp.ViewChanged += Cp_ViewChanged;
-            if (!dataCol.ShowScroll)
-            {
-                var sbar = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollBar>(this);
-                if (sbar != null)
-                    sbar.Visibility = Visibility.Collapsed;
-            } else
-            {
-                //var scroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
-                //foreach (var dcol in dataCol.Renderer.xListView.ItemsPanelRoot.Children)
-                //{
-                //    var otherScroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(dcol);
-                //    if (otherScroll != scroll)
-                //        otherScroll.SetBinding(ScrollViewer.VerticalOffsetProperty, new Binding() { Source = scroll, Path = new PropertyPath(nameof(ScrollViewer.VerticalOffsetProperty)) });
-                //}
-            }
-        }
-
-        public AttributeTransformationModel Model
-        {
-            get
-            {
-                return (DataContext as RawDataColumnModel).Model;
-            }
-        }
-        public List<AttributeModel> PrimaryKeys
-        {
-            get
-            {
-                return (DataContext as RawDataColumnModel).PrimaryKeys;
-            }
-        }
-        public List<List<object>> PrimaryValues
-        {
-            get
-            {
-                return (DataContext as RawDataColumnModel).PrimaryValues;
-            }
-        }
-        
-        private void Cp_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
-        {
-            //var dataCol = (DataContext as RawDataRenderer.RawColumnData);
-            //var scroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
-            //foreach (var dcol in dataCol.Renderer.xListView.ItemsPanelRoot.Children)
-            //{
-            //    var otherScroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(dcol);
-            //    if (otherScroll != scroll)
-            //        otherScroll.SetBinding(ScrollViewer.VerticalOffsetProperty, new Binding() { Source = scroll, Path = new PropertyPath(nameof(ScrollViewer.VerticalOffsetProperty)) });
-            //}
-            var scroll = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(this);
-            var dataCol = DataContext as RawDataColumnModel;
-            foreach (var dcol in dataCol.RendererListView.Children)
-            {
-                var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollViewer>(dcol);
-                if (cp != scroll)
-                    cp.ChangeView(null, scroll.VerticalOffset, null, true);
-            }
-        }
-
-
-        private void UpdateCellValue(Tuple<int, object> dcontext, string text)
-        {
-            int newval;
-            double newdoub;
-            var codemodel = Model.AttributeModel.FuncModel as AttributeFuncModel.AttributeAssignedValueFuncModel;
-            var func = IDEAAttributeModel.Function(Model.AttributeModel.RawName,
-                                 MainViewController.Instance.MainModel.SchemaModel.OriginModels.First());
-            var key = new List<object>(PrimaryKeys.Select((pkey) => PrimaryValues[PrimaryKeys.IndexOf(pkey)][dcontext.Item1]));
-            if (int.TryParse(text, out newval) && Model.AttributeModel.DataType == IDEA_common.catalog.DataType.Int)
-            {
-                codemodel.Add(PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), newval);
-                func.SetCode(codemodel.ComputeCode(Model.AttributeModel.DataType), Model.AttributeModel.DataType, false);
-            }
-            else if (double.TryParse(text, out newdoub) && Model.AttributeModel.DataType == IDEA_common.catalog.DataType.Double)
-            {
-                codemodel.Add(PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), newdoub);
-                func.SetCode(codemodel.ComputeCode(Model.AttributeModel.DataType), Model.AttributeModel.DataType, false);
-            }
-            else if (Model.AttributeModel.DataType == IDEA_common.catalog.DataType.String)
-            {
-                codemodel.Add(PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), text);
-                func.SetCode(codemodel.ComputeCode(Model.AttributeModel.DataType), Model.AttributeModel.DataType, false);
-            }
-        }
-
-        private void Tb_KeyDown(object sender, KeyRoutedEventArgs e)
-        {
-            var shift = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
             var tb = sender as TextBox;
-            if (e.Key == VirtualKey.Enter)
+
+            void Tb_KeyDown(object s, KeyRoutedEventArgs a)
             {
+                var shift = CoreWindow.GetForCurrentThread().GetKeyState(VirtualKey.Shift).HasFlag(CoreVirtualKeyStates.Down);
+                if (a.Key == VirtualKey.Enter)
+                {
+                    tb.LostFocus -= Tb_LostFocus;
+                    EditableDataValue_Update(tb.DataContext as Tuple<int, object>, tb.Text);
+                    var container = this.GetFirstAncestorOfType<Grid>();
+                    var ind = (this.DataContext as RawDataColumnModel).Data.IndexOf(tb.DataContext);
+                    var nextInd = shift ? Math.Max(0, ind - 1) : Math.Min(xListView.ItemsPanelRoot.Children.Count - 1, ind + 1);
+                    var listContainer = xListView.ItemsPanelRoot.Children[nextInd] as ListViewItem;
+                    var nextTextBoxToEdit = listContainer.GetFirstDescendantOfType<TextBox>();
+                    nextTextBoxToEdit.SelectAll();
+                    nextTextBoxToEdit.Focus(FocusState.Keyboard);
+                    a.Handled = true;
+                }
+                else
+                {
+                    tb.LostFocus -= Tb_LostFocus;
+                    tb.LostFocus += Tb_LostFocus;
+                }
+            }
+            void Tb_LostFocus(object s, RoutedEventArgs a)
+            {
+                EditableDataValue_Update(tb.DataContext as Tuple<int, object>, tb.Text);
+                tb.KeyDown -= Tb_KeyDown;
                 tb.LostFocus -= Tb_LostFocus;
-                UpdateCellValue(tb.DataContext as Tuple<int, object>, tb.Text);
-                var container = this.GetFirstAncestorOfType<Grid>();
-                var ind = (this.DataContext as RawDataColumnModel).Data.IndexOf(tb.DataContext);
-                var nextInd = shift ? Math.Max(0, ind - 1) : Math.Min(xListView.ItemsPanelRoot.Children.Count - 1, ind + 1);
-                var listContainer = xListView.ItemsPanelRoot.Children[nextInd] as ListViewItem;
-                var tbn = listContainer.GetFirstDescendantOfType<TextBox>();
-                tbn.SelectAll();
-                tbn.Focus(FocusState.Keyboard);
-                e.Handled = true;
             }
-            else
-            {
-                tb.LostFocus -= Tb_LostFocus;
-                tb.LostFocus += Tb_LostFocus;
-            }
-        }
-
-        private void Tb_LostFocus(object sender, RoutedEventArgs e)
-        {
-            var tb = sender as TextBox;
-            UpdateCellValue(tb.DataContext as Tuple<int, object>, tb.Text);
-            tb.KeyDown -= Tb_KeyDown;
-            tb.LostFocus -= Tb_LostFocus;
-        }
-
-        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
-        {
-            var tb = sender as TextBox;
             tb.KeyDown -= Tb_KeyDown;
             tb.KeyDown += Tb_KeyDown;
+
+            void EditableDataValue_Update(Tuple<int, object> dcontext, string text)
+            {
+                var primKeys = DataColumnModel.PrimaryKeys;
+                var AttributeModel = DataColumnModel.AttributeTranformationModel.AttributeModel;
+                var codemodel = AttributeModel.FuncModel as AttributeFuncModel.AttributeAssignedValueFuncModel;
+                var key = primKeys.Select((pkey) => DataColumnModel.PrimaryValues[primKeys.IndexOf(pkey)][dcontext.Item1]).ToList();
+                switch (AttributeModel.DataType)
+                {
+                    case DataType.Int:
+                        int newval;
+                        if (int.TryParse(text, out newval))
+                        {
+                            codemodel?.Add(DataColumnModel.PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), newval);
+                        }
+                        break;
+                    case DataType.Double:
+                        double newdoub;
+                        if (double.TryParse(text, out newdoub))
+                        {
+                            codemodel?.Add(DataColumnModel.PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), newdoub);
+                        }
+                        break;
+                    case DataType.String:
+                        codemodel?.Add(DataColumnModel.PrimaryKeys, new AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel.Key(key), text);
+                        break;
+                }
+                if (codemodel != null)
+                {
+                    var func = IDEAAttributeModel.Function(AttributeModel.RawName, MainViewController.Instance.MainModel.SchemaModel.OriginModels.First());
+                    func.SetCode(codemodel.ComputeCode(AttributeModel.DataType), AttributeModel.DataType, false);
+                }
+            }
         }
-        
     }
 }

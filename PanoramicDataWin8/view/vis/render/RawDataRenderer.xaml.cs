@@ -86,7 +86,7 @@ namespace PanoramicDataWin8.view.vis.render
                 else if (r is TextBlock)
                 {
                     var tb = r as TextBlock;
-                    var col = tb.GetFirstAncestorOfType<RawDataColumn>()?.Model ??
+                    var col = tb.GetFirstAncestorOfType<RawDataColumn>()?.DataColumnModel.AttributeTranformationModel ??
                               model.RawDataOperationModel.AttributeTransformationModelParameters.First();
                     if (tb.Tag != null)
                     {
@@ -253,7 +253,7 @@ namespace PanoramicDataWin8.view.vis.render
                 var acollection = new RawDataColumn.RawDataColumnModel
                 {
                     Alignment = HorizontalAlignment.Right,
-                    Model = col,
+                    AttributeTranformationModel = col,
                     RendererListView = xListView,
                     ColumnWidth = 85,// records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? 200 : 50,
                     ShowScroll = false
@@ -292,7 +292,7 @@ namespace PanoramicDataWin8.view.vis.render
                 xListView.ColumnDefinitions.Add(
                     new ColumnDefinition()
                     {
-                        Width = new GridLength(n.Model.AttributeModel.DataType == IDEA_common.catalog.DataType.String ? 2 : 1, GridUnitType.Star)
+                        Width = new GridLength(n.AttributeTranformationModel.AttributeModel.DataType == IDEA_common.catalog.DataType.String ? 2 : 1, GridUnitType.Star)
                     }
                 );
             }
@@ -375,7 +375,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var acollection = new RawDataColumn.RawDataColumnModel {
                 Alignment = records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? HorizontalAlignment.Left : HorizontalAlignment.Right,
-                Model = model,
+                AttributeTranformationModel = model,
                 RendererListView = xListView,
                 ColumnWidth =records.First() is string|| records.First() is IDEA_common.range.PreProcessedString ? 200:85,
                 ShowScroll = showScroll

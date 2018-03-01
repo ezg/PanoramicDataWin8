@@ -135,7 +135,7 @@ namespace PanoramicDataWin8.view.vis.render
                 xListView.ColumnDefinitions.Add(
                     new ColumnDefinition()
                     {
-                        Width = new GridLength(n.Model.AttributeModel.DataType == IDEA_common.catalog.DataType.String ? 2 : 1, GridUnitType.Star)
+                        Width = new GridLength(n.AttributeTranformationModel.AttributeModel.DataType == IDEA_common.catalog.DataType.String ? 2 : 1, GridUnitType.Star)
                     }
                 );
             }
@@ -147,7 +147,7 @@ namespace PanoramicDataWin8.view.vis.render
             var acollection = new RawDataColumn.RawDataColumnModel
             {
                 Alignment = records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? HorizontalAlignment.Left : HorizontalAlignment.Right,
-                Model = model,
+                AttributeTranformationModel = model,
                 PrimaryKeys = primaryKeys,
                 IsEditable = model.AttributeModel.FuncModel is AttributeModel.AttributeFuncModel.AttributeAssignedValueFuncModel,
                 PrimaryValues = primaryKeyValues,
