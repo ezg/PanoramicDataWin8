@@ -20,11 +20,9 @@ namespace PanoramicDataWin8.model.view.operation
 {
     public class AttributeOperationViewModel : LabeledOperationViewModel
     {
-        MenuItemViewModel AttributeNameMenuItemViewModel;
-        MenuItemViewModel menuItemViewModel;
         MenuViewModel menuViewModel;
-
-
+        List<MenuItemViewModel> types = new List<MenuItemViewModel>();
+        List<MenuItemViewModel> hints = new List<MenuItemViewModel>();
         MenuItemViewModel createColumnOptionToggleMenuItem(MenuViewModel parentMenuViewModel, int row, int col, AttachmentOrientation orientation, string name, object hints=null)
         {
             var isChecked = (hints is DataType && this.AttributeOperationModel.GetAttributeModel().DataType == (DataType)hints) ||
@@ -77,11 +75,7 @@ namespace PanoramicDataWin8.model.view.operation
                 AttributeOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
             }
         }
-
-
-        List<MenuItemViewModel> types = new List<MenuItemViewModel>();
-        List<MenuItemViewModel> hints = new List<MenuItemViewModel>();
-        private MenuViewModel CreateRightSideMenu(AttachmentViewModel attachmentViewModel)
+        MenuViewModel CreateRightSideMenu(AttachmentViewModel attachmentViewModel)
         {
             attachmentViewModel.ShowOnAttributeTapped = true;
 
@@ -172,20 +166,7 @@ namespace PanoramicDataWin8.model.view.operation
             attachmentViewModel.MenuViewModel = menuViewModel;
             return menuViewModel;
         }
-
-        public AttributeOperationViewModel(AttributeOperationModel attributeGroupOperationModel) : base(attributeGroupOperationModel)
-        {
-            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
-            var pmenu = CreateRightSideMenu(attachmentViewModel);
-
-            menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, AttributeOperationModel.AttributeTransformationModelParameters, "+", 50, 100, true, false, true, out menuItemViewModel);
-            createAttributeLabelMenu(AttachmentOrientation.Bottom, AttributeOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false, null, out AttributeNameMenuItemViewModel);
-            AttributeOperationModel.AttributeTransformationModelParameters.CollectionChanged += AttributeUsageModels_CollectionChanged;
-            AttributeOperationModel.AttributeTransformationModelParameters.Add(new AttributeTransformationModel(attributeGroupOperationModel.GetAttributeModel()));
-            (menuViewModel.MenuItemViewModels.Last().MenuItemComponentViewModel as AttributeMenuItemViewModel).CanDelete = false;
-        }
-        
-        private void AttributeUsageModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        void AttributeUsageModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (e.NewItems != null)
             {
@@ -207,6 +188,19 @@ namespace PanoramicDataWin8.model.view.operation
             }
         }
 
+        public AttributeOperationViewModel(AttributeOperationModel attributeGroupOperationModel) : base(attributeGroupOperationModel)
+        {
+            var attachmentViewModel = AttachementViewModels.First(avm => avm.AttachmentOrientation == AttachmentOrientation.Right);
+            var pmenu = CreateRightSideMenu(attachmentViewModel);
+
+            MenuItemViewModel menuItemViewModel, AttributeNameMenuItemViewModel;
+            menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, AttributeOperationModel.AttributeTransformationModelParameters, "+", 50, 100, true, false, true, out menuItemViewModel);
+            createAttributeLabelMenu(AttachmentOrientation.Bottom, AttributeOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false, null, out AttributeNameMenuItemViewModel);
+            AttributeOperationModel.AttributeTransformationModelParameters.CollectionChanged += AttributeUsageModels_CollectionChanged;
+            AttributeOperationModel.AttributeTransformationModelParameters.Add(new AttributeTransformationModel(attributeGroupOperationModel.GetAttributeModel())); // this creates a menu item that we configure to be not deletable below.
+            (menuViewModel.MenuItemViewModels.Last().MenuItemComponentViewModel as AttributeMenuItemViewModel).CanDelete = false;
+        }
+        
         public AttributeOperationModel AttributeOperationModel => (AttributeOperationModel)OperationModel;
     }
 }
