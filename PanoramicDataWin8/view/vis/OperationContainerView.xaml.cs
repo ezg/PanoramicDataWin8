@@ -294,6 +294,12 @@ namespace PanoramicDataWin8.view.vis
                 _renderer = new AttributeRenderer();
                 contentGrid.Children.Add(_renderer);
             }
+            else if (operationViewModel.OperationModel is GraphOperationModel && !(oldRenderer is GraphRenderer))
+            {
+                clearOldRenderer();
+                _renderer = new GraphRenderer();
+                contentGrid.Children.Add(_renderer);
+            }
             else if (operationViewModel.OperationModel is AttributeGroupOperationModel && !(oldRenderer is AttributeGroupRenderer))
             {
                 clearOldRenderer();

@@ -163,6 +163,7 @@
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventType.cs" />
     <Compile Include="model\data\operation\FilterProviderOperationModelImpl.cs" />
     <Compile Include="model\data\operation\computational\FunctionOperationModel.cs" />
+    <Compile Include="model\data\operation\GraphOperationModel.cs" />
     <Compile Include="model\data\operation\Range.cs" />
     <Compile Include="model\data\operation\RawDataOperationModel.cs" />
     <Compile Include="model\data\operation\RecommenderOperationModel.cs" />
@@ -210,6 +211,7 @@
     <Compile Include="model\view\InputGroupViewModelEventArgs.cs" />
     <Compile Include="model\view\operation\AttributeGroupOperationViewModel.cs" />
     <Compile Include="model\view\operation\AttributeOperationViewModel.cs" />
+    <Compile Include="model\view\operation\GraphOperationViewModel.cs" />
     <Compile Include="model\view\operation\LabeledOperationViewModel.cs" />
     <Compile Include="model\view\operation\CalculationOperationViewModel.cs" />
     <Compile Include="model\view\operation\PredictorOperationViewModel.cs" />
@@ -360,6 +362,9 @@
     </Compile>
     <Compile Include="view\vis\render\CalculationRenderer.xaml.cs">
       <DependentUpon>CalculationRenderer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\render\GraphRenderer.xaml.cs">
+      <DependentUpon>GraphRenderer.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\PredictorRenderer.xaml.cs">
       <DependentUpon>PredictorRenderer.xaml</DependentUpon>
@@ -604,6 +609,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="view\vis\render\GraphRenderer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="view\vis\render\PredictorRenderer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -697,7 +706,16 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\G1.gml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="PanoramicDataWin8_TemporaryKey.pfx" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="utils\Blueprints2\Blueprints.csproj">
+      <Project>{7355fa95-4259-465b-8c8d-26deed418788}</Project>
+      <Name>Blueprints</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

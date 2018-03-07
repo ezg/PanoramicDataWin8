@@ -833,6 +833,16 @@ namespace PanoramicDataWin8
 
                         count++;
                     }
+                    {
+                        var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "G1", OperationType = OperationType.Graph }, parentModel);
+                        tileMenuItemViewModel.Row = count;
+                        tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
+                                                       (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
+                        tileMenuItemViewModel.RowSpan = 1;
+                        tileMenuItemViewModel.ColumnSpan = 1;
+
+                        count++;
+                    }
                 }
                 foreach (var inputModel in inputModels)
                 {

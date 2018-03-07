@@ -12,6 +12,7 @@
         Calculation,
         Attribute,
         AttributeGroup,
+        Graph,
         Function
     }
     

@@ -316,9 +316,17 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.Add(visModel);
             return visModel;
         }
-        public AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(Pt position, AttributeModel groupModel=null)
+        public AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(Pt position, AttributeModel groupModel = null)
         {
             var visModel = OperationViewModelFactory.CreateDefaultAttributeGroupOperationViewModel(MainModel.SchemaModel, position, groupModel);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
+        public GraphOperationViewModel CreateDefaultGraphOperationViewModel(Pt position, AttributeModel groupModel=null)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultGraphOperationViewModel(MainModel.SchemaModel, position, groupModel);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -448,6 +456,10 @@ namespace PanoramicDataWin8.controller.view
                 operationViewModel = CreateDefaultAttributeGroupOperationViewModel(position);
                 height = 50;
                 size = new Vec(width, height);
+            }
+            else if (operationTypeModel.OperationType == OperationType.Graph)
+            {
+                operationViewModel = CreateDefaultGraphOperationViewModel(position);
             }
             else if (operationTypeModel.OperationType == OperationType.Filter)
             {
