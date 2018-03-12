@@ -348,7 +348,7 @@ namespace PanoramicDataWin8
                     commandBar.Visibility = Visibility.Visible;
                 }
 
-                if (((MainModel) DataContext)?.DatasetConfigurations?.Count > 1)
+                if (((MainModel) DataContext)?.DatasetConfigurations?.Count > 0)
                 {
                     addAttributeButton.Visibility = Visibility.Visible;
                     addOperationButton.Visibility = Visibility.Visible;
