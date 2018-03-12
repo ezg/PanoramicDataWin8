@@ -29,7 +29,6 @@ namespace PanoramicDataWin8.model.view.operation
                 var newName = new Regex("\\(.*\\)", RegexOptions.Compiled).Replace(AttributeGroupOperationModel.AttributeModel.DisplayName, str);
                 AttributeGroupOperationModel.SetName(newName);
             };
-
         }
 
         public bool Editable = true;

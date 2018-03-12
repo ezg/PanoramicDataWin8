@@ -7,6 +7,7 @@ using PanoramicDataWin8.model.data.idea;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 
 namespace PanoramicDataWin8.model.data.attribute
 {
@@ -103,25 +104,116 @@ namespace PanoramicDataWin8.model.data.attribute
                 Group,
                 Column,
                 Code,
+                Assigned,
                 Backend
             };
 
-            public virtual AttributeModelType ModelType { get; }
+            public virtual AttributeModelType ModelType { get; set;  }
+            public class AttributeAssignedValueFuncModel : AttributeCodeFuncModel
+            {
+                public class Key
+                {
+                    public List<object> values;
+                    public Key(List<object> vals) { values = vals; }
+                    public override int GetHashCode()
+                    {
+                        var code = 0;
+                        foreach (var v in values)
+                            code ^= v.GetHashCode();
+                        return code;
+                    }
+                    public override bool Equals(object obj)
+                    {
+                        var otherKey = obj as Key;
+                        if (otherKey == null || otherKey.values.Count != values.Count)
+                            return false;
+                        for (int i = 0; i < values.Count; i++)
+                            if (!otherKey.values[i].Equals(values[i]))
+                                return false;
+                        return true;
+                    }
+                }
+
+                public class AssignmentDictionary
+                {
+                    [NonSerialized]
+                    List<Tuple<Key, object>> _dict = new List<Tuple<Key, object>>();
+                    // Dictionary<Key, object> _dict = new Dictionary<Key, object>();
+                    public void Add(Key key, object value) { _dict.Add(new Tuple<Key,object>(key, value)); } //  _dict[key] = value; }
+                    // public Dictionary<Key, object> GetDict() { return _dict; }
+                    public List<Tuple<Key, object>> GetDict() { return _dict; }
+                    [NonSerialized]
+                    public List<AttributeModel> PrimaryKeys = new List<AttributeModel>();
+                }
+
+                [NonSerialized]
+                AssignmentDictionary _dict;
+                public void SetData(AssignmentDictionary d)
+                {
+                    _dict = d;
+                }
+                public List<AttributeModel> GetKeys()
+                {
+                    return _dict?.PrimaryKeys;
+                }
+                public void Add(List<AttributeModel> primaryKeys, Key key, object value)
+                {
+                    var d = _dict ?? new AssignmentDictionary();
+                    d.PrimaryKeys = primaryKeys;
+                    d.Add(key, value);
+                    _dict = d;
+                }
+
+                public string ComputeCode(DataType dtype)
+                {
+                    var code = "";
+                    if (_dict!= null && _dict.PrimaryKeys.Count != 0)
+                    {
+                        foreach (var di in _dict.GetDict().ToArray().Reverse())
+                        {
+                            code += "(";
+                            foreach (var primaryKey in _dict.PrimaryKeys)
+                            {
+                                if (_dict.PrimaryKeys.IndexOf(primaryKey) < di.Item1.values.Count)
+                                {
+                                    code += primaryKey.RawName + " == ";
+                                    if (di.Item1.values[_dict.PrimaryKeys.IndexOf(primaryKey)] is IDEA_common.range.PreProcessedString)
+                                        code += "\"" + di.Item1.values[_dict.PrimaryKeys.IndexOf(primaryKey)] + "\"&&";
+                                    else code += di.Item1.values[_dict.PrimaryKeys.IndexOf(primaryKey)] + "&&";
+                                }
+                            }
+                            code = code.Substring(0, code.Length - 2) + ")";
+                            if (dtype == DataType.String)
+                                code += " ? \"" + di.Item2 + "\" : ";
+                            else code += " ? " + di.Item2 + " : ";
+                        }
+                    }
+                    if (dtype == DataType.String)
+                        code += "\"\"";
+                    else code += "0";
+                    Debug.WriteLine("<<<code>>>" + code);
+                    return code;
+                }
+                public AttributeAssignedValueFuncModel():base("0")
+                {
+                }
+            }
+
             public class AttributeCodeFuncModel : AttributeFuncModel
             {
-                string _code;
+                [NonSerialized]
+                protected string _code;
                 public AttributeCodeFuncModel(string code)
                 {
                     _code = code;
                 }
-                public override AttributeModelType ModelType => AttributeModelType.Code;
+                public override AttributeModelType ModelType { get; set; } = AttributeModelType.Code;
                 public List<string> Terms { get { return TransformCode(Code).Item2;  }  }
                 public string RefactorVariable(string oldName, string newName)
                 {
                     return TransformCode(Code, oldName, newName).Item1;
                 }
                 public string Code { get => _code; set => _code = value; }
-
 
                 public static Tuple<string, List<string>> TransformCode(string expression, string oldName = null, string newName = null)
                 {

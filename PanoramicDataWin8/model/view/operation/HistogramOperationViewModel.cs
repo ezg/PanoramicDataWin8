@@ -393,6 +393,11 @@ namespace PanoramicDataWin8.model.view.operation
 
         public HistogramOperationModel HistogramOperationModel => (HistogramOperationModel) OperationModel;
 
+        public override void Dispose()
+        {
+            HistogramOperationModel.Dispose();
+        }
+
         public RecommenderOperationViewModel RecommenderOperationViewModel
         {
             get { return _recommenderOperationViewModel; }

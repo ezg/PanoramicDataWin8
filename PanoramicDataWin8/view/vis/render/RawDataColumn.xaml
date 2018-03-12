@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:PanoramicDataWin8.view.vis.render"
+    xmlns:utils="using:PanoramicDataWin8.utils"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -10,17 +11,17 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
     <UserControl.Resources>
-        <local:ObjectToStringConverter x:Key="ObjectToStringConverter"></local:ObjectToStringConverter>
-        <local:ObjectToUriConverter x:Key="ObjectToUriConverter"></local:ObjectToUriConverter>
-        <local:ObjectToAlignmentConverter x:Key="ObjectToAlignmentConverter"></local:ObjectToAlignmentConverter>
-        <local:ObjectToTextAlignmentConverter x:Key="ObjectToTextAlignmentConverter"></local:ObjectToTextAlignmentConverter>
+        <utils:ObjectToStringConverter x:Key="ObjectToStringConverter"/>
+        <utils:ObjectToUriConverter x:Key="ObjectToUriConverter"/>
+        <utils:ObjectToAlignmentConverter x:Key="ObjectToAlignmentConverter"/>
+        <utils:ObjectToTextAlignmentConverter x:Key="ObjectToTextAlignmentConverter"/>
         <Style x:Key="LeftStyle" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Left" />
             <Setter Property="VerticalContentAlignment"   Value="Center" />
             <Setter Property="Margin" Value="10,0,0,0" />
             <Setter Property="Padding" Value="0,0,0,0" />
             <Setter Property="MinWidth" Value="0" />
-            <Setter Property="MinHeight" Value="25" />
+            <Setter Property="MinHeight" Value="10" />
         </Style>
         <Style x:Key="RightStyle" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Right" />
@@ -28,7 +29,7 @@
             <Setter Property="Margin" Value="0,0,20,0" />
             <Setter Property="Padding" Value="0,0,0,0" />
             <Setter Property="MinWidth" Value="0" />
-            <Setter Property="MinHeight" Value="25" />
+            <Setter Property="MinHeight" Value="10" />
         </Style>
         <Style x:Key="ImageStyle" TargetType="ListViewItem">
             <Setter Property="HorizontalContentAlignment" Value="Center" />
@@ -36,13 +37,21 @@
             <Setter Property="Margin" Value="0,0,2,0" />
             <Setter Property="Padding" Value="0,0,0,0" />
             <Setter Property="MinWidth" Value="0" />
-            <Setter Property="MinHeight" Value="25" />
+            <Setter Property="MinHeight" Value="10" />
         </Style>
         <DataTemplate x:Key="ImageColTemplate">
-            <Image Source="{Binding Converter={StaticResource ObjectToUriConverter}}" Width="25" CanDrag="False"/>
+            <Image Source="{Binding Converter={StaticResource ObjectToUriConverter}}" Width="30" Height="30" CanDrag="False"/>
         </DataTemplate>
         <DataTemplate x:Key="TextColTemplate">
             <TextBlock Text="{Binding Converter={StaticResource ObjectToStringConverter}}"
+                       Height="32"
+                           TextAlignment="{Binding Converter={StaticResource ObjectToTextAlignmentConverter}}"
+                           
+                           HorizontalAlignment="{Binding Converter={StaticResource ObjectToAlignmentConverter}}" />
+        </DataTemplate>
+        <DataTemplate x:Key="ValueColTemplate">
+            <TextBox Text="{Binding Path=Item2, Converter={StaticResource ObjectToStringConverter}}"
+                     Height="20" GotFocus="EditableDataValue_GotFocus"
                            TextAlignment="{Binding Converter={StaticResource ObjectToTextAlignmentConverter}}"
                            
                            HorizontalAlignment="{Binding Converter={StaticResource ObjectToAlignmentConverter}}" />

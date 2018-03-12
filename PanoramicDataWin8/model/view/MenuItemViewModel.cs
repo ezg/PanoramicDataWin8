@@ -60,6 +60,8 @@ namespace PanoramicDataWin8.model.view
             set { SetProperty(ref _visible, value); }
         }
 
+        public bool Placeholding = false;
+
         public Thickness FocusThickness
         {
             get { return _focusThickness; }

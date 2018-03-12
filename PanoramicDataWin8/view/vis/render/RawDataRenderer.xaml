@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:PanoramicDataWin8.view.vis.render"
     xmlns:NewControls="using:NewControls"
+    xmlns:utils="using:PanoramicDataWin8.utils"
     xmlns:common="using:PanoramicDataWin8.view.common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -14,8 +15,8 @@
     FontFamily="{StaticResource abel}">
     <Grid x:Name="LayoutRoot" Background="{StaticResource lightBrush}">
         <Grid.Resources>
-            <local:ObjectToStringConverter x:Key="ObjectToStringConverter"></local:ObjectToStringConverter>
-            <local:ObjectToUriConverter x:Key="ObjectToUriConverter"></local:ObjectToUriConverter>
+            <utils:ObjectToStringConverter x:Key="ObjectToStringConverter"/>
+            <utils:ObjectToUriConverter x:Key="ObjectToUriConverter"/>
             <Style x:Name="TextStyle" TargetType="GridViewItem">
                 <Setter Property="HorizontalContentAlignment" Value="Left" />
                 <Setter Property="VerticalContentAlignment"   Value="Center" />

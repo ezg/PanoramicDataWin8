@@ -59,10 +59,9 @@ namespace PanoramicDataWin8.model.data.operation
                 }
             }
         }
-
-        public override void Cleanup()
-        {
+        public override void Dispose() { 
             IDEAAttributeModel.CodeDefinitionChangedEvent -= TestForRefresh;
+            ResultCauserClone?.Dispose();
         }
 
         public bool IncludeDistribution

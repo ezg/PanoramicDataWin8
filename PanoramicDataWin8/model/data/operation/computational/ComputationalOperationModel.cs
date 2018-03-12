@@ -51,14 +51,22 @@ namespace PanoramicDataWin8.model.data.operation
                 frend.Refactor(null, newName);
             }
         }
-        public ComputationalOperationModel(SchemaModel schemaModel, string code, DataType dataType, string visualizationType, string rawName, string displayName = null) : base(schemaModel)
+        public ComputationalOperationModel(SchemaModel schemaModel, DataType dataType, AttributeFuncModel.AttributeModelType attrType, string visualizationType, string rawName, string displayName = null) : base(schemaModel)
         {
             _rawName = rawName;
             if (rawName != null && !IDEAAttributeModel.NameExists(rawName, schemaModel.OriginModels.First()))
             {
-                IDEAAttributeModel.AddCodeField(rawName, displayName == null ? rawName : displayName, code, dataType, visualizationType, new List<VisualizationHint>(), schemaModel.OriginModels.First());
+                switch (attrType) {
+                    case AttributeFuncModel.AttributeModelType.Assigned:
+                        IDEAAttributeModel.AddCodeField(rawName, displayName == null ? rawName : displayName, attrType, dataType, visualizationType, new List<VisualizationHint>(), schemaModel.OriginModels.First());
+                        break;
+                    case AttributeFuncModel.AttributeModelType.Code:
+                        IDEAAttributeModel.AddCodeField(rawName, displayName == null ? rawName : displayName, "0", dataType, visualizationType, new List<VisualizationHint>(), schemaModel.OriginModels.First());
+                        break;
+                }
+
             }
-            CodeNameChangedEvent += (sender, oldname, newname) => UpdateName();
+            CodeNameChangedEvent += updateName;
         }
         public ComputationalOperationModel(SchemaModel schemaModel, DataType dataType, string visualizationType, string rawName, string displayName = null) : base(schemaModel)
         {
@@ -67,7 +75,14 @@ namespace PanoramicDataWin8.model.data.operation
             {
                 IDEAAttributeModel.AddBackendField(rawName, displayName == null ? rawName : displayName, null, DataType.Double, "numeric", new List<VisualizationHint>(), schemaModel.OriginModels.First());
             }
-            CodeNameChangedEvent += (sender, oldName, newName) => UpdateName();
+            CodeNameChangedEvent += updateName;
+        }
+
+        void updateName(object sender, string oldname, string newname) { UpdateName();  }
+
+        public override void Dispose()
+        {
+            CodeNameChangedEvent -= updateName;
         }
 
         public delegate void CodeNameChangedHandler(object sender, string oldName, string newName);

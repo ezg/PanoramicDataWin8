@@ -16,6 +16,10 @@ namespace PanoramicDataWin8.model.data.operation
         {
         }
 
+        public override void Dispose()
+        {
+        }
+
         public ModelId ModelId
         {
             get { return _modelId; }
@@ -53,6 +57,10 @@ namespace PanoramicDataWin8.model.data.operation
         public StatisticalComparisonOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
             _statisticallyComparableOperationModels.CollectionChanged += _statisticallyComparableOperationModels_CollectionChanged;
+        }
+
+        public override void Dispose()
+        {
         }
 
         private void _statisticallyComparableOperationModels_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)

@@ -10,6 +10,11 @@ namespace PanoramicDataWin8.model.view.operation
             addAttachmentViewModels();
         }
 
+        public override void Dispose()
+        {
+            FilterOperationModel.Dispose();
+        }
+
         public bool UseTypingUI { get; set; }
         public FilterOperationModel FilterOperationModel => (FilterOperationModel)OperationModel;
     }

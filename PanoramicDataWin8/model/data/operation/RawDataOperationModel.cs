@@ -21,6 +21,32 @@ namespace PanoramicDataWin8.model.data.operation
         public RawDataOperationModel(SchemaModel schemaModel) : base(schemaModel)
         {
             ColumnHeaderAttributeUsageModels.CollectionChanged += columnHeaderAttributeUsageModels_CollectionChanged;
+
+            IDEAAttributeModel.CodeDefinitionChangedEvent += TestForRefresh;
+        }
+
+        public override void Dispose()
+        {
+            IDEAAttributeModel.CodeDefinitionChangedEvent -= TestForRefresh;
+            ResultCauserClone?.Dispose();
+        }
+
+        private void TestForRefresh(object sender)
+        {
+            var attributeChanged = sender as IDEAAttributeModel;
+            List<AttributeCaclculatedParameters> attributeCodeParameters;
+            List<string> brushes;
+            var aggregates = this.AttributeTransformationModelParameters.ToList();
+            IDEAHelpers.GetBaseOperationParameters(this, out attributeCodeParameters, out brushes, BrushOperationModels.Select((m) => (object)m).ToList(), aggregates);
+
+            foreach (var attr in attributeCodeParameters.OfType<AttributeCodeParameters>())
+            {
+                if (attr.RawName == attributeChanged.RawName || attr.Code.Contains(attributeChanged.RawName))
+                {
+                    FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
+                    break;
+                }
+            }
         }
         public ObservableCollection<AttributeModel> ColumnHeaderAttributeUsageModels { get; } = new ObservableCollection<AttributeModel>();
 

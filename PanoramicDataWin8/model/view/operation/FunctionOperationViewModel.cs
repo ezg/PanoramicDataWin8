@@ -68,8 +68,7 @@ namespace PanoramicDataWin8.model.view.operation
             var menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, dict, 30, 30, false, true, true, out menuItemViewModel);
             MenuItemViewModel labelViewModel;
             createAttributeLabelMenu(AttachmentOrientation.Bottom, FunctionOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(60, 50), 0, true, false, null, out labelViewModel);
-            // createApplyAttributeMenu(FunctionOperationModel.GetAttributeModel(), AttachmentOrientation.Bottom, AttributeUsage.X, new Vec(60, 50), 0, false, false, true);
-        }
+         }
 
         private MenuViewModel CreateParameterRightSideMenu(AttachmentViewModel attachmentViewModel, int numParameters)
         {

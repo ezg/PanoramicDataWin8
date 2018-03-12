@@ -97,4 +97,66 @@ namespace PanoramicDataWin8.utils
             throw new NotImplementedException();
         }
     }
+    public class MyUri
+    {
+        public MyUri(string str) { Uri = new Uri(str); }
+        public Uri Uri { get; set; }
+    }
+    public class ObjectToUriConverter : IValueConverter
+    {
+        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is MyUri) // data is an image
+                return (value as MyUri).Uri;
+            throw new NotImplementedException();
+        }
+
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class ObjectToStringConverter : IValueConverter
+    {
+        static public FrameworkElement LastHit = null;
+        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
+        {
+            string text = "";
+            if (value is Tuple<int, object>)
+                text = (value as Tuple<int, object>).Item2.ToString() + " (" + (value as Tuple<int, object>).Item1 + ")";
+            else if (value is Tuple<int, double>)
+                text = "avg=" + (value as Tuple<int, double>).Item2;
+            else text = value.ToString();
+            return text;
+        }
+
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class ObjectToTextAlignmentConverter : IValueConverter
+    {
+        static public FrameworkElement LastHit = null;
+        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
+        {
+            return value is IDEA_common.range.PreProcessedString || value is string ? TextAlignment.Left : TextAlignment.Right;
+        }
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    public class ObjectToAlignmentConverter : IValueConverter
+    {
+        static public FrameworkElement LastHit = null;
+        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
+        {
+            return value is IDEA_common.range.PreProcessedString || value is string ? HorizontalAlignment.Left : HorizontalAlignment.Right;
+        }
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

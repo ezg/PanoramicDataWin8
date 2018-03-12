@@ -18,8 +18,11 @@ namespace PanoramicDataWin8.model.data.operation
             _linkModels.CollectionChanged += LinkModels_CollectionChanged;
             _host = host;
         }
+        
+        public void Dispose()
+        {
 
-        public void Cleanup() { }
+        }
 
         public FilteringOperation FilteringOperation
         {

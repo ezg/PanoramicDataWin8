@@ -34,6 +34,10 @@ namespace PanoramicDataWin8.model.data.operation
             AttributeTransformationModelParameters.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;
         }
 
+        public override void Dispose()
+        {
+        }
+
         private void GroupFuncModel_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             if (AttributeTransformationModelParameters.Count != GroupFuncModel.InputModels.Count)

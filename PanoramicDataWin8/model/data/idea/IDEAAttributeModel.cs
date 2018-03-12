@@ -26,6 +26,14 @@ namespace PanoramicDataWin8.model.data.idea
             return Function(name, model) != null;
         }
 
+        static public AttributeModel AddCodeField(string rawName, string displayName, AttributeFuncModel.AttributeModelType attrType,
+            DataType dataType, string inputVisualizationType, List<VisualizationHint> visualizationHints, OriginModel originModel)
+        {
+            var fieldModel = new IDEAAttributeModel(rawName, displayName, new AttributeFuncModel.AttributeAssignedValueFuncModel(),
+                dataType, inputVisualizationType, visualizationHints, originModel, false);
+            _allFieldAttributeModels.Add(fieldModel);
+            return fieldModel;
+        }
         static public AttributeModel AddCodeField(string rawName, string displayName, string code,
             DataType dataType, string inputVisualizationType, List<VisualizationHint> visualizationHints, OriginModel originModel)
         {
@@ -62,6 +70,7 @@ namespace PanoramicDataWin8.model.data.idea
         {
             return _allFieldAttributeModels.Where((fm) =>
                 (fm.FuncModel is AttributeFuncModel.AttributeCodeFuncModel ||
+                fm.FuncModel is AttributeFuncModel.AttributeAssignedValueFuncModel ||
                 fm.FuncModel is AttributeFuncModel.AttributeBackendFuncModel) &&
                 model == fm.OriginModel);
         }

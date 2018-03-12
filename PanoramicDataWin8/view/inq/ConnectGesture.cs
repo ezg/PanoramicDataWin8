@@ -121,10 +121,13 @@ namespace PanoramicDataWin8.view.inq
                                     filterOperationViewModel.Size = size;
                                     operationContainerView.DataContext = filterOperationViewModel;
                                     MainViewController.Instance.InkableScene.Add(operationContainerView);
-                                    if (FilterRenderer.FieldType(attr.RawName) ==   DataType.String)
-                                        (operationContainerView.Renderer as FilterRenderer).SetFilter(attr.RawName, Predicate.LESS_THAN, "a");
-                                    else
-                                        (operationContainerView.Renderer as FilterRenderer).SetFilter(attr.RawName, Predicate.LESS_THAN, 0);
+                                    if (operationContainerView.Renderer is FilterRenderer)
+                                    {
+                                        if (FilterRenderer.FieldType(attr.RawName) == DataType.String)
+                                            (operationContainerView.Renderer as FilterRenderer).SetFilter(attr.RawName, Predicate.LESS_THAN, "a");
+                                        else
+                                            (operationContainerView.Renderer as FilterRenderer).SetFilter(attr.RawName, Predicate.LESS_THAN, 0);
+                                    }
                                     FilterLinkViewController.Instance.CreateFilterLinkViewModel(filterOperationViewModel.OperationModel,
                                         (OperationModel)operationViewModel.OperationModel);
 

@@ -12,7 +12,7 @@ using static PanoramicDataWin8.model.data.attribute.AttributeModel;
 namespace PanoramicDataWin8.model.data.operation
 {
     [JsonObject(MemberSerialization.OptOut)]
-    public class OperationModel : ExtendedBindableBase, IOperationModel
+    public abstract class OperationModel : ExtendedBindableBase, IOperationModel
     {
         public delegate void OperationModelUpdatedHandler(object sender, OperationModelUpdatedEventArgs e);
 
@@ -27,6 +27,7 @@ namespace PanoramicDataWin8.model.data.operation
         private SchemaModel _schemaModel;
         public ObservableCollection<AttributeTransformationModel> AttributeTransformationModelParameters { get; } = new ObservableCollection<AttributeTransformationModel>();
 
+        public abstract void Dispose();
 
         public OperationModel(SchemaModel schemaModel)
         {
@@ -57,11 +58,6 @@ namespace PanoramicDataWin8.model.data.operation
         {
             get { return _schemaModel; }
             set { SetProperty(ref _schemaModel, value); }
-        }
-
-        public virtual void Cleanup()
-        {
-
         }
 
         public bool isClone = false;

@@ -10,7 +10,9 @@
         Filter,
         Definition,
         Calculation,
+        Attribute,
         AttributeGroup,
+        Graph,
         Function
     }
     

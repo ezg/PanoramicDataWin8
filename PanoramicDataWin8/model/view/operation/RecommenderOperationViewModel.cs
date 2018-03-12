@@ -8,6 +8,11 @@ namespace PanoramicDataWin8.model.view.operation
         {
         }
 
+        public override void Dispose()
+        {
+            RecommenderOperationModel.Dispose();
+        }
+
         public RecommenderOperationModel RecommenderOperationModel => (RecommenderOperationModel) OperationModel;
     }
 }

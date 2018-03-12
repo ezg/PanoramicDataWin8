@@ -22,7 +22,12 @@ namespace PanoramicDataWin8.model.view.operation
             createTopRightFilterDragMenu();
             menuViewModel = createExpandingMenu(AttachmentOrientation.TopStacked, RawDataOperationModel.AttributeTransformationModelParameters, "+", 50, 100, true, false, true, out menuItemViewModel);
             RawDataOperationModel.AttributeTransformationModelParameters.CollectionChanged += AttributeUsageModels_CollectionChanged;
-         }
+        }
+
+        public override void Dispose()
+        {
+            RawDataOperationModel.Dispose();
+        }
 
         public void ForceDrop(AttributeViewModel am)
         {
@@ -48,7 +53,6 @@ namespace PanoramicDataWin8.model.view.operation
                             {
                                 addColumnOptions(amivm, AttachmentOrientation.Top);
                                 SelectedDataAttribute = amivm;
-                                System.Diagnostics.Debug.WriteLine("Seleted Column = " + SelectedDataAttribute);
                             }
 
                             AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
@@ -174,7 +178,6 @@ namespace PanoramicDataWin8.model.view.operation
                     if (fire)
                     {
                         AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
-                        RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                         //SelectedColumn = null;
                         //System.Diagnostics.Debug.WriteLine("Clear Selected Column = " + SelectedColumn);
                         if (tapTrigger)

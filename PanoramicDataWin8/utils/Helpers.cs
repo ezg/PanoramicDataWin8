@@ -338,7 +338,7 @@ namespace PanoramicDataWin8.utils
         public static Rct GetBounds(this FrameworkElement elt, FrameworkElement parent)
         {
             if (parent == null)
-                return new Rct(0, 0, elt.Width, elt.Height);
+                return new Rct(0, 0, elt.ActualWidth, elt.ActualHeight);
 
             //if (elt.ActualHeight == 0 && elt.ActualWidth == 0)
             //    elt.UpdateLayout();

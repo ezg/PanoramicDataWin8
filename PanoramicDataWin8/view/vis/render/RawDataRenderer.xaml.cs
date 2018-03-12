@@ -26,97 +26,16 @@ using Windows.UI.Core;
 using Windows.UI.Xaml.Input;
 using IDEA_common.operations.histogram;
 using PanoramicDataWin8.model.view;
+using static PanoramicDataWin8.view.vis.render.RawDataColumn;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace PanoramicDataWin8.view.vis.render
 {
-    public class ObjectToUriConverter : IValueConverter
-    {
-        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
-        {
-            if (value is RawDataRenderer.MyUri) // data is an image
-                return (value as RawDataRenderer.MyUri).Uri;
-            throw new NotImplementedException();
-        }
-
-        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
-        }
-    }
-    public class ObjectToStringConverter : IValueConverter
-    {
-        static public FrameworkElement LastHit = null;
-        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
-        {
-            string text = "";
-            if (value is Tuple<int, object>)
-                text = (value as Tuple<int, object>).Item2.ToString() + " (" + (value as Tuple<int, object>).Item1 + ")";
-            else if (value is Tuple<int, double>)
-                text = "avg=" + (value as Tuple<int, double>).Item2;
-            else text = value.ToString();
-            return text;
-        }
-
-        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
-        }
-    }
-    public class ObjectToTextAlignmentConverter : IValueConverter
-    {
-        static public FrameworkElement LastHit = null;
-        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
-        {
-            return value is IDEA_common.range.PreProcessedString || value is string ? TextAlignment.Left : TextAlignment.Right;
-        }
-        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
-        }
-    }
-    public class ObjectToAlignmentConverter : IValueConverter
-    {
-        static public FrameworkElement LastHit = null;
-        object IValueConverter.Convert(object value, Type targetType, object parameter, string language)
-        {
-            return value is IDEA_common.range.PreProcessedString || value is string ? HorizontalAlignment.Left : HorizontalAlignment.Right;
-        }         
-        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            throw new NotImplementedException();
-        }
-    }
     public sealed partial class RawDataRenderer : Renderer, IScribbable, AttributeViewModelEventHandler
     {
-        public class RawColumnData : ExtendedBindableBase {
-            AttributeTransformationModel _model;
-            double _cwidth;
-            public bool ShowScroll = false;
-            public ObservableCollection<object> Data;
-            public RawDataRenderer Renderer;
-            public AttributeTransformationModel Model
-            {
-                get { return _model; }
-                set
-                {
-                    this.SetProperty(ref _model, value);
-                }
-            }
-            public double ColumnWidth
-            {
-                get { return _cwidth; }
-                set
-                {
-                    this.SetProperty(ref _cwidth, value);
-                }
-            }
-            public HorizontalAlignment Alignment;
-            public RawColumnData() { Data = new ObservableCollection<object>(); }
-        }
 
-        public ObservableCollection<RawColumnData> Records { get; set; } = new ObservableCollection<RawColumnData>();
+        public ObservableCollection<RawDataColumnModel> Records { get; set; } = new ObservableCollection<RawDataColumnModel>();
 
         public RawDataRenderer()
         {
@@ -124,7 +43,6 @@ namespace PanoramicDataWin8.view.vis.render
             this.DataContextChanged += PlotRenderer_DataContextChanged;
             this.Loaded += PlotRenderer_Loaded;
             //xRawDataGridView.ItemsSource = Records;
-            this.SizeChanged += RawDataRenderer_SizeChanged;
             this.Tapped += RawDataRenderer_Tapped;
             MainViewController.Instance.MainPage.AddHandler(PointerPressedEvent, new PointerEventHandler(RawDataRenderer_PointerPressed), true);
         }
@@ -168,7 +86,7 @@ namespace PanoramicDataWin8.view.vis.render
                 else if (r is TextBlock)
                 {
                     var tb = r as TextBlock;
-                    var col = tb.GetFirstAncestorOfType<RawDataColumn>()?.Model ??
+                    var col = tb.GetFirstAncestorOfType<RawDataColumn>()?.DataColumnModel.AttributeTranformationModel ??
                               model.RawDataOperationModel.AttributeTransformationModelParameters.First();
                     if (tb.Tag != null)
                     {
@@ -229,34 +147,6 @@ namespace PanoramicDataWin8.view.vis.render
             }
         }
 
-        private void RawDataRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            //this.xListView.ColumnDefinitions.Clear();
-            //foreach (var n in newRecords)
-            //{
-            //    this.xListView.Children.Add(
-            //        new RawDataColumn()
-            //        {
-            //            DataContext = n,
-            //            HorizontalAlignment = HorizontalAlignment.Stretch,
-            //            VerticalAlignment = VerticalAlignment.Stretch
-            //        });
-            //    Grid.SetColumn(xListView.Children.Last() as FrameworkElement, xListView.ColumnDefinitions.Count);
-            //    xListView.ColumnDefinitions.Add(
-            //        new ColumnDefinition()
-            //        {
-            //            Width = new GridLength(n.Model.AttributeModel.DataType == IDEA_common.catalog.DataType.String ? 2 : 1, GridUnitType.Star)
-            //        }
-            //    );
-            //}
-        }
-
-        public class MyUri {
-            public MyUri(string str) { Uri = new Uri(str);  }
-            public Uri Uri { get; set; }
-        }
-
-
         void PlotRenderer_Loaded(object sender, RoutedEventArgs e)
         {
             var cp = VisualTreeHelperExtensions.GetFirstDescendantOfType<ScrollBar>(this);
@@ -296,13 +186,6 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     loadResult(result);
                 }
-                else
-                {
-                    var operationModel = (RawDataOperationModel)((OperationViewModel)DataContext).OperationModel;
-                    if (!operationModel.AttributeTransformationModelParameters.Any())
-                    {
-                    }
-                }
             }
         }
         void OperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -314,12 +197,7 @@ namespace PanoramicDataWin8.view.vis.render
                 if (result != null)
                 {
                     loadResult(result);
-                   // render(operationModel.Function);
                 }
-            }
-            else if (e.PropertyName == "Function")
-            {
-                render(operationModel.Function);
             }
         }
         
@@ -369,15 +247,15 @@ namespace PanoramicDataWin8.view.vis.render
             var groupBy = operationModel.AttributeTransformationModelParameters.Where((atm) => atm.GroupBy).Select((atm) => atm.AttributeModel).ToList();
 
             Records.Clear();
-            var newRecords = new ObservableCollection<RawColumnData>();
+            var newRecords = new ObservableCollection<RawDataColumn.RawDataColumnModel>();
             foreach (var col in operationModel.AttributeTransformationModelParameters)
             {
-                var acollection = new RawColumnData
+                var acollection = new RawDataColumn.RawDataColumnModel
                 {
                     Alignment = HorizontalAlignment.Right,
-                    Model = col,
+                    AttributeTranformationModel = col,
+                    RendererListView = xListView,
                     ColumnWidth = 85,// records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? 200 : 50,
-                    Renderer = this,
                     ShowScroll = false
                 };
                 newRecords.Add(acollection);
@@ -396,7 +274,7 @@ namespace PanoramicDataWin8.view.vis.render
             setupListView(newRecords);
         }
 
-        private void setupListView(ObservableCollection<RawColumnData> newRecords)
+        private void setupListView(ObservableCollection<RawDataColumnModel> newRecords)
         {
             Records = newRecords;
             this.xListView.Children.Clear();
@@ -414,13 +292,13 @@ namespace PanoramicDataWin8.view.vis.render
                 xListView.ColumnDefinitions.Add(
                     new ColumnDefinition()
                     {
-                        Width = new GridLength(n.Model.AttributeModel.DataType == IDEA_common.catalog.DataType.String ? 2 : 1, GridUnitType.Star)
+                        Width = new GridLength(n.AttributeTranformationModel.AttributeModel.DataType == IDEA_common.catalog.DataType.String ? 2 : 1, GridUnitType.Star)
                     }
                 );
             }
         }
 
-        static void extractBin(RawDataOperationModel operationModel, ObservableCollection<RawColumnData> newRecords, int[] binIndex, List<AttributeModel> grouped,  Bin values)
+        static void extractBin(RawDataOperationModel operationModel, ObservableCollection<RawDataColumnModel> newRecords, int[] binIndex, List<AttributeModel> grouped,  Bin values)
         {
             for (int i = 0; i < binIndex.Length; i++)  // load index column data
                 newRecords[binIndex[i]].Data.Add("" + values.Spans[i].Min + " - " + values.Spans[i].Max);
@@ -436,7 +314,7 @@ namespace PanoramicDataWin8.view.vis.render
         void loadRawDataResult(IResult result)
         {
             var model = (DataContext as RawDataOperationViewModel);
-            Records = new ObservableCollection<RawColumnData>();
+            Records = new ObservableCollection<RawDataColumn.RawDataColumnModel>();
             xWordCloud.TheText = "";
             xWordCloud.WeightedWords = null;
             model.RawDataOperationModel.ClearFilterModels();
@@ -446,7 +324,7 @@ namespace PanoramicDataWin8.view.vis.render
             {
                 xWordCloud.WeightedWords = (result as RawDataResult).WeightedWords.FirstOrDefault().Value;
             }
-
+            
             for (int sampleIndex = 0; sampleIndex < (result as RawDataResult).Samples.Count(); sampleIndex++) {
                 var s = (result as RawDataResult).Samples[model.RawDataOperationModel.AttributeTransformationModelParameters[sampleIndex].AttributeModel.RawName];
                 if (s.Count > 0)
@@ -495,11 +373,11 @@ namespace PanoramicDataWin8.view.vis.render
 
         void loadRecordsAsync(List<object> records, AttributeTransformationModel model, bool showScroll)
         {
-            var acollection = new RawColumnData {
+            var acollection = new RawDataColumn.RawDataColumnModel {
                 Alignment = records.First() is string || records.First() is IDEA_common.range.PreProcessedString ? HorizontalAlignment.Left : HorizontalAlignment.Right,
-                Model = model,
+                AttributeTranformationModel = model,
+                RendererListView = xListView,
                 ColumnWidth =records.First() is string|| records.First() is IDEA_common.range.PreProcessedString ? 200:85,
-                Renderer = this,
                 ShowScroll = showScroll
             };
             Records.Add(acollection);
@@ -511,10 +389,8 @@ namespace PanoramicDataWin8.view.vis.render
                     var hostname = MainViewController.Instance.MainModel.Hostname;
                     string prepend = hostname + "/api/rawdata/" + dataset + "/" + model.AttributeModel.RawName+"/";
 #pragma warning disable CS4014
-                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                    CoreDispatcherPriority.Low,
-                    () =>
-                    {
+                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync( CoreDispatcherPriority.Low,
+                    () =>  {
                         foreach (var val in records)
                         {
                             acollection.Data.Add(new MyUri(prepend + val.ToString()));
@@ -526,15 +402,8 @@ namespace PanoramicDataWin8.view.vis.render
                 else
                 {
 #pragma warning disable CS4014
-                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(
-                    CoreDispatcherPriority.Low,
-                    () =>
-                    {
-                        foreach (var val in records)
-                        {
-                            acollection.Data.Add(val);
-                        }
-                    });
+                    CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync(CoreDispatcherPriority.Low,
+                        () => records.ForEach((r) => acollection.Data.Add(r)) );
 #pragma warning restore CS4014
                 }
         }
@@ -543,7 +412,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             var model = (DataContext as RawDataOperationViewModel);
             configureLayout(true, model.RawDataOperationModel.AttributeTransformationModelParameters[0].AttributeModel.VisualizationHints.FirstOrDefault() == IDEA_common.catalog.VisualizationHint.Image);
-         }
+        }
         public GeoAPI.Geometries.IGeometry BoundsGeometry
         {
             get

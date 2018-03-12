@@ -25,8 +25,9 @@ namespace PanoramicDataWin8.model.data.operation
         public FunctionOperationModel(SchemaModel schemaModel, DataType outputType, string inputVisualizationType,
                     IEnumerable<string> attributeParameterGroups = null,
                     IEnumerable<Tuple<string, object>> valueParameters = null, string rawName = null, string displayName = null) :
-        base(schemaModel, "0",
+        base(schemaModel, 
             outputType,
+            AttributeFuncModel.AttributeModelType.Code,
             inputVisualizationType,
             rawName,
             displayName == null ? rawName : displayName)
