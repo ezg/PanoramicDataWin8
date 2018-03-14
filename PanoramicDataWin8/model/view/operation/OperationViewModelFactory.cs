@@ -101,9 +101,9 @@ namespace PanoramicDataWin8.model.view.operation
             return new AttributeGroupOperationViewModel(
                 new AttributeGroupOperationModel(schemaModel, "G" + (groupCount++) + "()", groupModel), groupModel == null) { Position = position };
         }
-        public static GraphOperationViewModel CreateDefaultGraphOperationViewModel(SchemaModel schemaModel, Pt position, AttributeModel groupModel = null)
+        public static GraphOperationViewModel CreateDefaultGraphOperationViewModel(SchemaModel schemaModel, Pt position, GraphOperationModel graphModel)
         {
-            return new GraphOperationViewModel( new GraphOperationModel(schemaModel)) { Position = position };
+            return new GraphOperationViewModel( graphModel) { Position = position };
         }
         static int attrCount = 0;
         public static AttributeOperationViewModel CreateDefaultAttributeOperationViewModel(SchemaModel schemaModel, Pt position)

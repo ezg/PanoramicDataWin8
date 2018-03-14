@@ -17,13 +17,16 @@ namespace PanoramicDataWin8.model.data.operation
     public class GraphOperationModel : BaseVisualizationOperationModel
     {
         TinkerGrapĥ _g;
-        public GraphOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        public string InputGraphFile;
+        public GraphOperationModel(SchemaModel schemaModel, string inputGraphFile) : base(schemaModel)
         {
+            InputGraphFile = inputGraphFile;
+
             IDEAAttributeModel.CodeDefinitionChangedEvent += TestForRefresh;
 
             _g = new TinkerGrapĥ();
             var gr = new GmlReader(_g);
-            gr.InputGraph("Assets/G1.gml");
+            gr.InputGraph(inputGraphFile);
         }
 
         public TinkerGrapĥ Graph => _g;

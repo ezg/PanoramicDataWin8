@@ -833,16 +833,8 @@ namespace PanoramicDataWin8
 
                         count++;
                     }
-                    {
-                        var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "G1", OperationType = OperationType.Graph }, parentModel);
-                        tileMenuItemViewModel.Row = count;
-                        tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
-                                                       (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
-                        tileMenuItemViewModel.RowSpan = 1;
-                        tileMenuItemViewModel.ColumnSpan = 1;
 
-                        count++;
-                    }
+                    count = SETUP_GRAPH_TEST_MENU_ITEMS(parentModel, count);
                 }
                 foreach (var inputModel in inputModels)
                 {
@@ -886,6 +878,45 @@ namespace PanoramicDataWin8
                 parentModel.Size = new Vec(buttonBounds.Width, buttonBounds.Height);
                 parentModel.AreChildrenExpanded = true;
             }
+        }
+
+        int SETUP_GRAPH_TEST_MENU_ITEMS(TileMenuItemViewModel parentModel, int count)
+        {
+            var graphsMenuModel = new TileMenuItemViewModel(parentModel);
+            graphsMenuModel.Column = parentModel.ChildrenNrColumns -
+                                           (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
+            graphsMenuModel.Row = count++;
+            graphsMenuModel.ChildrenNrColumns = 1;
+            graphsMenuModel.ChildrenNrRows = 2;
+            graphsMenuModel.Alignment = Alignment.Center;
+            graphsMenuModel.AttachPosition = AttachPosition.Right;
+            graphsMenuModel.TileMenuContentViewModel = new OperationTypeGroupTileMenuContentViewModel
+            {
+                Name = "Graphs",
+                OperationTypeGroupModel = new OperationTypeGroupModel() { Name = "Graphs" }
+            };
+            parentModel.Children.Add(graphsMenuModel);
+
+            count++;
+
+            {
+                var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "G1", GraphType = new GraphOperationModel((DataContext as MainModel).SchemaModel, "Assets/G1.gml"), OperationType = OperationType.Graph }, graphsMenuModel);
+                tileMenuItemViewModel.Row = 0;
+                tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
+                                               (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
+                tileMenuItemViewModel.RowSpan = 1;
+                tileMenuItemViewModel.ColumnSpan = 1;
+            }
+            {
+                var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "G2", GraphType = new GraphOperationModel((DataContext as MainModel).SchemaModel, "Assets/G2.gml"), OperationType = OperationType.Graph }, graphsMenuModel);
+                tileMenuItemViewModel.Row = 1;
+                tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
+                                               (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
+                tileMenuItemViewModel.RowSpan = 1;
+                tileMenuItemViewModel.ColumnSpan = 1;
+            }
+
+            return count;
         }
 
         private TileMenuItemViewModel recursiveCreateTileMenu(object inputModel, TileMenuItemViewModel parent)

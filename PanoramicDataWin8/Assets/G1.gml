@@ -1,117 +1,117 @@
 graph [
   node [
     id 0
-    label 0
+    label "adsfasdflasdfasdf0"
     nodeID 0
-    f0 -0.65827015749907714
-    f1 -0.15335279511360456
-    f2 -1.255363281491741
-    f3 -1.7763885575701903
-    f4 -1.5200291706913382
+    f0 99
+    f1 999
+    f2 9999
+    f3 99999
+    f4 "yellow"
     class 0.0
   ]
   node [
     id 1
-    label 1
+    label "adsfasdflasdfasdf1"
     nodeID 1
-    f0 0.54176389198308716
-    f1 0.09857100282221315
-    f2 0.78627927401655728
-    f3 1.1193216272470328
-    f4 0.95189919465161499
+    f0 99
+    f1 999
+    f2 9999
+    f3 99999
+    f4 "yellow"
     class 1.0
   ]
   node [
     id 2
-    label 2
+    label "adsfasdflasdfasdf2"
     nodeID 2
-    f0 1.2017556216511014
-    f1 1.7642885804540509
-    f2 -2.0057074914754867
-    f3 2.5070617007584497
-    f4 -2.5480320756639427
+    f0 99
+    f1 999
+    f2 9999
+    f3 99999
+    f4 "yellow"
     class 0.0
   ]
   node [
     id 3
-    label 3
+    label "adsfasdflasdfasdf3"
     nodeID 3
-    f0 0.78868234827367267
-    f1 0.85361427666077117
-    f2 -0.9783215581628274
-    f3 1.2043760939385864
-    f4 -1.2424373170055238
+    f0 99
+    f1 999
+    f2 9999
+    f3 99999
+    f4 "yellow"
     class 0.0
   ]
   node [
     id 4
-    label 4
+    label "adsfasdflasdfasdf4"
     nodeID 4
-    f0 0.37303746739320487
-    f1 -0.010142702195328479
-    f2 0.84543198706271061
-    f3 0.89459815194237824
-    f4 1.0304162718132879
+    f0 99
+    f1 999
+    f2 9999
+    f3 99999
+    f4 "yellow"
     class 1.0
   ]
   node [
     id 5
-    label 5
+    label "adsfasdflasdfasdf5"
     nodeID 5
-    f0 0.69288103933482348
-    f1 0.34029266912698597
-    f2 -0.79665088884084212
-    f3 0.036853392875468405
-    f4 -0.99062583909666302
+    f0 99
+    f1 999
+    f2 9999
+    f3 99999
+    f4 "yellow"
     class 0.0
   ]
   node [
     id 6
-    label 6
+    label "adsfasdflasdfasdf6"
     nodeID 6
-    f0 -1.0334366031863882
-    f1 0.71666618586357878
-    f2 -0.7845436199505087
-    f3 1.0512934302463472
-    f4 -0.9982557402992458
+    f0 99
+    f1 999
+    f2 9999
+    f3 99999
+    f4 "yellow"
     class 0.0
   ]
   node [
     id 7
-    label 7
+    label "adsfasdflasdfasdf7"
     nodeID 7
-    f0 0.12823869861227985
-    f1 0.87488104016854829
-    f2 -0.9992744484032674
-    f3 1.2381105782815351
-    f4 -1.269224283709258
+    f0 99
+    f1 999
+    f2 9999
+    f3 99999
+    f4 "yellow"
     class 0.0
   ]
   node [
     id 8
-    label 8
+    label "adsfasdflasdfasdf8"
     nodeID 8
-    f0 0.21595104149339911
-    f1 0.1645239351711843
-    f2 -0.14377750052406185
-    f3 0.28094489143444579
-    f4 -0.18491603470677997
+    f0 99
+    f1 999
+    f2 9999
+    f3 99999
+    f4 "yellow"
     class 0.0
   ]
   node [
     id 9
-    label 9
+    label "adsfasdflasdfasdf9"
     nodeID 9
-    f0 0.53156065800527097
-    f1 1.4086971358151801
-    f2 -1.6176239423765049
-    f3 1.9841429183486476
-    f4 -2.0541688964530795
+    f0 99
+    f1 999
+    f2 9999
+    f3 99999
+    f4 "yellow"
     class 0.0
   ]
   node [
     id 10
-    label 10
+    label "adsfasdflasdfasdf10"
     nodeID 10
     f0 0.54591055211838146
     f1 -0.57825327787284697
@@ -3540,17 +3540,6 @@ graph [
     f3 1.4652165471698739
     f4 0.51488102370287536
     class 1.0
-  ]
-  node [
-    id 322
-    label 322
-    nodeID 322
-    f0 -1.5804807100294458
-    f1 -0.52476461033952126
-    f2 0.64219855901915102
-    f3 -0.69595610300782385
-    f4 0.81345678300411417
-    class 0.0
   ]
   node [
     id 323
@@ -11614,10 +11603,6 @@ graph [
   edge [
     source 28
     target 319
-  ]
-  edge [
-    source 28
-    target 322
   ]
   edge [
     source 28
@@ -23182,10 +23167,6 @@ graph [
   edge [
     source 321
     target 692
-  ]
-  edge [
-    source 322
-    target 843
   ]
   edge [
     source 323

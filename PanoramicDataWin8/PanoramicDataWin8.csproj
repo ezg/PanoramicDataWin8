@@ -709,6 +709,9 @@
     <Content Include="Assets\G1.gml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\G2.gml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="PanoramicDataWin8_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

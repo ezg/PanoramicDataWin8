@@ -14,8 +14,18 @@
     FontFamily="{StaticResource abel}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
     <Page>
-        <Grid x:Name="xMatrix" Background="{StaticResource lightBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Grid x:Name="xTop" Grid.Row="0" Grid.Column="1" Background="{StaticResource lightBrush}" Tapped="xTop_Tapped"  />
+            <Grid x:Name="xLeft" Grid.Row="1" Grid.Column="0" Background="{StaticResource lightBrush}" Tapped="xLeft_Tapped"/>
+            <Grid x:Name="xMatrix" Grid.Row="1" Grid.Column="1" Background="{StaticResource lightBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         </Grid>
     </Page>
 </local:Renderer>

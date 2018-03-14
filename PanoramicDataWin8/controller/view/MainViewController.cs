@@ -324,9 +324,9 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.Add(visModel);
             return visModel;
         }
-        public GraphOperationViewModel CreateDefaultGraphOperationViewModel(Pt position, AttributeModel groupModel=null)
+        public GraphOperationViewModel CreateDefaultGraphOperationViewModel(Pt position, GraphOperationModel graphModel)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultGraphOperationViewModel(MainModel.SchemaModel, position, groupModel);
+            var visModel = OperationViewModelFactory.CreateDefaultGraphOperationViewModel(MainModel.SchemaModel, position, graphModel);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -459,7 +459,7 @@ namespace PanoramicDataWin8.controller.view
             }
             else if (operationTypeModel.OperationType == OperationType.Graph)
             {
-                operationViewModel = CreateDefaultGraphOperationViewModel(position);
+                operationViewModel = CreateDefaultGraphOperationViewModel(position, operationTypeModel.GraphType);
             }
             else if (operationTypeModel.OperationType == OperationType.Filter)
             {
