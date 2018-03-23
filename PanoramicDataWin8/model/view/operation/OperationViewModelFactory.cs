@@ -20,8 +20,7 @@ namespace PanoramicDataWin8.model.view.operation
     {
         public static OperationViewModel CopyOperationViewModel(OperationViewModel operationViewModel)
         {
-            var histogramOperationViewModel = operationViewModel as HistogramOperationViewModel;
-            if (histogramOperationViewModel != null)
+            if (operationViewModel is HistogramOperationViewModel histogramOperationViewModel)
             {
                 var oldOperationViewModel = histogramOperationViewModel;
                 var oldOperationModel = histogramOperationViewModel.HistogramOperationModel;
@@ -41,8 +40,7 @@ namespace PanoramicDataWin8.model.view.operation
                 newHistogramOperationViewModel.Size = operationViewModel.Size;
                 return newHistogramOperationViewModel;
             }
-            var rawDataOperationViewModel = operationViewModel as RawDataOperationViewModel;
-            if (rawDataOperationViewModel != null)
+            if (operationViewModel is RawDataOperationViewModel rawDataOperationViewModel)
             {
                 var oldOperationViewModel        = rawDataOperationViewModel;
                 var oldOperationModel            = rawDataOperationViewModel.RawDataOperationModel;
@@ -59,10 +57,20 @@ namespace PanoramicDataWin8.model.view.operation
                 newRawDataOperationViewModel.Size = operationViewModel.Size;
                 return newRawDataOperationViewModel;
             }
-            if (operationViewModel is FilterOperationViewModel)
+            if (operationViewModel is GraphOperationViewModel graphOperationViewModel)
             {
-                var oldOperationViewModel = (FilterOperationViewModel)operationViewModel;
-                var oldOperationModel = (FilterOperationModel)oldOperationViewModel.OperationModel;
+                var oldOperationViewModel = graphOperationViewModel;
+                var oldOperationModel = graphOperationViewModel.GraphOperationModel;
+                var newGraphOperationViewModel = CreateDefaultGraphOperationViewModel(operationViewModel.OperationModel.SchemaModel, operationViewModel.Position);
+                var newOperationModel = newGraphOperationViewModel.OperationModel;
+                
+                newGraphOperationViewModel.Size = operationViewModel.Size;
+                return newGraphOperationViewModel;
+            }
+            if (operationViewModel is FilterOperationViewModel filterOperationViewModel)
+            {
+                var oldOperationViewModel = filterOperationViewModel;
+                var oldOperationModel = oldOperationViewModel.FilterOperationModel;
 
                 var newFilterOperationViewModel = CreateDefaultFilterOperationViewModel(operationViewModel.OperationModel.SchemaModel,
                     operationViewModel.Position, controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse);
@@ -75,6 +83,10 @@ namespace PanoramicDataWin8.model.view.operation
             return null;
         }
 
+        public static GraphOperationViewModel CreateDefaultGraphOperationViewModel(SchemaModel schemaModel, Pt position)
+        {
+            return new GraphOperationViewModel(new GraphOperationModel(schemaModel, null)) { Position = position };
+        }
 
         public static RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(SchemaModel schemaModel, Pt position)
         {
@@ -134,6 +146,10 @@ namespace PanoramicDataWin8.model.view.operation
         public static FilterOperationViewModel CreateDefaultFilterOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse)
         {
             return new FilterOperationViewModel(new FilterOperationModel(schemaModel), fromMouse) { Position = position };
+        }
+        public static GraphFilterViewModel CreateDefaultGraphFilterOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse)
+        {
+            return new GraphFilterViewModel(new GraphFilterOperationModel(schemaModel)) { Position = position };
         }
     }
 }

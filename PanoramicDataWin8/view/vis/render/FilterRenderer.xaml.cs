@@ -494,7 +494,13 @@ namespace PanoramicDataWin8.view.vis.render
                 ExpressionTextBox.Foreground = new SolidColorBrush(Colors.Red);
         }
 
-        public void SetFilter(string field, Predicate p, double value)
+        public void SetFilter(AttributeModel field, Predicate p, DataType t)
+        {
+            if (t == DataType.String)
+                SetFilter(field, p, "a");
+            else SetFilter(field, p, 0.0);
+        }
+        public void SetFilter(AttributeModel field, Predicate p, double value)
         {
             Op1Val.Text = Op2Val.Text = "";
             if (p == Predicate.LESS_THAN || p == Predicate.LESS_THAN_EQUAL || p == Predicate.EQUALS)
@@ -502,15 +508,15 @@ namespace PanoramicDataWin8.view.vis.render
             else Op1Val.Text = value.ToString();
 
             (DataContext as FilterOperationViewModel).FilterOperationModel.ClearFilterModels();
-            AddFilterModel(AttributeTransformationModel.MatchesExistingField(field), p, value);
+            AddFilterModel(new AttributeTransformationModel(field), p, value);
         }
-        public void SetFilter(string field, Predicate p, string value)
+        public void SetFilter(AttributeModel field, Predicate p, string value)
         {
             Op1Val.Text = Op2Val.Text = "";
             Op2Val.Text = value;
 
             (DataContext as FilterOperationViewModel).FilterOperationModel.ClearFilterModels();
-            AddFilterModel(AttributeTransformationModel.MatchesExistingField(field), p, value);
+            AddFilterModel(new AttributeTransformationModel(field), p, value);
         }
 
         string tokenize(ref string accum, char letter)

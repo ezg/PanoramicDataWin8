@@ -163,6 +163,7 @@
     <Compile Include="model\data\operation\FilterOperationModelUpdatedEventType.cs" />
     <Compile Include="model\data\operation\FilterProviderOperationModelImpl.cs" />
     <Compile Include="model\data\operation\computational\FunctionOperationModel.cs" />
+    <Compile Include="model\data\operation\GraphFilterOperationModel.cs" />
     <Compile Include="model\data\operation\GraphOperationModel.cs" />
     <Compile Include="model\data\operation\Range.cs" />
     <Compile Include="model\data\operation\RawDataOperationModel.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="model\view\AttributeViewModelEventArgs.cs" />
     <Compile Include="model\view\AttributeViewModelEventHandler.cs" />
     <Compile Include="model\view\BrushableOperationViewModelState.cs" />
+    <Compile Include="model\view\GraphFilterViewModel.cs" />
     <Compile Include="model\view\IncludeExludeMenuItemViewModel.cs" />
     <Compile Include="model\view\BudgetViewModel.cs" />
     <Compile Include="model\view\InputGroupViewModel.cs" />
@@ -250,6 +252,7 @@
     <Compile Include="view\common\HelpDialog.xaml.cs">
       <DependentUpon>HelpDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\inq\FilterGesture.cs" />
     <Compile Include="view\vis\HypothesisView.xaml.cs">
       <DependentUpon>HypothesisView.xaml</DependentUpon>
     </Compile>
@@ -362,6 +365,9 @@
     </Compile>
     <Compile Include="view\vis\render\CalculationRenderer.xaml.cs">
       <DependentUpon>CalculationRenderer.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="view\vis\render\GraphFilter.xaml.cs">
+      <DependentUpon>GraphFilter.xaml</DependentUpon>
     </Compile>
     <Compile Include="view\vis\render\GraphRenderer.xaml.cs">
       <DependentUpon>GraphRenderer.xaml</DependentUpon>
@@ -606,6 +612,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="view\vis\render\CalculationRenderer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="view\vis\render\GraphFilter.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

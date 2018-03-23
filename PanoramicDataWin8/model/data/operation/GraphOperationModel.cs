@@ -26,7 +26,7 @@ namespace PanoramicDataWin8.model.data.operation
 
             _g = new TinkerGrapĥ();
             var gr = new GmlReader(_g);
-            gr.InputGraph(inputGraphFile);
+            gr.InputGraph(inputGraphFile ?? "Assets/G1.gml");
         }
 
         public TinkerGrapĥ Graph => _g;
@@ -38,9 +38,10 @@ namespace PanoramicDataWin8.model.data.operation
             IDEAAttributeModel.CodeDefinitionChangedEvent -= TestForRefresh;
             ResultCauserClone?.Dispose();
         }
-        private void AttributeTransformationModel_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        public int NumNodes = int.MaxValue;
+        public void SetPropertyNodes()
         {
-            ClearFilterModels();
+            NumNodes = NumNodes > 1000 ? 30 : NumNodes + 30;
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
     }

@@ -802,6 +802,7 @@ namespace PanoramicDataWin8
                 if (!MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
                 {
                     allModels += 1; // + 1 for the (+) attribute group model
+                    allModels += 2; // + 2 for the (+) graph tests
                 }
                 var parentModel = new TileMenuItemViewModel(null);
                 parentModel.ChildrenNrColumns = (int) Math.Ceiling(allModels / 10.0);

@@ -29,12 +29,27 @@ namespace PanoramicDataWin8.view.vis.render
             this.Loaded += GraphRenderer_Loaded;
         }
 
+        private void GraphRenderer_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        {
+            GraphOperationViewModel.GraphOperationModel.OperationModelUpdated -= OperationModelUpdated;
+            GraphOperationViewModel.GraphOperationModel.OperationModelUpdated += OperationModelUpdated;
+        }
+
+        private void OperationModelUpdated(object sender, model.data.operation.OperationModelUpdatedEventArgs e)
+        {
+            GraphRenderer_SizeChanged(this, null);
+        }
+
         public GraphOperationViewModel GraphOperationViewModel => DataContext as GraphOperationViewModel;
 
         void GraphRenderer_Loaded(object sender, RoutedEventArgs e)
         {
             SizeChanged -= GraphRenderer_SizeChanged;
             SizeChanged += GraphRenderer_SizeChanged;
+            DataContextChanged -= GraphRenderer_DataContextChanged;
+            DataContextChanged += GraphRenderer_DataContextChanged;
+            if (DataContext != null)
+                GraphRenderer_DataContextChanged(this, null);
         }
         
         private void xTop_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
@@ -53,6 +68,7 @@ namespace PanoramicDataWin8.view.vis.render
         bool abort = false;
         private void GraphRenderer_SizeChanged(object sender, SizeChangedEventArgs e)
         {
+            var brushModels = GraphOperationViewModel.GraphOperationModel.BrushOperationModels;
             var g = GraphOperationViewModel.GraphOperationModel.Graph;
             var sortedVerts = g.GetVertices().ToList();
             if (_sortTop)
@@ -60,16 +76,17 @@ namespace PanoramicDataWin8.view.vis.render
                 sortedVerts.Sort(new Comparison<IVertex>((kp1, kp2) => kp1.GetEdges(Direction.Both).Count() - kp2.GetEdges(Direction.Both).Count()));
                 sortedVerts.Reverse();
             }
-            var topVerts = sortedVerts;
-            var sortedLeftVerts = g.GetVertices().Where((v,i) => i< 100).ToList();
+            var sortedLeftVerts = g.GetVertices().ToList();
             if (_sortLeft)
             {
                 sortedLeftVerts.Sort(new Comparison<IVertex>((kp1, kp2) => kp1.GetEdges(Direction.Both).Count() - kp2.GetEdges(Direction.Both).Count()));
                 sortedLeftVerts.Reverse();
             }
-            var leftVerts = sortedLeftVerts;
-            var topIds    = topVerts.Select((v) => v.Id).ToList();
-            var leftIds   = leftVerts.Select((v) => v.Id).ToList();
+            var maxNodes  = Math.Min(GraphOperationViewModel.GraphOperationModel.NumNodes, sortedVerts.Count);
+            var topVerts  = sortedVerts.Take(maxNodes).ToList();
+            var leftVerts = sortedLeftVerts.Take(maxNodes).ToList();
+            var topIds    = topVerts .Take(maxNodes).Select((v) => v.Id).ToList();
+            var leftIds   = leftVerts.Take(maxNodes).Select((v) => v.Id).ToList();
             var cellhgt   = xMatrix.ActualHeight / leftVerts.Count();
             var cellwid   = xMatrix.ActualWidth  / topVerts.Count();
             var glyphsize = Math.Max(1, cellwid);
@@ -149,6 +166,8 @@ namespace PanoramicDataWin8.view.vis.render
                                     var dot = xMatrix.Children.ElementAtOrDefault(ecount) as Ellipse;
                                     if (ecount >= xMatrix.Children.Count)
                                         xMatrix.Children.Add(dot = new Ellipse() { Width = glyphsize, Height = glyphhgt, Fill = new SolidColorBrush(Colors.Black), HorizontalAlignment = HorizontalAlignment.Left, VerticalAlignment = VerticalAlignment.Top });
+                                    dot.Width = glyphsize;
+                                    dot.Height = glyphhgt;
                                     dot.Visibility = Visibility.Visible;
                                     dot.RenderTransform = new TranslateTransform()
                                     {

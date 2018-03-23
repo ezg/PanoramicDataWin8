@@ -101,6 +101,14 @@ namespace PanoramicDataWin8.controller.view
             }
         }
 
+        /// <summary>
+        /// Creates a filterLinkModel between two OperationViewModels and adds it to a FilterLinkViewModel.
+        /// One FilterLinkViewModel is used for all filters that share the same 'to' (target) OperationModel. 
+        /// So this searches for the existing FilterLinkViewModel for the link destination, creating a new one if none exists.
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <returns></returns>
         public FilterLinkViewModel CreateFilterLinkViewModel(IOperationModel from, IOperationModel to)
         {
             var filterLinkModel = createLinkModel(from, to);
@@ -109,7 +117,7 @@ namespace PanoramicDataWin8.controller.view
             {
                 filterLinkViewModel =
                     FilterLinkViewModels.FirstOrDefault(
-                        lvm => lvm.ToOperationViewModel == MainViewController.Instance.OperationViewModels.First(vvm => vvm.OperationModel == filterLinkModel.ToOperationModel));
+                        flvm => flvm.ToOperationViewModel == MainViewController.Instance.OperationViewModels.First(vvm => vvm.OperationModel == to));
                 if (filterLinkViewModel == null)
                 {
                     filterLinkViewModel = new FilterLinkViewModel
@@ -119,11 +127,7 @@ namespace PanoramicDataWin8.controller.view
                                 .First(vvm => vvm.OperationModel == filterLinkModel.ToOperationModel)
                     };
                     FilterLinkViewModels.Add(filterLinkViewModel);
-                    var filterLinkView = new FilterLinkView
-                    {
-                        DataContext = filterLinkViewModel
-                    };
-                    MainViewController.Instance.InkableScene.Add(filterLinkView);
+                    MainViewController.Instance.InkableScene.Add(new FilterLinkView { DataContext = filterLinkViewModel });
                 }
                 if (!filterLinkViewModel.FilterLinkModels.Contains(filterLinkModel))
                 {

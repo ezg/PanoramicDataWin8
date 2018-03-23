@@ -60,6 +60,7 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.CollectionChanged += OperationViewViewModels_CollectionChanged;
 
             _gesturizer.AddGesture(new FilterGesture(InkableScene));
+            _gesturizer.AddGesture(new GraphFilterGesture(InkableScene));
             _gesturizer.AddGesture(new ConnectGesture(InkableScene));
             _gesturizer.AddGesture(new EraseGesture(InkableScene));
             //_gesturizer.AddGesture(new ScribbleGesture(_root));
@@ -348,6 +349,14 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.Add(visModel);
             return visModel;
         }
+        public GraphFilterViewModel CreateDefaultGraphFilterOperationViewModel(Pt position, bool fromMouse)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultGraphFilterOperationViewModel(MainModel.SchemaModel, position, fromMouse);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
 
 
         public OperationContainerView CopyOperationViewModel(OperationViewModel operationViewModel, Pt? centerPoint)
@@ -622,52 +631,21 @@ namespace PanoramicDataWin8.controller.view
 
             foreach (var recognizedGesture in recognizedGestures.ToList())
             {
-                if (recognizedGesture is ConnectGesture)
+                if (recognizedGesture is ConnectGesture connectGesture)
                 {
-                    var connect = recognizedGesture as ConnectGesture;
-                    bool created = false;
-                    if (connect.FilterConsumerOperationViewModel == null)
-                    {
-                        created = true;
-                        connect.CreateConsumer(e.InkStroke.Clone());
-                    }
-                    if (created && connect.FilterProviderOperationViewModel is FilterOperationModel &&
-                        connect.FilterConsumerOperationViewModel is FilterOperationModel )
-                    {
-                        FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterConsumerOperationViewModel,
-                                                                                    connect.FilterProviderOperationViewModel);
-                    } else
-                        FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, 
-                                                                                    connect.FilterConsumerOperationViewModel);
-
+                    connectGesture.CreateConnection(e.InkStroke);
                 }
-                else if (recognizedGesture is HitGesture)
+                else if (recognizedGesture is FilterGesture filterGesture)
                 {
-                    var hitGesture = recognizedGesture as HitGesture;
-                    foreach (var hitScribbable in hitGesture.HitScribbables)
-                    {
-                        if (hitScribbable is InkStroke)
-                        {
-                            InkableScene.Remove(hitScribbable as InkStroke);
-                        }
-                        else if (hitScribbable is OperationContainerView)
-                        {
-                            RemoveOperationViewModel(hitScribbable as OperationContainerView);
-                        }
-                        else if (hitScribbable is FilterLinkView)
-                        {
-                            var models = (hitScribbable as FilterLinkView).GetLinkModelsToRemove(e.InkStroke.Geometry);
-                            foreach (var model in models)
-                            {
-                                FilterLinkViewController.Instance.RemoveFilterLinkViewModel(model);
-                            }
-                        }
-                        else if (hitScribbable is MenuItemView)
-                        {
-                            var model = (hitScribbable as MenuItemView).DataContext as MenuItemViewModel;
-                            model.FireDeleted();
-                        }
-                    }
+                    filterGesture.CreateFilter(e.InkStroke);
+                }
+                else if (recognizedGesture is HitGesture hitGesture)
+                {
+                    hitGesture.ProcessHit(e.InkStroke);
+                }
+                else if (recognizedGesture is GraphFilterGesture graphFilterGesture)
+                {
+                    graphFilterGesture.CreateFilter(e.InkStroke);
                 }
             }
 
