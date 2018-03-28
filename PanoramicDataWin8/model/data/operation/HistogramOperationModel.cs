@@ -25,7 +25,7 @@ namespace PanoramicDataWin8.model.data.operation
             _attributeUsageTransformationModels =
                 new Dictionary<AttributeUsage, ObservableCollection<AttributeTransformationModel>>();
 
-        public HistogramOperationModel(SchemaModel schemaModel) : base(schemaModel) {
+        public HistogramOperationModel(OriginModel schemaModel) : base(schemaModel) {
 
             foreach (var attributeUsage in Enum.GetValues(typeof(AttributeUsage)).Cast<AttributeUsage>())
             {

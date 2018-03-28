@@ -15,7 +15,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         private int _pageSize = 9;
 
-        public RecommenderOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        public RecommenderOperationModel(OriginModel schemaModel) : base(schemaModel)
         {
         }
 

@@ -31,8 +31,6 @@ namespace PanoramicDataWin8.model.data.idea
 
         public override List<AttributeModel> InputModels { get; } = new List<AttributeModel>();
 
-        public override List<OriginModel> OriginModels { get; } = new List<OriginModel>();
-
         private void recursiveCreateAttributeModels(AttributeGroup attributeGroup, AttributeModel parentGroupModel)
         {
             var groupModel = IDEAAttributeModel.AddGroupField(attributeGroup.Name, attributeGroup.Name, this);

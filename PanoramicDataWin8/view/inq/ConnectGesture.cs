@@ -12,6 +12,7 @@ using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.view.vis.render;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.view.vis.menu;
+using Windows.Foundation;
 
 namespace PanoramicDataWin8.view.inq
 {
@@ -25,16 +26,29 @@ namespace PanoramicDataWin8.view.inq
         }
 
 
-        private IFilterProviderOperationModel _filterProviderOperationViewModel = null;
-        public IFilterProviderOperationModel FilterProviderOperationViewModel
-        {
-            get { return _filterProviderOperationViewModel; }
-        }
+        IFilterProviderOperationModel _filterProviderOperationViewModel = null;
+        IFilterConsumerOperationModel _filterConsumerOperationViewModel = null;
+        public IFilterProviderOperationModel FilterProviderOperationViewModel =>  _filterProviderOperationViewModel; 
+        public IFilterConsumerOperationModel FilterConsumerOperationViewModel => _filterConsumerOperationViewModel;
 
-        private IFilterConsumerOperationModel _filterConsumerOperationViewModel = null;
-        public IFilterConsumerOperationModel FilterConsumerOperationViewModel
+        public void CreateConnection(InkStroke stroke)
         {
-            get { return _filterConsumerOperationViewModel; }
+
+            bool created = false;
+            if (FilterConsumerOperationViewModel == null)
+            {
+                created = true;
+                CreateConsumer(stroke.Clone());
+            }
+            if (created && FilterProviderOperationViewModel is FilterOperationModel &&
+                FilterConsumerOperationViewModel is FilterOperationModel)
+            {
+                FilterLinkViewController.Instance.CreateFilterLinkViewModel(FilterConsumerOperationViewModel,
+                                                                            FilterProviderOperationViewModel);
+            }
+            else
+                FilterLinkViewController.Instance.CreateFilterLinkViewModel(FilterProviderOperationViewModel,
+                                                                            FilterConsumerOperationViewModel);
         }
 
         public bool Recognize(InkStroke inkStroke)
@@ -87,71 +101,5 @@ namespace PanoramicDataWin8.view.inq
             }
             return null;
         }
-    }
-    public class FilterGesture : IGesture
-    {
-        private InkableScene _inkableScene = null;
-
-        public FilterGesture(InkableScene inkableScene)
-        {
-            this._inkableScene = inkableScene;
-        }
-
-        
-
-        public bool Recognize(InkStroke inkStroke)
-        {
-            if (!inkStroke.IsErase)
-            {
-
-                foreach (var operationViewModel in controller.view.MainViewController.Instance.OperationViewModels)
-                {
-                    foreach (var attachmentViewModel in operationViewModel.AttachementViewModels)
-                    {
-                        if (attachmentViewModel.MenuViewModel != null)
-                            foreach (var menuItemViewModel in attachmentViewModel.MenuViewModel.MenuItemViewModels)
-                            {
-                                if (menuItemViewModel.MenuItemComponentViewModel is AttributeMenuItemViewModel &&
-                                    new Rct(menuItemViewModel.Position, menuItemViewModel.Size).Contains(inkStroke.Points[0]))
-                                {
-                                    var attr = (menuItemViewModel.MenuItemComponentViewModel as AttributeMenuItemViewModel).AttributeViewModel.AttributeModel;
-                                    var filterOperationViewModel = AddFilterModel(attr.RawName, Predicate.GREATER_THAN, 0, inkStroke.Points.Last(), controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse);
-                                    var size = new Vec(OperationViewModel.WIDTH, MainViewController.Instance.MainPage.LastTouchWasMouse ? 50 : OperationViewModel.HEIGHT);
-                                    var operationContainerView = new OperationContainerView();
-                                    filterOperationViewModel.Size = size;
-                                    operationContainerView.DataContext = filterOperationViewModel;
-                                    MainViewController.Instance.InkableScene.Add(operationContainerView);
-                                    if (operationContainerView.Renderer is FilterRenderer)
-                                    {
-                                        if (FilterRenderer.FieldType(attr.RawName) == DataType.String)
-                                            (operationContainerView.Renderer as FilterRenderer).SetFilter(attr.RawName, Predicate.LESS_THAN, "a");
-                                        else
-                                            (operationContainerView.Renderer as FilterRenderer).SetFilter(attr.RawName, Predicate.LESS_THAN, 0);
-                                    }
-                                    FilterLinkViewController.Instance.CreateFilterLinkViewModel(filterOperationViewModel.OperationModel,
-                                        (OperationModel)operationViewModel.OperationModel);
-
-                                    return true;
-                                }
-                            }
-                    }
-                }
-            }
-            return false;
-        }
-        private FilterOperationViewModel AddFilterModel(string field, Predicate pred, double value, Pt p, bool useTypingUI)
-        {
-            var schemaModel = (controller.view.MainViewController.Instance.MainPage.DataContext as MainModel).SchemaModel;
-            var inputModels = schemaModel.OriginModels.First().InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
-            var attributeTransformationModel = new AttributeTransformationModel(inputModels.First() as AttributeModel);
-            foreach (var im in inputModels)
-                if (im.RawName.ToLower() == field)
-                    attributeTransformationModel = new AttributeTransformationModel(im as AttributeModel);
-            
-            var filterModel = new FilterModel();
-            filterModel.ValueComparisons.Add(new ValueComparison(attributeTransformationModel, pred, value));
-            return controller.view.MainViewController.Instance.CreateDefaultFilterOperationViewModel(p, useTypingUI);
-        }
-        
     }
 }

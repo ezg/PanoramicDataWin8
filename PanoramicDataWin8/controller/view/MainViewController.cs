@@ -60,6 +60,7 @@ namespace PanoramicDataWin8.controller.view
             OperationViewModels.CollectionChanged += OperationViewViewModels_CollectionChanged;
 
             _gesturizer.AddGesture(new FilterGesture(InkableScene));
+            _gesturizer.AddGesture(new GraphFilterGesture(InkableScene));
             _gesturizer.AddGesture(new ConnectGesture(InkableScene));
             _gesturizer.AddGesture(new EraseGesture(InkableScene));
             //_gesturizer.AddGesture(new ScribbleGesture(_root));
@@ -217,7 +218,7 @@ namespace PanoramicDataWin8.controller.view
                 {
                     Name = "MinMaxScale",
                     OperationType = OperationType.Function,
-                    FunctionType = new MinMaxScaleFunctionModel(MainModel.SchemaModel)
+                    FunctionType = new MinMaxScaleFunctionModel(MainModel.SchemaModel.OriginModels.First())
                 });
             }
             MainModel.OperationTypeModels = parent.OperationTypeModels.ToList();
@@ -262,7 +263,7 @@ namespace PanoramicDataWin8.controller.view
 
         public RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(Pt position)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultRawDataOperationViewModel(MainModel.SchemaModel, position);
+            var visModel = OperationViewModelFactory.CreateDefaultRawDataOperationViewModel(MainModel.SchemaModel.OriginModels.First(), position);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -270,7 +271,7 @@ namespace PanoramicDataWin8.controller.view
         }
         public HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(AttributeModel attributeModel, Pt position)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(MainModel.SchemaModel, attributeModel, position);
+            var visModel = OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(attributeModel.OriginModel, attributeModel, position);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -278,7 +279,7 @@ namespace PanoramicDataWin8.controller.view
         }
         public FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(Pt position, FunctionOperationModel functionTypeModel)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultFunctionOperationViewModel(MainModel.SchemaModel, position, functionTypeModel);
+            var visModel = OperationViewModelFactory.CreateDefaultFunctionOperationViewModel(functionTypeModel.OriginModel, position, functionTypeModel);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -286,7 +287,7 @@ namespace PanoramicDataWin8.controller.view
         }
         public CalculationOperationViewModel CreateDefaultCalculationOperationViewModel(Pt position)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultCalculationOperationViewModel(MainModel.SchemaModel, position);
+            var visModel = OperationViewModelFactory.CreateDefaultCalculationOperationViewModel(MainModel.SchemaModel.OriginModels.First(), position);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -294,7 +295,7 @@ namespace PanoramicDataWin8.controller.view
         }
         public DefinitionOperationViewModel CreateDefaultDefinitionOperationViewModel(Pt position)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultDefinitionOperationViewModel(MainModel.SchemaModel, position);
+            var visModel = OperationViewModelFactory.CreateDefaultDefinitionOperationViewModel(MainModel.SchemaModel.OriginModels.First(), position);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -302,7 +303,7 @@ namespace PanoramicDataWin8.controller.view
         }
         public PredictorOperationViewModel CreateDefaultPredictorOperationViewModel(Pt position)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultPredictorOperationViewModel(MainModel.SchemaModel, position);
+            var visModel = OperationViewModelFactory.CreateDefaultPredictorOperationViewModel(MainModel.SchemaModel.OriginModels.First(), position);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -310,15 +311,23 @@ namespace PanoramicDataWin8.controller.view
         }
         public ExampleOperationViewModel CreateDefaultExampleOperationViewModel(Pt position)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultExampleOperationViewModel(MainModel.SchemaModel, position);
+            var visModel = OperationViewModelFactory.CreateDefaultExampleOperationViewModel(MainModel.SchemaModel.OriginModels.First(), position);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
             return visModel;
         }
-        public AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(Pt position, AttributeModel groupModel=null)
+        public AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(Pt position, AttributeModel groupModel = null)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultAttributeGroupOperationViewModel(MainModel.SchemaModel, position, groupModel);
+            var visModel = OperationViewModelFactory.CreateDefaultAttributeGroupOperationViewModel(groupModel?.OriginModel ?? MainModel.SchemaModel.OriginModels.First(), position, groupModel);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
+        public GraphOperationViewModel CreateDefaultGraphOperationViewModel(Pt position, GraphOperationModel graphModel)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultGraphOperationViewModel(MainModel.SchemaModel.OriginModels.First(), position, graphModel);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -326,7 +335,7 @@ namespace PanoramicDataWin8.controller.view
         }
         public AttributeOperationViewModel CreateDefaultAttributeOperationViewModel(Pt position)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultAttributeOperationViewModel(MainModel.SchemaModel, position);
+            var visModel = OperationViewModelFactory.CreateDefaultAttributeOperationViewModel(MainModel.SchemaModel.OriginModels.First(), position);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -334,7 +343,15 @@ namespace PanoramicDataWin8.controller.view
         }
         public FilterOperationViewModel CreateDefaultFilterOperationViewModel(Pt position, bool fromMouse)
         {
-            var visModel = OperationViewModelFactory.CreateDefaultFilterOperationViewModel(MainModel.SchemaModel, position, fromMouse);
+            var visModel = OperationViewModelFactory.CreateDefaultFilterOperationViewModel(MainModel.SchemaModel.OriginModels.First(), position, fromMouse);
+            visModel.Position = position;
+            addAttachmentViews(visModel);
+            OperationViewModels.Add(visModel);
+            return visModel;
+        }
+        public GraphFilterViewModel CreateDefaultGraphFilterOperationViewModel(Pt position, bool fromMouse)
+        {
+            var visModel = OperationViewModelFactory.CreateDefaultGraphFilterOperationViewModel(MainModel.SchemaModel.OriginModels.First(), position, fromMouse);
             visModel.Position = position;
             addAttachmentViews(visModel);
             OperationViewModels.Add(visModel);
@@ -448,6 +465,10 @@ namespace PanoramicDataWin8.controller.view
                 operationViewModel = CreateDefaultAttributeGroupOperationViewModel(position);
                 height = 50;
                 size = new Vec(width, height);
+            }
+            else if (operationTypeModel.OperationType == OperationType.Graph)
+            {
+                operationViewModel = CreateDefaultGraphOperationViewModel(position, operationTypeModel.GraphType);
             }
             else if (operationTypeModel.OperationType == OperationType.Filter)
             {
@@ -610,52 +631,21 @@ namespace PanoramicDataWin8.controller.view
 
             foreach (var recognizedGesture in recognizedGestures.ToList())
             {
-                if (recognizedGesture is ConnectGesture)
+                if (recognizedGesture is ConnectGesture connectGesture)
                 {
-                    var connect = recognizedGesture as ConnectGesture;
-                    bool created = false;
-                    if (connect.FilterConsumerOperationViewModel == null)
-                    {
-                        created = true;
-                        connect.CreateConsumer(e.InkStroke.Clone());
-                    }
-                    if (created && connect.FilterProviderOperationViewModel is FilterOperationModel &&
-                        connect.FilterConsumerOperationViewModel is FilterOperationModel )
-                    {
-                        FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterConsumerOperationViewModel,
-                                                                                    connect.FilterProviderOperationViewModel);
-                    } else
-                        FilterLinkViewController.Instance.CreateFilterLinkViewModel(connect.FilterProviderOperationViewModel, 
-                                                                                    connect.FilterConsumerOperationViewModel);
-
+                    connectGesture.CreateConnection(e.InkStroke);
                 }
-                else if (recognizedGesture is HitGesture)
+                else if (recognizedGesture is FilterGesture filterGesture)
                 {
-                    var hitGesture = recognizedGesture as HitGesture;
-                    foreach (var hitScribbable in hitGesture.HitScribbables)
-                    {
-                        if (hitScribbable is InkStroke)
-                        {
-                            InkableScene.Remove(hitScribbable as InkStroke);
-                        }
-                        else if (hitScribbable is OperationContainerView)
-                        {
-                            RemoveOperationViewModel(hitScribbable as OperationContainerView);
-                        }
-                        else if (hitScribbable is FilterLinkView)
-                        {
-                            var models = (hitScribbable as FilterLinkView).GetLinkModelsToRemove(e.InkStroke.Geometry);
-                            foreach (var model in models)
-                            {
-                                FilterLinkViewController.Instance.RemoveFilterLinkViewModel(model);
-                            }
-                        }
-                        else if (hitScribbable is MenuItemView)
-                        {
-                            var model = (hitScribbable as MenuItemView).DataContext as MenuItemViewModel;
-                            model.FireDeleted();
-                        }
-                    }
+                    filterGesture.CreateFilter(e.InkStroke);
+                }
+                else if (recognizedGesture is HitGesture hitGesture)
+                {
+                    hitGesture.ProcessHit(e.InkStroke);
+                }
+                else if (recognizedGesture is GraphFilterGesture graphFilterGesture)
+                {
+                    graphFilterGesture.CreateFilter(e.InkStroke);
                 }
             }
 

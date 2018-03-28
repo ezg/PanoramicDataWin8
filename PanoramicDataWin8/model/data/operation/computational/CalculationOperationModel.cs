@@ -12,7 +12,7 @@ namespace PanoramicDataWin8.model.data.operation
 {
     public class CalculationOperationModel : ComputationalOperationModel 
     {
-        public CalculationOperationModel(SchemaModel schemaModel, string rawName, string displayName = null) : 
+        public CalculationOperationModel(OriginModel schemaModel, string rawName, string displayName = null) : 
             base(schemaModel, DataType.Double, AttributeFuncModel.AttributeModelType.Code, "numeric", rawName, displayName)
         {
         }

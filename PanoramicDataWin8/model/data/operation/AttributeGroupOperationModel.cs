@@ -24,9 +24,9 @@ namespace PanoramicDataWin8.model.data.operation
             }
         }
 
-        public AttributeGroupOperationModel(SchemaModel schemaModel, string rawName, AttributeModel groupModel) : base(schemaModel)
+        public AttributeGroupOperationModel(OriginModel originModel, string rawName, AttributeModel groupModel) : base(originModel)
         {
-            attributeGroupModel = groupModel ?? IDEAAttributeModel.AddGroupField(rawName, rawName, schemaModel.OriginModels.First());
+            attributeGroupModel = groupModel ?? IDEAAttributeModel.AddGroupField(rawName, rawName, originModel);
             GroupFuncModel.InputModels.CollectionChanged += GroupFuncModel_CollectionChanged;
 
             foreach (var am in GroupFuncModel.InputModels)

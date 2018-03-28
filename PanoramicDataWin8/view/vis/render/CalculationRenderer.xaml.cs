@@ -68,7 +68,7 @@ namespace PanoramicDataWin8.view.vis.render
             var codeText = CodeBox.Text;
             var newAttr = new AttributeCodeParameters() { Code = codeText, RawName = CalculationOperationModel?.GetAttributeModel().RawName };
 
-            var originModel = CalculationOperationModel.SchemaModel.OriginModels.First();
+            var originModel = CalculationOperationModel.OriginModel;
             var attributeCodeParameters = IDEAAttributeModel.GetAllCalculatedAttributeModels(originModel).Select(a => IDEAHelpers.GetAttributeParameters(a)).OfType<AttributeCodeParameters>().ToList();
             if (attributeCodeParameters.Contains(newAttr))
                 attributeCodeParameters.Remove(newAttr);

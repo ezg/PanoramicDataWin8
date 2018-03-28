@@ -96,7 +96,7 @@ namespace PanoramicDataWin8.model.data.operation
             return ret;
         }
 
-        public static string GetFilterModelsRecursive(object filterGraphNode, List<IFilterProviderOperationModel> visitedFilterProviders, List<FilterModel> filterModels, bool isFirst)
+        public static string GetFilterModelsRecursive(OriginModel originModel, object filterGraphNode, List<IFilterProviderOperationModel> visitedFilterProviders, List<FilterModel> filterModels, bool isFirst)
         {
             var ret = "";
             if (filterGraphNode is IFilterProviderOperationModel)
@@ -106,19 +106,42 @@ namespace PanoramicDataWin8.model.data.operation
                 if (!isFirst && filterProvider.FilterModels.Count(fm => fm.ValueComparisons.Count > 0) > 0)
                 {
                     filterModels.AddRange(filterProvider.FilterModels.Where(fm => fm.ValueComparisons.Count > 0));
-                    if (filterProvider.FilterModels.Any(fm => fm.ValueComparisons.Count > 0))
-                    {
-                        if (filterProvider.FilterModels.Where(fm => fm.ValueComparisons.Count > 0).All(fm => fm.GroupAggregateComparisons == ""))
+                    //bool first = true;
+                    //foreach (var att in originModel.InputModels)
+                    //{
+                        if (filterProvider.FilterModels.Any(fm => fm.ValueComparisons.Count > 0))
                         {
-                            ret = "(" + string.Join(" || ", filterProvider.FilterModels.Select(fm => fm.ToPythonString())) + ")";
+                            if (filterProvider.FilterModels.Where(fm => fm.ValueComparisons.Count > 0).All(fm => fm.GroupAggregateComparisons == ""))
+                            {
+                            //    var mappedFilters = new List<FilterModel>();
+                            //    foreach (var gm in filterProvider.FilterModels)
+                            //    {
+                            //        var mappedFilter = new FilterModel();
+                            //        foreach (var vc in gm.ValueComparisons)
+                            //            if (att.DisplayName.EndsWith(vc.AttributeTransformationModel.AttributeModel.DisplayName))
+                            //            {
+                            //                mappedFilter.ValueComparisons.Add(new ValueComparison(new attribute.AttributeTransformationModel(att), vc.Predicate, vc.Value));
+                            //            }
+                            //        if (mappedFilter.ValueComparisons.Count > 0)
+                            //            mappedFilters.Add(mappedFilter);
+                            //    }
+                            //    if (mappedFilters.Count > 0)
+                            //    {
+                            //        ret += (!first ? " && " : "") + "(" + string.Join(" || ", mappedFilters.Select(fm => fm.ToPythonString())) + ")";
+                            //        first = false;
+                            //        filterModels.AddRange(mappedFilters.Where(fm => fm.ValueComparisons.Count > 0));
+                            //    }
+                            //}
+                                ret = "(" + string.Join(" || ", filterProvider.FilterModels.Select(fm => fm.ToPythonString())) + ")";
+                            }
+                            else
+                            {
+                                ret = "(" + filterProvider.FilterModels[0].ValueComparisons[0].AttributeTransformationModel.AttributeModel.RawName +
+                                      " in (" + string.Join(",", filterProvider.FilterModels.Select(fm => fm.ValueComparisons[0]).Select(vc => "'" + vc.Value.ToString() + "'")) + "))";
+                                //ret = "(" + string.Join(",", operationModel.FilterModels.Select(fm => fm.ValueComparisons[0].)) + ")";
+                            }
                         }
-                        else
-                        {
-                            ret = "(" + filterProvider.FilterModels[0].ValueComparisons[0].AttributeTransformationModel.AttributeModel.RawName +
-                                  " in (" + string.Join(",", filterProvider.FilterModels.Select(fm => fm.ValueComparisons[0]).Select(vc => "'" + vc.Value.ToString() + "'")) + "))";
-                            //ret = "(" + string.Join(",", operationModel.FilterModels.Select(fm => fm.ValueComparisons[0].)) + ")";
-                        }
-                    }
+                   // }
                 }
             }
             if (filterGraphNode is IFilterConsumerOperationModel)
@@ -129,7 +152,7 @@ namespace PanoramicDataWin8.model.data.operation
                 {
                     if (linkModel.FromOperationModel != null && !visitedFilterProviders.Contains(linkModel.FromOperationModel))
                     {
-                        var child = GetFilterModelsRecursive(linkModel.FromOperationModel, visitedFilterProviders, filterModels, false);
+                        var child = GetFilterModelsRecursive(originModel, linkModel.FromOperationModel, visitedFilterProviders, filterModels, false);
                         if (child != "")
                         {
                             if (linkModel.IsInverted)

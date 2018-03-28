@@ -22,8 +22,6 @@ namespace PanoramicDataWin8.model.data
         [JsonIgnore]
         public abstract List<AttributeModel> InputModels { get; }
 
-        public abstract List<OriginModel> OriginModels { get; }
-
         public override bool Equals(object obj)
         {
             if (obj is OriginModel)

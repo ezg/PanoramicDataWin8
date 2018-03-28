@@ -14,7 +14,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         IOperationModel ResultCauserClone { get; set; }
         
-        SchemaModel SchemaModel { get; set; }
+        OriginModel OriginModel { get; set; }
         event OperationModel.OperationModelUpdatedHandler OperationModelUpdated;
         void FireOperationModelUpdated(OperationModelUpdatedEventArgs args);
 

@@ -387,7 +387,7 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     var dataset = model.AttributeModel.OriginModel.Name;
                     var hostname = MainViewController.Instance.MainModel.Hostname;
-                    string prepend = hostname + "/api/rawdata/" + dataset + "/"+model.AttributeModel.RawName+"/";
+                    string prepend = hostname + "/api/rawdata/" + dataset + "/" + model.AttributeModel.RawName+"/";
 #pragma warning disable CS4014
                     CoreApplication.MainView.CoreWindow.Dispatcher.RunAsync( CoreDispatcherPriority.Low,
                     () =>  {

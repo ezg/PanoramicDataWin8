@@ -32,7 +32,7 @@ namespace PanoramicDataWin8.model.data.operation
         public int ExecutionId { get; set; } = 0;
         public ResultParameters ResultParameters { get; }
         public IOperationModel ResultCauserClone { get; set; }
-        public SchemaModel SchemaModel { get; set; }
+        public OriginModel OriginModel { get; set; }
 
         public OperationModel Clone()
         {

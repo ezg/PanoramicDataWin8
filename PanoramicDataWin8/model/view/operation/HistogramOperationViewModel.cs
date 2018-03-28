@@ -10,6 +10,7 @@ using System.Linq;
 using Windows.UI.Xaml.Media;
 using IDEA_common.aggregates;
 using System.ComponentModel;
+using PanoramicDataWin8.model.data.idea;
 
 namespace PanoramicDataWin8.model.view.operation
 {
@@ -254,6 +255,29 @@ namespace PanoramicDataWin8.model.view.operation
                     HistogramOperationModel.RemoveAttributeUsageTransformationModel(axis, oldModel);
                     oldModel.PropertyChanged -= AttributeTransformationModel_PropertyChanged;
                     oldModel.AttributeModel.PropertyChanged -= AttributeModel_PropertyChanged;
+                }
+                if (newModel.AttributeModel.OriginModel != this.HistogramOperationModel.OriginModel)
+                {
+                    var n1 = newModel.AttributeModel.OriginModel.Name;
+                    var n2 = HistogramOperationModel.OriginModel.Name;
+                    var configs = MainViewController.Instance.MainModel.DatasetConfigurations;
+                    foreach (var om in configs)
+                    {
+                        if (om.Schema.RawName.Contains(n1) && om.Schema.RawName.Contains(n2))
+                        {
+                            var iom = new IDEAOriginModel(om);
+                            iom.LoadInputFields();
+                            this.HistogramOperationModel.OriginModel =iom;
+                        }
+                    }
+                    //var otherModel = HistogramOperationModel.AttributeTransformationModels.FirstOrDefault();
+                    //if (otherModel != null) {
+                    //    foreach (var att in HistogramOperationModel.OriginModel.InputModels)
+                    //        if (att.DisplayName.Contains(newModel.AttributeModel.DisplayName))
+                    //        {
+                    //            newModel = new AttributeTransformationModel(att);
+                    //        }
+                    //}
                 }
                 if (attributeTransformationModel != null && !HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
                 {

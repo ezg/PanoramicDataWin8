@@ -51,7 +51,7 @@ namespace PanoramicDataWin8.controller.view
 
         public RecommenderOperationViewModel CreateRecommenderOperationViewModel(HistogramOperationViewModel histogramViewModel)
         {
-            RecommenderOperationModel model = new RecommenderOperationModel(_mainModel.SchemaModel);
+            RecommenderOperationModel model = new RecommenderOperationModel(histogramViewModel.OperationModel.OriginModel);
             model.Target = histogramViewModel.HistogramOperationModel;
 
             model.ModelId = HypothesesViewController.Instance.RiskOperationModel.ModelId;
@@ -299,9 +299,9 @@ namespace PanoramicDataWin8.controller.view
 
             var model = sender as RecommendedHistogramMenuItemViewModel;
             var attr = IDEAHelpers.GetAttributeModelFromAttribute(model.RecommendedHistogram.XAttribute,
-                model.HistogramOperationViewModel.HistogramOperationModel.SchemaModel.OriginModels.First());
+                model.HistogramOperationViewModel.HistogramOperationModel.OriginModel);
             var filterModels = IDEAHelpers.GetFilterModelsFromSelections(model.RecommendedHistogram.Selections,
-                model.HistogramOperationViewModel.HistogramOperationModel.SchemaModel.OriginModels.First());
+                model.HistogramOperationViewModel.HistogramOperationModel.OriginModel);
             var operationViewModel = MainViewController.Instance.CreateDefaultHistogramOperationViewModel(attr, bounds.Center - new Vec(width / 2.0, height / 2.0));
             operationViewModel.HistogramOperationModel.AddFilterModels(filterModels);
             FilterLinkViewController.Instance.CreateFilterLinkViewModel(operationViewModel.OperationModel, model.HistogramOperationViewModel.OperationModel);

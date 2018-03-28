@@ -14,6 +14,8 @@ namespace PanoramicDataWin8.model.data
 
         private FunctionOperationModel _functionTypeModel;
 
+        private GraphOperationModel _graphTypeModel;
+
         private Vec _size = new Vec(50, 50);
 
         public bool IsShadow
@@ -38,6 +40,11 @@ namespace PanoramicDataWin8.model.data
         {
             get { return _functionTypeModel; }
             set { SetProperty(ref _functionTypeModel, value); }
+        }
+        public GraphOperationModel GraphType
+        {
+            get { return _graphTypeModel; }
+            set { SetProperty(ref _graphTypeModel, value); }
         }
 
         public Vec Size

@@ -13,7 +13,7 @@ namespace PanoramicDataWin8.model.data.operation
     {
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
-        public PredictorOperationModel(SchemaModel schemaModel, string rawName, string displayName = null) : base(schemaModel, DataType.Double, "numeric", rawName, displayName)
+        public PredictorOperationModel(OriginModel schemaModel, string rawName, string displayName = null) : base(schemaModel, DataType.Double, "numeric", rawName, displayName)
         {
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             

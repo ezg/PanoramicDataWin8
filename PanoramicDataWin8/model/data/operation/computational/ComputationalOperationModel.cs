@@ -51,29 +51,29 @@ namespace PanoramicDataWin8.model.data.operation
                 frend.Refactor(null, newName);
             }
         }
-        public ComputationalOperationModel(SchemaModel schemaModel, DataType dataType, AttributeFuncModel.AttributeModelType attrType, string visualizationType, string rawName, string displayName = null) : base(schemaModel)
+        public ComputationalOperationModel(OriginModel originModel, DataType dataType, AttributeFuncModel.AttributeModelType attrType, string visualizationType, string rawName, string displayName = null) : base(originModel)
         {
             _rawName = rawName;
-            if (rawName != null && !IDEAAttributeModel.NameExists(rawName, schemaModel.OriginModels.First()))
+            if (rawName != null && !IDEAAttributeModel.NameExists(rawName, originModel))
             {
                 switch (attrType) {
                     case AttributeFuncModel.AttributeModelType.Assigned:
-                        IDEAAttributeModel.AddCodeField(rawName, displayName == null ? rawName : displayName, attrType, dataType, visualizationType, new List<VisualizationHint>(), schemaModel.OriginModels.First());
+                        IDEAAttributeModel.AddCodeField(rawName, displayName == null ? rawName : displayName, attrType, dataType, visualizationType, new List<VisualizationHint>(), originModel);
                         break;
                     case AttributeFuncModel.AttributeModelType.Code:
-                        IDEAAttributeModel.AddCodeField(rawName, displayName == null ? rawName : displayName, "0", dataType, visualizationType, new List<VisualizationHint>(), schemaModel.OriginModels.First());
+                        IDEAAttributeModel.AddCodeField(rawName, displayName == null ? rawName : displayName, "0", dataType, visualizationType, new List<VisualizationHint>(), originModel);
                         break;
                 }
 
             }
             CodeNameChangedEvent += updateName;
         }
-        public ComputationalOperationModel(SchemaModel schemaModel, DataType dataType, string visualizationType, string rawName, string displayName = null) : base(schemaModel)
+        public ComputationalOperationModel(OriginModel originModel, DataType dataType, string visualizationType, string rawName, string displayName = null) : base(originModel)
         {
             _rawName = rawName;
-            if (rawName != null && !IDEAAttributeModel.NameExists(rawName, SchemaModel.OriginModels.First()))
+            if (rawName != null && !IDEAAttributeModel.NameExists(rawName, originModel))
             {
-                IDEAAttributeModel.AddBackendField(rawName, displayName == null ? rawName : displayName, null, DataType.Double, "numeric", new List<VisualizationHint>(), schemaModel.OriginModels.First());
+                IDEAAttributeModel.AddBackendField(rawName, displayName == null ? rawName : displayName, null, DataType.Double, "numeric", new List<VisualizationHint>(), originModel);
             }
             CodeNameChangedEvent += updateName;
         }
@@ -102,7 +102,7 @@ namespace PanoramicDataWin8.model.data.operation
         }
         public IDEAAttributeModel GetAttributeModel()
         {
-            return IDEAAttributeModel.Function(_rawName, SchemaModel.OriginModels.First());
+            return IDEAAttributeModel.Function(_rawName, OriginModel);
         }
         public void SetCode(string code, DataType dataType)
         {

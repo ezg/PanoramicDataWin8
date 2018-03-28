@@ -24,14 +24,14 @@ namespace PanoramicDataWin8.model.data.operation
 
         private IResult _result;
 
-        private SchemaModel _schemaModel;
+        private OriginModel _originModel;
         public ObservableCollection<AttributeTransformationModel> AttributeTransformationModelParameters { get; } = new ObservableCollection<AttributeTransformationModel>();
 
         public abstract void Dispose();
 
-        public OperationModel(SchemaModel schemaModel)
+        public OperationModel(OriginModel originModel)
         {
-            _schemaModel = schemaModel;
+            _originModel = originModel;
 
             _id = _nextId++;
         }
@@ -54,10 +54,10 @@ namespace PanoramicDataWin8.model.data.operation
         }
         public virtual bool ResetFilterModelWhenInputLinksChange {  get { return true;  } }
 
-        public SchemaModel SchemaModel
+        public OriginModel OriginModel
         {
-            get { return _schemaModel; }
-            set { SetProperty(ref _schemaModel, value); }
+            get { return _originModel; }
+            set { SetProperty(ref _originModel, value); }
         }
 
         public bool isClone = false;

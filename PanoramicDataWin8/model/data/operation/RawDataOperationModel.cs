@@ -18,7 +18,7 @@ namespace PanoramicDataWin8.model.data.operation
     [JsonObject(MemberSerialization.OptOut)]
     public class RawDataOperationModel : BaseVisualizationOperationModel
     {
-        public RawDataOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        public RawDataOperationModel(OriginModel schemaModel) : base(schemaModel)
         {
             ColumnHeaderAttributeUsageModels.CollectionChanged += columnHeaderAttributeUsageModels_CollectionChanged;
 

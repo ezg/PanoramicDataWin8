@@ -12,7 +12,7 @@ namespace PanoramicDataWin8.model.data.operation
         private ModelId _modelId;
         private RiskControlType _riskControlType = RiskControlType.PCER;
 
-        public StatisticalComparisonDecisionOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        public StatisticalComparisonDecisionOperationModel(OriginModel schemaModel) : base(schemaModel)
         {
         }
 
@@ -54,7 +54,7 @@ namespace PanoramicDataWin8.model.data.operation
             new ObservableCollection<IStatisticallyComparableOperationModel>();
 
 
-        public StatisticalComparisonOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        public StatisticalComparisonOperationModel(OriginModel schemaModel) : base(schemaModel)
         {
             _statisticallyComparableOperationModels.CollectionChanged += _statisticallyComparableOperationModels_CollectionChanged;
         }

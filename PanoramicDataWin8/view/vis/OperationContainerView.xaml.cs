@@ -264,7 +264,14 @@ namespace PanoramicDataWin8.view.vis
                        _renderer = new PlotRenderer();
                     contentGrid.Children.Add(_renderer);
                 }
-            } else if(operationViewModel.OperationModel is RawDataOperationModel && !(oldRenderer is PlotRenderer))
+            }
+            else if (operationViewModel is GraphFilterViewModel && !(oldRenderer is GraphFilter))
+            {
+                clearOldRenderer();
+                _renderer = new GraphFilter();
+                contentGrid.Children.Add(_renderer);
+            }
+            else if(operationViewModel.OperationModel is RawDataOperationModel && !(oldRenderer is RawDataRenderer))
             {
                 clearOldRenderer();
                 _renderer = new RawDataRenderer();
@@ -282,7 +289,7 @@ namespace PanoramicDataWin8.view.vis
                 _renderer = new ExampleRenderer();
                 contentGrid.Children.Add(_renderer);
             }
-            else if (operationViewModel.OperationModel is FunctionOperationModel && !(oldRenderer is ExampleRenderer))
+            else if (operationViewModel.OperationModel is FunctionOperationModel && !(oldRenderer is FunctionRenderer))
             {
                 clearOldRenderer();
                 _renderer = new FunctionRenderer();
@@ -294,25 +301,31 @@ namespace PanoramicDataWin8.view.vis
                 _renderer = new AttributeRenderer();
                 contentGrid.Children.Add(_renderer);
             }
+            else if (operationViewModel.OperationModel is GraphOperationModel && !(oldRenderer is GraphRenderer))
+            {
+                clearOldRenderer();
+                _renderer = new GraphRenderer();
+                contentGrid.Children.Add(_renderer);
+            }
             else if (operationViewModel.OperationModel is AttributeGroupOperationModel && !(oldRenderer is AttributeGroupRenderer))
             {
                 clearOldRenderer();
                 _renderer = new AttributeGroupRenderer();
                 contentGrid.Children.Add(_renderer);
             }
-            else if (operationViewModel.OperationModel is FilterOperationModel && !(oldRenderer is AttributeGroupRenderer))
+            else if (operationViewModel.OperationModel is FilterOperationModel && !(oldRenderer is FilterRenderer))
             {
                 clearOldRenderer();
                 _renderer = new FilterRenderer();
                 contentGrid.Children.Add(_renderer);
             }
-            else if (operationViewModel.OperationModel is DefinitionOperationModel && !(oldRenderer is AttributeGroupRenderer))
+            else if (operationViewModel.OperationModel is DefinitionOperationModel && !(oldRenderer is DefinitionRenderer))
             {
                 clearOldRenderer();
                 _renderer = new DefinitionRenderer();
                 contentGrid.Children.Add(_renderer);
             }
-            else if (operationViewModel.OperationModel is CalculationOperationModel && !(oldRenderer is AttributeGroupRenderer))
+            else if (operationViewModel.OperationModel is CalculationOperationModel && !(oldRenderer is CalculationRenderer))
             {
                 clearOldRenderer();
                 _renderer = new CalculationRenderer();

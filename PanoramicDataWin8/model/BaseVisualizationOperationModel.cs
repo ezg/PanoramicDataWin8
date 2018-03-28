@@ -26,7 +26,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         private VisualizationType _visualizationType;
 
-        public BaseVisualizationOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        public BaseVisualizationOperationModel(OriginModel schemaModel) : base(schemaModel)
         {
             _filterProviderOperationModelImpl = new FilterProviderOperationModelImpl(this);
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);

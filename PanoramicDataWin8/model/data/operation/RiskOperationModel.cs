@@ -26,7 +26,7 @@ namespace PanoramicDataWin8.model.data.operation
             RiskControlType.PsiSupport
         };
 
-        public RiskOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        public RiskOperationModel(OriginModel schemaModel) : base(schemaModel)
         {
         }
 
