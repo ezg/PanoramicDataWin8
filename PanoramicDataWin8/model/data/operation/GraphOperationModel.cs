@@ -18,7 +18,7 @@ namespace PanoramicDataWin8.model.data.operation
     {
         TinkerGrapĥ _g;
         public string InputGraphFile;
-        public GraphOperationModel(SchemaModel schemaModel, string inputGraphFile) : base(schemaModel)
+        public GraphOperationModel(OriginModel schemaModel, string inputGraphFile) : base(schemaModel)
         {
             InputGraphFile = inputGraphFile;
 

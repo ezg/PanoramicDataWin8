@@ -11,7 +11,7 @@ namespace PanoramicDataWin8.model.data.operation
         private readonly FilterProviderOperationModelImpl _filterProviderOperationModelImpl;
         private readonly FilterConsumerOperationModelImpl _filterConsumerOperationModelImpl;
 
-        public FilterOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        public FilterOperationModel(OriginModel schemaModel) : base(schemaModel)
         {
             _filterProviderOperationModelImpl = new FilterProviderOperationModelImpl(this);
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);

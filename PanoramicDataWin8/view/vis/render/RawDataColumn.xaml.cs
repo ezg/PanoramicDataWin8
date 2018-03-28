@@ -172,7 +172,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 if (codemodel != null)
                 {
-                    var func = IDEAAttributeModel.Function(AttributeModel.RawName, MainViewController.Instance.MainModel.SchemaModel.OriginModels.First());
+                    var func = IDEAAttributeModel.Function(AttributeModel.RawName, AttributeModel.OriginModel);
                     func.SetCode(codemodel.ComputeCode(AttributeModel.DataType), AttributeModel.DataType, false);
                 }
             }

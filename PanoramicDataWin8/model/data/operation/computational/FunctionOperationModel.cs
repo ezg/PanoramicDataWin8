@@ -22,7 +22,7 @@ namespace PanoramicDataWin8.model.data.operation
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
         }
 
-        public FunctionOperationModel(SchemaModel schemaModel, DataType outputType, string inputVisualizationType,
+        public FunctionOperationModel(OriginModel schemaModel, DataType outputType, string inputVisualizationType,
                     IEnumerable<string> attributeParameterGroups = null,
                     IEnumerable<Tuple<string, object>> valueParameters = null, string rawName = null, string displayName = null) :
         base(schemaModel, 
@@ -73,7 +73,7 @@ namespace PanoramicDataWin8.model.data.operation
     /// </summary>
     public class MinMaxScaleFunctionModel : FunctionOperationModel
     {
-        public MinMaxScaleFunctionModel(SchemaModel schemaModel) : base(
+        public MinMaxScaleFunctionModel(OriginModel schemaModel) : base(
             schemaModel,
             DataType.Double,
             InputVisualizationTypeConstants.NUMERIC,

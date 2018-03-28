@@ -86,10 +86,11 @@ namespace PanoramicDataWin8.controller.view
             if (_mainModel.IsDefaultHypothesisEnabled)
             {
                 var model = sender as HistogramOperationModel;
+                var originModel = model.OriginModel;
 
                 var filter = "";
                 var filterModels = new List<FilterModel>();
-                filter = FilterModel.GetFilterModelsRecursive(model, new List<IFilterProviderOperationModel>(), filterModels, true);
+                filter = FilterModel.GetFilterModelsRecursive(originModel, model, new List<IFilterProviderOperationModel>(), filterModels, true);
 
                 if (!filterModels.Any())
                 {
@@ -120,7 +121,7 @@ namespace PanoramicDataWin8.controller.view
                         bool add = false;
                         if (model.StatisticalComparisonOperationModel == null)
                         {
-                            statModel = new StatisticalComparisonOperationModel(model.SchemaModel);
+                            statModel = new StatisticalComparisonOperationModel(model.OriginModel);
                             var a1 = model.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
                             if (a1.AttributeModel.DataType == DataType.Float ||
                                 a1.AttributeModel.DataType == DataType.Double ||
@@ -141,7 +142,7 @@ namespace PanoramicDataWin8.controller.view
                         }
                         statModel.AddStatisticallyComparableOperationModel(
                             OperationViewModelFactory.CreateDefaultHistogramOperationViewModel(
-                                    model.SchemaModel,
+                                    model.OriginModel,
                                     model.GetAttributeUsageTransformationModel(AttributeUsage.X).First().AttributeModel, new Pt())
                                 .HistogramOperationModel);
                         statModel.AddStatisticallyComparableOperationModel(model);
@@ -227,6 +228,7 @@ namespace PanoramicDataWin8.controller.view
         private void StatisticalComparisonOperationModel_OperationModelUpdated(object sender, OperationModelUpdatedEventArgs e)
         {
             var model = (StatisticalComparisonOperationModel) sender;
+            var originModel = model.OriginModel;
             if (model.StatisticallyComparableOperationModels.Count == 2 && !(e is BrushOperationModelUpdatedEventArgs))
             {
                 model.ComparisonOrder = _nextComparisonOrder++;
@@ -234,12 +236,12 @@ namespace PanoramicDataWin8.controller.view
 
                 var filter = "";
                 var filterModels = new List<FilterModel>();
-                filter = FilterModel.GetFilterModelsRecursive(model.StatisticallyComparableOperationModels[0], new List<IFilterProviderOperationModel>(), filterModels, true);
+                filter = FilterModel.GetFilterModelsRecursive(originModel, model.StatisticallyComparableOperationModels[0], new List<IFilterProviderOperationModel>(), filterModels, true);
                 _modelToSaveViewModel[model].FilterDist0 = filter;
 
                 filter = "";
                 filterModels = new List<FilterModel>();
-                filter = FilterModel.GetFilterModelsRecursive(model.StatisticallyComparableOperationModels[1], new List<IFilterProviderOperationModel>(), filterModels, true);
+                filter = FilterModel.GetFilterModelsRecursive(originModel, model.StatisticallyComparableOperationModels[1], new List<IFilterProviderOperationModel>(), filterModels, true);
                 _modelToSaveViewModel[model].FilterDist1 = filter;
 
                 model.ExecutionId += 1;
@@ -301,7 +303,7 @@ namespace PanoramicDataWin8.controller.view
 
                 if (_statisticalComparisonDecisionOperationModel == null)
                 {
-                    _statisticalComparisonDecisionOperationModel = new StatisticalComparisonDecisionOperationModel(_riskOperationModel.SchemaModel);
+                    _statisticalComparisonDecisionOperationModel = new StatisticalComparisonDecisionOperationModel(_riskOperationModel.OriginModel);
 
                     _statisticalComparisonDecisionOperationModel.PropertyChanged += StatisticalComparisonDecisionOperationModel_PropertyChanged;
                 }

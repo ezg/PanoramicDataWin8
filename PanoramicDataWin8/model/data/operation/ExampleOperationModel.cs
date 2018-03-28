@@ -12,7 +12,7 @@ namespace PanoramicDataWin8.model.data.operation
 
         private ExampleOperationType _exampleOperationType = ExampleOperationType.A;
 
-        public ExampleOperationModel(SchemaModel schemaModel) : base(schemaModel)
+        public ExampleOperationModel(OriginModel schemaModel) : base(schemaModel)
         {
             _filterConsumerOperationModelImpl = new FilterConsumerOperationModelImpl(this);
             AttributeTransformationModelParameters.CollectionChanged += _attributeUsageTransformationModels_CollectionChanged;

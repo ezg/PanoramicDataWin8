@@ -13,6 +13,7 @@ using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.vis.menu;
 using Windows.UI.Xaml;
 using PanoramicDataWin8.model.data.operation.computational;
+using PanoramicDataWin8.model.data.idea;
 
 namespace PanoramicDataWin8.model.view.operation
 {
@@ -25,7 +26,7 @@ namespace PanoramicDataWin8.model.view.operation
                 var oldOperationViewModel = histogramOperationViewModel;
                 var oldOperationModel = histogramOperationViewModel.HistogramOperationModel;
                 var attributeModel = histogramOperationViewModel.HistogramOperationModel.AttributeUsageTransformationModels[AttributeUsage.X].First().AttributeModel;
-                var newHistogramOperationViewModel = CreateDefaultHistogramOperationViewModel(operationViewModel.OperationModel.SchemaModel,
+                var newHistogramOperationViewModel = CreateDefaultHistogramOperationViewModel(operationViewModel.OperationModel.OriginModel,
                     attributeModel, operationViewModel.Position);
                 var newOperationModel = (HistogramOperationModel) newHistogramOperationViewModel.OperationModel;
                 newOperationModel.VisualizationType = VisualizationType.plot;
@@ -44,7 +45,7 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 var oldOperationViewModel        = rawDataOperationViewModel;
                 var oldOperationModel            = rawDataOperationViewModel.RawDataOperationModel;
-                var newRawDataOperationViewModel = CreateDefaultRawDataOperationViewModel(operationViewModel.OperationModel.SchemaModel, operationViewModel.Position);
+                var newRawDataOperationViewModel = CreateDefaultRawDataOperationViewModel(operationViewModel.OperationModel.OriginModel, operationViewModel.Position);
                 var newOperationModel            = (RawDataOperationModel)newRawDataOperationViewModel.OperationModel;
                 newOperationModel.VisualizationType = VisualizationType.plot;
 
@@ -61,7 +62,7 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 var oldOperationViewModel = graphOperationViewModel;
                 var oldOperationModel = graphOperationViewModel.GraphOperationModel;
-                var newGraphOperationViewModel = CreateDefaultGraphOperationViewModel(operationViewModel.OperationModel.SchemaModel, operationViewModel.Position);
+                var newGraphOperationViewModel = CreateDefaultGraphOperationViewModel(operationViewModel.OperationModel.OriginModel, operationViewModel.Position);
                 var newOperationModel = newGraphOperationViewModel.OperationModel;
                 
                 newGraphOperationViewModel.Size = operationViewModel.Size;
@@ -72,7 +73,7 @@ namespace PanoramicDataWin8.model.view.operation
                 var oldOperationViewModel = filterOperationViewModel;
                 var oldOperationModel = oldOperationViewModel.FilterOperationModel;
 
-                var newFilterOperationViewModel = CreateDefaultFilterOperationViewModel(operationViewModel.OperationModel.SchemaModel,
+                var newFilterOperationViewModel = CreateDefaultFilterOperationViewModel(operationViewModel.OperationModel.OriginModel,
                     operationViewModel.Position, controller.view.MainViewController.Instance.MainPage.LastTouchWasMouse);
                 var newOperationModel = (FilterOperationModel)newFilterOperationViewModel.OperationModel;
                 foreach (var fm in oldOperationModel.FilterModels)
@@ -83,47 +84,47 @@ namespace PanoramicDataWin8.model.view.operation
             return null;
         }
 
-        public static GraphOperationViewModel CreateDefaultGraphOperationViewModel(SchemaModel schemaModel, Pt position)
+        public static GraphOperationViewModel CreateDefaultGraphOperationViewModel(OriginModel schemaModel, Pt position)
         {
             return new GraphOperationViewModel(new GraphOperationModel(schemaModel, null)) { Position = position };
         }
 
-        public static RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(SchemaModel schemaModel, Pt position)
+        public static RawDataOperationViewModel CreateDefaultRawDataOperationViewModel(OriginModel schemaModel, Pt position)
         {
             return new RawDataOperationViewModel(new RawDataOperationModel(schemaModel), null) { Position = position };
         }
 
-        public static HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(SchemaModel schemaModel, AttributeModel attributeModel, Pt position)
+        public static HistogramOperationViewModel CreateDefaultHistogramOperationViewModel(OriginModel schemaModel, AttributeModel attributeModel, Pt position)
         {
             return new HistogramOperationViewModel(new HistogramOperationModel(schemaModel), attributeModel) { Position = position };
         }
 
-        public static ExampleOperationViewModel CreateDefaultExampleOperationViewModel(SchemaModel schemaModel, Pt position)
+        public static ExampleOperationViewModel CreateDefaultExampleOperationViewModel(OriginModel schemaModel, Pt position)
         {
             return new ExampleOperationViewModel(new ExampleOperationModel(schemaModel)) { Position = position };
         }
         static int predictorCount = 0;
-        public static PredictorOperationViewModel CreateDefaultPredictorOperationViewModel(SchemaModel schemaModel, Pt position)
+        public static PredictorOperationViewModel CreateDefaultPredictorOperationViewModel(OriginModel schemaModel, Pt position)
         {
             return new PredictorOperationViewModel(new PredictorOperationModel(schemaModel, "P"+(predictorCount++)+"()")) { Position = position };
         }
         static int groupCount = 0;
-        public static AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(SchemaModel schemaModel, Pt position, AttributeModel groupModel=null)
+        public static AttributeGroupOperationViewModel CreateDefaultAttributeGroupOperationViewModel(OriginModel schemaModel, Pt position, AttributeModel groupModel=null)
         {
             return new AttributeGroupOperationViewModel(
                 new AttributeGroupOperationModel(schemaModel, "G" + (groupCount++) + "()", groupModel), groupModel == null) { Position = position };
         }
-        public static GraphOperationViewModel CreateDefaultGraphOperationViewModel(SchemaModel schemaModel, Pt position, GraphOperationModel graphModel)
+        public static GraphOperationViewModel CreateDefaultGraphOperationViewModel(OriginModel schemaModel, Pt position, GraphOperationModel graphModel)
         {
             return new GraphOperationViewModel( graphModel) { Position = position };
         }
         static int attrCount = 0;
-        public static AttributeOperationViewModel CreateDefaultAttributeOperationViewModel(SchemaModel schemaModel, Pt position)
+        public static AttributeOperationViewModel CreateDefaultAttributeOperationViewModel(OriginModel schemaModel, Pt position)
         {
             return new AttributeOperationViewModel(new AttributeOperationModel(schemaModel, "A" + (attrCount++))) { Position = position };
         }
         static int funcCount = 0;
-        public static FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(SchemaModel schemaModel, Pt position, FunctionOperationModel genericFunctionModel, bool fromMouse = false)
+        public static FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(OriginModel schemaModel, Pt position, FunctionOperationModel genericFunctionModel, bool fromMouse = false)
         {
             return new FunctionOperationViewModel(new FunctionOperationModel(schemaModel,
                 genericFunctionModel.GetAttributeModel().DataType, genericFunctionModel.GetAttributeModel().InputVisualizationType,
@@ -133,21 +134,21 @@ namespace PanoramicDataWin8.model.view.operation
                 genericFunctionModel.GetAttributeModel().RawName), fromMouse) { Position = position }; ;
         }
         static int calcCount = 0;
-        public static CalculationOperationViewModel CreateDefaultCalculationOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse = false)
+        public static CalculationOperationViewModel CreateDefaultCalculationOperationViewModel(OriginModel schemaModel, Pt position, bool fromMouse = false)
         {
             return new CalculationOperationViewModel(new CalculationOperationModel(schemaModel, "Calc" + (calcCount++) + "()"), fromMouse) { Position = position };
         }
 
         static int defCount = 0;
-        public static DefinitionOperationViewModel CreateDefaultDefinitionOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse=false)
+        public static DefinitionOperationViewModel CreateDefaultDefinitionOperationViewModel(OriginModel schemaModel, Pt position, bool fromMouse=false)
         {
             return new DefinitionOperationViewModel(new DefinitionOperationModel(schemaModel, "Def" + (defCount++) + "()"), fromMouse) { Position = position };
         }
-        public static FilterOperationViewModel CreateDefaultFilterOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse)
+        public static FilterOperationViewModel CreateDefaultFilterOperationViewModel(OriginModel schemaModel, Pt position, bool fromMouse)
         {
             return new FilterOperationViewModel(new FilterOperationModel(schemaModel), fromMouse) { Position = position };
         }
-        public static GraphFilterViewModel CreateDefaultGraphFilterOperationViewModel(SchemaModel schemaModel, Pt position, bool fromMouse)
+        public static GraphFilterViewModel CreateDefaultGraphFilterOperationViewModel(OriginModel schemaModel, Pt position, bool fromMouse)
         {
             return new GraphFilterViewModel(new GraphFilterOperationModel(schemaModel)) { Position = position };
         }

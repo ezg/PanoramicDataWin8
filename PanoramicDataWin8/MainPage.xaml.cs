@@ -216,8 +216,8 @@ namespace PanoramicDataWin8
                 }
                 else if (e.Key == VirtualKey.T)
                 {
-                    var q1 = new HistogramOperationModel(MainViewController.Instance.MainModel.SchemaModel);
-                    var q2 = new HistogramOperationModel(MainViewController.Instance.MainModel.SchemaModel);
+                    var q1 = new HistogramOperationModel(MainViewController.Instance.MainModel.SchemaModel.OriginModels.First());
+                    var q2 = new HistogramOperationModel(MainViewController.Instance.MainModel.SchemaModel.OriginModels.First());
                     q1.FilterModels.Add(new FilterModel());
                     var lm = new FilterLinkModel();
                     lm.FromOperationModel = q1;
@@ -784,8 +784,7 @@ namespace PanoramicDataWin8
             else if ((_attributeMenu == null) && (mainModel.SchemaModel != null))
             {
                 var buttonBounds = addAttributeButton.GetBounds(this);
-                var inputModels =
-                    mainModel.SchemaModel.OriginModels.First()
+                var inputModels = mainModel.SchemaModel.OriginModels.First()
                         .InputModels.Where(am => am.IsDisplayed) /*.OrderBy(am => am.RawName)*/;
                 var groupModels = MainViewController.Instance.OperationViewModels.Select((opv) => 
                             opv.OperationModel as AttributeGroupOperationModel);
@@ -835,7 +834,7 @@ namespace PanoramicDataWin8
                         count++;
                     }
 
-                    count = SETUP_GRAPH_TEST_MENU_ITEMS(parentModel, count);
+                    //count = SETUP_GRAPH_TEST_MENU_ITEMS(parentModel, count);
                 }
                 foreach (var inputModel in inputModels)
                 {
@@ -901,7 +900,7 @@ namespace PanoramicDataWin8
             count++;
 
             {
-                var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "G1", GraphType = new GraphOperationModel((DataContext as MainModel).SchemaModel, "Assets/G1.gml"), OperationType = OperationType.Graph }, graphsMenuModel);
+                var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "G1", GraphType = new GraphOperationModel((DataContext as MainModel).SchemaModel.OriginModels.First(), "Assets/G1.gml"), OperationType = OperationType.Graph }, graphsMenuModel);
                 tileMenuItemViewModel.Row = 0;
                 tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
                                                (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;
@@ -909,7 +908,7 @@ namespace PanoramicDataWin8
                 tileMenuItemViewModel.ColumnSpan = 1;
             }
             {
-                var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "G2", GraphType = new GraphOperationModel((DataContext as MainModel).SchemaModel, "Assets/G2.gml"), OperationType = OperationType.Graph }, graphsMenuModel);
+                var tileMenuItemViewModel = recursiveCreateTileMenu(new OperationTypeModel { Name = "G2", GraphType = new GraphOperationModel((DataContext as MainModel).SchemaModel.OriginModels.First(), "Assets/G2.gml"), OperationType = OperationType.Graph }, graphsMenuModel);
                 tileMenuItemViewModel.Row = 1;
                 tileMenuItemViewModel.Column = parentModel.ChildrenNrColumns -
                                                (int)Math.Floor((parentModel.Children.Count - 1) / 10.0) - 1;

@@ -8,7 +8,7 @@ namespace PanoramicDataWin8.model.data.operation
 {
     public class GraphFilterOperationModel :  OperationModel
     {
-        public GraphFilterOperationModel(SchemaModel schemaModel) : base(schemaModel) { }
+        public GraphFilterOperationModel(OriginModel schemaModel) : base(schemaModel) { }
 
         public GraphOperationModel TargetGraphOperationModel;
 

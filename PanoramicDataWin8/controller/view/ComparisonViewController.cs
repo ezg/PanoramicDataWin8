@@ -79,7 +79,7 @@ namespace PanoramicDataWin8.controller.view
                             if (!StatisticalComparisonViews.Keys.Any(sov => sov.OperationViewModels.Contains(current) && sov.OperationViewModels.Contains(other)))
                             {
                                 var comparisonOperationViewModel = new StatisticalComparisonOperationViewModel(
-                                    new StatisticalComparisonOperationModel(current.OperationModel.SchemaModel));
+                                    new StatisticalComparisonOperationModel(current.OperationModel.OriginModel));
                                 
                                 comparisonOperationViewModel.OperationViewModels.Add(other);
                                 comparisonOperationViewModel.OperationViewModels.Add(current);
