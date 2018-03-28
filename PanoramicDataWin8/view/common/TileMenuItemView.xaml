@@ -16,5 +16,8 @@
         <Grid Background="Beige">
             <TextBlock Text="{Binding TileMenuContentViewModel.Name}" Foreground="Black" CacheMode="BitmapCache"></TextBlock>
         </Grid>
+        <ToolTipService.ToolTip>
+            <TextBlock Text="{Binding TileMenuContentViewModel.Name}"/>
+        </ToolTipService.ToolTip>
     </Grid>
 </UserControl>

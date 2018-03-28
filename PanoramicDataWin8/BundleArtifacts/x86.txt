@@ -1,1 +1,1 @@
-MainPackage=C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\bin\x86\Debug\PanoramicDataWin8_1.0.49.0_x86_Debug.appx
+MainPackage=C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\bin\x86\Debug\PanoramicDataWin8_1.0.53.0_x86_Debug.appx

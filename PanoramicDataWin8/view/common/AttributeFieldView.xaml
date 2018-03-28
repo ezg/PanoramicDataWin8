@@ -33,6 +33,9 @@
                 </transform:LayoutTransformControl>
             </Viewbox>
         </Border>
+        <ToolTipService.ToolTip>
+            <TextBlock Name="toolTipText"/>
+        </ToolTipService.ToolTip>
     </Grid>
 </UserControl>
 
