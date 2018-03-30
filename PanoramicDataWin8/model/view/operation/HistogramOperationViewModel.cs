@@ -250,17 +250,12 @@ namespace PanoramicDataWin8.model.view.operation
 
             void AssignTransformationModel(AttributeTransformationModel newModel, AttributeTransformationModel oldModel, AttributeUsage axis)
             {
-                if (oldModel != null)
-                {
-                    HistogramOperationModel.RemoveAttributeUsageTransformationModel(axis, oldModel);
-                    oldModel.PropertyChanged -= AttributeTransformationModel_PropertyChanged;
-                    oldModel.AttributeModel.PropertyChanged -= AttributeModel_PropertyChanged;
-                }
                 if (newModel.AttributeModel.OriginModel != this.HistogramOperationModel.OriginModel)
                 {
                     var n1 = newModel.AttributeModel.OriginModel.Name;
                     var n2 = HistogramOperationModel.OriginModel.Name;
                     var configs = MainViewController.Instance.MainModel.DatasetConfigurations;
+                    bool found = false;
                     foreach (var om in configs)
                     {
                         if (om.Schema.RawName.Contains(n1) && om.Schema.RawName.Contains(n2))
@@ -268,8 +263,11 @@ namespace PanoramicDataWin8.model.view.operation
                             var iom = new IDEAOriginModel(om);
                             iom.LoadInputFields();
                             this.HistogramOperationModel.OriginModel =iom;
+                            found = true;
                         }
                     }
+                    if (!found)
+                        return;
                     //var otherModel = HistogramOperationModel.AttributeTransformationModels.FirstOrDefault();
                     //if (otherModel != null) {
                     //    foreach (var att in HistogramOperationModel.OriginModel.InputModels)
@@ -278,6 +276,12 @@ namespace PanoramicDataWin8.model.view.operation
                     //            newModel = new AttributeTransformationModel(att);
                     //        }
                     //}
+                }
+                if (oldModel != null)
+                {
+                    HistogramOperationModel.RemoveAttributeUsageTransformationModel(axis, oldModel);
+                    oldModel.PropertyChanged -= AttributeTransformationModel_PropertyChanged;
+                    oldModel.AttributeModel.PropertyChanged -= AttributeModel_PropertyChanged;
                 }
                 if (attributeTransformationModel != null && !HistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
                 {
