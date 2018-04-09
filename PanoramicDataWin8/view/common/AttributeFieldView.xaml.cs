@@ -111,6 +111,7 @@ namespace PanoramicDataWin8.view.common
                 txtBlock.MaxWidth = model.Size.Y;
             }
 
+            toolTipText.Text = model.MainLabel;
             toggleHighlighted(model.IsHighlighted);
 
         }

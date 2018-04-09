@@ -1,4 +1,4 @@
-MainPackage=C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\bin\x64\Debug\PanoramicDataWin8_1.0.52.0_x64_Debug.appx
-ResourcePack=C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\bin\x64\Debug\PanoramicDataWin8_1.0.52.0_scale-125.appx
-ResourcePack=C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\bin\x64\Debug\PanoramicDataWin8_1.0.52.0_scale-200.appx
-ResourcePack=C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\bin\x64\Debug\PanoramicDataWin8_1.0.52.0_scale-400.appx
+MainPackage=C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\bin\x64\Debug\PanoramicDataWin8_1.0.53.0_x64_Debug.appx
+ResourcePack=C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\bin\x64\Debug\PanoramicDataWin8_1.0.53.0_scale-125.appx
+ResourcePack=C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\bin\x64\Debug\PanoramicDataWin8_1.0.53.0_scale-200.appx
+ResourcePack=C:\ez_projects\PanoramicDataWin8\PanoramicDataWin8\bin\x64\Debug\PanoramicDataWin8_1.0.53.0_scale-400.appx
