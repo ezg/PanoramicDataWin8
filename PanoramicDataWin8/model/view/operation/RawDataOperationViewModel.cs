@@ -91,8 +91,7 @@ namespace PanoramicDataWin8.model.view.operation
                     t.OtherToggles.AddRange(toggles.Where(ti => ti != null && ti != t));
                 
                 menuViewModel.MenuItemViewModels.Insert(1, createColumnOptionToggleMenuItem(attributeMenuItemViewModel, 1, attributeTransformationModel, "group by", orientation, attributeTransformationModel.GroupBy));
-                //if (!computeAsHistogram)
-                    menuViewModel.MenuItemViewModels.Insert(1, createColumnOptionToggleMenuItem(attributeMenuItemViewModel, 2, attributeTransformationModel, "sort", orientation, attributeTransformationModel.OrderingFunction != OrderingFunction.None));
+                menuViewModel.MenuItemViewModels.Insert(1, createColumnOptionToggleMenuItem(attributeMenuItemViewModel, 2, attributeTransformationModel, "sort",     orientation, attributeTransformationModel.OrderingFunction != OrderingFunction.None));
             }
         }
 
@@ -115,6 +114,25 @@ namespace PanoramicDataWin8.model.view.operation
                 }
             };
 
+
+            void Atm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName == nameof(AttributeTransformationModel.AggregateFunction))
+                {
+                    if ((toggleMenuItem.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).Label == atm.OrderingFunction.ToString())
+                        if ((toggleMenuItem.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).IsChecked == false)
+                            (toggleMenuItem.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).IsChecked = true;
+                }
+                if (e.PropertyName == nameof(AttributeTransformationModel.GroupBy))
+                {
+                    if (atm.GroupBy)
+                        if ((toggleMenuItem.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).IsChecked == true)
+                            (toggleMenuItem.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel).IsChecked = false;
+                }
+            }
+
+            atm.PropertyChanged += Atm_PropertyChanged;
+
             toggleMenuItem.MenuItemComponentViewModel.PropertyChanged += (sender, args) =>
             {
                 var model = sender as ToggleMenuItemComponentViewModel;
@@ -126,6 +144,7 @@ namespace PanoramicDataWin8.model.view.operation
                     {
                         atm.GroupBy = model.IsChecked;
                         atm.AggregateFunction = AggregateFunction.None;
+                        if (!model.IsChecked) SelectedDataAttribute = null;
                     }
                     else if (function == "sort")
                     {
@@ -151,6 +170,11 @@ namespace PanoramicDataWin8.model.view.operation
                     }
                     else if (model.IsChecked)
                     {
+                        if (atm.GroupBy && model.IsChecked)
+                        {
+                            model.IsChecked = false;
+                            return;
+                        }
                         var newAgg = function == AggregateFunction.Sum.ToString() ? AggregateFunction.Sum :
                                      function == AggregateFunction.Avg.ToString() ? AggregateFunction.Avg :
                                      function == AggregateFunction.Min.ToString() ? AggregateFunction.Min :
@@ -182,6 +206,7 @@ namespace PanoramicDataWin8.model.view.operation
                         //System.Diagnostics.Debug.WriteLine("Clear Selected Column = " + SelectedColumn);
                         if (tapTrigger)
                             attributeMenuItemViewModel.TappedTriggered(new PointerManagerEvent());
+                        this.RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs() { });
                     }
                 }
             };
