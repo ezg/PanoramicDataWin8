@@ -28,15 +28,21 @@ namespace PanoramicDataWin8.view.vis.menu
             this.PointerPressed += ToggleMenuItemView_PointerPressed;
         }
 
+
         void ToggleMenuItemView_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             var model = ((DataContext as MenuItemViewModel).MenuItemComponentViewModel as ToggleMenuItemComponentViewModel);
             if (model.IsChecked)
             {
-                model.IsChecked = false;
+                if (model.TriState)
+                    model.TriStateCount = (model.TriStateCount + 1) % 3;
+                if (model.CanToggleOff && (model.TriStateCount == 0 || !model.TriState))
+                    model.IsChecked = false;
             }
             else
             {
+                if (model.TriState)
+                    model.TriStateCount = 1;
                 model.IsChecked = true;
             }
             e.Handled = true;

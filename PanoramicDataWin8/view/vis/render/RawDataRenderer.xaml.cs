@@ -408,7 +408,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
         }
 
-        void render(RawDataOperationModel.FunctionApplied function = null) 
+        void render() 
         {
             var model = (DataContext as RawDataOperationViewModel);
             configureLayout(true, model.RawDataOperationModel.AttributeTransformationModelParameters[0].AttributeModel.VisualizationHints.FirstOrDefault() == IDEA_common.catalog.VisualizationHint.Image);

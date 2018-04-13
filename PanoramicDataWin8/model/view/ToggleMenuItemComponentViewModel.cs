@@ -6,6 +6,10 @@ namespace PanoramicDataWin8.model.view
     {
         private bool _isChecked;
         private bool _isVisible = true;
+        private bool _canToggleOff = true;
+
+        public bool TriState = false;
+        public int _triStateCount = 0;
 
         private string _label = "";
 
@@ -15,6 +19,16 @@ namespace PanoramicDataWin8.model.view
         {
             get { return _isChecked; }
             set { SetProperty(ref _isChecked, value); }
+        }
+        public int TriStateCount
+        {
+            get { return _triStateCount; }
+            set { SetProperty(ref _triStateCount, value); }
+        }
+        public bool CanToggleOff
+        {
+            get { return _canToggleOff; }
+            set { SetProperty(ref _canToggleOff, value); }
         }
 
         public string Label

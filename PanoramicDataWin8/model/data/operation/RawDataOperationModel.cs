@@ -31,6 +31,29 @@ namespace PanoramicDataWin8.model.data.operation
             ResultCauserClone?.Dispose();
         }
 
+        public void SetOrderingFunction(AttributeTransformationModel atm, OrderingFunction orderingFunction)
+        {
+            atm.OrderingFunction = orderingFunction;
+            foreach (var a in AttributeTransformationModelParameters)
+                if (a != atm)
+                    a.OrderingFunction = OrderingFunction.None;
+        }
+
+        public bool SetAggregationForModel(AttributeTransformationModel atm, AggregateFunction newAgg)
+        {
+            if (atm.AggregateFunction == newAgg)
+                return false;
+            else
+            {
+                if (atm.GroupBy)
+                {
+                    atm.GroupBy = false;
+                }
+                atm.AggregateFunction = newAgg;
+            }
+            return true;
+        }
+
         private void TestForRefresh(object sender)
         {
             var attributeChanged = sender as IDEAAttributeModel;
@@ -53,18 +76,6 @@ namespace PanoramicDataWin8.model.data.operation
         private void columnHeaderAttributeUsageModels_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
-        }
-
-        public class FunctionApplied
-        {
-            public AggregateFunction Function;
-        }
-
-        FunctionApplied _function;
-        public FunctionApplied Function
-        {
-            get { return _function; }
-            set { SetProperty(ref _function, value); }
         }
     }
 }
