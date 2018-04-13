@@ -16,7 +16,7 @@ namespace PanoramicDataWin8.model.view.operation
     public class RawDataOperationViewModel : OperationViewModel
     {
         const string GroupBy = "group by";
-        const string Sort = "sort";
+        const string Sort    = "sort";
         MenuViewModel     menuViewModel;
         MenuItemViewModel menuItemViewModel;
         public RawDataOperationViewModel(RawDataOperationModel rawDataOperationModel, AttributeModel attributeModel) : base(rawDataOperationModel)
@@ -84,15 +84,13 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 bool computeAsHistogram = RawDataOperationModel.AttributeTransformationModelParameters.Where((atm) => atm.GroupBy).Any();
 
-                int count = 2 + (computeAsHistogram ? 0 : 1);
-                if (computeAsHistogram && !attributeTransformationModel.GroupBy)
-                    foreach (var aggregationFunction in attributeTransformationModel.AggregateFunctions)
-                        if (aggregationFunction != AggregateFunction.None)
-                        {
-                            menuViewModel.MenuItemViewModels.Add(createColumnOptionToggleMenuItem(attributeMenuItemViewModel, count++, attributeTransformationModel, aggregationFunction.ToString(), 
-                                                                 orientation, attributeTransformationModel.AggregateFunction == aggregationFunction));
-                        }
-                var toggles = menuViewModel.MenuItemViewModels.Select(i => i.MenuItemComponentViewModel as ToggleMenuItemComponentViewModel);
+                int count = 2;
+                foreach (var aggregationFunction in attributeTransformationModel.AggregateFunctions)
+                    if (aggregationFunction != AggregateFunction.None)
+                    {
+                        menuViewModel.MenuItemViewModels.Add(createColumnOptionToggleMenuItem(attributeMenuItemViewModel, count++, attributeTransformationModel, aggregationFunction.ToString(), 
+                                                                orientation, attributeTransformationModel.AggregateFunction == aggregationFunction));
+                    }
                 
                 menuViewModel.MenuItemViewModels.Insert(1, createColumnOptionToggleMenuItem(attributeMenuItemViewModel, 1, attributeTransformationModel, GroupBy, orientation, attributeTransformationModel.GroupBy));
                 menuViewModel.MenuItemViewModels.Insert(1, createColumnOptionToggleMenuItem(attributeMenuItemViewModel, 2, attributeTransformationModel, Sort,     orientation, attributeTransformationModel.OrderingFunction != OrderingFunction.None));
@@ -101,40 +99,41 @@ namespace PanoramicDataWin8.model.view.operation
 
         public class AttributeToggleMenuItemComponentViewModel : ToggleMenuItemComponentViewModel
         {
-            private AttributeTransformationModel _atm;
+            AttributeTransformationModel _atm;
             // when the AggregateFunction or GroupBy parameters of a AttributeTransformationModel have changed,
             // we need to make sure that the appropriate menu items are toggled on/off.
             void Atm_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
             {
-                if (e.PropertyName == nameof(AttributeTransformationModel.AggregateFunction))
+                switch (e.PropertyName)
                 {
-                    if (this.Label == _atm.AggregateFunction.ToString())
-                    {
-                        if (this.IsChecked == false)
-                            this.IsChecked = true;
-                    }
-                    else if (this.Label != GroupBy)
-                        if (this.IsChecked == true)
-                            this.IsChecked = false;
-                }
-                if (e.PropertyName == nameof(OrderingFunction))
-                {
-                    if (this.Label == Sort)
-                    {
-                        if (_atm.OrderingFunction != OrderingFunction.None)
+                    case nameof(AttributeTransformationModel.AggregateFunction):
+                        if (Label == _atm.AggregateFunction.ToString())
                         {
-                            if (this.IsChecked == false)
-                                this.IsChecked = true;
+                            if (!IsChecked)
+                                IsChecked = true;
                         }
-                        else if (this.IsChecked == true)
-                            this.IsChecked = false;
-                    }
-                }
-                if (e.PropertyName == nameof(AttributeTransformationModel.GroupBy))
-                {
-                    if (this.Label == GroupBy)
-                        if (this.IsChecked != _atm.GroupBy)
-                            this.IsChecked = _atm.GroupBy;
+                        else if (Label != GroupBy)
+                        {
+                            if (IsChecked)
+                                IsChecked = false;
+                        }
+                        break;
+                    case nameof(OrderingFunction):
+                        if (Label == Sort)
+                        {
+                            if (_atm.OrderingFunction != OrderingFunction.None)
+                            {
+                                if (!IsChecked)
+                                    IsChecked = true;
+                            }
+                            else if (IsChecked)
+                                IsChecked = false;
+                        }
+                        break;
+                    case nameof(AttributeTransformationModel.GroupBy):
+                        if (Label == GroupBy && IsChecked != _atm.GroupBy)
+                            IsChecked = _atm.GroupBy;
+                        break;
                 }
             }
             public void Dispose()
@@ -173,42 +172,40 @@ namespace PanoramicDataWin8.model.view.operation
             {
                 var model = sender as ToggleMenuItemComponentViewModel;
                 bool fire = true;
-                if (args.PropertyName == model.GetPropertyName(() => model.TriStateCount))
-                {
-                    if (function == Sort)
-                    {
-                        RawDataOperationModel.SetOrderingFunction(atm,
-                            model.TriStateCount == 0 ? OrderingFunction.None : model.TriStateCount == 1 ? OrderingFunction.SortDown : OrderingFunction.SortUp);
-                        AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
-                        this.RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs() { });
-                    }
-                }
-                if (args.PropertyName == model.GetPropertyName(() => model.IsChecked))
-                {
-                    if (function == GroupBy)
-                    {
-                        atm.AggregateFunction = AggregateFunction.None;
-                        atm.GroupBy = model.IsChecked;
-                        if (!model.IsChecked)
-                            SelectedDataAttribute = null;
-                    }
-                    else if (model.IsChecked)
-                    {
-                        var newAgg = function == AggregateFunction.Sum.ToString() ? AggregateFunction.Sum :
-                                     function == AggregateFunction.Avg.ToString() ? AggregateFunction.Avg :
-                                     function == AggregateFunction.Min.ToString() ? AggregateFunction.Min :
-                                     function == AggregateFunction.Max.ToString() ? AggregateFunction.Max :
-                                     function == AggregateFunction.Count.ToString() ? AggregateFunction.Count : atm.AggregateFunction;
-                        fire = RawDataOperationModel.SetAggregationForModel(atm, newAgg);
-                    }
-                    else
-                        fire = false;
 
-                    if (fire)
-                    {
-                        AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
-                        this.RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs() { });
-                    }
+                switch (args.PropertyName)
+                {
+                    case nameof(ToggleMenuItemComponentViewModel.TriStateCount):
+                        if (function == Sort)
+                        {
+                            RawDataOperationModel.SetOrderingFunction(atm,
+                                model.TriStateCount == 0 ? OrderingFunction.None : model.TriStateCount == 1 ? OrderingFunction.SortDown : OrderingFunction.SortUp);
+                        }
+                        break;
+                    case nameof(ToggleMenuItemComponentViewModel.IsChecked):
+                        if (function == GroupBy)
+                        {
+                            RawDataOperationModel.SetGrouping(atm, model.IsChecked);
+                            if (!model.IsChecked)
+                                SelectedDataAttribute = null;
+                        }
+                        else if (model.IsChecked)
+                        {
+                            AggregateFunction newAgg;
+                            if (Enum.TryParse<AggregateFunction>(function, out newAgg))
+                            {
+                                fire = RawDataOperationModel.SetAggregationForModel(atm, newAgg);
+                            }
+                        }
+                        else
+                            fire = false;
+                        break;
+                }
+
+                if (fire)
+                {
+                    AttachementViewModels.First(atvm => atvm.AttachmentOrientation == AttachmentOrientation.TopStacked).StartDisplayActivationStopwatch();
+                    this.RawDataOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs() { });
                 }
             };
             return toggleMenuItem;

@@ -87,7 +87,7 @@ namespace PanoramicDataWin8.view.vis.render
                 {
                     var tb = r as TextBlock;
                     var col = tb.GetFirstAncestorOfType<RawDataColumn>()?.DataColumnModel.AttributeTranformationModel ??
-                              model.RawDataOperationModel.AttributeTransformationModelParameters.First();
+                              model.RawDataOperationModel.AttributeTransformationModelParameters.FirstOrDefault();
                     if (tb.Tag != null)
                     {
                         model.RawDataOperationModel.RemoveFilterModel(tb.Tag as FilterModel);
@@ -95,7 +95,7 @@ namespace PanoramicDataWin8.view.vis.render
                         tb.FontWeight = Windows.UI.Text.FontWeights.Normal;
                         tb.Tag = null;
                     }
-                    else
+                    else if (col != null)
                     {
                         tb.FontStyle = Windows.UI.Text.FontStyle.Italic;
                         tb.FontWeight = Windows.UI.Text.FontWeights.ExtraBold;

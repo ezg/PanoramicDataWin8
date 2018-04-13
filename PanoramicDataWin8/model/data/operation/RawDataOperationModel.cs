@@ -30,7 +30,11 @@ namespace PanoramicDataWin8.model.data.operation
             IDEAAttributeModel.CodeDefinitionChangedEvent -= TestForRefresh;
             ResultCauserClone?.Dispose();
         }
-
+        public void SetGrouping(AttributeTransformationModel atm, bool on)
+        {
+            atm.AggregateFunction = AggregateFunction.None;
+            atm.GroupBy = on;
+        }
         public void SetOrderingFunction(AttributeTransformationModel atm, OrderingFunction orderingFunction)
         {
             atm.OrderingFunction = orderingFunction;
