@@ -252,6 +252,17 @@
     <Compile Include="view\common\HelpDialog.xaml.cs">
       <DependentUpon>HelpDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="view\graphSharp\DoubleToIntegerConverter.cs" />
+    <Compile Include="view\graphSharp\PocEdge.cs" />
+    <Compile Include="view\graphSharp\PocGraph.cs" />
+    <Compile Include="view\graphSharp\PocGraphDataTemplates.cs" />
+    <Compile Include="view\graphSharp\PocGraphView.cs" />
+    <Compile Include="view\graphSharp\PocGraphViewModel.cs" />
+    <Compile Include="view\graphSharp\PocVertex.cs" />
+    <Compile Include="view\graphSharp\PocVertexToLayoutModeConverter.cs" />
+    <Compile Include="view\graphSharp\PocVertexView.xaml.cs">
+      <DependentUpon>PocVertexView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="view\inq\FilterGesture.cs" />
     <Compile Include="view\vis\HypothesisView.xaml.cs">
       <DependentUpon>HypothesisView.xaml</DependentUpon>
@@ -514,6 +525,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="view\graphSharp\PocGraphDataTemplates.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="view\graphSharp\PocVertexView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="view\vis\HypothesisView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -729,7 +748,20 @@
       <Project>{7355fa95-4259-465b-8c8d-26deed418788}</Project>
       <Name>Blueprints</Name>
     </ProjectReference>
+    <ProjectReference Include="utils\GraphSharpUWP\GraphSharp.ControlsCore\GraphSharp.ControlsCore.csproj">
+      <Project>{67192dd8-f8af-483a-b257-67f7456e8ad1}</Project>
+      <Name>GraphSharp.ControlsCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="utils\GraphSharpUWP\GraphSharpCore\GraphSharpCore.csproj">
+      <Project>{b7e3ebae-248c-4804-a009-6278ca9863c7}</Project>
+      <Name>GraphSharpCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="utils\GraphSharpUWP\QuickGraph\QuickGraphCore.csproj">
+      <Project>{e74e4623-4f23-44bf-921e-e4080cf52ce0}</Project>
+      <Name>QuickGraphCore</Name>
+    </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>

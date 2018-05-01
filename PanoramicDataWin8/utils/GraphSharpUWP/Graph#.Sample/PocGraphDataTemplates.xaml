@@ -1,0 +1,66 @@
+﻿<ResourceDictionary
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="using:GraphSharp.Sample" 
+	xmlns:local2="using:GraphSharpSampleCore" 
+	xmlns:GraphSharp_Controls="using:GraphSharp.Controls"
+    x:Class="GraphSharp.Controls.PocGraphDataTemplates">
+
+    <SolidColorBrush x:Key="HighlightedVertexBorderBrush" Color="Transparent" />
+	<SolidColorBrush x:Key="HighlightedVertexBackgroundBrush" Color="Red" />
+    <SolidColorBrush x:Key="HighlightedVertexForegroundBrush" Color="Black" />
+	<SolidColorBrush x:Key="SemiHighlightedSourceVertexBorderBrush" Color="Transparent" />
+	<SolidColorBrush x:Key="SemiHighlightedSourceVertexBackgroundBrush" Color="#FF1DBA00" />
+	<SolidColorBrush x:Key="SemiHighlightedTargetVertexBorderBrush" Color="Transparent" />
+	<SolidColorBrush x:Key="SemiHighlightedTargetVertexBackgroundBrush" Color="#FFD6A51C" />
+	<SolidColorBrush x:Key="HighlightedEdgeBrush" Color="Red"/>
+	<SolidColorBrush x:Key="SemiHighlightedInEdgeBrush" Color="#FF1DBA00" />
+	<SolidColorBrush x:Key="SemiHighlightedOutEdgeBrush" Color="#FFD6A51C" />
+
+    <!--<DataTemplate x:Key="VertexKey" x:DataType="local:PocVertex">
+        <TextBox Text="{Binding Path=ID, Mode=OneWay, FallbackValue=VertexId}"/>
+    </DataTemplate>-->
+	
+	<!-- VERTEX CONTROL -->
+	<Style TargetType="GraphSharp_Controls:VertexControl">
+		<Setter Property="Template">
+			<Setter.Value>
+                <ControlTemplate TargetType="GraphSharp_Controls:VertexControl">
+                    <ContentPresenter >
+                        <local2:PocVertexView BBrush="{TemplateBinding VBrush}" BThickness="{TemplateBinding VThickness}" BLabel="{Binding Path=ID, Mode=OneWay, FallbackValue=VertexId}" />
+                        <!--ContentPresenter.ContentTemplate>
+                            <DataTemplate x:DataType="local:PocVertex">
+                                <local2:MyVertex BBrush="{Binding VBrush}" BThickness="{Binding VThickness}"/>
+                            </DataTemplate>
+                        </ContentPresenter.ContentTemplate>-->
+                    </ContentPresenter>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+		<Setter Property="Background"      Value="#FFE3E3E3"/>
+        <Setter Property="VThickness"      Value="1"/>
+		<Setter Property="Padding"         Value="10,5,10,5"/>
+        <Setter Property="VBrush"          Value="#FF393939"/>
+    </Style>
+	
+	<!-- EDGE CONTROL -->
+    <Style TargetType="GraphSharp_Controls:EdgeControl">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="GraphSharp_Controls:EdgeControl">
+                    <Path Stroke="{TemplateBinding Foreground}" StrokeThickness="{TemplateBinding StrokeThickness}"
+                          MinWidth="1"  MinHeight="1" x:Name="edgePath">
+                        <Path.Data>
+                            <Binding RelativeSource="{RelativeSource TemplatedParent}" Path="PathGeometry"/>
+                        </Path.Data>
+                    </Path>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="MinWidth" Value="1" />
+        <Setter Property="MinHeight" Value="1" />
+        <Setter Property="Background" Value="Red" />
+        <Setter Property="Foreground" Value="Silver" />
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+</ResourceDictionary>

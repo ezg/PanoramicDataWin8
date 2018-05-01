@@ -40,6 +40,9 @@ using PanoramicDataWin8.view.vis;
 using PanoramicDataWin8.view.vis.menu;
 using PanoramicDataWin8.view.vis.render;
 using PanoramicDataWin8.model.data.pipeline;
+using GraphSharp.Sample;
+using Windows.UI;
+using GraphSharp.Algorithms.Layout;
 
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -73,6 +76,35 @@ namespace PanoramicDataWin8
 
             _messageTimer.Interval = TimeSpan.FromMilliseconds(2000);
             _messageTimer.Tick += _messageTimer_Tick;
+
+            Loaded += (s, e) => {
+                var graph = new PocGraph();
+
+                for (int i = 0; i < 8; i++)
+                {
+                    graph.AddVertex(new PocVertex(i.ToString(),
+                        new List<string>(new string[] { "i1", "i2", "i3" })));
+                }
+
+                graph.AddEdge(new PocEdge("0to1", graph.Vertices.ElementAt(0), graph.Vertices.ElementAt(1)));
+                graph.AddEdge(new PocEdge("1to2", graph.Vertices.ElementAt(1), graph.Vertices.ElementAt(2)));
+                graph.AddEdge(new PocEdge("2to3", graph.Vertices.ElementAt(2), graph.Vertices.ElementAt(3)));
+                graph.AddEdge(new PocEdge("2to4", graph.Vertices.ElementAt(2), graph.Vertices.ElementAt(4)));
+                graph.AddEdge(new PocEdge("0to5", graph.Vertices.ElementAt(0), graph.Vertices.ElementAt(5)));
+                graph.AddEdge(new PocEdge("1to7", graph.Vertices.ElementAt(1), graph.Vertices.ElementAt(7)));
+                graph.AddEdge(new PocEdge("4to6", graph.Vertices.ElementAt(4), graph.Vertices.ElementAt(6)));
+                graph.AddEdge(new PocEdge("7to4", graph.Vertices.ElementAt(7), graph.Vertices.ElementAt(4)));
+                var pg = new PocGraphView() {
+                    Graph = graph,
+                    LayoutAlgorithmType = StandardLayoutAlgorithmFactory<PocVertex, PocEdge, PocGraph>.AlgorithmTypeNames.EfficientSugiyama.ToString()
+                };
+                var c = new Canvas();
+                c.Width = c.Height = 100;
+                c.Children.Add(pg);
+                inkableScene.Children.Add(c);
+                var p = TransformToVisual(inkableScene).TransformPoint(new Point(ActualWidth / 2, ActualHeight / 2));
+                c.RenderTransform = new TranslateTransform() { X = p.X, Y = p.Y };
+            };
         }
 
         private void _messageTimer_Tick(object sender, object e)
