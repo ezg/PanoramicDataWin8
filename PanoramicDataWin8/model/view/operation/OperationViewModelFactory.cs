@@ -126,6 +126,10 @@ namespace PanoramicDataWin8.model.view.operation
         static int funcCount = 0;
         public static FunctionOperationViewModel CreateDefaultFunctionOperationViewModel(OriginModel schemaModel, Pt position, FunctionOperationModel genericFunctionModel, bool fromMouse = false)
         {
+            if (genericFunctionModel is PipelineFunctionModel pipe)
+                return new FunctionOperationViewModel(pipe) { Position = position }; //  new PipelineFunctionModel(schemaModel, "Pipeline" + (funcCount++))) { Position = position };
+            if (genericFunctionModel is MinMaxScaleFunctionModel)
+                return new FunctionOperationViewModel(new MinMaxScaleFunctionModel(schemaModel, "MinMaxScale" + (funcCount++))) { Position = position };
             return new FunctionOperationViewModel(new FunctionOperationModel(schemaModel,
                 genericFunctionModel.GetAttributeModel().DataType, genericFunctionModel.GetAttributeModel().InputVisualizationType,
                 genericFunctionModel.AttributeParameterGroups().Select((am) => am.Item1),

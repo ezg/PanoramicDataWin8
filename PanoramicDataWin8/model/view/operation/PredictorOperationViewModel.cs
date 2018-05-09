@@ -15,6 +15,7 @@ namespace PanoramicDataWin8.model.view.operation
     {
         MenuViewModel     TargetMenuViewModel;
         MenuItemViewModel TargetMenuItemViewModel;
+        MenuItemViewModel PipelineMenuItemViewModel;
         MenuItemViewModel PredictorNameMenuItemViewModel = null;
         public PredictorOperationModel PredictorOperationModel => (PredictorOperationModel)OperationModel;
         void hideLabelUnlessPredictorHasResult(MenuViewModel menuViewModel)
@@ -111,7 +112,31 @@ namespace PanoramicDataWin8.model.view.operation
                     DroppedTriggered = TargetDropped
                 }
             };
+            PipelineMenuItemViewModel = new MenuItemViewModel
+            {
+                MenuViewModel = TargetMenuViewModel,
+                Row = 1,
+                Column = 0,
+                RowSpan = 1,
+                ColumnSpan = 1,
+                Size = new Vec(50, 50),
+                TargetSize = new Vec(50, 50),
+                IsAlwaysDisplayed = false,
+                IsWidthBoundToParent = false,
+                IsHeightBoundToParent = false,
+                Position = Position,
+                MenuItemComponentViewModel = new FunctionOperationMenuItemViewModel
+                {
+                    Label = "Best Pipeline",
+                    TextBrush = Application.Current.Resources.MergedDictionaries[0]["darkBrush"] as SolidColorBrush,
+                    CanDrag = true,
+                    CanDelete = false,
+                    CanDrop = false,
+                    FunctionOperationViewModel = new FunctionOperationViewModel(new PipelineFunctionModel(this.PredictorOperationModel.OriginModel, "<pipeline datastructure goes here>", "<named pipeline>")),
+                }
+            };
             TargetMenuViewModel.MenuItemViewModels.Add(TargetMenuItemViewModel);
+            TargetMenuViewModel.MenuItemViewModels.Add(PipelineMenuItemViewModel);
         }
         public PredictorOperationViewModel(PredictorOperationModel predictorOperationModel) : base(predictorOperationModel)
         {

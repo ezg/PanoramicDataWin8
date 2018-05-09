@@ -11,7 +11,7 @@ namespace GraphSharp.Controls
         #region Attached Dependency Property registrations
         public static readonly DependencyProperty XProperty =
             DependencyProperty.RegisterAttached("X", typeof(double), typeof(GraphCanvas),
-                new PropertyMetadata(double.NaN)); // bcz:
+                new PropertyMetadata(0.0)); // bcz:
                                                  //new FrameworkPropertyMetadata(double.NaN,
                                                  //                               FrameworkPropertyMetadataOptions.AffectsMeasure |
                                                  //                               FrameworkPropertyMetadataOptions.AffectsArrange |
@@ -30,7 +30,7 @@ namespace GraphSharp.Controls
 
         public static readonly DependencyProperty YProperty =
             DependencyProperty.RegisterAttached("Y", typeof(double), typeof(GraphCanvas),
-                new PropertyMetadata(double.NaN)); // bcz:
+                new PropertyMetadata(0.0)); // bcz:
                                                  //new FrameworkPropertyMetadata(double.NaN,
                                                  //                               FrameworkPropertyMetadataOptions.AffectsMeasure |
                                                  //                               FrameworkPropertyMetadataOptions.AffectsArrange |
@@ -58,7 +58,7 @@ namespace GraphSharp.Controls
 
         #region Attached Properties
         //[AttachedPropertyBrowsableForChildren]
-        public static double GetX(DependencyObject obj)
+        public static double GetX(UIElement obj)
         {
             return (double)obj.GetValue(XProperty);
         }
@@ -66,6 +66,7 @@ namespace GraphSharp.Controls
         public static void SetX(UIElement obj, double value)
         {
             obj.SetValue(XProperty, value);
+            Canvas.SetLeft(obj, value);
         }
 
        //[AttachedPropertyBrowsableForChildren]
@@ -74,9 +75,10 @@ namespace GraphSharp.Controls
             return (double)obj.GetValue(YProperty);
         }
 
-        public static void SetY(DependencyObject obj, double value)
+        public static void SetY(UIElement obj, double value)
         {
             obj.SetValue(YProperty, value);
+            Canvas.SetTop(obj, value);
         }
 
         #endregion

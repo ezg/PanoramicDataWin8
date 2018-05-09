@@ -73,17 +73,38 @@ namespace PanoramicDataWin8.model.data.operation
     /// </summary>
     public class MinMaxScaleFunctionModel : FunctionOperationModel
     {
-        public MinMaxScaleFunctionModel(OriginModel schemaModel) : base(
+        public MinMaxScaleFunctionModel(OriginModel schemaModel, string name="MinMaxScale") : base(
             schemaModel,
             DataType.Double,
             InputVisualizationTypeConstants.NUMERIC,
             new string[] { "P1", "P2" },
             new Tuple<string, object>[] { new Tuple<string, object>("Dummy", 0.0), new Tuple<string, object>("Yummy", 1.0) },
-            "MinMaxScale",
-            "MinMaxScale"
+            name,
+            name
             )
         {
 
+        }
+        // public double DummyValue { get { return (double)GetValue("Dummy"); } set { SetValue("Dummy", value); } }
+    }
+
+    /// <summary>
+    /// Example of a filled in function -- these should be created automatically from a pipeline script, etc
+    /// </summary>
+    public class PipelineFunctionModel : FunctionOperationModel
+    {
+        public object PipelineDescription = null;
+        public PipelineFunctionModel(OriginModel schemaModel, object pipelineDescription, string name="Pipeline") : base(
+            schemaModel,
+            DataType.Double,
+            InputVisualizationTypeConstants.NUMERIC,
+            new string[] { /*"P1", "P2" */},
+            new Tuple<string, object>[] { new Tuple<string, object>("Dummy", 0.0), new Tuple<string, object>("Yummy", 1.0) },
+            name,
+            name
+            )
+        {
+            PipelineDescription = pipelineDescription;
         }
         // public double DummyValue { get { return (double)GetValue("Dummy"); } set { SetValue("Dummy", value); } }
     }

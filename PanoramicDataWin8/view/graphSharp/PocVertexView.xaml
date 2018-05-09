@@ -138,18 +138,17 @@
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
-                <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" HorizontalAlignment="Center"  Foreground="{StaticResource highlightBrush}" FontWeight="Bold" Text="{Binding ElementName=LayoutRoot,Path=NodeName}" />
-            <Button Grid.Row="1" Background="Transparent"   Click="Parameters_Click" Foreground="{StaticResource lightBrush}"  >
-                <TextBlock Margin="5"  Foreground="{StaticResource highlightBrush}" Text="Parameters" Height="20" />
+            <Button Grid.Row="0" Background="Transparent" HorizontalContentAlignment="Center" HorizontalAlignment="Center"  Click="Parameters_Click" Foreground="{StaticResource lightBrush}"  >
+                <TextBlock Grid.Row="0" HorizontalAlignment="Center"  Foreground="{StaticResource highlightBrush}" FontWeight="Bold" Text="{Binding ElementName=LayoutRoot,Path=NodeName}" />
+                <!--<TextBlock Margin="5"  Foreground="{StaticResource highlightBrush}" Text="Parameters" Height="20" />-->
                 <Button.Flyout>
                     <Flyout Placement="Top">
                         <ListView x:Name="vFlyyout" ItemsSource="{Binding ElementName=LayoutRoot,Path=NodeParameters}" Height="40" Width="80" />
                     </Flyout>
                 </Button.Flyout>
             </Button>
-            <StackPanel Orientation="Horizontal"  Grid.Row="2" >
+            <StackPanel Orientation="Horizontal"  Grid.Row="1" >
                 <TextBlock Foreground="Black" Text="Outputs:" />
                 <TextBlock  Foreground="{StaticResource highlightBrush}" Text="{Binding ElementName=LayoutRoot,Path=NodeOutputs}" />
             </StackPanel>

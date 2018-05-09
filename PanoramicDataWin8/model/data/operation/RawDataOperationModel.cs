@@ -32,7 +32,6 @@ namespace PanoramicDataWin8.model.data.operation
         }
         public void SetGrouping(AttributeTransformationModel atm, bool on)
         {
-            atm.AggregateFunction = AggregateFunction.None;
             atm.GroupBy = on;
         }
         public void SetOrderingFunction(AttributeTransformationModel atm, OrderingFunction orderingFunction)

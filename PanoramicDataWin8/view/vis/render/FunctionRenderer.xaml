@@ -138,9 +138,10 @@
                                RelativePanel.AlignRightWithPanel="True"
                                RelativePanel.AlignBottomWithPanel="True"
                                Visibility="Visible">
-                <Grid x:Name="Field">
-                    <inq:InkableScene x:Name="inkableField" utils:ClipToBounds.ClipToBounds="True"/>
-                </Grid>
+                <Viewbox x:Name="GraphViewbox">
+                    <Canvas x:Name="GraphCanvas" Width="200" Height="200" />
+                    <!--<inq:InkableScene x:Name="inkableField" utils:ClipToBounds.ClipToBounds="True"/>-->
+                </Viewbox>
             </Grid>
             <Grid x:Name="TypingPanel" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                 <TextBox  x:Name="NameTextBox" IsEnabled="False" Text="Hello World" IsSpellCheckEnabled="False" FontSize="30" VerticalAlignment="Center" VerticalContentAlignment="Center" TextAlignment="Center" KeyDown="NameTextBox_KeyDown"   PointerExited="NameTextBox_PointerExited"   />

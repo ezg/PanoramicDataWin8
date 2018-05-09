@@ -220,6 +220,12 @@ namespace PanoramicDataWin8.controller.view
                     OperationType = OperationType.Function,
                     FunctionType = new MinMaxScaleFunctionModel(MainModel.SchemaModel.OriginModels.First())
                 });
+                //funcs.OperationTypeModels.Add(new OperationTypeModel
+                //{
+                //    Name = "Pipeline",
+                //    OperationType = OperationType.Function,
+                //    FunctionType = new PipelineFunctionModel(MainModel.SchemaModel.OriginModels.First())
+                //});
             }
             MainModel.OperationTypeModels = parent.OperationTypeModels.ToList();
         }
@@ -483,7 +489,6 @@ namespace PanoramicDataWin8.controller.view
             else if (operationTypeModel.OperationType == OperationType.Function)
             {
                 operationViewModel = CreateDefaultFunctionOperationViewModel(position, operationTypeModel.FunctionType);
-                height = 50;
                 size = new Vec(width, height);
             }
             if (operationViewModel != null)

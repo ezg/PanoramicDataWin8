@@ -21,6 +21,10 @@ using GeoAPI.Geometries;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.inq;
+using PanoramicDataWin8.view.common;
+using PanoramicDataWin8.model.view.tilemenu;
+using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.operation;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -71,6 +75,25 @@ namespace PanoramicDataWin8.view.vis.menu
             {
                 mainGrid.Children.Clear();
                 mainGrid.Children.Add(new AttributeMenuItemView());
+            }
+            else if (model.MenuItemComponentViewModel is FunctionOperationMenuItemViewModel)
+            {
+                mainGrid.Children.Clear();
+                mainGrid.Children.Add(new OperationTypeView()
+                // unlike the other menu items, this uses a view that does not use MenuItemViewModels
+                // so we have to extract the information from the MenuItemViewModel and create an explicit DataContext
+                // that is specific to OperationTypeModels.  
+                // the right way to do this would probably be to make an OperationTypeMenuItemViewModel that consumes
+                // a MenuItemViewModel
+                {
+                    DataContext = new OperationTypeModel
+                    {
+                        Name = ((FunctionOperationMenuItemViewModel)model.MenuItemComponentViewModel).Label,
+                        OperationType = OperationType.Function,
+                        FunctionType = ((FunctionOperationMenuItemViewModel)model.MenuItemComponentViewModel).FunctionOperationViewModel.FunctionOperationModel
+                    }
+                }
+                );
             }
             else if (model.MenuItemComponentViewModel is StatisticalComparisonMenuItemViewModel)
             {
