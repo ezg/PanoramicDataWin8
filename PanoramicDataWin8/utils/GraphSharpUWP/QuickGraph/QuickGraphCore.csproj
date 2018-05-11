@@ -411,7 +411,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Algorithms\Cliques\ncliques.pdf" />
-    <Content Include="app.config" />
+    <None Include="app.config" />
     <None Include="paket.references" />
     <None Include="quickgraph.snk" />
     <None Include="Diagrams\TraversalInterfaces.cd" />
