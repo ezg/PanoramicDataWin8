@@ -304,7 +304,7 @@ namespace PanoramicDataWin8.view.vis.render
                 newRecords[binIndex[i]].Data.Add("" + values.Spans[i].Min + " - " + values.Spans[i].Max);
             for (int i = 0; i < values.AggregateResults.Length/3; i++)
             {
-                var res = values.AggregateResults[i, 2];
+                var res = values.AggregateResults[i * values.YSize + 2];
                 if (res is DoubleValueAggregateResult)
                     newRecords[AttributeTransformationModelToIndex(operationModel, grouped[i])].Data.Add((res as DoubleValueAggregateResult).Result);
                 else newRecords[AttributeTransformationModelToIndex(operationModel, grouped[i])].Data.Add(res.N);
