@@ -67,8 +67,6 @@ namespace PanoramicDataWin8.view.vis.render
                 var deviceWidth = (float) (canvas.ActualWidth/CompositionScaleX - leftOffset - rightOffset);
                 var deviceHeight = (float) (canvas.ActualHeight/CompositionScaleY - topOffset - bottomtOffset);
 
-                var metric = _optimizerResult.Metrics;
-
                 if (MainViewController.Instance.MainModel.IsDarpaSubmissionMode)
                 {
                     var blue = Color.FromArgb(255, 41, 170, 213);
@@ -97,24 +95,25 @@ namespace PanoramicDataWin8.view.vis.render
 
 
 
-                if (metric.AverageAccuracy.HasValue && metric.AverageAccuracy.Value != 0)
+                var solution = _optimizerResult.TopKSolutions.First();
+                if (solution.Score.MetricType == MetricType.Accuracy)
                 {
                     renderGauge(canvas, canvasArgs,
                         leftOffset,
                         topOffset + 30,
                         deviceWidth,
                         deviceHeight - 30,
-                        (float) metric.AverageAccuracy.Value,
+                        (float) solution.Score.Value,
                         "accuracy");
                 }
-                else if (metric.AverageRSquared.HasValue && metric.AverageRSquared.Value != 0)
+                else if (solution.Score.MetricType == MetricType.RSquared)
                 {
                     renderGauge(canvas, canvasArgs,
                         leftOffset,
                         topOffset + 30,
                         deviceWidth,
                         deviceHeight - 30,
-                        (float)metric.AverageRSquared.Value,
+                        (float)solution.Score.Value,
                         "r squared");
                 }
             }

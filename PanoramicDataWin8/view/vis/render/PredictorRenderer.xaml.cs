@@ -26,6 +26,7 @@ using IDEA_common.operations.ml.optimizer;
 using PanoramicDataWin8.controller.data.progressive;
 using PanoramicDataWin8.controller.view;
 using PanoramicDataWin8.model.data;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.model.data.result;
 using PanoramicDataWin8.model.view.operation;
@@ -120,13 +121,20 @@ namespace PanoramicDataWin8.view.vis.render
 
         void loadResult(IResult result)
         {
-            PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
-            var operationModel = (PredictorOperationModel) model.OperationModel;
-            operationModel.UpdateBackendOperatorId((result as OptimizerResult).PipelineId);
+            if (result is OptimizerResult)
+            {
+                PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
+                var operationModel = (PredictorOperationModel) model.OperationModel;
+                operationModel.UpdateBackendOperatorId((result as OptimizerResult).TopKSolutions.First().SolutionId);
 
-            _predictorRendererContentProvider.UpdateData(result,
-                (PredictorOperationModel)model.OperationModel,
-                (PredictorOperationModel)model.OperationModel.ResultCauserClone);
+                _predictorRendererContentProvider.UpdateData(result,
+                    (PredictorOperationModel) model.OperationModel,
+                    (PredictorOperationModel) model.OperationModel.ResultCauserClone);
+            }
+            else if (result is ErrorResult)
+            {
+                ErrorHandler.HandleError((result as ErrorResult).Message);
+            }
         }
 
         private List<Windows.Foundation.Point> _selectionPoints = new List<Windows.Foundation.Point>();

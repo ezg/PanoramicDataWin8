@@ -145,26 +145,38 @@ namespace PanoramicDataWin8.view.vis.render
         
         void loadResult(IResult result)
         {
-            _lastResult = result as HistogramResult;
-            var model = (DataContext as HistogramOperationViewModel);
-            _plotRendererContentProvider.UpdateFilterModels(model.HistogramOperationModel.FilterModels.ToList());
-
-            ResultHistogramOperationModel = (HistogramOperationModel)model.OperationModel.ResultCauserClone;
-            AttributeTransformationModel xIom = ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
-            AttributeTransformationModel yIom = ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
-            AttributeTransformationModel valueIom = null;
-
-            if (ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
+            if (result is HistogramResult)
             {
-                valueIom = ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Value).First();
+                _lastResult = result as HistogramResult;
+                var model = (DataContext as HistogramOperationViewModel);
+                _plotRendererContentProvider.UpdateFilterModels(model.HistogramOperationModel.FilterModels.ToList());
+
+                ResultHistogramOperationModel = (HistogramOperationModel) model.OperationModel.ResultCauserClone;
+                AttributeTransformationModel xIom = ResultHistogramOperationModel
+                    .GetAttributeUsageTransformationModel(AttributeUsage.X).FirstOrDefault();
+                AttributeTransformationModel yIom = ResultHistogramOperationModel
+                    .GetAttributeUsageTransformationModel(AttributeUsage.Y).FirstOrDefault();
+                AttributeTransformationModel valueIom = null;
+
+                if (ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Value).Any())
+                {
+                    valueIom = ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.Value)
+                        .First();
+                }
+                else if (ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue)
+                    .Any())
+                {
+                    valueIom = ResultHistogramOperationModel
+                        .GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
+                }
+                _plotRendererContentProvider.UpdateData(result, model.HistogramOperationModel.IncludeDistribution,
+                    model.HistogramOperationModel.BrushColors,
+                    xIom, yIom, valueIom, 30);
             }
-            else if (ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).Any())
+            else if (result is ErrorResult)
             {
-                valueIom = ResultHistogramOperationModel.GetAttributeUsageTransformationModel(AttributeUsage.DefaultValue).First();
+                ErrorHandler.HandleError((result as ErrorResult).Message);
             }
-            _plotRendererContentProvider.UpdateData(result, model.HistogramOperationModel.IncludeDistribution, 
-                model.HistogramOperationModel.BrushColors,
-                xIom, yIom, valueIom, 30);
         }
         
 

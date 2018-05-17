@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using IDEA_common.catalog;
 using IDEA_common.operations;
 using IDEA_common.operations.ml.optimizer;
@@ -12,7 +13,7 @@ namespace PanoramicDataWin8.controller.data.progressive
         public async Task SumbitResult(PredictorOperationModel model)
         {
             var submitParam = new SubmitProblemParameters();
-            submitParam.Id = (model.Result as OptimizerResult).PipelineId;
+            submitParam.Id = (model.Result as OptimizerResult).TopKSolutions.First().SolutionId;
 
             var ser = JsonConvert.SerializeObject(submitParam, IDEAGateway.JsonSerializerSettings);
             var response = await IDEAGateway.Request(ser, "submitProblem");
@@ -24,7 +25,7 @@ namespace PanoramicDataWin8.controller.data.progressive
         public async Task SpecifyProblem(PredictorOperationModel model, string userComment)
         {
             var specifyProblemParam = new SpecifyProblemParameters();
-            specifyProblemParam.Id = (model.Result as OptimizerResult).PipelineId;
+            specifyProblemParam.Id = (model.Result as OptimizerResult).TopKSolutions.First().SolutionId;
             specifyProblemParam.UserComment = userComment;
 
             var ser = JsonConvert.SerializeObject(specifyProblemParam, IDEAGateway.JsonSerializerSettings);
