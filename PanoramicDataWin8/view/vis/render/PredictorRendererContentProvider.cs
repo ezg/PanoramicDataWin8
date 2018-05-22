@@ -17,6 +17,8 @@ using PanoramicDataWin8.model.data;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.utils;
 using PanoramicDataWin8.view.common;
+using PanoramicDataWin8.model.view.operation;
+using PanoramicDataWin8.model.view;
 
 namespace PanoramicDataWin8.view.vis.render
 {
@@ -40,11 +42,13 @@ namespace PanoramicDataWin8.view.vis.render
         public IGeometry SubmitHitTarget { get; set; }
         public IGeometry SpecifyProblemHitTarget { get; set; }
 
-        public void UpdateData(IResult result, PredictorOperationModel predictorOperationModel, PredictorOperationModel predictorOperationModelClone)
+        public void UpdateData(IResult result, PredictorOperationViewModel predictorOperationViewModel, PredictorOperationModel predictorOperationModelClone)
         {
             _optimizerResult = (OptimizerResult) result;
             _predictorOperationModelClone = predictorOperationModelClone;
-            _predictorOperationModel = predictorOperationModel;
+            _predictorOperationModel = predictorOperationViewModel.PredictorOperationModel;
+            (predictorOperationViewModel.PipelineMenuItemViewModel.MenuItemComponentViewModel as FunctionOperationMenuItemViewModel).FunctionOperationViewModel =
+            new FunctionOperationViewModel(new PipelineFunctionModel(_predictorOperationModel.OriginModel, _optimizerResult.TopKSolutions.First().PipelineDescription, "<named pipeline>"));
 
             if (_optimizerResult != null)
                 _isResultEmpty = false;

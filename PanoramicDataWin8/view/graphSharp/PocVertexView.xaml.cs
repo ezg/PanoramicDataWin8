@@ -1,4 +1,5 @@
 ﻿using GraphSharp.Controls;
+using GraphSharp.Sample;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,19 +26,13 @@ namespace GraphSharpSampleCore
             DependencyProperty.Register("BBrush", typeof(Brush), typeof(PocVertexView), new PropertyMetadata(null));// bcz: new UIPropertyMetadata( null ) );
         public static readonly DependencyProperty BThicknessProperty =
             DependencyProperty.Register("BThickness", typeof(Thickness), typeof(PocVertexView), new PropertyMetadata(null));// bcz: new UIPropertyMetadata( null ) );
-        public static readonly DependencyProperty NodeParametersProperty =
-            DependencyProperty.Register("NodeParameters", typeof(List<string>), typeof(PocVertexView), new PropertyMetadata(null));// bcz: new UIPropertyMetadata( null ) );
-        public static readonly DependencyProperty NodeOutputsProperty =
-            DependencyProperty.Register("NodeOutputs", typeof(string), typeof(PocVertexView), new PropertyMetadata(null));// bcz: new UIPropertyMetadata( null ) );
-        public static readonly DependencyProperty NodeNameProperty =
-            DependencyProperty.Register("NodeName", typeof(string), typeof(PocVertexView), new PropertyMetadata(null));// bcz: new UIPropertyMetadata( null ) );
         VertexControl VC => VisualTreeHelper.GetParent(CP) as VertexControl;
         ContentPresenter CP => VisualTreeHelper.GetParent(this) as ContentPresenter;
         public PocVertexView()
         {
             this.InitializeComponent();
         }
-        
+
 
         public Brush BBrush
         {
@@ -49,21 +44,7 @@ namespace GraphSharpSampleCore
             get { return (Thickness)GetValue(BThicknessProperty); }
             set { SetValue(BThicknessProperty, value); }
         }
-        public string NodeName
-        {
-            get { return (string)GetValue(NodeNameProperty); }
-            set { SetValue(NodeNameProperty, value); }
-        }
-        public List<string> NodeParameters
-        {
-            get { return (List<string>)GetValue(NodeParametersProperty); }
-            set { SetValue(NodeParametersProperty, value); }
-        }
-        public string NodeOutputs
-        {
-            get { return (string)GetValue(NodeOutputsProperty); }
-            set { SetValue(NodeOutputsProperty, value); }
-        }
+
 
         Point delta = new Point();
         void MyVertex_PointerPressed(object sender, PointerRoutedEventArgs e)
@@ -96,8 +77,9 @@ namespace GraphSharpSampleCore
         
         private void Parameters_Click(object sender, RoutedEventArgs e)
         {
-            vFlyyout.ItemsSource = NodeParameters;
-            vFlyyout.Height = NodeParameters.Count * 50;
+            var hyperParams = (DataContext as PocVertex).HyperParams;
+            vFlyyout.ItemsSource = hyperParams;
+            vFlyyout.Height = hyperParams.Count * 50;
         }
     }
 }

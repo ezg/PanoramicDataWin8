@@ -13,11 +13,31 @@ namespace GraphSharp.Sample
 	[DebuggerDisplay( "{ID}" )]
 	public class PocVertex 
 	{
-		public string ID
+        public override string ToString()
+        {
+            return ID;
+        }
+        public string ID
 		{
 			get;
 			private set;
 		}
+        public string Output
+        {
+            get;
+            private set;
+        }
+        public string HyperParamPlaceholder
+        {
+            get;
+            private set;
+        }
+
+        public List<string> HyperParams
+        {
+            get;
+            private set;
+        }
 
         public List<string> Params
         {
@@ -25,10 +45,13 @@ namespace GraphSharp.Sample
             private set;
         }
 
-		public PocVertex( string id, List<string> parameters )
+		public PocVertex( string id, string output, List<string> hyperParams, List<string> arguments )
 		{
 			ID = id;
-            Params = parameters;
+            Output = output;
+            HyperParams = hyperParams;
+            HyperParamPlaceholder = hyperParams.Count == 1 ? hyperParams[0] : hyperParams.Count > 1 ? "(...)" : "";
+            Params = arguments;
 		}
     }
 }

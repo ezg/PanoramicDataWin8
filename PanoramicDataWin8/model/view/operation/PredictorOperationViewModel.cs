@@ -1,4 +1,5 @@
-﻿using PanoramicDataWin8.model.data.attribute;
+﻿using IDEA_common.operations.ml.optimizer;
+using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.operation;
 using PanoramicDataWin8.utils;
 using System;
@@ -15,7 +16,7 @@ namespace PanoramicDataWin8.model.view.operation
     {
         MenuViewModel     TargetMenuViewModel;
         MenuItemViewModel TargetMenuItemViewModel;
-        MenuItemViewModel PipelineMenuItemViewModel;
+        public MenuItemViewModel PipelineMenuItemViewModel;
         MenuItemViewModel PredictorNameMenuItemViewModel = null;
         public PredictorOperationModel PredictorOperationModel => (PredictorOperationModel)OperationModel;
         void hideLabelUnlessPredictorHasResult(MenuViewModel menuViewModel)
@@ -43,7 +44,7 @@ namespace PanoramicDataWin8.model.view.operation
             attributeMenuItemViewModel.Label = new Regex("\\(.*\\)", RegexOptions.None).Replace(attributeMenuItemViewModel.Label, "(" + attributeViewModel.AttributeModel.DisplayName + ")");
             PredictorOperationModel.SetRawName(attributeMenuItemViewModel.Label);
 
-            if (TargetMenuViewModel.MenuItemViewModels.Count > 1)
+            if (TargetMenuViewModel.MenuItemViewModels.Count > 2)
                 TargetMenuViewModel.MenuItemViewModels.RemoveAt(1);
 
             TargetMenuViewModel.NrColumns = 2;
@@ -132,12 +133,14 @@ namespace PanoramicDataWin8.model.view.operation
                     CanDrag = true,
                     CanDelete = false,
                     CanDrop = false,
-                    FunctionOperationViewModel = new FunctionOperationViewModel(new PipelineFunctionModel(this.PredictorOperationModel.OriginModel, "<pipeline datastructure goes here>", "<named pipeline>")),
+                    FunctionOperationViewModel = BestPredictorFunctionOperationViewModel = new FunctionOperationViewModel(new PipelineFunctionModel(this.PredictorOperationModel.OriginModel, new PipelineDescription(), "<named pipeline>")),
                 }
             };
             TargetMenuViewModel.MenuItemViewModels.Add(TargetMenuItemViewModel);
             TargetMenuViewModel.MenuItemViewModels.Add(PipelineMenuItemViewModel);
         }
+
+        public FunctionOperationViewModel BestPredictorFunctionOperationViewModel = null;
         public PredictorOperationViewModel(PredictorOperationModel predictorOperationModel) : base(predictorOperationModel)
         {
             var menuViewModel = createAttributeLabelMenu(AttachmentOrientation.Bottom, predictorOperationModel.GetAttributeModel(), AttributeUsage.X, new Vec(200, 50), 0, true, false, null, out PredictorNameMenuItemViewModel);

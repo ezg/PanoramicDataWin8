@@ -1,6 +1,6 @@
 ﻿using GraphSharp.Controls;
-using GraphSharpSampleCore;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Input;
 
 namespace GraphSharp.Sample
 {

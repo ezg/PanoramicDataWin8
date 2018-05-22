@@ -6,8 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    x:Name="LayoutRoot"
     d:DesignHeight="100"
+    x:Name="LayoutRoot"
     d:DesignWidth="400"
     PointerPressed="MyVertex_PointerPressed"
     >
@@ -138,19 +138,21 @@
             <Grid.RowDefinitions>
                 <RowDefinition></RowDefinition>
                 <RowDefinition></RowDefinition>
+                <RowDefinition></RowDefinition>
             </Grid.RowDefinitions>
-            <Button Grid.Row="0" Background="Transparent" HorizontalContentAlignment="Center" HorizontalAlignment="Center"  Click="Parameters_Click" Foreground="{StaticResource lightBrush}"  >
-                <TextBlock Grid.Row="0" HorizontalAlignment="Center"  Foreground="{StaticResource highlightBrush}" FontWeight="Bold" Text="{Binding ElementName=LayoutRoot,Path=NodeName}" />
+            <TextBlock Grid.Row="0" HorizontalAlignment="Center"  Foreground="{StaticResource highlightBrush}" FontWeight="Bold" Text="{Binding ID}" />
+            <Button Grid.Row="1" Background="Transparent" HorizontalContentAlignment="Center" HorizontalAlignment="Center"  Click="Parameters_Click" Foreground="{StaticResource lightBrush}"  >
+                <TextBlock HorizontalAlignment="Center"  Foreground="{StaticResource highlightBrush}" FontWeight="Bold" Text="{Binding HyperParamPlaceholder}" />
                 <!--<TextBlock Margin="5"  Foreground="{StaticResource highlightBrush}" Text="Parameters" Height="20" />-->
                 <Button.Flyout>
                     <Flyout Placement="Top">
-                        <ListView x:Name="vFlyyout" ItemsSource="{Binding ElementName=LayoutRoot,Path=NodeParameters}" Height="40" Width="80" />
+                        <ListView x:Name="vFlyyout" DataContext="{Binding ElementName=LayoutRoot,Path=DataContext}" ItemsSource="{Binding HyperParams}" Height="40"/>
                     </Flyout>
                 </Button.Flyout>
             </Button>
-            <StackPanel Orientation="Horizontal"  Grid.Row="1" >
+            <StackPanel Orientation="Horizontal"  Grid.Row="2" >
                 <TextBlock Foreground="Black" Text="Outputs:" />
-                <TextBlock  Foreground="{StaticResource highlightBrush}" Text="{Binding ElementName=LayoutRoot,Path=NodeOutputs}" />
+                <TextBlock  Foreground="{StaticResource highlightBrush}" Text="{Binding Output}" />
             </StackPanel>
         </Grid>
     </Border>

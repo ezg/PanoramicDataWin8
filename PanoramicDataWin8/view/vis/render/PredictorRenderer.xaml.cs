@@ -39,6 +39,7 @@ namespace PanoramicDataWin8.view.vis.render
     public sealed partial class PredictorRenderer : Renderer, IScribbable
     {
         private PredictorRendererContentProvider _predictorRendererContentProvider = new PredictorRendererContentProvider();
+        private PredictorOperationViewModel PredictorOperationViewModel => DataContext as PredictorOperationViewModel;
         
         public PredictorRenderer()
         {
@@ -51,7 +52,6 @@ namespace PanoramicDataWin8.view.vis.render
 
         void Relayout()
         {
-            var model = ((DataContext as PredictorOperationViewModel).OperationModel as PredictorOperationModel);
         }
         void Renderer_Loaded(object sender, RoutedEventArgs e)
         {
@@ -64,8 +64,9 @@ namespace PanoramicDataWin8.view.vis.render
         public override void Dispose()
         {
             base.Dispose();
-            (DataContext as PredictorOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
-            (DataContext as PredictorOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
+            var model = PredictorOperationViewModel.PredictorOperationModel;
+            model.OperationModelUpdated -= OperationModelUpdated;
+            model.PropertyChanged -= OperationModel_PropertyChanged;
             if (dxSurface != null)
             {
                 dxSurface.Dispose();
@@ -76,12 +77,13 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (args.NewValue != null)
             {
-                (DataContext as PredictorOperationViewModel).OperationModel.OperationModelUpdated -= OperationModelUpdated;
-                (DataContext as PredictorOperationViewModel).OperationModel.OperationModelUpdated += OperationModelUpdated;
-                (DataContext as PredictorOperationViewModel).OperationModel.PropertyChanged -= OperationModel_PropertyChanged;
-                (DataContext as PredictorOperationViewModel).OperationModel.PropertyChanged += OperationModel_PropertyChanged;
+                var model = PredictorOperationViewModel.PredictorOperationModel;
+                model.OperationModelUpdated -= OperationModelUpdated;
+                model.OperationModelUpdated += OperationModelUpdated;
+                model.PropertyChanged -= OperationModel_PropertyChanged;
+                model.PropertyChanged += OperationModel_PropertyChanged;
 
-                var result = (DataContext as PredictorOperationViewModel).OperationModel.Result;
+                var result = model.Result;
                 if (result != null)
                 {
                     loadResult(result);
@@ -89,8 +91,7 @@ namespace PanoramicDataWin8.view.vis.render
                 }
                 else
                 {
-                    PredictorOperationModel operationModel = (PredictorOperationModel)((OperationViewModel)DataContext).OperationModel;
-                    if (!operationModel.AttributeTransformationModelParameters.Any())
+                    if (!model.AttributeTransformationModelParameters.Any())
                     {
                         viewBox.Visibility = Visibility.Visible;
                     }
@@ -99,14 +100,16 @@ namespace PanoramicDataWin8.view.vis.render
         }
         void OperationModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            PredictorOperationModel operationModel = (PredictorOperationModel)((OperationViewModel)DataContext).OperationModel;
-            if (e.PropertyName == operationModel.GetPropertyName(() => operationModel.Result))
+            var model = PredictorOperationViewModel.PredictorOperationModel;
+            if (e.PropertyName == model.GetPropertyName(() => model.Result))
             {
-                var result = (DataContext as PredictorOperationViewModel).OperationModel.Result;
+                var result = model.Result;
                 if (result != null)
                 {
                     loadResult(result);
                     render();
+                    (PredictorOperationViewModel.BestPredictorFunctionOperationViewModel.FunctionOperationModel as PipelineFunctionModel).PipelineDescription = (result as OptimizerResult).TopKSolutions.First().PipelineDescription;
+                    PredictorOperationViewModel.BestPredictorFunctionOperationViewModel.FunctionOperationModel.FireOperationModelUpdated(new OperationModelUpdatedEventArgs());
                 }
             }
         }
@@ -123,13 +126,10 @@ namespace PanoramicDataWin8.view.vis.render
         {
             if (result is OptimizerResult)
             {
-                PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
-                var operationModel = (PredictorOperationModel) model.OperationModel;
-                operationModel.UpdateBackendOperatorId((result as OptimizerResult).TopKSolutions.First().SolutionId);
+                var model = PredictorOperationViewModel.PredictorOperationModel;
+                model.UpdateBackendOperatorId((result as OptimizerResult).TopKSolutions.First().SolutionId);
 
-                _predictorRendererContentProvider.UpdateData(result,
-                    (PredictorOperationModel) model.OperationModel,
-                    (PredictorOperationModel) model.OperationModel.ResultCauserClone);
+                _predictorRendererContentProvider.UpdateData(result, PredictorOperationViewModel, (PredictorOperationModel)model.ResultCauserClone);
             }
             else if (result is ErrorResult)
             {
@@ -146,7 +146,7 @@ namespace PanoramicDataWin8.view.vis.render
 
         public override void MoveSelection(Windows.Foundation.Point point)
         {
-            GeneralTransform gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
+            var gt = MainViewController.Instance.InkableScene.TransformToVisual(dxSurface);
             _selectionPoints.Add(gt.TransformPoint(point));
         }
 
@@ -179,11 +179,10 @@ namespace PanoramicDataWin8.view.vis.render
             ContentDialogResult result = await locationPromptDialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
-                PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
-                var operationModel = (PredictorOperationModel)model.OperationModel;
+                var model = PredictorOperationViewModel.PredictorOperationModel;
 
                 var catalogCommand = new SubmitProblemCommand();
-                await catalogCommand.SumbitResult(operationModel);
+                await catalogCommand.SumbitResult(model);
                 Application.Current.Exit();
             }
         }
@@ -211,17 +210,16 @@ namespace PanoramicDataWin8.view.vis.render
             dialog.PrimaryButtonText = "OK";
             dialog.SecondaryButtonText = "Cancel";
 
-            ContentDialogResult result = await dialog.ShowAsync();
+            var result = await dialog.ShowAsync();
             if (result == ContentDialogResult.Primary)
             {
-                PredictorOperationViewModel model = (DataContext as PredictorOperationViewModel);
-                var operationModel = (PredictorOperationModel) model.OperationModel;
+                var model = PredictorOperationViewModel.PredictorOperationModel;
 
                 string userComment = string.Empty;
                 inputTextBox.Document.GetText(Windows.UI.Text.TextGetOptions.None, out userComment);
 
                 var catalogCommand = new SpecifyProblemCommand();
-                await catalogCommand.SpecifyProblem(operationModel, userComment);
+                await catalogCommand.SpecifyProblem(model, userComment);
             }
         }
 
@@ -249,9 +247,7 @@ namespace PanoramicDataWin8.view.vis.render
         {
             get
             {
-                PredictorOperationViewModel model = this.DataContext as PredictorOperationViewModel;
-
-                Rct bounds = new Rct(model.Position, model.Size);
+                var bounds = new Rct(PredictorOperationViewModel.Position, PredictorOperationViewModel.Size);
                 return bounds.GetPolygon();
             }
         }

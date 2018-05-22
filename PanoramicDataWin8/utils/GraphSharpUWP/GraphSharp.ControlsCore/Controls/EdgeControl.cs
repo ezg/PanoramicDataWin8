@@ -107,7 +107,7 @@ namespace GraphSharp.Controls
         private static Geometry updateRoutePoints(VertexControl s, VertexControl t, Point[] routeInformation)
         {
             var sourceSize = new Vector(s.ActualWidth, s.ActualHeight);
-            var targetSize = new Vector(s.ActualWidth, s.ActualHeight);
+            var targetSize = new Vector(t.ActualWidth, t.ActualHeight);
             var sourcePos = new Point(Canvas.GetLeft(s), Canvas.GetTop(s)) + sourceSize/2;
             var targetPos = new Point(Canvas.GetLeft(t), Canvas.GetTop(t)) + targetSize / 2;
 

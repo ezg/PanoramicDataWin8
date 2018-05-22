@@ -1,4 +1,5 @@
 ﻿using IDEA_common.catalog;
+using IDEA_common.operations.ml.optimizer;
 using PanoramicDataWin8.model.data.attribute;
 using PanoramicDataWin8.model.data.idea;
 using System;
@@ -93,8 +94,8 @@ namespace PanoramicDataWin8.model.data.operation
     /// </summary>
     public class PipelineFunctionModel : FunctionOperationModel
     {
-        public object PipelineDescription = null;
-        public PipelineFunctionModel(OriginModel schemaModel, object pipelineDescription, string name="Pipeline") : base(
+        public PipelineDescription PipelineDescription = null;
+        public PipelineFunctionModel(OriginModel schemaModel, PipelineDescription pipelineDescription, string name="Pipeline") : base(
             schemaModel,
             DataType.Double,
             InputVisualizationTypeConstants.NUMERIC,

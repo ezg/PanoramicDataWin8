@@ -31,13 +31,18 @@ namespace GraphSharp.Algorithms.Layout.Simple.Circular
             double perimeter = 0;
             double[] halfSize = new double[VisitedGraph.VertexCount];
             int i = 0;
+
+            double maxHalfSize = 0;
             foreach ( var v in VisitedGraph.Vertices )
             {
                 Size s = sizes[v];
                 halfSize[i] = Math.Sqrt( s.Width * s.Width + s.Height * s.Height ) * 0.5;
-                perimeter += halfSize[i] * 2;
+                if (halfSize[i] > maxHalfSize)
+                    maxHalfSize = halfSize[i];
+                perimeter += halfSize[i] *2;
                 i++;
             }
+            perimeter = maxHalfSize * 2 * VisitedGraph.Vertices.Count(); // bcz: max estimate avoids overlap
 
             double radius = perimeter / ( 2 * Math.PI );
 
@@ -48,7 +53,7 @@ namespace GraphSharp.Algorithms.Layout.Simple.Circular
             i = 0;
             foreach ( var v in VisitedGraph.Vertices )
             {
-                a = Math.Sin( halfSize[i] * 0.5 / radius ) * 2;
+                a = Math.Sin( maxHalfSize /* halfSize[i] */ * 0.5 / radius ) * 2;
                 angle += a;
                 if ( ReportOnIterationEndNeeded )
                     VertexPositions[v] = new Point( Math.Cos( angle ) * radius + radius, Math.Sin( angle ) * radius + radius );
@@ -62,14 +67,14 @@ namespace GraphSharp.Algorithms.Layout.Simple.Circular
             radius = angle / ( 2 * Math.PI ) * radius;
 
             //calculation
-            angle = 0;
+            angle = -3.14;
             i = 0;
             foreach ( var v in VisitedGraph.Vertices )
             {
-                a = Math.Sin( halfSize[i] * 0.5 / radius ) * 2;
-                angle += a;
+                a = Math.Sin( maxHalfSize /* halfSize[i] */ * 0.5 / radius ) * 2;
+                angle -= a;
                 VertexPositions[v] = new Point( Math.Cos( angle ) * radius + radius, Math.Sin( angle ) * radius + radius );
-                angle += a;
+                angle -= a;
             }
         }
     }

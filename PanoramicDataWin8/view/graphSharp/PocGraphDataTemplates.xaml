@@ -27,10 +27,8 @@
 			<Setter.Value>
                 <ControlTemplate TargetType="GraphSharp_Controls:VertexControl">
                     <ContentPresenter >
-                        <local2:PocVertexView BBrush="{TemplateBinding VBrush}" BThickness="{TemplateBinding VThickness}" 
-                                              NodeName="{Binding Path=ID, Mode=OneWay, FallbackValue=VertexId}"
-                                              NodeParameters="{Binding Path=Params, Mode=OneWay, FallbackValue=VertexId}"
-                                              NodeOutputs="{Binding Path=ID, Mode=OneWay, FallbackValue=VertexId}"
+                        <local2:PocVertexView DataContext="{TemplateBinding DataContext}"
+                                              BBrush="{TemplateBinding VBrush}" BThickness="{TemplateBinding VThickness}" 
                                               />
                         <!--ContentPresenter.ContentTemplate>
                             <DataTemplate x:DataType="local:PocVertex">
