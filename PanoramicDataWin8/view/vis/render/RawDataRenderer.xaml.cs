@@ -27,6 +27,8 @@ using Windows.UI.Xaml.Input;
 using IDEA_common.operations.histogram;
 using PanoramicDataWin8.model.view;
 using static PanoramicDataWin8.view.vis.render.RawDataColumn;
+using IDEA_common.range;
+using Newtonsoft.Json;
 
 // The User Control item template is documented at https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -393,7 +395,8 @@ namespace PanoramicDataWin8.view.vis.render
                     () =>  {
                         foreach (var val in records)
                         {
-                            acollection.Data.Add(new MyUri(prepend + val.ToString()));
+                            var x = JsonConvert.DeserializeObject<PreProcessedString>(val.ToString());
+                            acollection.Data.Add(new MyUri(prepend +  x.Value));
                         }
                     });
 #pragma warning restore CS4014

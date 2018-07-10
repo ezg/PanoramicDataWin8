@@ -19,14 +19,14 @@ namespace Gma.CodeCloud.Controls.Geometry
             Center   = new Point(Surface.X + size.Width / 2, Surface.Y + size.Height / 2);
         }
 
-        public void Arrange(IEnumerable<IWord> words, IGraphicEngine graphicEngine)
+        public void Arrange(IEnumerable<Word> words, IGraphicEngine graphicEngine)
         {
             if (words == null)
             {
                 throw new ArgumentNullException("words");
             }
 
-            foreach (IWord word in words)
+            foreach (Word word in words)
             {
                 var size = graphicEngine.Measure(word.Text, word.Occurrences);
                 Rect freeRectangle;

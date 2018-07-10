@@ -5,14 +5,14 @@ namespace Gma.CodeCloud.Controls.Geometry
 {
     public class LayoutItem
     {
-        public LayoutItem(Rect rectangle, IWord word)
+        public LayoutItem(Rect rectangle, Word word)
         {
             this.Rectangle = rectangle;
             Word = word;
         }
 
         public Rect Rectangle { get; private set; }
-        public IWord Word { get; private set; }
+        public Word Word { get; private set; }
 
         public LayoutItem Clone()
         {

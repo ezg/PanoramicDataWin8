@@ -1,0 +1,569 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="PanoramicDataWin8.model.data.operation.BaseVisualizationOperationModel" Collapsed="true">
+    <Position X="80.25" Y="6.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAIBgQAAAAAAgAAAFAAAAgCQABAgACDAAAAAAAAAAAA=</HashCode>
+      <FileName>model\BaseVisualizationOperationModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.AttributeGroupOperationModel" Collapsed="true">
+    <Position X="86" Y="3.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>IAAAIAAAACAAAAAUAAAAAAAAAAAQBAAAAAAAQAAAAAA=</HashCode>
+      <FileName>model\data\operation\AttributeGroupOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.CalculationOperationModel" Collapsed="true">
+    <Position X="76.75" Y="6.5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\data\operation\computational\CalculationOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.ComputationalOperationModel" Collapsed="true">
+    <Position X="77" Y="3.25" Width="1.5" />
+    <NestedTypes>
+      <Delegate Name="PanoramicDataWin8.model.data.operation.ComputationalOperationModel.CodeNameChangedHandler" Collapsed="true">
+        <TypeIdentifier>
+          <NewMemberFileName>model\data\operation\computational\ComputationalOperationModel.cs</NewMemberFileName>
+        </TypeIdentifier>
+      </Delegate>
+    </NestedTypes>
+    <TypeIdentifier>
+      <HashCode>AAAAAACAACAAABAEAAAIAAAAEAAAAAAABAAAAAAAAAw=</HashCode>
+      <FileName>model\data\operation\computational\ComputationalOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.DefinitionOperationModel" Collapsed="true">
+    <Position X="76.75" Y="4.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAQAAAAAAAIAEEAAAAAAAQAAAAAAAAAAAAAgAAAA=</HashCode>
+      <FileName>model\data\operation\computational\DefinitionOperationModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.FunctionOperationModel" Collapsed="true">
+    <Position X="76.75" Y="7.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAIAAAAgAEAAIgAAAAAAAAAAAAAAgAAAQAEAA=</HashCode>
+      <FileName>model\data\operation\computational\FunctionOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.MinMaxScaleFunctionModel" Collapsed="true">
+    <Position X="79.25" Y="7.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\data\operation\computational\FunctionOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.PipelineFunctionModel" Collapsed="true">
+    <Position X="81.25" Y="7.5" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>model\data\operation\computational\FunctionOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.PredictorOperationModel" Collapsed="true">
+    <Position X="76.75" Y="5" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>IAAQgAAAAAAIgAAAAAAAIgAAAAAAAAAAAAAAAAIAAAA=</HashCode>
+      <FileName>model\data\operation\computational\PredictorOperationModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.ExampleOperationModel" Collapsed="true">
+    <Position X="80.25" Y="5.5" Width="3" />
+    <TypeIdentifier>
+      <HashCode>ACAAgAAAACAAgAAEAgAAAgAAAAAAAAAAAIAAAAAAABA=</HashCode>
+      <FileName>model\data\operation\ExampleOperationModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.FilterLinkModel" Collapsed="true">
+    <Position X="87.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAQBAgAAQgAAAAAAAAIIAAAAAIIAAAAA=</HashCode>
+      <FileName>model\data\operation\FilterLinkModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.FilterOperationModel" Collapsed="true">
+    <Position X="89" Y="3.25" Width="2.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAgQAAACAAgAAABAAAAgCQABAgAACAAAAAAAAAAAA=</HashCode>
+      <FileName>model\data\operation\FilterOperationModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.GraphFilterOperationModel" Collapsed="true">
+    <Position X="80.25" Y="3.25" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAA=</HashCode>
+      <FileName>model\data\operation\GraphFilterOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.GraphOperationModel" Collapsed="true">
+    <Position X="83.25" Y="6.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAABAAACAAAAAAAQEAABAAAAAAAAkAAAAAAAAAAAA=</HashCode>
+      <FileName>model\data\operation\GraphOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.HistogramOperationModel" Collapsed="true">
+    <Position X="85.25" Y="6.25" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>QAAAACAEACAIAAQEAAEAEAAAAAAFAAAAAgAgAAAAAAA=</HashCode>
+      <FileName>model\data\operation\HistogramOperationModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.OperationModel" Collapsed="true">
+    <Position X="84.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACADAAACAAAAQCgIBAAAQQCIAAAIQAAIBAAEAEABg=</HashCode>
+      <FileName>model\data\operation\OperationModel.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.RawDataOperationModel" Collapsed="true">
+    <Position X="87.5" Y="6.25" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAgACEAAAAgBAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\data\operation\RawDataOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.StatisticalComparisonDecisionOperationModel" Collapsed="true">
+    <Position X="80.25" Y="4" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAgACAAAAAJAAAACAAAAAAAAAAAAAAAE=</HashCode>
+      <FileName>model\data\operation\StatisticalComparisonOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.StatisticalComparisonOperationModel" Collapsed="true">
+    <Position X="80.25" Y="4.75" Width="3" />
+    <TypeIdentifier>
+      <HashCode>AAQAAAAAACAABAAIACAAApAAAAIAAYAAACAAEACAAAA=</HashCode>
+      <FileName>model\data\operation\StatisticalComparisonOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.attribute.AttributeModel" Collapsed="true">
+    <Position X="62.25" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAAEQAAAAIAAAAAoAAwAAQAEgAAKYQAAAAAAAAEABA=</HashCode>
+      <FileName>model\data\attribute\AttributeModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.idea.IDEAAttributeModel" Collapsed="true">
+    <Position X="62.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAggAABQAAEAAAAJAAAAAAAACABIAQACAAAg=</HashCode>
+      <FileName>model\data\idea\IDEAAttributeModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.OperationTypeGroupModel" Collapsed="true">
+    <Position X="67" Y="3" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>model\data\OperationTypeGroupModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.OperationTypeModel" Collapsed="true">
+    <Position X="67.25" Y="2" Width="2.25" />
+    <TypeIdentifier>
+      <HashCode>CAgAIAAAAAAQgAAAFAQAAAQAAAAAgAAAAABAAQIAIBE=</HashCode>
+      <FileName>model\data\OperationTypeModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.data.operation.computational.AttributeOperationModel" Collapsed="true">
+    <Position X="76.75" Y="5.75" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAABA=</HashCode>
+      <FileName>model\data\operation\computational\AttributeOperationModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.AttachmentViewModel" Collapsed="true">
+    <Position X="64.25" Y="2" Width="2.5" />
+    <TypeIdentifier>
+      <HashCode>gAAUAgICAAAAAAAQCAQAgAAAAAAAAAoCAAJAAAAMAAA=</HashCode>
+      <FileName>model\view\AttachmentViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.AttributeMenuItemViewModel" Collapsed="true">
+    <Position X="50" Y="7.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIEACgIAAAEBAACAFACAAJACAgAAABgSAgAAA=</HashCode>
+      <FileName>model\view\AttributeMenuItemViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.AttributeViewModel" Collapsed="true">
+    <Position X="49.75" Y="2.75" Width="4" />
+    <TypeIdentifier>
+      <HashCode>gBIRAAgQgAECmBAAEtQAgAAAAAACBCAjAAhIGQNkMBA=</HashCode>
+      <FileName>model\view\AttributeViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.AttributeGroupViewModel" Collapsed="true">
+    <Position X="49.75" Y="3.5" Width="4" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAABA=</HashCode>
+      <FileName>model\view\AttributeViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.CreateLinkMenuItemViewModel" Collapsed="true">
+    <Position X="50" Y="8.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAQAAAAAAAAAA=</HashCode>
+      <FileName>model\view\CreateLinkMenuItemViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.FilterLinkViewModel" Collapsed="true">
+    <Position X="89.25" Y="1.75" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACABAAAAAAAQAAAAAAAAAAIAAAAAAAAACgA=</HashCode>
+      <FileName>model\view\FilterLinkViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.FunctionOperationMenuItemViewModel" Collapsed="true">
+    <Position X="50" Y="5.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAACIEAAgAAAAEBAACAFACAAJACAgAAABgSAgABA=</HashCode>
+      <FileName>model\view\FunctionOperationMenuItemViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.GraphFilterViewModel" Collapsed="true">
+    <Position X="72.25" Y="5.5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\GraphFilterViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.IncludeExludeMenuItemViewModel" Collapsed="true">
+    <Position X="50" Y="6.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAAAAAAAEAAAAAAAAAAAAAAABAAAAAAAEAAAAAA=</HashCode>
+      <FileName>model\view\IncludeExludeMenuItemViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.MenuItemComponentViewModel" Collapsed="true">
+    <Position X="49.5" Y="4.75" Width="4.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\MenuItemComponentViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.MenuItemViewModel" Collapsed="true">
+    <Position X="49.25" Y="2" Width="4.75" />
+    <TypeIdentifier>
+      <HashCode>ASDwAEGDEAAAgMAwwABg1EAQCCABAgAYBgQIgBYUAgA=</HashCode>
+      <FileName>model\view\MenuItemViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.MenuViewModel" Collapsed="true">
+    <Position X="60" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>hCACECAAEAAIAAQAAAAQAESAIBAKIGAEQBFAABAAAAA=</HashCode>
+      <FileName>model\view\MenuViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.PagingMenuItemViewModel" Collapsed="true">
+    <Position X="50" Y="8" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAACAAAAAAAAAAAAAAECAAAAAAgAAAAA=</HashCode>
+      <FileName>model\view\PagingMenuItemViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.RecommendedHistogramMenuItemViewModel" Collapsed="true">
+    <Position X="50" Y="9.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAASAAAAAAAAAIAAAABgAAAYAAIAACAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\RecommendedHistogramMenuItemViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.RecommenderMenuItemViewModel" Collapsed="true">
+    <Position X="50" Y="10.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAIAAAAACAAAIAAABAQAQAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\RecommenderMenuItemViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.RecommenderProgressMenuItemViewModel" Collapsed="true">
+    <Position X="50" Y="11" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAQAAAgAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\RecommenderMenuItemViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.SliderMenuItemComponentViewModel" Collapsed="true">
+    <Position X="50" Y="11.75" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAAEAABCAgAABAAAAAAAAAAgAAAAAAgACAAAUA=</HashCode>
+      <FileName>model\view\SliderMenuItemComponentViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.StatisticalComparisonMenuItemViewModel" Collapsed="true">
+    <Position X="50" Y="12.5" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAQEAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\StatisticalComparisonMenuItemViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.ToggleMenuItemComponentViewModel" Collapsed="true">
+    <Position X="50" Y="13.25" Width="3.25" />
+    <TypeIdentifier>
+      <HashCode>AAAQAAAAEKAAEAAAABACAAAABAAAABAAAAAEIAEAgAA=</HashCode>
+      <FileName>model\view\ToggleMenuItemComponentViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.AttributeGroupOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="12.25" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAACAAAAAAAAAAAAAAAAAAAAAACAAAAAAA=</HashCode>
+      <FileName>model\view\operation\AttributeGroupOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.AttributeOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="7.75" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAQAASAIAAAAAAAACAAAAgAAAAAAAAAAAIAEAA=</HashCode>
+      <FileName>model\view\operation\AttributeOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.CalculationOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="8.5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAQ=</HashCode>
+      <FileName>model\view\operation\CalculationOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.DefinitionOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="9.25" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\operation\DefinitionOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.ExampleOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="2.5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAASAgAAAAAAAAAAAAAAAAAAAAAAACAAAAAAE=</HashCode>
+      <FileName>model\view\operation\ExampleOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.FilterOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="3.25" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAgA=</HashCode>
+      <FileName>model\view\operation\FilterOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.FunctionOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="10" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAgABAAAAAAAACAAAAAAIAAAAAAAA=</HashCode>
+      <FileName>model\view\operation\FunctionOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.GraphOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="4" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\operation\GraphOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.HistogramOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="10.75" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAAAACAAAAQAAIAAABAAIAAAAARAAAAAAAAAGAA=</HashCode>
+      <FileName>model\view\operation\HistogramOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.LabeledOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="4.75" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAAACAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>model\view\operation\LabeledOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.OperationViewModel" Collapsed="true">
+    <Position X="71.5" Y="1.75" Width="5.25" />
+    <TypeIdentifier>
+      <HashCode>ACAAAAIIAyAIgQLmQAQBgAUZEASAAAKAAIAAgAJAAhA=</HashCode>
+      <FileName>model\view\operation\OperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.PredictorOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="11.5" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAgAAAAAAAQAAgAAAAAAAAAAAAgAACABACAIAAAEAAA=</HashCode>
+      <FileName>model\view\operation\PredictorOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.RawDataOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="6.25" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAiAACQAAAgAAAAQACAACAAAAAAAQAAAAAAAEAA=</HashCode>
+      <FileName>model\view\operation\RawDataOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.operation.RecommenderOperationViewModel" Collapsed="true">
+    <Position X="72.25" Y="7" Width="3.75" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\operation\RecommenderOperationViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.tilemenu.InputFieldViewTileMenuContentViewModel" Collapsed="true">
+    <Position X="55.75" Y="4.25" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\tilemenu\InputFieldViewTileMenuContentViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.tilemenu.InputGroupViewTileMenuContentViewModel" Collapsed="true">
+    <Position X="55.75" Y="5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAQAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\tilemenu\InputGroupViewTileMenuContentViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.tilemenu.OperationTypeGroupTileMenuContentViewModel" Collapsed="true">
+    <Position X="55.75" Y="5.75" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>model\view\tilemenu\OperationTypeGroupTileMenuContentViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.tilemenu.OperationTypeTileMenuContentViewModel" Collapsed="true">
+    <Position X="55.75" Y="6.5" Width="3.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAA=</HashCode>
+      <FileName>model\view\tilemenu\OperationTypeTileMenuContentViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.tilemenu.TileMenuContentViewModel" Collapsed="true">
+    <Position X="55.5" Y="3.25" Width="4.25" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>model\view\tilemenu\TileMenuContentViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.model.view.tilemenu.TileMenuItemViewModel" Collapsed="true">
+    <Position X="56" Y="2" Width="3" />
+    <TypeIdentifier>
+      <HashCode>BAAQAEEAQogIgIAAUCFUwQAYEAAAY4AQBgAAAAIBAAE=</HashCode>
+      <FileName>model\view\tilemenu\TileMenuItemViewModel.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.utils.ExtendedBindableBase" Collapsed="true">
+    <Position X="73" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>utils\ExtendedBindableBase.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.AttributeGroupRenderer" Collapsed="true">
+    <Position X="66.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEAAAAIEEAAAAAAAIAEAAAAAAAAAAAAQAAAA0AAgAA=</HashCode>
+      <FileName>view\vis\render\AttributeGroupRenderer.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.AttributeRenderer" Collapsed="true">
+    <Position X="66" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAAAAAQIEAAQAAAAEAAEAAAIAAAAAIAAQAgAA0AAgCA=</HashCode>
+      <FileName>view\vis\render\AttributeRenderer.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.CalculationRenderer" Collapsed="true">
+    <Position X="65.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ABAAAAAoAAAAEAQAAAAEAAAAAAAAAACAAAAAAwAAgAQ=</HashCode>
+      <FileName>view\vis\render\CalculationRenderer.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.DefinitionRenderer" Collapsed="true">
+    <Position X="65.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQoAAAQEAUAAAAEACAAAAAAAAUAAAAAAwEQgAA=</HashCode>
+      <FileName>view\vis\render\DefinitionRenderer.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.ExampleRenderer" Collapsed="true">
+    <Position X="66.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAIACAQEAAAEAAEEAAAAAEAAAAAAAAgAkAQiAA=</HashCode>
+      <FileName>view\vis\render\ExampleRenderer.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.FilterRenderer" Collapsed="true">
+    <Position X="66.75" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABBRBJMCASFAwFcQAEUAAAABAAAAAQAAAAAkAQiIA=</HashCode>
+      <FileName>view\vis\render\FilterRenderer.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.FunctionRenderer" Collapsed="true">
+    <Position X="66.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QgAAAACIECAAAAAgQAAEAAAAAgAAAAIAQAAAAwAAgAA=</HashCode>
+      <FileName>view\vis\render\FunctionRenderer.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.GraphFilter" Collapsed="true">
+    <Position X="66.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAgAAAAAAAAA=</HashCode>
+      <FileName>view\vis\render\GraphFilter.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.GraphRenderer" Collapsed="true">
+    <Position X="66.25" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ggAAAAAIAAAAACAACAAkgAAAAAAAAAAAACggEkAAgAA=</HashCode>
+      <FileName>view\vis\render\GraphRenderer.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.PlotRenderer" Collapsed="true">
+    <Position X="67" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CgAAAAAIACAQFAQAUAAEECQAABAAAAAAAAEgAkASiEA=</HashCode>
+      <FileName>view\vis\render\PlotRenderer.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.PredictorRenderer" Collapsed="true">
+    <Position X="66" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAIACAQlAAAEAAEEAAAAAAACCAAAAAgAsAQiAA=</HashCode>
+      <FileName>view\vis\render\PredictorRenderer.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.RawDataRenderer" Collapsed="true">
+    <Position X="65.5" Y="7.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IgAAQAAIACAQAAIAVBAEgEAIABAAAIBACAEgAkAQiCA=</HashCode>
+      <FileName>view\vis\render\RawDataRenderer.xaml.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" />
+  </Class>
+  <Class Name="PanoramicDataWin8.view.vis.render.Renderer" Collapsed="true">
+    <Position X="66.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAACAAEAQAAAAAEAAAAAAAAAAAAAAAAAAAgAA=</HashCode>
+      <FileName>view\vis\render\Renderer.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

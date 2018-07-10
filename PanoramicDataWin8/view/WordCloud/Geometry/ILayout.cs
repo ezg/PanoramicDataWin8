@@ -7,7 +7,7 @@ namespace Gma.CodeCloud.Controls.Geometry
 {
     public interface ILayout
     {
-        void Arrange(IEnumerable<IWord> words, IGraphicEngine graphicEngine);
+        void Arrange(IEnumerable<Word> words, IGraphicEngine graphicEngine);
         IEnumerable<LayoutItem> GetWordsInArea(Rect area);
     }
 }

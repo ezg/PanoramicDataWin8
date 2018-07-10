@@ -41,7 +41,7 @@ namespace NewControls
         public delegate void TermDragStartingHandler(string term, DragStartingEventArgs args);
         public event TermDragStartingHandler TermDragStarting;
 
-        private IEnumerable<IWord> m_Words;
+        private IEnumerable<Word> m_Words;
         readonly Color[] m_DefaultPalette = new[] { Colors.DarkRed, Colors.DarkBlue, Colors.DarkGreen, Colors.Navy, Colors.DarkCyan, Colors.DarkOrange, Colors.DarkGoldenrod, Colors.DarkKhaki, Colors.Blue, Colors.Red, Colors.Green };
         private Color[] m_Palette;
         private LayoutType m_LayoutType = LayoutType.Spiral;
@@ -88,7 +88,7 @@ namespace NewControls
                     var terms    = new StringExtractor(text); //  ComponentFactory.CreateExtractor(inputType, text, new NullProgressIndicator());
                     var stemmer  = ComponentFactory.CreateWordStemmer(m_wordStemmer);  
                     var words    = terms.Filter(blacklist).Filter(customBlacklist).CountOccurences();
-                    var weighted = words.GroupByStem(stemmer).SortByOccurences().Cast<IWord>();
+                    var weighted = words.GroupByStem(stemmer).SortByOccurences().Cast<Word>();
 #pragma warning disable CS4014
                     MainViewController.Instance.MainPage.Dispatcher.RunIdleAsync((args) => WeightedWords = weighted);
 #pragma warning disable CS4014
@@ -179,7 +179,7 @@ namespace NewControls
             }
         }
 
-        public IEnumerable<IWord> WeightedWords
+        public IEnumerable<Word> WeightedWords
         {
             get { return m_Words; }
             set

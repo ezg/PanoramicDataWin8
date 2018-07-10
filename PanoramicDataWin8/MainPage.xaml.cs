@@ -39,7 +39,6 @@ using PanoramicDataWin8.view.common;
 using PanoramicDataWin8.view.vis;
 using PanoramicDataWin8.view.vis.menu;
 using PanoramicDataWin8.view.vis.render;
-using PanoramicDataWin8.model.data.pipeline;
 using GraphSharp.Sample;
 using Windows.UI;
 using GraphSharp.Algorithms.Layout;
@@ -68,7 +67,6 @@ namespace PanoramicDataWin8
         public MainPage()
         {
             InitializeComponent();
-            Pipeline.testc();
             Loaded += MainPage_Loaded;
             DataContextChanged += MainPage_DataContextChanged;
             AddHandler(PointerPressedEvent, new PointerEventHandler(MainPage_PointerPressed), true);

@@ -190,8 +190,6 @@
     <Compile Include="model\data\idea\IDEAOriginModel.cs" />
     <Compile Include="model\data\idea\IDEASchemaModel.cs" />
     <Compile Include="model\data\operation\HistogramOperationModel.cs" />
-    <Compile Include="model\data\pipeline\pipeline.cs" />
-    <Compile Include="model\data\pipeline\primitive.cs" />
     <Compile Include="model\data\result\ClassfierResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultDescriptionModel.cs" />
     <Compile Include="model\data\result\ResultItemModel.cs" />
@@ -742,6 +740,7 @@
     <Content Include="Assets\G2.gml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <None Include="ClassDiagram1.cd" />
     <None Include="PanoramicDataWin8_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>

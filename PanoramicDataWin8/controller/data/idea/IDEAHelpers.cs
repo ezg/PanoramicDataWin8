@@ -246,8 +246,8 @@ namespace PanoramicDataWin8.controller.data.progressive
                 MetricType = MetricType.RSquared,
                 SampleStreamBlockSize = sampleSize,
                 FeatureAttributes = used,
-                NrOfBanditRuns = 100,
-                NrOfCrossValidations = 1,
+                //NrOfBanditRuns = 100,
+                //NrOfCrossValidations = 1,
                 AttributeCalculatedParameters = new List<AttributeCaclculatedParameters>()
             };
             
